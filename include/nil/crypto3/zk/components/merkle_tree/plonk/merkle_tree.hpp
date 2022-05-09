@@ -38,45 +38,24 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class merkle_tree;
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8>
-                class merkle_tree<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
+                         std::size_t W6, std::size_t W7, std::size_t W8>
+                class merkle_tree<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
+                                  W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    using sha256_component = sha256<ArithmetizationType, BlueprintFieldType,
-                                W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using sha256_component =
+                        sha256<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                 public:
-
                     constexpr static const std::size_t rows_amount = 1023 * sha256_component::rows_amount;
 
                     struct params_type {
@@ -96,87 +75,75 @@ namespace nil {
                     struct result_type {
                         std::array<var, 2> output = {var(0, 0, false), var(0, 0, false)};
 
-                        result_type(const std::size_t &component_start_row) {
+                        result_type(std::size_t component_start_row) {
                             std::array<var, 2> output = {var(W0, component_start_row + rows_amount - 1, false),
-                            var(W1, component_start_row + rows_amount - 1, false)};
+                                                         var(W1, component_start_row + rows_amount - 1, false)};
                         }
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
                         return bp.allocate_rows(rows_amount);
                     }
 
-                    static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        const params_type &params,
+                                                        allocated_data_type &allocated_data,
+                                                        std::size_t component_start_row) {
 
                         generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
                         return result_type(component_start_row);
                     }
 
-                    static result_type generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        std::array<var, 2048> data; 
+                        std::array<var, 2048> data;
                         for (std::size_t i = 0; i < 2048; i++) {
                             data[i] = params.data[i];
                         }
                         int k;
-                        for(std::size_t i = 11; i > -1; i-=2) {
+                        for (std::size_t i = 11; i > -1; i -= 2) {
                             k = 0;
-                            for (std::size_t j = 0; j < (1 << i); j +=4) {
+                            for (std::size_t j = 0; j < (1 << i); j += 4) {
                                 std::array<var, 4> sha_blocks = {data[j], data[j + 1], data[j + 2], data[j + 3]};
                                 typename sha256_component::params_type sha_params = {sha_blocks};
-                                auto sha_output = sha256_component::generate_assignments(assignment, 
-                                sha_params, row);
+                                auto sha_output = sha256_component::generate_assignments(assignment, sha_params, row);
                                 data[k] = sha_output.output[0];
                                 data[k + 1] = sha_output.output[0];
                             }
-                            k +=2;    
+                            k += 2;
                         }
                         return result_type(component_start_row);
                     }
 
                 private:
-
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               allocated_data_type &allocated_data,
+                                               std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        for(std::size_t i = 11; i > -1; i-=2) {
-                            for (std::size_t j = 0; j < (1 << i); j +=4) {
-                                sha256_component::generate_gates(bp, assignment,
-                                allocated_data, row);
-                            }
-                        }
-                        
-                    }
-
-                    static void generate_copy_constraints(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-                        std::size_t row = component_start_row;
-                        for(std::size_t i = 11; i > -1; i-=2) {
-                            for (std::size_t j = 0; j < (1 << i); j +=4) {
-                                sha256_component::generate_copy_constraints(bp, assignment,
-                                allocated_data, row);
+                        for (std::size_t i = 11; i > -1; i -= 2) {
+                            for (std::size_t j = 0; j < (1 << i); j += 4) {
+                                sha256_component::generate_gates(bp, assignment, allocated_data, row);
                             }
                         }
                     }
 
-                    
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                          const params_type &params,
+                                                          std::size_t component_start_row) {
+                        std::size_t row = component_start_row;
+                        for (std::size_t i = 11; i > -1; i -= 2) {
+                            for (std::size_t j = 0; j < (1 << i); j += 4) {
+                                sha256_component::generate_copy_constraints(bp, assignment, allocated_data, row);
+                            }
+                        }
+                    }
                 };
 
             }    // namespace components

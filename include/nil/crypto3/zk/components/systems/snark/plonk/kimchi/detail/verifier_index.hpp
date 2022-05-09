@@ -46,7 +46,7 @@ namespace nil {
                     using FieldType = typename CurveType::scalar_field_type;
                     using var = snark::plonk_variable<FieldType>;
 
-                    //nil::crypto3::math::evaluation_domain<Fr> domain;
+                    // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_poly_size;
                     std::size_t max_quot_size;
                     std::size_t alpha_powers;
@@ -60,9 +60,9 @@ namespace nil {
                     var domain_size;
                     Fr omega;
                     Fr domain_size_inv;
-                    //linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
-                    //Alphas<Fr> powers_of_alpha;
-                    //ArithmeticSpongeParams<Fr> fr_sponge_params;
+                    // linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
+                    // Alphas<Fr> powers_of_alpha;
+                    // ArithmeticSpongeParams<Fr> fr_sponge_params;
                 };
 
                 /*struct kimchi_verifier_index_base {

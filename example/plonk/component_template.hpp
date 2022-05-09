@@ -84,7 +84,7 @@ namespace nil {
 
                     struct result_type {
                         result_type(params_type &params,
-                            const std::size_t &component_start_row) {
+                            std::size_t component_start_row) {
 
                         }
                     };
@@ -109,7 +109,7 @@ namespace nil {
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                        std::size_t component_start_row) {
 
                         generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
@@ -121,7 +121,7 @@ namespace nil {
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type &params,
-                            const std::size_t &component_start_row) {
+                            std::size_t component_start_row) {
 
                         return result_type(params, component_start_row);
                     }
@@ -144,7 +144,7 @@ namespace nil {
                             blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
-                            const std::size_t &component_start_row){
+                            std::size_t component_start_row){
                                 5
                     }
                 };

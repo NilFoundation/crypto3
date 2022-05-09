@@ -38,9 +38,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, 
-                         typename CurveType, 
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class element_g1_tripling;
 
                 template<typename BlueprintFieldType,
@@ -54,27 +52,26 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7>
                 class element_g1_tripling<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7>
-                    : public component<BlueprintFieldType> {
+                                          CurveType,
+                                          W0,
+                                          W1,
+                                          W2,
+                                          W3,
+                                          W4,
+                                          W5,
+                                          W6,
+                                          W7> : public component<BlueprintFieldType> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     element_g1_doubling_plonk<arithmetization_type, CurveType, W0, W1, W2, W3, W6> doubling_component;
-                    element_g1_addition_plonk<arithmetization_type, CurveType, W0, W1, W2, W3, W4, W5, W7> addition_component;
-                public:
+                    element_g1_addition_plonk<arithmetization_type, CurveType, W0, W1, W2, W3, W4, W5, W7>
+                        addition_component;
 
+                public:
                     element_g1_tripling(blueprint_type &bp) :
-                        component<FieldType>(bp), doubling_component(bp), 
-                        addition_component(bp) {
+                        component<FieldType>(bp), doubling_component(bp), addition_component(bp) {
                     }
 
                     void generate_gates() {
@@ -86,8 +83,7 @@ namespace nil {
                         generate_assignments(P1, P1.doubled() + P1);
                     }
 
-                    void generate_assignments(typename CurveType::value_type &P1, 
-                                               typename CurveType::value_type &P2) {
+                    void generate_assignments(typename CurveType::value_type &P1, typename CurveType::value_type &P2) {
                         doubling_component.generate_assignments(P1, P1.doubled());
                         addition_component.generate_assignments(P1.doubled(), P1, P2);
                     }

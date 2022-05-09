@@ -42,107 +42,80 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class pickles_verifier_base_field;
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
+                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
+                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
                 class pickles_verifier_base_field<
-                    snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams>,
-                    CurveType,
-                    W0, W1, W2, W3, W4,
-                    W5, W6, W7, W8, W9,
-                    W10, W11, W12, W13, W14> {
+                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, W0, W1, W2,
+                    W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
-                    using endo_mul = curve_element_variable_base_endo_scalar_mul<ArithmetizationType, CurveType,
-                                W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using endo_mul =
+                        curve_element_variable_base_endo_scalar_mul<ArithmetizationType, CurveType, W0, W1, W2, W3, W4,
+                                                                    W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:
-
                     constexpr static const std::size_t rows_amount = 1 + endo_mul::rows_amount;
 
                     struct params_type {
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type base_point;
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type
+                            base_point;
                         typename CurveType::scalar_field_type::value_type challenge;
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
                         return bp.allocate_rows(rows_amount);
                     }
 
-                    static void generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    static void generate_circuit(blueprint<ArithmetizationType> &bp,
+                                                 blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                 const params_type &params,
+                                                 std::size_t component_start_row) {
 
                         generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
                     }
 
-                    static void generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    static void generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                     const params_type &params,
+                                                     std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         row++;
 
                         typename endo_mul::params_type mul_params = {params.base_point, params.challenge};
-                        endo_mul::generate_assignments(assignment, 
-                            mul_params, row);
+                        endo_mul::generate_assignments(assignment, mul_params, row);
                     }
 
-                    private:
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                private:
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         row++;
 
                         typename endo_mul::params_type mul_params = {};
-                        endo_mul::generate_gates(bp, assignment,
-                            mul_params, row);
+                        endo_mul::generate_gates(bp, assignment, mul_params, row);
                     }
 
-                    static void generate_copy_constraints(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
-                        
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                          const params_type &params,
+                                                          std::size_t component_start_row) {
+
                         std::size_t row = component_start_row;
                         row++;
 
                         typename endo_mul::params_type mul_params = {};
-                        endo_mul::generate_copy_constraints(bp, assignment,
-                            mul_params, row);
+                        endo_mul::generate_copy_constraints(bp, assignment, mul_params, row);
                     }
                 };
             }    // namespace components

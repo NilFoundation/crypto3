@@ -49,9 +49,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class oracles_base;
 
                 template<typename ArithmetizationParams,
@@ -74,31 +72,68 @@ namespace nil {
                 class oracles_base<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
                     CurveType,
-                    W0, W1, W2, W3,
-                    W4, W5, W6, W7,
-                    W8, W9, W10, W11,
-                    W12, W13, W14> {
+                    W0,
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8,
+                    W9,
+                    W10,
+                    W11,
+                    W12,
+                    W13,
+                    W14> {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType,
-                                                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType,
+                                                                              CurveType,
+                                                                              W0,
+                                                                              W1,
+                                                                              W2,
+                                                                              W3,
+                                                                              W4,
+                                                                              W5,
+                                                                              W6,
+                                                                              W7,
+                                                                              W8,
+                                                                              W9,
+                                                                              W10,
+                                                                              W11,
+                                                                              W12,
+                                                                              W13,
+                                                                              W14>;
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
                     using exponentiation_component = zk::components::exponentiation<ArithmetizationType,
-                                                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    
+                                                                                    W0,
+                                                                                    W1,
+                                                                                    W2,
+                                                                                    W3,
+                                                                                    W4,
+                                                                                    W5,
+                                                                                    W6,
+                                                                                    W7,
+                                                                                    W8,
+                                                                                    W9,
+                                                                                    W10,
+                                                                                    W11,
+                                                                                    W12,
+                                                                                    W13,
+                                                                                    W14>;
+
                     struct field_op_component {
-                        using mul = zk::components::multiplication<ArithmetizationType,
-                                                            W0, W1, W2>;
+                        using mul = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                         // TODO: change to add / sub
-                        using add = zk::components::multiplication<ArithmetizationType,
-                                                            W0, W1, W2>;
-                        using sub = zk::components::multiplication<ArithmetizationType,
-                                                            W0, W1, W2>;
+                        using add = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                        using sub = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     };
 
                 public:
@@ -110,11 +145,12 @@ namespace nil {
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
                         kimchi_proof_scalar<CurveType> proof;
                         typename BlueprintFieldType::value_type joint_combiner;
-                        typename BlueprintFieldType::value_type beta; // beta and gamma can be combined from limbs in the base circuit
+                        typename BlueprintFieldType::value_type
+                            beta;    // beta and gamma can be combined from limbs in the base circuit
                         typename BlueprintFieldType::value_type gamma;
                         typename BlueprintFieldType::value_type alpha;
                         typename BlueprintFieldType::value_type zeta;
-                        typename BlueprintFieldType::value_type fq_digest; // TODO overflow check
+                        typename BlueprintFieldType::value_type fq_digest;    // TODO overflow check
                     };
 
                     struct result_type {
@@ -141,17 +177,15 @@ namespace nil {
                         var zeta1;
                         var ft_eval0;
 
-
-                        result_type(const params_type &params,
-                            const std::size_t &component_start_row) {
+                        result_type(const params_type &params, std::size_t component_start_row) {
                         }
                     };
-                    
-                    static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         std::size_t component_start_row) {
 
                         generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
@@ -159,44 +193,43 @@ namespace nil {
                         return result_type(params, component_start_row);
                     }
 
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            const std::size_t &component_start_row) {
-                        
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
+
                         return result_type(params, component_start_row);
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment, 
-                            const params_type &params,
-                        const std::size_t &component_start_row = 0) {
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               std::size_t component_start_row = 0) {
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment, 
-                            const params_type &params,
-                            const std::size_t &component_start_row = 0){
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row = 0) {
 
                         std::size_t row = component_start_row;
 
-                        /*std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
+                        /*std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input),
                                 var(0, row + 1, false, var::column_type::public_input)};
-                        std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input), 
+                        std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input),
                                 var(0, row + 3, false, var::column_type::public_input)};
 
                         row += 4;
-                        
+
                         copy_constraints_from_limbs(bp, assignment, alpha_pub_limbs, row);
                         row++;
                         // copy endo-scalar
                         row += endo_scalar_component::rows_amount;
-                        
+
                         copy_constraints_from_limbs(bp, assignment, zeta_pub_limbs, row);
                         row++;
                         // copy endo-scalar
                         row += endo_scalar_component::rows_amount;*/
-                        
                     }
                 };
             }    // namespace components

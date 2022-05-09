@@ -61,25 +61,25 @@ namespace nil {
 
                     /**
                      * @warning If you just want to compute intermediate fields (\p rt and \p sn) it is sufficient to
-                     * instantiate encrypted_input_voting component and call \p generate_r1cs_witness, but if you want to check
-                     * satisfiability of the CS you have to call \p generate_r1cs_witness for \p rt and \p sn with
-                     * expected values before call \p is_satisfied for \p bp. This is due to using of the
+                     * instantiate encrypted_input_voting component and call \p generate_r1cs_witness, but if you want
+                     * to check satisfiability of the CS you have to call \p generate_r1cs_witness for \p rt and \p sn
+                     * with expected values before call \p is_satisfied for \p bp. This is due to using of the
                      * bit_vector_copy_component which is responsible for both logics: copying of the computed fields
                      * (\p rt and \p sn) and comparison of the computed and passed values. So, if you don't call \p
                      * generate_r1cs_witness for \p rt and \p sn satisfiability check will always be positive, i.e.
                      * false positive error happens. Another solution - instead of manual calling to the \p
-                     * generate_r1cs_witness for \p rt and \p sn just use encrypted_input_voting's \p generate_r1cs_witness accepting
-                     * additional parameters \p root and \p sn.
+                     * generate_r1cs_witness for \p rt and \p sn just use encrypted_input_voting's \p
+                     * generate_r1cs_witness accepting additional parameters \p root and \p sn.
                      */
                     encrypted_input_voting(blueprint<field_type> &bp,
-                          const block_variable<field_type> &m,
-                          const block_variable<field_type> &eid,
-                          const digest_variable<field_type> &sn,
-                          const digest_variable<field_type> &rt,
-                          const blueprint_linear_combination_vector<field_type> &address_bits,
-                          const merkle_proof_component &path,
-                          const block_variable<field_type> &sk,
-                          const blueprint_linear_combination<field_type> &read_successful) :
+                                           const block_variable<field_type> &m,
+                                           const block_variable<field_type> &eid,
+                                           const digest_variable<field_type> &sn,
+                                           const digest_variable<field_type> &rt,
+                                           const blueprint_linear_combination_vector<field_type> &address_bits,
+                                           const merkle_proof_component &path,
+                                           const block_variable<field_type> &sk,
+                                           const blueprint_linear_combination<field_type> &read_successful) :
                         component<field_type>(bp),
                         // private fields
                         sn_computed(bp, hash_component::digest_bits), pk(bp, hash_component::digest_bits),
