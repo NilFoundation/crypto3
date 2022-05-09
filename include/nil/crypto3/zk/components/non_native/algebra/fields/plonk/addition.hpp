@@ -115,10 +115,36 @@ namespace nil {
                         }
                     };
 
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index){
+
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+                        if (selector_iterator == assignment.selectors_end()){
+                            first_selector_index = assignment.allocate_selector(selector_seed,
+                                gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second; 
+                        }
+                        std::size_t j = start_row_index;
+                        assignment.enable_selector(first_selector_index, j);
+
+                        generate_copy_constraints(bp, assignment, params, j);
+
+                        typename non_native_range_component::params_type non_range_params_r = {var(W0, j + 1), var(W1, j + 1), var(W2, j + 1), var(W3, j + 1)};
+                        non_native_range_component::generate_circuit(bp, assignment, non_range_params_r, j + 1);
+
+
+                        return result_type(start_row_index);
+                    }
+
                     static result_type generate_assignments(
                         blueprint_assignment_table<ArithmetizationType>
                             &assignment,
-                        const params_type params,
+                        const params_type &params,
                         const std::size_t start_row_index){
                         std::size_t row = start_row_index;
                         typename Ed25519Type::base_field_type::integral_type base = 1;
@@ -195,31 +221,7 @@ namespace nil {
                         return result_type(start_row_index);
                     }
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type params,
-                        const std::size_t start_row_index){
-
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second; 
-                        }
-                        std::size_t j = start_row_index;
-                        assignment.enable_selector(first_selector_index, j);
-
-                        generate_copy_constraints(bp, assignment, params, j);
-
-                        typename non_native_range_component::params_type non_range_params_r = {var(W0, j + 1), var(W1, j + 1), var(W2, j + 1), var(W3, j + 1)};
-                        non_native_range_component::generate_circuit(bp, assignment, non_range_params_r, j + 1);
-
-
-                        return result_type(start_row_index);
-                    }
+                private:
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
