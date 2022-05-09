@@ -63,7 +63,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f01;
+                    constexpr static const std::size_t selector_seed = 0x0fc1;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
@@ -161,7 +161,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f01;
+                    constexpr static const std::size_t selector_seed = 0x0fc2;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
@@ -259,7 +259,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f01;
+                    constexpr static const std::size_t selector_seed = 0x0fc3;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
@@ -357,7 +357,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f01;
+                    constexpr static const std::size_t selector_seed = 0x0fc4;
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
