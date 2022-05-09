@@ -97,7 +97,7 @@ namespace nil {
 
                 public:
 
-                    constexpr static const std::size_t rows_amount = 4 + 2 * non_native_range_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 3 + 2 * non_native_range_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {

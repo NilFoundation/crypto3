@@ -148,7 +148,6 @@ namespace nil {
                         typename Ed25519Type::base_field_type::extended_integral_type integral_eddsa_q = (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_a.data)
                         + typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) / 
                         eddsa_p;
-                        std::cout<<"q = "<<integral_eddsa_q<<std::endl;
                         typename Ed25519Type::base_field_type::extended_integral_type pow = extended_base << 257;
                         typename Ed25519Type::base_field_type::extended_integral_type minus_eddsa_p =  pow - eddsa_p;
 
