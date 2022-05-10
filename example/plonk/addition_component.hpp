@@ -90,7 +90,7 @@ namespace nil {
                     // Addition Component doesn't calculate anything, so result_type contains nothing
                     struct result_type {
                         result_type(const params_type &params,
-                            const std::size_t &component_start_row) {
+                            std::size_t component_start_row) {
 
                         }
                     };
@@ -120,7 +120,7 @@ namespace nil {
                         blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                        std::size_t component_start_row) {
 
                         // generate_gates defines algebraic expressions over cells
                         // for instance, x + y = z or x * y * z - 25 = 0
@@ -135,7 +135,7 @@ namespace nil {
                             blueprint_assignment_table<ArithmetizationType>
                                 &assignment,
                             const params_type &params,
-                            const std::size_t &component_start_row) {
+                            std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         // variables keeps only data about cells in the table, not the value itself
@@ -184,7 +184,7 @@ namespace nil {
                             blueprint<ArithmetizationType> &bp,
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
-                            const std::size_t &component_start_row){
+                            std::size_t component_start_row){
                         // recall that params contains variables which refers to the cells in the table
                         // these cells can be allocated outside ot the component
                         // however generate_gates enforces contraint only on the rows of the component

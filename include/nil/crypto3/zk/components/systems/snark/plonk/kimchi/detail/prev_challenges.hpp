@@ -40,10 +40,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class prev_challenges_scalar;
 
                 template<typename ArithmetizationParams,
@@ -66,30 +64,38 @@ namespace nil {
                 class prev_challenges_scalar<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
                     CurveType,
-                    W0, W1, W2, W3,
-                    W4, W5, W6, W7,
-                    W8, W9, W10, W11,
-                    W12, W13, W14> {
+                    W0,
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8,
+                    W9,
+                    W10,
+                    W11,
+                    W12,
+                    W13,
+                    W14> {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                 public:
                     constexpr static const std::size_t required_rows_amount = 1;
 
-                    struct params_type {
-                        
-                    };
+                    struct params_type { };
 
-                    struct result_type
-                    {
+                    struct result_type {
                         var result = var(0, 0);
 
-                        result_type(const std::size_t &component_start_row) {
+                        result_type(std::size_t component_start_row) {
                             result = var(W2, static_cast<int>(component_start_row), false, var::column_type::witness);
                         }
                     };
@@ -103,18 +109,16 @@ namespace nil {
                         bool previously_allocated;
                         std::size_t selector_1;
                     };
-                    
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &in_bp){
+                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &in_bp) {
                         return in_bp.allocate_rows(required_rows_amount);
                     }
 
-                    static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        const params_type &params,
+                                                        allocated_data_type &allocated_data,
+                                                        std::size_t component_start_row) {
 
                         generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
@@ -122,13 +126,12 @@ namespace nil {
                         return result_type(component_start_row);
                     }
 
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        const params_type &params,
-                                        const std::size_t &component_start_row) {
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
-                        
+
                         /*
                         let polys: Vec<(PolyComm<G>, _)> = self
                             .prev_challenges
@@ -138,66 +141,67 @@ namespace nil {
                             .collect();
                         */
 
-                       /*
-                        pub fn prev_chal_evals(
-                            &self,
-                            index: &VerifierIndex<G>,
-                            evaluation_points: &[Fr<G>],
-                            powers_of_eval_points_for_chunks: &[Fr<G>],
-                        ) -> Vec<Vec<Vec<Fr<G>>>> {
-                            self.prev_challenges
-                                .iter()
-                                .map(|(chals, _poly)| {
-                                    // No need to check the correctness of poly explicitly. Its correctness is assured by the
-                                    // checking of the inner product argument.
-                                    let b_len = 1 << chals.len();
-                                    let mut b: Option<Vec<Fr<G>>> = None;
+                        /*
+                         pub fn prev_chal_evals(
+                             &self,
+                             index: &VerifierIndex<G>,
+                             evaluation_points: &[Fr<G>],
+                             powers_of_eval_points_for_chunks: &[Fr<G>],
+                         ) -> Vec<Vec<Vec<Fr<G>>>> {
+                             self.prev_challenges
+                                 .iter()
+                                 .map(|(chals, _poly)| {
+                                     // No need to check the correctness of poly explicitly. Its correctness is assured
+                         by the
+                                     // checking of the inner product argument.
+                                     let b_len = 1 << chals.len();
+                                     let mut b: Option<Vec<Fr<G>>> = None;
 
-                                    (0..2)
-                                        .map(|i| {
-                                            let full = b_poly(chals, evaluation_points[i]);
-                                            if index.max_poly_size == b_len {
-                                                return vec![full];
-                                            }
-                                            let mut betaacc = Fr::<G>::one();
-                                            let diff = (index.max_poly_size..b_len)
-                                                .map(|j| {
-                                                    let b_j = match &b {
-                                                        None => {
-                                                            let t = b_poly_coefficients(chals);
-                                                            let res = t[j];
-                                                            b = Some(t);
-                                                            res
-                                                        }
-                                                        Some(b) => b[j],
-                                                    };
+                                     (0..2)
+                                         .map(|i| {
+                                             let full = b_poly(chals, evaluation_points[i]);
+                                             if index.max_poly_size == b_len {
+                                                 return vec![full];
+                                             }
+                                             let mut betaacc = Fr::<G>::one();
+                                             let diff = (index.max_poly_size..b_len)
+                                                 .map(|j| {
+                                                     let b_j = match &b {
+                                                         None => {
+                                                             let t = b_poly_coefficients(chals);
+                                                             let res = t[j];
+                                                             b = Some(t);
+                                                             res
+                                                         }
+                                                         Some(b) => b[j],
+                                                     };
 
-                                                    let ret = betaacc * b_j;
-                                                    betaacc *= &evaluation_points[i];
-                                                    ret
-                                                })
-                                                .fold(Fr::<G>::zero(), |x, y| x + y);
-                                            vec![full - (diff * powers_of_eval_points_for_chunks[i]), diff]
-                                        })
-                                        .collect()
-                                })
-                                .collect()
-                        }
-                       */
+                                                     let ret = betaacc * b_j;
+                                                     betaacc *= &evaluation_points[i];
+                                                     ret
+                                                 })
+                                                 .fold(Fr::<G>::zero(), |x, y| x + y);
+                                             vec![full - (diff * powers_of_eval_points_for_chunks[i]), diff]
+                                         })
+                                         .collect()
+                                 })
+                                 .collect()
+                         }
+                        */
 
-                        std::cout<<"prev_challenges is not implemented"<<std::endl;
+                        std::cout << "prev_challenges is not implemented" << std::endl;
 
                         return result_type(params, component_start_row);
                     }
 
-                    private:
+                private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                                               blueprint_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               allocated_data_type &allocated_data,
+                                               std::size_t component_start_row) {
 
-                        const std::size_t &row = component_start_row;
+                        std::size_t row = component_start_row;
 
                         std::size_t selector_index_1;
                         if (!allocated_data.previously_allocated) {
@@ -211,19 +215,20 @@ namespace nil {
 
                         // TODO constraints
 
-                        bp.add_gate(selector_index_1, 
-                            {});
+                        bp.add_gate(selector_index_1, {});
                     }
-                    
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            const std::size_t &component_start_row = 0){
 
-                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, 
-                        {params.scalar_limbs_var[0].index, params.scalar_limbs_var[0].rotation, false, params.scalar_limbs_var[0].type}});
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, 
-                            {params.scalar_limbs_var[1].index, params.scalar_limbs_var[1].rotation, false, params.scalar_limbs_var[1].type}});
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                          const params_type &params,
+                                                          std::size_t component_start_row = 0) {
+
+                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false},
+                                                {params.scalar_limbs_var[0].index, params.scalar_limbs_var[0].rotation,
+                                                 false, params.scalar_limbs_var[0].type}});
+                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false},
+                                                {params.scalar_limbs_var[1].index, params.scalar_limbs_var[1].rotation,
+                                                 false, params.scalar_limbs_var[1].type}});
                     }
                 };
             }    // namespace components

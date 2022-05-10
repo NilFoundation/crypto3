@@ -42,10 +42,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class kimchi_transcript;
 
                 template<typename BlueprintFieldType,
@@ -66,16 +64,26 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class kimchi_transcript<
-                    snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams>,
-                    CurveType,
-                    W0, W1, W2, W3, W4,
-                    W5, W6, W7, W8, W9,
-                    W10, W11, W12, W13, W14>{
+                class kimchi_transcript<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                        CurveType,
+                                        W0,
+                                        W1,
+                                        W2,
+                                        W3,
+                                        W4,
+                                        W5,
+                                        W6,
+                                        W7,
+                                        W8,
+                                        W9,
+                                        W10,
+                                        W11,
+                                        W12,
+                                        W13,
+                                        W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
@@ -85,62 +93,50 @@ namespace nil {
                 public:
                     constexpr static const std::size_t rows_amount = 1;
 
-                    struct params_type {
-                        
-                    };
+                    struct params_type { };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp,
-                        std::size_t components_amount = 1) {
-                        return bp.allocate_rows(rows_amount *
-                            components_amount);
+                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp,
+                                                     std::size_t components_amount = 1) {
+                        return bp.allocate_rows(rows_amount * components_amount);
                     }
 
-                    void init_assignment(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t &component_start_row) {
-                        
+                    void init_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                         std::size_t &component_start_row) {
                     }
 
                     void init_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const var &zero,
-                        std::size_t &component_start_row) {
-                            
+                                      blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                      const var &zero,
+                                      std::size_t &component_start_row) {
                     }
 
-                    void absorb_assignment(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            var absorbing_value,
-                            std::size_t &component_start_row) {
-                        
+                    void absorb_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                           var absorbing_value,
+                                           std::size_t &component_start_row) {
                     }
 
-                    void absorb_evaluations_assignment(
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        var public_eval,
-                        kimchi_proof_evaluations<CurveType> private_eval,
-                        std::size_t &component_start_row) {
-
+                    void absorb_evaluations_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                       var public_eval,
+                                                       kimchi_proof_evaluations<CurveType>
+                                                           private_eval,
+                                                       std::size_t &component_start_row) {
                     }
 
                     void absorb_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const var &input,
-                        std::size_t &start_row_index) {
-                            
+                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                        const var &input,
+                                        std::size_t &start_row_index) {
                     }
 
-                    var challenge_assignment(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t &component_start_row) {
+                    var challenge_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                             std::size_t &component_start_row) {
                         component_start_row++;
                         return var(W0, component_start_row - 1);
                     }
 
                     void challenge_generate_constraints(blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const std::size_t &component_start_row) {
-                            
+                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        std::size_t component_start_row) {
                     }
                 };
             }    // namespace components

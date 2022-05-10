@@ -70,8 +70,9 @@ namespace nil {
                         all_vars.emplace_back(Y);
                     }
 
-                    element_g1(blueprint<scalar_field_type> &bp,
-                               const typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type &P) :
+                    element_g1(
+                        blueprint<scalar_field_type> &bp,
+                        const typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type &P) :
                         component<scalar_field_type>(bp) {
 
                         // typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type Pcopy =

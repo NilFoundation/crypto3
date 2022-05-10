@@ -68,8 +68,9 @@ namespace nil {
                         // will be filled in precompute_G1_component, so do nothing here
                     }
 
-                    g1_precomputation(blueprint<FieldType> &bp,
-                                      const typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type &P_val) {
+                    g1_precomputation(
+                        blueprint<FieldType> &bp,
+                        const typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type &P_val) {
                         typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type P_val_copy =
                             P_val.to_affine();
                         P.reset(new element_g1<CurveType>(bp, P_val_copy));
@@ -198,8 +199,9 @@ namespace nil {
 
                     g2_precomputation() {
                     }
-                    g2_precomputation(blueprint<FieldType> &bp,
-                                      const typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type &Q_val) {
+                    g2_precomputation(
+                        blueprint<FieldType> &bp,
+                        const typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type &Q_val) {
                         Q.reset(new element_g2<CurveType>(bp, Q_val));
                         const typename CurveType::pairing::pair_curve_type::pairing::affine_ate_g2_precomp
                             native_precomp =

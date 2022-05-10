@@ -38,11 +38,10 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                
+
                 template<typename CurveType>
                 struct kimchi_proof_evaluations {
                     kimchi_proof_evaluations() {
-                        
                     }
                 };
 

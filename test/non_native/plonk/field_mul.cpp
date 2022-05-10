@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "multiplication component : " << duration.count() << "ms" << std::endl;
+    std::cout << "multiplication_component: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
