@@ -235,10 +235,10 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> one_polynomial = {1};
 
                         math::polynomial<typename FieldType::value_type> V_L_shifted =
-                            math::polynomial_shift<FieldType>(V_L, domain->get_domain_element(1));
+                            math::polynomial_shift(V_L, domain->get_domain_element(1));
 
                         math::polynomial<typename FieldType::value_type> F_perm_input_poly_shifted =
-                            math::polynomial_shift<FieldType>(F_perm_input_poly, domain->get_domain_element(-1));
+                            math::polynomial_shift(F_perm_input_poly, domain->get_domain_element(-1));
 
                         F[0] = preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_L);
                         F[1] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *

@@ -133,7 +133,7 @@ namespace nil {
                                 }
 
                                 if (var.rotation != 0) {
-                                    assignment = math::polynomial_shift<FieldType>(assignment, domain->get_domain_element(var.rotation));
+                                    assignment = math::polynomial_shift(assignment, domain->get_domain_element(var.rotation));
                                 }
 
                                 term_value = term_value * assignment;
@@ -170,7 +170,7 @@ namespace nil {
                                 }
 
                                 if (var.rotation != 0) {
-                                    assignment = math::polynomial_shift<FieldType>(assignment, var.rotation);
+                                    assignment = math::polynomial_shift(assignment, var.rotation);
                                 }
 
                                 term_value = term_value * assignment;

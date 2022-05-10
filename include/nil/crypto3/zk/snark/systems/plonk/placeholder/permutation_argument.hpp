@@ -145,7 +145,7 @@ namespace nil {
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
                         math::polynomial_dfs<typename FieldType::value_type> V_P_shifted =
-                            math::polynomial_shift<FieldType>(V_P, 1);
+                            math::polynomial_shift(V_P, 1);
 
                         F[0] = math::polynomial<typename FieldType::value_type>(
                             (preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_P)).coefficients());
