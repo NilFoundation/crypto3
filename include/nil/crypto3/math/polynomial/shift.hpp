@@ -32,41 +32,39 @@
 namespace nil {
     namespace crypto3 {
         namespace math {
-            namespace polynomial {
-                template<typename FieldValueType>
-                static inline polynomial<FieldValueType>
-                    shift(const polynomial<FieldValueType> &f,
-                                     const FieldValueType &x) {
-                    polynomial<FieldValueType> f_shifted(f);
-                    FieldValueType x_power = x;
-                    for (int i = 1; i < f.size(); i++) {
-                        f_shifted[i] = f_shifted[i] * x_power;
-                        x_power *= x;
-                    }
-
-                    return f_shifted;
+            template<typename FieldValueType>
+            static inline polynomial<FieldValueType>
+                polynomial_shift(const polynomial<FieldValueType> &f,
+                                 const FieldValueType &x) {
+                polynomial<FieldValueType> f_shifted(f);
+                FieldValueType x_power = x;
+                for (int i = 1; i < f.size(); i++) {
+                    f_shifted[i] = f_shifted[i] * x_power;
+                    x_power *= x;
                 }
 
-                template<typename FieldValueType>
-                static inline polynomial_dfs<FieldValueType>
-                    shift(const polynomial_dfs<FieldValueType> &f,
-                                     const int shift,
-                                     std::size_t domain_size = 0) {
-                    if ((domain_size == 0) && (f.size() > 0)) {
-                        domain_size = f.size() - 1;
-                    }
+                return f_shifted;
+            }
 
-                    assert(domain_size <= f.size() - 1);
-
-                    polynomial_dfs<FieldValueType> f_shifted(f.degree(), f.size());
-
-                    for (std::size_t index = 0; index < f.size(); index++){
-                        f_shifted[index] = f[(domain_size + 1 + index*(shift + 1)) % (domain_size + 1)];
-                    }
-
-                    return f_shifted;
+            template<typename FieldValueType>
+            static inline polynomial_dfs<FieldValueType>
+                polynomial_shift(const polynomial_dfs<FieldValueType> &f,
+                                 const int shift,
+                                 std::size_t domain_size = 0) {
+                if ((domain_size == 0) && (f.size() > 0)) {
+                    domain_size = f.size() - 1;
                 }
-            }    // namespace polynomial
+
+                assert(domain_size <= f.size() - 1);
+
+                polynomial_dfs<FieldValueType> f_shifted(f.degree(), f.size());
+
+                for (std::size_t index = 0; index < f.size(); index++){
+                    f_shifted[index] = f[(domain_size + 1 + index + shift) % (domain_size + 1)];
+                }
+
+                return f_shifted;
+            }
         }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
