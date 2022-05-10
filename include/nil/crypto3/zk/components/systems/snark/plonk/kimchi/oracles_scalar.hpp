@@ -92,10 +92,11 @@ namespace nil {
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
                     using exponentiation_component = zk::components::exponentiation<ArithmetizationType, 60,
                                                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using mul_component = zk::components::multiplication<ArithmetizationType,
+                                                            W0, W1, W2>;
                     
                     struct field_op_component {
-                        using mul = zk::components::multiplication<ArithmetizationType,
-                                                            W0, W1, W2>;
+                        
                         // TODO: change to add / sub
                         using add = zk::components::multiplication<ArithmetizationType,
                                                             W0, W1, W2>;
@@ -135,10 +136,10 @@ namespace nil {
                             var x,
                             var y,
                             std::size_t &component_start_row) {
-                        typename field_op_component::mul::params_type params = {x, y};
-                        typename field_op_component::mul::result_type res = 
-                            field_op_component::mul::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += field_op_component::mul::rows_amount;
+                        typename mul_component::params_type params = {x, y};
+                        typename mul_component::result_type res = 
+                            mul_component::generate_assignments(assignment, params, component_start_row);
+                        component_start_row += mul_component::rows_amount;
                         return res.res;
                     }
 
@@ -355,12 +356,12 @@ namespace nil {
                             0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         std::size_t endo_num_bits = 128;
                         // alpha = phi(alpha_challenge)
-                        endo_scalar_component::generate_circuit(bp, assignment,
-                            {params.fq_output.alpha, endo_factor, endo_num_bits}, row);
+                        var alpha_endo = endo_scalar_component::generate_circuit(bp, assignment,
+                            {params.fq_output.alpha, endo_factor, endo_num_bits}, row).endo_scalar;
                         row += endo_scalar_component::rows_amount;
                         // zeta = phi(zeta_challenge)
-                        endo_scalar_component::generate_circuit(bp, assignment,
-                            {params.fq_output.zeta, endo_factor, endo_num_bits}, row);
+                        var zeta_endo = endo_scalar_component::generate_circuit(bp, assignment,
+                            {params.fq_output.zeta, endo_factor, endo_num_bits}, row).endo_scalar;
                         row += endo_scalar_component::rows_amount;
 
                         // fr_transcript.absorb(fq_digest)
@@ -377,6 +378,19 @@ namespace nil {
                             {params.fq_output.zeta, params.verifier_index.domain_size, zero, one}, row).result;
                         row += exponentiation_component::rows_amount;
 
+                        std::cout<<"row before:"<<row<<std::endl;
+                        //var zeta_omega = zk::components::generate_circuit<mul_component>(bp, assignment,
+                        //var zeta_omega = mul_component::generate_circuit(bp, assignment, 
+                        //    {params.fq_output.zeta, params.verifier_index.omega}, row).res;
+                        //row += mul_component::rows_amount;
+                        std::cout<<"row after:"<<row<<std::endl;
+
+                        var zeta_omega_pow_n = 
+                            exponentiation_component::generate_circuit(bp, assignment, 
+                            {params.fq_output.zeta, params.verifier_index.domain_size, zero, one}, row).result;
+                        row += exponentiation_component::rows_amount;
+                        //var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
+
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
                     }
@@ -389,7 +403,6 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         // copy public input
-                        var omega = assignment.allocate_public_input(params.verifier_index.omega);
                         var max_poly_size = assignment.allocate_public_input(params.verifier_index.max_poly_size);
                         std::vector<var> zkpm(params.verifier_index.zkpm.size());
                         for (std::size_t i = 0; i < zkpm.size(); i++) {
@@ -426,11 +439,12 @@ namespace nil {
                         var n = params.verifier_index.domain_size;
                         var zeta_pow_n = assignment_exponentiation(assignment, zeta, n, zero, one, row);
 
-                        var zeta_omega = assigment_multiplication(assignment, zeta, omega, row);
+                        var zeta_omega = assigment_multiplication(assignment, zeta, params.verifier_index.omega, row);
                         var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
 
                         std::vector<var> alpha_powers = assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
-                        std::vector<var> omega_powers = assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
+                        std::vector<var> omega_powers = assigment_element_powers(assignment, params.verifier_index.omega,
+                            params.verifier_index.public_input_size, row);
                         std::vector<var> lagrange_base = assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
 
                         // TODO: check on empty public_input
@@ -499,23 +513,6 @@ namespace nil {
                             const std::size_t &component_start_row = 0){
 
                         std::size_t row = component_start_row;
-
-                        /*std::array<var, 2> alpha_pub_limbs = {var(0, row, false, var::column_type::public_input), 
-                                var(0, row + 1, false, var::column_type::public_input)};
-                        std::array<var, 2> zeta_pub_limbs = {var(0, row + 2, false, var::column_type::public_input), 
-                                var(0, row + 3, false, var::column_type::public_input)};
-
-                        row += 4;
-                        
-                        copy_constraints_from_limbs(bp, assignment, alpha_pub_limbs, row);
-                        row++;
-                        // copy endo-scalar
-                        row += endo_scalar_component::rows_amount;
-                        
-                        copy_constraints_from_limbs(bp, assignment, zeta_pub_limbs, row);
-                        row++;
-                        // copy endo-scalar
-                        row += endo_scalar_component::rows_amount;*/
                         
                     }
                 };
