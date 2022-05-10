@@ -58,7 +58,7 @@ namespace nil {
                     Fr w;
                     Fr endo;
                     var domain_size;
-                    Fr omega;
+                    var omega;
                     Fr domain_size_inv;
                     //linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
                     //Alphas<Fr> powers_of_alpha;
