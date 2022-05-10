@@ -33,6 +33,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <algorithm>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -81,9 +82,9 @@ void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool
 }
 
 template<typename ProofIterator>
-void print_placeholder_proof(ProofIterator proof_begin, ProofIterator proof_end, bool endl) {
+void print_placeholder_proof(ProofIterator proof_begin, ProofIterator proof_end, bool endl, const char *name) {
     std::ofstream out;
-    out.open("placeholder_proof.txt");
+    out.open(name);
     print_hex_byteblob(out, proof_begin, proof_end, endl);
 }
 
@@ -364,11 +365,103 @@ void test_placeholder_proof_marshalling(const Proof &proof) {
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
 
+    print_placeholder_proof(cv.cbegin(), cv.cend(), false, "placeholder_proof.txt");
+
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     auto constructed_val_read = types::make_placeholder_proof<Proof, Endianness>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
+}
+
+template<typename Endianness, typename Proof>
+void test_placeholder_proof_marshalling_evm_optimized(const Proof &proof) {
+    using namespace nil::crypto3::marshalling;
+
+    using proof_marshalling_type = types::placeholder_proof_evm<nil::marshalling::field_type<Endianness>, Proof>;
+    auto filled_placeholder_proof = types::fill_placeholder_proof_evm<Proof, Endianness>(proof);
+    Proof _proof = types::make_placeholder_proof_evm<Proof, Endianness>(filled_placeholder_proof);
+    BOOST_CHECK(_proof == proof);
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_placeholder_proof.length(), 0x00);
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
+
+    print_placeholder_proof(cv.cbegin(), cv.cend(), false, "placeholder_proof_evm.txt");
+
+    proof_marshalling_type test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    auto constructed_val_read = types::make_placeholder_proof_evm<Proof, Endianness>(test_val_read);
+    BOOST_CHECK(proof == constructed_val_read);
+}
+
+template<typename FieldType, typename ArithmetizationParams, typename Hash, std::size_t Lambda, typename Proof,
+         typename FRIParams, typename CommonData>
+void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    using placeholder_params =
+        nil::crypto3::zk::snark::placeholder_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+
+    std::cout << "modulus = " << FieldType::modulus << std::endl;
+    std::cout << "fri_params.r = " << fri_params.r << std::endl;
+    std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
+    std::cout << "fri_params.q = ";
+    for (const auto &coeff : fri_params.q) {
+        std::cout << coeff.data << ", ";
+    }
+    std::cout << std::endl;
+    std::cout << "fri_params.D_omegas = ";
+    for (const auto &dom : fri_params.D) {
+        std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*dom).omega.data << ", ";
+    }
+    std::cout << std::endl;
+    std::cout << "lpc_params.lambda = " << placeholder_params::batched_commitment_params_type::lambda << std::endl;
+    std::cout << "lpc_params.m = " << placeholder_params::batched_commitment_params_type::m << std::endl;
+    std::cout << "lpc_params.r = " << placeholder_params::batched_commitment_params_type::r << std::endl;
+    std::cout << "common_data.rows_amount = " << common_data.rows_amount << std::endl;
+    std::cout << "common_data.omega = "
+              << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*common_data.basic_domain).omega.data
+              << std::endl;
+    std::cout << "columns_rotations (" << common_data.columns_rotations.size() << " number) = {" << std::endl;
+    for (const auto &column_rotations : common_data.columns_rotations) {
+        std::cout << "[";
+        for (auto rot : column_rotations) {
+            std::cout << int(rot) << ", ";
+        }
+        std::cout << "]," << std::endl;
+    }
+    std::cout << "}" << std::endl;
+
+    auto max_leaf_size_fri_proof = [](const auto &fri_proof) {
+        std::size_t max_leaf_size = 0;
+        for (const auto &round_proofs_i : fri_proof.round_proofs) {
+            max_leaf_size = std::max(max_leaf_size, round_proofs_i.y.size());
+        }
+        return max_leaf_size;
+    };
+    auto max_leaf_size_lpc_proof = [&max_leaf_size_fri_proof](const auto &lpc_proof) {
+        std::size_t max_leaf_size = 0;
+        for (const auto &fri_proofs_i : lpc_proof.fri_proof) {
+            max_leaf_size = std::max(max_leaf_size, max_leaf_size_fri_proof(fri_proofs_i));
+        }
+        return max_leaf_size;
+    };
+    std::cout << "batched_fri_verified_data_max_size = "
+              << (0x20 * std::max({
+                             max_leaf_size_lpc_proof(proof.eval_proof.witness),
+                             max_leaf_size_lpc_proof(proof.eval_proof.quotient),
+                             max_leaf_size_lpc_proof(proof.eval_proof.id_permutation),
+                             max_leaf_size_lpc_proof(proof.eval_proof.sigma_permutation),
+                             max_leaf_size_lpc_proof(proof.eval_proof.public_input),
+                             max_leaf_size_lpc_proof(proof.eval_proof.constant),
+                             max_leaf_size_lpc_proof(proof.eval_proof.selector),
+                             max_leaf_size_lpc_proof(proof.eval_proof.special_selectors),
+                         }))
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE(placeholder_marshalling_proof_test_suite)
@@ -390,13 +483,15 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    constexpr std::size_t Lambda = 40;
+    constexpr std::size_t Lambda = 5;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10>;
 
+    // auto P = curve_type::template g1_type<>::value_type::one().to_affine();
+    // auto Q = curve_type::template g1_type<>::value_type::one().to_affine();
     auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
     auto Q = algebra::random_element<curve_type::template g1_type<>>().to_affine();
 
@@ -408,15 +503,18 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {P.X, P.Y, Q.X, Q.Y};
 
-    auto result_check = [&expected_res](AssignmentType &assignment,
-                                        component_type::result_type &real_res) {
+    auto result_check = [&expected_res](AssignmentType &assignment, component_type::result_type &real_res) {
         assert(expected_res.X == assignment.var_value(real_res.X));
         assert(expected_res.Y == assignment.var_value(real_res.Y));
     };
 
-    auto proof = nil::crypto3::create_component_proof<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        params, public_input, result_check);
+    auto [proof, fri_params, public_preprocessed_data] =
+        nil::crypto3::create_component_proof<component_type, BlueprintFieldType, ArithmetizationParams, hash_type,
+                                             Lambda>(params, public_input, result_check);
+    print_test_data<BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(proof, fri_params,
+                                                                                  public_preprocessed_data.common_data);
     test_placeholder_proof_marshalling<Endianness>(proof);
+    test_placeholder_proof_marshalling_evm_optimized<Endianness>(proof);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
