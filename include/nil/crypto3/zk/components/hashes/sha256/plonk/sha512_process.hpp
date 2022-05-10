@@ -81,7 +81,7 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = 1248;
-                    constexpr static const std::size_t selector_seed = 0x0f00;
+                    constexpr static const std::size_t selector_seed = 0x0f10;
                     //        constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 2;
                     struct params_type {
@@ -89,22 +89,12 @@ namespace nil {
                         std::vector<var> input_words;
                     };
 
-                    struct allocated_data_type {
-                        allocated_data_type() {
-                            previously_allocated = false;
-                        }
-
-                        // TODO access modifiers
-                        bool previously_allocated;
-                        std::array<std::size_t, 73> selectors;
-                    };
-
                     struct result_type {
                         std::array<var, 8> output_state = {var(0, 0, false), var(0, 0, false), var(0, 0, false),
                                                            var(0, 0, false), var(0, 0, false), var(0, 0, false),
                                                            var(0, 0, false), var(0, 0, false)};
 
-                        result_type(std::size_t start_row_index) {
+                        result_type(const std::size_t &start_row_index) {
                             std::array<var, 8> output_state = {var(W0, start_row_index + rows_amount - 3, false),
                                                                var(W1, start_row_index + rows_amount - 3, false),
                                                                var(W2, start_row_index + rows_amount - 3, false),
@@ -123,7 +113,7 @@ namespace nil {
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                                                         blueprint_assignment_table<ArithmetizationType> &assignment,
                                                         const params_type &params,
-                                                        std::size_t start_row_index) {
+                                                        const std::size_t &start_row_index) {
 
                         std::size_t j = start_row_index;
                         j = j + 3;
@@ -138,7 +128,7 @@ namespace nil {
                         } else {
                             first_selector_index = selector_iterator->second;
                         }
-
+                        assignment.enable_selector(first_selector_index, j, j + 239, 5);
                         assignment.enable_selector(first_selector_index + 1, j, j + 237, 5);
                         j++;
                         assignment.enable_selector(first_selector_index + 2, j, j + 237, 5);
@@ -152,22 +142,22 @@ namespace nil {
                             assignment.enable_selector(first_selector_index + 5 + i - j, i);
                         }
                         j++;
-                        assignment.enable_selector(first_selector_index + 67, j, j + 507, 8);
                         assignment.enable_selector(first_selector_index + 68, j, j + 507, 8);
+                        assignment.enable_selector(first_selector_index + 69, j, j + 507, 8);
                         j++;
                         j++;
-                        assignment.enable_selector(first_selector_index + 69, j, j + 505, 8);
+                        assignment.enable_selector(first_selector_index + 70, j, j + 505, 8);
                         j = j + 8 * 63 + 2;
-                        assignment.enable_selector(first_selector_index + 70, j);
-                        j++;
                         assignment.enable_selector(first_selector_index + 71, j);
+                        j++;
+                        assignment.enable_selector(first_selector_index + 72, j);
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t start_row_index) {
+                                                            const std::size_t &start_row_index) {
                         std::size_t row = start_row_index;
                         std::array<typename ArithmetizationType::field_type::value_type, 8> input_state = {
                             assignment.var_value(params.input_state[0]), assignment.var_value(params.input_state[1]),
@@ -537,17 +527,10 @@ namespace nil {
 
                     static void generate_sigma1_gates(blueprint<ArithmetizationType> &bp,
                                                       blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                      std::size_t first_selector_index) {
+                                                      const std::size_t &first_selector_index) {
 
-                        //                        std::size_t j = start_row_index;
                         std::size_t selector_index = first_selector_index;
-                        //                        if (!allocated_data.previously_allocated) {
-                        //                            selector_index = assignment.add_selector(j, j + 239, 5);
-                        //                            allocated_data.selectors[0] = selector_index;
-                        //                        } else {
-                        //                            selector_index = allocated_data.selectors[0];
-                        //                            assignment.enable_selector(selector_index, j, j + 239, 5);
-                        //                        }
+
                         auto constraint_1 = bp.add_constraint(
                             var(W0, 1) - (var(W1, 1) + var(W2, 1) * (1 << 6) + var(W3, 1) * (1 << 19) +
                                           var(W4, 1) * (1 << 33) + var(W5, 1) * (1 << 47) + var(W6, 1) * (1 << 61)));
@@ -570,7 +553,7 @@ namespace nil {
                     static void
                         generate_message_scheduling_gates(blueprint<ArithmetizationType> &bp,
                                                           blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                          std::size_t first_selector_index) {
+                                                          const std::size_t &first_selector_index) {
                         generate_sigma0_gates(bp, assignment, first_selector_index);
                         std::size_t selector_index_1 = first_selector_index + 1;
 
@@ -579,12 +562,12 @@ namespace nil {
                                            var(W3, 0) * (1 << 7) + var(W4, 0) * (1 << 18) + var(W5, 0) +
                                            var(W6, 0) * (1 << 10) + var(W7, 0) * (1 << 17) + var(W8, 0) * (1 << 19))));
                         bp.add_gate(selector_index_1, {constraint_1});
-                        generate_sigma0_gates(bp, assignment, first_selector_index);
+                        generate_sigma1_gates(bp, assignment, first_selector_index);
                     }
 
                     static void generate_Sigma0_gates(blueprint<ArithmetizationType> &bp,
                                                       blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                      std::size_t first_selector_index) {
+                                                      const std::size_t &first_selector_index) {
                         std::size_t selector_index_70 = first_selector_index + 70;
 
                         auto constraint_1 = bp.add_constraint(
@@ -605,7 +588,7 @@ namespace nil {
 
                     static void generate_Sigma1_gates(blueprint<ArithmetizationType> &bp,
                                                       blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                      std::size_t first_selector_index) {
+                                                      const std::size_t &first_selector_index) {
                         std::size_t selector_index_3 = first_selector_index + 3;
 
                         auto constraint_1 =
@@ -626,7 +609,7 @@ namespace nil {
 
                     static void generate_Maj_gates(blueprint<ArithmetizationType> &bp,
                                                    blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                   std::size_t first_selector_index) {
+                                                   const std::size_t &first_selector_index) {
                         std::size_t selector_index_69 = first_selector_index + 69;
 
                         auto constraint_1 =
@@ -638,7 +621,7 @@ namespace nil {
 
                     static void generate_Ch_gates(blueprint<ArithmetizationType> &bp,
                                                   blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                  std::size_t first_selector_index) {
+                                                  const std::size_t &first_selector_index) {
                         std::size_t selector_index_4 = first_selector_index + 4;
 
                         typename ArithmetizationType::field_type::value_type base7_value = base7;
@@ -651,13 +634,13 @@ namespace nil {
 
                     static void generate_compression_gates(blueprint<ArithmetizationType> &bp,
                                                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                           std::size_t first_selector_index,
-                                                           std::size_t start_row_index) {
+                                                           const std::size_t &first_selector_index,
+                                                           const std::size_t &start_row_index) {
                         generate_Sigma1_gates(bp, assignment, first_selector_index);
                         generate_Ch_gates(bp, assignment, first_selector_index);
                         std::size_t selector_index_68 = first_selector_index + 68;
-                        std::size_t selector_out_index_1 = first_selector_index + 70;
-                        std::size_t selector_out_index_2 = first_selector_index + 71;
+                        std::size_t selector_out_index_1 = first_selector_index + 71;
+                        std::size_t selector_out_index_2 = first_selector_index + 72;
                         for (std::size_t i = start_row_index; i < 508; i = i + 8) {
 
                             auto constraint_1 = bp.add_constraint(
@@ -696,7 +679,7 @@ namespace nil {
 
                     static std::array<std::vector<uint64_t>, 2>
                         split_and_sparse(std::vector<bool> bits, std::vector<std::size_t> sizes, std::size_t base) {
-
+                        std::size_t size = sizes.size();
                         std::array<std::vector<uint64_t>, 2> res = {std::vector<uint64_t>(size),
                                                                     std::vector<uint64_t>(size)};
 
@@ -706,7 +689,7 @@ namespace nil {
                     static std::array<std::vector<typename CurveType::scalar_field_type::integral_type>, 2>
                         reversed_sparse_and_split(typename CurveType::scalar_field_type::integral_type sparse_value,
                                                   std::vector<std::size_t> sizes, std::size_t base) {
-
+                        std::size_t size = sizes.size();
                         std::array<std::vector<typename CurveType::scalar_field_type::integral_type>, 2> res = {
                             std::vector<typename CurveType::scalar_field_type::integral_type>(size),
                             std::vector<typename CurveType::scalar_field_type::integral_type>(size)};
@@ -716,7 +699,7 @@ namespace nil {
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                                                blueprint_assignment_table<ArithmetizationType> &assignment,
-                                               std::size_t first_selector_index) {
+                                               const std::size_t &first_selector_index) {
                         generate_message_scheduling_gates(bp, assignment, first_selector_index);
                         generate_compression_gates(bp, assignment, first_selector_index);
                     }
@@ -724,7 +707,7 @@ namespace nil {
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                           blueprint_assignment_table<ArithmetizationType> &assignment,
                                                           const params_type &params,
-                                                          std::size_t start_row_index) {
+                                                          const std::size_t &start_row_index) {
                     }
                 };
 
