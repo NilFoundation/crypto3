@@ -154,7 +154,6 @@ namespace nil {
                                (V_P_shifted * h - V_P * g)).coefficients());
                         F[2] = math::polynomial<typename FieldType::value_type>(
                             (preprocessed_data.q_last * (V_P * V_P - V_P)).coefficients());
-
                         prover_result_type res = {F, V_P_normal, V_P_tree};
 
                         return res;

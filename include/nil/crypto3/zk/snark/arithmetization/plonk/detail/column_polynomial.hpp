@@ -91,7 +91,7 @@ namespace nil {
                         column_polynomial_dfs(const plonk_column<FieldType> &column_assignment,
                                           const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
-                        std::size_t d = domain.size();
+                        std::size_t d = 0;
 
                         return nil::crypto3::math::polynomial_dfs<typename FieldType::value_type> (
                             d, column_assignment.begin(), column_assignment.end());

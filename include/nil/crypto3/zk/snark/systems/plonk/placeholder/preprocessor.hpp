@@ -125,7 +125,7 @@ namespace nil {
                         assert(number < domain->m);
 
                         math::polynomial_dfs<typename FieldType::value_type> f (
-                            0, domain->m + 1, FieldType::value_type::zero());
+                            0, domain->m, FieldType::value_type::zero());
                         
                         if (number < domain->m) {
                             f[number] = FieldType::value_type::one();
@@ -305,6 +305,7 @@ namespace nil {
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_id(permutation_size);
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
+                            std:
                             S_id[i].resize(table_size);
                             for (std::size_t j = 0; j < table_size; j++) {
                                 S_id[i][j] = delta.pow(i) * omega.pow(j);
@@ -322,7 +323,6 @@ namespace nil {
                                                 const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
 
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_perm(permutation_size);
-
                         for (std::size_t i = 0; i < permutation_size; i++) {
                             S_perm[i].resize(table_size);
                             for (std::size_t j = 0; j < table_size; j++) {
@@ -337,7 +337,6 @@ namespace nil {
                     static inline math::polynomial_dfs<typename FieldType::value_type>
                         selector_blind(std::size_t table_size, std::size_t usable_rows,
                                        const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
-
                         math::polynomial_dfs<typename FieldType::value_type> q_blind;
                         q_blind.resize(table_size);
 
@@ -351,7 +350,6 @@ namespace nil {
                     static inline math::polynomial_dfs<typename FieldType::value_type>
                         selector_last(std::size_t table_size, std::size_t usable_rows,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &domain) {
-
                         math::polynomial_dfs<typename FieldType::value_type> q_last;
                         q_last.resize(table_size);
                         
@@ -370,27 +368,77 @@ namespace nil {
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, 2> &q_last_q_blind,
                         const typename ParamsType::commitment_params_type &commitment_params) {
 
+                        std::vector<math::polynomial<typename FieldType::value_type>> id_perm_polys_normal(
+                            id_perm_polys.size());
+                        for (std::size_t polynom_index = 0; polynom_index < id_perm_polys.size(); polynom_index++){
+                            id_perm_polys_normal[polynom_index] =
+                                math::polynomial<typename FieldType::value_type>(
+                                    id_perm_polys[polynom_index].coefficients());
+                        }
+
                         typename runtime_size_commitment_scheme_type::precommitment_type id_permutation =
-                            runtime_size_commitment_scheme_type::precommit(id_perm_polys, commitment_params.D[0]);
+                            runtime_size_commitment_scheme_type::precommit(id_perm_polys_normal, commitment_params.D[0]);
+
+                        std::vector<math::polynomial<typename FieldType::value_type>> sigma_perm_polys_normal(
+                            sigma_perm_polys.size());
+                        for (std::size_t polynom_index = 0; polynom_index < sigma_perm_polys.size(); polynom_index++){
+                            sigma_perm_polys_normal[polynom_index] =
+                                math::polynomial<typename FieldType::value_type>(
+                                    sigma_perm_polys[polynom_index].coefficients());
+                        }
 
                         typename runtime_size_commitment_scheme_type::precommitment_type sigma_permutation =
-                            runtime_size_commitment_scheme_type::precommit(sigma_perm_polys, commitment_params.D[0]);
+                            runtime_size_commitment_scheme_type::precommit(sigma_perm_polys_normal, commitment_params.D[0]);
+
+                        std::array<math::polynomial<typename FieldType::value_type>, ParamsType::public_input_columns>
+                            public_inputs_normal;
+                        for (std::size_t polynom_index = 0;
+                            polynom_index < public_table.public_inputs().size(); polynom_index++){
+                            public_inputs_normal[polynom_index] =
+                                math::polynomial<typename FieldType::value_type>(
+                                    public_table.public_inputs()[polynom_index].coefficients());
+                        }
 
                         typename public_input_commitment_scheme_type::precommitment_type public_input_precommitment =
                             public_input_commitment_scheme_type::precommit(
-                                public_table.public_inputs(), commitment_params.D[0]);
+                                public_inputs_normal, commitment_params.D[0]);
+
+                        std::array<math::polynomial<typename FieldType::value_type>, ParamsType::constant_columns>
+                            constants_normal;
+                        for (std::size_t polynom_index = 0;
+                            polynom_index < public_table.constants().size(); polynom_index++){
+                            constants_normal[polynom_index] =
+                                math::polynomial<typename FieldType::value_type>(
+                                    public_table.constants()[polynom_index].coefficients());
+                        }
 
                         typename constant_commitment_scheme_type::precommitment_type constant_precommitment =
                             constant_commitment_scheme_type::precommit(
-                                public_table.constants(), commitment_params.D[0]);
+                                constants_normal, commitment_params.D[0]);
+
+                        std::array<math::polynomial<typename FieldType::value_type>, ParamsType::selector_columns>
+                            selectors_normal;
+                        for (std::size_t polynom_index = 0;
+                            polynom_index < public_table.selectors().size(); polynom_index++){
+                            selectors_normal[polynom_index] =
+                                math::polynomial<typename FieldType::value_type>(
+                                    public_table.selectors()[polynom_index].coefficients());
+                        }
 
                         typename selector_commitment_scheme_type::precommitment_type selector_precommitment =
                             selector_commitment_scheme_type::precommit(
-                                public_table.selectors(), commitment_params.D[0]);
+                                selectors_normal, commitment_params.D[0]);
+
+                        std::array<math::polynomial<typename FieldType::value_type>, 2> q_last_q_blind_normal;
+                        for (std::size_t polynom_index = 0; polynom_index < q_last_q_blind.size(); polynom_index++){
+                            q_last_q_blind_normal[polynom_index] =
+                                math::polynomial<typename FieldType::value_type>(
+                                    q_last_q_blind[polynom_index].coefficients());
+                        }
 
                         typename special_commitment_scheme_type::precommitment_type special_selector_precommitment =
                             special_commitment_scheme_type::precommit(
-                                q_last_q_blind, commitment_params.D[0]);
+                                q_last_q_blind_normal, commitment_params.D[0]);
 
                         return typename preprocessed_data_type::public_precommitments_type {
                             id_permutation,          sigma_permutation,       public_input_precommitment,
