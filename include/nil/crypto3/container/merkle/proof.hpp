@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 //  Copyright (c) 2020-2021 Nikita Kaskov <nemo@nil.foundation>
-//  Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+//  Copyright (c) 2021-2022 Aleksei Moskvin <alalmoskvin@gmail.com>
 //  Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -70,7 +70,7 @@ namespace nil {
 
                         typename std::vector<layer_type>::iterator v_itr = _path.begin();
                         std::size_t cur_leaf = leaf_idx;
-                        std::size_t row_len = tree.leafs();
+                        std::size_t row_len = tree.leaves();
                         std::size_t row_begin_idx = 0;
                         while (cur_leaf != tree.size() - 1) {    // while it's not _root
                             std::size_t cur_leaf_pos = cur_leaf % arity;
@@ -142,6 +142,9 @@ namespace nil {
 
                         value_type _hash;
                         std::size_t _position;
+
+                        template<typename, typename>
+                        friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
                     };
 
                     typedef std::array<path_element_type, Arity - 1> layer_type;
@@ -155,9 +158,16 @@ namespace nil {
                         return _path;
                     }
 
+                private:
                     std::size_t _li;
                     value_type _root;
                     path_type _path;
+
+                    template<typename, typename, std::size_t>
+                    friend class nil::crypto3::zk::components::merkle_proof;
+
+                    template<typename, typename>
+                    friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
                 };
             }    // namespace detail
 

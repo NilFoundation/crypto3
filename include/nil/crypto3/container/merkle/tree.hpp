@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Aleksei Moskvin <alalmoskvin@gmail.com>
+// Copyright (c) 2021-2022 Aleksei Moskvin <alalmoskvin@gmail.com>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -28,14 +28,12 @@
 #define CRYPTO3_MERKLE_TREE_HPP
 
 #include <vector>
-
-#include <boost/config.hpp>
+#include <cmath>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/type_traits.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
-
 #include <nil/crypto3/container/merkle/node.hpp>
 
 namespace nil {
@@ -175,70 +173,260 @@ namespace nil {
                     typedef typename node_type::value_type value_type;
                     constexpr static const std::size_t value_bits = node_type::value_bits;
 
-                public:
+                    typedef std::vector<value_type> container_type;
+
+                    typedef typename container_type::allocator_type allocator_type;
+                    typedef typename container_type::reference reference;
+                    typedef typename container_type::const_reference const_reference;
+                    typedef typename container_type::size_type size_type;
+                    typedef typename container_type::difference_type difference_type;
+                    typedef typename container_type::pointer pointer;
+                    typedef typename container_type::const_pointer const_pointer;
+                    typedef typename container_type::iterator iterator;
+                    typedef typename container_type::const_iterator const_iterator;
+                    typedef typename container_type::reverse_iterator reverse_iterator;
+                    typedef typename container_type::const_reverse_iterator const_reverse_iterator;
+
                     merkle_tree_impl() : _leaves(0), _size(0), _rc(0) {};
 
-                    template<typename LeafIterator>
-                    merkle_tree_impl(LeafIterator first, LeafIterator last) :
-                        _leaves(std::distance(first, last)), _size(detail::merkle_tree_length(_leaves, Arity)),
-                        _rc(detail::merkle_tree_row_count(_leaves, Arity)) {
+                    ~merkle_tree_impl() = default;
 
-                        BOOST_ASSERT_MSG(_leaves % Arity == 0, "Wrong leafs number");
-
-                        _hashes.reserve(_size);
-
-                        while (first != last) {
-                            _hashes.template emplace_back(crypto3::hash<hash_type>(*first++));
-                        }
-
-                        _hashes.resize(_size);
-
-                        std::size_t row_idx = _leaves, row_size = _leaves / Arity;
-                        typename std::vector<value_type>::iterator it = _hashes.begin();
-
-                        for (size_t row_number = 1; row_number < _rc; ++row_number) {
-                            for (size_t cur_element = row_idx; cur_element < row_idx + row_size; ++cur_element) {
-                                accumulator_set<hash_type> acc;
-                                for (size_t i = 0; i < Arity; ++i) {
-                                    crypto3::hash<hash_type>(*it++, acc);
-                                }
-                                _hashes[cur_element] = accumulators::extract::hash<hash_type>(acc);
-                            }
-                            row_idx += row_size;
-                            row_size /= Arity;
-                        }
+                    merkle_tree_impl(size_t n) :
+                        _size(detail::merkle_tree_length(n, Arity)), _leaves(n),
+                        _rc(detail::merkle_tree_row_count(n, Arity)) {
+                        BOOST_ASSERT_MSG(std::log(n) / std::log(Arity) ==
+                                             (std::size_t)(std::log(n) / std::log(Arity)),
+                                         "Wrong leaves number");
                     }
 
-                    value_type root() const {
+                    merkle_tree_impl(const merkle_tree_impl &x) :
+                        _hashes(x._hashes), _size(x._size), _leaves(x._leaves), _rc(x._rc) {
+                    }
+
+                    merkle_tree_impl(const merkle_tree_impl &x, const allocator_type &a) : _hashes(x.hashes(), a) {
+                        set_row_count(detail::merkle_tree_row_count(std::distance(x.begin(), x.end()), Arity));
+                        set_leaves(std::distance(x.begin(), x.end()));
+                        set_complete_size(detail::merkle_tree_length(std::distance(x.begin(), x.end()), Arity));
+                    }
+
+                    merkle_tree_impl(std::initializer_list<value_type> il) : _hashes(il) {
+                        set_row_count(detail::merkle_tree_row_count(std::distance(il.begin(), il.end()), Arity));
+                        set_leaves(std::distance(il.begin(), il.end()));
+                        set_complete_size(detail::merkle_tree_length(std::distance(il.begin(), il.end()), Arity));
+                    }
+
+                    merkle_tree_impl(std::initializer_list<value_type> il, const allocator_type &a) : _hashes(il, a) {
+                        set_row_count(detail::merkle_tree_row_count(std::distance(il.begin(), il.end()), Arity));
+                        set_leaves(std::distance(il.begin(), il.end()));
+                        set_complete_size(detail::merkle_tree_length(std::distance(il.begin(), il.end()), Arity));
+                    }
+
+                    merkle_tree_impl(merkle_tree_impl &&x)
+                        BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
+                        _hashes(x._hashes),
+                        _size(x._size), _leaves(x._leaves), _rc(x._rc) {
+                    }
+
+                    merkle_tree_impl(merkle_tree_impl &&x, const allocator_type &a) :
+                        _hashes(x.hashes(), a), _size(x._size), _leaves(x._leaves), _rc(x._rc) {
+                    }
+
+                    merkle_tree_impl &operator=(const merkle_tree_impl &x) {
+                        _hashes = x.hashes();
+                        return *this;
+                    }
+
+                    merkle_tree_impl &operator=(merkle_tree_impl &&x) {
+                        _hashes = x._hashes;
+                        _size = x._size;
+                        _leaves = x._leaves;
+                        _rc = x._rc;
+                        return *this;
+                    }
+
+                    bool operator==(const merkle_tree_impl &rhs) const {
+                        return _hashes == rhs.val;
+                    }
+                    bool operator!=(const merkle_tree_impl &rhs) const {
+                        return !(rhs == *this);
+                    }
+
+                    allocator_type get_allocator() const BOOST_NOEXCEPT {
+                        return this->val.__alloc();
+                    }
+
+                    iterator begin() BOOST_NOEXCEPT {
+                        return _hashes.begin();
+                    }
+
+                    const_iterator begin() const BOOST_NOEXCEPT {
+                        return _hashes.begin();
+                    }
+                    iterator end() BOOST_NOEXCEPT {
+                        return _hashes.end();
+                    }
+                    const_iterator end() const BOOST_NOEXCEPT {
+                        return _hashes.end();
+                    }
+
+                    reverse_iterator rbegin() BOOST_NOEXCEPT {
+                        return _hashes.rbegin();
+                    }
+
+                    const_reverse_iterator rbegin() const BOOST_NOEXCEPT {
+                        return _hashes.rbegin();
+                    }
+
+                    reverse_iterator rend() BOOST_NOEXCEPT {
+                        return reverse_iterator(begin());
+                    }
+
+                    const_reverse_iterator rend() const BOOST_NOEXCEPT {
+                        return const_reverse_iterator(begin());
+                    }
+
+                    const_iterator cbegin() const BOOST_NOEXCEPT {
+                        return begin();
+                    }
+
+                    const_iterator cend() const BOOST_NOEXCEPT {
+                        return end();
+                    }
+
+                    const_reverse_iterator crbegin() const BOOST_NOEXCEPT {
+                        return rbegin();
+                    }
+
+                    const_reverse_iterator crend() const BOOST_NOEXCEPT {
+                        return rend();
+                    }
+
+                    size_type size() const BOOST_NOEXCEPT {
+                        return _hashes.size();
+                    }
+
+                    size_type complete_size() const BOOST_NOEXCEPT {
+                        return _size;
+                    }
+
+                    size_type capacity() const BOOST_NOEXCEPT {
+                        return _hashes.capacity();
+                    }
+                    bool empty() const BOOST_NOEXCEPT {
+                        return (_hashes.size() == 0);
+                    }
+                    size_type max_size() const BOOST_NOEXCEPT {
+                        return _hashes.max_size();
+                    }
+                    void reserve(size_type _n) {
+                        return _hashes.reserve(_n);
+                    }
+                    void shrink_to_fit() BOOST_NOEXCEPT {
+                        return _hashes.shrink_to_fit();
+                    }
+
+                    reference operator[](size_type _n) BOOST_NOEXCEPT {
+                        return _hashes[_n];
+                    }
+                    const_reference operator[](size_type _n) const BOOST_NOEXCEPT {
+                        return _hashes[_n];
+                    }
+                    reference at(size_type _n) {
+                        return _hashes.at(_n);
+                    }
+                    const_reference at(size_type _n) const {
+                        return _hashes.at(_n);
+                    }
+
+                    reference front() BOOST_NOEXCEPT {
+                        return _hashes.front();
+                    }
+                    const_reference front() const BOOST_NOEXCEPT {
+                        return _hashes.front();
+                    }
+                    reference back() BOOST_NOEXCEPT {
+                        return _hashes.back();
+                    }
+                    const_reference back() const BOOST_NOEXCEPT {
+                        return _hashes.back();
+                    }
+
+                    value_type *hashes() BOOST_NOEXCEPT {
+                        return _hashes;
+                    }
+
+                    const value_type *hashes() const BOOST_NOEXCEPT {
+                        return _hashes;
+                    }
+
+                    //                    void push_back(const_reference _x) {
+                    //#error ERROR
+                    //                    }
+                    //
+                    //                    void push_back(value_type &&_x) {
+                    //#error ERROR
+                    //                    }
+                    //
+                    template<class... Args>
+                    reference emplace_back(Args &&..._args) {
+                        return _hashes.template emplace_back(_args...);
+                    }
+
+                    void pop_back() {
+                        _hashes.pop_back();
+                    }
+
+                    void clear() BOOST_NOEXCEPT {
+                        _hashes.clear();
+                    }
+
+                    void resize(size_type _sz) {
+                        return _hashes.resize(_sz);
+                    }
+
+                    void resize(size_type _sz, const_reference _x) {
+                        return _hashes.resize(_sz, _x);
+                    }
+
+                    void swap(merkle_tree_impl &other) {
+                        _hashes.swap(other.hashes());
+                        std::swap(_leaves, other.leaves());
+                        std::swap(_rc, other.rc());
+                        std::swap(_size, other.size());
+                    }
+
+                    value_type root() const BOOST_NOEXCEPT {
+                        BOOST_ASSERT_MSG(_size == _hashes.size(), "MerkleTree not fulfilled");
                         return _hashes[_size - 1];
                     }
 
-                    value_type root() {
+                    value_type root() BOOST_NOEXCEPT {
+                        BOOST_ASSERT_MSG(_size == _hashes.size(), "MerkleTree not fulfilled");
                         return _hashes[_size - 1];
-                    }
-
-                    value_type &operator[](std::size_t idx) {
-                        return _hashes[idx];
-                    }
-
-                    value_type operator[](std::size_t idx) const {
-                        return _hashes[idx];
                     }
 
                     size_t row_count() const {
                         return _rc;
                     }
 
-                    size_t size() const {
-                        return _size;
-                    }
-
-                    size_t leafs() const {
+                    size_t leaves() const {
                         return _leaves;
                     }
 
-                private:
-                    std::vector<value_type> _hashes;
+                    void set_leaves(size_t s) {
+                        _leaves = s;
+                    }
+
+                    void set_row_count(size_t s) {
+                        _rc = s;
+                    }
+
+                    void set_complete_size(size_t s) {
+                        _size = s;
+                    }
+
+                protected:
+                    container_type _hashes;
 
                     size_t _leaves;
                     size_t _size;
@@ -251,14 +439,65 @@ namespace nil {
                     // Internally, this code considers only the _rc.
                     size_t _rc;
                 };
+
+                template<typename T, typename LeafIterator>
+                typename T::digest_type generate_hash(LeafIterator first, LeafIterator last) {
+                    accumulator_set<T> acc;
+                    while (first != last) {
+                        crypto3::hash<T>(*first++, acc);
+                    }
+                    return accumulators::extract::hash<T>(acc);
+                }
+
+                template<typename T, std::size_t Arity, typename LeafIterator>
+                merkle_tree_impl<T, Arity> make_merkle_tree(LeafIterator first, LeafIterator last) {
+                    typedef T node_type;
+                    typedef typename node_type::hash_type hash_type;
+                    typedef typename node_type::value_type value_type;
+
+                    merkle_tree_impl<T, Arity> ret(std::distance(first, last));
+//                    ret.set_row_count(detail::merkle_tree_row_count(std::distance(first, last), Arity));
+//                    ret.set_leaves(std::distance(first, last));
+//                    ret.set_complete_size(detail::merkle_tree_length(std::distance(first, last), Arity));
+
+                    ret.reserve(ret.complete_size());
+
+                    while (first != last) {
+                        ret.emplace_back(crypto3::hash<hash_type>(*first++));
+                    }
+
+                    std::size_t row_idx = ret.leaves(), row_size = row_idx / Arity;
+                    typename merkle_tree_impl<T, Arity>::iterator it = ret.begin();
+
+                    for (size_t row_number = 1; row_number < ret.row_count(); ++row_number,
+                                row_size /= Arity) {
+                        for (size_t i = 0; i < row_size; ++i, it += Arity) {
+                            ret.emplace_back(generate_hash<hash_type>(it, it + Arity));
+                        }
+                    }
+
+                    for (auto &i: ret) {
+                        std::cout << i << std::endl;
+                    }
+                    return ret;
+                }
             }    // namespace detail
 
             template<typename T, std::size_t Arity>
             using merkle_tree = typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
                                                           detail::merkle_tree_impl<detail::merkle_tree_node<T>, Arity>,
                                                           detail::merkle_tree_impl<T, Arity>>::type;
+
+            template<typename T, std::size_t Arity, typename LeafIterator>
+            merkle_tree<T, Arity> make_merkle_tree(LeafIterator first, LeafIterator last) {
+                return detail::make_merkle_tree<typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
+                                                                          detail::merkle_tree_node<T>,
+                                                                          T>::type,
+                                                Arity>(first, last);
+            }
+
         }    // namespace containers
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_TREE_HPP
+#endif    // CRYPTO3_MERKLE_TREE_HPP
