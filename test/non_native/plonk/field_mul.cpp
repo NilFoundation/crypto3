@@ -79,11 +79,14 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
 
     typename component_type::params_type params = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {45524, 52353, 68769, 5431, 3724, 342453, 5425, 54222};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {376016163868176636, 11973383560386057583, 1233274974622282422, 110012775631545330,
+     376016163868176636, 11973383560386057583, 1233274974622282422, 110012775631545330};
     //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
 
     auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
+        component_type::result_type &real_res) { 
+           std::cout << "multiplication ress : " << assignment.var_value(real_res.output[0]).data << " " << assignment.var_value(real_res.output[1]).data << " "<<
+        assignment.var_value(real_res.output[2]).data << " "<< assignment.var_value(real_res.output[3]).data << " "<< std::endl; 
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);

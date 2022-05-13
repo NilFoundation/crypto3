@@ -107,7 +107,7 @@ namespace nil {
                         std::array<var, 4> output;
 
                         result_type(const std::size_t &component_start_row) {
-                            std::array<var, 4> output = {var(W0, component_start_row + 1, false), 
+                            output = {var(W0, component_start_row + 1, false), 
                             var(W1, component_start_row +1, false), var(W2, component_start_row + 1, false), 
                             var(W3, component_start_row + 1, false)};
                         }

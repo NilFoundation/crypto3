@@ -109,7 +109,7 @@ namespace nil {
                         std::array<var, 4> output;
 
                         result_type(const std::size_t &component_start_row) {
-                            std::array<var, 4> output = {var(W3, component_start_row + rows_amount - 2, false), 
+                            output = {var(W3, component_start_row + rows_amount - 2, false), 
                             var(W4, component_start_row + rows_amount - 2, false), var(W5, component_start_row + rows_amount - 2, false), 
                             var(W6, component_start_row + rows_amount - 2, false)};
                         }
@@ -215,9 +215,13 @@ namespace nil {
 
                         typename CurveType::base_field_type::value_type u1 = t[2] - r[2] + t[3]*(pasta_base<<66)
                         - r[3]*(pasta_base<<66) + typename CurveType::base_field_type::value_type(u0_integral); 
+                        std::cout<<"true u1 = "<<u1.data<<std::endl;
 
-                        typename CurveType::base_field_type::integral_type u1_integral = typename CurveType::base_field_type::integral_type(u1.data) >> 132;
+                        typename CurveType::base_field_type::integral_type u1_integral = typename CurveType::base_field_type::integral_type(u1.data) >> 125;
                         std::array<typename CurveType::base_field_type::value_type, 4> u1_chunks;
+                        typename CurveType::base_field_type::value_type false_u1 = u1_integral *(pasta_base<<125);
+
+                        std::cout<<"false u1 = "<<false_u1.data<<std::endl;
 
                         u1_chunks[0] = u1_integral & ((1 << 22) - 1);
                         u1_chunks[1] = (u1_integral >> 22) & ((1 << 22) - 1);
@@ -293,7 +297,7 @@ namespace nil {
                         auto constraint_1 = bp.add_constraint(
                             var(W7, 0) * (base << 132) - (t[0] - var(W3, 0) + t[1]*(base<<66)
                         - var(W4, 0)*(base<<66)));
-                        auto constraint_2 = bp.add_constraint(var(W8, 0) * (base<< 132) - 
+                        auto constraint_2 = bp.add_constraint(var(W8, 0) * (base<< 125) - 
                         (t[2] - var(W5, 0) + t[3]*(base<<66)
                         - var(W6, 0)*(base<<66) + var(W7, 0)));
                         auto constraint_3 = bp.add_constraint(var(W7, 0) - (var(W0, +1) + var(W1, +1) * (1 << 22) + var(W2, +1) *(base<< 44) +
@@ -308,7 +312,7 @@ namespace nil {
                         (var(W3, 0) + var(W4, 0) * (base << 66) + var(W5, 0)*(base<< 132) + var(W6, 0) * (base << 198)) ));
 
                         bp.add_gate(first_selector_index, 
-                            { constraint_1, constraint_3, constraint_5, constraint_2, constraint_4
+                            { constraint_1, constraint_2, constraint_3, constraint_4, constraint_5
                             
                         }); 
                     }
