@@ -35,15 +35,12 @@
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/addition.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/subtraction.hpp>
 
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                          typename Ed25519Type,
+                template<typename ArithmetizationType, typename CurveType, typename Ed25519Type,
                          std::size_t... WireIndexes>
                 class variable_base_multiplication_per_bit;
 
@@ -90,13 +87,11 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     constexpr static const std::size_t selector_seed = 0xff82;
-                    
 
                 public:
-
-                    constexpr static const std::size_t rows_amount = 2 * non_native_range_component::rows_amount + 
-                    16 * multiplication_component::rows_amount + 6 * addition_component::rows_amount +
-                    3 * subtraction_component::rows_amount;
+                    constexpr static const std::size_t rows_amount =
+                        2 * non_native_range_component::rows_amount + 16 * multiplication_component::rows_amount +
+                        6 * addition_component::rows_amount + 3 * subtraction_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 2;
 
@@ -105,7 +100,7 @@ namespace nil {
                             std::array<var, 4> x;
                             std::array<var, 4> y;
                         };
-                        
+
                         var_ec_point T;
                         var_ec_point R;
                         var k;
@@ -114,17 +109,15 @@ namespace nil {
                     struct result_type {
                         std::array<var, 2> output = {var(0, 0, false), var(0, 0, false)};
 
-                        result_type(const std::size_t &component_start_row) {
+                        result_type(std::size_t component_start_row) {
                             std::array<var, 2> output = {var(W0, component_start_row + rows_amount - 1, false),
-                            var(W1, component_start_row + rows_amount - 1, false)};
+                                                         var(W1, component_start_row + rows_amount - 1, false)};
                         }
                     };
 
-                    static result_type generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         typename Ed25519Type::base_field_type::integral_type base = 1;
                         typename Ed25519Type::base_field_type::integral_type b = typename Ed25519Type::base_field_type::integral_type(assignment.var_value(params.k).data);
@@ -350,12 +343,11 @@ namespace nil {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
                             generate_gates(bp, assignment, params, first_selector_index);
                         } else {
-                            first_selector_index = selector_iterator->second; 
+                            first_selector_index = selector_iterator->second;
                         }
                         std::size_t row = start_row_index;
                         std::array<var, 4>  P_x = {var(W0, row), var(W1, row), var(W2, row), var(W3, row)};
@@ -401,14 +393,16 @@ namespace nil {
                         auto t3 = multiplication_component::generate_circuit(bp, assignment, typename multiplication_component::params_type({s3, R_x}), row);
                         row+=multiplication_component::rows_amount;
 
-                        std::array<var, 4> two_var_array = {var(0, 0, false, var::column_type::constant), var(0, 1, false, var::column_type::constant),
-                        var(0, 2, false, var::column_type::constant), var(0, 3, false, var::column_type::constant)};
+                        std::array<var, 4> two_var_array = {
+                            var(0, 0, false, var::column_type::constant), var(0, 1, false, var::column_type::constant),
+                            var(0, 2, false, var::column_type::constant), var(0, 3, false, var::column_type::constant)};
 
                         auto t4 = multiplication_component::generate_circuit(bp, assignment, typename multiplication_component::params_type({s2.output, two_var_array}), row);
                         row+=multiplication_component::rows_amount;
 
-                        std::array<var, 4> d_var_array = {var(0, 4, false, var::column_type::constant), var(0, 5, false, var::column_type::constant),
-                        var(0, 6, false, var::column_type::constant), var(0, 7, false, var::column_type::constant)};
+                        std::array<var, 4> d_var_array = {
+                            var(0, 4, false, var::column_type::constant), var(0, 5, false, var::column_type::constant),
+                            var(0, 6, false, var::column_type::constant), var(0, 7, false, var::column_type::constant)};
 
                         auto t5 = multiplication_component::generate_circuit(bp, assignment, typename multiplication_component::params_type({t4.output, d_var_array}), row);
                         row+=multiplication_component::rows_amount;
@@ -428,8 +422,7 @@ namespace nil {
                         auto r0 = multiplication_component::generate_circuit(bp, assignment, typename multiplication_component::params_type({l0.output, t4.output}), row);
                         row+=multiplication_component::rows_amount;
 
-                        std::array<var, 4> b_var_array = {var(1, row), var(2, row),
-                        var(3, row), var(4, row)};
+                        std::array<var, 4> b_var_array = {var(1, row), var(2, row), var(3, row), var(4, row)};
                         assignment.enable_selector(first_selector_index + 1, row);
                         row++;
 
@@ -469,8 +462,11 @@ namespace nil {
                         auto z3 = addition_component::generate_circuit(bp, assignment, typename addition_component::params_type({z1.output, z2.output}), row);
                         row+=addition_component::rows_amount;
 
-                        //generate_copy_constraints(bp, assignment, params, j);
+                        auto z3 = addition_component::generate_circuit(
+                            bp, assigment, addition_component::params_type(z1.output, z2.output), row);
+                        row += addition_component::rows_amount;
 
+                        // generate_copy_constraints(bp, assignment, params, j);
 
                         return result_type(start_row_index);
                     }
@@ -505,17 +501,12 @@ namespace nil {
                         
                     }
 
-                    static void generate_copy_constraints(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                          const params_type &params,
+                                                          std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        
-                        
                     }
-
-                    
                 };
 
             }    // namespace components

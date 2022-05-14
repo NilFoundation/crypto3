@@ -41,9 +41,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class curve_element_unified_addition;
 
                 template<typename BlueprintFieldType,
@@ -61,15 +59,22 @@ namespace nil {
                          std::size_t W9,
                          std::size_t W10>
                 class curve_element_unified_addition<
-                    snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams>,
+                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     CurveType,
-                    W0, W1, W2, W3, W4,
-                    W5, W6, W7, W8, W9,
-                    W10>{
+                    W0,
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8,
+                    W9,
+                    W10> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
@@ -77,19 +82,19 @@ namespace nil {
 
                     template<typename ComponentType, typename ArithmetizationType>
                     friend typename std::enable_if<
-                        (!(has_static_member_function_generate_circuit<ComponentType,
-                                typename ComponentType::result_type,
+                        (!(has_static_member_function_generate_circuit<
+                            ComponentType,
+                            typename ComponentType::result_type,
                             boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                blueprint_public_assignment_table<ArithmetizationType> &,
-                                const typename ComponentType::params_type &,
-                                const std::size_t>>::value)),
-                            typename ComponentType::result_type>::type
-                        generate_circuit(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const typename ComponentType::params_type &params,
-                            const std::size_t start_row_index);
-                    
+                                               blueprint_public_assignment_table<ArithmetizationType> &,
+                                               const typename ComponentType::params_type &,
+                                               const std::size_t>>::value)),
+                        typename ComponentType::result_type>::type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const typename ComponentType::params_type &params,
+                                         const std::size_t start_row_index);
+
                 public:
                     constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 1;
@@ -99,7 +104,7 @@ namespace nil {
                             var x = var(0, 0, false);
                             var y = var(0, 0, false);
                         };
-                        
+
                         var_ec_point P;
                         var_ec_point Q;
                     };
@@ -115,14 +120,13 @@ namespace nil {
                             Y = var(W5, start_row_index, false, var::column_type::witness);
                         }
 
-                        result_type() {}
+                        result_type() {
+                        }
                     };
 
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType>
-                                &assignment,
-                            const params_type params,
-                            const std::size_t start_row_index){
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type params,
+                                                            const std::size_t start_row_index) {
 
                         const std::size_t j = start_row_index;
 
@@ -130,17 +134,17 @@ namespace nil {
 
                         typename BlueprintFieldType::value_type p_x = assignment.var_value(params.P.x);
                         typename BlueprintFieldType::value_type p_y = assignment.var_value(params.P.y);
-                        typename CurveType::template 
-                            g1_type<algebra::curves::coordinates::affine>::value_type P(p_x, p_y);
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type P(p_x,
+                                                                                                                 p_y);
 
                         typename BlueprintFieldType::value_type q_x = assignment.var_value(params.Q.x);
-                        typename BlueprintFieldType::value_type q_y = assignment.var_value(params.Q.y);  
-                        typename CurveType::template 
-                            g1_type<algebra::curves::coordinates::affine>::value_type Q(q_x, q_y);
+                        typename BlueprintFieldType::value_type q_y = assignment.var_value(params.Q.y);
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q(q_x,
+                                                                                                                 q_y);
 
-                        const typename CurveType::template
-                            g1_type<algebra::curves::coordinates::affine>::value_type R = P + Q;
-                        
+                        const typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type R =
+                            P + Q;
+
                         assignment.witness(W0)[j] = P.X;
                         assignment.witness(W1)[j] = P.Y;
                         assignment.witness(W2)[j] = Q.X;
@@ -150,9 +154,9 @@ namespace nil {
 
                         assignment.witness(W6)[j] = 0;
 
-                        if (P.X != Q.X){
+                        if (P.X != Q.X) {
                             assignment.witness(W7)[j] = 0;
-                            assignment.witness(W8)[j] = (P.Y - Q.Y)/(P.X - Q.X);
+                            assignment.witness(W8)[j] = (P.Y - Q.Y) / (P.X - Q.X);
 
                             assignment.witness(W9)[j] = 0;
 
@@ -160,15 +164,15 @@ namespace nil {
                         } else {
                             assignment.witness(W7)[j] = 1;
 
-                            if (P.Y != Q.Y) { 
+                            if (P.Y != Q.Y) {
                                 assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
-                            } else { // doubling
+                            } else {    // doubling
                                 if (P.Y != 0) {
-                                    assignment.witness(W8)[j] = (3 * (P.X * P.X))/(2 * P.Y);
+                                    assignment.witness(W8)[j] = (3 * (P.X * P.X)) / (2 * P.Y);
                                 } else {
                                     assignment.witness(W8)[j] = 0;
                                 }
-                                
+
                                 assignment.witness(W9)[j] = 0;
                             }
 
@@ -177,47 +181,37 @@ namespace nil {
 
                         return result_type(params, start_row_index);
                     }
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment, 
-                        const params_type params,
-                        const std::size_t first_selector_index) {
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type params,
+                                               const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint(
-                            var(W7, 0) * (var(W2, 0) - var(W0, 0)));
-                        auto constraint_2 = bp.add_constraint(
-                            (var(W2, 0) - var(W0, 0)) * var(W10, 0) - 
-                            (1 - var(W7, 0)));
+                        auto constraint_1 = bp.add_constraint(var(W7, 0) * (var(W2, 0) - var(W0, 0)));
+                        auto constraint_2 =
+                            bp.add_constraint((var(W2, 0) - var(W0, 0)) * var(W10, 0) - (1 - var(W7, 0)));
                         auto constraint_3 = bp.add_constraint(
-                            var(W7, 0) * (2*var(W8, 0) * var(W1, 0) - 
-                            3*(var(W0, 0) * var(W0, 0))) + (1 - var(W7, 0)) * 
-                            ((var(W2, 0) - var(W0, 0)) * var(W8, 0) - 
-                            (var(W3, 0) - var(W1, 0))));
-                        auto constraint_4 = bp.add_constraint(
-                            (var(W8, 0) * var(W8, 0)) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
-                        auto constraint_5 = bp.add_constraint(
-                            var(W5, 0) - (var(W8, 0) * (var(W0, 0) - 
-                            var(W4, 0)) - var(W1, 0)));
-                        auto constraint_6 = bp.add_constraint(
-                            (var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
-                        auto constraint_7 = bp.add_constraint(
-                            (var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
-                        
-                        bp.add_gate(first_selector_index, 
-                            { constraint_1, constraint_2, constraint_3,
-                            constraint_4, constraint_5, constraint_6,
-                            constraint_7
-                        });
+                            var(W7, 0) * (2 * var(W8, 0) * var(W1, 0) - 3 * (var(W0, 0) * var(W0, 0))) +
+                            (1 - var(W7, 0)) * ((var(W2, 0) - var(W0, 0)) * var(W8, 0) - (var(W3, 0) - var(W1, 0))));
+                        auto constraint_4 =
+                            bp.add_constraint((var(W8, 0) * var(W8, 0)) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
+                        auto constraint_5 =
+                            bp.add_constraint(var(W5, 0) - (var(W8, 0) * (var(W0, 0) - var(W4, 0)) - var(W1, 0)));
+                        auto constraint_6 = bp.add_constraint((var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
+                        auto constraint_7 = bp.add_constraint((var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
+
+                        bp.add_gate(first_selector_index,
+                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                     constraint_7});
                     }
 
-                    static void generate_copy_constraints(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const params_type params,
-                            const std::size_t start_row_index){
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type params,
+                                                  const std::size_t start_row_index) {
 
                         bp.add_copy_constraint({{W6, static_cast<int>(start_row_index), false},
-                            {0, 0, false, var::column_type::constant}});
+                                                {0, 0, false, var::column_type::constant}});
                     }
                 };
             }    // namespace components

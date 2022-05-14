@@ -42,9 +42,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class endo_scalar;
 
                 template<typename BlueprintFieldType,
@@ -65,16 +63,26 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class endo_scalar<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    CurveType,
-                    W0, W1, W2, W3,
-                    W4, W5, W6, W7,
-                    W8, W9, W10, W11,
-                    W12, W13, W14> {
+                class endo_scalar<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                  CurveType,
+                                  W0,
+                                  W1,
+                                  W2,
+                                  W3,
+                                  W4,
+                                  W5,
+                                  W6,
+                                  W7,
+                                  W8,
+                                  W9,
+                                  W10,
+                                  W11,
+                                  W12,
+                                  W13,
+                                  W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
@@ -91,22 +99,22 @@ namespace nil {
 
                     struct result_type {
                         var endo_scalar = var(0, 0, false);
-                        result_type(const params_type &params, const std::size_t &start_row_index) {
+                        result_type(const params_type &params, std::size_t start_row_index) {
                             endo_scalar = var(W6, start_row_index + rows_amount - 1, false, var::column_type::witness);
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t start_row_index){
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t start_row_index) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
 
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
                             generate_gates(bp, assignment, params, first_selector_index);
                         } else {
                             first_selector_index = selector_iterator->second;
@@ -114,27 +122,27 @@ namespace nil {
 
                         std::size_t j = start_row_index;
                         assignment.enable_selector(first_selector_index, j, j + rows_amount - 1);
-                        assignment.enable_selector(first_selector_index+1, j + rows_amount - 1);
+                        assignment.enable_selector(first_selector_index + 1, j + rows_amount - 1);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
                     }
 
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType>
-                                &assignment,
-                            const params_type &params,
-                            const std::size_t start_row_index){
-                            
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            const std::size_t start_row_index) {
+
                         std::size_t row = start_row_index;
-                        
+
                         std::size_t crumbs_per_row = 8;
                         std::size_t bits_per_crumb = 2;
-                        std::size_t bits_per_row = bits_per_crumb * crumbs_per_row; // we suppose that params.num_bits % bits_per_row = 0
+                        std::size_t bits_per_row =
+                            bits_per_crumb * crumbs_per_row;    // we suppose that params.num_bits % bits_per_row = 0
 
                         std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
                         typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
-                        typename BlueprintFieldType::integral_type integral_scalar = typename  BlueprintFieldType::integral_type(scalar.data);
+                        typename BlueprintFieldType::integral_type integral_scalar =
+                            typename BlueprintFieldType::integral_type(scalar.data);
                         for (std::size_t i = 0; i < params.num_bits; i++) {
                             bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
                         }
@@ -159,7 +167,7 @@ namespace nil {
                                 a = a.doubled();
                                 b = b.doubled();
 
-                                typename BlueprintFieldType::value_type s = 
+                                typename BlueprintFieldType::value_type s =
                                     (b0 == BlueprintFieldType::value_type::one()) ? 1 : -1;
 
                                 if (b1 == BlueprintFieldType::value_type::zero()) {
@@ -182,11 +190,10 @@ namespace nil {
                         return result_type(params, start_row_index);
                     }
 
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment, 
-                        const params_type &params,
-                        const std::size_t first_selector_index) {
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               const std::size_t first_selector_index) {
 
                         using F = typename BlueprintFieldType::value_type;
 
@@ -194,72 +201,69 @@ namespace nil {
                         std::size_t selector_index_2 = first_selector_index + 1;
 
                         auto c_f = [](var x) {
-                            return (F(11) * F(6).inversed()) * x 
-                                + (-F(5) * F(2).inversed()) * x * x
-                                + (F(2) * F(3).inversed()) * x * x * x;
+                            return (F(11) * F(6).inversed()) * x + (-F(5) * F(2).inversed()) * x * x +
+                                   (F(2) * F(3).inversed()) * x * x * x;
                         };
 
                         auto d_f = [](var x) {
-                            return -F::one() + (F(29) * F(6).inversed()) * x 
-                                + (-F(7) * F(2).inversed()) * x * x
-                                + (F(2) * F(3).inversed()) * x * x * x;
+                            return -F::one() + (F(29) * F(6).inversed()) * x + (-F(7) * F(2).inversed()) * x * x +
+                                   (F(2) * F(3).inversed()) * x * x * x;
                         };
 
-                        auto constraint_1 = bp.add_constraint(
-                            var(W7, 0) * (var(W7, 0) - 1) * (var(W7, 0) - 2) * (var(W7, 0) - 3));
-                        auto constraint_2 = bp.add_constraint(
-                            var(W8, 0) * (var(W8, 0) - 1) * (var(W8, 0) - 2) * (var(W8, 0) - 3));
-                        auto constraint_3 = bp.add_constraint(
-                            var(W9, 0) * (var(W9, 0) - 1) * (var(W9, 0) - 2) * (var(W9, 0) - 3));
-                        auto constraint_4 = bp.add_constraint(
-                            var(W10, 0) * (var(W10, 0) - 1) * (var(W10, 0) - 2) * (var(W10, 0) - 3));
-                        auto constraint_5 = bp.add_constraint(
-                            var(W11, 0) * (var(W11, 0) - 1) * (var(W11, 0) - 2) * (var(W11, 0) - 3));
-                        auto constraint_6 = bp.add_constraint(
-                            var(W12, 0) * (var(W12, 0) - 1) * (var(W12, 0) - 2)* (var(W12, 0) - 3));
-                        auto constraint_7 = bp.add_constraint(
-                            var(W13, 0) * (var(W13, 0) - 1) * (var(W13, 0) - 2)* (var(W13, 0) - 3));
-                        auto constraint_8 = bp.add_constraint(
-                            var(W14, 0) * (var(W14, 0) - 1) * (var(W14, 0) - 2)* (var(W14, 0) - 3));
+                        auto constraint_1 =
+                            bp.add_constraint(var(W7, 0) * (var(W7, 0) - 1) * (var(W7, 0) - 2) * (var(W7, 0) - 3));
+                        auto constraint_2 =
+                            bp.add_constraint(var(W8, 0) * (var(W8, 0) - 1) * (var(W8, 0) - 2) * (var(W8, 0) - 3));
+                        auto constraint_3 =
+                            bp.add_constraint(var(W9, 0) * (var(W9, 0) - 1) * (var(W9, 0) - 2) * (var(W9, 0) - 3));
+                        auto constraint_4 =
+                            bp.add_constraint(var(W10, 0) * (var(W10, 0) - 1) * (var(W10, 0) - 2) * (var(W10, 0) - 3));
+                        auto constraint_5 =
+                            bp.add_constraint(var(W11, 0) * (var(W11, 0) - 1) * (var(W11, 0) - 2) * (var(W11, 0) - 3));
+                        auto constraint_6 =
+                            bp.add_constraint(var(W12, 0) * (var(W12, 0) - 1) * (var(W12, 0) - 2) * (var(W12, 0) - 3));
+                        auto constraint_7 =
+                            bp.add_constraint(var(W13, 0) * (var(W13, 0) - 1) * (var(W13, 0) - 2) * (var(W13, 0) - 3));
+                        auto constraint_8 =
+                            bp.add_constraint(var(W14, 0) * (var(W14, 0) - 1) * (var(W14, 0) - 2) * (var(W14, 0) - 3));
                         auto constraint_9 = bp.add_constraint(
-                            var(W4, 0) - (256 * var(W2, 0) + 128 * c_f(var(W7, 0)) +
-                            64 * c_f(var(W8, 0)) + 32 * c_f(var(W9, 0)) + 16 * c_f(var(W10, 0)) +
-                            8 * c_f(var(W11, 0)) + 4 * c_f(var(W12, 0)) + 2 * c_f(var(W13, 0)) + 
-                            c_f(var(W14, 0))));
+                            var(W4, 0) - (256 * var(W2, 0) + 128 * c_f(var(W7, 0)) + 64 * c_f(var(W8, 0)) +
+                                          32 * c_f(var(W9, 0)) + 16 * c_f(var(W10, 0)) + 8 * c_f(var(W11, 0)) +
+                                          4 * c_f(var(W12, 0)) + 2 * c_f(var(W13, 0)) + c_f(var(W14, 0))));
                         auto constraint_10 = bp.add_constraint(
-                            var(W5, 0) - (256 * var(W3, 0) + 128 * d_f(var(W7, 0)) +
-                            64 * d_f(var(W8, 0)) + 32 * d_f(var(W9, 0)) + 16 * d_f(var(W10, 0)) +
-                            8 * d_f(var(W11, 0)) + 4 * d_f(var(W12, 0)) + 2 * d_f(var(W13, 0)) +
-                            d_f(var(W14, 0))));
+                            var(W5, 0) - (256 * var(W3, 0) + 128 * d_f(var(W7, 0)) + 64 * d_f(var(W8, 0)) +
+                                          32 * d_f(var(W9, 0)) + 16 * d_f(var(W10, 0)) + 8 * d_f(var(W11, 0)) +
+                                          4 * d_f(var(W12, 0)) + 2 * d_f(var(W13, 0)) + d_f(var(W14, 0))));
                         auto constraint_11 = bp.add_constraint(
-                            var(W1, 0) - ((1 << 16) * var(W0, 0) + (1 << 14) * var(W7, 0) +
-                            (1 << 12) * var(W8, 0) + (1 << 10) * var(W9, 0) + (1 << 8) * var(W10, 0) +
-                            (1 << 6) * var(W11, 0) + (1 << 4) * var(W12, 0) + (1 << 2) * var(W13, 0) +
-                            var(W14, 0)));
+                            var(W1, 0) - ((1 << 16) * var(W0, 0) + (1 << 14) * var(W7, 0) + (1 << 12) * var(W8, 0) +
+                                          (1 << 10) * var(W9, 0) + (1 << 8) * var(W10, 0) + (1 << 6) * var(W11, 0) +
+                                          (1 << 4) * var(W12, 0) + (1 << 2) * var(W13, 0) + var(W14, 0)));
 
-                        auto constraint_12 = bp.add_constraint(var(W6, 0) - 
-                            (params.endo_factor * var(W4, 0) + var(W5, 0)));
-                        
-                            bp.add_gate(selector_index_2, {constraint_12});
+                        auto constraint_12 =
+                            bp.add_constraint(var(W6, 0) - (params.endo_factor * var(W4, 0) + var(W5, 0)));
 
-                            bp.add_gate(selector_index_1, 
-                            {constraint_1, constraint_2, constraint_3, constraint_4,
-                            constraint_5, constraint_6, constraint_7, constraint_8,
-                            constraint_9, constraint_10, constraint_11});
+                        bp.add_gate(selector_index_2, {constraint_12});
+
+                        bp.add_gate(selector_index_1,
+                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                     constraint_7, constraint_8, constraint_9, constraint_10, constraint_11});
                     }
 
-                    static void generate_copy_constraints(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            const std::size_t start_row_index){
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  const std::size_t start_row_index) {
 
-                        const std::size_t &j = start_row_index;
+                        std::size_t j = start_row_index;
 
-                        for (std::size_t z = 1; z < rows_amount; z++){
-                            bp.add_copy_constraint({{W0, static_cast<int>(j + z), false}, {W1, static_cast<int>(j + z - 1), false}});
-                            bp.add_copy_constraint({{W2, static_cast<int>(j + z), false}, {W4, static_cast<int>(j + z - 1), false}});
-                            bp.add_copy_constraint({{W3, static_cast<int>(j + z), false}, {W5, static_cast<int>(j + z - 1), false}});
+                        for (std::size_t z = 1; z < rows_amount; z++) {
+                            bp.add_copy_constraint(
+                                {{W0, static_cast<int>(j + z), false}, {W1, static_cast<int>(j + z - 1), false}});
+                            bp.add_copy_constraint(
+                                {{W2, static_cast<int>(j + z), false}, {W4, static_cast<int>(j + z - 1), false}});
+                            bp.add_copy_constraint(
+                                {{W3, static_cast<int>(j + z), false}, {W5, static_cast<int>(j + z - 1), false}});
                         }
 
                         // check that the recalculated n is equal to the input challenge

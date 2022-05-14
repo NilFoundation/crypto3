@@ -32,15 +32,12 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class reduction;
 
                 template<typename BlueprintFieldType,
@@ -56,25 +53,23 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8>
                 class reduction<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8> {
+                                CurveType,
+                                W0,
+                                W1,
+                                W2,
+                                W3,
+                                W4,
+                                W5,
+                                W6,
+                                W7,
+                                W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    
 
                 public:
-
                     constexpr static const std::size_t rows_amount = 4;
 
                     struct params_type {
@@ -94,60 +89,49 @@ namespace nil {
                     struct result_type {
                         var output = var(0, 0, false);
 
-                        result_type(const std::size_t &component_start_row) {
+                        result_type(std::size_t component_start_row) {
                             var(W0, component_start_row + rows_amount - 1, false);
                         }
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
                         return bp.allocate_rows(rows_amount);
                     }
 
-                    static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        const params_type &params,
+                                                        allocated_data_type &allocated_data,
+                                                        std::size_t component_start_row) {
 
                         generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
                         return result_type(component_start_row);
                     }
 
-                    static result_type generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        
+
                         return result_type(component_start_row);
                     }
 
                 private:
-
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               allocated_data_type &allocated_data,
+                                               std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        
-                        
                     }
 
-                    static void generate_copy_constraints(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &component_start_row) {
+                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                          const params_type &params,
+                                                          std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        
                     }
-
-                    
                 };
 
             }    // namespace components

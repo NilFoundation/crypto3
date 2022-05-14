@@ -64,8 +64,8 @@ BOOST_AUTO_TEST_CASE(fixed_base_scalar_mul_15_wires_test_case) {
 		curve_type::scalar_field_type::value_type::one();
 	typename curve_type::template g1_type<>::value_type P =
 		curve_type::template g1_type<>::value_type::one();
-	typename component_type::init_params_type init_params = {B};
-	typename component_type::assignment_params_type assignment_params = {a, s, P};
+	typename component_type::public_params_type init_params = {B};
+	typename component_type::private_params_type assignment_params = {a, s, P};
 
 	test_component<component_type, BlueprintFieldType, ArithmetizationParams> (init_params, assignment_params);
 }

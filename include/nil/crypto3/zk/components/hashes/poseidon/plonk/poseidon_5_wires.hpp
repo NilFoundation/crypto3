@@ -36,9 +36,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class poseidon;
 
                 template<typename BlueprintFieldType,
@@ -49,14 +47,16 @@ namespace nil {
                          std::size_t W2,
                          std::size_t W3,
                          std::size_t W4>
-                class poseidon<
-                    snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams>,
-                    CurveType,
-                    W0, W1, W2, W3, W4> {
+                class poseidon<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                               CurveType,
+                               W0,
+                               W1,
+                               W2,
+                               W3,
+                               W4> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     constexpr static const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
                     constexpr static const algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
@@ -74,17 +74,17 @@ namespace nil {
                         typename CurveType::template g1_type<>::value_type P;
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
                         return bp.allocate_rows(rows_amount);
                     }
 
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
-                        const std::size_t &component_start_row) {
+                    static void
+                        generate_gates(blueprint<ArithmetizationType> &bp,
+                                       blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                                       const init_params_type &init_params,
+                                       std::size_t component_start_row) {
 
-                        const std::size_t &j = component_start_row;
+                        std::size_t j = component_start_row;
 
                         for (std::size_t z = 0; z < 4; z++) {
                             this->bp.add_gate(j + z,
@@ -125,18 +125,15 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const init_params_type &init_params,
-                        const std::size_t &component_start_row) {
-
+                        std::size_t component_start_row) {
                     }
 
                     static void generate_assignments(
-                        blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
+                        blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const init_params_type &init_params,
                         const assignment_params_type &params,
-                        const std::size_t &component_start_row) {
-
+                        std::size_t component_start_row) {
                     }
                 };
 

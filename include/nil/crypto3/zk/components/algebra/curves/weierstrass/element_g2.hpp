@@ -74,7 +74,8 @@ namespace nil {
                     element_g2(blueprint<field_type> &bp,
                                const typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type &Q) :
                         component<field_type>(bp) {
-                        typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type Q_copy = Q.to_affine();
+                        typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type Q_copy =
+                            Q.to_affine();
 
                         X.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.X));
                         Y.reset(new typename component_policy::Fqe_variable_type(bp, Q_copy.Y));
@@ -85,7 +86,8 @@ namespace nil {
 
                     void generate_r1cs_witness(
                         const typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type &Q) {
-                        typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type Qcopy = Q.to_affine();
+                        typename CurveType::pairing::pair_curve_type::template g2_type<>::value_type Qcopy =
+                            Q.to_affine();
 
                         X->generate_r1cs_witness(Qcopy.X);
                         Y->generate_r1cs_witness(Qcopy.Y);

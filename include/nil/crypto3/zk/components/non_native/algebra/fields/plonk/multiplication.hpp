@@ -58,7 +58,7 @@ namespace nil {
                 */
 
                 template<typename BlueprintFieldType,
-                typename ArithmetizationParams,
+                         typename ArithmetizationParams,
                          typename CurveType,
                          typename Ed25519Type,
                          std::size_t W0,
@@ -70,39 +70,38 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class non_native_field_element_multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                       Ed25519Type,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams> ArithmetizationType;
+                class non_native_field_element_multiplication<
+                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    CurveType,
+                    Ed25519Type,
+                    W0,
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8> {
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    using non_native_range_component = zk::components::non_native_range<ArithmetizationType, CurveType, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8>;
+                    using non_native_range_component =
+                        zk::components::non_native_range<ArithmetizationType, CurveType, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
                     constexpr static const std::size_t selector_seed = 0xff81;
 
                     constexpr static const std::size_t T = 257;
 
-
                 public:
-
                     constexpr static const std::size_t rows_amount = 3 + 2 * non_native_range_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
-                         std::array<var, 4> A; //66,66,66,66 bits
-                         std::array<var, 4> B; //66,66,66,66 bits
+                        std::array<var, 4> A;    // 66,66,66,66 bits
+                        std::array<var, 4> B;    // 66,66,66,66 bits
                     };
 
                     struct result_type {
@@ -115,97 +114,103 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t start_row_index){
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t start_row_index) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
                             generate_gates(bp, assignment, params, first_selector_index);
                         } else {
-                            first_selector_index = selector_iterator->second; 
+                            first_selector_index = selector_iterator->second;
                         }
                         std::size_t j = start_row_index;
                         assignment.enable_selector(first_selector_index, j + 5);
 
                         generate_copy_constraints(bp, assignment, params, j);
 
-                        typename non_native_range_component::params_type non_range_params_q = {var(W8, j + 4), var(W0, j + 5), var(W1, j + 5), var(W2, j + 5)};
+                        typename non_native_range_component::params_type non_range_params_q = {
+                            var(W8, j + 4), var(W0, j + 5), var(W1, j + 5), var(W2, j + 5)};
                         non_native_range_component::generate_circuit(bp, assignment, non_range_params_q, j);
-                        typename non_native_range_component::params_type non_range_params_r = {var(W3, j + 5), var(W4, j + 5), var(W5, j + 5), var(W6, j + 5)};
+                        typename non_native_range_component::params_type non_range_params_r = {
+                            var(W3, j + 5), var(W4, j + 5), var(W5, j + 5), var(W6, j + 5)};
                         non_native_range_component::generate_circuit(bp, assignment, non_range_params_r, j + 2);
-
 
                         return result_type(start_row_index);
                     }
 
-                    static result_type generate_assignments(
-                        blueprint_assignment_table<ArithmetizationType>
-                            &assignment,
-                        const params_type &params,
-                        const std::size_t start_row_index){
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                         typename Ed25519Type::base_field_type::integral_type base = 1;
                         typename CurveType::base_field_type::integral_type pasta_base = 1;
                         typename Ed25519Type::base_field_type::extended_integral_type extended_base = 1;
-                        std::array<typename CurveType::base_field_type::value_type, 4> a = 
-                        {typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[0]).data),
-                         typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[1]).data),
-                        typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[2]).data),
-                        typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[3]).data)};
-                        typename Ed25519Type::base_field_type::value_type eddsa_a = typename Ed25519Type::base_field_type::integral_type(a[0].data) +
-                         typename Ed25519Type::base_field_type::integral_type(a[1].data) * (base<<66) +
-                        typename Ed25519Type::base_field_type::integral_type(a[2].data)* (base<<132) + typename Ed25519Type::base_field_type::integral_type(a[3].data) * (base<<198);
+                        std::array<typename CurveType::base_field_type::value_type, 4> a = {
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[0]).data),
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[1]).data),
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[2]).data),
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.A[3]).data)};
+                        typename Ed25519Type::base_field_type::value_type eddsa_a =
+                            typename Ed25519Type::base_field_type::integral_type(a[0].data) +
+                            typename Ed25519Type::base_field_type::integral_type(a[1].data) * (base << 66) +
+                            typename Ed25519Type::base_field_type::integral_type(a[2].data) * (base << 132) +
+                            typename Ed25519Type::base_field_type::integral_type(a[3].data) * (base << 198);
 
-                        std::array<typename CurveType::base_field_type::value_type, 4> b = 
-                        {typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[0]).data),
-                         typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[1]).data),
-                        typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[2]).data),
-                        typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[3]).data)};
-                        typename Ed25519Type::base_field_type::value_type eddsa_b = typename Ed25519Type::base_field_type::integral_type(b[0].data) + 
-                        typename Ed25519Type::base_field_type::integral_type(b[1].data) * (base<<66) +
-                        typename Ed25519Type::base_field_type::integral_type(b[2].data)* (base<<132) + typename Ed25519Type::base_field_type::integral_type(b[3].data) * (base<<198);
+                        std::array<typename CurveType::base_field_type::value_type, 4> b = {
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[0]).data),
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[1]).data),
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[2]).data),
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[3]).data)};
+                        typename Ed25519Type::base_field_type::value_type eddsa_b =
+                            typename Ed25519Type::base_field_type::integral_type(b[0].data) +
+                            typename Ed25519Type::base_field_type::integral_type(b[1].data) * (base << 66) +
+                            typename Ed25519Type::base_field_type::integral_type(b[2].data) * (base << 132) +
+                            typename Ed25519Type::base_field_type::integral_type(b[3].data) * (base << 198);
 
                         typename Ed25519Type::base_field_type::value_type eddsa_r = eddsa_a * eddsa_b;
-                        typename Ed25519Type::base_field_type::integral_type integral_eddsa_r = typename Ed25519Type::base_field_type::integral_type(eddsa_r.data);
-                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =  Ed25519Type::base_field_type::modulus;
-                        typename Ed25519Type::base_field_type::extended_integral_type integral_eddsa_q = (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_a.data)
-                         * typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) - typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) / 
-                        eddsa_p;
+                        typename Ed25519Type::base_field_type::integral_type integral_eddsa_r =
+                            typename Ed25519Type::base_field_type::integral_type(eddsa_r.data);
+                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =
+                            Ed25519Type::base_field_type::modulus;
+                        typename Ed25519Type::base_field_type::extended_integral_type integral_eddsa_q =
+                            (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_a.data) *
+                                 typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) -
+                             typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) /
+                            eddsa_p;
                         typename Ed25519Type::base_field_type::extended_integral_type pow = extended_base << 257;
-                        typename Ed25519Type::base_field_type::extended_integral_type minus_eddsa_p =  pow - eddsa_p;
+                        typename Ed25519Type::base_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
 
                         std::array<typename CurveType::base_field_type::value_type, 4> r;
                         std::array<typename CurveType::base_field_type::value_type, 4> q;
                         std::array<typename CurveType::base_field_type::value_type, 4> p;
                         typename CurveType::base_field_type::integral_type mask = (pasta_base << 66) - 1;
                         r[0] = (integral_eddsa_r) & (mask);
-                        q[0] = (integral_eddsa_q ) & (mask);
-                        p[0] = (minus_eddsa_p ) & (mask);
+                        q[0] = (integral_eddsa_q) & (mask);
+                        p[0] = (minus_eddsa_p) & (mask);
                         p[1] = (minus_eddsa_p >> 66) & (mask);
                         p[2] = (minus_eddsa_p >> 132) & (mask);
                         p[3] = (minus_eddsa_p >> 198) & (mask);
-                        for (std::size_t i = 1; i<4; i++) {
-                            r[i] = (integral_eddsa_r >> (66*i)) & (mask);
-                            q[i] = (integral_eddsa_q >> (66* i)) & (mask);
+                        for (std::size_t i = 1; i < 4; i++) {
+                            r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
+                            q[i] = (integral_eddsa_q >> (66 * i)) & (mask);
                         }
                         std::array<typename CurveType::base_field_type::value_type, 4> t;
-                        t[0] =  a[0]*b[0]  + p[0] * q[0];
-                        t[1] = a[1]*b[0] + a[0]*b[1] + p[0]*q[1] + p[1] * q[0];
-                        t[2] = a[2]*b[0] + a[0]*b[2] + a[1]*b[1] + p[2]*q[0] + q[2] * p[0]
-                        + p[1]* q[1];
-                        t[3] = a[3] * b[0] + b[3]*a[0] + a[1]*b[2] + b[1]*a[2] +
-                        p[3] * q[0] + q[3]*p[0] + p[1]*q[2] + q[1]*p[2];
+                        t[0] = a[0] * b[0] + p[0] * q[0];
+                        t[1] = a[1] * b[0] + a[0] * b[1] + p[0] * q[1] + p[1] * q[0];
+                        t[2] = a[2] * b[0] + a[0] * b[2] + a[1] * b[1] + p[2] * q[0] + q[2] * p[0] + p[1] * q[1];
+                        t[3] = a[3] * b[0] + b[3] * a[0] + a[1] * b[2] + b[1] * a[2] + p[3] * q[0] + q[3] * p[0] +
+                               p[1] * q[2] + q[1] * p[2];
 
-                        typename CurveType::base_field_type::value_type u0 = t[0] - r[0] + t[1]*(pasta_base<<66)
-                        - r[1]*(pasta_base<<66);
-                        
+                        typename CurveType::base_field_type::value_type u0 =
+                            t[0] - r[0] + t[1] * (pasta_base << 66) - r[1] * (pasta_base << 66);
 
-                        typename CurveType::base_field_type::integral_type u0_integral = typename CurveType::base_field_type::integral_type(u0.data) >> 132;
+                        typename CurveType::base_field_type::integral_type u0_integral =
+                            typename CurveType::base_field_type::integral_type(u0.data) >> 132;
                         std::array<typename CurveType::base_field_type::value_type, 4> u0_chunks;
 
                         u0_chunks[0] = u0_integral & ((1 << 22) - 1);
@@ -244,8 +249,8 @@ namespace nil {
                         assignment.witness(W4)[row + 5] = r[1];
                         assignment.witness(W5)[row + 5] = r[2];
                         assignment.witness(W6)[row + 5] = r[3];
-                        assignment.witness(W7)[row + 5] = typename CurveType::base_field_type::value_type (u0_integral);
-                        assignment.witness(W8)[row + 5] = typename CurveType::base_field_type::value_type (u1_integral);
+                        assignment.witness(W7)[row + 5] = typename CurveType::base_field_type::value_type(u0_integral);
+                        assignment.witness(W8)[row + 5] = typename CurveType::base_field_type::value_type(u1_integral);
                         assignment.witness(W0)[row + 6] = u0_chunks[0];
                         assignment.witness(W1)[row + 6] = u0_chunks[1];
                         assignment.witness(W2)[row + 6] = u0_chunks[2];
@@ -255,31 +260,32 @@ namespace nil {
                         assignment.witness(W6)[row + 6] = u1_chunks[2];
                         assignment.witness(W7)[row + 6] = u1_chunks[3];
 
-                        typename non_native_range_component::params_type range_params_q = {var(8, row + 4, false),
-                         var(0, row + 5, false), var(1, row + 5, false), var(2, row + 5, false)};
+                        typename non_native_range_component::params_type range_params_q = {
+                            var(8, row + 4, false), var(0, row + 5, false), var(1, row + 5, false),
+                            var(2, row + 5, false)};
                         non_native_range_component::generate_assignments(assignment, range_params_q, row);
 
-                        typename non_native_range_component::params_type range_params_r = {var(3, row + 5, false),
-                         var(4, row + 5, false), var(5, row + 5, false), var(6, row + 5, false)};
+                        typename non_native_range_component::params_type range_params_r = {
+                            var(3, row + 5, false), var(4, row + 5, false), var(5, row + 5, false),
+                            var(6, row + 5, false)};
                         non_native_range_component::generate_assignments(assignment, range_params_r, row + 2);
-
 
                         return result_type(start_row_index);
                     }
 
                 private:
-
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const params_type &params,
-                        const std::size_t first_selector_index) {
+                    static void
+                        generate_gates(blueprint<ArithmetizationType> &bp,
+                                       blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                                       const params_type &params,
+                                       const std::size_t first_selector_index) {
                         typename CurveType::base_field_type::integral_type base = 1;
                         typename Ed25519Type::base_field_type::extended_integral_type extended_base = 1;
-                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =  Ed25519Type::base_field_type::modulus;
+                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =
+                            Ed25519Type::base_field_type::modulus;
                         typename CurveType::base_field_type::value_type pasta_eddsa_p = eddsa_p;
                         typename Ed25519Type::base_field_type::extended_integral_type pow = extended_base << 257;
-                        typename Ed25519Type::base_field_type::extended_integral_type minus_eddsa_p =  pow - eddsa_p;
+                        typename Ed25519Type::base_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
                         std::array<typename CurveType::base_field_type::value_type, 4> p;
                         typename CurveType::base_field_type::integral_type mask = (base << 66) - 1;
                         p[0] = minus_eddsa_p & mask;
@@ -321,10 +327,10 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const params_type &params,
-                        const std::size_t &component_start_row) {
+                        std::size_t component_start_row) {
 
-                        const std::size_t &j = component_start_row;
-                        
+                        std::size_t j = component_start_row;
+
                         /*bp.add_copy_constraint({var(W0, j + 8, false), var(W0, j + 4, false)});
                         bp.add_copy_constraint({var(W1, j + 8, false), var(W0, j + 5, false)});
                         bp.add_copy_constraint({var(W2, j + 8, false), var(W1, j + 5, false)});

@@ -38,9 +38,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                         typename CurveType,
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class non_native_field_element_c_multiplication;
 
                 template<typename BlueprintFieldType,
@@ -54,30 +52,28 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class non_native_field_element_c_multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       FieldType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8>{
+                class non_native_field_element_c_multiplication<
+                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    FieldType,
+                    W0,
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    
-
                 public:
-
                     constexpr static const std::size_t rows_amount = 9;
 
-                   struct params_type {
+                    struct params_type {
                         typename FieldType::value_type A;
                         typename FieldType::value_type B;
                     };
@@ -95,21 +91,20 @@ namespace nil {
                     struct result_type {
                         std::array<var, 1> output = {var(0, 0, false)};
 
-                        result_type(const std::size_t &component_start_row) {
+                        result_type(std::size_t component_start_row) {
                             std::array<var, 1> output = {var(W0, component_start_row + rows_amount - 1, false)};
                         }
                     };
 
-                    static std::size_t allocate_rows (blueprint<ArithmetizationType> &bp){
+                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
                         return bp.allocate_rows(rows_amount);
                     }
 
-                     static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        allocated_data_type &allocated_data,
-                        const std::size_t &component_start_row) {
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        const params_type &params,
+                                                        allocated_data_type &allocated_data,
+                                                        std::size_t component_start_row) {
 
                         generate_gates(bp, assignment, params, allocated_data, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
@@ -117,39 +112,38 @@ namespace nil {
                     }
 
                     static result_type generate_assignments(
-                        blueprint_private_assignment_table<ArithmetizationType>
-                            &private_assignment,
+                        blueprint_private_assignment_table<ArithmetizationType> &private_assignment,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const init_params_type &init_params,
                         const assignment_params_type &params,
-                        const std::size_t &component_start_row) {
+                        std::size_t component_start_row) {
                         return result_type(component_start_row);
                     }
 
-                    private:
+                private:
+                    static void
+                        generate_gates(blueprint<ArithmetizationType> &bp,
+                                       blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                                       const init_params_type &init_params,
+                                       std::size_t component_start_row) {
 
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const init_params_type &init_params,
-                        const std::size_t &component_start_row) {
-
-                        const std::size_t &j = component_start_row;
+                        std::size_t j = component_start_row;
 
                         std::size_t selector_index = public_assignment.add_selector({j + 0, j + 2, j + 4, j + 6});
 
-                        snark::plonk_constraint<BlueprintFieldType> s = 
-                            (var(W1, 0) + var(W2, 0) + var(W3, 0) +
-                             var(W4, 0) + var(W5, 0) + var(W6, 0) +
-                             var(W7, 0) + var(W2, +1) + var(W3, +1) +
-                             var(W4, +1) + var(W5, +1) + var(W6, +1)
-                             - 12 * ((2^20) - 1));
+                        snark::plonk_constraint<BlueprintFieldType> s =
+                            (var(W1, 0) + var(W2, 0) + var(W3, 0) + var(W4, 0) + var(W5, 0) + var(W6, 0) + var(W7, 0) +
+                             var(W2, +1) + var(W3, +1) + var(W4, +1) + var(W5, +1) + var(W6, +1) - 12 * ((2 ^ 20) - 1));
 
                         bp.add_gate(selector_index, s * (var(W8, 0) * s - 1));
                         bp.add_gate(selector_index, var(W8, 0) * s + (1 - var(W8, 0) * s) * var(W8, +1) - 1);
-                        bp.add_gate(selector_index, var(W0, 0) - (var(W7, +1) + var(W6, +1) * (2^15) + var(W5, +1) * (2^35) + var(W4, +1) * (2^55)));
-                        bp.add_gate(selector_index, var(W0, +1) - (var(W3, +1) + var(W2, +1) * (2^20) + var(W7, 0) * (2^40)));
-                        bp.add_gate(selector_index, var(W1, +1) - (var(W6, 0) + var(W5, 0) * (2^20) + var(W4, 0) * (2^40)));
+                        bp.add_gate(selector_index,
+                                    var(W0, 0) - (var(W7, +1) + var(W6, +1) * (2 ^ 15) + var(W5, +1) * (2 ^ 35) +
+                                                  var(W4, +1) * (2 ^ 55)));
+                        bp.add_gate(selector_index,
+                                    var(W0, +1) - (var(W3, +1) + var(W2, +1) * (2 ^ 20) + var(W7, 0) * (2 ^ 40)));
+                        bp.add_gate(selector_index,
+                                    var(W1, +1) - (var(W6, 0) + var(W5, 0) * (2 ^ 20) + var(W4, 0) * (2 ^ 40)));
 
                         selector_index = public_assignment.add_selector(j + 7);
                         bp.add_gate(selector_index, var(W3, +1) - var(W1, 0));
@@ -160,10 +154,10 @@ namespace nil {
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const init_params_type &init_params,
-                        const std::size_t &component_start_row) {
+                        std::size_t component_start_row) {
 
-                        const std::size_t &j = component_start_row;
-                        
+                        std::size_t j = component_start_row;
+
                         bp.add_copy_constraint({var(W0, j + 8, false), var(W0, j + 4, false)});
                         bp.add_copy_constraint({var(W1, j + 8, false), var(W0, j + 5, false)});
                         bp.add_copy_constraint({var(W2, j + 8, false), var(W1, j + 5, false)});

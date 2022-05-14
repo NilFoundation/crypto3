@@ -36,9 +36,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, 
-                         typename CurveType, 
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class element_g1_addition;
 
                 template<typename BlueprintFieldType,
@@ -51,54 +49,51 @@ namespace nil {
                          std::size_t W5,
                          std::size_t W6>
                 class element_g1_addition<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6>
-                    : public component<BlueprintFieldType> {
+                                          CurveType,
+                                          W0,
+                                          W1,
+                                          W2,
+                                          W3,
+                                          W4,
+                                          W5,
+                                          W6> : public component<BlueprintFieldType> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t i;
-                public:
 
-                    element_g1_addition(blueprint_type &bp) :
-                        component<FieldType>(bp) {
+                public:
+                    element_g1_addition(blueprint_type &bp) : component<FieldType>(bp) {
                         i = bp.allocate_row();
                     }
 
                     void generate_r1cs_constraints() {
-                        typename blueprint_type::variable_type x_1(W0, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type y_1(W1, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type x_2(W2, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type y_2(W3, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type x_3(W4, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type y_3(W5, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type r(W6, 
-                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type x_1(
+                            W0, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_1(
+                            W1, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type x_2(
+                            W2, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_2(
+                            W3, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type x_3(
+                            W4, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_3(
+                            W5, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type r(W6,
+                                                                 blueprint_type::variable_type::rotation_type::current);
 
-                        bp.add_gate(i, (x_2 - x_1)*(y_1 + y_3) - (y_1 - y_2)*(x_1 - x_3));
-                        bp.add_gate(i, (x_1 + x_2 + x_3)*(x_1 - x_3)^2 - (y_1 + y_3)^2 );
-                        bp.add_gate(i, (x_2 - x_1) * r - 1 );
+                        bp.add_gate(i, (x_2 - x_1) * (y_1 + y_3) - (y_1 - y_2) * (x_1 - x_3));
+                        bp.add_gate(i, (x_1 + x_2 + x_3) * (x_1 - x_3) ^ 2 - (y_1 + y_3) ^ 2);
+                        bp.add_gate(i, (x_2 - x_1) * r - 1);
                     }
 
-                    void generate_r1cs_witness(typename CurveType::value_type &P1, 
-                                               typename CurveType::value_type &P2) {
-                        generate_r1cs_witness(P1, P2, P1+P2);
+                    void generate_r1cs_witness(typename CurveType::value_type &P1, typename CurveType::value_type &P2) {
+                        generate_r1cs_witness(P1, P2, P1 + P2);
                     }
 
-                    void generate_r1cs_witness(typename CurveType::value_type &P1, 
+                    void generate_r1cs_witness(typename CurveType::value_type &P1,
                                                typename CurveType::value_type &P2,
                                                typename CurveType::value_type &P3) {
                         bp.val(W0, i) = P1.X;
@@ -107,7 +102,7 @@ namespace nil {
                         bp.val(W3, i) = P2.Y;
                         bp.val(W4, i) = P3.X;
                         bp.val(W5, i) = P3.Y;
-                        bp.val(W6, i) = ?;
+                        bp.val(W6, i) = ? ;
                     }
                 };
 

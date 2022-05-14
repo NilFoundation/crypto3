@@ -36,9 +36,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, 
-                         typename CurveType, 
-                         std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class element_g1_doubling;
 
                 template<typename BlueprintFieldType,
@@ -49,53 +47,50 @@ namespace nil {
                          std::size_t W3,
                          std::size_t W6>
                 class element_g1_doubling<snark::plonk_constraint_system<BlueprintFieldType>,
-                                                       CurveType,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W6>
-                    : public component<BlueprintFieldType> {
+                                          CurveType,
+                                          W0,
+                                          W1,
+                                          W2,
+                                          W3,
+                                          W6> : public component<BlueprintFieldType> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType> arithmetization_type;
                     typedef blueprint<arithmetization_type> blueprint_type;
 
                     std::size_t i;
-                public:
 
-                    element_g1_doubling(blueprint_type &bp) :
-                        component<FieldType>(bp) {
+                public:
+                    element_g1_doubling(blueprint_type &bp) : component<FieldType>(bp) {
                         i = bp.allocate_row();
                     }
 
                     void generate_r1cs_constraints() {
-                        typename blueprint_type::variable_type x_1(W0, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type y_1(W1, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type x_2(W2, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type y_2(W3, 
-                            blueprint_type::variable_type::rotation_type::current);
-                        typename blueprint_type::variable_type r(W6, 
-                            blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type x_1(
+                            W0, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_1(
+                            W1, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type x_2(
+                            W2, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type y_2(
+                            W3, blueprint_type::variable_type::rotation_type::current);
+                        typename blueprint_type::variable_type r(W6,
+                                                                 blueprint_type::variable_type::rotation_type::current);
 
-                        bp.add_gate(i, 4*y_1^2 * (x_2 + 2*x_1) - 9 * x_1^4);
-                        bp.add_gate(i, 2*y_1 * (y_2 + y_1) - 3*x_1^2 * (x_1 - x_2));
-                        bp.add_gate(i, y_1*r_1 - 1);
+                        bp.add_gate(i, 4 * y_1 ^ 2 * (x_2 + 2 * x_1) - 9 * x_1 ^ 4);
+                        bp.add_gate(i, 2 * y_1 * (y_2 + y_1) - 3 * x_1 ^ 2 * (x_1 - x_2));
+                        bp.add_gate(i, y_1 * r_1 - 1);
                     }
 
                     void generate_r1cs_witness(typename CurveType::value_type &P1) {
                         generate_r1cs_witness(P1, P1.doubled());
                     }
 
-                    void generate_r1cs_witness(typename CurveType::value_type &P1, 
-                                               typename CurveType::value_type &P2) {
+                    void generate_r1cs_witness(typename CurveType::value_type &P1, typename CurveType::value_type &P2) {
                         bp.val(W0, i) = P1.X;
                         bp.val(W1, i) = P1.Y;
                         bp.val(W2, i) = P2.X;
                         bp.val(W3, i) = P2.Y;
-                        bp.val(W6, i) = ?;
+                        bp.val(W6, i) = ? ;
                     }
                 };
 

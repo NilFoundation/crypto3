@@ -72,7 +72,8 @@ namespace nil {
                     element_g1(blueprint<underlying_field_type> &bp,
                                const typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type &P) :
                         component<underlying_field_type>(bp) {
-                        typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type Pcopy = P.to_affine();
+                        typename CurveType::pairing::pair_curve_type::template g1_type<>::value_type Pcopy =
+                            P.to_affine();
 
                         X.assign(bp, Pcopy.X);
                         Y.assign(bp, Pcopy.Y);

@@ -44,64 +44,47 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                        std::size_t ExponentSize,
-                        std::size_t... WireIndexes>
+                template<typename ArithmetizationType, std::size_t ExponentSize, std::size_t... WireIndexes>
                 class exponentiation;
 
                 // res = base.pow(scalar)
-                // W0     | W1            | W2            | W3                   | W4  | W5  | W6  | W7  | W8  | W9  | W10 | W11 | W12 | W13  | W14  |
-                // base   | n = [b0...b8] | base^[b0b1b2] | W1^8 + base^[b3b4b5] | ... | - | - | b_8 | b_7 | b_6 | b_5 | b_4 | b_3 | b_2 | b_1 |
+                // W0     | W1            | W2            | W3                   | W4  | W5  | W6  | W7  | W8  | W9  |
+                // W10 | W11 | W12 | W13  | W14  | base   | n = [b0...b8] | base^[b0b1b2] | W1^8 + base^[b3b4b5] | ... |
+                // - | - | b_8 | b_7 | b_6 | b_5 | b_4 | b_3 | b_2 | b_1 |
                 // ...    | ...           | ...           | ...                  | ... | - | - | ... | ... | ...
                 // base   | n = scalar    | res           | ...                  | ... | - | - | ...
                 // ....
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t ExponentSize,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class exponentiation<
-                    snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams>,
-                    ExponentSize,
-                    W0, W1, W2, W3, W4,
-                    W5, W6, W7, W8, W9,
-                    W10, W11, W12, W13, W14>{
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
+                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
+                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                class exponentiation<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                     ExponentSize, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f09;
 
                     constexpr static const std::size_t witness_amount = 15;
-                    constexpr static const std::size_t reserved_witnesses = 2; // base, accumulated_n
+                    constexpr static const std::size_t reserved_witnesses = 2;    // base, accumulated_n
                     constexpr static const std::size_t intermediate_start = W0 + reserved_witnesses;
-                    constexpr static const std::size_t bits_per_intermediate_result = 2; // defines
-                                                                            // max degree of the constraints
-                                                                            // 2 ** bits_per_intermediate_result
-                    constexpr static const std::size_t intermediate_results_per_row = (witness_amount - reserved_witnesses) 
-                        / (bits_per_intermediate_result + 1);
-                    constexpr static const std::size_t bits_per_row = intermediate_results_per_row * bits_per_intermediate_result;
-                    constexpr static const std::size_t padded_exponent_size = ExponentSize + 
-                            ((bits_per_row - ExponentSize % bits_per_row) 
-                                % bits_per_row); // for ExponentSize % bits_per_row = 0
+                    constexpr static const std::size_t bits_per_intermediate_result =
+                        2;    // defines
+                              // max degree of the constraints
+                              // 2 ** bits_per_intermediate_result
+                    constexpr static const std::size_t intermediate_results_per_row =
+                        (witness_amount - reserved_witnesses) / (bits_per_intermediate_result + 1);
+                    constexpr static const std::size_t bits_per_row =
+                        intermediate_results_per_row * bits_per_intermediate_result;
+                    constexpr static const std::size_t padded_exponent_size =
+                        ExponentSize + ((bits_per_row - ExponentSize % bits_per_row) %
+                                        bits_per_row);    // for ExponentSize % bits_per_row = 0
                     constexpr static const std::size_t main_rows = (ExponentSize % bits_per_row == 0) ?
-                        (ExponentSize / bits_per_row) : (ExponentSize / bits_per_row) + 1;
+                                                                       (ExponentSize / bits_per_row) :
+                                                                       (ExponentSize / bits_per_row) + 1;
 
                 public:
                     constexpr static const std::size_t rows_amount = 1 + main_rows;
@@ -117,49 +100,46 @@ namespace nil {
                     struct result_type {
                         var result = var(0, 0);
 
-                        result_type(const params_type &params,
-                            const std::size_t &component_start_row) {
-                                result = var(intermediate_start + intermediate_results_per_row - 1,
-                                    component_start_row + rows_amount - 1, false);
+                        result_type(const params_type &params, std::size_t component_start_row) {
+                            result = var(intermediate_start + intermediate_results_per_row - 1,
+                                         component_start_row + rows_amount - 1, false);
                         }
                     };
 
-                    static result_type generate_circuit(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t &start_row_index) {
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         std::size_t start_row_index) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
 
-                        if (selector_iterator == assignment.selectors_end()){
-                            first_selector_index = assignment.allocate_selector(selector_seed,
-                                gates_amount);
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
                             generate_gates(bp, assignment, params, first_selector_index);
                         } else {
                             first_selector_index = selector_iterator->second;
                         }
 
-                        assignment.enable_selector(first_selector_index, start_row_index + 1, 
-                                start_row_index + 1 + main_rows - 1);
+                        assignment.enable_selector(first_selector_index, start_row_index + 1,
+                                                   start_row_index + 1 + main_rows - 1);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
 
                         return result_type(params, start_row_index);
                     }
 
-                    static result_type generate_assignments(
-                            blueprint_assignment_table<ArithmetizationType>
-                                &assignment,
-                            const params_type &params,
-                            const std::size_t &start_row_index) {
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t start_row_index) {
 
                         typename BlueprintFieldType::value_type base = assignment.var_value(params.base);
                         typename BlueprintFieldType::value_type exponent = assignment.var_value(params.exponent);
 
                         std::array<bool, padded_exponent_size> bits;
-                        typename BlueprintFieldType::integral_type integral_exp = typename BlueprintFieldType::integral_type(exponent.data);
+                        typename BlueprintFieldType::integral_type integral_exp =
+                            typename BlueprintFieldType::integral_type(exponent.data);
                         for (std::size_t i = 0; i < padded_exponent_size; i++) {
                             bits[padded_exponent_size - i - 1] = multiprecision::bit_test(integral_exp, i);
                         }
@@ -170,7 +150,7 @@ namespace nil {
                         // we use first empty row to unify first row gate woth others
                         assignment.witness(W1)[start_row_index] = 0;
                         assignment.witness(intermediate_start + intermediate_results_per_row - 1)[start_row_index] = 1;
-                        std::size_t start_row_padded = start_row_index + 1; 
+                        std::size_t start_row_padded = start_row_index + 1;
 
                         std::size_t current_bit = 0;
                         for (std::size_t row = start_row_padded; row < start_row_padded + main_rows; row++) {
@@ -178,8 +158,9 @@ namespace nil {
 
                             for (std::size_t j = 0; j < intermediate_results_per_row; j++) {
                                 typename ArithmetizationType::field_type::value_type intermediate_exponent = 0;
-                                for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result; bit_column++) {
-                                    std::size_t column_idx = W14 - j * (bits_per_intermediate_result) - bit_column;
+                                for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result;
+                                     bit_column++) {
+                                    std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
                                     assignment.witness(column_idx)[row] = bits[current_bit];
 
                                     intermediate_exponent = 2 * intermediate_exponent + bits[current_bit];
@@ -191,8 +172,8 @@ namespace nil {
 
                                     current_bit++;
                                 }
-                                accumulated_n = (accumulated_n * (1 << bits_per_intermediate_result))
-                                                    + intermediate_exponent;
+                                accumulated_n =
+                                    (accumulated_n * (1 << bits_per_intermediate_result)) + intermediate_exponent;
                                 assignment.witness(intermediate_start + j)[row] = acc1;
                             }
                             assignment.witness(W1)[row] = accumulated_n;
@@ -201,12 +182,11 @@ namespace nil {
                         return result_type(params, start_row_index);
                     }
 
-                    private:
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment, 
-                        const params_type &params,
-                        const std::size_t first_selector_index) {
+                private:
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               const std::size_t first_selector_index) {
 
                         typename ArithmetizationType::field_type::value_type exponent_shift = 2;
                         exponent_shift = power(exponent_shift, bits_per_row);
@@ -216,11 +196,11 @@ namespace nil {
                         snark::plonk_constraint<BlueprintFieldType> accumulated_n_constraint;
                         for (std::size_t j = 0; j < intermediate_results_per_row; j++) {
                             snark::plonk_constraint<BlueprintFieldType> intermediate_result_constraint =
-                                j == 0 ? var(intermediate_start + intermediate_results_per_row - 1, -1) 
-                                        : var(intermediate_start + j - 1, 0);
+                                j == 0 ? var(intermediate_start + intermediate_results_per_row - 1, -1) :
+                                         var(intermediate_start + j - 1, 0);
 
                             for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result; bit_column++) {
-                                std::size_t column_idx = W14 - j * (bits_per_intermediate_result) - bit_column;
+                                std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
                                 auto bit_check_constraint = bp.add_bit_check(var(column_idx, 0));
                                 constraints.push_back(bit_check_constraint);
 
@@ -230,12 +210,13 @@ namespace nil {
                                 } else {
                                     accumulated_n_constraint = 2 * accumulated_n_constraint + var(column_idx, 0);
                                 }
-                                intermediate_result_constraint = 
-                                        intermediate_result_constraint * intermediate_result_constraint
-                                        * (bit_res + (1 - var(column_idx, 0)));
+                                intermediate_result_constraint = intermediate_result_constraint *
+                                                                 intermediate_result_constraint *
+                                                                 (bit_res + (1 - var(column_idx, 0)));
                             }
 
-                            intermediate_result_constraint = intermediate_result_constraint - var(intermediate_start + j, 0);
+                            intermediate_result_constraint =
+                                intermediate_result_constraint - var(intermediate_start + j, 0);
                             constraints.push_back(intermediate_result_constraint);
                         }
 
@@ -243,26 +224,27 @@ namespace nil {
 
                         constraints.push_back(accumulated_n_constraint);
 
-                        snark::plonk_gate<BlueprintFieldType, snark::plonk_constraint<BlueprintFieldType>>
-                            gate(first_selector_index, constraints);
+                        snark::plonk_gate<BlueprintFieldType, snark::plonk_constraint<BlueprintFieldType>> gate(
+                            first_selector_index, constraints);
                         bp.add_gate(gate);
                     }
 
-                    static void generate_copy_constraints(
-                            blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const params_type &params,
-                            const std::size_t &component_start_row){
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
 
                         for (std::size_t row = component_start_row; row < component_start_row + rows_amount; row++) {
                             bp.add_copy_constraint({{W0, static_cast<int>(row), false}, params.zero});
                         }
                         bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, params.base});
-                        bp.add_copy_constraint(
-                            {{intermediate_start + intermediate_results_per_row - 1, static_cast<int>(component_start_row), false},
-                            params.one});
+                        bp.add_copy_constraint({{intermediate_start + intermediate_results_per_row - 1,
+                                                 static_cast<int>(component_start_row), false},
+                                                params.one});
                         // check that the recalculated n is equal to the input challenge
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
+                        bp.add_copy_constraint(
+                            {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
                     }
                 };
             }    // namespace components
