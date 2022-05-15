@@ -456,9 +456,6 @@ namespace nil {
                     typedef typename node_type::value_type value_type;
 
                     merkle_tree_impl<T, Arity> ret(std::distance(first, last));
-//                    ret.set_row_count(detail::merkle_tree_row_count(std::distance(first, last), Arity));
-//                    ret.set_leaves(std::distance(first, last));
-//                    ret.set_complete_size(detail::merkle_tree_length(std::distance(first, last), Arity));
 
                     ret.reserve(ret.complete_size());
 
@@ -474,10 +471,6 @@ namespace nil {
                         for (size_t i = 0; i < row_size; ++i, it += Arity) {
                             ret.emplace_back(generate_hash<hash_type>(it, it + Arity));
                         }
-                    }
-
-                    for (auto &i: ret) {
-                        std::cout << i << std::endl;
                     }
                     return ret;
                 }
