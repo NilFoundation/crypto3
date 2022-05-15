@@ -125,7 +125,7 @@ namespace nil {
                         assert(number < domain->m);
 
                         math::polynomial_dfs<typename FieldType::value_type> f (
-                            0, domain->m, FieldType::value_type::zero());
+                            domain->m-1, domain->m, FieldType::value_type::zero());
                         
                         if (number < domain->m) {
                             f[number] = FieldType::value_type::one();
@@ -305,11 +305,13 @@ namespace nil {
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_id(permutation_size);
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
-                            std:
-                            S_id[i].resize(table_size);
+                            std::vector<typename FieldType::value_type> data(table_size);
+
                             for (std::size_t j = 0; j < table_size; j++) {
-                                S_id[i][j] = delta.pow(i) * omega.pow(j);
+                                data[j] = delta.pow(i) * omega.pow(j);
                             }
+
+                            S_id[i] = math::polynomial_dfs<typename FieldType::value_type>(domain->m - 1, data);
                         }
 
                         return S_id;
@@ -324,11 +326,14 @@ namespace nil {
 
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_perm(permutation_size);
                         for (std::size_t i = 0; i < permutation_size; i++) {
-                            S_perm[i].resize(table_size);
+                            std::vector<typename FieldType::value_type> data(table_size);
+
                             for (std::size_t j = 0; j < table_size; j++) {
                                 auto key = std::make_pair(i, j);
-                                S_perm[i][j] = delta.pow(permutation[key].first) * omega.pow(permutation[key].second);
+                                data[j] = delta.pow(permutation[key].first) * omega.pow(permutation[key].second);
                             }
+
+                            S_perm[i] = math::polynomial_dfs<typename FieldType::value_type>(domain->m - 1, data);
                         }
 
                         return S_perm;

@@ -108,12 +108,12 @@ namespace nil {
                         }
 
                         // 3. Calculate $V_P$
-                        math::polynomial_dfs<typename FieldType::value_type> V_P;
-                        V_P.resize(table_rows);
+                        math::polynomial_dfs<typename FieldType::value_type> V_P(table_rows - 1, table_rows);
 
                         V_P[0] = FieldType::value_type::one();
                         for (std::size_t j = 1; j < table_rows; j++) {
-                            V_P[j] = V_P[j - 1] * id_binding[j - 1] / sigma_binding[j - 1];
+                            V_P[j] = V_P[j - 1] * id_binding.evaluate(domain->get_domain_element(j - 1)) /
+                                sigma_binding.evaluate(domain->get_domain_element(j - 1));
                         }
 
                         math::polynomial<typename FieldType::value_type> V_P_normal =
@@ -141,7 +141,7 @@ namespace nil {
                         }
 
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
-                            0, V_P.size(), FieldType::value_type::one());
+                            V_P.size()-1, V_P.size(), FieldType::value_type::one());
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
                         math::polynomial_dfs<typename FieldType::value_type> V_P_shifted =
@@ -196,6 +196,7 @@ namespace nil {
 
                         std::array<typename FieldType::value_type, argument_size> F;
                         typename FieldType::value_type one = FieldType::value_type::one();
+
                         F[0] = preprocessed_data.common_data.lagrange_0.evaluate(challenge) * (one - perm_polynomial_value);
                         F[1] = (one - preprocessed_data.q_last.evaluate(challenge) -
                                 preprocessed_data.q_blind.evaluate(challenge)) *
