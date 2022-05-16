@@ -69,6 +69,7 @@ option(CRYPTO3_HASH_STREEBOG "Build with Streebog hash support" TRUE)
 option(CRYPTO3_HASH_TIGER "Build with Tiger hash support" TRUE)
 option(CRYPTO3_HASH_WHIRLPOOL "Build with Whirlpool hash support" TRUE)
 option(CRYPTO3_HASH_POSEIDON "Build with Poseidon hash support" TRUE)
+option(CRYPTO3_HASH_PEDERSEN "Build with Pedersen hash support" TRUE)
 
 set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
 
