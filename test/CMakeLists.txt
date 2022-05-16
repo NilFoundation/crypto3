@@ -87,6 +87,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/basic_verifier"
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles"
+    "sponge/sponge"
     )
 
 set(FIELDS_TESTS_FILES
