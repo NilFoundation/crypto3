@@ -216,33 +216,33 @@ namespace nil {
                         F[8] = prover_res[0];
 
                         /////TEST
-                        for (std::size_t i = 0; i < f_parts; i++) {
-                            for (std::size_t j = 0; j < table_description.rows_amount; j++) {
-                                if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != FieldType::value_type::zero()) {
-                                    std::cout<<"F["<<i<<"] != 0 at j = "<<j<<std::endl;
-                                }
-                            }
-                        }
+                        // for (std::size_t i = 0; i < f_parts; i++) {
+                        //     for (std::size_t j = 0; j < table_description.rows_amount; j++) {
+                        //         if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != FieldType::value_type::zero()) {
+                        //             std::cout<<"F["<<i<<"] != 0 at j = "<<j<<std::endl;
+                        //         }
+                        //     }
+                        // }
 
-                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
-                        std::cout<<"Gates size: "<<gates.size()<<std::endl;
+                        // const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
+                        // std::cout<<"Gates size: "<<gates.size()<<std::endl;
 
-                        for (std::size_t i = 0; i < gates.size(); i++) {
-                            std::cout<<"gate "<<i<<" use selector "<<gates[i].selector_index<<std::endl;
-                            for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-                                math::polynomial<typename FieldType::value_type> constraint_result =
-                                    gates[i].constraints[j].evaluate(polynomial_table, preprocessed_public_data.common_data.basic_domain) * 
-                                        polynomial_table.selector(gates[i].selector_index);
-                                for (std::size_t k = 0; k < table_description.rows_amount; k++) {
-                                    if (constraint_result.evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(k)) != FieldType::value_type::zero()) {
-                                        std::cout<<"constraint "<<j<<" from gate "<<i<<" on row "<<k<<std::endl;
-                                        std::cout<<"selector: "<<gates[i].selector_index<<" ("<<polynomial_table.selector(gates[i].selector_index).evaluate(
-                                            preprocessed_public_data.common_data.basic_domain->get_domain_element(k)
-                                        ).data<<")"<<std::endl;
-                                    }
-                                }
-                            }
-                        }
+                        // for (std::size_t i = 0; i < gates.size(); i++) {
+                        //     std::cout<<"gate "<<i<<" use selector "<<gates[i].selector_index<<std::endl;
+                        //     for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
+                        //         math::polynomial<typename FieldType::value_type> constraint_result =
+                        //             gates[i].constraints[j].evaluate(polynomial_table, preprocessed_public_data.common_data.basic_domain) * 
+                        //                 polynomial_table.selector(gates[i].selector_index);
+                        //         for (std::size_t k = 0; k < table_description.rows_amount; k++) {
+                        //             if (constraint_result.evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(k)) != FieldType::value_type::zero()) {
+                        //                 std::cout<<"constraint "<<j<<" from gate "<<i<<" on row "<<k<<std::endl;
+                        //                 std::cout<<"selector: "<<gates[i].selector_index<<" ("<<polynomial_table.selector(gates[i].selector_index).evaluate(
+                        //                     preprocessed_public_data.common_data.basic_domain->get_domain_element(k)
+                        //                 ).data<<")"<<std::endl;
+                        //             }
+                        //         }
+                        //     }
+                        // }
                         /////
 
                         // 7. Aggregate quotient polynomial
