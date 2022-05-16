@@ -15,10 +15,10 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-* [Algebra](https://github.com/nilfoundation/crypto3-algebra.git).
-* [Math](https://github.com/nilfoundation/crypto3-math.git).
-* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git).
-* [ZK](https://github.com/nilfoundation/crypto3-zk.git).
+* [Crypto3.Algebra](https://github.com/nilfoundation/crypto3-algebra.git).
+* [Crypto3.Math](https://github.com/nilfoundation/crypto3-math.git).
+* [Crypto3.Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git).
+* [Crypto3.ZK](https://github.com/nilfoundation/crypto3-zk.git).
 
 ### External
 * [Boost](https://boost.org) (>= 1.76)
