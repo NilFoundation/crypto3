@@ -35,7 +35,6 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <boost/test/unit_test.hpp>
-#include <boost/test/included/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
