@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <aux_sponge.hpp>
+#include <../test/sponge/aux_sponge.hpp>
 
 #include "test_plonk_component.hpp"
 
