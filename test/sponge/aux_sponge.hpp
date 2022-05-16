@@ -90,6 +90,7 @@ namespace nil {
 
                     struct params_type {
                         std::vector<var> input;
+                        var zero;
                     };
 
                     struct result_type {
@@ -107,8 +108,7 @@ namespace nil {
 
                         std::size_t row = start_row_index;
                         sponge_type sponge;
-                        var zero = var(0, 0, false);
-                        sponge.init_generate_constraints(bp, assignment, zero, row);
+                        sponge.init_circuit(bp, assignment, params.zero, row);
                         for (std::size_t i = 0; i < params.input.size(); ++i) {
                             sponge.absorb_circuit(bp, assignment, params.input[i], row);
                         }

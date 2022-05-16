@@ -161,7 +161,7 @@ namespace nil {
                         component_start_row++;
                     }
 
-                    void init_generate_constraints(blueprint<ArithmetizationType> &bp,
+                    void init_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const var &zero,
                         std::size_t &component_start_row) {
@@ -240,12 +240,9 @@ namespace nil {
                                 permute_assignment(assignment,
                                     component_start_row);
                                 this->state_count = 1;
-                                // TODO: poseidon should return var
-                                return var(W0, component_start_row - 1, false);
+                                return this->state[0];
                             } else {
-                                this->state_count++;
-
-                                return var(W0 + this->state_count, component_start_row - 1, false);
+                                return this->state[this->state_count++];
                             }
                         } else {
                             permute_assignment(assignment,
@@ -254,7 +251,7 @@ namespace nil {
                             this->state_absorbed = false;
                             this->state_count = 1;
 
-                            return var(W0, component_start_row - 1, false);
+                            return this->state[0];
                         }
                     }
 
@@ -267,12 +264,9 @@ namespace nil {
                                 permute_circuit(bp, assignment,
                                     component_start_row);
                                 this->state_count = 1;
-                                // TODO: poseidon should return var
-                                return var(W0, component_start_row - 1, false);
+                                return this->state[0];
                             } else {
-                                this->state_count++;
-
-                                return var(W0 + this->state_count, component_start_row - 1, false);
+                                return this->state[this->state_count++];
                             }
                         } else {
                             permute_circuit(bp, assignment,
@@ -281,7 +275,7 @@ namespace nil {
                             this->state_absorbed = false;
                             this->state_count = 1;
 
-                            return var(W0, component_start_row - 1, false);
+                            return this->state[0];
                         }  
                     }
                 };
