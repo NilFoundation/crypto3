@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
+// Copyright (c) 2022 Ekaterina Chukavina <kate@nil.foundation>
 //
 // MIT License
 //
@@ -31,7 +32,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -71,32 +72,20 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = 3;
-
+                    constexpr static const std::size_t selector_seed = 0x0FFE;
+                    constexpr static const std::size_t gates_amount = 3;
                     struct params_type {
                         std::array<var, 2> data;
                     };
 
-                    struct allocated_data_type {
-                        allocated_data_type() {
-                            previously_allocated = false;
-                        }
-
-                        // TODO access modifiers
-                        bool previously_allocated;
-                        std::array<std::size_t, 1> selectors;
-                    };
-
                     struct result_type {
-                        std::array<var, 8> output_state = {var(0, 0, false), var(0, 0, false), var(0, 0, false),
-                                                           var(0, 0, false), var(0, 0, false), var(0, 0, false),
-                                                           var(0, 0, false), var(0, 0, false)};
+                        std::array<var, 8> output;
 
-                        result_type(std::size_t component_start_row) {
-                            std::array<var, 8> output_state = {
-                                var(W0, component_start_row + 1, false), var(W1, component_start_row + 1, false),
-                                var(W2, component_start_row + 1, false), var(W3, component_start_row + 1, false),
-                                var(W4, component_start_row + 1, false), var(W5, component_start_row + 1, false),
-                                var(W6, component_start_row + 1, false), var(W7, component_start_row + 1, false)};
+                        result_type(std::size_t start_row_index) {
+                            output = {var(W0, start_row_index + 1, false), var(W1, start_row_index + 1, false),
+                                      var(W2, start_row_index + 1, false), var(W3, start_row_index + 1, false),
+                                      var(W4, start_row_index + 1, false), var(W5, start_row_index + 1, false),
+                                      var(W6, start_row_index + 1, false), var(W7, start_row_index + 1, false)};
                         }
                     };
 
@@ -104,21 +93,32 @@ namespace nil {
                         return bp.allocate_rows(rows_amount);
                     }
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        allocated_data_type &allocated_data,
-                                                        std::size_t component_start_row) {
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         std::size_t start_row_index) {
+                        std::size_t j = start_row_index + 1;
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
 
-                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
-                        return result_type(component_start_row);
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
+                        }
+
+                        assignment.enable_selector(first_selector_index, j);
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
+
+                        return result_type(start_row_index);
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
+                                                            std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
                         std::array<typename ArithmetizationType::field_type::integral_type, 2> data = {
                             typename ArithmetizationType::field_type::integral_type(
                                 assignment.var_value(params.data[0]).data),
@@ -126,13 +126,15 @@ namespace nil {
                                 assignment.var_value(params.data[1]).data)};
                         std::array<typename ArithmetizationType::field_type::integral_type, 16> range_chunks;
                         std::size_t shift = 0;
+
                         for (std::size_t i = 0; i < 8; i++) {
-                            range_chunks[i] = (data[0] >> shift) & (1 << 16 - 1);
+                            range_chunks[i] = (data[0] >> shift) & ((1 << 16) - 1);
                             assignment.witness(i)[row] = range_chunks[i];
-                            range_chunks[i + 8] = (data[1] >> shift) & (1 << 16 - 1);
+                            range_chunks[i + 8] = (data[1] >> shift) & ((1 << 16) - 1);
                             assignment.witness(i)[row + 2] = range_chunks[i + 8];
                             shift += 16;
                         }
+
                         assignment.witness(8)[row] = data[0];
                         assignment.witness(8)[row + 2] = data[1];
 
@@ -145,30 +147,25 @@ namespace nil {
                         assignment.witness(6)[row + 1] = range_chunks[13] * (1 << 16) + range_chunks[12];
                         assignment.witness(7)[row + 1] = range_chunks[15] * (1 << 16) + range_chunks[14];
 
-                        return result_type(component_start_row);
+                        return result_type(start_row_index);
                     }
 
                 private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_assignment_table<ArithmetizationType> &assignment,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
-                                               allocated_data_type &allocated_data,
-                                               std::size_t component_start_row) {
-                        std::size_t j = component_start_row + 1;
-                        std::size_t selector_index;
-                        if (!allocated_data.previously_allocated) {
-                            selector_index = assignment.add_selector(j);
-                            allocated_data.selectors[1] = selector_index;
-                        } else {
-                            selector_index = allocated_data.selectors[1];
-                            assignment.enable_selector(selector_index, j);
-                        }
+                                               std::size_t first_selector_index) {
+
+                        std::size_t selector_index = first_selector_index;
+
                         auto constraint_1 =
-                            bp.add_constraint(var(W8, -1) - (var(W0, 0) + var(W1, 0) * (1 << 32) +
-                                                             var(W2, 0) * (1 << 64) + var(W3, 0) * (1 << 96)));
+                            bp.add_constraint(var(W8, -1) - (var(W0, 0) + var(W1, 0) * 0x100000000_cppui255 +
+                                                             var(W2, 0) * 0x10000000000000000_cppui255 +
+                                                             var(W3, 0) * 0x1000000000000000000000000_cppui255));
                         auto constraint_2 =
-                            bp.add_constraint(var(W8, +1) - (var(W4, 0) + var(W1, 5) * (1 << 32) +
-                                                             var(W6, 0) * (1 << 64) + var(W7, 0) * (1 << 96)));
+                            bp.add_constraint(var(W8, 1) - (var(W4, 0) + var(W5, 0) * 0x100000000_cppui255 +
+                                                            var(W6, 0) * 0x10000000000000000_cppui255 +
+                                                            var(W7, 0) * 0x1000000000000000000000000_cppui255));
                         auto constraint_3 = bp.add_constraint(var(W0, 0) - (var(W0, -1) + var(W1, -1) * (1 << 16)));
                         auto constraint_4 = bp.add_constraint(var(W1, 0) - (var(W2, -1) + var(W3, -1) * (1 << 16)));
                         auto constraint_5 = bp.add_constraint(var(W2, 0) - (var(W4, -1) + var(W5, -1) * (1 << 16)));
@@ -177,19 +174,16 @@ namespace nil {
                         auto constraint_8 = bp.add_constraint(var(W5, 0) - (var(W2, +1) + var(W3, +1) * (1 << 16)));
                         auto constraint_9 = bp.add_constraint(var(W6, 0) - (var(W4, +1) + var(W5, +1) * (1 << 16)));
                         auto constraint_10 = bp.add_constraint(var(W7, 0) - (var(W6, +1) + var(W7, +1) * (1 << 16)));
-                        if (!allocated_data.previously_allocated) {
-                            bp.add_gate(selector_index,
-                                        {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
-                                         constraint_6, constraint_7, constraint_8, constraint_9, constraint_10});
-                        }
-
-                        // to-do add lookup constraints
+                        bp.add_gate(selector_index,
+                                    { constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
+                                     constraint_6, constraint_7, constraint_8, constraint_9, constraint_10});
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row) {
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t start_row_index) {
                     }
                 };
 

@@ -72,22 +72,13 @@ namespace nil {
                         zk::components::endo_scalar<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
                                                     W9, W10, W11, W12, W13, W14>;
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
-<<<<<<< HEAD
-                    using exponentiation_component = zk::components::exponentiation<ArithmetizationType, 60,
-                                                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    using mul_component = zk::components::multiplication<ArithmetizationType,
-                                                            W0, W1, W2>;
-                    
-                    struct field_op_component {
-                        
-=======
+
                     using exponentiation_component =
                         zk::components::exponentiation<ArithmetizationType, 60, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                                                        W10, W11, W12, W13, W14>;
 
                     struct field_op_component {
                         using mul = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
->>>>>>> c74498b3e9f8dc071b677a3de8179ac9f9fe7af0
                         // TODO: change to add / sub
                         using add = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                         using sub = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
@@ -123,15 +114,6 @@ namespace nil {
                     }
 
                     static var assigment_multiplication(blueprint_assignment_table<ArithmetizationType> &assignment,
-<<<<<<< HEAD
-                            var x,
-                            var y,
-                            std::size_t &component_start_row) {
-                        typename mul_component::params_type params = {x, y};
-                        typename mul_component::result_type res = 
-                            mul_component::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += mul_component::rows_amount;
-=======
                                                         var x,
                                                         var y,
                                                         std::size_t &component_start_row) {
@@ -139,7 +121,6 @@ namespace nil {
                         typename field_op_component::mul::result_type res =
                             field_op_component::mul::generate_assignments(assignment, params, component_start_row);
                         component_start_row += field_op_component::mul::rows_amount;
->>>>>>> c74498b3e9f8dc071b677a3de8179ac9f9fe7af0
                         return res.res;
                     }
 
@@ -361,21 +342,12 @@ namespace nil {
                             0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         std::size_t endo_num_bits = 128;
                         // alpha = phi(alpha_challenge)
-<<<<<<< HEAD
-                        var alpha_endo = endo_scalar_component::generate_circuit(bp, assignment,
-                            {params.fq_output.alpha, endo_factor, endo_num_bits}, row).endo_scalar;
-                        row += endo_scalar_component::rows_amount;
-                        // zeta = phi(zeta_challenge)
-                        var zeta_endo = endo_scalar_component::generate_circuit(bp, assignment,
-                            {params.fq_output.zeta, endo_factor, endo_num_bits}, row).endo_scalar;
-=======
                         endo_scalar_component::generate_circuit(
                             bp, assignment, {params.fq_output.alpha, endo_factor, endo_num_bits}, row);
                         row += endo_scalar_component::rows_amount;
                         // zeta = phi(zeta_challenge)
                         endo_scalar_component::generate_circuit(
                             bp, assignment, {params.fq_output.zeta, endo_factor, endo_num_bits}, row);
->>>>>>> c74498b3e9f8dc071b677a3de8179ac9f9fe7af0
                         row += endo_scalar_component::rows_amount;
 
                         // fr_transcript.absorb(fq_digest)
@@ -453,19 +425,12 @@ namespace nil {
                         var zeta_omega = assigment_multiplication(assignment, zeta, params.verifier_index.omega, row);
                         var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
 
-<<<<<<< HEAD
-                        std::vector<var> alpha_powers = assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
-                        std::vector<var> omega_powers = assigment_element_powers(assignment, params.verifier_index.omega,
-                            params.verifier_index.public_input_size, row);
-                        std::vector<var> lagrange_base = assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
-=======
                         std::vector<var> alpha_powers =
                             assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
                         std::vector<var> omega_powers =
                             assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
                         std::vector<var> lagrange_base =
                             assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
->>>>>>> c74498b3e9f8dc071b677a3de8179ac9f9fe7af0
 
                         // TODO: check on empty public_input
                         std::array<var, 2> public_eval = assignment_puiblic_eval(
