@@ -107,13 +107,18 @@ namespace nil {
                             }
                         }
 
+                        math::polynomial<typename FieldType::value_type> id_binding_normal =
+                            math::polynomial<typename FieldType::value_type>(id_binding.coefficients());
+                        math::polynomial<typename FieldType::value_type> sigma_binding_normal =
+                            math::polynomial<typename FieldType::value_type>(sigma_binding.coefficients());
+                            
                         // 3. Calculate $V_P$
                         math::polynomial_dfs<typename FieldType::value_type> V_P(table_rows - 1, table_rows);
 
                         V_P[0] = FieldType::value_type::one();
                         for (std::size_t j = 1; j < table_rows; j++) {
-                            V_P[j] = V_P[j - 1] * id_binding.evaluate(domain->get_domain_element(j - 1)) /
-                                sigma_binding.evaluate(domain->get_domain_element(j - 1));
+                            V_P[j] = V_P[j - 1] * id_binding_normal.evaluate(domain->get_domain_element(j - 1)) /
+                                sigma_binding_normal.evaluate(domain->get_domain_element(j - 1));
                         }
 
                         math::polynomial<typename FieldType::value_type> V_P_normal =
