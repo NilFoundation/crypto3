@@ -30,6 +30,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
@@ -117,7 +118,7 @@ namespace nil {
 
                         struct params_type {
                             bool operator==(const params_type &rhs) const {
-                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D && q == rhs.q;
+                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D;
                             }
                             bool operator!=(const params_type &rhs) const {
                                 return !(rhs == *this);
@@ -178,8 +179,8 @@ namespace nil {
                             precommit(const math::polynomial<typename FieldType::value_type> &f,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
-                            math::polynomial_dfs<typename FieldType::value_type> f;
-                            f.from_coefficients(f);
+                            math::polynomial_dfs<typename FieldType::value_type> f_dfs;
+                            f_dfs.from_coefficients(f);
 
                             return precommit(f_dfs, D);
                         }
@@ -252,8 +253,8 @@ namespace nil {
                                 }
 
                                 // create polynomial of degree (degree(f) / 2)
-                                math::polynomial_dfs<typename FieldType::value_type> f_next = fold_polynomial<FieldType>(
-                                    f, alpha);
+                                math::polynomial_dfs<typename FieldType::value_type> f_next =
+                                    fold_polynomial<FieldType>(f, alpha);
 
                                 // m = 2, so:
                                 std::array<std::size_t, m> s_indices;
@@ -296,7 +297,6 @@ namespace nil {
                                         round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
                                 }
 
-                                x = x_next;
                                 x_index = x_next_index;
                                 f = f_next;
                             }
@@ -399,6 +399,7 @@ namespace nil {
                                                 const math::polynomial<typename FieldType::value_type> &V,
                                                 transcript_type &transcript = transcript_type()) {
 
+                            math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
                             std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
 
@@ -407,7 +408,7 @@ namespace nil {
                             for (std::size_t i = 0; i < r; i++) {
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
-                                typename FieldType::value_type x_next = fri_params.q.evaluate(x);
+                                typename FieldType::value_type x_next = q.evaluate(x);
 
                                 // m = 2, so:
                                 std::array<typename FieldType::value_type, m> s;

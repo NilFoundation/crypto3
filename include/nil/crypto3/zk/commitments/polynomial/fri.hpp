@@ -80,8 +80,9 @@ namespace nil {
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
 
+                    template<typename PolynomialType>
                     static typename basic_fri::proof_type proof_eval(
-                        const math::polynomial<typename FieldType::value_type> &g,
+                        const PolynomialType &g,
                         precommitment_type &T,
                         const typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {

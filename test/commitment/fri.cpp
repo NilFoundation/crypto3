@@ -84,15 +84,12 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
 
-    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     params.r = r;
     params.D = D;
-    params.q = q;
     params.max_degree = d - 1;
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
-    BOOST_CHECK(params.q.evaluate(D[0]->get_domain_element(1)) == D[0]->get_domain_element(1).squared());
 
     // commit
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
@@ -144,13 +141,12 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
 
     params.r = r;
     params.D = D;
-    params.q = q;
 
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
 
     typename FieldType::value_type omega = D[0]->get_domain_element(1);
 
-    typename FieldType::value_type x_next = params.q.evaluate(omega);
+    typename FieldType::value_type x_next = q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
 
     math::polynomial<typename FieldType::value_type> f_next = zk::commitments::detail::fold_polynomial<FieldType>(f, alpha);
@@ -197,7 +193,6 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
 
     params.r = r - 1;
     params.D = D;
-    params.q = f;
     params.max_degree = d - 1;
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);
@@ -249,15 +244,12 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_test) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
 
-    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     params.r = r;
     params.D = D;
-    params.q = q;
     params.max_degree = d - 1;
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
-    BOOST_CHECK(params.q.evaluate(D[0]->get_domain_element(1)) == D[0]->get_domain_element(1).squared());
 
     // commit
     std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f = {{
