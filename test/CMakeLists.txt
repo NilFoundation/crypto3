@@ -91,6 +91,7 @@ set(PLONK_TESTS_FILES
 
 set(FIELDS_TESTS_FILES
     "algebra/fields/plonk/field_operations"
+    "algebra/fields/plonk/combined_inner_product"
     "algebra/fields/r1cs/fp2"
     "algebra/fields/r1cs/fp2_verification"
     "algebra/fields/r1cs/fp3"
