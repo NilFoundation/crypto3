@@ -81,6 +81,7 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/multi_scalar_multiplication"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
+    "hashes/plonk/decomposition"
     "merkle_tree/plonk/merkle_tree"
     "verifiers/kimchi/base_field"
     "verifiers/kimchi/scalar_field"
