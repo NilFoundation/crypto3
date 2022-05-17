@@ -121,22 +121,16 @@ namespace nil {
 
                         template<std::size_t list_size>
                         static precommitment_type precommit(
-                            const std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                            const std::array<math::polynomial_dfs<typename FieldType::value_type>, list_size> &poly,
                             const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                             std::vector<std::array<std::uint8_t, field_element_type::length() * list_size>> y_data;
                             y_data.resize(D->m);
-                            std::array<std::vector<typename FieldType::value_type>, list_size> poly_dfs;
-                            for (std::size_t i = 0; i < list_size; i++) {
-                                poly_dfs[i].resize(poly[i].size());
-                                std::copy(poly[i].begin(), poly[i].end(), poly_dfs[i].begin());
-                                D->fft(poly_dfs[i]);
-                            }
 
                             for (std::size_t i = 0; i < D->m; i++) {
                                 for (std::size_t j = 0; j < list_size; j++) {
 
-                                    field_element_type y_val(poly_dfs[j][i]);
+                                    field_element_type y_val(poly[j][i]);
                                     auto write_iter = y_data[i].begin() + field_element_type::length() * j;
                                     y_val.write(write_iter, field_element_type::length());
                                 }
@@ -145,11 +139,28 @@ namespace nil {
                             return precommitment_type(y_data.begin(), y_data.end());
                         }
 
+                        template<std::size_t list_size>
+                        static precommitment_type precommit(
+                            const std::array<math::polynomial<typename FieldType::value_type>, list_size> &poly,
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+
+                            std::vector<std::array<std::uint8_t, field_element_type::length() * list_size>> y_data;
+                            y_data.resize(D->m);
+
+                            std::array<math::polynomial_dfs<typename FieldType::value_type>, list_size> poly_dfs;
+                            for (std::size_t i = 0; i < list_size; i++) {
+                                poly_dfs[i].from_coefficients(poly[i]);
+                            }
+
+                            return precommitment_type(poly_dfs, D);
+                        }
+
                         static commitment_type commit(precommitment_type P) {
                             return P.root();
                         }
 
-                        static commitment_type commit(math::polynomial<typename FieldType::value_type> &f,
+                        template <typename PolynomialType>
+                        static commitment_type commit(PolynomialType &f,
                                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
                             return commit(precommit(f, D));
                         }
@@ -170,7 +181,7 @@ namespace nil {
                             std::size_t domain_size = fri_params.D[0]->m;
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
                             std::uint64_t x_next_index;
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(x_index);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                             std::size_t r = fri_params.r;
 
@@ -268,7 +279,7 @@ namespace nil {
                                         transcript_type &transcript = transcript_type()) {
 
                             std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
 
                             std::size_t r = fri_params.r;
 
@@ -377,7 +388,7 @@ namespace nil {
                                         transcript_type &transcript = transcript_type()) {
 
                             std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
 
                             std::size_t r = fri_params.r;
 
@@ -484,7 +495,7 @@ namespace nil {
                                                 transcript_type &transcript = transcript_type()) {
 
                             std::size_t idx = transcript.template int_challenge<std::size_t>();
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
 
                             std::size_t r = fri_params.r;
 

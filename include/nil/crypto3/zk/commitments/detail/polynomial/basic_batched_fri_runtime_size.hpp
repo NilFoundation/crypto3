@@ -168,8 +168,7 @@ namespace nil {
                             std::size_t domain_size = fri_params.D[0]->m;
                             std::size_t x_index = (transcript.template int_challenge<std::size_t>())%domain_size;
                             std::size_t x_next_index;
-                            typename FieldType::value_type x =
-                                fri_params.D[0]->get_domain_element(1).pow(x_index);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                             std::size_t r = fri_params.r;
 
@@ -273,7 +272,7 @@ namespace nil {
                             std::size_t leaf_size = U.size();
 
                             std::size_t idx = transcript.template int_challenge<std::size_t>();
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
 
                             std::size_t r = fri_params.r;
 
@@ -385,7 +384,7 @@ namespace nil {
                             std::size_t leaf_size = U.size();
 
                             std::size_t idx = transcript.template int_challenge<std::size_t>();
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
 
                             std::size_t r = fri_params.r;
 
