@@ -147,9 +147,11 @@ namespace nil {
                     math::polynomial_dfs<typename VariableType::assignment_type>
                         evaluate(const plonk_polynomial_dfs_table<FieldType, ArithmetizationParams> &assignments,
                             std::shared_ptr<math::evaluation_domain<FieldType>> domain) const {
-                        math::polynomial_dfs<typename VariableType::assignment_type> acc (0, domain->m + 1);
+                        math::polynomial_dfs<typename VariableType::assignment_type> acc (
+                            0, domain->m, FieldType::value_type::zero());
                         for (const math::non_linear_term<VariableType> &nlt : this->terms) {
-                            math::polynomial_dfs<typename VariableType::assignment_type> term_value = {nlt.coeff};
+                            math::polynomial_dfs<typename VariableType::assignment_type> term_value (
+                                0, domain->m, nlt.coeff);
 
                             for (const VariableType &var : nlt.vars) {
 

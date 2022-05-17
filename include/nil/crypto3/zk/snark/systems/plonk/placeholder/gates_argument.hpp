@@ -77,7 +77,8 @@ namespace nil {
                         const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
-                            math::polynomial<typename FieldType::value_type> gate_result = {0};
+                            math::polynomial_dfs<typename FieldType::value_type> gate_result(
+                                0, domain->m, FieldType::value_type::zero());
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
                                 gate_result =
@@ -87,7 +88,7 @@ namespace nil {
 
                             gate_result = gate_result * column_polynomials.selector(gates[i].selector_index);
 
-                            F[0] = F[0] + gate_result;
+                            F[0] = F[0] + math::polynomial<typename FieldType::value_type>(gate_result.coefficients());
                         }
 
                         return F;
