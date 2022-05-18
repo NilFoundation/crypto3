@@ -44,7 +44,7 @@
 
 #include <nil/crypto3/hash/poseidon.hpp>
 
-#include <nil/crypto3/zk/transcript/sponge_transcript.hpp>
+#include <nil/crypto3/zk/transcript/kimchi_transcript.hpp>
 
 using namespace nil::crypto3;
 
