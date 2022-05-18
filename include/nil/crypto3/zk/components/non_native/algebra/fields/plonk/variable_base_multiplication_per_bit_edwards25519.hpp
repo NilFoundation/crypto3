@@ -190,6 +190,8 @@ namespace nil {
 
                         std::cout<<"Rx: "<<assignment.var_value(R_x[0]).data<<" "<<assignment.var_value(R_x[1]).data<<" "<<assignment.var_value(R_x[2]).data<<" "
                         <<assignment.var_value(R_x[3]).data<<std::endl;
+                        std::cout<<"Rx: "<<assignment.var_value(R_y[0]).data<<" "<<assignment.var_value(R_y[1]).data<<" "<<assignment.var_value(R_y[2]).data<<" "
+                        <<assignment.var_value(R_y[3]).data<<std::endl;
 
                         auto s0 = multiplication_component::generate_assignments(assignment, typename multiplication_component::params_type({R_x, R_x}), row);
                         row+=multiplication_component::rows_amount;
@@ -461,10 +463,6 @@ namespace nil {
 
                         auto z3 = addition_component::generate_circuit(bp, assignment, typename addition_component::params_type({z1.output, z2.output}), row);
                         row+=addition_component::rows_amount;
-
-                        auto z3 = addition_component::generate_circuit(
-                            bp, assigment, addition_component::params_type(z1.output, z2.output), row);
-                        row += addition_component::rows_amount;
 
                         // generate_copy_constraints(bp, assignment, params, j);
 
