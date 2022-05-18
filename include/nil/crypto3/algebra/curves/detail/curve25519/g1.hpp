@@ -36,6 +36,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 struct curve25519;
+                struct ed25519;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of curve25519 curve.
@@ -46,7 +47,8 @@ namespace nil {
                     struct curve25519_g1 {
                         using params_type = curve25519_g1_params<Form>;
 
-                        using curve_type = curve25519;
+                        using curve_type = typename std::conditional<
+                            std::is_same<Form, forms::twisted_edwards>::value, ed25519, curve25519>::type;
 
                         using field_type = typename params_type::field_type;
 
