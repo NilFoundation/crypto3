@@ -35,18 +35,6 @@
 
 namespace nil {
     namespace crypto3 {
-        template<typename TIter>
-        void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
-            os << std::hex;
-            for (TIter it = iter_begin; it != iter_end; it++) {
-                os << std::setfill('0') << std::setw(2) << std::right << int(*it);
-            }
-            os << std::dec;
-            if (endl) {
-                os << std::endl;
-            }
-        }
-
         template<typename ValueType>
         void profiling(std::vector<ValueType> column) {
             for (std::size_t index = 0; index < column.size(); index++) {
