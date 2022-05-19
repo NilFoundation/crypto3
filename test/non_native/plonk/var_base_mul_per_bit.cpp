@@ -79,17 +79,15 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
 
     std::array<var, 4> input_var_Ya = {var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input),
         var(0, 10, false, var::column_type::public_input), var(0, 11, false, var::column_type::public_input)};
-    std::array<var, 4> input_var_Yb = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
-        var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input)};
+    std::array<var, 4> input_var_Yb = {var(0, 12, false, var::column_type::public_input), var(0,13, false, var::column_type::public_input),
+        var(0, 14, false, var::column_type::public_input), var(0, 15, false, var::column_type::public_input)};
 
-    var b = var(0, 14, false, var::column_type::public_input);
+    var b = var(0, 16, false, var::column_type::public_input);
 
     typename component_type::params_type params = {{input_var_Xa, input_var_Xb}, {input_var_Ya, input_var_Yb}, b};
 
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<ed25519_type::template g1_type<algebra::curves::coordinates::affine>>();
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type R = 2 * T;
-
-    std::cout<<"Ry = "<< R.Y.data <<std::endl;
 
     ed25519_type::base_field_type::integral_type Tx = ed25519_type::base_field_type::integral_type(T.X.data);
     ed25519_type::base_field_type::integral_type Ty = ed25519_type::base_field_type::integral_type(T.Y.data);
@@ -103,8 +101,6 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
     Rx & mask, (Rx >> 66) & mask, (Rx >> 132) & mask, (Rx >> 198) & mask,
     Ry & mask, (Ry >> 66) & mask, (Ry >> 132) & mask, (Ry >> 198) & mask,
     1};
-    std::cout<<"Ry = "<<public_input[12].data << " "<< public_input[13].data <<" "<< public_input[14].data << " "<< public_input[15].data <<std::endl;
-
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {

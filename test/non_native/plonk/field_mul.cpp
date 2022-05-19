@@ -79,8 +79,14 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
 
     typename component_type::params_type params = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {376016163868176636, 11973383560386057583, 1233274974622282422, 110012775631545330,
-     376016163868176636, 11973383560386057583, 1233274974622282422, 110012775631545330};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {0xd82c379532e8162d_cppui256,
+    0x177ebb2a58fdc7a92_cppui256,
+    0x3c649579851ed093a_cppui256,
+    0x13f74e50c1c801afd_cppui256,
+    0xd82c379532e8162d_cppui256,
+    0x177ebb2a58fdc7a92_cppui256,
+    0x3c649579851ed093a_cppui256,
+    0x13f74e50c1c801afd_cppui256};
     //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
 
     auto result_check = [](AssignmentType &assignment, 

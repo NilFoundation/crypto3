@@ -79,7 +79,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
 
     typename component_type::params_type params = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {45524, 52353, 68769, 5431, 3724, 342453, 5425, 54222};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {50487820917883000126, 66311244956735484629, 42644117754458223050, 4430350364495459,
+    70146846583887931932, 25100954424844344111, 30721111503502419544, 5387564486173743};
     //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
 
     auto result_check = [](AssignmentType &assignment, 

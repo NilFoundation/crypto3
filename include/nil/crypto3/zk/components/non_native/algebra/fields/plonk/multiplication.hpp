@@ -160,7 +160,6 @@ namespace nil {
                             typename Ed25519Type::base_field_type::integral_type(a[1].data) * (base << 66) +
                             typename Ed25519Type::base_field_type::integral_type(a[2].data) * (base << 132) +
                             typename Ed25519Type::base_field_type::integral_type(a[3].data) * (base << 198);
-
                         std::array<typename CurveType::base_field_type::value_type, 4> b = {
                             typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[0]).data),
                             typename CurveType::base_field_type::integral_type(assignment.var_value(params.B[1]).data),
@@ -171,7 +170,6 @@ namespace nil {
                             typename Ed25519Type::base_field_type::integral_type(b[1].data) * (base << 66) +
                             typename Ed25519Type::base_field_type::integral_type(b[2].data) * (base << 132) +
                             typename Ed25519Type::base_field_type::integral_type(b[3].data) * (base << 198);
-
                         typename Ed25519Type::base_field_type::value_type eddsa_r = eddsa_a * eddsa_b;
                         typename Ed25519Type::base_field_type::integral_type integral_eddsa_r =
                             typename Ed25519Type::base_field_type::integral_type(eddsa_r.data);
@@ -220,14 +218,9 @@ namespace nil {
 
                         typename CurveType::base_field_type::value_type u1 = t[2] - r[2] + t[3]*(pasta_base<<66)
                         - r[3]*(pasta_base<<66) + typename CurveType::base_field_type::value_type(u0_integral); 
-                        std::cout<<"true u1 = "<<u1.data<<std::endl;
 
                         typename CurveType::base_field_type::integral_type u1_integral = typename CurveType::base_field_type::integral_type(u1.data) >> 125;
                         std::array<typename CurveType::base_field_type::value_type, 4> u1_chunks;
-                        typename CurveType::base_field_type::value_type false_u1 = u1_integral *(pasta_base<<125);
-
-                        std::cout<<"false u1 = "<<false_u1.data<<std::endl;
-
                         u1_chunks[0] = u1_integral & ((1 << 22) - 1);
                         u1_chunks[1] = (u1_integral >> 22) & ((1 << 22) - 1);
                         u1_chunks[2] = (u1_integral >> 44) & ((1 << 22) - 1);
@@ -293,7 +286,7 @@ namespace nil {
                         p[2] = (minus_eddsa_p >> 132) & (mask);
                         p[3] = (minus_eddsa_p >> 198) & (mask);
 
-                        std::array<snark::plonk_constraint<BlueprintFieldType>, 4> t;
+                        std::array<snark::plonk_constraint<BlueprintFieldType>, 5> t;
                         t[0] =  var(W0, -1)*var(W4, - 1)  + p[0] * var(W8, - 1);
                         t[1] = var(W1, - 1)*var(W4, - 1) + var(W0, -1)*var(W5, - 1) + p[0]*var(W0, 0) + p[1] * var(W8, - 1);
                         t[2] = var(W2, -1)*var(W4, - 1) + var(W0, -1)*var(W6, - 1) + var(W1, - 1)*var(W5, - 1) + p[2]*var(W8, - 1) + var(W1, 0) * p[0]

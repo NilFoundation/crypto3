@@ -188,28 +188,14 @@ namespace nil {
                         non_native_range_component::generate_assignments(assignment, range_params_y3, row);
                         row+=non_native_range_component::rows_amount;
 
-                        std::cout<<"Rx: "<<assignment.var_value(R_x[0]).data<<" "<<assignment.var_value(R_x[1]).data<<" "<<assignment.var_value(R_x[2]).data<<" "
-                        <<assignment.var_value(R_x[3]).data<<std::endl;
-                        std::cout<<"Rx: "<<assignment.var_value(R_y[0]).data<<" "<<assignment.var_value(R_y[1]).data<<" "<<assignment.var_value(R_y[2]).data<<" "
-                        <<assignment.var_value(R_y[3]).data<<std::endl;
-
                         auto s0 = multiplication_component::generate_assignments(assignment, typename multiplication_component::params_type({R_x, R_x}), row);
                         row+=multiplication_component::rows_amount;
-
-                        std::cout<<"so: "<<assignment.var_value(s0.output[0]).data<<" "<<assignment.var_value(s0.output[1]).data<<" "<<assignment.var_value(s0.output[2]).data<<" "
-                        <<assignment.var_value(s0.output[3]).data<<std::endl;
 
                         auto s1 = multiplication_component::generate_assignments(assignment, typename multiplication_component::params_type({R_y, R_y}), row);
                         row+=multiplication_component::rows_amount;
 
-                        std::cout<<"s1: "<<assignment.var_value(s1.output[0]).data<<" "<<assignment.var_value(s1.output[1]).data<<" "<<assignment.var_value(s1.output[2]).data<<" "
-                        <<assignment.var_value(s1.output[3]).data<<std::endl;
-
                         auto s2 = multiplication_component::generate_assignments(assignment, typename multiplication_component::params_type({R_x, R_y}), row);
                         row+=multiplication_component::rows_amount;
-
-                        std::cout<<"s2: "<<assignment.var_value(s2.output[0]).data<<" "<<assignment.var_value(s2.output[1]).data<<" "<<assignment.var_value(s2.output[2]).data<<" "
-                        <<assignment.var_value(s2.output[3]).data<<std::endl;
 
                         assignment.witness(W0)[row] = T_y_array[0];
                         assignment.witness(W1)[row] = T_y_array[1];
@@ -271,12 +257,6 @@ namespace nil {
 
                         auto l0 = addition_component::generate_assignments(assignment, typename addition_component::params_type({two_var_array, t2.output}), row);
                         row+=addition_component::rows_amount;
-
-                        std::cout<<"lo: "<<assignment.var_value(l0.output[0]).data<<" "<<assignment.var_value(l0.output[1]).data<<" "<<assignment.var_value(l0.output[2]).data<<" "
-                        <<assignment.var_value(l0.output[3]).data<<std::endl;
-
-                        std::cout<<"t1: "<<assignment.var_value(t1.output[0]).data<<" "<<assignment.var_value(t1.output[1]).data<<" "<<assignment.var_value(t1.output[2]).data<<" "
-                        <<assignment.var_value(t1.output[3]).data<<std::endl;
 
                         auto l1 = multiplication_component::generate_assignments(assignment, typename multiplication_component::params_type({l0.output, t1.output}), row);
                         row+=multiplication_component::rows_amount;
@@ -377,7 +357,7 @@ namespace nil {
                         auto s2 = multiplication_component::generate_circuit(bp, assignment, typename multiplication_component::params_type({R_x, R_y}), row);
                         row+=multiplication_component::rows_amount;
 
-                        assignment.enable_selector(first_selector_index, row, row + 2);
+                        assignment.enable_selector(first_selector_index, row, row + 1);
                         std::array<var, 4> s3 = {var(W5, row), var(W6, row), var(W7, row), var(W8, row)};
                         row++;
                         std::array<var, 4> s4 = {var(W5, row), var(W6, row), var(W7, row), var(W8, row)};

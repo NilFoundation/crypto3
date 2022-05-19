@@ -95,7 +95,7 @@ namespace nil {
                     constexpr static const std::size_t T = 257;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + non_native_range_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 2 + non_native_range_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -107,9 +107,9 @@ namespace nil {
                         std::array<var, 4> output;
 
                         result_type(const std::size_t &component_start_row) {
-                            output = {var(W0, component_start_row + 1, false), 
-                            var(W1, component_start_row +1, false), var(W2, component_start_row + 1, false), 
-                            var(W3, component_start_row + 1, false)};
+                            output = {var(W0, component_start_row + 2, false), 
+                            var(W1, component_start_row + 2, false), var(W2, component_start_row + 2, false), 
+                            var(W3, component_start_row + 2, false)};
                         }
                     };
 
@@ -139,16 +139,17 @@ namespace nil {
                         typename Ed25519Type::base_field_type::extended_integral_type eddsa_p =
                             Ed25519Type::base_field_type::modulus;
                         typename Ed25519Type::base_field_type::value_type eddsa_b =
-                            eddsa_p - (typename Ed25519Type::base_field_type::integral_type(b[0].data) +
+                            (typename Ed25519Type::base_field_type::integral_type(b[0].data) +
                                        typename Ed25519Type::base_field_type::integral_type(b[1].data) * (base << 66) +
                                        typename Ed25519Type::base_field_type::integral_type(b[2].data) * (base << 132) +
                                        typename Ed25519Type::base_field_type::integral_type(b[3].data) * (base << 198));
 
-                        typename Ed25519Type::base_field_type::value_type eddsa_r = eddsa_a + eddsa_b;
+                        typename Ed25519Type::base_field_type::value_type eddsa_r = eddsa_a - eddsa_b;
                         typename Ed25519Type::base_field_type::integral_type integral_eddsa_r =
-                            typename Ed25519Type::base_field_type::integral_type(eddsa_r.data);
+                            typename Ed25519Type::base_field_type::integral_type(eddsa_r.data); 
                         typename Ed25519Type::base_field_type::extended_integral_type integral_eddsa_q =
                             (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_a.data) +
+                            eddsa_p -
                              typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) -
                              typename Ed25519Type::base_field_type::extended_integral_type(eddsa_r.data)) /
                             eddsa_p;
@@ -165,9 +166,10 @@ namespace nil {
                         for (std::size_t i = 1; i < 4; i++) {
                             r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
                         }
+                        typename Ed25519Type::base_field_type::extended_integral_type eddsa_p0 = eddsa_p & mask;
                         typename CurveType::base_field_type::value_type t =
-                            a[0] +
-                            (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) & mask) +
+                            a[0] + eddsa_p0 - 
+                            b[0] +
                             p[0] * q[0];
 
                         typename CurveType::base_field_type::value_type u0 = t - r[0];
@@ -179,26 +181,31 @@ namespace nil {
                         u0_chunks[0] = u0_integral & ((1 << 22) - 1);
                         u0_chunks[1] = (u0_integral >> 22) & ((1 << 22) - 1);
                         u0_chunks[2] = (u0_integral >> 44) & ((1 << 22) - 1);
-                        u0_chunks[3] = (u0_integral >> 66) & (1);
+                        u0_chunks[3] = (u0_integral >> 66) & ((1<<2) - 1);
 
-                        assignment.witness(W0)[row] = a[0];
-                        assignment.witness(W1)[row] =
-                            (typename Ed25519Type::base_field_type::extended_integral_type(eddsa_b.data) & mask);
-                        assignment.witness(W2)[row] = integral_eddsa_q;
+                        assignment.witness(W0)[row + 1] = a[0];
+                        assignment.witness(W1)[row + 1] = b[0];
+                        assignment.witness(W2)[row + 1] = integral_eddsa_q;
+                        assignment.witness(W3)[row + 1] = a[1];
+                        assignment.witness(W4)[row + 1] = a[2];
+                        assignment.witness(W5)[row + 1] = a[3];
+                        assignment.witness(W6)[row + 1] = b[1];
+                        assignment.witness(W7)[row + 1] = b[2];
+                        assignment.witness(W8)[row + 1] = b[3];
                         assignment.witness(W3)[row] = u0_chunks[0];
                         assignment.witness(W4)[row] = u0_chunks[1];
                         assignment.witness(W5)[row] = u0_chunks[2];
                         assignment.witness(W6)[row] = u0_chunks[3];
                         assignment.witness(W7)[row] = typename CurveType::base_field_type::value_type(u0_integral);
-                        assignment.witness(W0)[row + 1] = r[0];
-                        assignment.witness(W1)[row + 1] = r[1];
-                        assignment.witness(W2)[row + 1] = r[2];
-                        assignment.witness(W3)[row + 1] = r[3];
+                        assignment.witness(W0)[row + 2] = r[0];
+                        assignment.witness(W1)[row + 2] = r[1];
+                        assignment.witness(W2)[row + 2] = r[2];
+                        assignment.witness(W3)[row + 2] = r[3];
 
                         typename non_native_range_component::params_type range_params_r = {
-                            var(0, row + 1, false), var(1, row + 1, false), var(2, row + 1, false),
-                            var(3, row + 1, false)};
-                        non_native_range_component::generate_assignments(assignment, range_params_r, row + 1);
+                            var(0, row + 2, false), var(1, row + 2, false), var(2, row + 2, false),
+                            var(3, row + 2, false)};
+                        non_native_range_component::generate_assignments(assignment, range_params_r, row + 2);
 
                         return result_type(start_row_index);
                     }
@@ -218,13 +225,13 @@ namespace nil {
                             first_selector_index = selector_iterator->second;
                         }
                         std::size_t j = start_row_index;
-                        assignment.enable_selector(first_selector_index, j);
+                        assignment.enable_selector(first_selector_index, j + 1);
 
                         generate_copy_constraints(bp, assignment, params, j);
 
                         typename non_native_range_component::params_type non_range_params_r = {
-                            var(W0, j + 1), var(W1, j + 1), var(W2, j + 1), var(W3, j + 1)};
-                        non_native_range_component::generate_circuit(bp, assignment, non_range_params_r, j + 1);
+                            var(W0, j + 2), var(W1, j + 2), var(W2, j + 2), var(W3, j + 2)};
+                        non_native_range_component::generate_circuit(bp, assignment, non_range_params_r, j + 2);
 
                         return result_type(start_row_index);
                     }
@@ -246,17 +253,21 @@ namespace nil {
                         typename Ed25519Type::base_field_type::extended_integral_type eddsa_p0 = eddsa_p & mask;
                         p[0] = minus_eddsa_p & mask;
 
-                        snark::plonk_constraint<BlueprintFieldType> t = var(W0, 0) + var(W1, 0) + p[0] * var(W2, 0);
-                        auto constraint_1 = bp.add_constraint(var(W7, 0) * (base << 66) - (t - var(W0, +1)));
-
+                        snark::plonk_constraint<BlueprintFieldType> t = var(W0, 0) + p[0]*var(W2, 0);
+                        auto constraint_1 = bp.add_constraint(var(W7, -1) * (base << 66) - (t + eddsa_p0 - var(W1, 0) - var(W0, +1)));
                         auto constraint_2 = bp.add_constraint(var(W2, 0) * (var(W2, 0) - 1));
-
                         auto constraint_3 =
-                            bp.add_constraint(var(W7, 0) - (var(W3, 0) + var(W4, 0) * (1 << 22) +
-                                                            var(W5, 0) * (base << 44) + var(W6, 0) * (base << 66)));
+                            bp.add_constraint(var(W7, -1) - (var(W3, -1) + var(W4, -1) * (1 << 22) +
+                                                            var(W5, -1) * (base << 44) + var(W6, -1) * (base << 66)));
+
+                        auto constraint_4 = bp.add_constraint( (var(W0, 0) + var(W3, 0) * (base << 66) + var(W4, 0)
+                        *(base<< 132) + var(W5, 0) * (base << 198)) + pasta_eddsa_p - 
+                        (var(W1, 0) + var(W6, 0) * (base << 66) + var(W7, 0)*(base<< 132) + var(W8, 0) 
+                        * (base << 198)) - pasta_eddsa_p*var(W2, 0) -
+                        (var(W0, +1) + var(W1, +1) * (base << 66) + var(W2, +1)*(base<< 132) + var(W3, +1) * (base << 198)) );
 
                         bp.add_gate(first_selector_index,
-                                    {constraint_1, constraint_2, constraint_3
+                                    {constraint_1, constraint_2, constraint_3, constraint_4
 
                                     });
                     }
