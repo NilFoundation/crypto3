@@ -43,12 +43,14 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
+                template<size_t num_squeezes,
+                         typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
                 class aux;
 
                 template<typename BlueprintFieldType,
+                         size_t num_squeezes,
                          typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
@@ -67,6 +69,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class aux<
+                    num_squeezes,
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     CurveType,
                     W0, W1, W2, W3,
@@ -112,7 +115,10 @@ namespace nil {
                         for (std::size_t i = 0; i < params.input.size(); ++i) {
                             sponge.absorb_circuit(bp, assignment, params.input[i], row);
                         }
-                        auto sq = sponge.squeeze_circuit(bp, assignment, row);
+                        var sq;
+                        for (size_t i = 0; i < num_squeezes; ++i) {
+                            sq = sponge.squeeze_circuit(bp, assignment, row);
+                        }
                         return {sq};
                     }
 
@@ -128,8 +134,10 @@ namespace nil {
                         for (std::size_t i = 0; i < params.input.size(); ++i) {
                             sponge.absorb_assignment(assignment, params.input[i], row);
                         }
-                        auto sq = sponge.squeeze_assignment(assignment, row);
-                        // assert(assignment.var_value(sq) == 0x336C73D08AD408CEB7D1264867096F0817A1D0558B313312A1207602F23624FE_cppui256);
+                        var sq;
+                        for (size_t i = 0; i < num_squeezes; ++i) {
+                            sq = sponge.squeeze_assignment(assignment, row);
+                        }
                         return {sq};
                     }
 
