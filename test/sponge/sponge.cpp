@@ -61,7 +61,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 //                 ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-//     using component_type = zk::components::aux<ArithmetizationType, curve_type,
+//     constexpr size_t num_squeezes = 1;
+//     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
 //                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
 //     constexpr std::size_t Lambda = 40;
@@ -98,7 +99,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 //                 ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-//     using component_type = zk::components::aux<ArithmetizationType, curve_type,
+//     constexpr size_t num_squeezes = 1;
+//     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
 //                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
 //     constexpr std::size_t Lambda = 40;
@@ -138,7 +140,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 //                 ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-//     using component_type = zk::components::aux<ArithmetizationType, curve_type,
+//     constexpr size_t num_squeezes = 1;
+//     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
 //                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
 //     constexpr std::size_t Lambda = 40;
@@ -178,7 +181,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 //                 ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-//     using component_type = zk::components::aux<ArithmetizationType, curve_type,
+//     constexpr size_t num_squeezes = 1;
+//     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
 //                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
 //     constexpr std::size_t Lambda = 40;
@@ -220,7 +224,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 //                 ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-//     using component_type = zk::components::aux<ArithmetizationType, curve_type,
+//     constexpr size_t num_squeezes = 1;
+//     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
 //                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
 //     constexpr std::size_t Lambda = 40;
@@ -263,7 +268,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_5) {
                 ArithmetizationParams>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-    using component_type = zk::components::aux<ArithmetizationType, curve_type,
+    constexpr size_t num_squeezes = 1;
+    using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -308,60 +314,26 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_5) {
 //                 ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-//     using component_type = zk::components::aux<ArithmetizationType, curve_type,
+//     size_t num_squeezes = 2;
+//     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
 //                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
 //     constexpr std::size_t Lambda = 40;
 
 //     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     
-//     std::vector<var> input = {{0, 1, false, var::column_type::public_input}, 
-//                             {0, 2, false, var::column_type::public_input}, 
-//                             {0, 3, false, var::column_type::public_input}, 
-//                             {0, 4, false, var::column_type::public_input}, 
-//                             {0, 5, false, var::column_type::public_input}, 
-//                             {0, 6, false, var::column_type::public_input}, 
-//                             {0, 7, false, var::column_type::public_input}, 
-//                             {0, 8, false, var::column_type::public_input}, 
-//                             {0, 9, false, var::column_type::public_input}, 
-//                             {0, 10, false, var::column_type::public_input}, 
-//                             {0, 11, false, var::column_type::public_input}, 
-//                             {0, 12, false, var::column_type::public_input}, 
-//                             {0, 13, false, var::column_type::public_input}, 
-//                             {0, 14, false, var::column_type::public_input}, 
-//                             {0, 15, false, var::column_type::public_input}};
+//     std::vector<var> input;
 //     var zero(0, 0, false, var::column_type::public_input);
 //     typename component_type::params_type params = {input, zero};
 
-//     std::vector<typename BlueprintFieldType::value_type> public_input = {0, 0x3BF94859752456E29D614935100E62269F9801C0F1CB31ABBF52D599A6E76AB6_cppui256,
-//                                                                         0x2D8ED2DE2E8383F0465717A5027F8929E83B9F3132AA12C4FA7000FF9E6D4F70_cppui256,
-//                                                                         0x21602B8FF55B69B2FC8228BC7FB6BAFEB5412F2A928177B589F0D48F435CC8DE_cppui256,
-//                                                                         0x0C792A70D18A0BF4AEAB88D16FC2A2BA81A8C9BA160A2DBE6A1194ADF83D36B8_cppui256,
-//                                                                         0x2263F0DF1C6FF9CF7851CAF892081FCB7F1A581FA1C266B503C1E1890FFA52C0_cppui256,
-//                                                                         0x2971AB345176A1995A1B15D79BDD4D52374A65D5FA2C00533D0BA71EB78B9B68_cppui256,
-//                                                                         0x0C48F01843B9621A6DB54D6810C5096D5E136D12534769D2F6FDFB5038CD650C_cppui256,
-//                                                                         0x1A895FE289F422634334B69E27891BB416A59042DB1A6841167B4D6CF00C2D8D_cppui256,
-//                                                                         0x17C0DE034249AE221C917B35379E531534E9C0FF065D91DE92CE891B4C6F84E7_cppui256,
-//                                                                         0x0E8C43C286D690D9B091CCF924B94FF0D9725F6CA6A0E5E35E6A1EDA92233E43_cppui256,
-//                                                                         0x3AC7E59770247C5DDEB619ECBEBE40145A271B252060D5F46012B91081D1CF9B_cppui256,
-//                                                                         0x37E21F5C17470DA3C119380E9517879C9F4E5FFE69056DF1BFA7E78F2E071D92_cppui256,
-//                                                                         0x3D3876F40202356EE09AFF71A37ED643036275E079057D0EB12DCD6C815E966D_cppui256,
-//                                                                         0x0932D67D83FC4864BD48E6A4D35FD961DEEF01948F152C8D02717FCA92F8D3D1_cppui256,
-//                                                                         0x17BFBE2D51ED33867451E54DD7EDC15746E20EE790C56D3A41592DA35ACF84B8_cppui256};
+//     std::vector<typename BlueprintFieldType::value_type> public_input;
 
-//     typename BlueprintFieldType::value_type result = 0x00000000000000000000000000000000D09EB225B807EF186C948352E80A5773_cppui256;
+//     typename BlueprintFieldType::value_type result = 0x160A4D666FF9427DC907A5358B16C6966EB386213CE7994F87C8970F7DB8CDC3_cppui256;
 //     auto result_check = [&result](AssignmentType &assignment, 
 //         component_type::result_type &real_res) {
 //         assert(result == assignment.var_value(real_res.squeezed));
 //     };
 //     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
-    
-//     // typename BlueprintFieldType::value_type result_2 = 0x00000000000000000000000000000000BB8D2F465A6DACAA34EDA19A92FE7D21_cppui256;
-//     // auto result_check_2 = [&result_2](AssignmentType &assignment, 
-//     //     component_type::result_type &real_res) {
-//     //     assert(result_2 == assignment.var_value(real_res.squeezed));
-//     // };
-//     // test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check_2);
 
 //     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 //     std::cout << "kimchi sponge: " << duration.count() << "ms" << std::endl;
