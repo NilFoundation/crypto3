@@ -159,8 +159,8 @@ namespace nil {
                             return P.root();
                         }
 
-                        template <typename PolynomialType>
-                        static commitment_type commit(PolynomialType &f,
+                        template <std::size_t list_size, typename PolynomialType>
+                        static commitment_type commit(const std::array<PolynomialType, list_size> &poly,
                                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
                             return commit(precommit(f, D));
                         }
@@ -255,15 +255,11 @@ namespace nil {
                                         round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
                                     p_tree = std::make_unique<merkle_tree_type>(T_next);
-                                } else {
-                                    merkle_proof_type colinear_path;
 
-                                    round_proofs.push_back(
-                                        round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+                                    x = x_next;
+                                    x_index = x_next_index;
                                 }
 
-                                x = x_next;
-                                x_index = x_next_index;
                                 f = f_next;
                             }
                             return proof_type({round_proofs, f});

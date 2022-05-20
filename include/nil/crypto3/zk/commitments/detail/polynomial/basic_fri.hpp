@@ -230,8 +230,6 @@ namespace nil {
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->m;
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
-                            std::uint64_t x_next_index;
-                            // typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                             std::size_t r = fri_params.r;
 
@@ -245,42 +243,41 @@ namespace nil {
 
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
-                                x_index %= domain_size;
-
-                                // TODO: set x_next evaluation with params
-                                if (i < r-1){
-                                    x_next_index = x_index % (fri_params.D[i + 1]->m);
-                                }
-
                                 // create polynomial of degree (degree(f) / 2)
-                                math::polynomial_dfs<typename FieldType::value_type> f_next =
-                                    fold_polynomial<FieldType>(f, alpha);
+                                // math::polynomial_dfs<typename FieldType::value_type> f_next =
+                                //     fold_polynomial<FieldType>(f, alpha);
+                                math::polynomial<typename FieldType::value_type> f_normal(f.coefficients());
 
-                                // m = 2, so:
-                                std::array<std::size_t, m> s_indices;
-                                if constexpr (m == 2) {
-                                    s_indices[0] = x_index;
-                                    s_indices[1] = (x_index + domain_size/2)%domain_size;
-                                } else {
-                                    return {};
-                                }
-
-                                std::array<typename FieldType::value_type, m> y;
-
-                                for (std::size_t j = 0; j < m; j++) {
-                                    y[j] = (i == 0 ? g[s_indices[j]] : f[s_indices[j]]);
-                                }
-
-                                std::array<merkle_proof_type, m> p;
-
-                                for (std::size_t j = 0; j < m; j++) {
-
-                                    p[j] = merkle_proof_type(*p_tree, s_indices[j]);
-                                }
-
-                                typename FieldType::value_type colinear_value = f_next[x_next_index];
+                                math::polynomial_dfs<typename FieldType::value_type> f_next;
+                                f_next.from_coefficients(fold_polynomial<FieldType>(f_normal, alpha));
 
                                 if (i < r - 1) {
+
+                                    x_index %= domain_size;
+
+                                    // m = 2, so:
+                                    std::array<std::size_t, m> s_indices;
+                                    if constexpr (m == 2) {
+                                        s_indices[0] = x_index;
+                                        s_indices[1] = (x_index + domain_size/2)%domain_size;
+                                    } else {
+                                        return {};
+                                    }
+
+                                    std::array<typename FieldType::value_type, m> y;
+                                    std::array<merkle_proof_type, m> p;
+
+                                    for (std::size_t j = 0; j < m; j++) {
+                                        y[j] = (i == 0 ? g[s_indices[j]] : f[s_indices[j]]);
+                                        p[j] = merkle_proof_type(*p_tree, s_indices[j]);
+                                    }
+
+                                    f_next.resize(fri_params.D[i+1]->m);
+
+                                    std::uint64_t x_next_index = x_index % (fri_params.D[i + 1]->m);
+
+                                    typename FieldType::value_type colinear_value = f_next[x_next_index];
+
                                     T_next = precommit(f_next, fri_params.D[i + 1]);    // new merkle tree
                                     transcript(commit(T_next));
 
@@ -290,17 +287,15 @@ namespace nil {
                                         round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
                                     p_tree = std::make_unique<merkle_tree_type>(T_next);
-                                } else {
-                                    merkle_proof_type colinear_path;
 
-                                    round_proofs.push_back(
-                                        round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+                                    x_index = x_next_index;
                                 }
 
-                                x_index = x_next_index;
                                 f = f_next;
                             }
-                            return proof_type({round_proofs, f});
+
+                            math::polynomial<typename FieldType::value_type> f_normal(f.coefficients());
+                            return proof_type({round_proofs, f_normal});
                         }
 
                         static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
@@ -316,7 +311,6 @@ namespace nil {
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->m;
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
-                            std::uint64_t x_next_index;
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
                             typename FieldType::value_type x_next;
                             std::size_t r = fri_params.r;
@@ -331,45 +325,39 @@ namespace nil {
 
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
-                                x_index %= domain_size;
-
-                                if (i < r-1){
-                                    x_next_index = x_index % (fri_params.D[i + 1]->m);
-                                    x_next = fri_params.D[i+1]->get_domain_element(x_next_index);
-                                }
-
                                 math::polynomial<typename FieldType::value_type> f_next = fold_polynomial<FieldType>(
                                     f, alpha);    // create polynomial of degree (degree(f) / 2)
 
-                                // m = 2, so:
-                                std::array<typename FieldType::value_type, m> s;
-                                std::array<std::size_t, m> s_indices;
-                                if constexpr (m == 2) {
-                                    s[0] = x;
-                                    s[1] = -x;
-                                    s_indices[0] = x_index;
-                                    s_indices[1] = (x_index + domain_size/2)%domain_size;
-                                } else {
-                                    return {};
-                                }
-
-                                std::array<typename FieldType::value_type, m> y;
-
-                                for (std::size_t j = 0; j < m; j++) {
-                                    y[j] = (i == 0 ? g.evaluate(s[j]) : f.evaluate(s[j]));    // polynomial evaluation
-                                }
-
-                                std::array<merkle_proof_type, m> p;
-
-                                for (std::size_t j = 0; j < m; j++) {
-
-                                    p[j] = merkle_proof_type(*p_tree, s_indices[j]);
-                                }
-
-                                typename FieldType::value_type colinear_value =
-                                    f_next.evaluate(x_next);    // polynomial evaluation
-
                                 if (i < r - 1) {
+
+                                    x_index %= domain_size;
+
+                                    std::uint64_t x_next_index = x_index % (fri_params.D[i + 1]->m);
+                                    x_next = fri_params.D[i+1]->get_domain_element(x_next_index);
+
+                                    // m = 2, so:
+                                    std::array<typename FieldType::value_type, m> s;
+                                    std::array<std::size_t, m> s_indices;
+                                    if constexpr (m == 2) {
+                                        s[0] = x;
+                                        s[1] = -x;
+                                        s_indices[0] = x_index;
+                                        s_indices[1] = (x_index + domain_size/2)%domain_size;
+                                    } else {
+                                        return {};
+                                    }
+
+                                    std::array<typename FieldType::value_type, m> y;
+                                    std::array<merkle_proof_type, m> p;
+
+                                    for (std::size_t j = 0; j < m; j++) {
+                                        y[j] = (i == 0 ? g.evaluate(s[j]) : f.evaluate(s[j]));    // polynomial evaluation
+                                        p[j] = merkle_proof_type(*p_tree, s_indices[j]);
+                                    }
+
+                                    typename FieldType::value_type colinear_value =
+                                        f_next.evaluate(x_next);    // polynomial evaluation
+                                
                                     T_next = precommit(f_next, fri_params.D[i + 1]);    // new merkle tree
                                     transcript(commit(T_next));
 
@@ -379,15 +367,11 @@ namespace nil {
                                         round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
                                     p_tree = std::make_unique<merkle_tree_type>(T_next);
-                                } else {
-                                    merkle_proof_type colinear_path;
 
-                                    round_proofs.push_back(
-                                        round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+                                    x = x_next;
+                                    x_index = x_next_index;
                                 }
 
-                                x = x_next;
-                                x_index = x_next_index;
                                 f = f_next;
                             }
                             return proof_type({round_proofs, f});
@@ -410,59 +394,60 @@ namespace nil {
 
                                 typename FieldType::value_type x_next = q.evaluate(x);
 
-                                // m = 2, so:
-                                std::array<typename FieldType::value_type, m> s;
-                                if constexpr (m == 2) {
-                                    s[0] = x;
-                                    s[1] = -x;
-                                } else {
-                                    return false;
-                                }
+                                if (i < r - 1) {
+                                    // m = 2, so:
+                                    std::array<typename FieldType::value_type, m> s;
+                                    if constexpr (m == 2) {
+                                        s[0] = x;
+                                        s[1] = -x;
+                                    } else {
+                                        return false;
+                                    }
 
-                                for (std::size_t j = 0; j < m; j++) {
-                                    typename FieldType::value_type leaf = proof.round_proofs[i].y[j];
+                                    for (std::size_t j = 0; j < m; j++) {
+                                        typename FieldType::value_type leaf = proof.round_proofs[i].y[j];
+
+                                        std::array<std::uint8_t, field_element_type::length()> leaf_data;
+
+                                        field_element_type leaf_val(leaf);
+                                        auto write_iter = leaf_data.begin();
+                                        leaf_val.write(write_iter, field_element_type::length());
+
+                                        if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
+                                            return false;
+                                        }
+                                    }
+
+                                    std::array<typename FieldType::value_type, m> y;
+
+                                    for (std::size_t j = 0; j < m; j++) {
+                                        if (i == 0) {
+                                            y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j])) / V.evaluate(s[j]);
+                                        } else {
+                                            y[j] = proof.round_proofs[i].y[j];
+                                        }
+                                    }
+
+                                    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                                        interpolation_points {
+                                            std::make_pair(s[0], y[0]),
+                                            std::make_pair(s[1], y[1]),
+                                        };
+
+                                    math::polynomial<typename FieldType::value_type> interpolant =
+                                        math::lagrange_interpolation(interpolation_points);
+
+                                    typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value;
 
                                     std::array<std::uint8_t, field_element_type::length()> leaf_data;
-
                                     field_element_type leaf_val(leaf);
                                     auto write_iter = leaf_data.begin();
                                     leaf_val.write(write_iter, field_element_type::length());
 
-                                    if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
+                                    if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value) {
                                         return false;
                                     }
-                                }
-
-                                std::array<typename FieldType::value_type, m> y;
-
-                                for (std::size_t j = 0; j < m; j++) {
-                                    if (i == 0) {
-                                        y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j])) / V.evaluate(s[j]);
-                                    } else {
-                                        y[j] = proof.round_proofs[i].y[j];
-                                    }
-                                }
-
-                                std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
-                                    interpolation_points {
-                                        std::make_pair(s[0], y[0]),
-                                        std::make_pair(s[1], y[1]),
-                                    };
-
-                                math::polynomial<typename FieldType::value_type> interpolant =
-                                    math::lagrange_interpolation(interpolation_points);
-
-                                typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value;
-
-                                std::array<std::uint8_t, field_element_type::length()> leaf_data;
-                                field_element_type leaf_val(leaf);
-                                auto write_iter = leaf_data.begin();
-                                leaf_val.write(write_iter, field_element_type::length());
-
-                                if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value) {
-                                    return false;
-                                }
-                                if (i < r - 1) {
+                                
                                     transcript(proof.round_proofs[i + 1].T_root);
                                     if (!proof.round_proofs[i].colinear_path.validate(leaf_data)) {
                                         return false;
