@@ -42,11 +42,29 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class sha256;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
-                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
-                         std::size_t W6, std::size_t W7, std::size_t W8>
-                class sha256<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, W0,
-                             W1, W2, W3, W4, W5, W6, W7, W8> {
+                template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
+                         typename CurveType,
+                         std::size_t W0,
+                         std::size_t W1,
+                         std::size_t W2,
+                         std::size_t W3,
+                         std::size_t W4,
+                         std::size_t W5,
+                         std::size_t W6,
+                         std::size_t W7,
+                         std::size_t W8>
+                class sha256<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                             CurveType,
+                             W0,
+                             W1,
+                             W2,
+                             W3,
+                             W4,
+                             W5,
+                             W6,
+                             W7,
+                             W8> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -187,7 +205,6 @@ namespace nil {
                         sha256_process_component::generate_copy_constraints(bp, assignment, j);
                     }
                 };
-
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3

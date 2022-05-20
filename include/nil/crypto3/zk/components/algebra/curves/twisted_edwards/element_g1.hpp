@@ -75,7 +75,7 @@ namespace nil {
 
                 private:
                     void init() {
-                        blueprint_variable<field_type> X1X2_var, X1Y2_var, Y1Y2_var, Y1X2_var, X1X2Y1Y2_var,
+                        detail::blueprint_variable<field_type> X1X2_var, X1Y2_var, Y1Y2_var, Y1X2_var, X1X2Y1Y2_var,
                             dX1X2Y1Y2_var, aX1X2_var;
 
                         X1X2_var.allocate(this->bp);
