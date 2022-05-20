@@ -259,6 +259,7 @@ namespace nil {
                         // 8. Run evaluation proofs
                         typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
                         proof.eval_proof.challenge = challenge;
+                        proof.eval_proof.lagrange_0 = preprocessed_public_data.common_data.lagrange_0.evaluate(challenge);
 
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);

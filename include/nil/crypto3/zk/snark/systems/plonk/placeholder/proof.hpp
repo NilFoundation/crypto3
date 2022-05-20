@@ -64,6 +64,7 @@ namespace nil {
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
+                        typename FieldType::value_type lagrange_0;
                         typename witness_commitment_scheme_type::proof_type witness;
                         
                         typename permutation_commitment_scheme_type::proof_type permutation;
