@@ -289,7 +289,7 @@ namespace nil {
                                                                     var(0, 0, false)};
 
                         result_type(const params_type &params, std::size_t component_start_row) {
-                            std::array<var, state_size> output_state = {
+                            output_state = {
                                 var(W0, component_start_row + rows_amount - 1, false),
                                 var(W1, component_start_row + rows_amount - 1, false),
                                 var(W2, component_start_row + rows_amount - 1, false)};
@@ -383,8 +383,7 @@ namespace nil {
                             assignment.witness(W2)[i + 1] = next_state[2];
                             state = next_state;
                         }
-                        std::cout << "Circuit result: " << state[0].data << " " << state[1].data << " " << state[2].data
-                                  << std::endl;
+                        
                         return result_type(params, component_start_row);
                     }
 
@@ -392,7 +391,7 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-                        std::size_t j = first_selector_index;
+                        std::size_t j = 0;
                         for (std::size_t z = 0; z < rounds_amount; z += rounds_per_row) {
                             auto constraint_1 = bp.add_constraint(
                                 var(W3, 0) -
@@ -458,7 +457,7 @@ namespace nil {
                                 var(W2, +1) -
                                 (var(W12, 0).pow(sbox_alpha) * mds[2][0] + var(W13, 0).pow(sbox_alpha) * mds[2][1] +
                                  var(W14, 0).pow(sbox_alpha) * mds[2][2] + round_constant[z + 4][2]));
-                            bp.add_gate(j - first_selector_index,
+                            bp.add_gate(j + first_selector_index,
                                         {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
                                          constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
                                          constraint_11, constraint_12, constraint_13, constraint_14, constraint_15});

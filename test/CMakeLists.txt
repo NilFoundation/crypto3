@@ -81,16 +81,19 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/multi_scalar_multiplication"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
+    "hashes/plonk/decomposition"
     "merkle_tree/plonk/merkle_tree"
     "verifiers/kimchi/base_field"
     "verifiers/kimchi/scalar_field"
     "verifiers/kimchi/basic_verifier"
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles"
+    "sponge/sponge"
     )
 
 set(FIELDS_TESTS_FILES
     "algebra/fields/plonk/field_operations"
+    "algebra/fields/plonk/combined_inner_product"
     "algebra/fields/r1cs/fp2"
     "algebra/fields/r1cs/fp2_verification"
     "algebra/fields/r1cs/fp3"

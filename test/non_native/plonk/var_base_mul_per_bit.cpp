@@ -30,8 +30,9 @@
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 
-#include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -53,15 +54,16 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
-    using ed25519_type = algebra::curves::curve25519;
+    using ed25519_type = algebra::curves::ed25519;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -77,20 +79,37 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
 
     std::array<var, 4> input_var_Ya = {var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input),
         var(0, 10, false, var::column_type::public_input), var(0, 11, false, var::column_type::public_input)};
-    std::array<var, 4> input_var_Yb = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
-        var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input)};
+    std::array<var, 4> input_var_Yb = {var(0, 12, false, var::column_type::public_input), var(0,13, false, var::column_type::public_input),
+        var(0, 14, false, var::column_type::public_input), var(0, 15, false, var::column_type::public_input)};
 
-    var b = var(0, 14, false, var::column_type::public_input);
+    var b = var(0, 16, false, var::column_type::public_input);
 
     typename component_type::params_type params = {{input_var_Xa, input_var_Xb}, {input_var_Ya, input_var_Yb}, b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {45524, 52353, 68769, 5431, 3724, 342453, 5425, 54222, 132442,4234,24342,2342,24324,243234,24234,2434235,1};
-    //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
+    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<ed25519_type::template g1_type<algebra::curves::coordinates::affine>>();
+    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type R = 2 * T;
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input);
+    ed25519_type::base_field_type::integral_type Tx = ed25519_type::base_field_type::integral_type(T.X.data);
+    ed25519_type::base_field_type::integral_type Ty = ed25519_type::base_field_type::integral_type(T.Y.data);
+    ed25519_type::base_field_type::integral_type Rx = ed25519_type::base_field_type::integral_type(R.X.data);
+    ed25519_type::base_field_type::integral_type Ry = ed25519_type::base_field_type::integral_type(R.Y.data);
+    typename ed25519_type::base_field_type::integral_type base = 1;
+    typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
+
+    std::vector<typename BlueprintFieldType::value_type> public_input = {Tx & mask, (Tx >> 66) & mask, (Tx >> 132) & mask, (Tx >> 198) & mask,
+    Ty & mask, (Ty >> 66) & mask, (Ty >> 132) & mask, (Ty >> 198) & mask,
+    Rx & mask, (Rx >> 66) & mask, (Rx >> 132) & mask, (Rx >> 198) & mask,
+    Ry & mask, (Ry >> 66) & mask, (Ry >> 132) & mask, (Ry >> 198) & mask,
+    1};
+
+    auto result_check = [](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "multiplication component : " << duration.count() << "ms" << std::endl;
+    std::cout << "Variable_base_multiplication_per_bit_component: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
