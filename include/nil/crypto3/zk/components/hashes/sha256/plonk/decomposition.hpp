@@ -186,7 +186,6 @@ namespace nil {
                                                   std::size_t start_row_index) {
                     }
                 };
-
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
