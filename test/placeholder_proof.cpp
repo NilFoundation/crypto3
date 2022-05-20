@@ -450,17 +450,17 @@ void print_test_data(const Proof &proof, const FRIParams &fri_params, const Comm
         }
         return max_leaf_size;
     };
-    std::cout << "batched_fri_verified_data_max_size = "
-              << (0x20 * std::max({
-                             max_leaf_size_lpc_proof(proof.eval_proof.witness),
-                             max_leaf_size_lpc_proof(proof.eval_proof.quotient),
-                             max_leaf_size_lpc_proof(proof.eval_proof.id_permutation),
-                             max_leaf_size_lpc_proof(proof.eval_proof.sigma_permutation),
-                             max_leaf_size_lpc_proof(proof.eval_proof.public_input),
-                             max_leaf_size_lpc_proof(proof.eval_proof.constant),
-                             max_leaf_size_lpc_proof(proof.eval_proof.selector),
-                             max_leaf_size_lpc_proof(proof.eval_proof.special_selectors),
-                         }))
+    std::cout << "max_leaf_size = "
+              << std::max({
+                     max_leaf_size_lpc_proof(proof.eval_proof.witness),
+                     max_leaf_size_lpc_proof(proof.eval_proof.quotient),
+                     max_leaf_size_lpc_proof(proof.eval_proof.id_permutation),
+                     max_leaf_size_lpc_proof(proof.eval_proof.sigma_permutation),
+                     max_leaf_size_lpc_proof(proof.eval_proof.public_input),
+                     max_leaf_size_lpc_proof(proof.eval_proof.constant),
+                     max_leaf_size_lpc_proof(proof.eval_proof.selector),
+                     max_leaf_size_lpc_proof(proof.eval_proof.special_selectors),
+                 })
               << std::endl;
 }
 
@@ -508,7 +508,7 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
         assert(expected_res.Y == assignment.var_value(real_res.Y));
     };
 
-    auto [proof, fri_params, public_preprocessed_data] =
+    auto [proof, fri_params, public_preprocessed_data, bp] =
         nil::crypto3::create_component_proof<component_type, BlueprintFieldType, ArithmetizationParams, hash_type,
                                              Lambda>(params, public_input, result_check);
     print_test_data<BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(proof, fri_params,

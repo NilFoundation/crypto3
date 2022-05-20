@@ -59,6 +59,8 @@ namespace nil {
                     std::tuple<
                         // typename FieldType::value_type challenge
                         field_element<TTypeBase, typename Proof::field_type::value_type>,
+                        // typename FieldType::value_type lagrange_0
+                        field_element<TTypeBase, typename Proof::field_type::value_type>,
                         // typename witness_commitment_scheme_type::proof_type witness
                         typename lpc_proof<TTypeBase, typename Proof::witness_commitment_scheme_type>::type,
                         // typename permutation_commitment_scheme_type::proof_type permutation
@@ -124,6 +126,8 @@ namespace nil {
                     TTypeBase,
                     std::tuple<
                         // typename FieldType::value_type challenge
+                        field_element<TTypeBase, typename Proof::field_type::value_type>,
+                        // typename FieldType::value_type lagrange_0
                         field_element<TTypeBase, typename Proof::field_type::value_type>,
                         // typename witness_commitment_scheme_type::proof_type witness
                         typename lpc_proof_evm<TTypeBase, typename Proof::witness_commitment_scheme_type>::type,
@@ -210,6 +214,9 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     field_marhsalling_type filled_challenge = field_marhsalling_type(proof.challenge);
 
+                    // typename FieldType::value_type lagrange_0
+                    field_marhsalling_type filled_lagrange_0 = field_marhsalling_type(proof.lagrange_0);
+
                     // typename CommitmentSchemeTypeWitness::proof_type witness
                     lpc_witness_proof_marshalling_type filled_witness =
                         fill_lpc_proof<typename Proof::witness_commitment_scheme_type, Endianness>(proof.witness);
@@ -259,9 +266,9 @@ namespace nil {
                             proof.special_selectors);
 
                     return placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, Proof>(
-                        std::make_tuple(filled_challenge, filled_witness, filled_permutation, filled_quotient,
-                                        filled_lookups, filled_id_permutation, filled_sigma_permutation,
-                                        filled_public_input, filled_constant, filled_selector,
+                        std::make_tuple(filled_challenge, filled_lagrange_0, filled_witness, filled_permutation,
+                                        filled_quotient, filled_lookups, filled_id_permutation,
+                                        filled_sigma_permutation, filled_public_input, filled_constant, filled_selector,
                                         filled_special_selectors));
                 }
 
@@ -274,53 +281,56 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     proof.challenge = std::get<0>(filled_proof.value()).value();
 
+                    // typename FieldType::value_type lagrange_0
+                    proof.lagrange_0 = std::get<1>(filled_proof.value()).value();
+
                     // typename witness_commitment_scheme_type::proof_type witness
                     proof.witness = make_lpc_proof<typename Proof::witness_commitment_scheme_type, Endianness>(
-                        std::get<1>(filled_proof.value()));
+                        std::get<2>(filled_proof.value()));
 
                     // typename permutation_commitment_scheme_type::proof_type permutation
                     proof.permutation = make_lpc_proof<typename Proof::permutation_commitment_scheme_type, Endianness>(
-                        std::get<2>(filled_proof.value()));
+                        std::get<3>(filled_proof.value()));
 
                     // typename runtime_size_commitment_scheme_type::proof_type quotient
                     proof.quotient = make_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
-                        std::get<3>(filled_proof.value()));
+                        std::get<4>(filled_proof.value()));
 
                     // std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
-                    proof.lookups.reserve(std::get<4>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<4>(filled_proof.value()).value().size(); ++i) {
+                    proof.lookups.reserve(std::get<5>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<5>(filled_proof.value()).value().size(); ++i) {
                         proof.lookups.emplace_back(
                             make_lpc_proof<typename Proof::quotient_commitment_scheme_type, Endianness>(
-                                std::get<4>(filled_proof.value()).value().at(i)));
+                                std::get<5>(filled_proof.value()).value().at(i)));
                     }
 
                     // typename runtime_size_commitment_scheme_type::proof_type id_permutation
                     proof.id_permutation =
                         make_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
-                            std::get<5>(filled_proof.value()));
+                            std::get<6>(filled_proof.value()));
 
                     // typename runtime_size_commitment_scheme_type::proof_type sigma_permutation
                     proof.sigma_permutation =
                         make_lpc_proof<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
-                            std::get<6>(filled_proof.value()));
+                            std::get<7>(filled_proof.value()));
 
                     // typename public_input_commitment_scheme_type::proof_type public_input
                     proof.public_input =
                         make_lpc_proof<typename Proof::public_input_commitment_scheme_type, Endianness>(
-                            std::get<7>(filled_proof.value()));
+                            std::get<8>(filled_proof.value()));
 
                     // typename constant_commitment_scheme_type::proof_type constant
                     proof.constant = make_lpc_proof<typename Proof::constant_commitment_scheme_type, Endianness>(
-                        std::get<8>(filled_proof.value()));
+                        std::get<9>(filled_proof.value()));
 
                     // typename selector_commitment_scheme_type::proof_type selector
                     proof.selector = make_lpc_proof<typename Proof::selector_commitment_scheme_type, Endianness>(
-                        std::get<9>(filled_proof.value()));
+                        std::get<10>(filled_proof.value()));
 
                     // typename special_commitment_scheme_type::proof_type special_selectors
                     proof.special_selectors =
                         make_lpc_proof<typename Proof::special_commitment_scheme_type, Endianness>(
-                            std::get<10>(filled_proof.value()));
+                            std::get<11>(filled_proof.value()));
 
                     return proof;
                 }
@@ -440,6 +450,9 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     field_marhsalling_type filled_challenge = field_marhsalling_type(proof.challenge);
 
+                    // typename FieldType::value_type lagrange_0
+                    field_marhsalling_type filled_lagrange_0 = field_marhsalling_type(proof.lagrange_0);
+
                     // typename CommitmentSchemeTypeWitness::proof_type witness
                     lpc_witness_proof_marshalling_type filled_witness =
                         fill_lpc_proof_evm<typename Proof::witness_commitment_scheme_type, Endianness>(proof.witness);
@@ -490,9 +503,9 @@ namespace nil {
                             proof.special_selectors);
 
                     return placeholder_evaluation_proof_evm<nil::marshalling::field_type<Endianness>, Proof>(
-                        std::make_tuple(filled_challenge, filled_witness, filled_permutation, filled_quotient,
-                                        filled_lookups, filled_id_permutation, filled_sigma_permutation,
-                                        filled_public_input, filled_constant, filled_selector,
+                        std::make_tuple(filled_challenge, filled_lagrange_0, filled_witness, filled_permutation,
+                                        filled_quotient, filled_lookups, filled_id_permutation,
+                                        filled_sigma_permutation, filled_public_input, filled_constant, filled_selector,
                                         filled_special_selectors));
                 }
 
@@ -506,54 +519,57 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     proof.challenge = std::get<0>(filled_proof.value()).value();
 
+                    // typename FieldType::value_type lagrange_0
+                    proof.lagrange_0 = std::get<1>(filled_proof.value()).value();
+
                     // typename witness_commitment_scheme_type::proof_type witness
                     proof.witness = make_lpc_proof_evm<typename Proof::witness_commitment_scheme_type, Endianness>(
-                        std::get<1>(filled_proof.value()));
+                        std::get<2>(filled_proof.value()));
 
                     // typename permutation_commitment_scheme_type::proof_type permutation
                     proof.permutation = make_lpc_proof<typename Proof::permutation_commitment_scheme_type, Endianness>(
-                        std::get<2>(filled_proof.value()));
+                        std::get<3>(filled_proof.value()));
 
                     // typename runtime_size_commitment_scheme_type::proof_type quotient
                     proof.quotient =
                         make_lpc_proof_evm<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
-                            std::get<3>(filled_proof.value()));
+                            std::get<4>(filled_proof.value()));
 
                     // std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
-                    proof.lookups.reserve(std::get<4>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<4>(filled_proof.value()).value().size(); ++i) {
+                    proof.lookups.reserve(std::get<5>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<5>(filled_proof.value()).value().size(); ++i) {
                         proof.lookups.emplace_back(
                             make_lpc_proof<typename Proof::quotient_commitment_scheme_type, Endianness>(
-                                std::get<4>(filled_proof.value()).value().at(i)));
+                                std::get<5>(filled_proof.value()).value().at(i)));
                     }
 
                     // typename runtime_size_commitment_scheme_type::proof_type id_permutation
                     proof.id_permutation =
                         make_lpc_proof_evm<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
-                            std::get<5>(filled_proof.value()));
+                            std::get<6>(filled_proof.value()));
 
                     // typename runtime_size_commitment_scheme_type::proof_type sigma_permutation
                     proof.sigma_permutation =
                         make_lpc_proof_evm<typename Proof::runtime_size_commitment_scheme_type, Endianness>(
-                            std::get<6>(filled_proof.value()));
+                            std::get<7>(filled_proof.value()));
 
                     // typename public_input_commitment_scheme_type::proof_type public_input
                     proof.public_input =
                         make_lpc_proof_evm<typename Proof::public_input_commitment_scheme_type, Endianness>(
-                            std::get<7>(filled_proof.value()));
+                            std::get<8>(filled_proof.value()));
 
                     // typename constant_commitment_scheme_type::proof_type constant
                     proof.constant = make_lpc_proof_evm<typename Proof::constant_commitment_scheme_type, Endianness>(
-                        std::get<8>(filled_proof.value()));
+                        std::get<9>(filled_proof.value()));
 
                     // typename selector_commitment_scheme_type::proof_type selector
                     proof.selector = make_lpc_proof_evm<typename Proof::selector_commitment_scheme_type, Endianness>(
-                        std::get<9>(filled_proof.value()));
+                        std::get<10>(filled_proof.value()));
 
                     // typename special_commitment_scheme_type::proof_type special_selectors
                     proof.special_selectors =
                         make_lpc_proof_evm<typename Proof::special_commitment_scheme_type, Endianness>(
-                            std::get<10>(filled_proof.value()));
+                            std::get<11>(filled_proof.value()));
 
                     return proof;
                 }
