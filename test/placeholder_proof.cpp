@@ -62,6 +62,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/profiling.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -397,73 +398,6 @@ void test_placeholder_proof_marshalling_evm_optimized(const Proof &proof) {
     BOOST_CHECK(proof == constructed_val_read);
 }
 
-template<typename FieldType, typename ArithmetizationParams, typename Hash, std::size_t Lambda, typename Proof,
-         typename FRIParams, typename CommonData>
-void print_test_data(const Proof &proof, const FRIParams &fri_params, const CommonData &common_data) {
-    using Endianness = nil::marshalling::option::big_endian;
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
-    using placeholder_params =
-        nil::crypto3::zk::snark::placeholder_params<FieldType, ArithmetizationParams, Hash, Hash, Lambda>;
-
-    std::cout << "modulus = " << FieldType::modulus << std::endl;
-    std::cout << "fri_params.r = " << fri_params.r << std::endl;
-    std::cout << "fri_params.max_degree = " << fri_params.max_degree << std::endl;
-    std::cout << "fri_params.q = ";
-    for (const auto &coeff : fri_params.q) {
-        std::cout << coeff.data << ", ";
-    }
-    std::cout << std::endl;
-    std::cout << "fri_params.D_omegas = ";
-    for (const auto &dom : fri_params.D) {
-        std::cout << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*dom).omega.data << ", ";
-    }
-    std::cout << std::endl;
-    std::cout << "lpc_params.lambda = " << placeholder_params::batched_commitment_params_type::lambda << std::endl;
-    std::cout << "lpc_params.m = " << placeholder_params::batched_commitment_params_type::m << std::endl;
-    std::cout << "lpc_params.r = " << placeholder_params::batched_commitment_params_type::r << std::endl;
-    std::cout << "common_data.rows_amount = " << common_data.rows_amount << std::endl;
-    std::cout << "common_data.omega = "
-              << static_cast<nil::crypto3::math::basic_radix2_domain<FieldType> &>(*common_data.basic_domain).omega.data
-              << std::endl;
-    std::cout << "columns_rotations (" << common_data.columns_rotations.size() << " number) = {" << std::endl;
-    for (const auto &column_rotations : common_data.columns_rotations) {
-        std::cout << "[";
-        for (auto rot : column_rotations) {
-            std::cout << int(rot) << ", ";
-        }
-        std::cout << "]," << std::endl;
-    }
-    std::cout << "}" << std::endl;
-
-    auto max_leaf_size_fri_proof = [](const auto &fri_proof) {
-        std::size_t max_leaf_size = 0;
-        for (const auto &round_proofs_i : fri_proof.round_proofs) {
-            max_leaf_size = std::max(max_leaf_size, round_proofs_i.y.size());
-        }
-        return max_leaf_size;
-    };
-    auto max_leaf_size_lpc_proof = [&max_leaf_size_fri_proof](const auto &lpc_proof) {
-        std::size_t max_leaf_size = 0;
-        for (const auto &fri_proofs_i : lpc_proof.fri_proof) {
-            max_leaf_size = std::max(max_leaf_size, max_leaf_size_fri_proof(fri_proofs_i));
-        }
-        return max_leaf_size;
-    };
-    std::cout << "max_leaf_size = "
-              << std::max({
-                     max_leaf_size_lpc_proof(proof.eval_proof.witness),
-                     max_leaf_size_lpc_proof(proof.eval_proof.quotient),
-                     max_leaf_size_lpc_proof(proof.eval_proof.id_permutation),
-                     max_leaf_size_lpc_proof(proof.eval_proof.sigma_permutation),
-                     max_leaf_size_lpc_proof(proof.eval_proof.public_input),
-                     max_leaf_size_lpc_proof(proof.eval_proof.constant),
-                     max_leaf_size_lpc_proof(proof.eval_proof.selector),
-                     max_leaf_size_lpc_proof(proof.eval_proof.special_selectors),
-                 })
-              << std::endl;
-}
-
 BOOST_AUTO_TEST_SUITE(placeholder_marshalling_proof_test_suite)
 
 BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
@@ -511,8 +445,10 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
     auto [proof, fri_params, public_preprocessed_data, bp] =
         nil::crypto3::create_component_proof<component_type, BlueprintFieldType, ArithmetizationParams, hash_type,
                                              Lambda>(params, public_input, result_check);
-    print_test_data<BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(proof, fri_params,
-                                                                                  public_preprocessed_data.common_data);
+    using placeholder_params =
+        zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
+    nil::crypto3::zk::snark::placeholder_profiling<placeholder_params>::print_params(
+        proof, fri_params, public_preprocessed_data.common_data);
     test_placeholder_proof_marshalling<Endianness>(proof);
     test_placeholder_proof_marshalling_evm_optimized<Endianness>(proof);
 }
