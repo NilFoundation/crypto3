@@ -87,7 +87,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i <= f_folded.degree(); i++) {
                             f_folded[i] = two_inversed * (
-                                (1 + alpha * power(omega_inversed, i)) * f[i] + (1 - alpha * power(omega_inversed, i)) * f[d / 2 + i]
+                                (1 + alpha * power(omega_inversed, i)) * f[i] + (1 - alpha * power(omega_inversed, i)) * f[(d + 1) / 2 + i]
                             );
                         }
 
