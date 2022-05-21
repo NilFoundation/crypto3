@@ -31,6 +31,7 @@
 #include <vector>
 
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -343,34 +344,18 @@ namespace nil {
                 }
 
                 void resize(size_type _sz) {
-                    BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
-                    typedef typename value_type::field_type FieldType;
+                    // BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
 
-                    value_type omega = unity_root<FieldType>(this->size());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(val, omega.inversed());
-#endif
-                    const value_type sconst = value_type(this->size()).inversed();
-                    std::transform(val.begin(),
-                                   val.end(),
-                                   val.begin(),
-                                   std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
+                    if (this->size() == 1){
+                        this->val.resize(_sz, this->val[0]);
+                    } else {
+                        typedef typename value_type::field_type FieldType;
 
-                    value_type omega_new = unity_root<FieldType>(_sz);
-                    val.resize(_sz);
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega_new);
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(val, omega_new);
-#endif
+                        make_evaluation_domain<FieldType>(this->size())->inverse_fft(this->val);
+                        this->val.resize(_sz, FieldValueType::zero());
+                        make_evaluation_domain<FieldType>(_sz)->fft(this->val);
+                    }
                 }
-
-                //                void resize(size_type _sz, const_reference _x) {
-                //                    BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
-                //                    return val.resize(_sz, _x);
-                //                }
 
                 void swap(polynomial_dfs& other) {
                     val.swap(other.val);
@@ -458,9 +443,11 @@ namespace nil {
                  * polynomial C.
                  */
                 polynomial_dfs operator*(const polynomial_dfs& other) const {
-                    polynomial_dfs result(this->_d + other._d, this->begin(), this->end());
+                    polynomial_dfs result(this->degree() + other.degree(), this->begin(), this->end());
+
                     size_t polynomial_s =
-                        detail::power_of_two(std::max({this->size(), other.size(), this->_d + other._d + 1}));
+                        detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
+
                     if (result.size() < polynomial_s) {
                         result.resize(polynomial_s);
                     }
@@ -586,7 +573,8 @@ namespace nil {
                     return polynomial_dfs(r_deg, r);
                 }
 
-                void from_coefficients(const container_type &tmp) {
+                template<typename ContainerType>
+                void from_coefficients(const ContainerType &tmp) {
                     typedef typename value_type::field_type FieldType;
                     size_t n = detail::power_of_two(tmp.size());
                     value_type omega = unity_root<FieldType>(n);
