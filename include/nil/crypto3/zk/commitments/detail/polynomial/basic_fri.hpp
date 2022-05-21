@@ -177,8 +177,7 @@ namespace nil {
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
-                                return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial
-                                    && final_polynomial_root = rhs.final_polynomial_root;
+                                return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial;
                             }
                             bool operator!=(const proof_type &rhs) const {
                                 return !(rhs == *this);
@@ -187,7 +186,6 @@ namespace nil {
                             std::vector<round_proof_type> round_proofs;    // 0..r-2
 
                             math::polynomial<typename FieldType::value_type> final_polynomial;
-                            commitment_type final_polynomial_root;
                         };
 
                         static precommitment_type
@@ -409,7 +407,7 @@ namespace nil {
                             }
 
                             // last round contains only final_polynomial without queries
-                            return proof_type({round_proofs, f, p_tree->root()});
+                            return proof_type({round_proofs, f});
                         }
 
                         static bool verify_eval(proof_type &proof,
@@ -480,11 +478,7 @@ namespace nil {
                                 if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value) {
                                     return false;
                                 }
-                                if (i == r - 2) {
-                                    transcript(proof.final_polynomial_root);
-                                } else {
-                                    transcript(proof.round_proofs[i + 1].T_root);
-                                }
+                                transcript(proof.round_proofs[i].colinear_path.root());
                                 if (!proof.round_proofs[i].colinear_path.validate(leaf_data)) {
                                     return false;
                                 }
@@ -493,7 +487,7 @@ namespace nil {
 
                             // check the final polynomial against its root
                             auto final_root = commit(precommit(proof.final_polynomial, fri_params.D[r - 1]));
-                            if (final_root != proof.final_polynomial_root) {
+                            if (final_root != proof.round_proofs[r - 2].colinear_path.root()) {
                                 return false;
                             }
                             if (proof.final_polynomial.degree() >
