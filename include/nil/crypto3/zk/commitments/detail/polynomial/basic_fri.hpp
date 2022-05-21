@@ -177,7 +177,8 @@ namespace nil {
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
-                                return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial;
+                                return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial
+                                && target_commitment == rhs.target_commitment;
                             }
                             bool operator!=(const proof_type &rhs) const {
                                 return !(rhs == *this);
@@ -186,6 +187,7 @@ namespace nil {
                             std::vector<round_proof_type> round_proofs;    // 0..r-2
 
                             math::polynomial<typename FieldType::value_type> final_polynomial;
+                            commitment_type target_commitment;
                         };
 
                         static precommitment_type
@@ -324,7 +326,7 @@ namespace nil {
                             }
 
                             math::polynomial<typename FieldType::value_type> f_normal(f.coefficients());
-                            return proof_type({round_proofs, f_normal});
+                            return proof_type({round_proofs, f_normal, T});
                         }
 
                         static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
@@ -336,6 +338,8 @@ namespace nil {
                             proof_type proof;
 
                             math::polynomial<typename FieldType::value_type> f = Q;    // copy?
+
+                            transcript(commit(T));
 
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->m;
@@ -407,7 +411,7 @@ namespace nil {
                             }
 
                             // last round contains only final_polynomial without queries
-                            return proof_type({round_proofs, f});
+                            return proof_type({round_proofs, f, commit(T)});
                         }
 
                         static bool verify_eval(proof_type &proof,
@@ -416,6 +420,8 @@ namespace nil {
                                                 const math::polynomial<typename FieldType::value_type> &V,
                                                 transcript_type &transcript = transcript_type()) {
 
+                            transcript(proof.target_commitment);
+                            
                             std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(1).pow(idx);
 
