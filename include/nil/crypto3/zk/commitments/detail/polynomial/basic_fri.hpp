@@ -66,6 +66,35 @@ namespace nil {
                     }
 
                     template<typename FieldType>
+                    math::polynomial_dfs<typename FieldType::value_type>
+                        fold_polynomial(math::polynomial_dfs<typename FieldType::value_type> &f,
+                                        typename FieldType::value_type alpha,
+                                        std::shared_ptr<math::evaluation_domain<FieldType>> domain) {
+
+                        std::size_t d = f.degree();
+                        if (d % 2 == 0) {
+                            f.push_back(0);
+                            d++;
+                        }
+                        //codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
+                        // + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in range(len(codeword)//2)]
+                        math::polynomial_dfs<typename FieldType::value_type> f_folded(d / 2, d / 2 + 1, 0);
+
+                        typename FieldType::value_type two_inversed = 2; 
+                        two_inversed = two_inversed.inversed();
+                        typename FieldType::value_type omega_inversed = domain->get_domain_element(1);
+                        omega_inversed = omega_inversed.inversed();
+
+                        for (std::size_t i = 0; i <= f_folded.degree(); i++) {
+                            f_folded[i] = two_inversed * (
+                                (1 + alpha * power(omega_inversed, i)) * f[i] + (1 - alpha * power(omega_inversed, i)) * f[d / 2 + i]
+                            );
+                        }
+
+                        return f_folded;
+                    }
+
+                    template<typename FieldType>
                     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>>
                         calculate_domain_set(const std::size_t max_domain_degree, const std::size_t set_size) {
 
