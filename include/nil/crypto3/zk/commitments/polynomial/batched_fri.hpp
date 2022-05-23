@@ -65,9 +65,9 @@ namespace nil {
                          std::size_t BatchSize>
                 struct batched_fri:
                     public detail::basic_batched_fri<
-                        FieldType, MerkleTreeHashType, TranscriptHashType, M, 0> {
+                        FieldType, MerkleTreeHashType, TranscriptHashType, M> {
 
-                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, 0>;
+                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
 
                     constexpr static const std::size_t m = basic_fri::m;
 
@@ -86,7 +86,7 @@ namespace nil {
 
                     template<typename ContainerType>
                     static typename basic_fri::proof_type
-                        proof_eval(const ContainerType g,
+                        proof_eval(const ContainerType &g,
                                    precommitment_type &T,
                                    const typename basic_fri::params_type &fri_params,
                                    typename basic_fri::transcript_type &transcript =

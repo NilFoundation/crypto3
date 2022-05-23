@@ -486,7 +486,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t leaf_size = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -509,9 +509,14 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
 
     // commit
-    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f = {{
+    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f_data = {{
         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1},
-        {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}}};
+        {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 7, 7, 7, 2, 1, 1}}};
+
+    std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size> f;
+    for (std::size_t polynom_index = 0; polynom_index < f.size(); polynom_index++){
+        f[polynom_index].from_coefficients(f_data[polynom_index]);
+    }
 
     merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
 
@@ -519,6 +524,11 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
+    using ContainerType = std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size>;
+    static_assert(!std::is_same<typename ContainerType::value_type,
+                                          math::polynomial<typename FieldType::value_type>>::value);
+    static_assert(std::is_same<typename ContainerType::value_type,
+                                          math::polynomial_dfs<typename FieldType::value_type>>::value);
     proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
 
     // verify

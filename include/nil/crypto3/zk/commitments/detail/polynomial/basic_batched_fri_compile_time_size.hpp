@@ -30,6 +30,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
@@ -62,8 +63,7 @@ namespace nil {
                     template<typename FieldType,
                              typename MerkleTreeHashType,
                              typename TranscriptHashType,
-                             std::size_t M = 2,
-                             std::size_t BatchSize = 1>
+                             std::size_t M = 2>
                     struct basic_batched_fri {
 
                         constexpr static const std::size_t m = M;
@@ -175,7 +175,10 @@ namespace nil {
                         }
 
                         template <typename ContainerType>
-                        static proof_type
+                        static typename std::enable_if<
+                            (std::is_same<typename ContainerType::value_type,
+                                          math::polynomial_dfs<typename FieldType::value_type>>::value),
+                            proof_type>::type
                             proof_eval(const ContainerType &Q,
                                        const ContainerType &g,
                                        precommitment_type &T,
@@ -194,7 +197,111 @@ namespace nil {
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->m;
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
-                            std::uint64_t x_next_index;
+
+                            std::size_t r = fri_params.r;
+
+                            std::vector<round_proof_type> round_proofs;
+                            std::unique_ptr<merkle_tree_type> p_tree = std::make_unique<merkle_tree_type>(T);
+                            merkle_tree_type T_next;
+
+                            for (std::size_t i = 0; i < r - 1; i++) {
+
+                                std::size_t domain_size = fri_params.D[i]->m;
+
+                                typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
+
+                                x_index %= domain_size;
+
+                                // m = 2, so:
+                                std::array<std::size_t, m> s_indices;
+                                if constexpr (m == 2) {
+                                    s_indices[0] = x_index;
+                                    s_indices[1] = (x_index + domain_size / 2) % domain_size;
+                                } else {
+                                    return {};
+                                }
+
+
+                                // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y;
+                                std::vector<std::array<typename FieldType::value_type, m>> y(leaf_size);
+
+                                for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                                    for (std::size_t j = 0; j < m; j++) {
+                                        y[polynom_index][j] =
+                                            (i == 0 ? g[polynom_index][s_indices[j]] :
+                                                      f[polynom_index][s_indices[j]]);    // polynomial evaluation
+                                    }
+                                }
+
+                                std::array<merkle_proof_type, m> p;
+
+                                for (std::size_t j = 0; j < m; j++) {
+
+                                    p[j] = merkle_proof_type(*p_tree, s_indices[j]);
+                                }
+
+                                // std::array<typename FieldType::value_type, leaf_size> colinear_value;
+                                std::vector<typename FieldType::value_type> colinear_value(leaf_size);
+
+                                for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                                    f[polynom_index] =
+                                        fold_polynomial<FieldType>(f[polynom_index], alpha, fri_params.D[i]);
+                                }
+
+                                x_index = x_index % (fri_params.D[i + 1]->m);
+
+                                for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                                    colinear_value[polynom_index] =
+                                        f[polynom_index][x_index];    // polynomial evaluation
+                                }
+
+                                T_next = precommit(f, fri_params.D[i + 1]);    // new merkle tree
+                                transcript(commit(T_next));
+
+                                merkle_proof_type colinear_path = merkle_proof_type(T_next, x_index);
+
+                                round_proofs.push_back(
+                                    round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+
+                                p_tree = std::make_unique<merkle_tree_type>(T_next);
+                            }
+
+                            std::vector<math::polynomial<typename FieldType::value_type>>
+                                final_polynomials(f.size());
+                                
+                            for (std::size_t polynom_index = 0; polynom_index < f.size(); polynom_index++){
+                                final_polynomials[polynom_index] =
+                                    math::polynomial<typename FieldType::value_type>(
+                                        f[polynom_index].coefficients());
+                            }
+
+                            return proof_type({round_proofs, final_polynomials, commit(T)});
+                        }
+
+                        template <typename ContainerType>
+                        static typename std::enable_if<
+                            (std::is_same<typename ContainerType::value_type,
+                                          math::polynomial<typename FieldType::value_type>>::value),
+                            proof_type>::type
+                            proof_eval(const ContainerType &Q,
+                                       const ContainerType &g,
+                                       precommitment_type &T,
+                                       const params_type &fri_params,
+                                       transcript_type &transcript = transcript_type()) {
+
+                            assert(Q.size() == g.size());
+                            std::size_t leaf_size = Q.size();
+
+                            proof_type proof;
+
+                            ContainerType f = Q;    // copy?
+
+                            transcript(commit(T));
+
+                            // TODO: how to sample x?
+                            std::size_t domain_size = fri_params.D[0]->m;
+                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
+
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                             std::size_t r = fri_params.r;
@@ -210,10 +317,6 @@ namespace nil {
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                                 x_index %= domain_size;
-                                
-                                x_next_index = x_index % (fri_params.D[i + 1]->m);
-                                typename FieldType::value_type x_next =
-                                    fri_params.D[i+1]->get_domain_element(x_next_index);
 
                                 // m = 2, so:
                                 std::array<typename FieldType::value_type, m> s;
@@ -253,23 +356,23 @@ namespace nil {
                                     f[polynom_index] = fold_polynomial<FieldType>(f[polynom_index], alpha);
                                 }
 
+                                x_index = x_index % (fri_params.D[i + 1]->m);
+                                x = fri_params.D[i+1]->get_domain_element(x_index);
+
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     colinear_value[polynom_index] =
-                                        f[polynom_index].evaluate(x_next);    // polynomial evaluation
+                                        f[polynom_index].evaluate(x);    // polynomial evaluation
                                 }
 
                                 T_next = precommit(f, fri_params.D[i + 1]);    // new merkle tree
                                 transcript(commit(T_next));
 
-                                merkle_proof_type colinear_path = merkle_proof_type(T_next, x_next_index);
+                                merkle_proof_type colinear_path = merkle_proof_type(T_next, x_index);
 
                                 round_proofs.push_back(
                                     round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
                                 p_tree = std::make_unique<merkle_tree_type>(T_next);
-
-                                x = x_next;
-                                x_index = x_next_index;
                             }
 
                             std::vector<math::polynomial<typename FieldType::value_type>>
