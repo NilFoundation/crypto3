@@ -76,9 +76,9 @@ namespace nil {
                     using exponentiation_component =
                         zk::components::exponentiation<ArithmetizationType, 60, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                                                        W10, W11, W12, W13, W14>;
+                    using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
                     struct field_op_component {
-                        using mul = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                         // TODO: change to add / sub
                         using add = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                         using sub = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
@@ -117,10 +117,10 @@ namespace nil {
                                                         var x,
                                                         var y,
                                                         std::size_t &component_start_row) {
-                        typename field_op_component::mul::params_type params = {x, y};
-                        typename field_op_component::mul::result_type res =
-                            field_op_component::mul::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += field_op_component::mul::rows_amount;
+                        typename mul_component::params_type params = {x, y};
+                        typename mul_component::result_type res =
+                            mul_component::generate_assignments(assignment, params, component_start_row);
+                        component_start_row += mul_component::rows_amount;
                         return res.res;
                     }
 
@@ -367,16 +367,16 @@ namespace nil {
                         row += exponentiation_component::rows_amount;
 
                         std::cout<<"row before:"<<row<<std::endl;
-                        //var zeta_omega = zk::components::generate_circuit<mul_component>(bp, assignment,
+                        var zeta_omega = zk::components::generate_circuit<mul_component>(bp, assignment,
                         //var zeta_omega = mul_component::generate_circuit(bp, assignment, 
-                        //    {params.fq_output.zeta, params.verifier_index.omega}, row).res;
-                        //row += mul_component::rows_amount;
+                           {params.fq_output.zeta, params.verifier_index.omega}, row).res;
+                        row += mul_component::rows_amount;
                         std::cout<<"row after:"<<row<<std::endl;
 
-                        var zeta_omega_pow_n = 
-                            exponentiation_component::generate_circuit(bp, assignment, 
-                            {params.fq_output.zeta, params.verifier_index.domain_size, zero, one}, row).result;
-                        row += exponentiation_component::rows_amount;
+                        // var zeta_omega_pow_n = 
+                        //     exponentiation_component::generate_circuit(bp, assignment, 
+                        //     {params.fq_output.zeta, params.verifier_index.domain_size, zero, one}, row).result;
+                        // row += exponentiation_component::rows_amount;
                         //var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
