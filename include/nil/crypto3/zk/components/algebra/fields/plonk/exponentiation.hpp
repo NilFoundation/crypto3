@@ -88,7 +88,7 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = 1 + main_rows;
-                    constexpr static const std::size_t gates_amount = 0;
+                    constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
                         var base;
