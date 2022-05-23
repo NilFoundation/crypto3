@@ -298,7 +298,7 @@ namespace nil {
                             U[polynom_index] = math::lagrange_interpolation(U_interpolation_points[polynom_index]);
                         }
 
-                        math::polynomial<typename FieldType::value_type> V = {1};    
+                        math::polynomial<typename FieldType::value_type> V = {1};
                         for (std::size_t point_index = 0; point_index < evaluation_points.size();
                              point_index++) {
                             V = V * (math::polynomial<typename FieldType::value_type>(
@@ -318,9 +318,9 @@ namespace nil {
                 template<typename FieldType, typename LPCParams>
                 struct batched_list_polynomial_commitment<FieldType, LPCParams, 0, true> : 
                     public detail::basic_batched_fri_runtime_size<FieldType,
-                                                                             typename LPCParams::merkle_hash_type,
-                                                                             typename LPCParams::transcript_hash_type,
-                                                                             LPCParams::m> {
+                                                                  typename LPCParams::merkle_hash_type,
+                                                                  typename LPCParams::transcript_hash_type,
+                                                                  LPCParams::m> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 

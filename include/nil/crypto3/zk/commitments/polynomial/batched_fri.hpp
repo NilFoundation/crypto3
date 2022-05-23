@@ -39,6 +39,7 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_compile_time_size.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_runtime_size.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -61,14 +62,15 @@ namespace nil {
                 template<typename FieldType,
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
-                         std::size_t M = 2,
-                         std::size_t BatchSize = 1>
-                struct batched_fri : public detail::basic_batched_fri_compile_time_size<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize> {
+                         std::size_t M,
+                         std::size_t BatchSize>
+                struct batched_fri:
+                    public detail::basic_batched_fri<
+                        FieldType, MerkleTreeHashType, TranscriptHashType, M, 0> {
 
-                    using basic_fri = detail::basic_batched_fri_compile_time_size<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>;
+                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, 0>;
 
                     constexpr static const std::size_t m = basic_fri::m;
-                    constexpr static const std::size_t leaf_size = BatchSize;
 
                     using field_type = typename basic_fri::field_type;
                     using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
@@ -83,9 +85,9 @@ namespace nil {
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
 
-                    template<typename PolynomialType>
+                    template<typename ContainerType>
                     static typename basic_fri::proof_type
-                        proof_eval(const std::array<PolynomialType, leaf_size> g,
+                        proof_eval(const ContainerType g,
                                    precommitment_type &T,
                                    const typename basic_fri::params_type &fri_params,
                                    typename basic_fri::transcript_type &transcript =
@@ -99,15 +101,14 @@ namespace nil {
                         typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
-                        std::array<math::polynomial<typename FieldType::value_type>, leaf_size> U;
+                        std::size_t leaf_size = proof.final_polynomials.size();
+
+                        std::vector<math::polynomial<typename FieldType::value_type>> U(leaf_size);
                         for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                             U[polynom_index] = {0};
                         }
 
-                        std::array<math::polynomial<typename FieldType::value_type>, leaf_size> V;
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                            V[polynom_index] = {1};
-                        }
+                        math::polynomial<typename FieldType::value_type> V = {1};
 
                         return basic_fri::verify_eval(proof, fri_params, U, V, transcript);
                     }
