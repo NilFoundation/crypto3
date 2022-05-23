@@ -235,16 +235,16 @@ namespace nil {
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
 
-                        for (std::size_t row = component_start_row; row < component_start_row + rows_amount; row++) {
-                            bp.add_copy_constraint({{W0, static_cast<int>(row), false}, params.zero});
+                        for (std::size_t row = component_start_row + 1; row < component_start_row + rows_amount; row++) {
+                            bp.add_copy_constraint({{W0, static_cast<int>(row), false}, params.base});
                         }
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, params.base});
+                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, params.zero});
                         bp.add_copy_constraint({{intermediate_start + intermediate_results_per_row - 1,
                                                  static_cast<int>(component_start_row), false},
                                                 params.one});
                         // check that the recalculated n is equal to the input challenge
                         bp.add_copy_constraint(
-                            {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
+                           {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
                     }
                 };
             }    // namespace components
