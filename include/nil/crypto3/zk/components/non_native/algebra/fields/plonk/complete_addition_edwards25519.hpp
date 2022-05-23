@@ -91,7 +91,7 @@ namespace nil {
                         2 * non_native_range_component::rows_amount + 8 * multiplication_component::rows_amount +
                         3 * addition_component::rows_amount + subtraction_component::rows_amount;
 
-                    constexpr static const std::size_t gates_amount = 2;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
                         struct var_ec_point {
@@ -204,8 +204,6 @@ namespace nil {
 
                         auto z0 = addition_component::generate_assignments(assignment, typename addition_component::params_type({t0.output, t1.output}), row);
                         row+=addition_component::rows_amount;
-                        std::cout<<"z0 res = "<< assignment.var_value(z0.output[0]).data<<" "<< assignment.var_value(z0.output[1]).data<<" "
-                        << assignment.var_value(z0.output[2]).data<<" "<< assignment.var_value(z0.output[3]).data<<std::endl;
 
                         auto z1 = addition_component::generate_assignments(assignment, typename addition_component::params_type({t2.output, t3.output}), row);
                         row+=addition_component::rows_amount;
@@ -232,8 +230,6 @@ namespace nil {
 
                         auto k3 = addition_component::generate_assignments(assignment, typename addition_component::params_type({P_x, k1.output}), row);
                         row+=addition_component::rows_amount;
-                        std::cout<<"k3 res = "<< assignment.var_value(k3.output[0]).data<<" "<< assignment.var_value(k3.output[1]).data<<
-                        " "<< assignment.var_value(k3.output[2]).data<<" "<< assignment.var_value(k3.output[3]).data<<std::endl;
 
                         auto k4 = subtraction_component::generate_assignments(assignment, typename subtraction_component::params_type({P_y, k2.output}), row);
                         row+=subtraction_component::rows_amount;
