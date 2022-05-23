@@ -93,8 +93,12 @@ namespace nil {
 
                         std::size_t d = std::distance(column_assignment.begin(), column_assignment.end() - 1);
 
-                        return nil::crypto3::math::polynomial_dfs<typename FieldType::value_type> (
+                        nil::crypto3::math::polynomial_dfs<typename FieldType::value_type> res(
                             d, column_assignment.begin(), column_assignment.end());
+
+                        res.resize(domain->m);
+                        
+                        return res;
                     }
 
                     template<typename FieldType>

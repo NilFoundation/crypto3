@@ -106,12 +106,10 @@ namespace nil {
                                 sigma_binding = sigma_binding * (column_polynomials[i] + beta * S_sigma[i] + gamma);
                             }
                         }
-
                         math::polynomial<typename FieldType::value_type> id_binding_normal =
                             math::polynomial<typename FieldType::value_type>(id_binding.coefficients());
                         math::polynomial<typename FieldType::value_type> sigma_binding_normal =
                             math::polynomial<typename FieldType::value_type>(sigma_binding.coefficients());
-                            
                         // 3. Calculate $V_P$
                         math::polynomial_dfs<typename FieldType::value_type> V_P(table_rows - 1, table_rows);
 
@@ -120,17 +118,15 @@ namespace nil {
                             V_P[j] = V_P[j - 1] * id_binding_normal.evaluate(domain->get_domain_element(j - 1)) /
                                 sigma_binding_normal.evaluate(domain->get_domain_element(j - 1));
                         }
-
+                        V_P.resize(fri_params.D[0]->m);
                         math::polynomial<typename FieldType::value_type> V_P_normal =
                             math::polynomial<typename FieldType::value_type>(V_P.coefficients());
-
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
                         typename permutation_commitment_scheme_type::precommitment_type V_P_tree =
-                            permutation_commitment_scheme_type::precommit(V_P_normal, fri_params.D[0]);
+                            permutation_commitment_scheme_type::precommit(V_P, fri_params.D[0]);
                         typename permutation_commitment_scheme_type::commitment_type V_P_commitment =
                             permutation_commitment_scheme_type::commit(V_P_tree);
                         transcript(V_P_commitment);
-
                         // 5. Calculate g_perm, h_perm
                         math::polynomial_dfs<typename FieldType::value_type> g;
                         math::polynomial_dfs<typename FieldType::value_type> h;
@@ -148,7 +144,6 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
                             V_P.size()-1, V_P.size(), FieldType::value_type::one());
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
-
                         math::polynomial_dfs<typename FieldType::value_type> V_P_shifted =
                             math::polynomial_shift(V_P, 1);
 

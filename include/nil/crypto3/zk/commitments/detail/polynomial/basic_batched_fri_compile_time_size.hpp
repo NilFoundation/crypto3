@@ -135,9 +135,9 @@ namespace nil {
                             y_data.resize(D->m);
 
                             for (std::size_t i = 0; i < D->m; i++) {
+                                y_data[i].resize(field_element_type::length()*list_size);
                                 for (std::size_t j = 0; j < list_size; j++) {
-                                    y_data[i].resize(field_element_type::length()*list_size);
-
+                                    
                                     field_element_type y_val(poly[j][i]);
                                     auto write_iter = y_data[i].begin() + field_element_type::length() * j;
                                     y_val.write(write_iter, field_element_type::length());
