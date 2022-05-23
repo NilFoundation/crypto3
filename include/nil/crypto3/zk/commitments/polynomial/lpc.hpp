@@ -111,7 +111,7 @@ namespace nil {
                     static proof_type proof_eval(
                         const std::vector<typename FieldType::value_type> &evaluation_points,
                         precommitment_type &T,
-                        const math::polynomial<typename FieldType::value_type> &g,
+                        const math::polynomial_dfs<typename FieldType::value_type> &g,
                         const typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
@@ -120,8 +120,10 @@ namespace nil {
                         std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
                             U_interpolation_points(k);
 
+                        math::polynomial<typename FieldType::value_type> g_normal(g.coefficients());
+
                         for (std::size_t j = 0; j < k; j++) {
-                            z[j] = g.evaluate(evaluation_points[j]);    // transform to point-representation
+                            z[j] = g_normal.evaluate(evaluation_points[j]);    // transform to point-representation
                             U_interpolation_points[j] =
                                 std::make_pair(evaluation_points[j], z[j]);    // prepare points for interpolation
                         }
@@ -129,14 +131,18 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> U = math::lagrange_interpolation(
                             U_interpolation_points);    // k is small => iterpolation goes fast
 
-                        math::polynomial<typename FieldType::value_type> Q = (g - U);
+                        math::polynomial<typename FieldType::value_type> Q_normal = (g_normal - U);
                         for (std::size_t j = 0; j < k; j++) {
                             math::polynomial<typename FieldType::value_type> denominator_polynom = {
                                 -evaluation_points[j], 1};
-                            Q = Q / denominator_polynom;
+
+                            Q_normal = Q_normal / denominator_polynom;
                         }
 
                         std::array<typename basic_fri::proof_type, lambda> fri_proof;
+
+                        math::polynomial_dfs<typename FieldType::value_type> Q;
+                        Q.from_coefficients(Q_normal);
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
                             fri_proof[round_id] = basic_fri::proof_eval(Q, g, T, fri_params, transcript);
@@ -146,13 +152,13 @@ namespace nil {
                     }
 
                     static proof_type proof_eval(
-                        const typename FieldType::value_type &evaluation_points,
+                        const std::vector<typename FieldType::value_type> &evaluation_points,
                         precommitment_type &T,
                         const math::polynomial<typename FieldType::value_type> &g,
                         const typename basic_fri::params_type &fri_params,
                         typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
-                        std::size_t k = 1;
+                        std::size_t k = evaluation_points.size();
                         std::vector<typename FieldType::value_type> z(k);
                         std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>>
                             U_interpolation_points(k);
