@@ -366,18 +366,15 @@ namespace nil {
                                              .result;
                         row += exponentiation_component::rows_amount;
 
-                        std::cout<<"row before:"<<row<<std::endl;
                         var zeta_omega = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //var zeta_omega = mul_component::generate_circuit(bp, assignment, 
                            {params.fq_output.zeta, params.verifier_index.omega}, row).res;
                         row += mul_component::rows_amount;
-                        std::cout<<"row after:"<<row<<std::endl;
 
-                        // var zeta_omega_pow_n = 
-                        //     exponentiation_component::generate_circuit(bp, assignment, 
-                        //     {params.fq_output.zeta, params.verifier_index.domain_size, zero, one}, row).result;
-                        // row += exponentiation_component::rows_amount;
-                        //var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
+                        var zeta_omega_pow_n = 
+                            exponentiation_component::generate_circuit(bp, assignment, 
+                            {zeta_omega, params.verifier_index.domain_size, zero, one}, row).result;
+                        row += exponentiation_component::rows_amount;
+                        std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
