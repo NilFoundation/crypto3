@@ -34,6 +34,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/element_powers.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
@@ -122,40 +123,6 @@ namespace nil {
                             mul_component::generate_assignments(assignment, params, component_start_row);
                         component_start_row += mul_component::rows_amount;
                         return res.res;
-                    }
-
-                    static std::vector<var>
-                        assigment_element_powers(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                 var x,
-                                                 std::size_t n,
-                                                 std::size_t &row) {
-
-                        std::vector<var> res(n);
-                        if (n < 2) {
-                            res.resize(2);
-                        }
-                        assignment.witness(W0)[row] = 1;
-                        res[0] = var(0, row, false);
-                        typename BlueprintFieldType::value_type base_value = assignment.var_value(x);
-                        assignment.witness(W0 + 1)[row] = base_value;
-                        res[1] = var(W0 + 1, row, false);
-                        typename BlueprintFieldType::value_type prev_value = base_value;
-                        std::size_t column_idx = 2;
-
-                        for (std::size_t i = 2; i < n; i++) {
-                            // we need to copy any power of the element
-                            // so we place them only on copy-constrainted columns
-                            if (column_idx >= zk::snark::kimchi_constant::PERMUTES) {
-                                column_idx = 0;
-                                row++;
-                            }
-                            typename BlueprintFieldType::value_type new_value = prev_value * base_value;
-                            assignment.witness(W0 + column_idx)[row] = new_value;
-                            res[i] = var(W0 + i, row, false);
-                            prev_value = new_value;
-                        }
-
-                        return res;
                     }
 
                     static std::vector<var>
@@ -374,7 +341,10 @@ namespace nil {
                             exponentiation_component::generate_circuit(bp, assignment, 
                             {zeta_omega, params.verifier_index.domain_size, zero, one}, row).result;
                         row += exponentiation_component::rows_amount;
-                        std::cout<<"row:"<<row<<std::endl;
+
+                        // std::vector<var> alpha_powers =
+                        //     assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
+                        // std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);

@@ -93,7 +93,9 @@ namespace nil {
                         result_type(const params_type &params, std::size_t start_row_index) {
                             res = var(W2, start_row_index, false, var::column_type::witness);
                         }
-                        result_type() {
+
+                        result_type(std::size_t start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
                         }
                     };
 
@@ -180,6 +182,10 @@ namespace nil {
                     struct result_type {
                         var res = var(0, 0, false);
                         result_type(const params_type &params, std::size_t start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+
+                        result_type(std::size_t start_row_index) {
                             res = var(W2, start_row_index, false, var::column_type::witness);
                         }
                         result_type() {
@@ -269,6 +275,9 @@ namespace nil {
                     struct result_type {
                         var res = var(0, 0, false);
                         result_type(const params_type &params, std::size_t start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type(std::size_t start_row_index) {
                             res = var(W2, start_row_index, false, var::column_type::witness);
                         }
                         result_type() {
@@ -361,6 +370,9 @@ namespace nil {
                     struct result_type {
                         var res = var(0, 0, false);
                         result_type(const params_type &params, std::size_t start_row_index) {
+                            res = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type(std::size_t start_row_index) {
                             res = var(W2, start_row_index, false, var::column_type::witness);
                         }
                         result_type() {
