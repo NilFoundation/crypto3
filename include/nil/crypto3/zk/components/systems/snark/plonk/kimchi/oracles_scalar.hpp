@@ -49,16 +49,16 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t alpha_powers_n, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, std::size_t... WireIndexes>
                 class oracles_scalar;
 
-                template<typename ArithmetizationParams, typename CurveType, std::size_t alpha_powers_n, std::size_t W0, std::size_t W1,
+                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType, std::size_t W0, std::size_t W1,
                          std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                          std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                          std::size_t W13, std::size_t W14>
                 class oracles_scalar<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
-                    CurveType, alpha_powers_n, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+                    CurveType, KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
 
@@ -79,7 +79,10 @@ namespace nil {
                                                        W10, W11, W12, W13, W14>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     
-                    using alpha_powers_component = zk::components::element_powers<ArithmetizationType, alpha_powers_n, 0, 1, 2, 3,
+                    using alpha_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::alpha_powers_n, 0, 1, 2, 3,
+                                                                          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+
+                    using pi_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::public_input_size, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
                     struct field_op_component {
@@ -345,9 +348,16 @@ namespace nil {
                             {zeta_omega, params.verifier_index.domain_size, zero, one}, row).result;
                         row += exponentiation_component::rows_amount;
 
-                        std::array<var, alpha_powers_n> alpha_powers =
+                        std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers =
                             alpha_powers_component::generate_circuit(bp, assignment, 
                             {alpha, one}, row).output;
+                        row += alpha_powers_component::rows_amount;
+
+                        std::array<var, KimchiParamsType::public_input_size> omega_powers =
+                            pi_powers_component::generate_circuit(bp, assignment, 
+                            {params.verifier_index.omega, one}, row).output;
+                        row += alpha_powers_component::rows_amount;
+                        
                         std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
@@ -396,10 +406,15 @@ namespace nil {
                         var zeta_omega = assigment_multiplication(assignment, zeta, params.verifier_index.omega, row);
                         var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
 
-                        std::array<var, alpha_powers_n> alpha_powers = alpha_powers_component::generate_assignments(assignment, {alpha_endo, one}, row).output;
+                        std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers = alpha_powers_component::generate_assignments(
+                            assignment, {alpha_endo, one}, row).output;
                         row += alpha_powers_component::rows_amount;
-                        // std::vector<var> omega_powers =
-                        //     assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
+
+                        std::array<var, KimchiParamsType::public_input_size> omega_powers =
+                            pi_powers_component::generate_assignments(assignment, 
+                            {params.verifier_index.omega, one}, row).output;
+                        row += pi_powers_component::rows_amount;
+                        std::cout<<"assignment row: "<<row<<std::endl;
                         // std::vector<var> lagrange_base =
                         //     assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
 

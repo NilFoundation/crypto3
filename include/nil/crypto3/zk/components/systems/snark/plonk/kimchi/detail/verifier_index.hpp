@@ -40,6 +40,12 @@ namespace nil {
             namespace components {
                 typedef std::array<uint64_t, 2> kimchi_scalar_limbs;
 
+                template<std::size_t AlphaPowersN, std::size_t PublicInputSize>
+                struct kimchi_params_type {
+                    constexpr static std::size_t alpha_powers_n = AlphaPowersN;
+                    constexpr static std::size_t public_input_size = PublicInputSize;
+                };
+
                 template<typename CurveType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
                     using Fr = typename CurveType::scalar_field_type::value_type;

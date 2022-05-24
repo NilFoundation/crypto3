@@ -68,6 +68,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
+    constexpr static std::size_t alpha_powers_n = 5;
+    constexpr static std::size_t public_input_size = 0;
+    using kimchi_params = zk::components::kimchi_params_type<alpha_powers_n, public_input_size>;
+
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
     verifier_index.max_poly_size = 512;
@@ -78,11 +82,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     std::size_t domain_size = 512;
     verifier_index.domain_size = var(0, 6, false, var::column_type::public_input);
     verifier_index.omega = var(0, 7, false, var::column_type::public_input); 
-    verifier_index.public_input_size = 0;
-    constexpr static std::size_t alpha_powers = 5;
-    verifier_index.alpha_powers = alpha_powers;
+    verifier_index.public_input_size = public_input_size;
+    verifier_index.alpha_powers = alpha_powers_n;
 
-    using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type, alpha_powers,
+    using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type, kimchi_params,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
