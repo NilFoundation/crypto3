@@ -116,7 +116,7 @@ namespace nil {
                         auto addition_result = add_component::generate_assignments(assignment, 
                             {input, state[state_index]}, component_start_row);
                         component_start_row += add_component::rows_amount;
-                        state[state_index] = addition_result.res;
+                        state[state_index] = addition_result.output;
                     }
 
                     void permute_circuit(blueprint<ArithmetizationType> &bp,
@@ -142,7 +142,7 @@ namespace nil {
                         auto addition_result = zk::components::generate_circuit<add_component>(bp, assignment, 
                             {input, state[state_index]}, component_start_row);
                         component_start_row += add_component::rows_amount;
-                        state[state_index] = addition_result.res;
+                        state[state_index] = addition_result.output;
                     }
 
                 public:

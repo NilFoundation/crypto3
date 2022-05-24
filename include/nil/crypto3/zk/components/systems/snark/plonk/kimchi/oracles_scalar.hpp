@@ -85,6 +85,10 @@ namespace nil {
                     using pi_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::public_input_size, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
+                    using lagrange_base_component =
+                            zk::components::kimchi_oracles_lagrange<ArithmetizationType, CurveType, W0, W1, W2, W3, W4,
+                                                                    W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                     struct field_op_component {
                         // TODO: change to add / sub
                         using add = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
@@ -128,23 +132,7 @@ namespace nil {
                         typename mul_component::result_type res =
                             mul_component::generate_assignments(assignment, params, component_start_row);
                         component_start_row += mul_component::rows_amount;
-                        return res.res;
-                    }
-
-                    static std::vector<var>
-                        assignment_lagrange(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                            var zeta,
-                                            var zeta_omega,
-                                            std::vector<var>
-                                                omega_powers,
-                                            std::size_t &row) {
-                        using lagrange_base_component =
-                            zk::components::kimchi_oracles_lagrange<ArithmetizationType, CurveType, W0, W1, W2, W3, W4,
-                                                                    W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                        auto res = lagrange_base_component::generate_assignments(assignment,
-                                                                                 {zeta, zeta_omega, omega_powers}, row);
-                        row += lagrange_base_component::rows_amount;
-                        return res.lagrange_base;
+                        return res.output;
                     }
 
                     static std::array<var, 2>
@@ -340,7 +328,7 @@ namespace nil {
                         row += exponentiation_component::rows_amount;
 
                         var zeta_omega = zk::components::generate_circuit<mul_component>(bp, assignment,
-                           {params.fq_output.zeta, params.verifier_index.omega}, row).res;
+                           {params.fq_output.zeta, params.verifier_index.omega}, row).output;
                         row += mul_component::rows_amount;
 
                         var zeta_omega_pow_n = 
@@ -357,7 +345,7 @@ namespace nil {
                             pi_powers_component::generate_circuit(bp, assignment, 
                             {params.verifier_index.omega, one}, row).output;
                         row += alpha_powers_component::rows_amount;
-                        
+
                         std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
@@ -414,9 +402,12 @@ namespace nil {
                             pi_powers_component::generate_assignments(assignment, 
                             {params.verifier_index.omega, one}, row).output;
                         row += pi_powers_component::rows_amount;
+
+                        // std::vector<var> lagrange_base = lagrange_base_component::generate_assignments(assignment,
+                        //                                             {zeta, zeta_omega, omega_powers}, row).output;
+                        // row += lagrange_base_component::rows_amount;
+
                         std::cout<<"assignment row: "<<row<<std::endl;
-                        // std::vector<var> lagrange_base =
-                        //     assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
 
                         // // TODO: check on empty public_input
                         // std::array<var, 2> public_eval = assignment_puiblic_eval(

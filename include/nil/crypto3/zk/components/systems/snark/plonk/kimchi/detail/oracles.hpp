@@ -221,10 +221,10 @@ namespace nil {
                     };
 
                     struct result_type {
-                        std::vector<var> lagrange_base;
+                        std::vector<var> output;
 
                         result_type(const params_type &params, std::size_t component_start_row) {
-                            lagrange_base = std::vector<var>(0);
+                            output = std::vector<var>(0);
                         }
                     };
 

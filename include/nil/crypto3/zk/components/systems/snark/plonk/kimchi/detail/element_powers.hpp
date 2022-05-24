@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_PREV_CHALLENGES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_PREV_CHALLENGES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ELEMENT_POWERS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ELEMENT_POWERS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -112,7 +112,7 @@ namespace nil {
                                output[1] = var(W1, component_start_row, false);
                             }
                             for (std::size_t i = 2; i < n; i++) {
-                                output[i] = typename mul_component::result_type(component_start_row + i - 1).res;
+                                output[i] = typename mul_component::result_type(component_start_row + i - 1).output;
                             }
                         }
                     };
@@ -127,7 +127,7 @@ namespace nil {
                         std::size_t row = start_row_index + 1;
                         for (std::size_t i = 2; i < n; i++) {
                             last_result = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {base, last_result}, row).res;
+                                {base, last_result}, row).output;
                             row += mul_component::rows_amount;
                         }
 
@@ -149,7 +149,7 @@ namespace nil {
                         
                         for (std::size_t i = 2; i < n; i++) {
                             last_result = mul_component::generate_assignments(assignment,
-                                {base, last_result}, row).res;
+                                {base, last_result}, row).output;
                             row += mul_component::rows_amount;
                         }
 
@@ -180,4 +180,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_PREV_CHALLENGES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ELEMENT_POWERS_HPP

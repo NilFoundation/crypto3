@@ -117,7 +117,7 @@ namespace nil {
                                output[1] = var(W1, component_start_row, false);
                             }
                             for (std::size_t i = 2; i < n; i++) {
-                                output[i] = mul_component::result_type(component_start_row + i);
+                                output[i] = mul_component::result_type(component_start_row + i).output;
                             }
                         }
                     };

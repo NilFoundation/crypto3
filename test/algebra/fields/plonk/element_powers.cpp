@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_combined_inner_product_test
+#define BOOST_TEST_MODULE blueprint_plonk_element_powers_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -45,7 +45,7 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_combined_inner_product) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_element_powers) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
