@@ -50,7 +50,7 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_var_base_mul_per_bit) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
