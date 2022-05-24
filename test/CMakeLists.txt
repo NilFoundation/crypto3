@@ -90,6 +90,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/basic_verifier"
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles"
+    "verifiers/kimchi/detail/lagrange_base"
     "sponge/sponge"
     "algebra/fields/plonk/field_operations"
     "algebra/fields/plonk/combined_inner_product"
