@@ -66,9 +66,24 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type,
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
+    typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
+    verifier_index.max_poly_size = 512;
+    verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
+        0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
+        0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
+        0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
+    std::size_t domain_size = 512;
+    verifier_index.domain_size = var(0, 6, false, var::column_type::public_input);
+    verifier_index.omega = var(0, 7, false, var::column_type::public_input); 
+    verifier_index.public_input_size = 0;
+    constexpr static std::size_t alpha_powers = 5;
+    verifier_index.alpha_powers = alpha_powers;
+
+    using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type, alpha_powers,
+                                                            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
@@ -82,19 +97,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     std::cout<<"Expected alpha: "<<expected_alpha.data<<std::endl;
     typename BlueprintFieldType::value_type expected_zeta = 0x3D0F1F3A3D07DC73FBDF3718FFE270122AA367FB5BA667AD4A4AB81167D21BE4_cppui256;
     std::cout<<"Expected zeta: "<<expected_zeta.data<<std::endl;
-
-    zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
-    typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
-    verifier_index.max_poly_size = 512;
-    verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
-        0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
-        0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
-        0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
-    std::size_t domain_size = 512;
-    verifier_index.domain_size = var(0, 6, false, var::column_type::public_input);
-    verifier_index.omega = var(0, 7, false, var::column_type::public_input); 
-    verifier_index.public_input_size = 0;
-    verifier_index.alpha_powers = 1;
 
     zk::components::kimchi_proof_scalar<curve_type> proof;
     typename component_type::params_type::fq_sponge_output fq_output = {

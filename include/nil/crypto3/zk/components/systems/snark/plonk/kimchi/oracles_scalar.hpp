@@ -49,16 +49,16 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t alpha_powers_n, std::size_t... WireIndexes>
                 class oracles_scalar;
 
-                template<typename ArithmetizationParams, typename CurveType, std::size_t W0, std::size_t W1,
+                template<typename ArithmetizationParams, typename CurveType, std::size_t alpha_powers_n, std::size_t W0, std::size_t W1,
                          std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                          std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                          std::size_t W13, std::size_t W14>
                 class oracles_scalar<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
-                    CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+                    CurveType, alpha_powers_n, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
 
@@ -78,6 +78,9 @@ namespace nil {
                         zk::components::exponentiation<ArithmetizationType, 60, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                                                        W10, W11, W12, W13, W14>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                    
+                    using alpha_powers_component = zk::components::element_powers<ArithmetizationType, alpha_powers_n, 0, 1, 2, 3,
+                                                                          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
                     struct field_op_component {
                         // TODO: change to add / sub
@@ -98,7 +101,7 @@ namespace nil {
                         typename endo_scalar_component::result_type endo_scalar_res =
                             endo_scalar_component::generate_assignments(assignment, params, component_start_row);
                         component_start_row += endo_scalar_component::rows_amount;
-                        return endo_scalar_res.endo_scalar;
+                        return endo_scalar_res.output;
                     }
 
                     static var assignment_exponentiation(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -309,12 +312,12 @@ namespace nil {
                             0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         std::size_t endo_num_bits = 128;
                         // alpha = phi(alpha_challenge)
-                        endo_scalar_component::generate_circuit(
-                            bp, assignment, {params.fq_output.alpha, endo_factor, endo_num_bits}, row);
+                        var alpha = endo_scalar_component::generate_circuit(
+                            bp, assignment, {params.fq_output.alpha, endo_factor, endo_num_bits}, row).output;
                         row += endo_scalar_component::rows_amount;
                         // zeta = phi(zeta_challenge)
-                        endo_scalar_component::generate_circuit(
-                            bp, assignment, {params.fq_output.zeta, endo_factor, endo_num_bits}, row);
+                        var zeta = endo_scalar_component::generate_circuit(
+                            bp, assignment, {params.fq_output.zeta, endo_factor, endo_num_bits}, row).output;
                         row += endo_scalar_component::rows_amount;
 
                         // fr_transcript.absorb(fq_digest)
@@ -342,9 +345,10 @@ namespace nil {
                             {zeta_omega, params.verifier_index.domain_size, zero, one}, row).result;
                         row += exponentiation_component::rows_amount;
 
-                        // std::vector<var> alpha_powers =
-                        //     assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
-                        // std::cout<<"row:"<<row<<std::endl;
+                        std::array<var, alpha_powers_n> alpha_powers =
+                            alpha_powers_component::generate_circuit(bp, assignment, 
+                            {alpha, one}, row).output;
+                        std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
@@ -392,51 +396,51 @@ namespace nil {
                         var zeta_omega = assigment_multiplication(assignment, zeta, params.verifier_index.omega, row);
                         var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
 
-                        std::vector<var> alpha_powers =
-                            assigment_element_powers(assignment, alpha, params.verifier_index.alpha_powers, row);
-                        std::vector<var> omega_powers =
-                            assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
-                        std::vector<var> lagrange_base =
-                            assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
+                        std::array<var, alpha_powers_n> alpha_powers = alpha_powers_component::generate_assignments(assignment, {alpha_endo, one}, row).output;
+                        row += alpha_powers_component::rows_amount;
+                        // std::vector<var> omega_powers =
+                        //     assigment_element_powers(assignment, alpha, params.verifier_index.public_input_size, row);
+                        // std::vector<var> lagrange_base =
+                        //     assignment_lagrange(assignment, zeta, zeta_omega, omega_powers, row);
 
-                        // TODO: check on empty public_input
-                        std::array<var, 2> public_eval = assignment_puiblic_eval(
-                            assignment, params.proof.public_input, zeta_pow_n, zeta_omega_pow_n, lagrange_base,
-                            omega_powers, params.verifier_index.domain_size_inv, row);
-                        transcript.absorb_evaluations_assignment(
-                            assignment, public_eval[0], params.proof.proof_evals[0], row);
-                        transcript.absorb_evaluations_assignment(
-                            assignment, public_eval[1], params.proof.proof_evals[1], row);
+                        // // TODO: check on empty public_input
+                        // std::array<var, 2> public_eval = assignment_puiblic_eval(
+                        //     assignment, params.proof.public_input, zeta_pow_n, zeta_omega_pow_n, lagrange_base,
+                        //     omega_powers, params.verifier_index.domain_size_inv, row);
+                        // transcript.absorb_evaluations_assignment(
+                        //     assignment, public_eval[0], params.proof.proof_evals[0], row);
+                        // transcript.absorb_evaluations_assignment(
+                        //     assignment, public_eval[1], params.proof.proof_evals[1], row);
 
-                        transcript.absorb_assignment(assignment, params.proof.ft_eval, row);
+                        // transcript.absorb_assignment(assignment, params.proof.ft_eval, row);
 
-                        var v_challenge = transcript.challenge_assignment(assignment, row);
-                        var v = assignments_endo_scalar(assignment, v_challenge, row);
+                        // var v_challenge = transcript.challenge_assignment(assignment, row);
+                        // var v = assignments_endo_scalar(assignment, v_challenge, row);
 
-                        var u_challenge = transcript.challenge_assignment(assignment, row);
-                        var u = assignments_endo_scalar(assignment, u_challenge, row);
+                        // var u_challenge = transcript.challenge_assignment(assignment, row);
+                        // var u = assignments_endo_scalar(assignment, u_challenge, row);
 
-                        std::array<var, 2> powers_of_eval_points_for_chunks = {
-                            assignment_exponentiation(assignment, zeta, max_poly_size, zero, one, row),
-                            assignment_exponentiation(assignment, zeta_omega, max_poly_size, zero, one, row),
-                        };
+                        // std::array<var, 2> powers_of_eval_points_for_chunks = {
+                        //     assignment_exponentiation(assignment, zeta, max_poly_size, zero, one, row),
+                        //     assignment_exponentiation(assignment, zeta_omega, max_poly_size, zero, one, row),
+                        // };
 
-                        std::vector<var> prev_challenges_evals =
-                            assignment_prev_chal_evals(assignment,
-                                                       max_poly_size,
-                                                       std::array<var, 2> {zeta, zeta_omega},
-                                                       powers_of_eval_points_for_chunks,
-                                                       row);
+                        // std::vector<var> prev_challenges_evals =
+                        //     assignment_prev_chal_evals(assignment,
+                        //                                max_poly_size,
+                        //                                std::array<var, 2> {zeta, zeta_omega},
+                        //                                powers_of_eval_points_for_chunks,
+                        //                                row);
 
-                        std::array<kimchi_proof_evaluations<CurveType>, 2> evals = {
-                            assignment_combine_evaluations(assignment, params.proof.proof_evals[0],
-                                                           powers_of_eval_points_for_chunks[0], row),
-                            assignment_combine_evaluations(assignment, params.proof.proof_evals[1],
-                                                           powers_of_eval_points_for_chunks[1], row),
-                        };
+                        // std::array<kimchi_proof_evaluations<CurveType>, 2> evals = {
+                        //     assignment_combine_evaluations(assignment, params.proof.proof_evals[0],
+                        //                                    powers_of_eval_points_for_chunks[0], row),
+                        //     assignment_combine_evaluations(assignment, params.proof.proof_evals[1],
+                        //                                    powers_of_eval_points_for_chunks[1], row),
+                        // };
 
-                        // ft(zeta)
-                        var ft_at_zeta = ft_eval_at_zeta(assignment, row);
+                        // // ft(zeta)
+                        // var ft_at_zeta = ft_eval_at_zeta(assignment, row);
 
                         return result_type(params, component_start_row);
                     }

@@ -98,9 +98,9 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var endo_scalar = var(0, 0, false);
+                        var output = var(0, 0, false);
                         result_type(const params_type &params, std::size_t start_row_index) {
-                            endo_scalar = var(W6, start_row_index + rows_amount - 1, false, var::column_type::witness);
+                            output = var(W6, start_row_index + rows_amount - 1, false, var::column_type::witness);
                         }
                     };
 
