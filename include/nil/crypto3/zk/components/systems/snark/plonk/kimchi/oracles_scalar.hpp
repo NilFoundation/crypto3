@@ -90,6 +90,10 @@ namespace nil {
                             zk::components::lagrange_base<ArithmetizationType, KimchiParamsType::public_input_size, W0, W1, W2, W3, W4,
                                                                     W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    using public_eval_component =
+                            zk::components::kimchi_oracles_public_eval<ArithmetizationType, CurveType, W0, W1, W2, W3,
+                                                                       W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                     struct field_op_component {
                         // TODO: change to add / sub
                         using add = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
@@ -134,24 +138,6 @@ namespace nil {
                             mul_component::generate_assignments(assignment, params, component_start_row);
                         component_start_row += mul_component::rows_amount;
                         return res.output;
-                    }
-
-                    static std::array<var, 2>
-                        assignment_puiblic_eval(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                const std::vector<var> &public_input,
-                                                var zeta_pow_n,
-                                                var zeta_omega_pow_n,
-                                                std::vector<var> &lagrange_base,
-                                                std::vector<var> &omega_powers,
-                                                typename BlueprintFieldType::value_type domain_size_inv,
-                                                std::size_t &row) {
-                        using public_eval_component =
-                            zk::components::kimchi_oracles_public_eval<ArithmetizationType, CurveType, W0, W1, W2, W3,
-                                                                       W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                        auto res = public_eval_component::generate_assignments(
-                            assignment, {zeta_pow_n, zeta_omega_pow_n, public_input, lagrange_base, omega_powers}, row);
-                        row += public_eval_component::rows_amount;
-                        return res.public_evaluations;
                     }
 
                     static std::vector<var>
@@ -412,12 +398,18 @@ namespace nil {
                                     {zeta, zeta_omega, omega_powers, one}, row).output;
                         row += lagrange_base_component::rows_amount;
 
-                        std::cout<<"assignment row: "<<row<<std::endl;
+                        // TODO: check on empty public_input
+                         = assignment_puiblic_eval(
+                            assignment, params.proof.public_input, zeta_pow_n, zeta_omega_pow_n, lagrange_base,
+                            omega_powers, params.verifier_index.domain_size_inv, row);
 
-                        // // TODO: check on empty public_input
-                        // std::array<var, 2> public_eval = assignment_puiblic_eval(
-                        //     assignment, params.proof.public_input, zeta_pow_n, zeta_omega_pow_n, lagrange_base,
-                        //     omega_powers, params.verifier_index.domain_size_inv, row);
+                        std::array<var, 2> public_eval = public_eval_component::generate_assignments(
+                            assignment, {zeta_pow_n, zeta_omega_pow_n, public_input, lagrange_base, omega_powers}, row);
+                        row += public_eval_component::rows_amount;
+                        return res.public_evaluations;
+                        
+                        std::cout<<"assignment row: "<<row<<std::endl;
+                        
                         // transcript.absorb_evaluations_assignment(
                         //     assignment, public_eval[0], params.proof.proof_evals[0], row);
                         // transcript.absorb_evaluations_assignment(
