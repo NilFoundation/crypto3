@@ -251,7 +251,7 @@ namespace nil {
                                 b[32 - i - 1] = multiprecision::bit_test(integral_b, i);
                             }
                             std::vector<std::size_t> b_sizes = {10, 7, 2, 13};
-                            std::array<std::vector<std::size_t>, 2> b_chunks = split_and_sparse(b, b_sizes, base4);
+                            std::array<std::vector<uint64_t>, 2> b_chunks = split_and_sparse(b, b_sizes, base4);
                             assignment.witness(W0)[i + 4] = message_scheduling_words[i / 5 + 14];
                             assignment.witness(W1)[i + 4] = b_chunks[0][0];
                             assignment.witness(W2)[i + 4] = b_chunks[0][1];
