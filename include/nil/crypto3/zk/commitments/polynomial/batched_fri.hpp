@@ -38,7 +38,7 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_compile_time_size.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri.hpp>
 
 namespace nil {
     namespace crypto3 {

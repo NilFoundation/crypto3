@@ -35,8 +35,7 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_runtime_size.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri_compile_time_size.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
