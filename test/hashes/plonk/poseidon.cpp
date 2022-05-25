@@ -53,6 +53,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using FieldType = typename curve_type::base_field_type;
+
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;

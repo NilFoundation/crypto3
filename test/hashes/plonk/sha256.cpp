@@ -52,6 +52,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
+    using FieldType = typename curve_type::base_field_type;
+
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 2;
@@ -59,21 +61,23 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::sha256<ArithmetizationType, curve_type,
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type = zk::components::sha256<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     std::array<typename ArithmetizationType::field_type::value_type, 4> public_input = {0, 0, 0, 0};
-    std::array<var, 4> input_state_var = {var(1, 0, false, var::column_type::public_input),
-     var(1, 1, false, var::column_type::public_input), var(1, 2, false, var::column_type::public_input), var(1, 3, false, var::column_type::public_input)};
+    std::array<var, 4> input_state_var = {
+        var(1, 0, false, var::column_type::public_input), var(1, 1, false, var::column_type::public_input),
+        var(1, 2, false, var::column_type::public_input), var(1, 3, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {input_state_var};
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
+    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
