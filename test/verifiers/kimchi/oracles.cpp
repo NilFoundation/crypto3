@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     constexpr static std::size_t alpha_powers_n = 5;
-    constexpr static std::size_t public_input_size = 0;
+    constexpr static std::size_t public_input_size = 5;
     using kimchi_params = zk::components::kimchi_params_type<alpha_powers_n, public_input_size>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;

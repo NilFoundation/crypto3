@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/element_powers.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_base.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
@@ -86,7 +87,7 @@ namespace nil {
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
                     using lagrange_base_component =
-                            zk::components::kimchi_oracles_lagrange<ArithmetizationType, CurveType, W0, W1, W2, W3, W4,
+                            zk::components::lagrange_base<ArithmetizationType, KimchiParamsType::public_input_size, W0, W1, W2, W3, W4,
                                                                     W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     struct field_op_component {
@@ -346,6 +347,11 @@ namespace nil {
                             {params.verifier_index.omega, one}, row).output;
                         row += alpha_powers_component::rows_amount;
 
+                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_base =
+                                            lagrange_base_component::generate_circuit(bp, assignment,
+                                                {zeta, zeta_omega, omega_powers, one}, row).output;
+                        row += lagrange_base_component::rows_amount;
+
                         std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
@@ -365,17 +371,15 @@ namespace nil {
                             zkpm[i] = assignment.allocate_public_input(params.verifier_index.zkpm[i]);
                         }
 
-                        var alpha = params.fq_output.alpha;
-                        var zeta = params.fq_output.zeta;
                         var fq_digest = params.fq_output.fq_digest;
                         var beta = params.fq_output.beta;
                         var gamma = params.fq_output.gamma;
                         var joint_combiner = params.fq_output.joint_combiner;
 
-                        var alpha_endo = assignments_endo_scalar(assignment, alpha, row);
-                        std::cout << "alpha: " << assignment.var_value(alpha_endo).data << std::endl;
-                        var zeta_endo = assignments_endo_scalar(assignment, zeta, row);
-                        std::cout << "zeta: " << assignment.var_value(zeta_endo).data << std::endl;
+                        var alpha = assignments_endo_scalar(assignment, params.fq_output.alpha, row);
+                        std::cout << "alpha: " << assignment.var_value(alpha).data << std::endl;
+                        var zeta = assignments_endo_scalar(assignment, params.fq_output.zeta, row);
+                        std::cout << "zeta: " << assignment.var_value(zeta).data << std::endl;
 
                         var zero = var(0, 0, false, var::column_type::constant);
                         var one = var(0, 1, false, var::column_type::constant);
@@ -395,7 +399,7 @@ namespace nil {
                         var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
 
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers = alpha_powers_component::generate_assignments(
-                            assignment, {alpha_endo, one}, row).output;
+                            assignment, {alpha, one}, row).output;
                         row += alpha_powers_component::rows_amount;
 
                         std::array<var, KimchiParamsType::public_input_size> omega_powers =
@@ -403,9 +407,10 @@ namespace nil {
                             {params.verifier_index.omega, one}, row).output;
                         row += pi_powers_component::rows_amount;
 
-                        // std::vector<var> lagrange_base = lagrange_base_component::generate_assignments(assignment,
-                        //                                             {zeta, zeta_omega, omega_powers}, row).output;
-                        // row += lagrange_base_component::rows_amount;
+                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_base = 
+                                    lagrange_base_component::generate_assignments(assignment,
+                                    {zeta, zeta_omega, omega_powers, one}, row).output;
+                        row += lagrange_base_component::rows_amount;
 
                         std::cout<<"assignment row: "<<row<<std::endl;
 

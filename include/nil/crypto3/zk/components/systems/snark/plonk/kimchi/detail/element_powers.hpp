@@ -93,7 +93,7 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0f0c;
 
                 public:
-                    constexpr static const std::size_t rows_amount = n * mul_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = n <= 1 ? 1 : (n - 2) * mul_component::rows_amount + 1;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type { 
@@ -172,7 +172,7 @@ namespace nil {
                         bp.add_copy_constraint({{W0, static_cast<int>(start_row_index), false},
                                                 params.one});
                         bp.add_copy_constraint({{W1, static_cast<int>(start_row_index), false},
-                                                params.base});
+                                               params.base});
                     }
                 };
             }    // namespace components
