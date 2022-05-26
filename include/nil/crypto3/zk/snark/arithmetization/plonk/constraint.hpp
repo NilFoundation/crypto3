@@ -172,7 +172,7 @@ namespace nil {
                                 }
 
                                 if (var.rotation != 0) {
-                                    assignment = math::polynomial_shift(assignment, var.rotation);
+                                    assignment = math::polynomial_shift(assignment, var.rotation, domain->m);
                                 }
 
                                 term_value = term_value * assignment;

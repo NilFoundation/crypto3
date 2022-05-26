@@ -127,8 +127,14 @@ namespace nil {
                             (std::is_same<typename ContainerType::value_type,
                                           math::polynomial_dfs<typename FieldType::value_type>>::value),
                             precommitment_type>::type precommit(
-                                const ContainerType &poly,
+                                ContainerType poly,
                                 const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+
+                            for (int i = 0; i < poly.size(); ++i) {
+                                if (poly[i].size() != D->m){
+                                    poly[i].resize(D->m);
+                                }
+                            }
 
                             std::size_t list_size = poly.size();
                             std::vector<std::vector<std::uint8_t>> y_data;
@@ -220,7 +226,6 @@ namespace nil {
                                 } else {
                                     return {};
                                 }
-
 
                                 // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y;
                                 std::vector<std::array<typename FieldType::value_type, m>> y(leaf_size);

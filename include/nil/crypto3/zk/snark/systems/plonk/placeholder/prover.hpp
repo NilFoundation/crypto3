@@ -236,7 +236,7 @@ namespace nil {
                         // 7. Aggregate quotient polynomial
                         math::polynomial<typename FieldType::value_type> T =
                             quotient_polynomial(preprocessed_public_data, F, transcript);
-                        
+
                         std::vector<math::polynomial<typename FieldType::value_type>> T_splitted =
                             detail::split_polynomial<FieldType>(T, fri_params.max_degree);
 

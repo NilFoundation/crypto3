@@ -191,9 +191,12 @@ namespace nil {
                         };
 
                         static precommitment_type
-                            precommit(const math::polynomial_dfs<typename FieldType::value_type> &f,
+                            precommit(math::polynomial_dfs<typename FieldType::value_type> f,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
+                            if (f.size() != D->m){
+                                f.resize(D->m);
+                            }
                             std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
                             y_data.resize(D->m);
 

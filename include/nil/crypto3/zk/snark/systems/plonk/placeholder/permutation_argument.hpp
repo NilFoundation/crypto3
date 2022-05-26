@@ -80,13 +80,11 @@ namespace nil {
                         typename ParamsType::commitment_params_type fri_params,
                         transcript_type &transcript = transcript_type()) {
 
-                        const std::size_t table_rows = table_description.rows_amount;
-
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> &S_id =
                             preprocessed_data.identity_polynomials;
-                        std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_data.common_data.basic_domain;
+                        std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain = preprocessed_data.common_data.basic_domain;
 
                         // 1. $\beta_1, \gamma_1 = \challenge$
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
@@ -111,14 +109,15 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> sigma_binding_normal =
                             math::polynomial<typename FieldType::value_type>(sigma_binding.coefficients());
                         // 3. Calculate $V_P$
-                        math::polynomial_dfs<typename FieldType::value_type> V_P(table_rows - 1, table_rows);
+                        math::polynomial_dfs<typename FieldType::value_type> V_P(basic_domain->m - 1, basic_domain->m);
 
                         V_P[0] = FieldType::value_type::one();
-                        for (std::size_t j = 1; j < table_rows; j++) {
-                            V_P[j] = V_P[j - 1] * id_binding_normal.evaluate(domain->get_domain_element(j - 1)) /
-                                sigma_binding_normal.evaluate(domain->get_domain_element(j - 1));
+                        for (std::size_t j = 1; j < basic_domain->m; j++) {
+                            V_P[j] = V_P[j - 1] * id_binding_normal.evaluate(basic_domain->get_domain_element(j - 1)) /
+                                sigma_binding_normal.evaluate(basic_domain->get_domain_element(j - 1));
                         }
-                        V_P.resize(fri_params.D[0]->m);
+                        // V_P.resize(fri_params.D[0]->m);
+
                         math::polynomial<typename FieldType::value_type> V_P_normal =
                             math::polynomial<typename FieldType::value_type>(V_P.coefficients());
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
@@ -142,10 +141,10 @@ namespace nil {
                         }
 
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
-                            V_P.size()-1, V_P.size(), FieldType::value_type::one());
+                            0, V_P.size(), FieldType::value_type::one());
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
                         math::polynomial_dfs<typename FieldType::value_type> V_P_shifted =
-                            math::polynomial_shift(V_P, 1);
+                            math::polynomial_shift(V_P, 1, basic_domain->m);
 
                         F[0] = math::polynomial<typename FieldType::value_type>(
                             (preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_P)).coefficients());

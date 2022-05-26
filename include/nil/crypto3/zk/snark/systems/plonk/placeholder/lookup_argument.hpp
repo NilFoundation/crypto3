@@ -83,16 +83,16 @@ namespace nil {
                         const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates =
                             constraint_system.lookup_gates();
 
-                        std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                        std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             preprocessed_data.common_data.basic_domain;
 
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
                         math::polynomial_dfs<typename FieldType::value_type> F_compr_input(
-                            domain->m - 1, domain->m, 0);
+                            basic_domain->m - 1, basic_domain->m, 0);
 
                         math::polynomial_dfs<typename FieldType::value_type> F_compr_value(
-                            domain->m - 1, domain->m, 0);
+                            basic_domain->m - 1, basic_domain->m, 0);
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
@@ -134,7 +134,7 @@ namespace nil {
                                         case VariableType::column_type::selector:
                                             break;
                                     }
-                                    for (std::size_t t = 0; t < domain->m; t++) {
+                                    for (std::size_t t = 0; t < basic_domain->m; t++) {
                                         F_compr_input[t] =
                                             F_compr_input[t] +
                                             theta_acc *
@@ -159,7 +159,7 @@ namespace nil {
                         // to-do better sort for F_perm_value
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_value = F_compr_value;
                         F_perm_value[0] = F_perm_input[0];
-                        for (std::size_t i = 1; i < domain->m; i++) {
+                        for (std::size_t i = 1; i < basic_domain->m; i++) {
                             if (F_perm_input[i] != F_perm_input[i - 1]) {
                                 if (F_perm_input[i] != F_perm_value[i]) {
                                     auto index = std::distance(
@@ -194,10 +194,10 @@ namespace nil {
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
                         math::polynomial_dfs<typename FieldType::value_type> V_L(
-                            domain->m - 1, domain->m);
+                            basic_domain->m - 1, basic_domain->m);
 
                         V_L[0] = FieldType::value_type::one();
-                        for (std::size_t j = 1; j < domain->m; j++) {
+                        for (std::size_t j = 1; j < basic_domain->m; j++) {
                             V_L[j] =
                                 (V_L[j - 1] * (F_compr_input[j - 1] + beta) *
                                  (F_compr_value[j - 1] + gamma)) *
@@ -219,13 +219,13 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> h =
                             (F_perm_input + beta) * (F_perm_value + gamma);
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
-                            domain->m-1, domain->m, FieldType::value_type::one());
+                            basic_domain->m-1, basic_domain->m, FieldType::value_type::one());
 
                         math::polynomial_dfs<typename FieldType::value_type> V_L_shifted =
-                            math::polynomial_shift(V_L, 1);
+                            math::polynomial_shift(V_L, 1, basic_domain->m);
 
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_input_shifted =
-                            math::polynomial_shift(F_perm_input, -1);
+                            math::polynomial_shift(F_perm_input, -1, basic_domain->m);
 
                         F[0] = math::polynomial<typename FieldType::value_type>(
                                (preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_L)).coefficients());
