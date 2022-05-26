@@ -90,6 +90,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/basic_verifier"
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles"
+    "verifiers/kimchi/batch_verify_base_field"
     "sponge/sponge"
     )
 
