@@ -25,6 +25,7 @@
 
 #define BOOST_TEST_MODULE blueprint_plonk_non_native_field_test
 
+#include <chrono>
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -109,7 +110,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_var_base_mul_per_bit) {
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Variable_base_multiplication_per_bit_component: " << duration.count() << "ms" << std::endl;
+    std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
