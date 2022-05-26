@@ -154,7 +154,7 @@ namespace nil {
                         j++;
 
                         typename unified_addition_component::params_type addition_params = {
-                            {params.T.x, params.T.y}, {mul_res.res, params.T.y}};
+                            {params.T.x, params.T.y}, {mul_res.output, params.T.y}};
                         auto add_res = unified_addition_component::generate_assignments(assignment, addition_params, j);
                         j++;
 
@@ -262,7 +262,7 @@ namespace nil {
                         j++;
 
                         typename unified_addition_component::params_type addition_params = {
-                            {params.T.x, params.T.y}, {mul_res.res, params.T.y}};
+                            {params.T.x, params.T.y}, {mul_res.output, params.T.y}};
                         zk::components::generate_circuit<unified_addition_component>(
                             bp, assignment, addition_params, j);
                         typename unified_addition_component::result_type add_res(addition_params, j);
@@ -335,7 +335,7 @@ namespace nil {
                         j++;
 
                         typename unified_addition_component::params_type addition_params = {
-                            {params.T.x, params.T.y}, {mul_res.res, params.T.y}};
+                            {params.T.x, params.T.y}, {mul_res.output, params.T.y}};
                         typename unified_addition_component::result_type add_res(addition_params, j);
                         j++;
 

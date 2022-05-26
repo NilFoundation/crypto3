@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     std::cout<<"Expected result: "<<result.data<<std::endl;
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        assert(result == assignment.var_value(real_res.endo_scalar));
+        assert(result == assignment.var_value(real_res.output));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 }
