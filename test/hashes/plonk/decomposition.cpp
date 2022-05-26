@@ -24,6 +24,7 @@
 
 #define BOOST_TEST_MODULE plonk_decomposition_test
 #include <fstream>
+#include <chrono>
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -48,7 +49,7 @@ using namespace nil::crypto3;
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition) {
-
+    auto start = std::chrono::high_resolution_clock::now();
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
 
@@ -78,6 +79,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition) {
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         params, public_input, result_check);
+
+    auto prover_duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Time_execution: " << prover_duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

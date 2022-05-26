@@ -1,5 +1,6 @@
 #---------------------------------------------------------------------------#
 # Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+# Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@gmail.com>
 #
 # Distributed under the Boost Software License, Version 1.0
 # See accompanying file LICENSE_1_0.txt or copy at
@@ -23,18 +24,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${Boost_LIBRARIES})
 
 macro(define_blueprint_test test)
-    get_filename_component(name ${test} NAME)
-    get_filename_component(path ${test} DIRECTORY)
-
-    get_filename_component(dir ${test} NAME)
-
-    set (full_test_name blueprint_${name}_test)
-
-    if (NOT ${path}  STREQUAL "")
-        get_filename_component(dir ${path} NAME)
-        
-        set (full_test_name blueprint_${dir}_${name}_test)
-    endif()
+    string(REPLACE "/" "_" full_test_name blueprint_${test}_test)
 
     cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
 

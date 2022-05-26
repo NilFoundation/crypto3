@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
 
     typename component_type::params_type params = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {50487820917883000126, 66311244956735484629, 42644117754458223050, 4430350364495459,
-    70146846583887931932, 25100954424844344111, 30721111503502419544, 5387564486173743};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {0x2BCA8C5A0FDF3D53E_cppui253, 0x39840DDF4C421B2D5_cppui253, 0x24FCE5728D26931CA_cppui253, 0xFBD6153B4CE63_cppui253,
+    0x3CD7BA9506A76AA1C_cppui253, 0x15C58810F101DDB2F_cppui253, 0x1AA5750251F6DA658_cppui253, 0x1323F61B67242F_cppui253};
     //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
 
     auto result_check = [](AssignmentType &assignment, 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "sub_component: " << duration.count() << "ms" << std::endl;
+    std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
