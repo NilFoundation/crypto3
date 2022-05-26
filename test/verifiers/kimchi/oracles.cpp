@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     constexpr static std::size_t alpha_powers_n = 5;
-    constexpr static std::size_t public_input_size = 5;
+    constexpr static std::size_t public_input_size = 3;
     using kimchi_params = zk::components::kimchi_params_type<alpha_powers_n, public_input_size>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
@@ -101,19 +101,28 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     typename BlueprintFieldType::value_type expected_zeta = 0x3D0F1F3A3D07DC73FBDF3718FFE270122AA367FB5BA667AD4A4AB81167D21BE4_cppui256;
     std::cout<<"Expected zeta: "<<expected_zeta.data<<std::endl;
 
-    zk::components::kimchi_proof_scalar<curve_type> proof;
+    zk::components::kimchi_proof_scalar<curve_type, public_input_size> proof;
     typename component_type::params_type::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
         var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input) 
     };
 
-    typename component_type::params_type params = {verifier_index, proof, fq_output};
     std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner, beta, gamma, 
         alpha, zeta, fq_digest,
         //verifier_index (6+)
         domain_size,
         omega};
+
+    // TODO prepare real data
+    for (std::size_t i = 0; i < public_input_size; i++) {
+        typename BlueprintFieldType::value_type tmp = 
+            algebra::random_element<BlueprintFieldType>();
+        public_input.push_back(tmp);
+        proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    }
+
+    typename component_type::params_type params = {verifier_index, proof, fq_output};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {

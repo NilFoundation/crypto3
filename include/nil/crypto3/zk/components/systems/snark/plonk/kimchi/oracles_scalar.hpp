@@ -36,6 +36,7 @@
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/element_powers.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_base.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/public_evaluations.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
@@ -91,8 +92,9 @@ namespace nil {
                                                                     W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using public_eval_component =
-                            zk::components::kimchi_oracles_public_eval<ArithmetizationType, CurveType, W0, W1, W2, W3,
-                                                                       W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            zk::components::public_evaluations<ArithmetizationType, 
+                                                        KimchiParamsType::public_input_size, W0, W1, W2, W3,
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     struct field_op_component {
                         // TODO: change to add / sub
@@ -237,7 +239,7 @@ namespace nil {
                         };
 
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
-                        kimchi_proof_scalar<CurveType> proof;
+                        kimchi_proof_scalar<CurveType, KimchiParamsType::public_input_size> proof;
                         fq_sponge_output fq_output;
                     };
 
@@ -331,12 +333,22 @@ namespace nil {
                         std::array<var, KimchiParamsType::public_input_size> omega_powers =
                             pi_powers_component::generate_circuit(bp, assignment, 
                             {params.verifier_index.omega, one}, row).output;
-                        row += alpha_powers_component::rows_amount;
+                        row += pi_powers_component::rows_amount;
 
                         std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_base =
                                             lagrange_base_component::generate_circuit(bp, assignment,
                                                 {zeta, zeta_omega, omega_powers, one}, row).output;
                         row += lagrange_base_component::rows_amount;
+
+                        // TODO: check on empty public_input
+                        std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
+                        std::array<var, 2> public_eval = public_eval_component::generate_circuit(bp,
+                            assignment, {zeta_pow_n, zeta_omega_pow_n, 
+                                        pi,
+                                        lagrange_base, 
+                                        omega_powers,
+                                        params.verifier_index.domain_size, one, zero}, row).output;
+                        row += public_eval_component::rows_amount;
 
                         std::cout<<"row:"<<row<<std::endl;
 
@@ -399,14 +411,14 @@ namespace nil {
                         row += lagrange_base_component::rows_amount;
 
                         // TODO: check on empty public_input
-                         = assignment_puiblic_eval(
-                            assignment, params.proof.public_input, zeta_pow_n, zeta_omega_pow_n, lagrange_base,
-                            omega_powers, params.verifier_index.domain_size_inv, row);
-
+                        std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
                         std::array<var, 2> public_eval = public_eval_component::generate_assignments(
-                            assignment, {zeta_pow_n, zeta_omega_pow_n, public_input, lagrange_base, omega_powers}, row);
+                            assignment, {zeta_pow_n, zeta_omega_pow_n, 
+                                        pi,
+                                        lagrange_base, 
+                                        omega_powers,
+                                        n, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
-                        return res.public_evaluations;
                         
                         std::cout<<"assignment row: "<<row<<std::endl;
                         
