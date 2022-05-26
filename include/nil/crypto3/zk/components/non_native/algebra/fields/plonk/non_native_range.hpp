@@ -81,7 +81,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
-                        std::array<var, 4> input;    // 66,66,66,63 bits
+                        std::array<var, 4> input;    // 66,66,66,57 bits
                     };
 
                     struct result_type {
@@ -129,9 +129,16 @@ namespace nil {
                         for (std::size_t i = 0; i < 4; i++) {
                             for (std::size_t j = 0; j < 3; j++) {
                                 if (i == 3) {
-                                    mask = (base << 21) - 1;
-                                    range_chunks[9 + j] = (ed25519_value[i] >> (21 * j)) & mask;
-                                    xi += range_chunks[i * 3 + j] - (base << 21) + 1;
+                                    if (j == 2){
+                                        mask = (base << 15) - 1; 
+                                        range_chunks[9 + j] = (ed25519_value[i] >> (21 * j)) & mask;
+                                        xi += range_chunks[i * 3 + j] - (base << 15) + 1;
+                                    }
+                                    else {
+                                        mask = (base << 21) - 1;
+                                        range_chunks[9 + j] = (ed25519_value[i] >> (21 * j)) & mask;
+                                        xi += range_chunks[i * 3 + j] - (base << 21) + 1;
+                                    }
                                 } else {
                                     mask = (1 << 22) - 1;
                                     range_chunks[i * 3 + j] = (ed25519_value[i] >> (22 * j)) & mask;
@@ -157,7 +164,7 @@ namespace nil {
                         assignment.witness(W6)[row] = range_chunks[10];
                         assignment.witness(W7)[row] = range_chunks[11];
                         bool c = 0;
-                        if (range_chunks[11] > (base << 22) - 20) {
+                        if (range_chunks[11] > (base << 15) - 20) {
                             c = 1;
                         }
                         assignment.witness(W8)[row] = c;
@@ -181,8 +188,8 @@ namespace nil {
 
                         snark::plonk_constraint<BlueprintFieldType> sum =
                             var(W5, 0) + var(W6, 0) + var(W7, 0) + var(W0, +1) + var(W1, +1) + var(W2, +1) +
-                            var(W3, +1) + var(W4, +1) + var(W5, +1) + var(W6, +1) + var(W7, +1) - 3 * (base << 21) -
-                            8 * (base << 22) + 11;
+                            var(W3, +1) + var(W4, +1) + var(W5, +1) + var(W6, +1) + var(W7, +1) - 2 * (base << 21) -
+                            8 * (base << 22) - (base << 15) + 11;
                         auto constraint_5 = bp.add_constraint(sum * (var(W8, 0) * sum - 1));
                         auto constraint_6 =
                             bp.add_constraint(var(W8, 0) * sum + (1 - var(W8, 0) * sum) * var(W8, +1) - 1);

@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range) {
 
     typename component_type::params_type params = {input_var};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {455245345345345, 523553453454343, 68753453534534689, 543553453453453534};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {455245345345345, 523553453454343, 68753453534534689, 54355345344544};
     
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {
