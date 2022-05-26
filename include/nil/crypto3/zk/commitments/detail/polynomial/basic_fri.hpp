@@ -72,13 +72,11 @@ namespace nil {
                                         std::shared_ptr<math::evaluation_domain<FieldType>> domain) {
 
                         std::size_t d = f.degree();
-                        if (d % 2 == 0) {
-                            f.push_back(0);
-                            d++;
-                        }
+                        
                         //codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
                         // + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in range(len(codeword)//2)]
-                        math::polynomial_dfs<typename FieldType::value_type> f_folded(d / 2, d / 2 + 1, 0);
+                        math::polynomial_dfs<typename FieldType::value_type> f_folded(
+                            d / 2, domain->m / 2, FieldType::value_type::zero());
 
                         typename FieldType::value_type two_inversed = 2; 
                         two_inversed = two_inversed.inversed();
