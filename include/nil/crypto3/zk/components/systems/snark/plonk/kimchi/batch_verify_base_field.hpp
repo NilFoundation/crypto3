@@ -98,18 +98,15 @@ namespace nil {
 
                     using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, bases_size,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
+                    using var_ec_point = typename msm_component::params_type::var_ec_point;
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 0;
+                    constexpr static const std::size_t rows_amount = 1 + sub_component::rows_amount + msm_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct var_ec_point {
-                            var x;
-                            var y;
-                        };
                         struct f_comm {
                             std::vector<var_ec_point> shifted;
                             std::vector<var_ec_point> unshifted;
@@ -140,7 +137,7 @@ namespace nil {
                         struct public_input {
                             var_ec_point H;
                             std::array<var_ec_point, n> G;
-                            std::array<var, bases_size> scalars;
+                            std::vector<var> scalars;
                         };
                         struct result {
                             std::array<var_proof, batch_size> proofs;
@@ -160,28 +157,28 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        std::size_t n_2 = ceil(log2(n));
-                        std::size_t padding = (1 << n_2) - n;
+                        //std::size_t n_2 = ceil(log2(n));
+                        //std::size_t padding = (1 << n_2) - n;
                         typename BlueprintFieldType::integral_type one = 1;
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type::zero;
-                        assignment.constant(0)[row] = zero.X;
-                        assignment.constant(0)[row + 1] = zero.Y;
+                        //typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type::zero();
+                        //assignment.constant(0)[row] = zero.X;
+                        //assignment.constant(0)[row + 1] = zero.Y;
                         assignment.constant(0)[row + 2] = (one << 255);
-                        std::vector<typename params_type::var_ec_point> bases;
+                        std::vector<var_ec_point> bases;
                         bases.push_back(params.input.PI.H);
                         for(std::size_t i = 1; i < n + 1; i ++){
                             bases.push_back(params.input.PI.G[i - 1]);
                         }
-                        for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
+                        /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
-                        }
+                        }*/
                         for (std::size_t i = 0; i < batch_size; i++) {
                             var cip = params.input.cip[i];
                             typename sub_component::params_type sub_params = {cip, var(0, component_start_row + 2, false, var::column_type::constant)};
                             auto sub_res = sub_component::generate_assignments(assignment, sub_params, row);
-                            row = row + typename sub_component::rows_amount;
+                            row = row + sub_component::rows_amount;
 
-                            params.input.proofs[i].transcript.absorb_assignment(assignment, sub_res.res, row);
+                            //params.input.proofs[i].transcript.absorb_assignment(assignment, sub_res.output, row);
                             //U = transcript.squeeze.to_group()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
                             assignment.witness(W0)[row] = U.X;
@@ -189,8 +186,9 @@ namespace nil {
                             std::size_t u_row = row;
                             row++;
 
-                            params.input.proofs[i].transcript.absorb_assignment(assignment, input.proofs.o[i].delta, row);
-                            bases.push_back(params.input.proofs.o[i].G);
+                            //params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].o.delta.x, row);
+                            //params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].o.delta.y, row);
+                            bases.push_back(params.input.proofs[i].o.G);
                             bases.push_back({var(0, row), var(1, row)});
                             for (std::size_t j = 0 ; j < lr_rounds; j++) {
                                 bases.push_back(params.input.proofs[i].o.L[j]);
@@ -200,19 +198,19 @@ namespace nil {
                             std::size_t shifted_size = 0;
 
                             for (std::size_t j = 0 ; j < comm_size; j++) {
-                                unshifted_size = params.input.proofs[i].pe.f_comm[j].unshifted.size();
+                                unshifted_size = params.input.proofs[i].pe.comm[j].unshifted.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
-                                    bases.push_back(params.input.proofs[i].pe.f_comm[j].unshifted[k]);
+                                    bases.push_back(params.input.proofs[i].pe.comm[j].unshifted[k]);
                                 }
-                                shifted_size = params.input.proofs[i].pe.f_comm[j].shifted.size();
+                                shifted_size = params.input.proofs[i].pe.comm[j].shifted.size();
                                 for (std::size_t k =0; k< shifted_size; k++){
-                                    bases.push_back(params.input.proofs[i].pe.f_comm[j].shifted[k]);
+                                    bases.push_back(params.input.proofs[i].pe.comm[j].shifted[k]);
                                 }
                             }
                             bases.push_back({var(0, u_row, false), var(1, u_row, false)});
-                            bases.push_back(params.input.proofs.o.delta).
+                            bases.push_back(params.input.proofs[i].o.delta);
                         }
-                        auto res = msm_component::generate_assignments(assignment, typename msm_component::params_type({input.PI.scalars, bases}), row);
+                        auto res = msm_component::generate_assignments(assignment, {params.input.PI.scalars, bases}, row);
                         return result_type(component_start_row);
                     }
 
@@ -230,73 +228,60 @@ namespace nil {
                             first_selector_index = selector_iterator->second;
                         }
                         std::size_t row = start_row_index;
-                        std::size_t size = 0;
-                        typename CurveType::base_field_type::integral_type one = 1;
-                        std::size_t n_2 = ceil(log2(n));
-                        std::size_t padding = (1 << n_2) - n;
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type::zero;
-                        std::size_t f_comm_size = 0;
-                        for(std::size i = 0; i < comm_size; i++) {
-                            f_comm_size+= params.input.proofs.PE.f_comm[i].unshifted.size();
-                            f_comm_size+= params.input.proofs.PE.f_comm[i].shifted.size();
-                        }
-                        std::size_t all_size = (1 + 1 + 2*lr_rounds + f_comm_size + 1);
-                        std::vector<std::array<var, 2>> bases(n + padding + 1 + size* batch_sizes);
-                        bases[0] = input.PI.H;
-                        size++;
+                        //std::size_t n_2 = ceil(log2(n));
+                        //std::size_t padding = (1 << n_2) - n;
+                        typename BlueprintFieldType::integral_type one = 1;
+                        //typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type::zero();
+                        //assignment.constant(0)[row] = zero.X;
+                        //assignment.constant(0)[row + 1] = zero.Y;
+                        std::vector<var_ec_point> bases;
+                        bases.push_back(params.input.PI.H);
                         for(std::size_t i = 1; i < n + 1; i ++){
-                            bases[size] = input.PI.G[i - 1];
-                            size++;
+                            bases.push_back(params.input.PI.G[i - 1]);
                         }
-                        for (std::size_t i = n + 1; i < n + 1 + padding) {
-                            bases[size] = {var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)};
-                            size++;
-                        }
+                        /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
+                            bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
+                        }*/
                         for (std::size_t i = 0; i < batch_size; i++) {
-                            var cip = input.cip[i];
-                            sub_component::params_type sub_params = {cip, var(0, component_start_row + 2, false, var::column_type::constant)};
-                            auto sub_res = sub_component::generate_circuit(bp, assigment, sub_params, row);
-                            row += sub_component::rows;
+                            var cip = params.input.cip[i];
+                            typename sub_component::params_type sub_params = {cip, var(0, start_row_index + 2, false, var::column_type::constant)};
+                            zk::components::generate_circuit<sub_component>(bp, assignment, sub_params,
+                                                                        start_row_index);
+                            typename sub_component::result_type sub_res(sub_params, start_row_index);
+                            row = row + sub_component::rows_amount;
 
-                            input.proofs[i].transcript.absorb_circuit(bp, assignment, sub_res, row);
+                            //params.input.proofs[i].transcript.absorb_assignment(assignment, sub_res.output, row);
                             //U = transcript.squeeze.to_group()
-                            CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = algebra::random_element<CurveType::template g1_type<algebra::curves::coordinates::affine>>();
+                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
                             std::size_t u_row = row;
                             row++;
 
-                            input.proofs[i].transcript.absorb_circuit(bp, assignment, input.proofs.o.delta, row);
-                            bases[size] = input.proofs.o.G.
-                            size++;
-                            bases[size] = {var(0, row), var(1, row)};
-                            size++;
-                            for (std::Size_t j = 0 ; j < lr_rounds; j++) {
-                                bases[size] =  input.proofs.o.L[j];
-                                size++:
-                                bases[size] =  input.proofs.o.R[j];
-                                size++:
+                            //params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].o.delta.x, row);
+                            //params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].o.delta.y, row);
+                            bases.push_back(params.input.proofs[i].o.G);
+                            bases.push_back({var(0, row), var(1, row)});
+                            for (std::size_t j = 0 ; j < lr_rounds; j++) {
+                                bases.push_back(params.input.proofs[i].o.L[j]);
+                                bases.push_back(params.input.proofs[i].o.R[j]);
                             }
                             std::size_t unshifted_size = 0;
                             std::size_t shifted_size = 0;
 
-                            for (std::Size_t j = 0 ; j < comm_size; j++) {
-                                unshifted_size = input.proofs.PE.f_comm[j].unshifted.size();
+                            for (std::size_t j = 0 ; j < comm_size; j++) {
+                                unshifted_size = params.input.proofs[i].pe.comm[j].unshifted.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
-                                    bases[size] =  input.proofs.PE.f_comm[j].unshifted[k];
-                                    size++;
+                                    bases.push_back(params.input.proofs[i].pe.comm[j].unshifted[k]);
                                 }
-                                shifted_size = input.proofs.PE.f_comm[j].shifted.size();
+                                shifted_size = params.input.proofs[i].pe.comm[j].shifted.size();
                                 for (std::size_t k =0; k< shifted_size; k++){
-                                    bases[size] =  input.proofs.PE.f_comm[j].shifted[k];
-                                    size++;
+                                    bases.push_back(params.input.proofs[i].pe.comm[j].shifted[k]);
                                 }
                             }
-                            bases[size] = {var(0, u_row, false), var(1, u_row, false)};
-                            size++;
-                            bases[size] = input.proofs.o.delta.
-                            size++;
+                            bases.push_back({var(0, u_row, false), var(1, u_row, false)});
+                            bases.push_back(params.input.proofs[i].o.delta);
                         }
-                        auto res = msm_component::generate_circuit(bp, assignment, msm_component::params_type({input.PI.scalars, bases}), row);
-                        return result_type(component_start_row);
+                        auto res = msm_component::generate_circuit(bp, assignment, {params.input.PI.scalars, bases}, row);
+                        return result_type(start_row_index);
                     }
 
                 private:

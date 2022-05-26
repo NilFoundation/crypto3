@@ -42,7 +42,6 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 
 #include "test_plonk_component.hpp"
-#include "proof_data.hpp"
 
 using namespace nil::crypto3;
 
@@ -68,13 +67,18 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr static const std::size_t lr_rounds = 1;
     constexpr static const std::size_t n = 1;
     constexpr static const std::size_t comm_size = 1;
-    constexpr static const std::size_t n_2 = ceil(log2(n));
-    constexpr static const std::size_t padding = (1 << n_2) - n;
+    //constexpr static const std::size_t n_2 = ceil(log2(n));
+    //constexpr static const std::size_t padding = (1 << n_2) - n;
     constexpr static const std::size_t f_comm_size = 2;
-    constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*lr_rounds + f_comm_size + 1)* batch_size;
+    //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*lr_rounds + f_comm_size + 1)* batch_size;
+    constexpr static const std::size_t bases_size = n + 1 + (1 + 1 + 2*lr_rounds + f_comm_size + 1)* batch_size;
 
     using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, batch_size, lr_rounds, n, comm_size, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+
+    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, curve_type, bases_size,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14> ;
+    using var_ec_point = typename msm_component::params_type::var_ec_point;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     //zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
@@ -87,7 +91,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(shifted.X);
     public_input.push_back(shifted.Y);
 
-    typename component_type::params_type::var_ec_point shifted_var = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
+    var_ec_point shifted_var = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type unshifted = 
     algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
@@ -95,7 +99,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(unshifted.X);
     public_input.push_back(unshifted.Y);
 
-    typename component_type::params_type::var_ec_point unshifted_var = {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
+    var_ec_point unshifted_var = {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
 
     curve_type::base_field_type::value_type f_zeta = algebra::random_element<curve_type::base_field_type>();
 
@@ -115,7 +119,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(L.X);
     public_input.push_back(L.Y);
 
-    typename component_type::params_type::var_ec_point L_var = {var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
+    var_ec_point L_var = {var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type R = 
     algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
@@ -123,7 +127,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(R.X);
     public_input.push_back(R.Y);
 
-    typename component_type::params_type::var_ec_point R_var = {var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input)};
+    var_ec_point R_var = {var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input)};
 
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type delta = 
     algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
@@ -131,7 +135,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(delta.X);
     public_input.push_back(delta.Y);
 
-    typename component_type::params_type::var_ec_point delta_var = {var(0, 10, false, var::column_type::public_input), var(0, 11, false, var::column_type::public_input)};
+    var_ec_point delta_var = {var(0, 10, false, var::column_type::public_input), var(0, 11, false, var::column_type::public_input)};
 
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type G = 
     algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
@@ -139,7 +143,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(G.X);
     public_input.push_back(G.Y);
 
-    typename component_type::params_type::var_ec_point G_var = {var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input)};
+    var_ec_point G_var = {var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input)};
 
     curve_type::base_field_type::value_type z1 = algebra::random_element<curve_type::base_field_type>();
 
@@ -172,7 +176,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(H.X);
     public_input.push_back(H.Y);
 
-    typename component_type::params_type::var_ec_point H_var = {var(0, 20, false, var::column_type::public_input), var(0, 21, false, var::column_type::public_input)};
+    var_ec_point H_var = {var(0, 20, false, var::column_type::public_input), var(0, 21, false, var::column_type::public_input)};
 
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type PI_G = 
     algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
@@ -180,11 +184,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     public_input.push_back(PI_G.X);
     public_input.push_back(PI_G.Y);
 
-    typename component_type::params_type::var_ec_point PI_G_var = {var(0, 22, false, var::column_type::public_input), var(0, 23, false, var::column_type::public_input)};
+    var_ec_point PI_G_var = {var(0, 22, false, var::column_type::public_input), var(0, 23, false, var::column_type::public_input)};
 
     std::array<curve_type::base_field_type::value_type, bases_size> scalars;
 
-    std::array<var, bases_size> scalars_var;
+    std::vector<var> scalars_var(bases_size);
 
     for (std::size_t i = 0; i < bases_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();
