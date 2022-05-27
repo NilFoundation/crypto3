@@ -194,8 +194,7 @@ namespace nil {
                     merkle_tree_impl(size_t n) :
                         _size(detail::merkle_tree_length(n, Arity)), _leaves(n),
                         _rc(detail::merkle_tree_row_count(n, Arity)) {
-                        BOOST_ASSERT_MSG(std::log(n) / std::log(Arity) ==
-                                             (std::size_t)(std::log(n) / std::log(Arity)),
+                        BOOST_ASSERT_MSG(std::log(n) / std::log(Arity) == (std::size_t)(std::log(n) / std::log(Arity)),
                                          "Wrong leaves number");
                     }
 
@@ -359,17 +358,24 @@ namespace nil {
                         return _hashes;
                     }
 
-                    //                    void push_back(const_reference _x) {
-                    //#error ERROR
-                    //                    }
-                    //
-                    //                    void push_back(value_type &&_x) {
-                    //#error ERROR
-                    //                    }
+                    void push_back(const_reference _x) {
+                        //    #error ERROR
+                        _hashes.push_back(_x);
+                    }
+
+                    void push_back(value_type &&_x) {
+                        //    #error ERROR
+                        _hashes.push_back(_x);
+                    }
                     //
                     template<class... Args>
                     reference emplace_back(Args &&..._args) {
                         return _hashes.template emplace_back(_args...);
+                    }
+
+                    template<class... Args>
+                    iterator emplace(const_iterator _position, Args&&... _args) {
+                        return _hashes.template emplace(_position, _args...);
                     }
 
                     void pop_back() {
@@ -466,8 +472,7 @@ namespace nil {
                     std::size_t row_idx = ret.leaves(), row_size = row_idx / Arity;
                     typename merkle_tree_impl<T, Arity>::iterator it = ret.begin();
 
-                    for (size_t row_number = 1; row_number < ret.row_count(); ++row_number,
-                                row_size /= Arity) {
+                    for (size_t row_number = 1; row_number < ret.row_count(); ++row_number, row_size /= Arity) {
                         for (size_t i = 0; i < row_size; ++i, it += Arity) {
                             ret.emplace_back(generate_hash<hash_type>(it, it + Arity));
                         }
