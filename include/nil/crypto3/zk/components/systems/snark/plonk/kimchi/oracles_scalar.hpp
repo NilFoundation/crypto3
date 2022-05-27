@@ -312,12 +312,12 @@ namespace nil {
                         // zeta_pow_n = zeta**n
                         var zeta_pow_n = exponentiation_component::generate_circuit(
                                              bp, assignment,
-                                             {params.fq_output.zeta, params.verifier_index.domain_size, zero, one}, row)
+                                             {zeta, params.verifier_index.domain_size, zero, one}, row)
                                              .result;
                         row += exponentiation_component::rows_amount;
 
                         var zeta_omega = zk::components::generate_circuit<mul_component>(bp, assignment,
-                           {params.fq_output.zeta, params.verifier_index.omega}, row).output;
+                           {zeta, params.verifier_index.omega}, row).output;
                         row += mul_component::rows_amount;
 
                         var zeta_omega_pow_n = 
@@ -350,6 +350,40 @@ namespace nil {
                                         params.verifier_index.domain_size, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
 
+                        // transcript.absorb_evaluations_circuit(
+                        //     bp, assignment, public_eval[0], params.proof.proof_evals[0], row);
+                        // transcript.absorb_evaluations_circuit(
+                        //     bp, assignment, public_eval[1], params.proof.proof_evals[1], row);
+
+                        //transcript.absorb_circuit(assignment, params.proof.ft_eval, row);
+
+                        // var v_challenge = transcript.challenge_circuit(bp, assignment, row);
+                        // var v = endo_scalar_component::generate_circuit(
+                        //     bp, assignment, {v_challenge, endo_factor, endo_num_bits}, row).output;
+                        // row += endo_scalar_component::rows_amount;
+
+                        // var u_challenge = transcript.challenge_circuit(bp, assignment, row);
+                        // var u = endo_scalar_component::generate_circuit(
+                        //     bp, assignment, {u_challenge, endo_factor, endo_num_bits}, row).output;
+                        // row += endo_scalar_component::rows_amount;
+
+
+                        std::array<var, 2> powers_of_eval_points_for_chunks;
+                        powers_of_eval_points_for_chunks[0] = exponentiation_component::generate_circuit(
+                                             bp, assignment,
+                                             {zeta, params.verifier_index.max_poly_size, zero, one}, row)
+                                             .result;
+                        row += exponentiation_component::rows_amount;
+                        powers_of_eval_points_for_chunks[1] = exponentiation_component::generate_circuit(
+                                             bp, assignment,
+                                             {zeta_omega, params.verifier_index.max_poly_size, zero, one}, row)
+                                             .result;
+                        row += exponentiation_component::rows_amount;
+
+                        //     assignment_exponentiation(assignment, zeta, max_poly_size, zero, one, row),
+                        //     assignment_exponentiation(assignment, zeta_omega, max_poly_size, zero, one, row),
+                        // };
+
                         std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
@@ -363,7 +397,6 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         // copy public input
-                        var max_poly_size = assignment.allocate_public_input(params.verifier_index.max_poly_size);
                         std::vector<var> zkpm(params.verifier_index.zkpm.size());
                         for (std::size_t i = 0; i < zkpm.size(); i++) {
                             zkpm[i] = assignment.allocate_public_input(params.verifier_index.zkpm[i]);
@@ -378,6 +411,7 @@ namespace nil {
                         std::cout << "alpha: " << assignment.var_value(alpha).data << std::endl;
                         var zeta = assignments_endo_scalar(assignment, params.fq_output.zeta, row);
                         std::cout << "zeta: " << assignment.var_value(zeta).data << std::endl;
+                        std::cout << "params.fq_output.zeta: " << assignment.var_value(params.fq_output.zeta).data << std::endl;
 
                         var zero = var(0, 0, false, var::column_type::constant);
                         var one = var(0, 1, false, var::column_type::constant);
@@ -420,8 +454,6 @@ namespace nil {
                                         n, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
                         
-                        std::cout<<"assignment row: "<<row<<std::endl;
-                        
                         // transcript.absorb_evaluations_assignment(
                         //     assignment, public_eval[0], params.proof.proof_evals[0], row);
                         // transcript.absorb_evaluations_assignment(
@@ -435,10 +467,12 @@ namespace nil {
                         // var u_challenge = transcript.challenge_assignment(assignment, row);
                         // var u = assignments_endo_scalar(assignment, u_challenge, row);
 
-                        // std::array<var, 2> powers_of_eval_points_for_chunks = {
-                        //     assignment_exponentiation(assignment, zeta, max_poly_size, zero, one, row),
-                        //     assignment_exponentiation(assignment, zeta_omega, max_poly_size, zero, one, row),
-                        // };
+                        std::array<var, 2> powers_of_eval_points_for_chunks = {
+                            assignment_exponentiation(assignment, zeta, params.verifier_index.max_poly_size, zero, one, row),
+                            assignment_exponentiation(assignment, zeta_omega, params.verifier_index.max_poly_size, zero, one, row),
+                        };
+
+                        std::cout<<"assignment row: "<<row<<std::endl;
 
                         // std::vector<var> prev_challenges_evals =
                         //     assignment_prev_chal_evals(assignment,
