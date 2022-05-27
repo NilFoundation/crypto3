@@ -426,21 +426,12 @@ namespace nil {
                     this->resize(n, value_type::zero());
                     other.resize(n, value_type::zero());
 
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(this, omega);
-                    detail::basic_parallel_radix2_fft<FieldType>(v, omega);
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(it, omega);
-                    detail::basic_serial_radix2_fft<FieldType>(other, omega);
-#endif
+                    _basic_radix2_fft<FieldType>(it, omega);
+                    _basic_radix2_fft<FieldType>(other, omega);
 
                     std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::multiplies<value_type>());
 
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(this, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(it, omega.inversed());
-#endif
+                    _basic_radix2_fft<FieldType>(it, omega.inversed());
 
                     const value_type sconst = value_type(n).inversed();
                     std::transform(this->begin(),

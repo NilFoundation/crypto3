@@ -589,11 +589,9 @@ namespace nil {
 
                     value_type omega = unity_root<FieldType>(this->size());
                     std::vector<FieldValueType> tmp(this->begin(), this->end());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(tmp, omega.inversed());
-#endif
+
+                    _basic_radix2_fft<FieldType>(tmp, omega.inversed());
+
                     const value_type sconst = value_type(this->size()).inversed();
                     std::transform(tmp.begin(),
                                    tmp.end(),

@@ -288,11 +288,9 @@ namespace nil {
                     typedef typename value_type::field_type FieldType;
 
                     value_type omega = unity_root<FieldType>(this->size());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(it, omega.inversed());
-#endif
+
+                    _basic_radix2_fft<FieldType>(it, omega.inversed());
+
                     const value_type sconst = value_type(this->size()).inversed();
                     std::transform(it.begin(),
                                    it.end(),
@@ -301,11 +299,8 @@ namespace nil {
 
                     value_type omega_new = unity_root<FieldType>(_sz);
                     it.resize(_sz);
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega_new);
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(it, omega_new);
-#endif
+
+                    _basic_radix2_fft<FieldType>(it, omega_new);
                 }
 
                 //                void resize(size_type _sz, const_reference _x) {
@@ -323,11 +318,9 @@ namespace nil {
                 //                    const std::size_t n = detail::power_of_two(this->_d);
                 //
                 //                    std::vector<FieldValueType> c(this->begin(), this->begin() + n);
-                //#ifdef MULTICORE
-                //                    detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-                //#else
-                //                    detail::basic_serial_radix2_fft<FieldType>(c, (this->_omega).inversed());
-                //#endif
+                //
+                //                    _basic_radix2_fft<FieldType>(c, (this->_omega).inversed());
+                //
                 //                    std::vector<FieldValueType> result(value.size(), 0);
                 //                    auto end = c.end();
                 //                    while (end != c.begin()) {
@@ -568,11 +561,9 @@ namespace nil {
 
                     value_type omega = unity_root<FieldType>(this->size());
                     std::vector<FieldValueType> tmp(this->begin(), this->end());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(tmp, omega.inversed());
-#endif
+
+                    _basic_radix2_fft<FieldType>(tmp, omega.inversed());
+
                     const value_type sconst = value_type(this->size()).inversed();
                     std::transform(tmp.begin(),
                                    tmp.end(),

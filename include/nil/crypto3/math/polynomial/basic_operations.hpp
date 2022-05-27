@@ -160,21 +160,12 @@ namespace nil {
                 v.resize(n, value_type::zero());
                 c.resize(n, value_type::zero());
 
-#ifdef MULTICORE
-                detail::basic_parallel_radix2_fft<FieldType>(u, omega);
-                detail::basic_parallel_radix2_fft<FieldType>(v, omega);
-#else
-                detail::basic_serial_radix2_fft<FieldType>(u, omega);
-                detail::basic_serial_radix2_fft<FieldType>(v, omega);
-#endif
+                _basic_radix2_fft<FieldType>(u, omega);
+                _basic_radix2_fft<FieldType>(v, omega);
 
                 std::transform(u.begin(), u.end(), v.begin(), c.begin(), std::multiplies<value_type>());
 
-#ifdef MULTICORE
-                detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-#else
-                detail::basic_serial_radix2_fft<FieldType>(c, omega.inversed());
-#endif
+                _basic_radix2_fft<FieldType>(c, omega.inversed());
 
                 const value_type sconst = value_type(n).inversed();
                 std::transform(c.begin(),
