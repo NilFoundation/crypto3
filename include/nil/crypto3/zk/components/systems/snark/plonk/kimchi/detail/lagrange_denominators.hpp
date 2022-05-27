@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_BASE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_BASE_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_DENOMINATORS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_DENOMINATORS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -48,7 +48,7 @@ namespace nil {
                 // result = [(zeta - omega^(i))^(-1)] concat. [(zeta_omega - omega^(i))^(-1)] for i in
                 // (0..public_input_size)
                 template<typename ArithmetizationType, std::size_t PublicInputSize, std::size_t... WireIndexes>
-                class lagrange_base;
+                class lagrange_denominators;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
@@ -68,7 +68,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class lagrange_base<
+                class lagrange_denominators<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     PublicInputSize,
                     W0,
@@ -206,4 +206,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_BASE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_DENOMINATORS_HPP

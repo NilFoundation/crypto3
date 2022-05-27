@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_kimchi_lagrange_base_test
+#define BOOST_TEST_MODULE blueprint_plonk_kimchi_lagrange_denominators_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -35,7 +35,7 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_base.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_denominators.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -45,7 +45,7 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_base) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_denominators) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_base) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::lagrange_base<ArithmetizationType, n, 0, 1, 2, 3,
+    using component_type = zk::components::lagrange_denominators<ArithmetizationType, n, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     var one(0, 0, false, var::column_type::public_input);
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_base) {
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "lagrange_base_component: " << duration.count() << "ms" << std::endl;
+    std::cout << "lagrange_denominators_component: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

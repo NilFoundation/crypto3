@@ -35,7 +35,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/element_powers.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_base.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_denominators.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/public_evaluations.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
@@ -87,8 +87,8 @@ namespace nil {
                     using pi_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::public_input_size, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-                    using lagrange_base_component =
-                            zk::components::lagrange_base<ArithmetizationType, KimchiParamsType::public_input_size, W0, W1, W2, W3, W4,
+                    using lagrange_denominators_component =
+                            zk::components::lagrange_denominators<ArithmetizationType, KimchiParamsType::public_input_size, W0, W1, W2, W3, W4,
                                                                     W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using public_eval_component =
@@ -335,17 +335,17 @@ namespace nil {
                             {params.verifier_index.omega, one}, row).output;
                         row += pi_powers_component::rows_amount;
 
-                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_base =
-                                            lagrange_base_component::generate_circuit(bp, assignment,
+                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_denominators =
+                                            lagrange_denominators_component::generate_circuit(bp, assignment,
                                                 {zeta, zeta_omega, omega_powers, one}, row).output;
-                        row += lagrange_base_component::rows_amount;
+                        row += lagrange_denominators_component::rows_amount;
 
                         // TODO: check on empty public_input
                         std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
                         std::array<var, 2> public_eval = public_eval_component::generate_circuit(bp,
                             assignment, {zeta_pow_n, zeta_omega_pow_n, 
                                         pi,
-                                        lagrange_base, 
+                                        lagrange_denominators, 
                                         omega_powers,
                                         params.verifier_index.domain_size, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
@@ -439,17 +439,17 @@ namespace nil {
                             {params.verifier_index.omega, one}, row).output;
                         row += pi_powers_component::rows_amount;
 
-                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_base = 
-                                    lagrange_base_component::generate_assignments(assignment,
+                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_denominators = 
+                                    lagrange_denominators_component::generate_assignments(assignment,
                                     {zeta, zeta_omega, omega_powers, one}, row).output;
-                        row += lagrange_base_component::rows_amount;
+                        row += lagrange_denominators_component::rows_amount;
 
                         // TODO: check on empty public_input
                         std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
                         std::array<var, 2> public_eval = public_eval_component::generate_assignments(
                             assignment, {zeta_pow_n, zeta_omega_pow_n, 
                                         pi,
-                                        lagrange_base, 
+                                        lagrange_denominators, 
                                         omega_powers,
                                         n, one, zero}, row).output;
                         row += public_eval_component::rows_amount;

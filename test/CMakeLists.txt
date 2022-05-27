@@ -81,7 +81,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles"
     "verifiers/kimchi/batch_verify_base_field"
-    "verifiers/kimchi/detail/lagrange_base"
+    "verifiers/kimchi/detail/lagrange_denominators"
     "verifiers/kimchi/detail/public_evaluations"
     "sponge/sponge"
     "algebra/fields/plonk/field_operations"
