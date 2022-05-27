@@ -164,7 +164,7 @@ namespace nil {
                         assignment.witness(W6)[row] = range_chunks[10];
                         assignment.witness(W7)[row] = range_chunks[11];
                         bool c = 0;
-                        if (range_chunks[11] > (base << 15) - 20) {
+                        if (range_chunks[11] < (base << 15) - 20) {
                             c = 1;
                         }
                         assignment.witness(W8)[row] = c;
