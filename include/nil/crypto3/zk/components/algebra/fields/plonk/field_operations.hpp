@@ -133,7 +133,7 @@ namespace nil {
                         const std::size_t j = start_row_index;
                         var component_x = var(W0, static_cast<int>(j), false);
                         var component_y = var(W1, static_cast<int>(j), false);
-                        bp.add_copy_constraint({component_x, params.x});
+                        bp.add_copy_constraint({params.x, component_x});
                         bp.add_copy_constraint({component_y, params.y});
                     }
                 };

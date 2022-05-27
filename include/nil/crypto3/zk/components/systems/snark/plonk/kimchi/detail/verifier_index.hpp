@@ -53,7 +53,7 @@ namespace nil {
                     using var = snark::plonk_variable<FieldType>;
 
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
-                    std::size_t max_poly_size;
+                    var max_poly_size;
                     std::size_t max_quot_size;
                     std::size_t alpha_powers;
                     std::size_t public_input_size;

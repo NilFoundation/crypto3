@@ -50,7 +50,7 @@ namespace nil {
                     using FieldType = typename CurveType::scalar_field_type;
                     using var = snark::plonk_variable<FieldType>;
 
-                    //std::array<kimchi_proof_evaluations<CurveType>, 2> proof_evals;
+                    std::array<kimchi_proof_evaluations<CurveType>, 2> proof_evals;
                     //var ft_eval;
                     std::array<var, PublicInputSize> public_input;
                 };
