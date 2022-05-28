@@ -11,7 +11,12 @@ cmake_minimum_required(VERSION 2.8.12)
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
 
-if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+list(APPEND CMAKE_MODULE_PATH
+     "${CMAKE_CURRENT_LIST_DIR}/cmake"
+     "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
+     "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
+
+if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
 endif()
 
