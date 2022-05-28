@@ -105,6 +105,8 @@ namespace nil {
                                                         KimchiCommitmentParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    constexpr static const std::size_t eval_points_amount = 2;
+
                     struct field_op_component {
                         // TODO: change to add / sub
                         using add = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
@@ -154,9 +156,9 @@ namespace nil {
                     static std::vector<var>
                         assignment_prev_chal_evals(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                    var max_poly_size,
-                                                   std::array<var, 2>
+                                                   std::array<var, eval_points_amount>
                                                        eval_points,
-                                                   std::array<var, 2>
+                                                   std::array<var, eval_points_amount>
                                                        powers_of_eval_points_for_chunks,
                                                    std::size_t &component_start_row) {
                         return std::vector<var>(0);
@@ -215,7 +217,7 @@ namespace nil {
                     }
 
                 public:
-                    constexpr static const std::size_t rows_amount = 100;
+                    constexpr static const std::size_t rows_amount = 200;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -272,7 +274,7 @@ namespace nil {
                         random_oracles oracles;
                         std::vector<var> alpha_powers;
                         std::vector<std::vector<var>> p_eval;
-                        std::array<var, 2> zeta_powers;
+                        std::array<var, eval_points_amount> zeta_powers;
                         //??? polys;
                         var zeta1;
                         var ft_eval0;
@@ -345,14 +347,14 @@ namespace nil {
                             {params.verifier_index.omega, one}, row).output;
                         row += pi_powers_component::rows_amount;
 
-                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_denominators =
+                        std::array<var, eval_points_amount * KimchiParamsType::public_input_size> lagrange_denominators =
                                             lagrange_denominators_component::generate_circuit(bp, assignment,
                                                 {zeta, zeta_omega, omega_powers, one}, row).output;
                         row += lagrange_denominators_component::rows_amount;
 
                         // TODO: check on empty public_input
                         std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
-                        std::array<var, 2> public_eval = public_eval_component::generate_circuit(bp,
+                        std::array<var, eval_points_amount> public_eval = public_eval_component::generate_circuit(bp,
                             assignment, {zeta_pow_n, zeta_omega_pow_n, 
                                         pi,
                                         lagrange_denominators, 
@@ -378,7 +380,7 @@ namespace nil {
                         // row += endo_scalar_component::rows_amount;
 
 
-                        std::array<var, 2> powers_of_eval_points_for_chunks;
+                        std::array<var, eval_points_amount> powers_of_eval_points_for_chunks;
                         powers_of_eval_points_for_chunks[0] = exponentiation_component::generate_circuit(
                                              bp, assignment,
                                              {zeta, params.verifier_index.max_poly_size, zero, one}, row)
@@ -389,6 +391,17 @@ namespace nil {
                                              {zeta_omega, params.verifier_index.max_poly_size, zero, one}, row)
                                              .result;
                         row += exponentiation_component::rows_amount;
+
+                        std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
+                            params.proof.prev_challenges;
+                        std::array<std::array<var, KimchiCommitmentParamsType::res_size>, eval_points_amount> 
+                            prev_challenges_evals = 
+                            prev_chal_evals_component::generate_circuit(bp, assignment,
+                                {prev_challenges, 
+                                {{zeta, zeta_omega}},
+                                powers_of_eval_points_for_chunks, 
+                                one, zero}, row).output;
+                        row += prev_chal_evals_component::rows_amount;
 
                         std::cout<<"row:"<<row<<std::endl;
 
@@ -445,14 +458,14 @@ namespace nil {
                             {params.verifier_index.omega, one}, row).output;
                         row += pi_powers_component::rows_amount;
 
-                        std::array<var, 2 * KimchiParamsType::public_input_size> lagrange_denominators = 
+                        std::array<var, eval_points_amount * KimchiParamsType::public_input_size> lagrange_denominators = 
                                     lagrange_denominators_component::generate_assignments(assignment,
                                     {zeta, zeta_omega, omega_powers, one}, row).output;
                         row += lagrange_denominators_component::rows_amount;
 
                         // TODO: check on empty public_input
                         std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
-                        std::array<var, 2> public_eval = public_eval_component::generate_assignments(
+                        std::array<var, eval_points_amount> public_eval = public_eval_component::generate_assignments(
                             assignment, {zeta_pow_n, zeta_omega_pow_n, 
                                         pi,
                                         lagrange_denominators, 
@@ -473,14 +486,23 @@ namespace nil {
                         // var u_challenge = transcript.challenge_assignment(assignment, row);
                         // var u = assignments_endo_scalar(assignment, u_challenge, row);
 
-                        std::array<var, 2> powers_of_eval_points_for_chunks = {
+                        std::array<var, eval_points_amount> powers_of_eval_points_for_chunks = {
                             assignment_exponentiation(assignment, zeta, params.verifier_index.max_poly_size, zero, one, row),
                             assignment_exponentiation(assignment, zeta_omega, params.verifier_index.max_poly_size, zero, one, row),
                         };
 
-                        std::cout<<"assignment row: "<<row<<std::endl;
+                        std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
+                            params.proof.prev_challenges;
+                        std::array<std::array<var, KimchiCommitmentParamsType::res_size>, eval_points_amount> 
+                            prev_challenges_evals = 
+                            prev_chal_evals_component::generate_assignments(assignment,
+                                {prev_challenges, 
+                                {{zeta, zeta_omega}},
+                                powers_of_eval_points_for_chunks, 
+                                one, zero}, row).output;
+                        row += prev_chal_evals_component::rows_amount;
 
-                        //std::array<var, 2> prev_challenges_evals = 
+                        std::cout<<"assignment row: "<<row<<std::endl;
 
                         // let polys: Vec<(PolyComm<G>, _)> = self
                         //     .prev_challenges
@@ -494,11 +516,11 @@ namespace nil {
                         // std::vector<var> prev_challenges_evals =
                         //     assignment_prev_chal_evals(assignment,
                         //                                max_poly_size,
-                        //                                std::array<var, 2> {zeta, zeta_omega},
+                        //                                std::array<var, eval_points_amount> {zeta, zeta_omega},
                         //                                powers_of_eval_points_for_chunks,
                         //                                row);
 
-                        // std::array<kimchi_proof_evaluations<CurveType>, 2> evals = {
+                        // std::array<kimchi_proof_evaluations<CurveType>, eval_points_amount> evals = {
                         //     assignment_combine_evaluations(assignment, params.proof.proof_evals[0],
                         //                                    powers_of_eval_points_for_chunks[0], row),
                         //     assignment_combine_evaluations(assignment, params.proof.proof_evals[1],

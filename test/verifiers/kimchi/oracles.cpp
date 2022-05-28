@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
-    constexpr static std::size_t max_poly_size = 128;
-    constexpr static std::size_t eval_rounds = 7;
+    constexpr static std::size_t max_poly_size = 32;
+    constexpr static std::size_t eval_rounds = 5;
 
     using kimchi_params = zk::components::kimchi_params_type<alpha_powers_n, public_input_size>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
@@ -126,6 +126,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
             algebra::random_element<BlueprintFieldType>();
         public_input.push_back(tmp);
         proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    }
+
+    for (std::size_t i = 0; i < eval_rounds; i++) {
+        typename BlueprintFieldType::value_type tmp = 
+            algebra::random_element<BlueprintFieldType>();
+        public_input.push_back(tmp);
+        proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
     typename component_type::params_type params = {verifier_index, proof, fq_output};
