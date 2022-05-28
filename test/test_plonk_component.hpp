@@ -89,7 +89,9 @@ namespace nil {
             zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
             std::size_t start_row = zk::components::allocate<component_type>(bp);
-            bp.allocate_rows(public_input.size());
+            if (public_input.size() > component_type::rows_amount) {
+                bp.allocate_rows(public_input.size() - component_type::rows_amount);
+            }
 
             for (std::size_t i = 0; i < public_input.size(); i++) {
                 auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
