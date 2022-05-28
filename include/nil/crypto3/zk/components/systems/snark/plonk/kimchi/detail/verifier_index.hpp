@@ -46,6 +46,14 @@ namespace nil {
                     constexpr static std::size_t public_input_size = PublicInputSize;
                 };
 
+                template <std::size_t EvalRounds,
+                    std::size_t MaxPolySize>
+                struct kimchi_commitment_params_type {
+                    constexpr static std::size_t max_poly_size = MaxPolySize;
+                    constexpr static std::size_t eval_rounds = EvalRounds;
+                    constexpr static std::size_t res_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
+                };
+
                 template<typename CurveType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
                     using Fr = typename CurveType::scalar_field_type::value_type;

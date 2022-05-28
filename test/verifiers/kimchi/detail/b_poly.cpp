@@ -77,8 +77,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_b_poly) {
     std::array<typename BlueprintFieldType::value_type, n> challenges_values;
     for (std::size_t i = 0; i < n; i++) {
         challenges_values[i] = algebra::random_element<BlueprintFieldType>();
-        challenges[i] = var(0, 3 + i, false, var::column_type::public_input);
         public_input.push_back(challenges_values[i]);
+        challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
     typename component_type::params_type params = {challenges, zeta, one};
@@ -89,9 +89,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_b_poly) {
         powers_twos[i] = powers_twos[i - 1] * powers_twos[i - 1];
     }
 
-    typename BlueprintFieldType::value_type expected_result;
+    typename BlueprintFieldType::value_type expected_result = 1;
     for (std::size_t i = 0; i < n; i++) {
-        typename BlueprintFieldType::value_type term = 1 + challenges_values[i] * powers_twos[i];
+        typename BlueprintFieldType::value_type term = 1 + challenges_values[i] * powers_twos[n - 1 - i];
         expected_result = expected_result * term;
     }
 

@@ -45,14 +45,18 @@ namespace nil {
                     }
                 };
 
-                template<typename CurveType, std::size_t PublicInputSize>
+                template<typename CurveType, std::size_t PublicInputSize,
+                    std::size_t EvalRounds>
                 struct kimchi_proof_scalar {
                     using FieldType = typename CurveType::scalar_field_type;
                     using var = snark::plonk_variable<FieldType>;
 
+                    constexpr static const std::size_t chal_per_round = 2;
+
                     std::array<kimchi_proof_evaluations<CurveType>, 2> proof_evals;
                     //var ft_eval;
                     std::array<var, PublicInputSize> public_input;
+                    std::array<std::array<var, chal_per_round>, EvalRounds> prev_challenges;
                 };
             }    // namespace components
         }        // namespace zk
