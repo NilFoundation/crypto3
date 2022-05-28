@@ -280,8 +280,7 @@ namespace nil {
                         var(W4, 0)* (base << 66) + var(W5, 0) * (base <<88) + var(W6, 0) * (base << 110) + var(W7, 0) * (base << 132) + 
                         var(W8, 0) * (base << 154) + var(W0, + 1)* (base << 176) + var(W1, +1) * (base << 198) + var(W2, + 1) * (base << 220) +
                         var(W3, + 1) * (base << 242))); 
-                        /*bp.add_gate(first_selector_index,
-                                    {constraint_1});*/
+                        bp.add_gate(first_selector_index, {constraint_1});
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
