@@ -37,8 +37,9 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/element_powers.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_denominators.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/public_evaluations.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/prev_chal_evals.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
@@ -51,16 +52,19 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
+                    typename KimchiCommitmentParamsType, std::size_t... WireIndexes>
                 class oracles_scalar;
 
-                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType, std::size_t W0, std::size_t W1,
+                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
+                         typename KimchiCommitmentParamsType, std::size_t W0, std::size_t W1,
                          std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                          std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                          std::size_t W13, std::size_t W14>
                 class oracles_scalar<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
-                    CurveType, KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+                    CurveType, KimchiParamsType, KimchiCommitmentParamsType, 
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
 
@@ -94,6 +98,11 @@ namespace nil {
                     using public_eval_component =
                             zk::components::public_evaluations<ArithmetizationType, 
                                                         KimchiParamsType::public_input_size, W0, W1, W2, W3,
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using prev_chal_evals_component =
+                            zk::components::prev_chal_evals<ArithmetizationType, 
+                                                        KimchiCommitmentParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     struct field_op_component {
@@ -239,7 +248,8 @@ namespace nil {
                         };
 
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
-                        kimchi_proof_scalar<CurveType, KimchiParamsType::public_input_size> proof;
+                        kimchi_proof_scalar<CurveType, KimchiParamsType::public_input_size,
+                            KimchiCommitmentParamsType::eval_rounds> proof;
                         fq_sponge_output fq_output;
                     };
 
@@ -380,10 +390,6 @@ namespace nil {
                                              .result;
                         row += exponentiation_component::rows_amount;
 
-                        //     assignment_exponentiation(assignment, zeta, max_poly_size, zero, one, row),
-                        //     assignment_exponentiation(assignment, zeta_omega, max_poly_size, zero, one, row),
-                        // };
-
                         std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
@@ -473,6 +479,17 @@ namespace nil {
                         };
 
                         std::cout<<"assignment row: "<<row<<std::endl;
+
+                        //std::array<var, 2> prev_challenges_evals = 
+
+                        // let polys: Vec<(PolyComm<G>, _)> = self
+                        //     .prev_challenges
+                        //     .iter()
+                        //     .zip(self.prev_chal_evals(index, &ep, &powers_of_eval_points_for_chunks))
+                        //     .map(|(c, e)| (c.1.clone(), e))
+                        //     .collect();
+                        //self.prev_challenges
+                        //         .iter()
 
                         // std::vector<var> prev_challenges_evals =
                         //     assignment_prev_chal_evals(assignment,

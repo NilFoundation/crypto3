@@ -70,22 +70,25 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
+    constexpr static std::size_t max_poly_size = 128;
+    constexpr static std::size_t eval_rounds = 7;
+
     using kimchi_params = zk::components::kimchi_params_type<alpha_powers_n, public_input_size>;
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
-    typename BlueprintFieldType::value_type max_poly_size = 512;
     verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
         0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
         0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
         0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
-    std::size_t domain_size = 512;
+    std::size_t domain_size = 128;
     verifier_index.domain_size = var(0, 6, false, var::column_type::public_input);
     verifier_index.omega = var(0, 7, false, var::column_type::public_input); 
     verifier_index.public_input_size = public_input_size;
     verifier_index.alpha_powers = alpha_powers_n;
 
-    using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type, kimchi_params,
+    using component_type = zk::components::oracles_scalar<ArithmetizationType, curve_type, kimchi_params, commitment_params,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
@@ -101,7 +104,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     typename BlueprintFieldType::value_type expected_zeta = 0x3D0F1F3A3D07DC73FBDF3718FFE270122AA367FB5BA667AD4A4AB81167D21BE4_cppui256;
     std::cout<<"Expected zeta: "<<expected_zeta.data<<std::endl;
 
-    zk::components::kimchi_proof_scalar<curve_type, public_input_size> proof;
+    zk::components::kimchi_proof_scalar<curve_type, public_input_size, eval_rounds> proof;
     typename component_type::params_type::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
