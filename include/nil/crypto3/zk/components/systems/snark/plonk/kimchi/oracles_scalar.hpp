@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/public_evaluations.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/prev_chal_evals.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/combine_proof_evals.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/ft_eval.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
@@ -111,13 +112,12 @@ namespace nil {
                                                         KimchiParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    constexpr static const std::size_t eval_points_amount = 2;
+                    using ft_eval_component =
+                            zk::components::ft_eval<ArithmetizationType, CurveType,
+                                                        KimchiParamsType, W0, W1, W2, W3,
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    struct field_op_component {
-                        // TODO: change to add / sub
-                        using add = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-                        using sub = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-                    };
+                    constexpr static const std::size_t eval_points_amount = 2;
 
                     static var assignments_endo_scalar(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                        var scalar,
@@ -254,6 +254,10 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
+                        var beta = params.fq_output.beta;
+                        var gamma = params.fq_output.gamma;
+                        var joint_combiner = params.fq_output.joint_combiner;
+
                         typename BlueprintFieldType::value_type endo_factor =
                             0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         std::size_t endo_num_bits = 128;
@@ -366,6 +370,24 @@ namespace nil {
                             row += combined_proof_evals_component::rows_amount;
                         }
 
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            eval_points_amount> p_evals = params.proof.proof_evals;
+                        var ft_eval0 = ft_eval_component::generate_circuit(
+                            bp,
+                            assignment, 
+                            {params.verifier_index,
+                            zeta_pow_n,
+                            alpha_powers,
+                            combined_evals,
+                            gamma,
+                            beta,
+                            p_evals,
+                            zeta,
+                            joint_combiner},
+                            row
+                        ).output;
+                        row += ft_eval_component::rows_amount;
+
                         std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
@@ -474,33 +496,24 @@ namespace nil {
                             row += combined_proof_evals_component::rows_amount;
                         }
 
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            eval_points_amount> p_evals = params.proof.proof_evals;
+                        var ft_eval0 = ft_eval_component::generate_assignments(
+                            assignment, 
+                            {params.verifier_index,
+                            zeta_pow_n,
+                            alpha_powers,
+                            combined_evals,
+                            gamma,
+                            beta,
+                            p_evals,
+                            zeta,
+                            joint_combiner},
+                            row
+                        ).output;
+                        row += ft_eval_component::rows_amount;
+
                         std::cout<<"assignment row: "<<row<<std::endl;
-
-                        // let polys: Vec<(PolyComm<G>, _)> = self
-                        //     .prev_challenges
-                        //     .iter()
-                        //     .zip(self.prev_chal_evals(index, &ep, &powers_of_eval_points_for_chunks))
-                        //     .map(|(c, e)| (c.1.clone(), e))
-                        //     .collect();
-                        //self.prev_challenges
-                        //         .iter()
-
-                        // std::vector<var> prev_challenges_evals =
-                        //     assignment_prev_chal_evals(assignment,
-                        //                                max_poly_size,
-                        //                                std::array<var, eval_points_amount> {zeta, zeta_omega},
-                        //                                powers_of_eval_points_for_chunks,
-                        //                                row);
-
-                        // std::array<kimchi_proof_evaluations<CurveType>, eval_points_amount> evals = {
-                        //     assignment_combine_evaluations(assignment, params.proof.proof_evals[0],
-                        //                                    powers_of_eval_points_for_chunks[0], row),
-                        //     assignment_combine_evaluations(assignment, params.proof.proof_evals[1],
-                        //                                    powers_of_eval_points_for_chunks[1], row),
-                        // };
-
-                        // // ft(zeta)
-                        // var ft_at_zeta = ft_eval_at_zeta(assignment, row);
 
                         return result_type(params, component_start_row);
                     }

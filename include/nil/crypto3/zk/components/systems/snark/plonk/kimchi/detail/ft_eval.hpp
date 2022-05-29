@@ -111,8 +111,6 @@ namespace nil {
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> p_evals;
                         var zeta;
                         var joint_combiner;
-                        var one;
-                        var zero;
                     };
 
                     struct result_type {

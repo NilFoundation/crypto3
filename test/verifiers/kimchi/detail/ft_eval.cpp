@@ -140,9 +140,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
         beta,
         proof.proof_evals,
         zeta,
-        joint_combiner,
-        one,
-        zero};
+        joint_combiner};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {
