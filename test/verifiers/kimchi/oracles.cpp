@@ -50,6 +50,41 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_oracles_test_suite)
 
+template <typename CurveType, typename BlueprintFieldType, typename KimchiParamsType,
+    std::size_t EvelRounds>
+void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
+    zk::components::kimchi_proof_scalar<CurveType, KimchiParamsType, EvelRounds> &circuit_proof,
+    std::vector<typename BlueprintFieldType::value_type> &public_input) {
+        using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    // eval_proofs
+    for (std::size_t point_idx = 0; point_idx < 2; point_idx++) {
+        // w
+        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
+            public_input.push_back(original_proof.evals[point_idx].w[i]);
+            circuit_proof.proof_evals[point_idx].w[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
+        // z
+        public_input.push_back(original_proof.evals[point_idx].z);
+        circuit_proof.proof_evals[point_idx].z = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // s
+        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
+            public_input.push_back(original_proof.evals[point_idx].s[i]);
+            circuit_proof.proof_evals[point_idx].s[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
+        // lookup
+        if (KimchiParamsType::use_lookup) {
+            // TODO
+        }
+        // generic_selector
+        public_input.push_back(original_proof.evals[point_idx].generic_selector);
+        circuit_proof.proof_evals[point_idx].generic_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // poseidon_selector
+        public_input.push_back(original_proof.evals[point_idx].poseidon_selector);
+        circuit_proof.proof_evals[point_idx].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    }
+}
+
 BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     using curve_type = algebra::curves::vesta;
@@ -141,6 +176,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
         public_input.push_back(tmp);
         proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
+
+    prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(
+        kimchi_proof, proof, public_input
+    );
 
     typename component_type::params_type params = {verifier_index, proof, fq_output};
 

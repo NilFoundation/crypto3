@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_denominators.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/public_evaluations.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/prev_chal_evals.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/combine_proof_evals.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
@@ -104,6 +105,11 @@ namespace nil {
                             zk::components::prev_chal_evals<ArithmetizationType, 
                                                         KimchiCommitmentParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                                        
+                    using combined_proof_evals_component =
+                            zk::components::combine_proof_evals<ArithmetizationType, 
+                                                        KimchiParamsType, W0, W1, W2, W3,
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     constexpr static const std::size_t eval_points_amount = 2;
 
@@ -162,49 +168,6 @@ namespace nil {
                                                        powers_of_eval_points_for_chunks,
                                                    std::size_t &component_start_row) {
                         return std::vector<var>(0);
-                    }
-
-                    // let init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
-                    static var ft_eval_1(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                         var eval_w,
-                                         var gamma,
-                                         var eval_z,
-                                         var alpha_0,
-                                         var zkp,
-                                         std::size_t &component_start_row) {
-                    }
-
-                    static var ft_eval_at_zeta(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                               std::size_t &row) {
-
-                        /*var zkpm_at_zeta = assignment_evaluate_polynomial(
-                            assignment, zkpm, zeta, row);
-                        var zeta1m1 = assignment_add(assignment, zeta_pow_n, -1, row);
-
-                        // (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alphas[0] * zkpm_at_zeta;
-                        var init = ft_eval_1(evals[0].w[zk::snark::kimchi_constant::PERMUTES - 1],
-                            gamma,
-                            evals[1].z,
-                            alpha_powers[0],
-                            zkpm_at_zeta);
-                        var ft_eval0 = permutation_fold(
-
-                        );
-                        var nominator;
-                        var denominator;
-                        ft_eval0 = assignment_add(assignment,
-                            ft_eval0,
-                            assignment_mul(assignment, nominator, denominator, row),
-                            row);
-                        var tmp = ft_eval_2(
-
-                        );
-                        ft_eval0 = assignment_sub(
-                            assignment,
-                            ft_eval0,
-                            tmp,
-                            row);*/
-                        return var(0, row, false);
                     }
 
                 public:
@@ -394,9 +357,16 @@ namespace nil {
                                 one, zero}, row).output;
                         row += prev_chal_evals_component::rows_amount;
 
-                        std::cout<<"row:"<<row<<std::endl;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            eval_points_amount> combined_evals;
+                        for (std::size_t i = 0; i < eval_points_amount; i++) {
+                            combined_evals[i] = combined_proof_evals_component::generate_circuit(
+                                bp, assignment, {params.proof.proof_evals[i], 
+                                powers_of_eval_points_for_chunks[i]}, row).output;
+                            row += combined_proof_evals_component::rows_amount;
+                        }
 
-                        // COMBINE BEFORE FT_EVAL
+                        std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
@@ -494,6 +464,15 @@ namespace nil {
                                 powers_of_eval_points_for_chunks, 
                                 one, zero}, row).output;
                         row += prev_chal_evals_component::rows_amount;
+
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            eval_points_amount> combined_evals;
+                        for (std::size_t i = 0; i < eval_points_amount; i++) {
+                            combined_evals[i] = combined_proof_evals_component::generate_assignments(
+                                assignment, {params.proof.proof_evals[i], 
+                                powers_of_eval_points_for_chunks[i]}, row).output;
+                            row += combined_proof_evals_component::rows_amount;
+                        }
 
                         std::cout<<"assignment row: "<<row<<std::endl;
 
