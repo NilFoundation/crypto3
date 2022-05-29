@@ -29,20 +29,10 @@
 #include <algorithm>
 #include <vector>
 
-#ifdef MULTICORE
-#include <omp.h>
-#endif
-
 #include <nil/crypto3/algebra/type_traits.hpp>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
-
-#ifdef MULTICORE
-#define _basic_radix2_fft detail::basic_parallel_radix2_fft
-#else
-#define _basic_radix2_fft detail::basic_serial_radix2_fft
-#endif
 
 namespace nil {
     namespace crypto3 {
@@ -54,7 +44,7 @@ namespace nil {
                  * Also, note that it's the caller's responsibility to multiply by 1/N.
                  */
                 template<typename FieldType, typename Range>
-                void basic_serial_radix2_fft(Range &a, const typename FieldType::value_type &omega) {
+                void basic_radix2_fft(Range &a, const typename FieldType::value_type &omega) {
                     typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
                         value_type;
 
@@ -89,91 +79,6 @@ namespace nil {
                         }
                         asm volatile("/* post-inner */");
                         m *= 2;
-                    }
-                }
-
-                template<typename FieldType, typename Range>
-                void basic_parallel_radix2_fft_inner(Range &a,
-                                                     const typename FieldType::value_type &omega,
-                                                     const std::size_t log_cpus) {
-                    typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
-                        value_type;
-
-                    BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
-                    BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
-
-                    const std::size_t num_cpus = 1ul << log_cpus;
-
-                    const std::size_t m = a.size();
-                    const std::size_t log_m = log2(m);
-                    if (m != 1ul << log_m)
-                        throw std::invalid_argument("expected m == 1ul<<log_m");
-
-                    if (log_m < log_cpus) {
-                        basic_serial_radix2_fft<FieldType>(a, omega);
-                        return;
-                    }
-
-                    std::vector<std::vector<value_type>> tmp(num_cpus);
-                    for (std::size_t j = 0; j < num_cpus; ++j) {
-                        tmp[j].resize(1ul << (log_m - log_cpus), value_type::zero());
-                    }
-
-#ifdef MULTICORE
-#pragma omp parallel for
-#endif
-                    for (std::size_t j = 0; j < num_cpus; ++j) {
-                        const value_type omega_j = omega.pow(j);
-                        const value_type omega_step = omega.pow(j << (log_m - log_cpus));
-
-                        value_type elt = value_type::one();
-                        for (std::size_t i = 0; i < 1ul << (log_m - log_cpus); ++i) {
-                            for (std::size_t s = 0; s < num_cpus; ++s) {
-                                // invariant: elt is omega^(j*idx)
-                                const std::size_t idx = (i + (s << (log_m - log_cpus))) % (1u << log_m);
-                                tmp[j][i] += a[idx] * elt;
-                                elt *= omega_step;
-                            }
-                            elt *= omega_j;
-                        }
-                    }
-
-                    const value_type omega_num_cpus = omega.pow(num_cpus);
-
-#ifdef MULTICORE
-#pragma omp parallel for
-#endif
-                    for (std::size_t j = 0; j < num_cpus; ++j) {
-                        basic_serial_radix2_fft<FieldType>(tmp[j], omega_num_cpus);
-                    }
-
-#ifdef MULTICORE
-#pragma omp parallel for
-#endif
-                    for (std::size_t i = 0; i < num_cpus; ++i) {
-                        for (std::size_t j = 0; j < 1ul << (log_m - log_cpus); ++j) {
-                            // now: i = idx >> (log_m - log_cpus) and j = idx % (1u << (log_m - log_cpus)), for idx
-                            // =
-                            // ((i<<(log_m-log_cpus))+j) % (1u << log_m)
-                            a[(j << log_cpus) + i] = tmp[i][j];
-                        }
-                    }
-                }
-
-                template<typename FieldType, typename Range>
-                void basic_parallel_radix2_fft(Range &a, const typename FieldType::value_type &omega) {
-#ifdef MULTICORE
-                    const std::size_t num_cpus = omp_get_max_threads();
-#else
-                    const std::size_t num_cpus = 1;
-#endif
-                    const std::size_t log_cpus =
-                        ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
-
-                    if (log_cpus == 0) {
-                        basic_serial_radix2_fft<FieldType>(a, omega);
-                    } else {
-                        basic_parallel_radix2_fft_inner(a, omega, log_cpus);
                     }
                 }
 

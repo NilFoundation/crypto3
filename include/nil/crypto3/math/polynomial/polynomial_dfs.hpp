@@ -518,7 +518,7 @@ namespace nil {
                     size_t n = this->size();
                     value_type omega = unity_root<FieldType>(n);
                     q.resize(n);
-                    detail::basic_serial_radix2_fft<FieldType>(q, omega);
+                    detail::basic_radix2_fft<FieldType>(q, omega);
                     return polynomial_dfs(new_s - 1, q);
                 }
 
@@ -569,7 +569,7 @@ namespace nil {
                     size_t n = this->size();
                     value_type omega = unity_root<FieldType>(n);
                     r.resize(n);
-                    detail::basic_serial_radix2_fft<FieldType>(r, omega);
+                    detail::basic_radix2_fft<FieldType>(r, omega);
                     return polynomial_dfs(r_deg, r);
                 }
 
@@ -581,7 +581,7 @@ namespace nil {
                     _d = tmp.size() - 1;
                     val.assign(tmp.begin(), tmp.end());
                     val.resize(n, FieldValueType::zero());
-                    detail::basic_serial_radix2_fft<FieldType>(val, omega);
+                    detail::basic_radix2_fft<FieldType>(val, omega);
                 }
 
                 std::vector<FieldValueType> coefficients() const {
@@ -590,7 +590,7 @@ namespace nil {
                     value_type omega = unity_root<FieldType>(this->size());
                     std::vector<FieldValueType> tmp(this->begin(), this->end());
 
-                    _basic_radix2_fft<FieldType>(tmp, omega.inversed());
+                    detail::basic_radix2_fft<FieldType>(tmp, omega.inversed());
 
                     const value_type sconst = value_type(this->size()).inversed();
                     std::transform(tmp.begin(),

@@ -92,8 +92,8 @@ namespace nil {
                         shift_i *= shift;
                     }
 
-                    _basic_radix2_fft<FieldType>(a0, omega);
-                    _basic_radix2_fft<FieldType>(a1, omega);
+                    detail::basic_radix2_fft<FieldType>(a0, omega);
+                    detail::basic_radix2_fft<FieldType>(a1, omega);
 
                     for (std::size_t i = 0; i < small_m; ++i) {
                         a[i] = a0[i];
@@ -115,8 +115,8 @@ namespace nil {
                     std::vector<value_type> a1(a.begin() + small_m, a.end());
 
                     const value_type omega_inverse = omega.inversed();
-                    _basic_radix2_fft<FieldType>(a0, omega_inverse);
-                    _basic_radix2_fft<FieldType>(a1, omega_inverse);
+                    detail::basic_radix2_fft<FieldType>(a0, omega_inverse);
+                    detail::basic_radix2_fft<FieldType>(a1, omega_inverse);
 
                     const value_type shift_to_small_m = shift.pow(small_m);
                     const value_type sconst = (value_type(small_m) * (value_type::one() - shift_to_small_m)).inversed();

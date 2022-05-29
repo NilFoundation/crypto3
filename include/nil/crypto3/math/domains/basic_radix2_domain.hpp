@@ -75,7 +75,7 @@ namespace nil {
                         }
                     }
 
-                    _basic_radix2_fft<FieldType>(a, omega);
+                    detail::basic_radix2_fft<FieldType>(a, omega);
                 }
 
                 void inverse_fft(std::vector<value_type> &a) {
@@ -87,7 +87,7 @@ namespace nil {
                         }
                     }
 
-                    _basic_radix2_fft<FieldType>(a, omega.inversed());
+                    detail::basic_radix2_fft<FieldType>(a, omega.inversed());
 
                     const value_type sconst = value_type(a.size()).inversed();
                     for (std::size_t i = 0; i < a.size(); ++i) {

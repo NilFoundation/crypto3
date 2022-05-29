@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FIELD_UTILS_HPP
-#define CRYPTO3_ALGEBRA_FIELD_UTILS_HPP
+#ifndef CRYPTO3_MATH_FIELD_UTILS_HPP
+#define CRYPTO3_MATH_FIELD_UTILS_HPP
 
 #include <type_traits>
 #include <complex>
@@ -72,4 +72,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_FIELD_UTILS_HPP
+#endif    // CRYPTO3_MATH_FIELD_UTILS_HPP

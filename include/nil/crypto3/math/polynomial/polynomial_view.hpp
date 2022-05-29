@@ -426,12 +426,12 @@ namespace nil {
                     this->resize(n, value_type::zero());
                     other.resize(n, value_type::zero());
 
-                    _basic_radix2_fft<FieldType>(it, omega);
-                    _basic_radix2_fft<FieldType>(other, omega);
+                    detail::basic_radix2_fft<FieldType>(it, omega);
+                    detail::basic_radix2_fft<FieldType>(other, omega);
 
                     std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::multiplies<value_type>());
 
-                    _basic_radix2_fft<FieldType>(it, omega.inversed());
+                    detail::basic_radix2_fft<FieldType>(it, omega.inversed());
 
                     const value_type sconst = value_type(n).inversed();
                     std::transform(this->begin(),
