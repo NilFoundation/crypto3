@@ -85,6 +85,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/detail/b_poly"
     "verifiers/kimchi/detail/public_evaluations"
     "verifiers/kimchi/detail/prev_chal_evals"
+    "verifiers/kimchi/detail/ft_eval"
     "sponge/sponge"
     "algebra/fields/plonk/field_operations"
     "algebra/fields/plonk/combined_inner_product"
