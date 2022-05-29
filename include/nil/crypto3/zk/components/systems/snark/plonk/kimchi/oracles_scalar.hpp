@@ -164,15 +164,6 @@ namespace nil {
                         return std::vector<var>(0);
                     }
 
-                    static kimchi_proof_evaluations<CurveType>
-                        assignment_combine_evaluations(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                       const kimchi_proof_evaluations<CurveType> &proof_eval,
-                                                       const var &proof_eval_for_chunk,
-                                                       std::size_t &row) {
-
-                        return kimchi_proof_evaluations<CurveType>();
-                    }
-
                     // let init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
                     static var ft_eval_1(blueprint_assignment_table<ArithmetizationType> &assignment,
                                          var eval_w,
@@ -250,7 +241,7 @@ namespace nil {
                         };
 
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
-                        kimchi_proof_scalar<CurveType, KimchiParamsType::public_input_size,
+                        kimchi_proof_scalar<CurveType, KimchiParamsType,
                             KimchiCommitmentParamsType::eval_rounds> proof;
                         fq_sponge_output fq_output;
                     };
@@ -404,6 +395,8 @@ namespace nil {
                         row += prev_chal_evals_component::rows_amount;
 
                         std::cout<<"row:"<<row<<std::endl;
+
+                        // COMBINE BEFORE FT_EVAL
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);

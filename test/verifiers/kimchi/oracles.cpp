@@ -73,7 +73,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
-    using kimchi_params = zk::components::kimchi_params_type<alpha_powers_n, public_input_size>;
+    constexpr static std::size_t witness_columns = 15;
+    constexpr static std::size_t perm_size = 7;
+
+    using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
+        alpha_powers_n, public_input_size>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
@@ -104,7 +108,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     typename BlueprintFieldType::value_type expected_zeta = 0x3D0F1F3A3D07DC73FBDF3718FFE270122AA367FB5BA667AD4A4AB81167D21BE4_cppui256;
     std::cout<<"Expected zeta: "<<expected_zeta.data<<std::endl;
 
-    zk::components::kimchi_proof_scalar<curve_type, public_input_size, eval_rounds> proof;
+    zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
     typename component_type::params_type::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),

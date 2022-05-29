@@ -72,8 +72,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
+    constexpr static std::size_t witness_columns = 15;
+    constexpr static std::size_t perm_size = 7;
 
-    using kimchi_params = zk::components::kimchi_params_type<alpha_powers_n, public_input_size>;
+    using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
+        alpha_powers_n, public_input_size>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
@@ -124,7 +127,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
         alpha_powers[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    zk::components::kimchi_proof_scalar<curve_type, public_input_size, eval_rounds> proof;
+    zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
 
     typename component_type::params_type params = {verifier_index, 
         zeta_pow_n,
