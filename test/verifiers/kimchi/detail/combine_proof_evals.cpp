@@ -40,7 +40,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/ft_eval.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/combine_proof_evals.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 
 #include "test_plonk_component.hpp"
@@ -48,9 +48,44 @@
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_ft_eval_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_combine_proof_evals_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
+template <typename CurveType, typename BlueprintFieldType, typename KimchiParamsType,
+    std::size_t EvelRounds>
+void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
+    zk::components::kimchi_proof_scalar<CurveType, KimchiParamsType, EvelRounds> &circuit_proof,
+    std::vector<typename BlueprintFieldType::value_type> &public_input) {
+        using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    // eval_proofs
+    for (std::size_t point_idx = 0; point_idx < 2; point_idx++) {
+        // w
+        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
+            public_input.push_back(original_proof.evals[point_idx].w[i]);
+            circuit_proof.proof_evals[point_idx].w[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
+        // z
+        public_input.push_back(original_proof.evals[point_idx].z);
+        circuit_proof.proof_evals[point_idx].z = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // s
+        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
+            public_input.push_back(original_proof.evals[point_idx].s[i]);
+            circuit_proof.proof_evals[point_idx].s[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
+        // lookup
+        if (KimchiParamsType::use_lookup) {
+            // TODO
+        }
+        // generic_selector
+        public_input.push_back(original_proof.evals[point_idx].generic_selector);
+        circuit_proof.proof_evals[point_idx].generic_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // poseidon_selector
+        public_input.push_back(original_proof.evals[point_idx].poseidon_selector);
+        circuit_proof.proof_evals[point_idx].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
@@ -82,70 +117,54 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
         alpha_powers_n, public_input_size>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
 
-    zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
-    typename BlueprintFieldType::value_type omega_value = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
-    verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
-        0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
-        0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
-        0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
-    std::size_t domain_size_value = 128;
-    verifier_index.public_input_size = public_input_size;
-    verifier_index.alpha_powers = alpha_powers_n;
-
-    using component_type = zk::components::ft_eval<ArithmetizationType, curve_type, kimchi_params,
+    using component_type = zk::components::combine_proof_evals<ArithmetizationType, kimchi_params,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
-    typename BlueprintFieldType::value_type joint_combiner_value = 15;
-    typename BlueprintFieldType::value_type beta_value = 3;
-    typename BlueprintFieldType::value_type gamma_value = 5;
-    typename BlueprintFieldType::value_type alpha_value = 0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_value = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner_value, beta_value, gamma_value, 
-        power(zeta_value, domain_size_value),
-        //verifier_index
-        domain_size_value,
-        omega_value,
+    std::vector<typename BlueprintFieldType::value_type> public_input = {
         zeta_value,
         1, 0};
 
-    var joint_combiner(0, 0, false, var::column_type::public_input);
-    var beta(0, 1, false, var::column_type::public_input);
-    var gamma(0, 2, false, var::column_type::public_input);
-    var zeta_pow_n(0, 3, false, var::column_type::public_input);
-    var domain_size(0, 4, false, var::column_type::public_input);
-    var omega(0, 5, false, var::column_type::public_input);
-    var zeta(0, 6, false, var::column_type::public_input);
-    var one(0, 7, false, var::column_type::public_input);
-    var zero(0, 8, false, var::column_type::public_input);
-    verifier_index.domain_size = domain_size;
-    verifier_index.omega = omega; 
-
-    // TODO prepare real data
-    std::array<var, alpha_powers_n> alpha_powers;
-    for (std::size_t i = 0; i < alpha_powers_n; i++) {
-        public_input.push_back(power(alpha_value, i));
-        alpha_powers[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    }
+    var zeta(0, 0, false, var::column_type::public_input);
+    var one(0, 1, false, var::column_type::public_input);
+    var zero(0, 2, false, var::column_type::public_input);
 
     zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
 
-    typename component_type::params_type params = {verifier_index, 
-        zeta_pow_n,
-        alpha_powers,
-        proof.proof_evals,
-        gamma,
-        beta,
-        proof.proof_evals,
-        zeta,
-        joint_combiner,
-        one,
-        zero};
+    prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(
+        kimchi_proof, proof, public_input
+    );
 
-    auto result_check = [](AssignmentType &assignment, 
+    typename component_type::params_type params = {
+        proof.proof_evals[0],
+        zeta
+    };
+
+    auto result_check = [&kimchi_proof, &zeta_value](AssignmentType &assignment, 
         component_type::result_type &real_res) {
+        // w
+        for (std::size_t i = 0; i < kimchi_proof.evals[0].w.size(); i++) {
+            assert(kimchi_proof.evals[0].w[i] == 
+                assignment.var_value(real_res.output.w[i]));
+        }
+        // z
+        assert(kimchi_proof.evals[0].z == 
+                assignment.var_value(real_res.output.z));
+        // s
+        for (std::size_t i = 0; i < kimchi_proof.evals[0].s.size(); i++) {
+            assert(kimchi_proof.evals[0].s[i] == 
+                assignment.var_value(real_res.output.s[i]));
+        }
+        // lookup
+        // generic_selector
+        assert(kimchi_proof.evals[0].generic_selector == 
+                assignment.var_value(real_res.output.generic_selector));
+        // poseidon_selector
+        assert(kimchi_proof.evals[0].generic_selector == 
+                assignment.var_value(real_res.output.generic_selector));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);

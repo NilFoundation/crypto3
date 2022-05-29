@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -35,6 +35,8 @@
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
@@ -43,14 +45,12 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType,
-                    typename CurveType,
                     typename KimchiParamsType,
                     std::size_t... WireIndexes>
-                class ft_eval;
+                class combine_proof_evals;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         typename CurveType,
                          typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
@@ -67,9 +67,8 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class ft_eval<
+                class combine_proof_evals<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    CurveType,
                     KimchiParamsType,
                     W0,
                     W1,
@@ -94,33 +93,51 @@ namespace nil {
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f22;
-                    constexpr static const std::size_t eval_points_amount = 2;
+                    constexpr static const std::size_t selector_seed = 0x0f23;
 
                 public:
-                    constexpr static const std::size_t rows_amount = mul_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 
+                        KimchiParamsType::witness_columns * mul_component::rows_amount // w
+                        + mul_component::rows_amount // z
+                        + (KimchiParamsType::permut_size - 1) * mul_component::rows_amount  // s
+                        + mul_component::rows_amount // generic
+                        + mul_component::rows_amount; // poseidon
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        kimchi_verifier_index_scalar<CurveType> verifier_index;
-                        var zeta_pow_n;
-                        std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
-                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> combined_evals;
-                        var gamma;
-                        var beta;
-                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> p_evals;
-                        var zeta;
-                        var joint_combiner;
-                        var one;
-                        var zero;
+                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType> evals;
+                        var x;
                     };
 
                     struct result_type {
-                        var output;
+                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType> output;
 
                         result_type(std::size_t component_start_row) {
                             std::size_t row = component_start_row;
-                            output = typename mul_component::result_type(row).output;
+
+                            // w
+                            for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
+                                output.w[i] = typename mul_component::result_type(row).output;
+                                row += mul_component::rows_amount;
+                            }
+                            // z
+                            output.z = typename mul_component::result_type(row).output;
+                            row += mul_component::rows_amount;
+                            // s
+                            for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
+                                output.s[i] = typename mul_component::result_type(row).output;
+                                row += mul_component::rows_amount;
+                            }
+                            // lookup
+                            if (KimchiParamsType::use_lookup) {
+                                // TODO
+                            }
+                            // generic_selector
+                            output.generic_selector = typename mul_component::result_type(row).output;
+                            row += mul_component::rows_amount;
+                            // poseidon_selector
+                            output.poseidon_selector = typename mul_component::result_type(row).output;
+                            row += mul_component::rows_amount;
                         }
                     };
 
@@ -131,10 +148,34 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        zk::components::generate_circuit<mul_component>(bp, assignment, 
-                            {params.zeta_pow_n, params.gamma}, row);
+                        // w
+                        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
+                            zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {params.evals.w[i], params.x}, row);
+                            row += mul_component::rows_amount;
+                        }
+                        // z
+                        zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {params.evals.z, params.x}, row);
                         row += mul_component::rows_amount;
-
+                        // s
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
+                            zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {params.evals.s[i], params.x}, row);
+                            row += mul_component::rows_amount;
+                        }
+                        // lookup
+                        if (KimchiParamsType::use_lookup) {
+                            // TODO
+                        }
+                        // generic_selector
+                        zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {params.evals.generic_selector, params.x}, row);
+                        row += mul_component::rows_amount;
+                        // poseidon_selector
+                        zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {params.evals.poseidon_selector, params.x}, row);
+                        row += mul_component::rows_amount;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
@@ -145,8 +186,34 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
-                        mul_component::generate_assignments(assignment, 
-                            {params.zeta_pow_n, params.gamma}, row);
+
+                        // w
+                        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
+                            mul_component::generate_assignments(assignment,
+                                {params.evals.w[i], params.x}, row);
+                            row += mul_component::rows_amount;
+                        }
+                        // z
+                        mul_component::generate_assignments(assignment,
+                                {params.evals.z, params.x}, row);
+                        row += mul_component::rows_amount;
+                        // s
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
+                            mul_component::generate_assignments(assignment,
+                                {params.evals.s[i], params.x}, row);
+                            row += mul_component::rows_amount;
+                        }
+                        // lookup
+                        if (KimchiParamsType::use_lookup) {
+                            // TODO
+                        }
+                        // generic_selector
+                        mul_component::generate_assignments(assignment,
+                                {params.evals.generic_selector, params.x}, row);
+                        row += mul_component::rows_amount;
+                        // poseidon_selector
+                        mul_component::generate_assignments(assignment,
+                                {params.evals.poseidon_selector, params.x}, row);
                         row += mul_component::rows_amount;
 
                         return result_type(start_row_index);
@@ -171,4 +238,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
