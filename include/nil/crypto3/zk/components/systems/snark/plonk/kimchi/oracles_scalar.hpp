@@ -119,57 +119,6 @@ namespace nil {
 
                     constexpr static const std::size_t eval_points_amount = 2;
 
-                    static var assignments_endo_scalar(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                       var scalar,
-                                                       std::size_t &component_start_row) {
-
-                        typename BlueprintFieldType::value_type endo_factor =
-                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
-                        std::size_t num_bits = 128;
-                        // TODO endo_scalar component has to get variable as scalar param
-
-                        typename endo_scalar_component::params_type params = {scalar, endo_factor, num_bits};
-                        typename endo_scalar_component::result_type endo_scalar_res =
-                            endo_scalar_component::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += endo_scalar_component::rows_amount;
-                        return endo_scalar_res.output;
-                    }
-
-                    static var assignment_exponentiation(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                         var base,
-                                                         var power,
-                                                         var zero,
-                                                         var one,
-                                                         std::size_t &component_start_row) {
-                        typename exponentiation_component::params_type params = {base, power, zero, one};
-                        typename exponentiation_component::result_type res =
-                            exponentiation_component::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += exponentiation_component::rows_amount;
-                        return res.result;
-                    }
-
-                    static var assigment_multiplication(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                        var x,
-                                                        var y,
-                                                        std::size_t &component_start_row) {
-                        typename mul_component::params_type params = {x, y};
-                        typename mul_component::result_type res =
-                            mul_component::generate_assignments(assignment, params, component_start_row);
-                        component_start_row += mul_component::rows_amount;
-                        return res.output;
-                    }
-
-                    static std::vector<var>
-                        assignment_prev_chal_evals(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                   var max_poly_size,
-                                                   std::array<var, eval_points_amount>
-                                                       eval_points,
-                                                   std::array<var, eval_points_amount>
-                                                       powers_of_eval_points_for_chunks,
-                                                   std::size_t &component_start_row) {
-                        return std::vector<var>(0);
-                    }
-
                 public:
                     constexpr static const std::size_t rows_amount = 200;
                     constexpr static const std::size_t gates_amount = 1;
@@ -233,7 +182,7 @@ namespace nil {
                         var zeta1;
                         var ft_eval0;
 
-                        result_type(const params_type &params, std::size_t component_start_row) {
+                        result_type() {
                         }
                     };
 
@@ -283,7 +232,7 @@ namespace nil {
                         var zeta_pow_n = exponentiation_component::generate_circuit(
                                              bp, assignment,
                                              {zeta, params.verifier_index.domain_size, zero, one}, row)
-                                             .result;
+                                             .output;
                         row += exponentiation_component::rows_amount;
 
                         var zeta_omega = zk::components::generate_circuit<mul_component>(bp, assignment,
@@ -292,7 +241,7 @@ namespace nil {
 
                         var zeta_omega_pow_n = 
                             exponentiation_component::generate_circuit(bp, assignment, 
-                            {zeta_omega, params.verifier_index.domain_size, zero, one}, row).result;
+                            {zeta_omega, params.verifier_index.domain_size, zero, one}, row).output;
                         row += exponentiation_component::rows_amount;
 
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers =
@@ -342,12 +291,12 @@ namespace nil {
                         powers_of_eval_points_for_chunks[0] = exponentiation_component::generate_circuit(
                                              bp, assignment,
                                              {zeta, params.verifier_index.max_poly_size, zero, one}, row)
-                                             .result;
+                                             .output;
                         row += exponentiation_component::rows_amount;
                         powers_of_eval_points_for_chunks[1] = exponentiation_component::generate_circuit(
                                              bp, assignment,
                                              {zeta_omega, params.verifier_index.max_poly_size, zero, one}, row)
-                                             .result;
+                                             .output;
                         row += exponentiation_component::rows_amount;
 
                         std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
@@ -391,7 +340,7 @@ namespace nil {
                         std::cout<<"row:"<<row<<std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
-                        return result_type(params, start_row_index);
+                        return result_type();
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -399,6 +348,10 @@ namespace nil {
                                                             std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
+
+                        typename BlueprintFieldType::value_type endo_factor =
+                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        std::size_t num_bits = 128;
 
                         // copy public input
                         std::vector<var> zkpm(params.verifier_index.zkpm.size());
@@ -411,9 +364,14 @@ namespace nil {
                         var gamma = params.fq_output.gamma;
                         var joint_combiner = params.fq_output.joint_combiner;
 
-                        var alpha = assignments_endo_scalar(assignment, params.fq_output.alpha, row);
+                        var alpha = endo_scalar_component::generate_assignments(assignment,
+                            {params.fq_output.alpha, endo_factor, num_bits}, row).output;
+                        row += endo_scalar_component::rows_amount;
                         std::cout << "alpha: " << assignment.var_value(alpha).data << std::endl;
-                        var zeta = assignments_endo_scalar(assignment, params.fq_output.zeta, row);
+
+                        var zeta = endo_scalar_component::generate_assignments(assignment,
+                            {params.fq_output.zeta, endo_factor, num_bits}, row).output;
+                        row += endo_scalar_component::rows_amount;
                         std::cout << "zeta: " << assignment.var_value(zeta).data << std::endl;
                         std::cout << "params.fq_output.zeta: " << assignment.var_value(params.fq_output.zeta).data << std::endl;
 
@@ -429,10 +387,17 @@ namespace nil {
                         transcript.absorb_assignment(assignment, fq_digest, row);
 
                         var n = params.verifier_index.domain_size;
-                        var zeta_pow_n = assignment_exponentiation(assignment, zeta, n, zero, one, row);
+                        var zeta_pow_n = exponentiation_component::generate_assignments(
+                            assignment, {zeta, n, zero, one}, row).output;
+                        row += exponentiation_component::rows_amount;
 
-                        var zeta_omega = assigment_multiplication(assignment, zeta, params.verifier_index.omega, row);
-                        var zeta_omega_pow_n = assignment_exponentiation(assignment, zeta_omega, n, zero, one, row);
+                        var zeta_omega = mul_component::generate_assignments(assignment, {zeta, 
+                            params.verifier_index.omega}, row).output;
+                        row += mul_component::rows_amount;
+
+                        var zeta_omega_pow_n = exponentiation_component::generate_assignments(
+                            assignment, {zeta_omega, n, zero, one}, row).output;
+                        row += exponentiation_component::rows_amount;
 
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers = alpha_powers_component::generate_assignments(
                             assignment, {alpha, one}, row).output;
@@ -466,15 +431,23 @@ namespace nil {
                         // transcript.absorb_assignment(assignment, params.proof.ft_eval, row);
 
                         // var v_challenge = transcript.challenge_assignment(assignment, row);
-                        // var v = assignments_endo_scalar(assignment, v_challenge, row);
+                        // var v = endo_scalar_component::generate_assignments(assignment,
+                            // {v_challenge, endo_factor, num_bits}, row).output;
+                        // row += endo_scalar_component::rows_amount;
 
                         // var u_challenge = transcript.challenge_assignment(assignment, row);
-                        // var u = assignments_endo_scalar(assignment, u_challenge, row);
+                        // var u = endo_scalar_component::generate_assignments(assignment,
+                            // {u_challenge, endo_factor, num_bits}, row).output;
+                        // row += endo_scalar_component::rows_amount;
 
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks = {
-                            assignment_exponentiation(assignment, zeta, params.verifier_index.max_poly_size, zero, one, row),
-                            assignment_exponentiation(assignment, zeta_omega, params.verifier_index.max_poly_size, zero, one, row),
+                            exponentiation_component::generate_assignments(
+                                assignment, {zeta, params.verifier_index.max_poly_size, zero, one}, row).output,
+                            exponentiation_component::generate_assignments(
+                                assignment, {zeta_omega, params.verifier_index.max_poly_size, zero, one}, 
+                                row + exponentiation_component::rows_amount).output
                         };
+                        row += 2 * exponentiation_component::rows_amount;
 
                         std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
                             params.proof.prev_challenges;
@@ -515,7 +488,7 @@ namespace nil {
 
                         std::cout<<"assignment row: "<<row<<std::endl;
 
-                        return result_type(params, component_start_row);
+                        return result_type();
                     }
 
                 private:
