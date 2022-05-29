@@ -82,8 +82,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prev_chal_evals) {
 
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
-    constexpr static std::size_t max_poly_size = 512;
-    constexpr static std::size_t eval_rounds = 9;
+    constexpr static std::size_t max_poly_size = 16;
+    constexpr static std::size_t eval_rounds = 4;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
 

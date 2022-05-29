@@ -56,7 +56,7 @@ namespace nil {
                     std::array<kimchi_proof_evaluations<CurveType>, 2> proof_evals;
                     //var ft_eval;
                     std::array<var, PublicInputSize> public_input;
-                    std::array<std::array<var, chal_per_round>, EvalRounds> prev_challenges;
+                    std::array<var, EvalRounds> prev_challenges;
                 };
             }    // namespace components
         }        // namespace zk
