@@ -27,7 +27,7 @@ if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
 endif()
 
 cm_find_package(CM)
-include(CMDeploy)
+include(CMConfig)
 include(CMSetupVersion)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
