@@ -168,16 +168,19 @@ namespace nil {
                             var u_chal;
                         };
 
+                        kimchi_transcript<ArithmetizationType, CurveType, 
+                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                            W11, W12, W13, W14> transcript;
                         var digest;
                         random_oracles oracles;
-                        std::vector<var> alpha_powers;
-                        std::vector<std::vector<var>> p_eval;
-                        std::array<var, 2> zeta_powers;
-                        //??? polys;
-                        var zeta1;
+                        std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
+                        std::array<var, eval_points_amount> p_eval;
+                        std::array<var, eval_points_amount> powers_of_eval_points_for_chunks;
+                        // polys std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges;
+                        var zeta_pow_n;
                         var ft_eval0;
 
-                        result_type(const params_type &params, std::size_t component_start_row) {
+                        result_type() {
                         }
                     };
 
