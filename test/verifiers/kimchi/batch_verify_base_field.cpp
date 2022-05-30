@@ -145,31 +145,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     var_ec_point G_var = {var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input)};
 
-    curve_type::base_field_type::value_type z1 = algebra::random_element<curve_type::base_field_type>();
-
-    public_input.push_back(z1);
-
-    var z1_var = var(0, 14, false, var::column_type::public_input);
-
-    curve_type::base_field_type::value_type z2 = algebra::random_element<curve_type::base_field_type>();
-
-    public_input.push_back(z2);
-
-    var z2_var = var(0, 15, false, var::column_type::public_input);
-
-    curve_type::base_field_type::value_type u = algebra::random_element<curve_type::base_field_type>();
-    public_input.push_back(u);
-    var u_var = var(0, 16, false, var::column_type::public_input);
-    curve_type::base_field_type::value_type v = algebra::random_element<curve_type::base_field_type>();
-    public_input.push_back(v);
-    var v_var = var(0, 17, false, var::column_type::public_input);
-    curve_type::base_field_type::value_type zeta = algebra::random_element<curve_type::base_field_type>();
-    public_input.push_back(zeta);
-    var zeta_var = var(0, 18, false, var::column_type::public_input);
-    curve_type::base_field_type::value_type zeta_w = algebra::random_element<curve_type::base_field_type>();
-    public_input.push_back(zeta_w);
-    var zeta_w_var = var(0, 19, false, var::column_type::public_input);
-
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type H = 
     algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
 
@@ -203,11 +178,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     typename component_type::params_type::f_comm comm_var = {{shifted_var}, {unshifted_var}};
 
-    typename component_type::params_type::PE pe_var = {comm_var, {f_zeta_var}, {f_zeta_w_var}};
-    typename component_type::params_type::opening_proof o_var = {{L_var}, {R_var}, delta_var, G_var, z1_var, z2_var};
+    typename component_type::params_type::PE pe_var = {comm_var};
+    typename component_type::params_type::opening_proof o_var = {{L_var}, {R_var}, delta_var, G_var};
     zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                         11, 12, 13, 14> transcript;
-    typename component_type::params_type::var_proof proof_var = {transcript, zeta_var, zeta_w_var, u_var, v_var, pe_var, o_var}; 
+    typename component_type::params_type::var_proof proof_var = {transcript, pe_var, o_var}; 
     typename component_type::params_type::public_input PI_var = {H_var, PI_G_var, scalars_var};
     typename component_type::params_type::result input = {{proof_var}, PI_var, cip_var};
     typename component_type::params_type params = {input};

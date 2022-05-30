@@ -39,17 +39,14 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, std::size_t batch_size, std::size_t lr_rounds,
-                std::size_t n, std::size_t comm_size, std::size_t bases_size,
+                std::size_t n, std::size_t bases_size,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
-                         std::size_t batch_size,
-                         std::size_t lr_rounds,
                          std::size_t n,
-                         std::size_t comm_size,
                          std::size_t bases_size,
                          std::size_t W0,
                          std::size_t W1,
@@ -68,10 +65,7 @@ namespace nil {
                          std::size_t W14>
                 class batch_verify_base_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
-                                                        batch_size,
-                                                        lr_rounds,
                                                         n,
-                                                        comm_size,
                                                         bases_size,
                                                        W0,
                                                        W1,
@@ -112,25 +106,17 @@ namespace nil {
                             std::vector<var_ec_point> unshifted;
                         };
                         struct PE {
-                            std::array<f_comm, comm_size> comm;
-                            std::array<var, comm_size> f_zeta;
-                            std::array<var, comm_size> f_zeta_w;
+                            std::vector<f_comm> comm;
                         };
                         struct opening_proof {
-                            std::array<var_ec_point, lr_rounds> L;
-                            std::array<var_ec_point, lr_rounds> R;
+                            std::vector<var_ec_point> L;
+                            std::vector<var_ec_point> R;
                             var_ec_point delta;
                             var_ec_point G;
-                            var z1;
-                            var z2;
                         };
                         struct var_proof {
                             kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
                                           W11, W12, W13, W14> transcript;
-                            var zeta;
-                            var zeta_w;
-                            var u;
-                            var v;
                             PE pe;
                             opening_proof o;
                         };
@@ -138,11 +124,11 @@ namespace nil {
                             var_ec_point H;
                             std::array<var_ec_point, n> G;
                             std::vector<var> scalars;
+                            std::vector<var> cip;
                         };
                         struct result {
-                            std::array<var_proof, batch_size> proofs;
+                            std::vector<var_proof> proofs;
                             public_input PI;
-                            std::array<var, batch_size> cip;
                         };
                         result input;    
                     };
@@ -172,7 +158,7 @@ namespace nil {
                         /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
                         }*/
-                        for (std::size_t i = 0; i < batch_size; i++) {
+                        for (std::size_t i = 0; i < params.input.proofs.size(); i++) {
                             var cip = params.input.cip[i];
                             typename sub_component::params_type sub_params = {cip, var(0, component_start_row + 2, false, var::column_type::constant)};
                             auto sub_res = sub_component::generate_assignments(assignment, sub_params, row);
@@ -190,14 +176,14 @@ namespace nil {
                             //params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].o.delta.y, row);
                             bases.push_back(params.input.proofs[i].o.G);
                             bases.push_back({var(0, row), var(1, row)});
-                            for (std::size_t j = 0 ; j < lr_rounds; j++) {
+                            for (std::size_t j = 0 ; j < params.input.proofs[i].o.L.size(); j++) {
                                 bases.push_back(params.input.proofs[i].o.L[j]);
                                 bases.push_back(params.input.proofs[i].o.R[j]);
                             }
                             std::size_t unshifted_size = 0;
                             std::size_t shifted_size = 0;
 
-                            for (std::size_t j = 0 ; j < comm_size; j++) {
+                            for (std::size_t j = 0 ; j < params.input.proofs[i].pe.comm.size(); j++) {
                                 unshifted_size = params.input.proofs[i].pe.comm[j].unshifted.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
                                     bases.push_back(params.input.proofs[i].pe.comm[j].unshifted[k]);
@@ -242,7 +228,7 @@ namespace nil {
                         /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
                         }*/
-                        for (std::size_t i = 0; i < batch_size; i++) {
+                        for (std::size_t i = 0; i < params.input.proofs.size(); i++) {
                             var cip = params.input.cip[i];
                             typename sub_component::params_type sub_params = {cip, var(0, start_row_index + 2, false, var::column_type::constant)};
                             zk::components::generate_circuit<sub_component>(bp, assignment, sub_params,
@@ -260,14 +246,14 @@ namespace nil {
                             //params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].o.delta.y, row);
                             bases.push_back(params.input.proofs[i].o.G);
                             bases.push_back({var(0, row), var(1, row)});
-                            for (std::size_t j = 0 ; j < lr_rounds; j++) {
+                            for (std::size_t j = 0 ; j < params.input.proofs[i].o.L.size(); j++) {
                                 bases.push_back(params.input.proofs[i].o.L[j]);
                                 bases.push_back(params.input.proofs[i].o.R[j]);
                             }
                             std::size_t unshifted_size = 0;
                             std::size_t shifted_size = 0;
 
-                            for (std::size_t j = 0 ; j < comm_size; j++) {
+                            for (std::size_t j = 0 ; j < params.input.proofs[i].pe.comm.size(); j++) {
                                 unshifted_size = params.input.proofs[i].pe.comm[j].unshifted.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
                                     bases.push_back(params.input.proofs[i].pe.comm[j].unshifted[k]);
