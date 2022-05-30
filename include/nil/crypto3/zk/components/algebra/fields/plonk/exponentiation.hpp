@@ -98,10 +98,10 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var result = var(0, 0);
+                        var output = var(0, 0);
 
                         result_type(const params_type &params, std::size_t component_start_row) {
-                            result = var(intermediate_start + intermediate_results_per_row - 1,
+                            output = var(intermediate_start + intermediate_results_per_row - 1,
                                          component_start_row + rows_amount - 1, false);
                         }
                     };

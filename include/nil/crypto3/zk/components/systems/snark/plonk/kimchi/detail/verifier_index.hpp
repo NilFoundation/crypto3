@@ -40,10 +40,24 @@ namespace nil {
             namespace components {
                 typedef std::array<uint64_t, 2> kimchi_scalar_limbs;
 
-                template<std::size_t AlphaPowersN, std::size_t PublicInputSize>
+                template<std::size_t WitnessColumns, std::size_t PermutSize,
+                    bool UseLookup, std::size_t LookupTableSize,
+                    std::size_t AlphaPowersN, std::size_t PublicInputSize>
                 struct kimchi_params_type {
                     constexpr static std::size_t alpha_powers_n = AlphaPowersN;
                     constexpr static std::size_t public_input_size = PublicInputSize;
+                    constexpr static std::size_t witness_columns = WitnessColumns;
+                    constexpr static std::size_t permut_size = PermutSize;
+                    constexpr static std::size_t lookup_table_size = LookupTableSize;
+                    constexpr static bool use_lookup = UseLookup;
+                };
+
+                template <std::size_t EvalRounds,
+                    std::size_t MaxPolySize>
+                struct kimchi_commitment_params_type {
+                    constexpr static std::size_t max_poly_size = MaxPolySize;
+                    constexpr static std::size_t eval_rounds = EvalRounds;
+                    constexpr static std::size_t res_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
                 };
 
                 template<typename CurveType, std::size_t Permuts = 7>

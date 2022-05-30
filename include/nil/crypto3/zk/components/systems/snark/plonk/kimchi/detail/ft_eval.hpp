@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_BASE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_BASE_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -32,9 +32,9 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
-
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
@@ -42,17 +42,16 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                //TODO : the naive method for batch inversion is not the optimal one, we can use
-                // Montgomery’s Trick and Fast Implementation of Masked AES
-                // Genelle, Prouff and Quisquater, Section 3.2
-                // result = [(zeta - omega^(i))^(-1)] concat. [(zeta_omega - omega^(i))^(-1)] for i in
-                // (0..public_input_size)
-                template<typename ArithmetizationType, std::size_t PublicInputSize, std::size_t... WireIndexes>
-                class lagrange_base;
+                template<typename ArithmetizationType,
+                    typename CurveType,
+                    typename KimchiParamsType,
+                    std::size_t... WireIndexes>
+                class ft_eval;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         std::size_t PublicInputSize,
+                         typename CurveType,
+                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -68,9 +67,10 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class lagrange_base<
+                class ft_eval<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    PublicInputSize,
+                    CurveType,
+                    KimchiParamsType,
                     W0,
                     W1,
                     W2,
@@ -91,43 +91,34 @@ namespace nil {
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    
-                    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
-                    using div_component = zk::components::division<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f0d;
+                    using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+
+                    constexpr static const std::size_t selector_seed = 0x0f22;
+                    constexpr static const std::size_t eval_points_amount = 2;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 
-                            (sub_component::rows_amount + div_component::rows_amount) * 
-                            PublicInputSize * 2;
+                    constexpr static const std::size_t rows_amount = mul_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
-                    struct params_type { 
+                    struct params_type {
+                        kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        var zeta_pow_n;
+                        std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> combined_evals;
+                        var gamma;
+                        var beta;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> p_evals;
                         var zeta;
-                        var zeta_omega;
-                        std::array<var, PublicInputSize> omega_powers;
-                        var one;
+                        var joint_combiner;
                     };
 
                     struct result_type {
-                        std::array<var, PublicInputSize * 2> output;
+                        var output;
 
                         result_type(std::size_t component_start_row) {
                             std::size_t row = component_start_row;
-                            for (std::size_t i = 0; i < PublicInputSize; i++) {
-                                row += sub_component::rows_amount;
-                                var div_res = typename div_component::result_type(row).output;
-                                row += div_component::rows_amount;
-                                output[i] = div_res;
-                            }
-
-                            for (std::size_t i = 0; i < PublicInputSize; i++) {
-                                row += sub_component::rows_amount;
-                                var div_res = typename div_component::result_type(row).output;
-                                row += div_component::rows_amount;
-                                output[PublicInputSize + i] = div_res;
-                            }
+                            output = typename mul_component::result_type(row).output;
                         }
                     };
 
@@ -138,23 +129,10 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        for (std::size_t i = 0; i < PublicInputSize; i++) {
-                            var sub_res = zk::components::generate_circuit<sub_component>(bp, assignment, 
-                                {params.zeta, params.omega_powers[i]}, row).output;
-                            row += sub_component::rows_amount;
-                            var div_res = zk::components::generate_circuit<div_component>(bp, assignment, 
-                                {params.one, sub_res}, row).output;
-                            row += div_component::rows_amount;
-                        }
+                        zk::components::generate_circuit<mul_component>(bp, assignment, 
+                            {params.zeta_pow_n, params.gamma}, row);
+                        row += mul_component::rows_amount;
 
-                        for (std::size_t i = 0; i < PublicInputSize; i++) {
-                            var sub_res = zk::components::generate_circuit<sub_component>(bp, assignment, 
-                                {params.zeta_omega, params.omega_powers[i]}, row).output;
-                            row += sub_component::rows_amount;
-                            var div_res = zk::components::generate_circuit<div_component>(bp, assignment, 
-                                {params.one, sub_res}, row).output;
-                            row += div_component::rows_amount;
-                        }
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
@@ -165,24 +143,9 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
-
-                        for (std::size_t i = 0; i < PublicInputSize; i++) {
-                            var sub_res = sub_component::generate_assignments(assignment, 
-                                {params.zeta, params.omega_powers[i]}, row).output;
-                            row += sub_component::rows_amount;
-                            var div_res = div_component::generate_assignments(assignment, 
-                                {params.one, sub_res}, row).output;
-                            row += div_component::rows_amount;
-                        }
-
-                        for (std::size_t i = 0; i < PublicInputSize; i++) {
-                            var sub_res = sub_component::generate_assignments(assignment, 
-                                {params.zeta_omega, params.omega_powers[i]}, row).output;
-                            row += sub_component::rows_amount;
-                            var div_res = div_component::generate_assignments(assignment, 
-                                {params.one, sub_res}, row).output;
-                            row += div_component::rows_amount;
-                        }
+                        mul_component::generate_assignments(assignment, 
+                            {params.zeta_pow_n, params.gamma}, row);
+                        row += mul_component::rows_amount;
 
                         return result_type(start_row_index);
                     }
@@ -206,4 +169,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_LAGRANGE_BASE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP

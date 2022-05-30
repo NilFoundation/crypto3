@@ -39,20 +39,55 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename CurveType>
+                template<typename FieldType, typename KimchiParamsType>
+                struct kimchi_lookup_evaluations {
+                    /// sorted lookup table polynomial
+                    // pub sorted: Vec<Field>,
+                    // /// lookup aggregation polynomial
+                    // pub aggreg: Field,
+                    // // TODO: May be possible to optimize this away?
+                    // /// lookup table polynomial
+                    // pub table: Field,
+
+                    // /// Optionally, a runtime table polynomial.
+                    // pub runtime: Option<Field>,
+                    kimchi_lookup_evaluations() {
+                    }
+                };
+
+                template<typename FieldType, typename KimchiParamsType>
                 struct kimchi_proof_evaluations {
+                    using var = snark::plonk_variable<FieldType>;
+                    // witness polynomials
+                    std::array<var, KimchiParamsType::witness_columns> w;
+                    // permutation polynomial
+                    var z;
+                    // permutation polynomials
+                    // (PERMUTS-1 evaluations because the last permutation is only used in commitment form)
+                    std::array<var, KimchiParamsType::permut_size - 1> s;
+                    // /// lookup-related evaluations
+                    kimchi_lookup_evaluations<FieldType, KimchiParamsType> lookup;
+                    // /// evaluation of the generic selector polynomial
+                    var generic_selector;
+                    // /// evaluation of the poseidon selector polynomial
+                    var poseidon_selector;
+
                     kimchi_proof_evaluations() {
                     }
                 };
 
-                template<typename CurveType, std::size_t PublicInputSize>
+                template<typename CurveType, typename KimchiParamsType,
+                    std::size_t EvalRounds>
                 struct kimchi_proof_scalar {
                     using FieldType = typename CurveType::scalar_field_type;
                     using var = snark::plonk_variable<FieldType>;
 
-                    std::array<kimchi_proof_evaluations<CurveType>, 2> proof_evals;
+                    constexpr static const std::size_t chal_per_round = 2;
+
+                    std::array<kimchi_proof_evaluations<FieldType, KimchiParamsType>, 2> proof_evals;
                     //var ft_eval;
-                    std::array<var, PublicInputSize> public_input;
+                    std::array<var, KimchiParamsType::public_input_size> public_input;
+                    std::array<var, EvalRounds> prev_challenges;
                 };
             }    // namespace components
         }        // namespace zk

@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_kimchi_lagrange_base_test
+#define BOOST_TEST_MODULE blueprint_plonk_kimchi_prev_chal_evals_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -35,7 +35,7 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_base.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/prev_chal_evals.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -45,7 +45,23 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_base) {
+template<typename FieldType, std::size_t ChalAmount>
+typename FieldType::value_type b_poly(
+        const std::array<typename FieldType::value_type, ChalAmount>& chals,
+        typename FieldType::value_type x) {
+    std::vector<typename FieldType::value_type> pow_twos;
+    pow_twos.push_back(x);
+    for (int i = 1; i < ChalAmount; ++i) {
+        pow_twos.push_back(pow_twos[i - 1] * pow_twos[i - 1]);
+    }
+    typename FieldType::value_type res = 1;
+    for (int i = 0; i < ChalAmount; ++i) {
+        res *= FieldType::value_type::one() + chals[i] * pow_twos[ChalAmount - 1 - i];
+    }
+    return res;
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prev_chal_evals) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
@@ -53,7 +69,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_base) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 2;
+    constexpr std::size_t SelectorColumns = 5;
     constexpr std::size_t n = 5;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -64,47 +80,71 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_base) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::lagrange_base<ArithmetizationType, n, 0, 1, 2, 3,
+    constexpr static std::size_t alpha_powers_n = 5;
+    constexpr static std::size_t public_input_size = 3;
+    constexpr static std::size_t max_poly_size = 16;
+    constexpr static std::size_t eval_rounds = 4;
+
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
+
+    using component_type = zk::components::prev_chal_evals<ArithmetizationType, commitment_params, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
+    std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0};
     var one(0, 0, false, var::column_type::public_input);
-    var zeta(0, 1, false, var::column_type::public_input);
-    var zeta_omega(0, 2, false, var::column_type::public_input);
+    var zero(0, 1, false, var::column_type::public_input);
+
     typename BlueprintFieldType::value_type zeta_value = algebra::random_element<BlueprintFieldType>();
     typename BlueprintFieldType::value_type omega_value = algebra::random_element<BlueprintFieldType>();
     typename BlueprintFieldType::value_type zeta_omega_value = zeta_value * omega_value;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {1, zeta_value, zeta_omega_value};
+    public_input.push_back(zeta_value);
+    var zeta(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(power(zeta_value, n));
+    var zeta_pow_n(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    std::array<var, n> omega_powers;
-    std::array<typename BlueprintFieldType::value_type, n> omega_powers_values;
-    for (std::size_t i = 0; i < n; i++) {
-        omega_powers_values[i] = power(omega_value, i);
-        omega_powers[i] = var(0, 3 + i, false, var::column_type::public_input);
-        public_input.push_back(omega_powers_values[i]);
+    public_input.push_back(zeta_omega_value);
+    var zeta_omega(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(power(zeta_omega_value, n));
+    var zeta_omega_pow_n(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    std::array<var, eval_rounds> prev_challenges;
+    std::array<typename BlueprintFieldType::value_type, eval_rounds> prev_challenges_values;
+    for (std::size_t i = 0; i < eval_rounds; i++) {
+        prev_challenges_values[i] = algebra::random_element<BlueprintFieldType>();
+        public_input.push_back(prev_challenges_values[i]);
+        prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    typename component_type::params_type params = {zeta, zeta_omega, omega_powers, one};
+    std::array<var, 2> evals = {zeta, zeta_omega};
+    std::array<var, 2> evals_power = {zeta_pow_n, zeta_omega_pow_n};
 
-    std::vector<typename BlueprintFieldType::value_type> expected_result(2 * n);
-    for (std::size_t i = 0; i < n; i++) {
-        expected_result[i] = (zeta_value - omega_powers_values[i]).inversed();
-        expected_result[n + i] = (zeta_omega_value - omega_powers_values[i]).inversed();
-    }
+    typename component_type::params_type params = {
+        prev_challenges,
+        evals,
+        evals_power,
+        one,
+        zero};
+
+    // r[0] = (zeta_pow_n - 1) * domain.size_inv * SUM(-l * p * w) 
+        //where l from lagrange, p from public, w from omega_powers for l from 0 to PulicInputSize
+    // r[2] = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w) 
+        //where l from lagrange, p from public, w from omega_powers for l from PulicInputSize to 2 * PulicInputSize    
+    std::array<typename BlueprintFieldType::value_type, 2> expected_result; 
+    expected_result[0] = b_poly<BlueprintFieldType, eval_rounds>(prev_challenges_values, zeta_value);
+    expected_result[1] = b_poly<BlueprintFieldType, eval_rounds>(prev_challenges_values, zeta_omega_value);
 
 
     auto result_check = [&expected_result](AssignmentType &assignment, 
         component_type::result_type &real_res) { 
-            for (std::size_t i = 0; i < n; i++) {
-                assert(expected_result[i] == assignment.var_value(real_res.output[i]));
-                assert(expected_result[n + i] == assignment.var_value(real_res.output[n + i]));
-            }
+            assert(expected_result[0] == assignment.var_value(real_res.output[0][0]));
+            assert(expected_result[1] == assignment.var_value(real_res.output[1][0]));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "lagrange_base_component: " << duration.count() << "ms" << std::endl;
+    std::cout << "prev_chal_evals_component: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

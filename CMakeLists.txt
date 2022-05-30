@@ -14,8 +14,6 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMConfig)
 include(CMSetupVersion)
 
-message(${CMAKE_CXX_COMPILER})
-
 if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
 endif()
