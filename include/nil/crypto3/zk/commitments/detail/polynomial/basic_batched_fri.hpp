@@ -198,8 +198,6 @@ namespace nil {
                             assert(f.size() == g.size());
                             std::size_t leaf_size = f.size();
 
-                            proof_type proof;
-
                             transcript(commit(T));
 
                             // TODO: how to sample x?
@@ -298,8 +296,6 @@ namespace nil {
 
                             assert(f.size() == g.size());
                             std::size_t leaf_size = f.size();
-
-                            proof_type proof;
 
                             transcript(commit(T));
 

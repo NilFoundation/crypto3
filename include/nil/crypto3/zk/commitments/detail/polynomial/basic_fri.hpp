@@ -76,7 +76,7 @@ namespace nil {
                         //codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
                         // + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in range(len(codeword)//2)]
                         math::polynomial_dfs<typename FieldType::value_type> f_folded(
-                            d / 2, domain->size() / 2, FieldType::value_type::zero());
+                            domain->size() / 2 - 1, domain->size() / 2, FieldType::value_type::zero());
 
                         typename FieldType::value_type two_inversed = 2; 
                         two_inversed = two_inversed.inversed();
@@ -255,8 +255,6 @@ namespace nil {
                                                      const params_type &fri_params,
                                                      transcript_type &transcript = transcript_type()) {
 
-                            proof_type proof;
-
                             transcript(commit(T));
 
                             // TODO: how to sample x?
@@ -322,8 +320,6 @@ namespace nil {
                                                      precommitment_type &T,
                                                      const params_type &fri_params,
                                                      transcript_type &transcript = transcript_type()) {
-
-                            proof_type proof;
 
                             transcript(commit(T));
 
