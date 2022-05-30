@@ -97,16 +97,16 @@ namespace nil {
 
                     kimchi_sponge<ArithmetizationType, CurveType,
                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> sponge;
-                    from_limbs<ArithmetizationType, CurveType, W0, W1, W2> pack;
-                    to_limbs<ArithmetizationType, CurveType, W0, W1, W2, W3, W4> unpack;
+                    using pack = from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
+                    using unpack = to_limbs<ArithmetizationType, CurveType, W0, W1, W2, W3, W4>;
 
-                    std::vector<std::uint64_t> last_squeezed;
+                    std::vector<var> last_squeezed;
                     var result = var(W0, 0, false);
 
                     var pack_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                         std::size_t &component_start_row,
-                                        const std::vector<std::uint64_t>& limbs) {
-                        auto pack_res = pack::generate_assignment(assignment, {limbs}, component_start_row);
+                                        std::array<var, 2> limbs) {
+                        auto pack_res = pack::generate_assignments(assignment, limbs, component_start_row);
                         component_start_row += pack::rows_amount;
                         return pack_res.result;
                     }
@@ -114,21 +114,21 @@ namespace nil {
                     var pack_circuit(blueprint<ArithmetizationType> &bp,
                                     blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                     std::size_t &component_start_row,
-                                    const std::vector<std::uint64_t>& limbs) {
-                        auto pack_res = pack::generate_circuit(bp, assignment, {limbs}, component_start_row);
+                                    std::array<var, 2> limbs) {
+                        auto pack_res = pack::generate_circuit(bp, assignment, limbs, component_start_row);
                         component_start_row += pack::rows_amount;
                         return pack_res.result;
                     }
 
-                    std::vector<var> unpack_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                    std::array<var, 4> unpack_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                     std::size_t &component_start_row,
                                                     var elem) {
-                        auto unpack_res = unpack::generate_assignment(assignment, {elem}, component_start_row);
+                        auto unpack_res = unpack::generate_assignments(assignment, {elem}, component_start_row);
                         component_start_row += unpack::rows_amount;
                         return unpack_res.result;
                     }
 
-                    std::vector<var> unpack_circuit(blueprint<ArithmetizationType> &bp,
+                    std::array<var, 4> unpack_circuit(blueprint<ArithmetizationType> &bp,
                                                     blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                     std::size_t &component_start_row,
                                                     var elem) {
@@ -195,9 +195,8 @@ namespace nil {
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             std::size_t &component_start_row) {
                         if (last_squeezed.size() >= CHALLENGE_LENGTH_IN_LIMBS) {
-                            auto copy_last_squeezed = last_squeezed;
-                            std::vector<std::uint64_t> limbs = {copy_last_squeezed.begin(), copy_last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS};
-                            std::vector<std::uint64_t> remaining = {copy_last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, copy_last_squeezed.end()};
+                            std::array<var, 2> limbs = {last_squeezed[0], last_squeezed[1]};
+                            std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, last_squeezed.end()};
                             last_squeezed = remaining;
                             return pack_assignment(assignment, component_start_row, limbs);
                         }
@@ -213,9 +212,8 @@ namespace nil {
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             std::size_t &component_start_row) {
                         if (last_squeezed.size() >= CHALLENGE_LENGTH_IN_LIMBS) {
-                            auto copy_last_squeezed = last_squeezed;
-                            std::vector<std::uint64_t> limbs = {copy_last_squeezed.begin(), copy_last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS};
-                            std::vector<std::uint64_t> remaining = {copy_last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, copy_last_squeezed.end()};
+                            std::array<var, 2> limbs = {last_squeezed[0], last_squeezed[1]};
+                            std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, last_squeezed.end()};
                             last_squeezed = remaining;
                             return pack_circuit(bp, assignment, component_start_row, limbs);
                         }

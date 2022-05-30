@@ -90,8 +90,8 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount =
-                        2 * non_native_range_component::rows_amount + 16 * multiplication_component::rows_amount +
-                        6 * addition_component::rows_amount + 3 * subtraction_component::rows_amount;
+                        2 * non_native_range_component::rows_amount + 17 * multiplication_component::rows_amount +
+                        6 * addition_component::rows_amount + 3 * subtraction_component::rows_amount + 3;
 
                     constexpr static const std::size_t gates_amount = 2;
 
