@@ -36,89 +36,104 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
-                class pickles_verifier_scalar_field;
+                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
+                    typename KimchiCommitmentParamsType, std::size_t... WireIndexes>
+                class kimchi_verifier_scalar_field;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
-                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
-                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
-                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
-                class pickles_verifier_scalar_field<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, W0, W1, W2,
-                    W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
+                         typename KimchiCommitmentParamsType, std::size_t W0, std::size_t W1,
+                         std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
+                         std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
+                         std::size_t W13, std::size_t W14>
+                class kimchi_verifier_scalar_field<
+                    snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
+                    CurveType, KimchiParamsType, KimchiCommitmentParamsType, 
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+
+                    using BlueprintFieldType = typename CurveType::scalar_field_type;
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using poseidon_component = poseidon<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5,
-                                                        W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    using oracles_component = oracles_scalar<ArithmetizationType, CurveType, KimchiParamsType,
+                                KimchiCommitmentParamsType, W0, W1, W2, W3, W4, W5,
+                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    constexpr static const std::size_t selector_seed = 0x0f24;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + poseidon_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 220;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_data;
+                        struct fq_sponge_output {
+                            var joint_combiner;
+                            var beta;    // beta and gamma can be combined from limbs in the base circuit
+                            var gamma;
+                            var alpha;
+                            var zeta;
+                            var fq_digest;    // TODO overflow check
+                        };
+
+                        kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        kimchi_proof_scalar<CurveType, KimchiParamsType,
+                            KimchiCommitmentParamsType::eval_rounds> proof;
+                        fq_sponge_output fq_output;
                     };
 
-                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
-                        return bp.allocate_rows(rows_amount);
+                    struct result_type {
+                        var output;
+                    };
+
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t start_row_index) {
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
+                        }
+
+                        return result_type();
                     }
 
-                    static void generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                 blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                 const params_type &params,
-                                                 std::size_t component_start_row) {
-
-                        generate_gates(bp, assignment, params, component_start_row);
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
-                    }
-
-                    static void generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                     const params_type &params,
-                                                     std::size_t component_start_row) {
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
-                        row++;
 
-                        std::array<typename ArithmetizationType::field_type::value_type, 3> input_state =
-                            params.input_data;
-                        typename poseidon_component::params_type poseidon_params = {input_state};
-                        poseidon_component::generate_assignments(assignment, poseidon_params, row);
-                        assignment.public_input(0)[component_start_row] = assignment.witness(1)[row + 11];
+                        return result_type();
                     }
 
                 private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_assignment_table<ArithmetizationType> &assignment,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
-                                               std::size_t component_start_row) {
-
-                        std::size_t row = component_start_row;
-                        row++;
-                        typename poseidon_component::params_type poseidon_params = {};
-                        poseidon_component::generate_gates(bp, assignment, poseidon_params, row);
+                                               std::size_t component_start_row = 0) {
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
-                        row++;
-
-                        typename poseidon_component::params_type poseidon_params = {};
-                        poseidon_component::generate_copy_constraints(bp, assignment, poseidon_params, row);
-                        bp.add_copy_constraint(
-                            {{W1, row + rows_amount - 1, false},
-                             {0, row - 1, false,
-                              snark::plonk_variable<BlueprintFieldType>::column_type::public_input}});
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row = 0) {
+                        
                     }
                 };
             }    // namespace components
