@@ -43,6 +43,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
@@ -116,6 +117,9 @@ namespace nil {
                             zk::components::ft_eval<ArithmetizationType, CurveType,
                                                         KimchiParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType>;
 
                     constexpr static const std::size_t eval_points_amount = 2;
 
@@ -193,38 +197,20 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct fq_sponge_output {
-                            var joint_combiner;
-                            var beta;    // beta and gamma can be combined from limbs in the base circuit
-                            var gamma;
-                            var alpha;
-                            var zeta;
-                            var fq_digest;    // TODO overflow check
+                        
 
-                            static fq_sponge_output
-                                allocate_fq_output(blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                   typename BlueprintFieldType::value_type joint_combiner,
-                                                   typename BlueprintFieldType::value_type beta,
-                                                   typename BlueprintFieldType::value_type gamma,
-                                                   typename BlueprintFieldType::value_type alpha,
-                                                   typename BlueprintFieldType::value_type zeta,
-                                                   typename BlueprintFieldType::value_type fq_digest) {
-
-                                return fq_sponge_output {
-                                    assignment.allocate_public_input(joint_combiner),
-                                    assignment.allocate_public_input(beta),
-                                    assignment.allocate_public_input(gamma),
-                                    assignment.allocate_public_input(alpha),
-                                    assignment.allocate_public_input(zeta),
-                                    assignment.allocate_public_input(fq_digest),
-                                };
-                            }
-                        };
-
-                        kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        kimchi_verifier_index_scalar<CurveType> &verifier_index;
                         kimchi_proof_scalar<CurveType, KimchiParamsType,
-                            KimchiCommitmentParamsType::eval_rounds> proof;
-                        fq_sponge_output fq_output;
+                            KimchiCommitmentParamsType::eval_rounds> &proof;
+                        typename proof_binding::fq_sponge_output &fq_output;
+
+                        params_type(kimchi_verifier_index_scalar<CurveType> &_verifier_index,
+                            kimchi_proof_scalar<CurveType, KimchiParamsType,
+                                KimchiCommitmentParamsType::eval_rounds> &_proof,
+                            typename proof_binding::fq_sponge_output &_fq_output) : 
+                                                        verifier_index(_verifier_index),
+                                                        proof(_proof),
+                                                        fq_output(_fq_output) {}
                     };
 
                     struct result_type {
@@ -247,6 +233,8 @@ namespace nil {
                         std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges;
                         var zeta_pow_n;
                         var ft_eval0;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            eval_points_amount> combined_evals;
                     };
 
                     static result_type
@@ -419,7 +407,8 @@ namespace nil {
                             powers_of_eval_points_for_chunks,
                             prev_challenges,
                             zeta_pow_n,
-                            ft_eval0
+                            ft_eval0,
+                            combined_evals
                         };
                     }
 
@@ -577,7 +566,8 @@ namespace nil {
                             powers_of_eval_points_for_chunks,
                             prev_challenges,
                             zeta_pow_n,
-                            ft_eval0
+                            ft_eval0,
+                            combined_evals
                         };
                     }
 

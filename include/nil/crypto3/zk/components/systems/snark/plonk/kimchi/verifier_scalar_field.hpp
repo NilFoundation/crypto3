@@ -36,7 +36,9 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
+
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -68,6 +70,9 @@ namespace nil {
                                 KimchiCommitmentParamsType, W0, W1, W2, W3, W4, W5,
                                 W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType>;
+
                     constexpr static const std::size_t selector_seed = 0x0f24;
 
                 public:
@@ -75,19 +80,10 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct fq_sponge_output {
-                            var joint_combiner;
-                            var beta;    // beta and gamma can be combined from limbs in the base circuit
-                            var gamma;
-                            var alpha;
-                            var zeta;
-                            var fq_digest;    // TODO overflow check
-                        };
-
-                        kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        kimchi_verifier_index_scalar<CurveType> &verifier_index;
                         kimchi_proof_scalar<CurveType, KimchiParamsType,
-                            KimchiCommitmentParamsType::eval_rounds> proof;
-                        fq_sponge_output fq_output;
+                            KimchiCommitmentParamsType::eval_rounds> &proof;
+                        typename proof_binding::fq_sponge_output &fq_output;
                     };
 
                     struct result_type {
@@ -109,15 +105,30 @@ namespace nil {
                             first_selector_index = selector_iterator->second;
                         }
 
+                        std::size_t row = start_row_index;
+
+                        typename oracles_component::params_type oracles_params(
+                            params.verifier_index, params.proof, params.fq_output
+                        );
+                        auto oracles_output = oracles_component::generate_circuit(bp, assignment,
+                            oracles_params, row);
+                        row += oracles_component::rows_amount; 
+
                         return result_type();
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
+                                                            std::size_t start_row_index) {
 
-                        std::size_t row = component_start_row;
+                        std::size_t row = start_row_index;
 
+                        typename oracles_component::params_type oracles_params(
+                            params.verifier_index, params.proof, params.fq_output
+                        );
+                        auto oracles_output = oracles_component::generate_assignments(assignment,
+                            oracles_params, row);
+                        row += oracles_component::rows_amount; 
                         return result_type();
                     }
 

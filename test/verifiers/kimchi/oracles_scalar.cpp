@@ -42,6 +42,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
@@ -147,7 +148,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     std::cout<<"Expected zeta: "<<expected_zeta.data<<std::endl;
 
     zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
-    typename component_type::params_type::fq_sponge_output fq_output = {
+    typename zk::components::binding<ArithmetizationType, BlueprintFieldType>::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
         var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input) 
