@@ -433,12 +433,6 @@ namespace nil {
                             0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         std::size_t num_bits = 128;
 
-                        // copy public input
-                        std::vector<var> zkpm(params.verifier_index.zkpm.size());
-                        for (std::size_t i = 0; i < zkpm.size(); i++) {
-                            zkpm[i] = assignment.allocate_public_input(params.verifier_index.zkpm[i]);
-                        }
-
                         var fq_digest = params.fq_output.fq_digest;
                         var beta = params.fq_output.beta;
                         var gamma = params.fq_output.gamma;
