@@ -89,6 +89,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/detail/combine_proof_evals"
     "sponge/sponge"
     "sponge/oracles"
+    "sponge/transcript_fr"
     "algebra/fields/plonk/field_operations"
     "algebra/fields/plonk/combined_inner_product"
     "algebra/fields/plonk/element_powers"
