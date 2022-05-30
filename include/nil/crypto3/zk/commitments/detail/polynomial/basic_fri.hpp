@@ -76,7 +76,7 @@ namespace nil {
                         //codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
                         // + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in range(len(codeword)//2)]
                         math::polynomial_dfs<typename FieldType::value_type> f_folded(
-                            d / 2, domain->m / 2, FieldType::value_type::zero());
+                            d / 2, domain->size() / 2, FieldType::value_type::zero());
 
                         typename FieldType::value_type two_inversed = 2; 
                         two_inversed = two_inversed.inversed();
@@ -85,7 +85,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i <= f_folded.degree(); i++) {
                             f_folded[i] = two_inversed * (
-                                (1 + alpha * power(omega_inversed, i)) * f[i] + (1 - alpha * power(omega_inversed, i)) * f[(d + 1) / 2 + i]
+                                (1 + alpha * power(omega_inversed, i)) * f[i] + (1 - alpha * power(omega_inversed, i)) * f[domain->size() / 2 + i]
                             );
                         }
 
@@ -192,13 +192,13 @@ namespace nil {
                             precommit(math::polynomial_dfs<typename FieldType::value_type> f,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
-                            if (f.size() != D->m){
-                                f.resize(D->m);
+                            if (f.size() != D->size()){
+                                f.resize(D->size());
                             }
                             std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
-                            y_data.resize(D->m);
+                            y_data.resize(D->size());
 
-                            for (std::size_t i = 0; i < D->m; i++) {
+                            for (std::size_t i = 0; i < D->size(); i++) {
                                 field_element_type y_val(f[i]);
                                 auto write_iter = y_data[i].begin();
                                 y_val.write(write_iter, field_element_type::length());
@@ -249,7 +249,7 @@ namespace nil {
                             return commit(precommit(f, D));
                         }
 
-                        static proof_type proof_eval(const math::polynomial_dfs<typename FieldType::value_type> &Q,
+                        static proof_type proof_eval(math::polynomial_dfs<typename FieldType::value_type> f,
                                                      const math::polynomial_dfs<typename FieldType::value_type> &g,
                                                      precommitment_type &T,
                                                      const params_type &fri_params,
@@ -257,11 +257,10 @@ namespace nil {
 
                             proof_type proof;
 
-                            math::polynomial_dfs<typename FieldType::value_type> f = Q;    // copy?
                             transcript(commit(T));
 
                             // TODO: how to sample x?
-                            std::size_t domain_size = fri_params.D[0]->m;
+                            std::size_t domain_size = fri_params.D[0]->size();
                             f.resize(domain_size);
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
 
@@ -273,7 +272,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i < r - 1; i++) {
 
-                                std::size_t domain_size = fri_params.D[i]->m;
+                                std::size_t domain_size = fri_params.D[i]->size();
 
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
@@ -296,7 +295,7 @@ namespace nil {
                                     p[j] = merkle_proof_type(*p_tree, s_indices[j]);
                                 }
 
-                                x_index %= fri_params.D[i + 1]->m;
+                                x_index %= fri_params.D[i + 1]->size();
 
                                 // create polynomial of degree (degree(f) / 2)
                                 f = fold_polynomial<FieldType>(f, alpha, fri_params.D[i]);
@@ -318,7 +317,7 @@ namespace nil {
                             return proof_type({round_proofs, f_normal, commit(T)});
                         }
 
-                        static proof_type proof_eval(const math::polynomial<typename FieldType::value_type> &Q,
+                        static proof_type proof_eval(math::polynomial<typename FieldType::value_type> f,
                                                      const math::polynomial<typename FieldType::value_type> &g,
                                                      precommitment_type &T,
                                                      const params_type &fri_params,
@@ -326,12 +325,10 @@ namespace nil {
 
                             proof_type proof;
 
-                            math::polynomial<typename FieldType::value_type> f = Q;    // copy?
-
                             transcript(commit(T));
 
                             // TODO: how to sample x?
-                            std::size_t domain_size = fri_params.D[0]->m;
+                            std::size_t domain_size = fri_params.D[0]->size();
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
                             
                             typename FieldType::value_type x =
@@ -345,7 +342,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i < r - 1; i++) {
 
-                                std::size_t domain_size = fri_params.D[i]->m;
+                                std::size_t domain_size = fri_params.D[i]->size();
 
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
@@ -371,7 +368,7 @@ namespace nil {
                                     p[j] = merkle_proof_type(*p_tree, s_indices[j]);
                                 }
 
-                                x_index %= fri_params.D[i + 1]->m;
+                                x_index %= fri_params.D[i + 1]->size();
                                 
                                 x = fri_params.D[i+1]->get_domain_element(x_index);
 

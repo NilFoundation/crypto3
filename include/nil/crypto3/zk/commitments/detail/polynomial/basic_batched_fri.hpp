@@ -131,16 +131,16 @@ namespace nil {
                                 const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                             for (int i = 0; i < poly.size(); ++i) {
-                                if (poly[i].size() != D->m){
-                                    poly[i].resize(D->m);
+                                if (poly[i].size() != D->size()){
+                                    poly[i].resize(D->size());
                                 }
                             }
 
                             std::size_t list_size = poly.size();
                             std::vector<std::vector<std::uint8_t>> y_data;
-                            y_data.resize(D->m);
+                            y_data.resize(D->size());
 
-                            for (std::size_t i = 0; i < D->m; i++) {
+                            for (std::size_t i = 0; i < D->size(); i++) {
                                 y_data[i].resize(field_element_type::length()*list_size);
                                 for (std::size_t j = 0; j < list_size; j++) {
                                     
@@ -185,23 +185,25 @@ namespace nil {
                             (std::is_same<typename ContainerType::value_type,
                                           math::polynomial_dfs<typename FieldType::value_type>>::value),
                             proof_type>::type
-                            proof_eval(const ContainerType &Q,
+                            proof_eval(ContainerType f,
                                        const ContainerType &g,
                                        precommitment_type &T,
                                        const params_type &fri_params,
                                        transcript_type &transcript = transcript_type()) {
 
-                            assert(Q.size() == g.size());
-                            std::size_t leaf_size = Q.size();
+                            for (int i = 0; i < g.size(); ++i) {
+                                assert(g[i].size() == fri_params.D[0]->size());
+                            }
+
+                            assert(f.size() == g.size());
+                            std::size_t leaf_size = f.size();
 
                             proof_type proof;
-
-                            ContainerType f = Q;    // copy?
 
                             transcript(commit(T));
 
                             // TODO: how to sample x?
-                            std::size_t domain_size = fri_params.D[0]->m;
+                            std::size_t domain_size = fri_params.D[0]->size();
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
 
                             std::size_t r = fri_params.r;
@@ -212,7 +214,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i < r - 1; i++) {
 
-                                std::size_t domain_size = fri_params.D[i]->m;
+                                std::size_t domain_size = fri_params.D[i]->size();
 
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
@@ -253,7 +255,7 @@ namespace nil {
                                         fold_polynomial<FieldType>(f[polynom_index], alpha, fri_params.D[i]);
                                 }
 
-                                x_index = x_index % (fri_params.D[i + 1]->m);
+                                x_index = x_index % (fri_params.D[i + 1]->size());
 
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     colinear_value[polynom_index] =
@@ -288,23 +290,21 @@ namespace nil {
                             (std::is_same<typename ContainerType::value_type,
                                           math::polynomial<typename FieldType::value_type>>::value),
                             proof_type>::type
-                            proof_eval(const ContainerType &Q,
+                            proof_eval(ContainerType f,
                                        const ContainerType &g,
                                        precommitment_type &T,
                                        const params_type &fri_params,
                                        transcript_type &transcript = transcript_type()) {
 
-                            assert(Q.size() == g.size());
-                            std::size_t leaf_size = Q.size();
+                            assert(f.size() == g.size());
+                            std::size_t leaf_size = f.size();
 
                             proof_type proof;
-
-                            ContainerType f = Q;    // copy?
 
                             transcript(commit(T));
 
                             // TODO: how to sample x?
-                            std::size_t domain_size = fri_params.D[0]->m;
+                            std::size_t domain_size = fri_params.D[0]->size();
                             std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
 
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
@@ -317,7 +317,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i < r - 1; i++) {
 
-                                std::size_t domain_size = fri_params.D[i]->m;
+                                std::size_t domain_size = fri_params.D[i]->size();
 
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
@@ -361,7 +361,7 @@ namespace nil {
                                     f[polynom_index] = fold_polynomial<FieldType>(f[polynom_index], alpha);
                                 }
 
-                                x_index = x_index % (fri_params.D[i + 1]->m);
+                                x_index = x_index % (fri_params.D[i + 1]->size());
                                 x = fri_params.D[i+1]->get_domain_element(x_index);
 
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
@@ -399,8 +399,9 @@ namespace nil {
 
                             transcript(proof.target_commitment);
 
-                            std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
+                            std::size_t domain_size = fri_params.D[0]->size();
+                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                             std::size_t r = fri_params.r;
 
@@ -510,8 +511,9 @@ namespace nil {
                             std::size_t leaf_size = U.size();
                             transcript(proof.target_commitment);
 
-                            std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
-                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
+                            std::size_t domain_size = fri_params.D[0]->size();
+                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                             std::size_t r = fri_params.r;
 
