@@ -224,6 +224,7 @@ namespace nil {
                         };
 
                         kimchi_transcript<ArithmetizationType, CurveType, 
+                            KimchiParamsType,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
                             W11, W12, W13, W14> transcript;
                         random_oracles oracles;
@@ -273,7 +274,8 @@ namespace nil {
                         // fr_transcript.absorb(fq_digest)
                         var zero = var(0, 0, false, var::column_type::constant);
                         var one = var(0, 1, false, var::column_type::constant);
-                        kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                        kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
+                                          W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
                                           W11, W12, W13, W14>
                             transcript;
                         //transcript.init_circuit(bp, assignment, zero, row);
@@ -443,8 +445,9 @@ namespace nil {
                         assignment.constant(0)[0] = 0;    // set zero constant
                         assignment.constant(0)[1] = 1;    // set one constant
 
-                        kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14>
+                        kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
+                                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                                        W11, W12, W13, W14>
                             transcript;
                         //transcript.init_assignment(assignment, row);
                         //transcript.absorb_assignment(assignment, fq_digest, row);

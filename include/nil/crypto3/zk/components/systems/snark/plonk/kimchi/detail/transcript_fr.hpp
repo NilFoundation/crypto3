@@ -48,12 +48,13 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, std::size_t... WireIndexes>
                 class kimchi_transcript;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
+                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -71,6 +72,7 @@ namespace nil {
                          std::size_t W14>
                 class kimchi_transcript<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                         CurveType,
+                                        KimchiParamsType,
                                         W0,
                                         W1,
                                         W2,
@@ -171,7 +173,7 @@ namespace nil {
 
                     void absorb_evaluations_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                        var public_eval,
-                                                       kimchi_proof_evaluations<CurveType>
+                                                       kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>
                                                            private_eval,
                                                        std::size_t &component_start_row) {
                         std::vector<var> points = {public_eval, private_eval.z, private_eval.generic_selector, private_eval.poseidon_selector,
