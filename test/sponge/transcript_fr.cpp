@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <../test/transcript/aux_transcript_fr.hpp>
+#include <../test/sponge/aux_transcript_fr.hpp>
 
 #include "test_plonk_component.hpp"
 
