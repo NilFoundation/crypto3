@@ -142,393 +142,393 @@ typedef placeholder_params<FieldType, typename placeholder_test_params::arithmet
 typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params>
     circuit_3_params;
 
-// BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
+BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
 
-//     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
-//     std::size_t expected_size = 4;
-//     std::size_t max_degree = 3;
+    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+    std::size_t expected_size = 4;
+    std::size_t max_degree = 3;
 
-//     std::vector<math::polynomial<typename FieldType::value_type>> f_splitted =
-//         zk::snark::detail::split_polynomial<FieldType>(f, max_degree);
+    std::vector<math::polynomial<typename FieldType::value_type>> f_splitted =
+        zk::snark::detail::split_polynomial<FieldType>(f, max_degree);
 
-//     BOOST_CHECK(f_splitted.size() == expected_size);
+    BOOST_CHECK(f_splitted.size() == expected_size);
 
-//     typename FieldType::value_type y = algebra::random_element<FieldType>();
+    typename FieldType::value_type y = algebra::random_element<FieldType>();
 
-//     typename FieldType::value_type f_at_y = f.evaluate(y);
-//     typename FieldType::value_type f_splitted_at_y = FieldType::value_type::zero();
-//     for (std::size_t i = 0; i < f_splitted.size(); i++) {
-//         f_splitted_at_y = f_splitted_at_y + f_splitted[i].evaluate(y) * y.pow((max_degree + 1) * i);
-//     }
+    typename FieldType::value_type f_at_y = f.evaluate(y);
+    typename FieldType::value_type f_splitted_at_y = FieldType::value_type::zero();
+    for (std::size_t i = 0; i < f_splitted.size(); i++) {
+        f_splitted_at_y = f_splitted_at_y + f_splitted[i].evaluate(y) * y.pow((max_degree + 1) * i);
+    }
 
-//     BOOST_CHECK(f_at_y == f_splitted_at_y);
-// }
+    BOOST_CHECK(f_at_y == f_splitted_at_y);
+}
 
-// // BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
+BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
 
-// //     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-// //         circuit_test_2<FieldType>();
+    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
+        circuit_test_2<FieldType>();
 
-// //     constexpr std::size_t argument_size = 3;
+    constexpr std::size_t argument_size = 3;
 
-// //     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-// //     typedef commitments::list_polynomial_commitment<FieldType,
-// //         circuit_2_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_2_params::batched_commitment_params_type> lpc_type;
 
-// //     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-// //     plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
 
-// //     desc.rows_amount = table_rows;
-// //     desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = table_rows;
+    desc.usable_rows_amount = usable_rows;
 
-// //     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-// //                                                                    circuit.lookup_gates);
-// //     typename policy_type::variable_assignment_type assignments = circuit.table;
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
-// //     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-// //     typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-// //         preprocessed_public_data =
-// //         placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-// //             constraint_system, assignments.public_table(), desc,
-// //             fri_params, columns_with_copy_constraints.size());
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data =
+        placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
 
-// //     typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-// //         preprocessed_private_data =
-// //         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-// //                                                                                assignments.private_table(), desc);
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data =
+        placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
+                                                                               assignments.private_table(), desc, fri_params);
 
-// //     auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
-// //         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+        preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
-// //     std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_public_data.common_data.basic_domain;
-// //     typename FieldType::value_type id_res = FieldType::value_type::one();
-// //     typename FieldType::value_type sigma_res = FieldType::value_type::one();
-// //     for (std::size_t i = 0; i < table_rows; i++) {
-// //         for (auto &identity_polynomial : preprocessed_public_data.identity_polynomials) {
-// //             id_res = id_res * identity_polynomial.evaluate(domain->get_domain_element(i));
-// //         }
+    std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_public_data.common_data.basic_domain;
+    typename FieldType::value_type id_res = FieldType::value_type::one();
+    typename FieldType::value_type sigma_res = FieldType::value_type::one();
+    for (std::size_t i = 0; i < table_rows; i++) {
+        for (auto &identity_polynomial : preprocessed_public_data.identity_polynomials) {
+            id_res = id_res * identity_polynomial.evaluate(domain->get_domain_element(i));
+        }
 
-// //         for (auto &permutation_polynomial : preprocessed_public_data.permutation_polynomials) {
-// //             sigma_res = sigma_res * permutation_polynomial.evaluate(domain->get_domain_element(i));
-// //         }
-// //     }
-// //     BOOST_CHECK_MESSAGE(id_res == sigma_res, "Simple check");
+        for (auto &permutation_polynomial : preprocessed_public_data.permutation_polynomials) {
+            sigma_res = sigma_res * permutation_polynomial.evaluate(domain->get_domain_element(i));
+        }
+    }
+    BOOST_CHECK_MESSAGE(id_res == sigma_res, "Simple check");
 
-// //     typename FieldType::value_type beta = algebra::random_element<FieldType>();
-// //     typename FieldType::value_type gamma = algebra::random_element<FieldType>();
+    typename FieldType::value_type beta = algebra::random_element<FieldType>();
+    typename FieldType::value_type gamma = algebra::random_element<FieldType>();
 
-// //     id_res = FieldType::value_type::one();
-// //     sigma_res = FieldType::value_type::one();
+    id_res = FieldType::value_type::one();
+    sigma_res = FieldType::value_type::one();
 
-// //     for (std::size_t i = 0; i < table_rows; i++) {
-// //         for (std::size_t j = 0; j < preprocessed_public_data.identity_polynomials.size(); j++) {
-// //             id_res = id_res *
-// //                      (polynomial_table[j].evaluate(domain->get_domain_element(i)) +
-// //                       beta * preprocessed_public_data.identity_polynomials[j].evaluate(domain->get_domain_element(i)) +
-// //                       gamma);
-// //         }
+    for (std::size_t i = 0; i < table_rows; i++) {
+        for (std::size_t j = 0; j < preprocessed_public_data.identity_polynomials.size(); j++) {
+            id_res = id_res *
+                     (polynomial_table[j].evaluate(domain->get_domain_element(i)) +
+                      beta * preprocessed_public_data.identity_polynomials[j].evaluate(domain->get_domain_element(i)) +
+                      gamma);
+        }
 
-// //         for (std::size_t j = 0; j < preprocessed_public_data.permutation_polynomials.size(); j++) {
-// //             sigma_res =
-// //                 sigma_res *
-// //                 (polynomial_table[j].evaluate(domain->get_domain_element(i)) +
-// //                  beta * preprocessed_public_data.permutation_polynomials[j].evaluate(domain->get_domain_element(i)) +
-// //                  gamma);
-// //         }
-// //     }
-// //     BOOST_CHECK_MESSAGE(id_res == sigma_res, "Complex check");
-// // }
+        for (std::size_t j = 0; j < preprocessed_public_data.permutation_polynomials.size(); j++) {
+            sigma_res =
+                sigma_res *
+                (polynomial_table[j].evaluate(domain->get_domain_element(i)) +
+                 beta * preprocessed_public_data.permutation_polynomials[j].evaluate(domain->get_domain_element(i)) +
+                 gamma);
+        }
+    }
+    BOOST_CHECK_MESSAGE(id_res == sigma_res, "Complex check");
+}
 
-// // BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
+BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
 
-// //     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-// //         circuit_test_2<FieldType>();
+    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
+        circuit_test_2<FieldType>();
 
-// //     constexpr std::size_t argument_size = 3;
+    constexpr std::size_t argument_size = 3;
 
-// //     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-// //     typedef commitments::list_polynomial_commitment<FieldType,
-// //         circuit_2_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_2_params::batched_commitment_params_type> lpc_type;
 
-// //     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-// //     plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
 
-// //     desc.rows_amount = table_rows;
-// //     desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = table_rows;
+    desc.usable_rows_amount = usable_rows;
 
-// //     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-// //                                                                    circuit.lookup_gates);
-// //     typename policy_type::variable_assignment_type assignments = circuit.table;
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
-// //     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-// //     typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-// //         preprocessed_public_data =
-// //         placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-// //             constraint_system, assignments.public_table(), desc,
-// //             fri_params, columns_with_copy_constraints.size());
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data =
+        placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
 
-// //     typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-// //         preprocessed_private_data =
-// //         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-// //                                                                                assignments.private_table(), desc);
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data =
+        placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
+                                                                               assignments.private_table(), desc, fri_params);
 
-// //     auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
-// //         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+        preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
-// //     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-// //     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript(
-// //         init_blob);
-// //     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
-// //         init_blob);
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript(
+        init_blob);
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
+        init_blob);
 
-// //     typename placeholder_permutation_argument<FieldType, circuit_2_params>::prover_result_type
-// //         prover_res = placeholder_permutation_argument<FieldType, circuit_2_params>::prove_eval(
-// //             constraint_system, preprocessed_public_data, desc, polynomial_table,
-// //             fri_params, prover_transcript);
+    typename placeholder_permutation_argument<FieldType, circuit_2_params>::prover_result_type
+        prover_res = placeholder_permutation_argument<FieldType, circuit_2_params>::prove_eval(
+            constraint_system, preprocessed_public_data, desc, polynomial_table,
+            fri_params, prover_transcript);
 
-// //     // Challenge phase
-// //     typename FieldType::value_type y = algebra::random_element<FieldType>();
-// //     std::vector<typename FieldType::value_type> f_at_y(permutation_size);
-// //     for (int i = 0; i < permutation_size; i++) {
-// //         f_at_y[i] = polynomial_table[i].evaluate(y);
-// //     }
+    // Challenge phase
+    typename FieldType::value_type y = algebra::random_element<FieldType>();
+    std::vector<typename FieldType::value_type> f_at_y(permutation_size);
+    for (int i = 0; i < permutation_size; i++) {
+        f_at_y[i] = polynomial_table[i].evaluate(y);
+    }
 
-// //     typename FieldType::value_type v_p_at_y = prover_res.permutation_polynomial.evaluate(y);
-// //     typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(circuit.omega * y);
+    typename FieldType::value_type v_p_at_y = prover_res.permutation_polynomial.evaluate(y);
+    typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(circuit.omega * y);
 
-// //     std::array<typename FieldType::value_type, 3> verifier_res =
-// //         placeholder_permutation_argument<FieldType, circuit_2_params>::verify_eval(
-// //             preprocessed_public_data, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
-// //             prover_res.permutation_poly_precommitment.root(), verifier_transcript);
+    std::array<typename FieldType::value_type, 3> verifier_res =
+        placeholder_permutation_argument<FieldType, circuit_2_params>::verify_eval(
+            preprocessed_public_data, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
+            prover_res.permutation_poly_precommitment.root(), verifier_transcript);
 
-// //     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
-// //     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
-// //     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+    typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
-// //     for (int i = 0; i < argument_size; i++) {
-// //         std::cout << i << ": " << prover_res.F[i].evaluate(y).data << " " << verifier_res[i].data << std::endl;
-// //         BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
-// //     }
-// // }
+    for (int i = 0; i < argument_size; i++) {
+        std::cout << i << ": " << prover_res.F[i].evaluate(y).data << " " << verifier_res[i].data << std::endl;
+        BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
+    }
+}
 
-// BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
+BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
 
-//     circuit_description<FieldType, circuit_3_params, table_rows_log, 0> circuit = circuit_test_3<FieldType>();
+    circuit_description<FieldType, circuit_3_params, table_rows_log, 0> circuit = circuit_test_3<FieldType>();
 
-//     constexpr std::size_t argument_size = 5;
+    constexpr std::size_t argument_size = 5;
 
-//     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-//     typedef commitments::list_polynomial_commitment<FieldType,
-//         circuit_3_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_3_params::batched_commitment_params_type> lpc_type;
 
-//     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-//     plonk_table_description<FieldType, typename circuit_3_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_3_params::arithmetization_params> desc;
 
-//     desc.rows_amount = table_rows;
-//     desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = table_rows;
+    desc.usable_rows_amount = usable_rows;
 
-//     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-//                                                                    circuit.lookup_gates);
-//     typename policy_type::variable_assignment_type assignments = circuit.table;
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
-//     typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-//         preprocessed_public_data =
-//         placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
-//             constraint_system, assignments.public_table(), desc, fri_params, 0);
+    typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+        preprocessed_public_data =
+        placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
+            constraint_system, assignments.public_table(), desc, fri_params, 0);
 
-//     typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-//         preprocessed_private_data =
-//         placeholder_private_preprocessor<FieldType, circuit_3_params>::process(constraint_system,
-//                                                                                assignments.private_table(), desc);
+    typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+        preprocessed_private_data =
+        placeholder_private_preprocessor<FieldType, circuit_3_params>::process(constraint_system,
+                                                                               assignments.private_table(), desc, fri_params);
 
-//     auto polynomial_table =
-//         plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params_lookups::arithmetization_params>(
-//             preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
+    auto polynomial_table =
+        plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params_lookups::arithmetization_params>(
+            preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
-//     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params_lookups::transcript_hash_type>
-//         prover_transcript(init_blob);
-//     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params_lookups::transcript_hash_type>
-//         verifier_transcript(init_blob);
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params_lookups::transcript_hash_type>
+        prover_transcript(init_blob);
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params_lookups::transcript_hash_type>
+        verifier_transcript(init_blob);
 
-//     typename placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prover_lookup_result prover_res =
-//         placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prove_eval(
-//             constraint_system, preprocessed_public_data, assignments,
-//             fri_params, prover_transcript);
+    typename placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prover_lookup_result prover_res =
+        placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prove_eval(
+            constraint_system, preprocessed_public_data, assignments,
+            fri_params, prover_transcript);
 
-//     // Challenge phase
-//     typename FieldType::value_type y = algebra::random_element<FieldType>();
-//     typename policy_type::evaluation_map columns_at_y;
-//     for (std::size_t i = 0; i < placeholder_test_params::witness_columns; i++) {
+    // Challenge phase
+    typename FieldType::value_type y = algebra::random_element<FieldType>();
+    typename policy_type::evaluation_map columns_at_y;
+    for (std::size_t i = 0; i < placeholder_test_params::witness_columns; i++) {
 
-//         std::size_t i_global_index = i;
+        std::size_t i_global_index = i;
 
-//         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-//             auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
-//             columns_at_y[key] = polynomial_table.witness(i).evaluate(y * circuit.omega.pow(rotation));
-//         }
-//     }
-//     for (std::size_t i = 0; i < 0 + placeholder_test_params_lookups::constant_columns; i++) {
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
+            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * circuit.omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < 0 + placeholder_test_params_lookups::constant_columns; i++) {
 
-//         std::size_t i_global_index = placeholder_test_params_lookups::witness_columns +
-//                                      placeholder_test_params_lookups::public_input_columns + i;
+        std::size_t i_global_index = placeholder_test_params_lookups::witness_columns +
+                                     placeholder_test_params_lookups::public_input_columns + i;
 
-//         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-//             auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
 
-//             columns_at_y[key] = polynomial_table.constant(i).evaluate(y * circuit.omega.pow(rotation));
-//         }
-//     }
-//     for (std::size_t i = 0; i < placeholder_test_params_lookups::selector_columns; i++) {
+            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * circuit.omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < placeholder_test_params_lookups::selector_columns; i++) {
 
-//         std::size_t i_global_index = placeholder_test_params_lookups::witness_columns +
-//                                      placeholder_test_params_lookups::constant_columns +
-//                                      placeholder_test_params_lookups::public_input_columns + i;
+        std::size_t i_global_index = placeholder_test_params_lookups::witness_columns +
+                                     placeholder_test_params_lookups::constant_columns +
+                                     placeholder_test_params_lookups::public_input_columns + i;
 
-//         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-//             auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
 
-//             columns_at_y[key] = polynomial_table.selector(i).evaluate(y * circuit.omega.pow(rotation));
-//         }
-//     }
+            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * circuit.omega.pow(rotation));
+        }
+    }
 
-//     typename FieldType::value_type input_at_y = prover_res.input_polynomial.evaluate(y);
-//     typename FieldType::value_type input_at_y_shifted =
-//         prover_res.input_polynomial.evaluate(circuit.omega.inversed() * y);
+    typename FieldType::value_type input_at_y = prover_res.input_polynomial.evaluate(y);
+    typename FieldType::value_type input_at_y_shifted =
+        prover_res.input_polynomial.evaluate(circuit.omega.inversed() * y);
 
-//     typename FieldType::value_type value_at_y = prover_res.value_polynomial.evaluate(y);
+    typename FieldType::value_type value_at_y = prover_res.value_polynomial.evaluate(y);
 
-//     typename FieldType::value_type v_l_at_y = prover_res.V_L_polynomial.evaluate(y);
-//     typename FieldType::value_type v_l_at_y_shifted = prover_res.V_L_polynomial.evaluate(circuit.omega * y);
+    typename FieldType::value_type v_l_at_y = prover_res.V_L_polynomial.evaluate(y);
+    typename FieldType::value_type v_l_at_y_shifted = prover_res.V_L_polynomial.evaluate(circuit.omega * y);
 
-//     std::array<typename FieldType::value_type, 5> verifier_res =
-//         placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::verify_eval(
-//             preprocessed_public_data, constraint_system.lookup_gates(), y, columns_at_y, input_at_y, input_at_y_shifted,
-//             value_at_y, v_l_at_y, v_l_at_y_shifted, prover_res.input_precommitment.root(),
-//             prover_res.value_precommitment.root(), prover_res.V_L_precommitment.root(), verifier_transcript);
+    std::array<typename FieldType::value_type, 5> verifier_res =
+        placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::verify_eval(
+            preprocessed_public_data, constraint_system.lookup_gates(), y, columns_at_y, input_at_y, input_at_y_shifted,
+            value_at_y, v_l_at_y, v_l_at_y_shifted, prover_res.input_precommitment.root(),
+            prover_res.value_precommitment.root(), prover_res.V_L_precommitment.root(), verifier_transcript);
 
-//     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
-//     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
-//     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+    typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
-//     for (int i = 0; i < argument_size; i++) {
-//         BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
-//     }
-// }
+    for (int i = 0; i < argument_size; i++) {
+        BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
+    }
+}
 
-// BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
+BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
-//     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-//         circuit_test_2<FieldType>();
+    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
+        circuit_test_2<FieldType>();
 
-//     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-//     typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
 
-//     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-//     plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
 
-//     desc.rows_amount = table_rows;
-//     desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = table_rows;
+    desc.usable_rows_amount = usable_rows;
 
-//     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-//                                                                    circuit.lookup_gates);
-//     typename policy_type::variable_assignment_type assignments = circuit.table;
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
-//     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-//     typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-//         preprocessed_public_data =
-//         placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-//             constraint_system, assignments.public_table(), desc,
-//             fri_params, columns_with_copy_constraints.size());
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data =
+        placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
 
-//     typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-//         preprocessed_private_data =
-//         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-//                                                                                assignments.private_table(), desc);
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data =
+        placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
+                                                                               assignments.private_table(), desc, fri_params);
 
-//     auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
-//         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+        preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
-//     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript(
-//         init_blob);
-//     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
-//         init_blob);
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript(
+        init_blob);
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
+        init_blob);
 
-//     std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
-//         placeholder_gates_argument<FieldType, circuit_2_params>::prove_eval(
-//             constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, prover_transcript);
+    std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
+        placeholder_gates_argument<FieldType, circuit_2_params>::prove_eval(
+            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, prover_transcript);
 
-//     // Challenge phase
-//     typename FieldType::value_type y = algebra::random_element<FieldType>();
-//     typename FieldType::value_type omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
+    // Challenge phase
+    typename FieldType::value_type y = algebra::random_element<FieldType>();
+    typename FieldType::value_type omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
-//     typename policy_type::evaluation_map columns_at_y;
-//     for (std::size_t i = 0; i < placeholder_test_params::witness_columns; i++) {
+    typename policy_type::evaluation_map columns_at_y;
+    for (std::size_t i = 0; i < placeholder_test_params::witness_columns; i++) {
 
-//         std::size_t i_global_index = i;
+        std::size_t i_global_index = i;
 
-//         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-//             auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
-//             columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
-//         }
-//     }
-//     for (std::size_t i = 0; i < 0 + placeholder_test_params::public_input_columns; i++) {
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
+            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < 0 + placeholder_test_params::public_input_columns; i++) {
 
-//         std::size_t i_global_index = placeholder_test_params::witness_columns + i;
+        std::size_t i_global_index = placeholder_test_params::witness_columns + i;
 
-//         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
 
-//             auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::public_input);
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::public_input);
 
-//             columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
-//         }
-//     }
-//     for (std::size_t i = 0; i < 0 + placeholder_test_params::constant_columns; i++) {
+            columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < 0 + placeholder_test_params::constant_columns; i++) {
 
-//         std::size_t i_global_index =
-//             placeholder_test_params::witness_columns + placeholder_test_params::public_input_columns + i;
+        std::size_t i_global_index =
+            placeholder_test_params::witness_columns + placeholder_test_params::public_input_columns + i;
 
-//         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-//             auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
 
-//             columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
-//         }
-//     }
-//     for (std::size_t i = 0; i < placeholder_test_params::selector_columns; i++) {
+            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < placeholder_test_params::selector_columns; i++) {
 
-//         std::size_t i_global_index = placeholder_test_params::witness_columns +
-//                                      placeholder_test_params::constant_columns +
-//                                      placeholder_test_params::public_input_columns + i;
+        std::size_t i_global_index = placeholder_test_params::witness_columns +
+                                     placeholder_test_params::constant_columns +
+                                     placeholder_test_params::public_input_columns + i;
 
-//         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-//             auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
 
-//             columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
-//         }
-//     }
+            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
+        }
+    }
 
-//     std::array<typename FieldType::value_type, 1> verifier_res =
-//         placeholder_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), columns_at_y, y,
-//                                                                              verifier_transcript);
+    std::array<typename FieldType::value_type, 1> verifier_res =
+        placeholder_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), columns_at_y, y,
+                                                                             verifier_transcript);
 
-//     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
-//     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
-//     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+    typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
-//     BOOST_CHECK(prover_res[0].evaluate(y) == verifier_res[0]);
-// }
+    BOOST_CHECK(prover_res[0].evaluate(y) == verifier_res[0]);
+}
 
 BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 
