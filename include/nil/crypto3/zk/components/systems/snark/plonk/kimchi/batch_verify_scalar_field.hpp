@@ -29,7 +29,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 
 namespace nil {
@@ -37,19 +36,12 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t batch_size, std::size_t lr_rounds,
-                std::size_t n, std::size_t comm_size, std::size_t bases_size,
+                template<typename ArithmetizationType, 
                          std::size_t... WireIndexes>
                 class batch_verify_scalar_field;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t batch_size,
-                         std::size_t lr_rounds,
-                         std::size_t n,
-                         std::size_t comm_size,
-                         std::size_t bases_size,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -66,12 +58,6 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class batch_verify_scalar_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                        batch_size,
-                                                        lr_rounds,
-                                                        n,
-                                                        comm_size,
-                                                        bases_size,
                                                        W0,
                                                        W1,
                                                        W2,
@@ -95,58 +81,19 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
-                    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, bases_size,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
-                    using var_ec_point = typename msm_component::params_type::var_ec_point;
-                    constexpr static const std::size_t selector_seed = 0xff91;
+                    constexpr static const std::size_t selector_seed = 0x0f28;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + sub_component::rows_amount + msm_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 1;
 
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct f_comm {
-                            std::vector<var_ec_point> shifted;
-                            std::vector<var_ec_point> unshifted;
-                        };
-                        struct PE {
-                            std::array<f_comm, comm_size> comm;
-                            std::array<var, comm_size> f_zeta;
-                            std::array<var, comm_size> f_zeta_w;
-                        };
-                        struct opening_proof {
-                            std::array<var_ec_point, lr_rounds> L;
-                            std::array<var_ec_point, lr_rounds> R;
-                            var_ec_point delta;
-                            var_ec_point G;
-                            var z1;
-                            var z2;
-                        };
-                        struct var_proof {
-                            kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14> transcript;
-                            var zeta;
-                            var zeta_w;
-                            var u;
-                            var v;
-                            PE pe;
-                            opening_proof o;
-                        };
-                        struct public_input {
-                            var_ec_point H;
-                            std::array<var_ec_point, n> G;
-                            std::vector<var> scalars;
-                        };
-                        struct result {
-                            std::array<var_proof, batch_size> proofs;
-                            public_input PI;
-                            std::array<var, batch_size> cip;
-                        };
-                        result input;    
+                        
                     };
 
                     struct result_type {
+                        var output;
 
                         result_type(std::size_t component_start_row) {
                         }
@@ -156,17 +103,7 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        //to-do: get random values from new transcript
-                        typename BlueprintFieldType::value_type ro1 = 1;
-                        typename BlueprintFieldType::value_type ro2 = 2;
-                        typename BlueprintFieldType::value_type r1 = 1;
-                        typename BlueprintFieldType::value_type r_1 = 1;
-                        std::size_t n_2 = ceil(log2(n));
-                        std::size_t padding = (1 << n_2) - n;
-                        std::vector<typename BlueprintFieldType::value_type> scalars(n + padding);
-                        for (std::size_t i = 0; i < batch_size; i++) {
 
-                        }
                         return result_type(component_start_row);
                     }
 
@@ -175,14 +112,6 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index){
 
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
                         std::size_t row = start_row_index;
 
                         return result_type(start_row_index);
