@@ -433,6 +433,13 @@ namespace nil {
                         const typename ParamsType::commitment_params_type &commitment_params,
                         std::size_t columns_with_copy_constraints) {
 
+#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+                        auto begin = std::chrono::high_resolution_clock::now();
+                        auto last = begin;
+                        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "Placeholder public preprocessor:" << std::endl;
+#endif
+
                         std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = table_description.usable_rows_amount;
 
@@ -493,10 +500,15 @@ namespace nil {
                             basic_domain, nil::crypto3::math::polynomial<typename FieldType::value_type> {Z},
                             lagrange_0, public_commitments, c_rotations, N_rows};
 
-                        return preprocessed_data_type(
+                        preprocessed_data_type preprocessed_data(
                             {public_polynomial_table, sigma_perm_polys, id_perm_polys, q_last_q_blind[0],
                                 q_last_q_blind[1],
                              public_precommitments, common_data});
+#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin);
+                        std::cout << "Placeholder public preprocessor, total time: " << elapsed.count() * 1e-9 << std::endl;
+#endif
+                        return preprocessed_data;
                     }
                 };
 

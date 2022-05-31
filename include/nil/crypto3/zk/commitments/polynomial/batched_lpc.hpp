@@ -165,6 +165,7 @@ namespace nil {
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size> Q;
                         for (int polynom_index = 0; polynom_index < Q_normal.size(); ++polynom_index){
                             Q[polynom_index].from_coefficients(Q_normal[polynom_index]);
+                            Q[polynom_index].resize(fri_params.D[0]->size());
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {
@@ -291,6 +292,7 @@ namespace nil {
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size> Q;
                         for (int polynom_index = 0; polynom_index < Q_normal.size(); ++polynom_index){
                             Q[polynom_index].from_coefficients(Q_normal[polynom_index]);
+                            Q[polynom_index].resize(fri_params.D[0]->size());
                         }
 
                         for (std::size_t round_id = 0; round_id <= lambda - 1; round_id++) {

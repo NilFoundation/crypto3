@@ -88,35 +88,25 @@ namespace nil {
 
                         // 1. $\beta_1, \gamma_1 = \challenge$
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
-
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
-
+                        
                         // 2. Calculate id_binding, sigma_binding for j from 1 to N_rows
-                        math::polynomial_dfs<typename FieldType::value_type> id_binding;
-                        math::polynomial_dfs<typename FieldType::value_type> sigma_binding;
-
-                        for (std::size_t i = 0; i < S_id.size(); i++) {
-                            if (i == 0) {
-                                id_binding = column_polynomials[0] + beta * S_id[0] + gamma;
-                                sigma_binding = column_polynomials[0] + beta * S_sigma[0] + gamma;
-                            } else {
-                                id_binding = id_binding * (column_polynomials[i] + beta * S_id[i] + gamma);
-                                sigma_binding = sigma_binding * (column_polynomials[i] + beta * S_sigma[i] + gamma);
-                            }
-                        }
-                        math::polynomial<typename FieldType::value_type> id_binding_normal =
-                            math::polynomial<typename FieldType::value_type>(id_binding.coefficients());
-                        math::polynomial<typename FieldType::value_type> sigma_binding_normal =
-                            math::polynomial<typename FieldType::value_type>(sigma_binding.coefficients());
                         // 3. Calculate $V_P$
-                        math::polynomial_dfs<typename FieldType::value_type> V_P(basic_domain->m - 1, basic_domain->m);
+                        math::polynomial_dfs<typename FieldType::value_type> V_P(
+                            basic_domain->size() - 1, basic_domain->size());
 
                         V_P[0] = FieldType::value_type::one();
-                        for (std::size_t j = 1; j < basic_domain->m; j++) {
-                            V_P[j] = V_P[j - 1] * id_binding_normal.evaluate(basic_domain->get_domain_element(j - 1)) /
-                                sigma_binding_normal.evaluate(basic_domain->get_domain_element(j - 1));
+                        for (std::size_t j = 1; j < basic_domain->size(); j++) {
+                            typename FieldType::value_type coeff = FieldType::value_type::one();
+
+                            for (std::size_t i = 0; i < S_id.size(); i++) {
+                                coeff *= (column_polynomials[i][j - 1] + beta * S_id[i][j - 1] + gamma) /
+                                    (column_polynomials[i][j - 1] + beta * S_sigma[i][j - 1] + gamma);
+                            }
+                            V_P[j] = V_P[j - 1] * coeff;
                         }
-                        // V_P.resize(fri_params.D[0]->m);
+                        
+                        V_P.resize(fri_params.D[0]->m);
 
                         math::polynomial<typename FieldType::value_type> V_P_normal =
                             math::polynomial<typename FieldType::value_type>(V_P.coefficients());

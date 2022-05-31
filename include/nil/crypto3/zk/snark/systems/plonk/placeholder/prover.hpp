@@ -142,6 +142,7 @@ namespace nil {
                         auto begin = std::chrono::high_resolution_clock::now();
                         auto last = begin;
                         auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "Placeholder prover:" << std::endl;
 #endif
 
                         placeholder_proof<FieldType, ParamsType> proof;
@@ -472,6 +473,8 @@ namespace nil {
                         elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
                         std::cout << "special_selectors proof_eval, time: " << elapsed.count() * 1e-9 << std::endl;
                         last = std::chrono::high_resolution_clock::now();
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin);
+                        std::cout << "Placeholder prover, total time: " << elapsed.count() * 1e-9 << std::endl;
 #endif
 
                         return proof;
