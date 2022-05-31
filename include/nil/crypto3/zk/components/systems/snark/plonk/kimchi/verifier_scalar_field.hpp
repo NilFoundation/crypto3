@@ -154,6 +154,8 @@ namespace nil {
                                          const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
+
                         var zero = var(0, start_row_index, false, var::column_type::constant);
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
                         var domain_size = var(0, start_row_index + 2, false, var::column_type::constant);

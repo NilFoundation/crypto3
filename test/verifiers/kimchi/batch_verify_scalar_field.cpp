@@ -117,10 +117,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     constexpr static std::size_t lookup_table_size = 1;
     constexpr static bool use_lookup = false;
 
+    constexpr std::size_t srs_len = 10;
+
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
         alpha_powers_n, public_input_size>;
-    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
+        srs_len>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
@@ -132,8 +135,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     verifier_index.domain_size = domain_size;
     verifier_index.omega = var(0, 6, false, var::column_type::public_input); 
 
+    constexpr std::size_t batch_size = 3;
+
     using component_type = zk::components::batch_verify_scalar_field<ArithmetizationType, 
-            
+            commitment_params, batch_size,
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();

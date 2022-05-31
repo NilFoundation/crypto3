@@ -56,11 +56,12 @@ namespace nil {
                 };
 
                 template <std::size_t EvalRounds,
-                    std::size_t MaxPolySize>
+                    std::size_t MaxPolySize, std::size_t SrsLen>
                 struct kimchi_commitment_params_type {
                     constexpr static std::size_t max_poly_size = MaxPolySize;
                     constexpr static std::size_t eval_rounds = EvalRounds;
                     constexpr static std::size_t res_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
+                    constexpr static std::size_t srs_len = SrsLen;
                 };
             }    // namespace components
         }        // namespace zk
