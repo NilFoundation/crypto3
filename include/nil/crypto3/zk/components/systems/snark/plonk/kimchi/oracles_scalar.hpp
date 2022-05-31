@@ -34,15 +34,16 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/element_powers.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/lagrange_denominators.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/public_evaluations.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/prev_chal_evals.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/combine_proof_evals.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/ft_eval.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/element_powers.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/lagrange_denominators.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/public_evaluations.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/prev_chal_evals.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/combine_proof_evals.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/ft_eval.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
@@ -116,6 +117,9 @@ namespace nil {
                             zk::components::ft_eval<ArithmetizationType, CurveType,
                                                         KimchiParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType>;
 
                     constexpr static const std::size_t eval_points_amount = 2;
 
@@ -193,38 +197,20 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct fq_sponge_output {
-                            var joint_combiner;
-                            var beta;    // beta and gamma can be combined from limbs in the base circuit
-                            var gamma;
-                            var alpha;
-                            var zeta;
-                            var fq_digest;    // TODO overflow check
+                        
 
-                            static fq_sponge_output
-                                allocate_fq_output(blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                   typename BlueprintFieldType::value_type joint_combiner,
-                                                   typename BlueprintFieldType::value_type beta,
-                                                   typename BlueprintFieldType::value_type gamma,
-                                                   typename BlueprintFieldType::value_type alpha,
-                                                   typename BlueprintFieldType::value_type zeta,
-                                                   typename BlueprintFieldType::value_type fq_digest) {
-
-                                return fq_sponge_output {
-                                    assignment.allocate_public_input(joint_combiner),
-                                    assignment.allocate_public_input(beta),
-                                    assignment.allocate_public_input(gamma),
-                                    assignment.allocate_public_input(alpha),
-                                    assignment.allocate_public_input(zeta),
-                                    assignment.allocate_public_input(fq_digest),
-                                };
-                            }
-                        };
-
-                        kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        kimchi_verifier_index_scalar<CurveType> &verifier_index;
                         kimchi_proof_scalar<CurveType, KimchiParamsType,
-                            KimchiCommitmentParamsType::eval_rounds> proof;
-                        fq_sponge_output fq_output;
+                            KimchiCommitmentParamsType::eval_rounds> &proof;
+                        typename proof_binding::fq_sponge_output &fq_output;
+
+                        params_type(kimchi_verifier_index_scalar<CurveType> &_verifier_index,
+                            kimchi_proof_scalar<CurveType, KimchiParamsType,
+                                KimchiCommitmentParamsType::eval_rounds> &_proof,
+                            typename proof_binding::fq_sponge_output &_fq_output) : 
+                                                        verifier_index(_verifier_index),
+                                                        proof(_proof),
+                                                        fq_output(_fq_output) {}
                     };
 
                     struct result_type {
@@ -238,6 +224,7 @@ namespace nil {
                         };
 
                         kimchi_transcript<ArithmetizationType, CurveType, 
+                            KimchiParamsType,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
                             W11, W12, W13, W14> transcript;
                         random_oracles oracles;
@@ -247,6 +234,8 @@ namespace nil {
                         std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges;
                         var zeta_pow_n;
                         var ft_eval0;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            eval_points_amount> combined_evals;
                     };
 
                     static result_type
@@ -263,6 +252,8 @@ namespace nil {
                         } else {
                             first_selector_index = selector_iterator->second;
                         }
+
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
 
                         std::size_t row = start_row_index;
 
@@ -283,9 +274,13 @@ namespace nil {
                         row += endo_scalar_component::rows_amount;
 
                         // fr_transcript.absorb(fq_digest)
-                        var zero = var(0, 0, false, var::column_type::constant);
-                        var one = var(0, 1, false, var::column_type::constant);
-                        kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
+                        var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
+
+                        kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
+                                          W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
                                           W11, W12, W13, W14>
                             transcript;
                         //transcript.init_circuit(bp, assignment, zero, row);
@@ -294,7 +289,7 @@ namespace nil {
                         // zeta_pow_n = zeta**n
                         var zeta_pow_n = exponentiation_component::generate_circuit(
                                              bp, assignment,
-                                             {zeta, params.verifier_index.domain_size, zero, one}, row)
+                                             {zeta, domain_size, zero, one}, row)
                                              .output;
                         row += exponentiation_component::rows_amount;
 
@@ -304,7 +299,7 @@ namespace nil {
 
                         var zeta_omega_pow_n = 
                             exponentiation_component::generate_circuit(bp, assignment, 
-                            {zeta_omega, params.verifier_index.domain_size, zero, one}, row).output;
+                            {zeta_omega, domain_size, zero, one}, row).output;
                         row += exponentiation_component::rows_amount;
 
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers =
@@ -329,7 +324,7 @@ namespace nil {
                                         pi,
                                         lagrange_denominators, 
                                         omega_powers,
-                                        params.verifier_index.domain_size, one, zero}, row).output;
+                                        domain_size, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
 
                         // transcript.absorb_evaluations_circuit(
@@ -353,12 +348,12 @@ namespace nil {
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks;
                         powers_of_eval_points_for_chunks[0] = exponentiation_component::generate_circuit(
                                              bp, assignment,
-                                             {zeta, params.verifier_index.max_poly_size, zero, one}, row)
+                                             {zeta, max_poly_size, zero, one}, row)
                                              .output;
                         row += exponentiation_component::rows_amount;
                         powers_of_eval_points_for_chunks[1] = exponentiation_component::generate_circuit(
                                              bp, assignment,
-                                             {zeta_omega, params.verifier_index.max_poly_size, zero, one}, row)
+                                             {zeta_omega, max_poly_size, zero, one}, row)
                                              .output;
                         row += exponentiation_component::rows_amount;
 
@@ -419,15 +414,16 @@ namespace nil {
                             powers_of_eval_points_for_chunks,
                             prev_challenges,
                             zeta_pow_n,
-                            ft_eval0
+                            ft_eval0,
+                            combined_evals
                         };
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
+                                                            std::size_t start_row_index) {
 
-                        std::size_t row = component_start_row;
+                        std::size_t row = start_row_index;
 
                         typename BlueprintFieldType::value_type endo_factor =
                             0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
@@ -449,18 +445,19 @@ namespace nil {
                         std::cout << "zeta: " << assignment.var_value(zeta).data << std::endl;
                         std::cout << "params.fq_output.zeta: " << assignment.var_value(params.fq_output.zeta).data << std::endl;
 
-                        var zero = var(0, 0, false, var::column_type::constant);
-                        var one = var(0, 1, false, var::column_type::constant);
-                        assignment.constant(0)[0] = 0;    // set zero constant
-                        assignment.constant(0)[1] = 1;    // set one constant
+                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
+                        var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
 
-                        kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14>
+                        kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
+                                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                                        W11, W12, W13, W14>
                             transcript;
                         //transcript.init_assignment(assignment, row);
                         //transcript.absorb_assignment(assignment, fq_digest, row);
 
-                        var n = params.verifier_index.domain_size;
+                        var n = domain_size;
                         var zeta_pow_n = exponentiation_component::generate_assignments(
                             assignment, {zeta, n, zero, one}, row).output;
                         row += exponentiation_component::rows_amount;
@@ -516,9 +513,9 @@ namespace nil {
 
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks = {
                             exponentiation_component::generate_assignments(
-                                assignment, {zeta, params.verifier_index.max_poly_size, zero, one}, row).output,
+                                assignment, {zeta, max_poly_size, zero, one}, row).output,
                             exponentiation_component::generate_assignments(
-                                assignment, {zeta_omega, params.verifier_index.max_poly_size, zero, one}, 
+                                assignment, {zeta_omega, max_poly_size, zero, one}, 
                                 row + exponentiation_component::rows_amount).output
                         };
                         row += 2 * exponentiation_component::rows_amount;
@@ -577,7 +574,8 @@ namespace nil {
                             powers_of_eval_points_for_chunks,
                             prev_challenges,
                             zeta_pow_n,
-                            ft_eval0
+                            ft_eval0,
+                            combined_evals
                         };
                     }
 
@@ -594,6 +592,22 @@ namespace nil {
                                                   const params_type &params,
                                                   std::size_t component_start_row = 0) {
                         
+                    }
+
+                    static void
+                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
+                            std::size_t row = component_start_row + 4;
+                            assignment.constant(0)[row] = 0;
+                            row++;
+                            assignment.constant(0)[row] = 1;
+                            row++;
+
+                            assignment.constant(0)[row] = params.verifier_index.domain_size;
+                            row++;
+                            assignment.constant(0)[row] = KimchiCommitmentParamsType::max_poly_size;
                     }
                 };
             }    // namespace components

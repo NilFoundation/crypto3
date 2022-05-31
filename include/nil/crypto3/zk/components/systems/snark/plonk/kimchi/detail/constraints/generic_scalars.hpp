@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_COEFFICIENTS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_COEFFICIENTS_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_GENERIC_SCALARS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_GENERIC_SCALARS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -42,13 +42,13 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, std::size_t EvalRounds, 
+                template<typename ArithmetizationType, typename KimchiParamsType,
                     std::size_t... WireIndexes>
-                class b_poly_coefficients;
+                class generic_scalars;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         std::size_t EvalRounds,
+                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -64,9 +64,9 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class b_poly_coefficients<
+                class generic_scalars<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    EvalRounds,
+                    KimchiParamsType,
                     W0,
                     W1,
                     W2,
@@ -91,20 +91,25 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0xf21;
-                    constexpr static const std::size_t polynomial_len = 1 << EvalRounds;
+                    constexpr static const std::size_t selector_seed = 0x0f26;
+
+                    constexpr static const std::size_t generic_offset = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 0;
+                    constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 0;
 
+                    constexpr static const std::size_t output_size = 10;
+
                     struct params_type {
-                        std::array<var, EvalRounds> &challenges;
-                        var one;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            KimchiParamsType::eval_points_amount> evals;
+                        std::array<var, KimchiParamsType::alpha_powers_n> alphas;
+                        std::size_t start_idx;
                     };
 
                     struct result_type {
-                        std::array<var, polynomial_len> output;
+                        std::array<var, output_size> output;
 
                         result_type(std::size_t start_row_index) {
                             std::size_t row = start_row_index;
@@ -144,10 +149,16 @@ namespace nil {
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                     }
+
+                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  const std::size_t start_row_index) {
+                    }
                 };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_COEFFICIENTS_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_GENERIC_SCALARS_HPP

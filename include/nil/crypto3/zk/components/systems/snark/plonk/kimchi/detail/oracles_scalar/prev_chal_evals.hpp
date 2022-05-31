@@ -33,8 +33,8 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/b_poly.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/b_poly_coefficients.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly_coefficients.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {

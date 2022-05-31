@@ -29,27 +29,28 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
+
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
+
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/random.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t batch_size, std::size_t lr_rounds,
-                std::size_t n, std::size_t comm_size, std::size_t bases_size,
+                template<typename ArithmetizationType, 
+                         typename KimchiCommitmentParamsType,
+                         std::size_t BatchSize,
                          std::size_t... WireIndexes>
                 class batch_verify_scalar_field;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t batch_size,
-                         std::size_t lr_rounds,
-                         std::size_t n,
-                         std::size_t comm_size,
-                         std::size_t bases_size,
+                         typename KimchiCommitmentParamsType,
+                         std::size_t BatchSize,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -66,12 +67,8 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class batch_verify_scalar_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                        batch_size,
-                                                        lr_rounds,
-                                                        n,
-                                                        comm_size,
-                                                        bases_size,
+                                                       KimchiCommitmentParamsType,
+                                                       BatchSize,
                                                        W0,
                                                        W1,
                                                        W2,
@@ -93,97 +90,294 @@ namespace nil {
                     
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
+                    using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
-                    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, bases_size,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
-                    using var_ec_point = typename msm_component::params_type::var_ec_point;
-                    constexpr static const std::size_t selector_seed = 0xff91;
+                    using random_component = zk::components::random<ArithmetizationType, 
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using batch_proof = batch_evaluation_proof_scalar;
+
+                    constexpr static const std::size_t selector_seed = 0x0f28;
+
+                    constexpr static const std::size_t srs_len = KimchiCommitmentParamsType::srs_len;
+
+                    constexpr static std::size_t scalars_len() {
+                        return 10;
+                    }
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + sub_component::rows_amount + msm_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 100;
 
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct f_comm {
-                            std::vector<var_ec_point> shifted;
-                            std::vector<var_ec_point> unshifted;
-                        };
-                        struct PE {
-                            std::array<f_comm, comm_size> comm;
-                            std::array<var, comm_size> f_zeta;
-                            std::array<var, comm_size> f_zeta_w;
-                        };
-                        struct opening_proof {
-                            std::array<var_ec_point, lr_rounds> L;
-                            std::array<var_ec_point, lr_rounds> R;
-                            var_ec_point delta;
-                            var_ec_point G;
-                            var z1;
-                            var z2;
-                        };
-                        struct var_proof {
-                            kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14> transcript;
-                            var zeta;
-                            var zeta_w;
-                            var u;
-                            var v;
-                            PE pe;
-                            opening_proof o;
-                        };
-                        struct public_input {
-                            var_ec_point H;
-                            std::array<var_ec_point, n> G;
-                            std::vector<var> scalars;
-                        };
-                        struct result {
-                            std::array<var_proof, batch_size> proofs;
-                            public_input PI;
-                            std::array<var, batch_size> cip;
-                        };
-                        result input;    
+                        std::array<batch_proof, srs_len> batches;
                     };
 
                     struct result_type {
+                        std::array<var, scalars_len()> output;
 
-                        result_type(std::size_t component_start_row) {
+                        result_type(std::size_t start_row_index) {
                         }
                     };
-
-                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                            const params_type &params,
-                                                            std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
-                        //to-do: get random values from new transcript
-                        typename BlueprintFieldType::value_type ro1 = 1;
-                        typename BlueprintFieldType::value_type ro2 = 2;
-                        typename BlueprintFieldType::value_type r1 = 1;
-                        typename BlueprintFieldType::value_type r_1 = 1;
-                        std::size_t n_2 = ceil(log2(n));
-                        std::size_t padding = (1 << n_2) - n;
-                        std::vector<typename BlueprintFieldType::value_type> scalars(n + padding);
-                        for (std::size_t i = 0; i < batch_size; i++) {
-
-                        }
-                        return result_type(component_start_row);
-                    }
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         const std::size_t start_row_index){
 
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
+
                         std::size_t row = start_row_index;
+
+                        var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
+
+                        std::array<var, scalars_len()> scalars;
+                        
+                        var rand_base = random_component::generate_circuit(
+                            bp, assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+                        var sg_rand_base = random_component::generate_circuit(
+                            bp, assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+
+                        var rand_base_i = one;
+                        var sg_rand_base_i = one;
+
+                        for (std::size_t i = 0; i < params.batches.size(); i++) {
+                            rand_base_i = zk::components::generate_circuit<mul_component>(
+                                bp, assignment,
+                                {rand_base_i, rand_base}, row).output;
+                            row += mul_component::rows_amount;
+
+                            sg_rand_base_i = zk::components::generate_circuit<mul_component>(
+                                bp, assignment,
+                                {sg_rand_base_i, sg_rand_base}, row).output;
+                            row += mul_component::rows_amount;
+                        }
+
+                        std::cout<<"circuit row: "<<row<<std::endl;
+
+                        return result_type(start_row_index);
+                    }
+
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
+
+                        var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
+
+                        std::array<var, scalars_len()> scalars;
+                        var rand_base = random_component::generate_assignments(
+                            assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+                        var sg_rand_base = random_component::generate_assignments(
+                            assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+
+                        var rand_base_i = one;
+                        var sg_rand_base_i = one;
+
+                        for (std::size_t i = 0; i < params.batches.size(); i++) {
+                            rand_base_i = mul_component::generate_assignments(assignment,
+                                {rand_base_i, rand_base}, row).output;
+                            row += mul_component::rows_amount;
+
+                            sg_rand_base_i = mul_component::generate_assignments(assignment,
+                                {sg_rand_base_i, sg_rand_base}, row).output;
+                            row += mul_component::rows_amount;
+                        }
+
+                        std::cout<<"assignment row: "<<row<<std::endl;
+
+                    //     // Verifier checks for all i,
+                    //     // c_i Q_i + delta_i = z1_i (G_i + b_i U_i) + z2_i H
+                    //     //
+                    //     // if we sample r at random, it suffices to check
+                    //     //
+                    //     // 0 == sum_i r^i (c_i Q_i + delta_i - ( z1_i (G_i + b_i U_i) + z2_i H ))
+                    //     //
+                    //     // and because each G_i is a multiexp on the same array self.g, we
+                    //     // can batch the multiexp across proofs.
+                    //     //
+                    //     // So for each proof in the batch, we add onto our big multiexp the following terms
+                    //     // r^i c_i Q_i
+                    //     // r^i delta_i
+                    //     // - (r^i z1_i) G_i
+                    //     // - (r^i z2_i) H
+                    //     // - (r^i z1_i b_i) U_i
+
+                    //     // We also check that the sg component of the proof is equal to the polynomial commitment
+                    //     // to the "s" array
+
+                    //     let nonzero_length = self.g.len();
+
+                    //     let max_rounds = math::ceil_log2(nonzero_length);
+
+                    //     let padded_length = 1 << max_rounds;
+
+                    //     // TODO: This will need adjusting
+                    //     let padding = padded_length - nonzero_length;
+
+                    //     let mut scalars = vec![ScalarField::<G>::zero(); padded_length + 1];
+
+                    //     for BatchEvaluationProof {
+                    //         sponge,
+                    //         evaluation_points,
+                    //         xi,
+                    //         r,
+                    //         evaluations,
+                    //         opening,
+                    //     } in batch.iter_mut()
+                    //     {
+                    //         // TODO: This computation is repeated in ProverProof::oracles
+                    //         let combined_inner_product0 = {
+                    //             let es: Vec<_> = evaluations
+                    //                 .iter()
+                    //                 .map(
+                    //                     |Evaluation {
+                    //                         commitment,
+                    //                         evaluations,
+                    //                         degree_bound,
+                    //                     }| {
+                    //                         let bound: Option<usize> = (|| {
+                    //                             let b = (*degree_bound)?;
+                    //                             let x = commitment.shifted?;
+                    //                             if x.is_zero() {
+                    //                                 None
+                    //                             } else {
+                    //                                 Some(b)
+                    //                             }
+                    //                         })();
+                    //                         (evaluations.clone(), bound)
+                    //                     },
+                    //                 )
+                    //                 .collect();
+                    //             combined_inner_product::<G>(evaluation_points, xi, r, &es, self.g.len())
+                    //         };
+
+                    //         sponge.absorb_fr(&[shift_scalar::<G>(combined_inner_product0)]);
+
+                    //         let t = sponge.challenge_fq();
+                    //         let u: G = to_group(group_map, t);
+
+                    //         let Challenges { chal, chal_inv } =
+                    //             opening.challenges::<EFqSponge>(&self.endo_r, sponge);
+
+                    //         sponge.absorb_g(&[opening.delta]);
+                    //         let c = ScalarChallenge(sponge.challenge()).to_field(&self.endo_r);
+
+                    //         // < s, sum_i r^i pows(evaluation_point[i]) >
+                    //         // ==
+                    //         // sum_i r^i < s, pows(evaluation_point[i]) >
+                    //         let b0 = {
+                    //             let mut scale = ScalarField::<G>::one();
+                    //             let mut res = ScalarField::<G>::zero();
+                    //             for &e in evaluation_points.iter() {
+                    //                 let term = b_poly(&chal, e);
+                    //                 res += &(scale * term);
+                    //                 scale *= *r;
+                    //             }
+                    //             res
+                    //         };
+
+                    //         let s = b_poly_coefficients(&chal);
+
+                    //         let neg_rand_base_i = -rand_base_i;
+
+                    //         // TERM
+                    //         // - rand_base_i z1 G
+                    //         //
+                    //         // we also add -sg_rand_base_i * G to check correctness of sg.
+                    //         points.push(opening.sg);
+                    //         scalars.push(neg_rand_base_i * opening.z1 - sg_rand_base_i);
+
+                    //         // Here we add
+                    //         // sg_rand_base_i * ( < s, self.g > )
+                    //         // =
+                    //         // < sg_rand_base_i s, self.g >
+                    //         //
+                    //         // to check correctness of the sg component.
+                    //         {
+                    //             let terms: Vec<_> = s.par_iter().map(|s| sg_rand_base_i * s).collect();
+
+                    //             for (i, term) in terms.iter().enumerate() {
+                    //                 scalars[i + 1] += term;
+                    //             }
+                    //         }
+
+                    //         // TERM
+                    //         // - rand_base_i * z2 * H
+                    //         scalars[0] -= &(rand_base_i * opening.z2);
+
+                    //         // TERM
+                    //         // -rand_base_i * (z1 * b0 * U)
+                    //         scalars.push(neg_rand_base_i * (opening.z1 * b0));
+                    //         points.push(u);
+
+                    //         // TERM
+                    //         // rand_base_i c_i Q_i
+                    //         // = rand_base_i c_i
+                    //         //   (sum_j (chal_invs[j] L_j + chals[j] R_j) + P_prime)
+                    //         // where P_prime = combined commitment + combined_inner_product * U
+                    //         let rand_base_i_c_i = c * rand_base_i;
+                    //         for ((l, r), (u_inv, u)) in opening.lr.iter().zip(chal_inv.iter().zip(chal.iter())) {
+                    //             points.push(*l);
+                    //             scalars.push(rand_base_i_c_i * u_inv);
+
+                    //             points.push(*r);
+                    //             scalars.push(rand_base_i_c_i * u);
+                    //         }
+
+                    //         // TERM
+                    //         // sum_j r^j (sum_i xi^i f_i) (elm_j)
+                    //         // == sum_j sum_i r^j xi^i f_i(elm_j)
+                    //         // == sum_i xi^i sum_j r^j f_i(elm_j)
+                    //         {
+                    //             let mut xi_i = ScalarField::<G>::one();
+
+                    //             for Evaluation {
+                    //                 commitment,
+                    //                 degree_bound,
+                    //                 ..
+                    //             } in evaluations
+                    //                 .iter()
+                    //                 .filter(|x| !x.commitment.unshifted.is_empty())
+                    //             {
+                    //                 // iterating over the polynomial segments
+                    //                 for comm_ch in commitment.unshifted.iter() {
+                    //                     scalars.push(rand_base_i_c_i * xi_i);
+                    //                     points.push(*comm_ch);
+
+                    //                     xi_i *= *xi;
+                    //                 }
+
+                    //                 if let Some(_m) = degree_bound {
+                    //                     if let Some(comm_ch) = commitment.shifted {
+                    //                         if !comm_ch.is_zero() {
+                    //                             // xi^i sum_j r^j elm_j^{N - m} f(elm_j)
+                    //                             scalars.push(rand_base_i_c_i * xi_i);
+                    //                             points.push(comm_ch);
+
+                    //                             xi_i *= *xi;
+                    //                         }
+                    //                     }
+                    //                 }
+                    //             }
+                    //         };
+
+                    //         scalars.push(rand_base_i_c_i * combined_inner_product0);
+                    //         points.push(u);
+
+                    //         scalars.push(rand_base_i);
+                    //         points.push(opening.delta);
+
+                    //         rand_base_i *= &rand_base;
+                    //         sg_rand_base_i *= &sg_rand_base;
+                    //     }
 
                         return result_type(start_row_index);
                     }
@@ -204,6 +398,18 @@ namespace nil {
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
+                    }
+
+                    static void
+                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
+                            std::size_t row = component_start_row;
+                            assignment.constant(0)[row] = 0;
+                            row++;
+                            assignment.constant(0)[row] = 1;
+                            row++;
                     }
                 };
 

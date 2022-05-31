@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -32,11 +32,9 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 
+#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
@@ -44,14 +42,19 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                    typename KimchiParamsType,
+                // let k = chals.len();
+                // let mut pow_twos = vec![x];
+                // for i in 1..k {
+                //     pow_twos.push(pow_twos[i - 1].square());
+                // }
+                // product((0..k).map(|i| (F::one() + (chals[i] * pow_twos[k - 1 - i]))))
+                template<typename ArithmetizationType, std::size_t EvalRounds, 
                     std::size_t... WireIndexes>
-                class combine_proof_evals;
+                class b_poly;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         typename KimchiParamsType,
+                         std::size_t EvalRounds,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -67,9 +70,9 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class combine_proof_evals<
+                class b_poly<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    KimchiParamsType,
+                    EvalRounds,
                     W0,
                     W1,
                     W2,
@@ -92,52 +95,43 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f23;
+                    constexpr static const std::size_t selector_seed = 0xf20;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 
-                        KimchiParamsType::witness_columns * mul_component::rows_amount // w
-                        + mul_component::rows_amount // z
-                        + (KimchiParamsType::permut_size - 1) * mul_component::rows_amount  // s
-                        + mul_component::rows_amount // generic
-                        + mul_component::rows_amount; // poseidon
+                    constexpr static const std::size_t rows_amount = EvalRounds * mul_component::rows_amount
+                        + EvalRounds * (
+                            mul_component::rows_amount + add_component::rows_amount + mul_component::rows_amount
+                        );
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType> evals;
-                        var x;
+                        std::array<var, EvalRounds> &challenges;
+                        var eval_point;
+                        var one;
                     };
 
                     struct result_type {
-                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType> output;
+                        var output;
 
-                        result_type(std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
+                        result_type(std::size_t start_row_index) {
+                            std::size_t row = start_row_index;
 
-                            // w
-                            for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
-                                output.w[i] = typename mul_component::result_type(row).output;
+                            for (std::size_t i = 1; i < EvalRounds; i++) {
                                 row += mul_component::rows_amount;
                             }
-                            // z
-                            output.z = typename mul_component::result_type(row).output;
-                            row += mul_component::rows_amount;
-                            // s
-                            for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
-                                output.s[i] = typename mul_component::result_type(row).output;
+                            var res;
+                            for (std::size_t i = 0; i < EvalRounds; i++) {
+                                row += mul_component::rows_amount;
+
+                                row += add_component::rows_amount;
+
+                                res = typename mul_component::result_type(row).output;
                                 row += mul_component::rows_amount;
                             }
-                            // lookup
-                            if (KimchiParamsType::use_lookup) {
-                                // TODO
-                            }
-                            // generic_selector
-                            output.generic_selector = typename mul_component::result_type(row).output;
-                            row += mul_component::rows_amount;
-                            // poseidon_selector
-                            output.poseidon_selector = typename mul_component::result_type(row).output;
-                            row += mul_component::rows_amount;
+
+                            output = res;
                         }
                     };
 
@@ -148,34 +142,27 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        // w
-                        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
-                            zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.w[i], params.x}, row);
+                        std::array<var, EvalRounds> pow_twos;
+                        pow_twos[0] = params.eval_point;
+                        for (std::size_t i = 1; i < EvalRounds; i++) {
+                            pow_twos[i] = zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {pow_twos[i - 1], pow_twos[i - 1]}, row).output;
                             row += mul_component::rows_amount;
                         }
-                        // z
-                        zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.z, params.x}, row);
-                        row += mul_component::rows_amount;
-                        // s
-                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
-                            zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.s[i], params.x}, row);
+                        var res = params.one;
+                        for (std::size_t i = 0; i < EvalRounds; i++) {
+                            var mul_result = zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row).output;
+                            row += mul_component::rows_amount;
+
+                            var sum_result = zk::components::generate_circuit<add_component>(bp, assignment,
+                                {params.one, mul_result}, row).output;
+                            row += add_component::rows_amount;
+
+                            res = zk::components::generate_circuit<mul_component>(bp, assignment,
+                                {res, sum_result}, row).output;
                             row += mul_component::rows_amount;
                         }
-                        // lookup
-                        if (KimchiParamsType::use_lookup) {
-                            // TODO
-                        }
-                        // generic_selector
-                        zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.generic_selector, params.x}, row);
-                        row += mul_component::rows_amount;
-                        // poseidon_selector
-                        zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.poseidon_selector, params.x}, row);
-                        row += mul_component::rows_amount;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
@@ -187,34 +174,27 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        // w
-                        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
-                            mul_component::generate_assignments(assignment,
-                                {params.evals.w[i], params.x}, row);
+                        std::array<var, EvalRounds> pow_twos;
+                        pow_twos[0] = params.eval_point;
+                        for (std::size_t i = 1; i < EvalRounds; i++) {
+                            pow_twos[i] = mul_component::generate_assignments(assignment,
+                                {pow_twos[i - 1], pow_twos[i - 1]}, row).output;
                             row += mul_component::rows_amount;
                         }
-                        // z
-                        mul_component::generate_assignments(assignment,
-                                {params.evals.z, params.x}, row);
-                        row += mul_component::rows_amount;
-                        // s
-                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
-                            mul_component::generate_assignments(assignment,
-                                {params.evals.s[i], params.x}, row);
+                        var res = params.one;
+                        for (std::size_t i = 0; i < EvalRounds; i++) {
+                            var mul_result = mul_component::generate_assignments(assignment,
+                                {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row).output;
+                            row += mul_component::rows_amount;
+
+                            var sum_result = add_component::generate_assignments(assignment,
+                                {params.one, mul_result}, row).output;
+                            row += add_component::rows_amount;
+
+                            res = mul_component::generate_assignments(assignment,
+                                {res, sum_result}, row).output;
                             row += mul_component::rows_amount;
                         }
-                        // lookup
-                        if (KimchiParamsType::use_lookup) {
-                            // TODO
-                        }
-                        // generic_selector
-                        mul_component::generate_assignments(assignment,
-                                {params.evals.generic_selector, params.x}, row);
-                        row += mul_component::rows_amount;
-                        // poseidon_selector
-                        mul_component::generate_assignments(assignment,
-                                {params.evals.poseidon_selector, params.x}, row);
-                        row += mul_component::rows_amount;
 
                         return result_type(start_row_index);
                     }
@@ -238,4 +218,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_HPP

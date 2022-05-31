@@ -34,31 +34,15 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
                 typedef std::array<uint64_t, 2> kimchi_scalar_limbs;
 
-                template<std::size_t WitnessColumns, std::size_t PermutSize,
-                    bool UseLookup, std::size_t LookupTableSize,
-                    std::size_t AlphaPowersN, std::size_t PublicInputSize>
-                struct kimchi_params_type {
-                    constexpr static std::size_t alpha_powers_n = AlphaPowersN;
-                    constexpr static std::size_t public_input_size = PublicInputSize;
-                    constexpr static std::size_t witness_columns = WitnessColumns;
-                    constexpr static std::size_t permut_size = PermutSize;
-                    constexpr static std::size_t lookup_table_size = LookupTableSize;
-                    constexpr static bool use_lookup = UseLookup;
-                };
-
-                template <std::size_t EvalRounds,
-                    std::size_t MaxPolySize>
-                struct kimchi_commitment_params_type {
-                    constexpr static std::size_t max_poly_size = MaxPolySize;
-                    constexpr static std::size_t eval_rounds = EvalRounds;
-                    constexpr static std::size_t res_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
-                };
+                struct constraint_description {};
 
                 template<typename CurveType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
@@ -66,23 +50,22 @@ namespace nil {
                     using FieldType = typename CurveType::scalar_field_type;
                     using var = snark::plonk_variable<FieldType>;
 
+                    enum argument_type {
+                        Permutation,
+                        Generic,
+                    };
+
+                    constexpr static const std::size_t constraints_amount = 2;
+
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
-                    var max_poly_size;
                     std::size_t max_quot_size;
-                    std::size_t alpha_powers;
-                    std::size_t public_input_size;
+                    std::size_t domain_size;
                     std::array<Fr, Permuts> shift;
 
-                    // Polynomial in coefficients form
-                    nil::crypto3::math::polynomial<Fr> zkpm;
-                    Fr w;
-                    Fr endo;
-                    var domain_size;
                     var omega;
-                    Fr domain_size_inv;
-                    // linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
-                    // Alphas<Fr> powers_of_alpha;
-                    // ArithmeticSpongeParams<Fr> fr_sponge_params;
+                    std::map<argument_type, std::pair<int, int>> alpha_map;
+
+                    std::array<constraint_description, constraints_amount> constraints;
                 };
 
                 /*struct kimchi_verifier_index_base {

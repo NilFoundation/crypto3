@@ -40,7 +40,6 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
 
 using namespace nil::crypto3;
 

@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -32,9 +32,9 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
@@ -42,16 +42,13 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType,
-                    typename CurveType,
-                    typename KimchiParamsType,
+                // (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
+                template<typename ArithmetizationType, 
                     std::size_t... WireIndexes>
-                class ft_eval;
+                class zkpm_evaluate;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         typename CurveType,
-                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -67,10 +64,8 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class ft_eval<
+                class zkpm_evaluate<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    CurveType,
-                    KimchiParamsType,
                     W0,
                     W1,
                     W2,
@@ -93,32 +88,27 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f22;
-                    constexpr static const std::size_t eval_points_amount = 2;
+                    constexpr static const std::size_t selector_seed = 0x0f25;
+
+                    constexpr static const std::size_t zk_rows = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = mul_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        kimchi_verifier_index_scalar<CurveType> verifier_index;
-                        var zeta_pow_n;
-                        std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
-                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> combined_evals;
-                        var gamma;
-                        var beta;
-                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> p_evals;
-                        var zeta;
-                        var joint_combiner;
+                        var group_gen;
+                        std::size_t domain_size;
+                        var x;
                     };
 
                     struct result_type {
                         var output;
 
-                        result_type(std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
-                            output = typename mul_component::result_type(row).output;
+                        result_type(std::size_t start_row_index) {
+                            std::size_t row = start_row_index;
                         }
                     };
 
@@ -129,11 +119,6 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        zk::components::generate_circuit<mul_component>(bp, assignment, 
-                            {params.zeta_pow_n, params.gamma}, row);
-                        row += mul_component::rows_amount;
-
-
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
                     }
@@ -143,9 +128,6 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
-                        mul_component::generate_assignments(assignment, 
-                            {params.zeta_pow_n, params.gamma}, row);
-                        row += mul_component::rows_amount;
 
                         return result_type(start_row_index);
                     }
@@ -163,10 +145,17 @@ namespace nil {
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                     }
+
+                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  const std::size_t start_row_index) {
+                        //assignment.constant(0)[start_row_index] = power(params.group_gen, params.domain_size - zk_rows);
+                    }
                 };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_FT_EVAL_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP

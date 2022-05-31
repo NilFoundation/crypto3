@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_PERM_SCALAR_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_PERM_SCALAR_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -42,19 +42,13 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // let k = chals.len();
-                // let mut pow_twos = vec![x];
-                // for i in 1..k {
-                //     pow_twos.push(pow_twos[i - 1].square());
-                // }
-                // product((0..k).map(|i| (F::one() + (chals[i] * pow_twos[k - 1 - i]))))
-                template<typename ArithmetizationType, std::size_t EvalRounds, 
+                template<typename ArithmetizationType, typename KimchiParamsType,
                     std::size_t... WireIndexes>
-                class b_poly;
+                class perm_scalars;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         std::size_t EvalRounds,
+                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -70,9 +64,9 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class b_poly<
+                class perm_scalars<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    EvalRounds,
+                    KimchiParamsType,
                     W0,
                     W1,
                     W2,
@@ -97,19 +91,23 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0xf20;
+                    constexpr static const std::size_t selector_seed = 0x0f26;
+
+                    constexpr static const std::size_t zk_rows = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = EvalRounds * mul_component::rows_amount
-                        + EvalRounds * (
-                            mul_component::rows_amount + add_component::rows_amount + mul_component::rows_amount
-                        );
+                    constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::array<var, EvalRounds> &challenges;
-                        var eval_point;
-                        var one;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            KimchiParamsType::eval_points_amount> evals;
+                        std::array<var, KimchiParamsType::alpha_powers_n> alphas;
+                        std::size_t start_idx;
+
+                        var beta;
+                        var gamma;
+                        var zkp_zeta;
                     };
 
                     struct result_type {
@@ -117,21 +115,6 @@ namespace nil {
 
                         result_type(std::size_t start_row_index) {
                             std::size_t row = start_row_index;
-
-                            for (std::size_t i = 1; i < EvalRounds; i++) {
-                                row += mul_component::rows_amount;
-                            }
-                            var res;
-                            for (std::size_t i = 0; i < EvalRounds; i++) {
-                                row += mul_component::rows_amount;
-
-                                row += add_component::rows_amount;
-
-                                res = typename mul_component::result_type(row).output;
-                                row += mul_component::rows_amount;
-                            }
-
-                            output = res;
                         }
                     };
 
@@ -142,28 +125,6 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        std::array<var, EvalRounds> pow_twos;
-                        pow_twos[0] = params.eval_point;
-                        for (std::size_t i = 1; i < EvalRounds; i++) {
-                            pow_twos[i] = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {pow_twos[i - 1], pow_twos[i - 1]}, row).output;
-                            row += mul_component::rows_amount;
-                        }
-                        var res = params.one;
-                        for (std::size_t i = 0; i < EvalRounds; i++) {
-                            var mul_result = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row).output;
-                            row += mul_component::rows_amount;
-
-                            var sum_result = zk::components::generate_circuit<add_component>(bp, assignment,
-                                {params.one, mul_result}, row).output;
-                            row += add_component::rows_amount;
-
-                            res = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {res, sum_result}, row).output;
-                            row += mul_component::rows_amount;
-                        }
-
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
                     }
@@ -173,28 +134,6 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
-
-                        std::array<var, EvalRounds> pow_twos;
-                        pow_twos[0] = params.eval_point;
-                        for (std::size_t i = 1; i < EvalRounds; i++) {
-                            pow_twos[i] = mul_component::generate_assignments(assignment,
-                                {pow_twos[i - 1], pow_twos[i - 1]}, row).output;
-                            row += mul_component::rows_amount;
-                        }
-                        var res = params.one;
-                        for (std::size_t i = 0; i < EvalRounds; i++) {
-                            var mul_result = mul_component::generate_assignments(assignment,
-                                {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row).output;
-                            row += mul_component::rows_amount;
-
-                            var sum_result = add_component::generate_assignments(assignment,
-                                {params.one, mul_result}, row).output;
-                            row += add_component::rows_amount;
-
-                            res = mul_component::generate_assignments(assignment,
-                                {res, sum_result}, row).output;
-                            row += mul_component::rows_amount;
-                        }
 
                         return result_type(start_row_index);
                     }
@@ -212,10 +151,16 @@ namespace nil {
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                     }
+
+                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  const std::size_t start_row_index) {
+                    }
                 };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_B_POLY_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_PERM_SCALAR_HPP

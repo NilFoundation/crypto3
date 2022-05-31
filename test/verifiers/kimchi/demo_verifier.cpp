@@ -34,6 +34,8 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
+
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
@@ -75,11 +77,10 @@ template<typename fri_type, typename FieldType>
         std::size_t r = degree_log - 1;
 
         std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-            zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+            math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
 
         params.r = r;
         params.D = domain_set;
-        params.q = q;
         params.max_degree = (1 << degree_log) - 1;
 
         return params;
@@ -88,7 +89,7 @@ template<typename fri_type, typename FieldType>
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    constexpr std::size_t complexity = 10;
+    constexpr std::size_t complexity = 1500;
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -177,7 +178,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
         zk::snark::placeholder_public_preprocessor<BlueprintFieldType, params>::process(bp, public_assignment, desc,
                                                                                      fri_params, permutation_size);
     typename zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::preprocessed_data_type private_preprocessed_data =
-        zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc);
+        zk::snark::placeholder_private_preprocessor<BlueprintFieldType, params>::process(bp, private_assignment, desc, fri_params);
 
     auto placeholder_proof = zk::snark::placeholder_prover<BlueprintFieldType, params>::process(
         public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);

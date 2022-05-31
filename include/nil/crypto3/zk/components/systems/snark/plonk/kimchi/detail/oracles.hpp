@@ -77,6 +77,7 @@ namespace nil {
                     struct params_type {
                         var first_limb = var(0, 0, false);
                         var second_limb = var(0, 0, false);
+                        params_type(std::array<var, 2> input) : first_limb(input[0]), second_limb(input[1]) {}
                         params_type(var first, var second) : first_limb(first), second_limb(second) {}
                     };
 
@@ -124,7 +125,6 @@ namespace nil {
                         assignment.witness(W1)[row] = second_limb;
                         typename BlueprintFieldType::value_type scalar = 2;
                         scalar = scalar.pow(64) * second_limb + first_limb;
-                        std::cout << scalar.data << std::endl;
                         assignment.witness(W2)[row] = scalar;
 
                         return result_type(component_start_row);
@@ -186,6 +186,8 @@ namespace nil {
 
                     struct params_type {
                         var param = var(0, 0, false);
+
+                        params_type(var value) : param(value) {}
                     };
 
                     struct result_type {
