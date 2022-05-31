@@ -44,6 +44,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationType,
+                         typename KimchiParamsType,
                          typename KimchiCommitmentParamsType>
                 struct batch_evaluation_proof_scalar {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
@@ -62,6 +63,8 @@ namespace nil {
                     // pub opening: &'a OpeningProof<G>,
                     var cip;
                     typename proof_binding::fq_sponge_output fq_output;
+                    std::array<var, KimchiParamsType::eval_points_amount> eval_points;
+                    var r;
                 };
             }    // namespace components
         }        // namespace zk

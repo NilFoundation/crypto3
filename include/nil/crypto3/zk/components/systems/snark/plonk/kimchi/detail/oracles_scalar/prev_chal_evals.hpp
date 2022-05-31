@@ -95,7 +95,7 @@ namespace nil {
                     using b_poly_component = zk::components::b_poly<ArithmetizationType, 
                         KimchiCommitmentParamsType::eval_rounds, W0, W1, W2, W3, W4, W5,
                         W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                        using b_poly_coeff_component = zk::components::b_poly_coefficients<ArithmetizationType, 
+                    using b_poly_coeff_component = zk::components::b_poly_coefficients<ArithmetizationType, 
                         KimchiCommitmentParamsType::eval_rounds, W0, W1, W2, W3, W4, W5,
                         W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 

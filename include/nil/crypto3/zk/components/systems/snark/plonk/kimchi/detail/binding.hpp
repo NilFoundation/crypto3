@@ -53,6 +53,7 @@ namespace nil {
                         var zeta;
                         var fq_digest;    // TODO overflow check
                         std::array<var, KimchiCommitmentParamsType::eval_rounds> challenges;
+                        var c;
 
 
                         static fq_sponge_output
@@ -64,7 +65,8 @@ namespace nil {
                                 typename BlueprintFieldType::value_type zeta,
                                 typename BlueprintFieldType::value_type fq_digest,
                                 std::array<typename BlueprintFieldType::value_type,
-                                    KimchiCommitmentParamsType::eval_rounds> challenges) {
+                                    KimchiCommitmentParamsType::eval_rounds> challenges,
+                                typename BlueprintFieldType::value_type c) {
 
                             std::array<var, KimchiCommitmentParamsType::eval_rounds> chals;
                             for (std::size_t i = 0; i < KimchiCommitmentParamsType::eval_rounds; i++) {
@@ -78,7 +80,8 @@ namespace nil {
                                 assignment.allocate_public_input(alpha),
                                 assignment.allocate_public_input(zeta),
                                 assignment.allocate_public_input(fq_digest),
-                                chals
+                                chals,
+                                assignment.allocate_public_input(c)
                             };
                         }
                     };
