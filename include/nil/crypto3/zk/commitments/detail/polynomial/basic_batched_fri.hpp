@@ -248,9 +248,16 @@ namespace nil {
                                 // std::array<typename FieldType::value_type, leaf_size> colinear_value;
                                 std::vector<typename FieldType::value_type> colinear_value(leaf_size);
 
+
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                                    f[polynom_index] =
-                                        fold_polynomial<FieldType>(f[polynom_index], alpha, fri_params.D[i]);
+                                    // f[polynom_index] =
+                                    //     fold_polynomial<FieldType>(f[polynom_index], alpha, fri_params.D[i]);
+                                    math::polynomial<typename FieldType::value_type> f_tmp ( 
+                                        f[polynom_index].coefficients());
+
+                                    f[polynom_index].from_coefficients(
+                                        fold_polynomial<FieldType>(f_tmp, alpha));
+                                    f[polynom_index].resize(fri_params.D[i+1]->size());
                                 }
 
                                 x_index = x_index % (fri_params.D[i + 1]->size());
