@@ -101,8 +101,8 @@ namespace nil {
 
                     struct params_type {
                         struct var_ec_point {
-                            var x = var(0, 0, false);
-                            var y = var(0, 0, false);
+                            var x;
+                            var y;
                         };
 
                         var_ec_point P;
