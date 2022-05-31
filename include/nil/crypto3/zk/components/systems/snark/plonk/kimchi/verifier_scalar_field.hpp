@@ -112,8 +112,28 @@ namespace nil {
                                 + generic_scalars_component::output_size
                                 + verifier_index_type::constraints_amount;
 
+                    constexpr static std::size_t rows() {
+                        std::size_t row = 0;
+
+                        row += oracles_component::rows_amount; 
+
+                        row += zkpm_evaluate_component::rows_amount;
+
+                        row += perm_scalars_component::rows_amount;
+
+                        row += generic_scalars_component::rows_amount;
+
+                        row += sub_component::rows_amount;
+
+                        for(std::size_t i = 0; i < verifier_index_type::constraints_amount; i++) {
+                            row += index_terms_scalars_component::rows_amount;
+                        }
+
+                        return row;
+                    }
+
                 public:
-                    constexpr static const std::size_t rows_amount = 220;
+                    constexpr static const std::size_t rows_amount = rows();
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -132,16 +152,6 @@ namespace nil {
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-
-                        if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
-
                         std::size_t row = start_row_index;
 
                         var zero = var(0, start_row_index, false, var::column_type::constant);
@@ -209,8 +219,6 @@ namespace nil {
                             ).output;
                             row += index_terms_scalars_component::rows_amount;
                         }
-
-                        std::cout<<"circuit row: "<<row<<std::endl;
 
                         return result_type();
                     }
@@ -285,8 +293,6 @@ namespace nil {
                             ).output;
                             row += index_terms_scalars_component::rows_amount;
                         }
-
-                        std::cout<<"assignments row: "<<row<<std::endl;
 
                         return result_type();
                     }
