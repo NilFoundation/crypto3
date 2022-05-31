@@ -55,6 +55,8 @@ namespace nil {
                         Generic,
                     };
 
+                    constexpr static const std::size_t constraints_amount = 2;
+
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;
@@ -62,6 +64,8 @@ namespace nil {
 
                     var omega;
                     std::map<argument_type, std::pair<int, int>> alpha_map;
+
+                    std::array<constraint_description, constraints_amount> constraints;
                 };
 
                 /*struct kimchi_verifier_index_base {

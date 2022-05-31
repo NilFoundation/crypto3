@@ -274,10 +274,10 @@ namespace nil {
                         row += endo_scalar_component::rows_amount;
 
                         // fr_transcript.absorb(fq_digest)
-                        var zero = var(0, 0, false, var::column_type::constant);
-                        var one = var(0, 1, false, var::column_type::constant);
-                        var domain_size = var(0, 2, false, var::column_type::constant);
-                        var max_poly_size = var(0, 3, false, var::column_type::constant);
+                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
+                        var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
 
                         kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
                                           W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
@@ -421,9 +421,9 @@ namespace nil {
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
+                                                            std::size_t start_row_index) {
 
-                        std::size_t row = component_start_row;
+                        std::size_t row = start_row_index;
 
                         typename BlueprintFieldType::value_type endo_factor =
                             0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
@@ -445,10 +445,10 @@ namespace nil {
                         std::cout << "zeta: " << assignment.var_value(zeta).data << std::endl;
                         std::cout << "params.fq_output.zeta: " << assignment.var_value(params.fq_output.zeta).data << std::endl;
 
-                        var zero = var(0, 0, false, var::column_type::constant);
-                        var one = var(0, 1, false, var::column_type::constant);
-                        var domain_size = var(0, 2, false, var::column_type::constant);
-                        var max_poly_size = var(0, 3, false, var::column_type::constant);
+                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
+                        var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
 
                         kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
                                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
@@ -599,7 +599,7 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
+                            std::size_t row = component_start_row + 4;
                             assignment.constant(0)[row] = 0;
                             row++;
                             assignment.constant(0)[row] = 1;
