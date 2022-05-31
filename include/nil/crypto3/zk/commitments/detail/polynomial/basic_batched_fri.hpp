@@ -433,7 +433,6 @@ namespace nil {
                                     }
 
                                     if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
-                                        std::cout<<"0"<<std::endl;
                                         return false;
                                     }
                                 }
@@ -473,14 +472,12 @@ namespace nil {
 
                                     if (interpolant.evaluate(alpha) !=
                                         proof.round_proofs[i].colinear_value[polynom_index]) {
-                                        std::cout<<"1, i = "<<i<<" for pi = "<<polynom_index<<std::endl;
                                         return false;
                                     }
                                 }
 
                                 transcript(proof.round_proofs[i].colinear_path.root());
                                 if (!proof.round_proofs[i].colinear_path.validate(leaf_data)) {
-                                    std::cout<<"2"<<std::endl;
                                     return false;
                                 }
                                 x = x_next;
@@ -495,7 +492,6 @@ namespace nil {
 
                                 if (proof.final_polynomials[polynom_index].degree() >
                                     std::pow(2, std::log2(fri_params.max_degree + 1) - r + 1) - 1) {
-                                    std::cout<<"3"<<std::endl;
                                     return false;
                                 }
 

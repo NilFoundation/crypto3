@@ -95,7 +95,7 @@ namespace nil {
 
                         nil::crypto3::math::polynomial_dfs<typename FieldType::value_type> res (d,
                             column_assignment.begin(), column_assignment.end());
-                        
+
                         res.resize(domain->size());
                         
                         return res;

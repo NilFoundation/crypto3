@@ -125,13 +125,13 @@ namespace nil {
                                             const typename ParamsType::commitment_params_type &commitment_params) {
 
                         math::polynomial_dfs<typename FieldType::value_type> f (
-                            domain->m-1, domain->m, FieldType::value_type::zero());
+                            domain->size()-1, domain->size(), FieldType::value_type::zero());
                         
-                        if (number < domain->m) {
+                        if (number < domain->size()) {
                             f[number] = FieldType::value_type::one();
                         }
 
-                        f.resize(commitment_params.D[0]->m);
+                        f.resize(commitment_params.D[0]->size());
 
                         return f;
                     }
@@ -308,14 +308,14 @@ namespace nil {
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_id(permutation_size);
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
-                            S_id[i] = math::polynomial_dfs<typename FieldType::value_type>(domain->m - 1,
-                                domain->m, FieldType::value_type::zero());
+                            S_id[i] = math::polynomial_dfs<typename FieldType::value_type>(domain->size() - 1,
+                                domain->size(), FieldType::value_type::zero());
 
-                            for (std::size_t j = 0; j < domain->m; j++) {
+                            for (std::size_t j = 0; j < domain->size(); j++) {
                                 S_id[i][j] = delta.pow(i) * omega.pow(j);
                             }
 
-                            S_id[i].resize(commitment_params.D[0]->m);
+                            S_id[i].resize(commitment_params.D[0]->size());
                         }
 
                         return S_id;
@@ -331,15 +331,15 @@ namespace nil {
 
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_perm(permutation_size);
                         for (std::size_t i = 0; i < permutation_size; i++) {
-                            S_perm[i] = math::polynomial_dfs<typename FieldType::value_type>(domain->m - 1,
-                                domain->m, FieldType::value_type::zero());
+                            S_perm[i] = math::polynomial_dfs<typename FieldType::value_type>(domain->size() - 1,
+                                domain->size(), FieldType::value_type::zero());
 
-                            for (std::size_t j = 0; j < domain->m; j++) {
+                            for (std::size_t j = 0; j < domain->size(); j++) {
                                 auto key = std::make_pair(i, j);
                                 S_perm[i][j] = delta.pow(permutation[key].first) * omega.pow(permutation[key].second);
                             }
 
-                            S_perm[i].resize(commitment_params.D[0]->m);
+                            S_perm[i].resize(commitment_params.D[0]->size());
                         }
 
                         return S_perm;
@@ -350,13 +350,13 @@ namespace nil {
                                        const std::shared_ptr<math::evaluation_domain<FieldType>> &domain,
                                        const typename ParamsType::commitment_params_type &commitment_params) {
                         math::polynomial_dfs<typename FieldType::value_type> q_blind(
-                            domain->m - 1, domain->m, FieldType::value_type::zero());
+                            domain->size() - 1, domain->size(), FieldType::value_type::zero());
 
-                        for (std::size_t j = usable_rows + 1; j < domain->m; j++) {
+                        for (std::size_t j = usable_rows + 1; j < domain->size(); j++) {
                             q_blind[j] = FieldType::value_type::one();
                         }
 
-                        q_blind.resize(commitment_params.D[0]->m);
+                        q_blind.resize(commitment_params.D[0]->size());
                         return q_blind;
                     }
 
