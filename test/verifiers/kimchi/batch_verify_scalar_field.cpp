@@ -178,7 +178,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
         kimchi_proof, proof, public_input
     );
 
-    typename component_type::params_type params = {};
+    std::array<zk::components::batch_evaluation_proof_scalar, 
+        srs_len> batches;
+
+    typename component_type::params_type params = {batches};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {

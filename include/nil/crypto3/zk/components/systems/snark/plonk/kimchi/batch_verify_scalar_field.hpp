@@ -29,7 +29,12 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
+
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/random.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -85,27 +90,34 @@ namespace nil {
                     
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
+                    using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+
+                    using random_component = zk::components::random<ArithmetizationType, 
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using batch_proof = batch_evaluation_proof_scalar;
 
                     constexpr static const std::size_t selector_seed = 0x0f28;
+
+                    constexpr static const std::size_t srs_len = KimchiCommitmentParamsType::srs_len;
 
                     constexpr static std::size_t scalars_len() {
                         return 10;
                     }
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 100;
 
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        
+                        std::array<batch_proof, srs_len> batches;
                     };
 
                     struct result_type {
-                        var output;
+                        std::array<var, scalars_len()> output;
 
-                        result_type(std::size_t component_start_row) {
+                        result_type(std::size_t start_row_index) {
                         }
                     };
 
@@ -114,19 +126,72 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index){
 
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
+
                         std::size_t row = start_row_index;
+
+                        var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
+
+                        std::array<var, scalars_len()> scalars;
+                        
+                        var rand_base = random_component::generate_circuit(
+                            bp, assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+                        var sg_rand_base = random_component::generate_circuit(
+                            bp, assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+
+                        var rand_base_i = one;
+                        var sg_rand_base_i = one;
+
+                        for (std::size_t i = 0; i < params.batches.size(); i++) {
+                            rand_base_i = zk::components::generate_circuit<mul_component>(
+                                bp, assignment,
+                                {rand_base_i, rand_base}, row).output;
+                            row += mul_component::rows_amount;
+
+                            sg_rand_base_i = zk::components::generate_circuit<mul_component>(
+                                bp, assignment,
+                                {sg_rand_base_i, sg_rand_base}, row).output;
+                            row += mul_component::rows_amount;
+                        }
+
+                        std::cout<<"circuit row: "<<row<<std::endl;
 
                         return result_type(start_row_index);
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
+                                                            std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
+
+                        var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
                         std::array<var, scalars_len()> scalars;
-                        var rand_base; //todo random
-                        var sg_rand_base;
+                        var rand_base = random_component::generate_assignments(
+                            assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+                        var sg_rand_base = random_component::generate_assignments(
+                            assignment, {one}, row).output;
+                        row += random_component::rows_amount;
+
+                        var rand_base_i = one;
+                        var sg_rand_base_i = one;
+
+                        for (std::size_t i = 0; i < params.batches.size(); i++) {
+                            rand_base_i = mul_component::generate_assignments(assignment,
+                                {rand_base_i, rand_base}, row).output;
+                            row += mul_component::rows_amount;
+
+                            sg_rand_base_i = mul_component::generate_assignments(assignment,
+                                {sg_rand_base_i, sg_rand_base}, row).output;
+                            row += mul_component::rows_amount;
+                        }
+
+                        std::cout<<"assignment row: "<<row<<std::endl;
 
                     //     // Verifier checks for all i,
                     //     // c_i Q_i + delta_i = z1_i (G_i + b_i U_i) + z2_i H
@@ -156,19 +221,8 @@ namespace nil {
 
                     //     // TODO: This will need adjusting
                     //     let padding = padded_length - nonzero_length;
-                    //     let mut points = vec![self.h];
-                    //     points.extend(self.g.clone());
-                    //     points.extend(vec![G::zero(); padding]);
 
                     //     let mut scalars = vec![ScalarField::<G>::zero(); padded_length + 1];
-                    //     assert_eq!(scalars.len(), points.len());
-
-                    //     // sample randomiser to scale the proofs with
-                    //     let rand_base = ScalarField::<G>::rand(rng);
-                    //     let sg_rand_base = ScalarField::<G>::rand(rng);
-
-                    //     let mut rand_base_i = ScalarField::<G>::one();
-                    //     let mut sg_rand_base_i = ScalarField::<G>::one();
 
                     //     for BatchEvaluationProof {
                     //         sponge,
@@ -325,12 +379,7 @@ namespace nil {
                     //         sg_rand_base_i *= &sg_rand_base;
                     //     }
 
-                    //     // verify the equation
-                    //     let scalars: Vec<_> = scalars.iter().map(|x| x.into_repr()).collect();
-                    //     VariableBaseMSM::multi_scalar_mul(&points, &scalars) == G::Projective::zero()
-                    // }
-
-                        return result_type(component_start_row);
+                        return result_type(start_row_index);
                     }
 
                 private:

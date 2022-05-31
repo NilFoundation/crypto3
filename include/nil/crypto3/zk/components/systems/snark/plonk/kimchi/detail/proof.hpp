@@ -89,6 +89,10 @@ namespace nil {
                     std::array<var, KimchiParamsType::public_input_size> public_input;
                     std::array<var, EvalRounds> prev_challenges;
                 };
+
+                struct batch_evaluation_proof_scalar {
+
+                };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
