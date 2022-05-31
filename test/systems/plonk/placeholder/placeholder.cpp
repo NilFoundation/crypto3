@@ -313,7 +313,6 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
     for (int i = 0; i < argument_size; i++) {
-        std::cout << i << ": " << prover_res.F[i].evaluate(y).data << " " << verifier_res[i].data << std::endl;
         BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
     }
 }
