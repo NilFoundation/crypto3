@@ -248,7 +248,8 @@ namespace nil {
                                 // std::array<typename FieldType::value_type, leaf_size> colinear_value;
                                 std::vector<typename FieldType::value_type> colinear_value(leaf_size);
 
-                                for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {///////////////
+
+                                for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     if (i == 0) {
                                         f[polynom_index].resize(fri_params.D[i]->size());
                                     }
