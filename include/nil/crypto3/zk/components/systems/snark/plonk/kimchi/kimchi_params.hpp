@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFIER_INDEX_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFIER_INDEX_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PARAMS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PARAMS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -38,8 +38,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                typedef std::array<uint64_t, 2> kimchi_scalar_limbs;
-
                 template<std::size_t WitnessColumns, std::size_t PermutSize,
                     bool UseLookup, std::size_t LookupTableSize,
                     std::size_t AlphaPowersN, std::size_t PublicInputSize>
@@ -52,6 +50,8 @@ namespace nil {
                     constexpr static bool use_lookup = UseLookup;
 
                     constexpr static std::size_t permutation_constraints = 3;
+                    constexpr static std::size_t generic_constraints = 2;
+
                     constexpr static std::size_t eval_points_amount = 2;
                 };
 
@@ -62,68 +62,9 @@ namespace nil {
                     constexpr static std::size_t eval_rounds = EvalRounds;
                     constexpr static std::size_t res_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
                 };
-
-                template<typename CurveType, std::size_t Permuts = 7>
-                struct kimchi_verifier_index_scalar {
-                    using Fr = typename CurveType::scalar_field_type::value_type;
-                    using FieldType = typename CurveType::scalar_field_type;
-                    using var = snark::plonk_variable<FieldType>;
-
-                    enum argument_type {
-                        Permutation,
-                    };
-
-                    // nil::crypto3::math::evaluation_domain<Fr> domain;
-                    std::size_t max_quot_size;
-                    std::size_t domain_size;
-                    std::array<Fr, Permuts> shift;
-
-                    // Polynomial in coefficients form
-                    nil::crypto3::math::polynomial<Fr> zkpm;
-                    Fr w;
-                    Fr endo;
-                    var omega;
-                    Fr domain_size_inv;
-                    // linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
-                    // ArithmeticSpongeParams<Fr> fr_sponge_params;
-                    std::map<argument_type, std::pair<int, int>> alpha_map;
-                };
-
-                /*struct kimchi_verifier_index_base {
-                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
-                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
-                    using curve_t = CurveType;
-                    using Fr = typename CurveType::scalar_field_type;
-                    using Fq = typename CurveType::base_field_type;
-
-                    nil::crypto3::math::evaluation_domain<Fr> domain;
-                    size_t max_poly_size;
-                    size_t max_quot_size;
-                    srs_t<CurveType> srs;
-                    std::array<commitment_type, Permuts> sigma_comm;
-                    std::array<commitment_type, WiresAmount> coefficients_comm;
-                    commitment_type generic_comm;
-                    commitment_type psm_comm;
-                    commitment_type complete_add_comm;
-                    commitment_type mul_comm;
-                    commitment_type emul_comm;
-                    commitment_type endomul_scalar_comm;
-                    std::array<commitment_type, 4> chacha_comm;
-                    std::array<Fr, Permuts> shift;
-
-                    // Polynomial in coefficients form
-                    nil::crypto3::math::polynomial<Fr> zkpm;
-                    Fr w;
-                    Fr endo;
-                    lookup_verifier_index<CurveType> lookup_index;
-                    linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
-                    Alphas<Fr> powers_of_alpha;
-                    ArithmeticSpongeParams<Fr> fr_sponge_params;
-                    ArithmeticSpongeParams<Fq> fq_sponge_params;
-                };*/
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFIER_INDEX_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PARAMS_HPP

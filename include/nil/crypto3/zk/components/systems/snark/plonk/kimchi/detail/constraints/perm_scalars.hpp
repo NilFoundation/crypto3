@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -42,7 +42,6 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
                 template<typename ArithmetizationType, typename KimchiParamsType,
                     std::size_t... WireIndexes>
                 class perm_scalars;

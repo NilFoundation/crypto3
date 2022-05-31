@@ -41,6 +41,8 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/perm_scalars.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/generic_scalars.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_scalars.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -80,6 +82,14 @@ namespace nil {
                                 W0, W1, W2, W3, W4, W5,
                                 W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    using generic_scalars_component = generic_scalars<ArithmetizationType, KimchiParamsType,
+                                W0, W1, W2, W3, W4, W5,
+                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using index_terms_scalars_component = index_terms_scalars<ArithmetizationType, KimchiParamsType,
+                                W0, W1, W2, W3, W4, W5,
+                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType>;
 
@@ -87,7 +97,7 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0x0f24;
                     
-                    constexpr static const std::size_t f_comm_msm_size = 5;
+                    constexpr static const std::size_t f_comm_msm_size = 20;
 
                 public:
                     constexpr static const std::size_t rows_amount = 220;
@@ -129,6 +139,8 @@ namespace nil {
                         row += oracles_component::rows_amount; 
 
                         std::array<var, f_comm_msm_size> f_comm_scalars;
+                        std::size_t f_comm_idx = 0;
+
                         var zkp = zkpm_evaluate_component::generate_circuit(bp, assignment,
                             {params.verifier_index.omega, params.verifier_index.domain_size,
                             oracles_output.oracles.zeta}, row).output;
@@ -136,12 +148,24 @@ namespace nil {
 
                         std::pair<std::size_t, std::size_t> alpha_idxs = 
                             params.verifier_index.alpha_map[argument_type::Permutation];
-                        var perm_scalars = perm_scalars_component::generate_circuit(bp,
+                        f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_circuit(bp,
                             assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
                             alpha_idxs.first,
                             params.fq_output.beta, params.fq_output.gamma,
                             zkp}, row).output;
+                        f_comm_idx += 1;
                         row += perm_scalars_component::rows_amount;
+
+                        alpha_idxs = 
+                            params.verifier_index.alpha_map[argument_type::Generic];
+                        std::array<var, generic_scalars_component::output_size> generic_scalars = 
+                            generic_scalars_component::generate_circuit(bp,
+                                assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
+                                alpha_idxs.first}, row).output;
+                        std::copy(std::begin(generic_scalars), std::end(generic_scalars),
+                            std::begin(f_comm_scalars) + f_comm_idx);
+                        f_comm_idx += generic_scalars_component::output_size;
+                        row += generic_scalars_component::rows_amount;
 
                         return result_type();
                     }
@@ -160,6 +184,7 @@ namespace nil {
                         row += oracles_component::rows_amount; 
 
                         std::array<var, f_comm_msm_size> f_comm_scalars;
+                        std::size_t f_comm_idx = 0;
                         var zkp = zkpm_evaluate_component::generate_assignments(assignment,
                             {params.verifier_index.omega, params.verifier_index.domain_size,
                             oracles_output.oracles.zeta}, row).output;
@@ -167,12 +192,25 @@ namespace nil {
 
                         std::pair<std::size_t, std::size_t> alpha_idxs = 
                             params.verifier_index.alpha_map[argument_type::Permutation];
-                        var perm_scalars = perm_scalars_component::generate_assignments(
+                        f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_assignments(
                             assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
                             alpha_idxs.first,
                             params.fq_output.beta, params.fq_output.gamma,
                             zkp}, row).output;
+                        f_comm_idx += 1;
                         row += perm_scalars_component::rows_amount;
+
+                        alpha_idxs = 
+                            params.verifier_index.alpha_map[argument_type::Generic];
+                        std::array<var, generic_scalars_component::output_size> generic_scalars = 
+                            generic_scalars_component::generate_assignments(
+                                assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
+                                alpha_idxs.first}, row).output;
+                        std::copy(std::begin(generic_scalars), std::end(generic_scalars),
+                            std::begin(f_comm_scalars) + f_comm_idx);
+                        f_comm_idx += generic_scalars_component::output_size;
+                        row += generic_scalars_component::rows_amount;
+
                         return result_type();
                     }
 

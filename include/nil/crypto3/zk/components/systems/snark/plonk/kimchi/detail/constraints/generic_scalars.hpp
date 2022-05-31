@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_GENERIC_SCALARS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_GENERIC_SCALARS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -42,13 +42,13 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
-                template<typename ArithmetizationType, 
+                template<typename ArithmetizationType, typename KimchiParamsType,
                     std::size_t... WireIndexes>
-                class zkpm_evaluate;
+                class generic_scalars;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
+                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -64,8 +64,9 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class zkpm_evaluate<
+                class generic_scalars<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    KimchiParamsType,
                     W0,
                     W1,
                     W2,
@@ -90,22 +91,25 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f25;
+                    constexpr static const std::size_t selector_seed = 0x0f26;
 
-                    constexpr static const std::size_t zk_rows = 3;
+                    constexpr static const std::size_t generic_offset = 3;
 
                 public:
                     constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 0;
 
+                    constexpr static const std::size_t output_size = 10;
+
                     struct params_type {
-                        var group_gen;
-                        std::size_t domain_size;
-                        var x;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            KimchiParamsType::eval_points_amount> evals;
+                        std::array<var, KimchiParamsType::alpha_powers_n> alphas;
+                        std::size_t start_idx;
                     };
 
                     struct result_type {
-                        var output;
+                        std::array<var, output_size> output;
 
                         result_type(std::size_t start_row_index) {
                             std::size_t row = start_row_index;
@@ -150,7 +154,6 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
-                        //assignment.constant(0)[start_row_index] = power(params.group_gen, params.domain_size - zk_rows);
                     }
                 };
             }    // namespace components
@@ -158,4 +161,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_GENERIC_SCALARS_HPP
