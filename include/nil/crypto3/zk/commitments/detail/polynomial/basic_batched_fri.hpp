@@ -39,7 +39,7 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/fold_polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -43,6 +43,7 @@
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
@@ -82,7 +83,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;
@@ -136,7 +137,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_test) {
 
     std::size_t d_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = 
-        zk::commitments::detail::calculate_domain_set<FieldType>(d_log, 1);
+        math::calculate_domain_set<FieldType>(d_log, 1);
 
     params.r = r;
     params.D = D;
@@ -186,7 +187,7 @@ BOOST_AUTO_TEST_CASE(fri_fold_dfs_test) {
 
     std::size_t d_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = 
-        zk::commitments::detail::calculate_domain_set<FieldType>(d_log, 2);
+        math::calculate_domain_set<FieldType>(d_log, 2);
 
     params.r = r;
     params.D = D;
@@ -255,7 +256,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;
@@ -307,7 +308,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_compile_time_size_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;
@@ -368,7 +369,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_runtime_size_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;
@@ -433,7 +434,7 @@ BOOST_AUTO_TEST_CASE(fri_dfs_basic_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;
@@ -494,7 +495,7 @@ BOOST_AUTO_TEST_CASE(fri_dfs_test_2) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;
@@ -560,7 +561,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;
@@ -632,7 +633,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_test_2) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     params.r = r;
     params.D = D;

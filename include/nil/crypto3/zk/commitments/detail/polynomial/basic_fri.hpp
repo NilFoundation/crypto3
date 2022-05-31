@@ -39,72 +39,13 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/fold_polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
                 namespace detail {
-
-                    template<typename FieldType>
-                    math::polynomial<typename FieldType::value_type>
-                        fold_polynomial(math::polynomial<typename FieldType::value_type> &f,
-                                        typename FieldType::value_type alpha) {
-
-                        std::size_t d = f.degree();
-                        if (d % 2 == 0) {
-                            f.push_back(0);
-                            d++;
-                        }
-                        math::polynomial<typename FieldType::value_type> f_folded(d / 2 + 1);
-
-                        for (std::size_t index = 0; index <= f_folded.degree(); index++) {
-                            f_folded[index] = f[2 * index] + alpha * f[2 * index + 1];
-                        }
-
-                        return f_folded;
-                    }
-
-                    template<typename FieldType>
-                    math::polynomial_dfs<typename FieldType::value_type>
-                        fold_polynomial(math::polynomial_dfs<typename FieldType::value_type> &f,
-                                        typename FieldType::value_type alpha,
-                                        std::shared_ptr<math::evaluation_domain<FieldType>> domain) {
-
-                        std::size_t d = f.degree();
-                        
-                        //codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
-                        // + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in range(len(codeword)//2)]
-                        math::polynomial_dfs<typename FieldType::value_type> f_folded(
-                            domain->size() / 2 - 1, domain->size() / 2, FieldType::value_type::zero());
-
-                        typename FieldType::value_type two_inversed = 2; 
-                        two_inversed = two_inversed.inversed();
-                        typename FieldType::value_type omega_inversed = domain->get_domain_element(1);
-                        omega_inversed = omega_inversed.inversed();
-
-                        for (std::size_t i = 0; i <= f_folded.degree(); i++) {
-                            f_folded[i] = two_inversed * (
-                                (1 + alpha * power(omega_inversed, i)) * f[i] + (1 - alpha * power(omega_inversed, i)) * f[domain->size() / 2 + i]
-                            );
-                        }
-
-                        return f_folded;
-                    }
-
-                    template<typename FieldType>
-                    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>>
-                        calculate_domain_set(const std::size_t max_domain_degree, const std::size_t set_size) {
-
-                        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set(set_size);
-                        for (std::size_t i = 0; i < set_size; i++) {
-                            const std::size_t domain_size = std::pow(2, max_domain_degree - i);
-                            std::shared_ptr<math::evaluation_domain<FieldType>> domain =
-                                math::make_evaluation_domain<FieldType>(domain_size);
-                            domain_set[i] = domain;
-                        }
-                        return domain_set;
-                    }
 
                     /**
                      * @brief Based on the FRI Commitment description from \[ResShift].

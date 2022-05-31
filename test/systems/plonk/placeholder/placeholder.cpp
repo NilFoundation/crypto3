@@ -41,6 +41,7 @@
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -74,7 +75,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     std::size_t r = degree_log - 1;
 
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
 
     params.r = r;
     params.D = domain_set;
