@@ -29,8 +29,9 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
+//#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>
 
 namespace nil {
@@ -38,7 +39,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t batch_size, std::size_t lr_rounds,
+                template<typename ArithmetizationType, typename CurveType,
                 std::size_t n, std::size_t bases_size,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
@@ -92,7 +93,7 @@ namespace nil {
 
                     using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, bases_size,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
-                    using var_ec_point = typename msm_component::params_type::var_ec_point;
+                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -115,14 +116,14 @@ namespace nil {
                             var_ec_point G;
                         };
                         struct var_proof {
-                            kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14> transcript;
+                            /*kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                                          W11, W12, W13, W14> transcript;*/
                             PE pe;
                             opening_proof o;
                         };
                         struct public_input {
                             var_ec_point H;
-                            std::array<var_ec_point, n> G;
+                            std::vector<var_ec_point> G;
                             std::vector<var> scalars;
                             std::vector<var> cip;
                         };
@@ -159,7 +160,7 @@ namespace nil {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
                         }*/
                         for (std::size_t i = 0; i < params.input.proofs.size(); i++) {
-                            var cip = params.input.cip[i];
+                            var cip = params.input.PI.cip[i];
                             typename sub_component::params_type sub_params = {cip, var(0, component_start_row + 2, false, var::column_type::constant)};
                             auto sub_res = sub_component::generate_assignments(assignment, sub_params, row);
                             row = row + sub_component::rows_amount;
@@ -229,11 +230,11 @@ namespace nil {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
                         }*/
                         for (std::size_t i = 0; i < params.input.proofs.size(); i++) {
-                            var cip = params.input.cip[i];
-                            typename sub_component::params_type sub_params = {cip, var(0, start_row_index + 2, false, var::column_type::constant)};
+                            var cip = params.input.PI.cip[i];
+                            typename sub_component::params_type sub_params = {cip, var(0, row + 2, false, var::column_type::constant)};
                             zk::components::generate_circuit<sub_component>(bp, assignment, sub_params,
-                                                                        start_row_index);
-                            typename sub_component::result_type sub_res(sub_params, start_row_index);
+                                                                        row);
+                            typename sub_component::result_type sub_res(sub_params, row);
                             row = row + sub_component::rows_amount;
 
                             //params.input.proofs[i].transcript.absorb_assignment(assignment, sub_res.output, row);

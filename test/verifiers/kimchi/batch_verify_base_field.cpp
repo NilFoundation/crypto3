@@ -35,10 +35,11 @@
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
+//#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 
 #include "test_plonk_component.hpp"
@@ -73,12 +74,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*lr_rounds + f_comm_size + 1)* batch_size;
     constexpr static const std::size_t bases_size = n + 1 + (1 + 1 + 2*lr_rounds + f_comm_size + 1)* batch_size;
 
-    using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, batch_size, lr_rounds, n, comm_size, bases_size,
+    using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, n, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, curve_type, bases_size,
                     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14> ;
-    using var_ec_point = typename msm_component::params_type::var_ec_point;
+    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     //zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
@@ -178,13 +179,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     typename component_type::params_type::f_comm comm_var = {{shifted_var}, {unshifted_var}};
 
-    typename component_type::params_type::PE pe_var = {comm_var};
+    typename component_type::params_type::PE pe_var = {{comm_var}};
     typename component_type::params_type::opening_proof o_var = {{L_var}, {R_var}, delta_var, G_var};
-    zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                        11, 12, 13, 14> transcript;
-    typename component_type::params_type::var_proof proof_var = {transcript, pe_var, o_var}; 
-    typename component_type::params_type::public_input PI_var = {H_var, PI_G_var, scalars_var};
-    typename component_type::params_type::result input = {{proof_var}, PI_var, cip_var};
+    //zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    //                    11, 12, 13, 14> transcript;
+    typename component_type::params_type::var_proof proof_var = {/*transcript,*/ pe_var, o_var}; 
+    typename component_type::params_type::public_input PI_var = {H_var, {PI_G_var}, scalars_var, {cip_var}};
+    typename component_type::params_type::result input = {{proof_var}, PI_var};
     typename component_type::params_type params = {input};
 
     auto result_check = [](AssignmentType &assignment, 

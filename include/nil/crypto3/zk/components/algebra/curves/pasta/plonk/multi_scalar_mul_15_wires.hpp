@@ -36,7 +36,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
-
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
 
@@ -69,6 +69,7 @@ namespace nil {
                                                                        W4, W5, W6, W7, W8, W9, W10>;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f07;
@@ -77,10 +78,6 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct var_ec_point {
-                            var X;
-                            var Y;
-                        };
 
                         std::vector<var> scalars;
                         std::vector<var_ec_point> bases;
