@@ -296,6 +296,9 @@ namespace nil {
                                 x_index %= fri_params.D[i + 1]->size();
 
                                 // create polynomial of degree (degree(f) / 2)
+                                if (i == 0) {
+                                    f.resize(fri_params.D[i]->size());
+                                }
                                 f = fold_polynomial<FieldType>(f, alpha, fri_params.D[i]);
 
                                 typename FieldType::value_type colinear_value = f[x_index];
