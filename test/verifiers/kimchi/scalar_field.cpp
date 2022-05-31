@@ -127,10 +127,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
         0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
         0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
     std::size_t domain_size = 128;
-    verifier_index.domain_size = var(0, 6, false, var::column_type::public_input);
-    verifier_index.omega = var(0, 7, false, var::column_type::public_input); 
-    verifier_index.public_input_size = public_input_size;
-    verifier_index.alpha_powers = alpha_powers_n;
+    verifier_index.domain_size = domain_size;
+    verifier_index.omega = var(0, 6, false, var::column_type::public_input); 
 
     using component_type = zk::components::kimchi_verifier_scalar_field<ArithmetizationType, 
             curve_type, kimchi_params, commitment_params,
@@ -155,11 +153,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner, beta, gamma, 
         alpha, zeta, fq_digest,
         //verifier_index (6+)
-        domain_size,
         omega};
-
-    public_input.push_back(max_poly_size);
-    verifier_index.max_poly_size = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
     // TODO prepare real data
     for (std::size_t i = 0; i < public_input_size; i++) {

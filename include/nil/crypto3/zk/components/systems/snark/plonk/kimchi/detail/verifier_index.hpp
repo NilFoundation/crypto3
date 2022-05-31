@@ -67,17 +67,14 @@ namespace nil {
                     using var = snark::plonk_variable<FieldType>;
 
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
-                    var max_poly_size;
                     std::size_t max_quot_size;
-                    std::size_t alpha_powers;
-                    std::size_t public_input_size;
+                    std::size_t domain_size;
                     std::array<Fr, Permuts> shift;
 
                     // Polynomial in coefficients form
                     nil::crypto3::math::polynomial<Fr> zkpm;
                     Fr w;
                     Fr endo;
-                    var domain_size;
                     var omega;
                     Fr domain_size_inv;
                     // linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>

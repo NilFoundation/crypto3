@@ -39,6 +39,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -70,10 +71,16 @@ namespace nil {
                                 KimchiCommitmentParamsType, W0, W1, W2, W3, W4, W5,
                                 W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    using zkpm_evaluate_component = zkpm_evaluate<ArithmetizationType,
+                                W0, W1, W2, W3, W4, W5,
+                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f24;
+                    
+                    constexpr static const std::size_t f_comm_msm_size = 5;
 
                 public:
                     constexpr static const std::size_t rows_amount = 220;
@@ -114,6 +121,12 @@ namespace nil {
                             oracles_params, row);
                         row += oracles_component::rows_amount; 
 
+                        std::array<var, f_comm_msm_size> f_comm_scalars;
+                        var zkp = zkpm_evaluate_component::generate_circuit(bp, assignment,
+                            {params.verifier_index.omega, params.verifier_index.domain_size,
+                            oracles_output.oracles.zeta}, row).output;
+                        row += zkpm_evaluate_component::rows_amount;
+
                         return result_type();
                     }
 
@@ -129,6 +142,12 @@ namespace nil {
                         auto oracles_output = oracles_component::generate_assignments(assignment,
                             oracles_params, row);
                         row += oracles_component::rows_amount; 
+
+                        std::array<var, f_comm_msm_size> f_comm_scalars;
+                        var zkp = zkpm_evaluate_component::generate_assignments(assignment,
+                            {params.verifier_index.omega, params.verifier_index.domain_size,
+                            oracles_output.oracles.zeta}, row).output;
+                        row += zkpm_evaluate_component::rows_amount;
                         return result_type();
                     }
 
