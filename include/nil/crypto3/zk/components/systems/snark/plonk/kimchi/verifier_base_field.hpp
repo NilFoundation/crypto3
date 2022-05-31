@@ -569,12 +569,12 @@ namespace nil {
                                 std::vector<var_ec_point> part_unshifted_commitments;
                                 std::vector<var> part_scalars;
                                 for (std::size_t k = 0; k < size; k++) {
-                                    if (j < unshifted_commitments[j].size()){
+                                    if (k < unshifted_commitments[j].size()){
                                         part_unshifted_commitments.push_back(unshifted_commitments[j][k]);
-                                        part_scalars.push_back(params.input.proofs[i].scalars[j]);
+                                        part_scalars.push_back(params.input.proofs[i].scalars[k]);
                                     } else {
                                         part_unshifted_commitments.push_back({var(W0, urow, false), var(W1, urow, false)});
-                                        part_scalars.push_back(params.input.proofs[i].scalars[j]);
+                                        part_scalars.push_back(params.input.proofs[i].scalars[k]);
                                     }
                                 }
                                 auto res = msm_component::generate_circuit(bp, assignment, {part_scalars, part_unshifted_commitments}, row);
