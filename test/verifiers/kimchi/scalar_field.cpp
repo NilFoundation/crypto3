@@ -148,10 +148,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
     typename BlueprintFieldType::value_type fq_digest = 0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
 
     zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
-    typename zk::components::binding<ArithmetizationType, BlueprintFieldType>::fq_sponge_output fq_output = {
+    std::array<var, eval_rounds> challenges;
+    typename zk::components::binding<ArithmetizationType, BlueprintFieldType, commitment_params>::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
-        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input) 
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+        challenges
     };
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner, beta, gamma, 

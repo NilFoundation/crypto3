@@ -40,7 +40,8 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType, 
-                    typename BlueprintFieldType>
+                    typename BlueprintFieldType,
+                    typename KimchiCommitmentParamsType>
                 struct binding {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
@@ -51,15 +52,24 @@ namespace nil {
                         var alpha;
                         var zeta;
                         var fq_digest;    // TODO overflow check
+                        std::array<var, KimchiCommitmentParamsType::eval_rounds> challenges;
+
 
                         static fq_sponge_output
                             allocate_fq_output(blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                typename BlueprintFieldType::value_type joint_combiner,
-                                                typename BlueprintFieldType::value_type beta,
-                                                typename BlueprintFieldType::value_type gamma,
-                                                typename BlueprintFieldType::value_type alpha,
-                                                typename BlueprintFieldType::value_type zeta,
-                                                typename BlueprintFieldType::value_type fq_digest) {
+                                typename BlueprintFieldType::value_type joint_combiner,
+                                typename BlueprintFieldType::value_type beta,
+                                typename BlueprintFieldType::value_type gamma,
+                                typename BlueprintFieldType::value_type alpha,
+                                typename BlueprintFieldType::value_type zeta,
+                                typename BlueprintFieldType::value_type fq_digest,
+                                std::array<typename BlueprintFieldType::value_type,
+                                    KimchiCommitmentParamsType::eval_rounds> challenges) {
+
+                            std::array<var, KimchiCommitmentParamsType::eval_rounds> chals;
+                            for (std::size_t i = 0; i < KimchiCommitmentParamsType::eval_rounds; i++) {
+                                chals[i] = assignment.allocate_public_input(challenges[i]);
+                            }
 
                             return fq_sponge_output {
                                 assignment.allocate_public_input(joint_combiner),
@@ -68,6 +78,7 @@ namespace nil {
                                 assignment.allocate_public_input(alpha),
                                 assignment.allocate_public_input(zeta),
                                 assignment.allocate_public_input(fq_digest),
+                                chals
                             };
                         }
                     };

@@ -33,8 +33,13 @@
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/combined_inner_product.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/random.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
+
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -42,12 +47,14 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType, 
+                         typename CurveType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
                          std::size_t... WireIndexes>
                 class batch_verify_scalar_field;
 
                 template<typename BlueprintFieldType,
+                         typename CurveType,
                          typename ArithmetizationParams,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
@@ -67,6 +74,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class batch_verify_scalar_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                                       CurveType,
                                                        KimchiCommitmentParamsType,
                                                        BatchSize,
                                                        W0,
@@ -91,15 +99,22 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
                     using random_component = zk::components::random<ArithmetizationType, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    using batch_proof = batch_evaluation_proof_scalar;
+                    using endo_scalar_component =
+                        zk::components::endo_scalar<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                                                    W9, W10, W11, W12, W13, W14>;
+
+                    using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
+                        ArithmetizationType, KimchiCommitmentParamsType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f28;
 
                     constexpr static const std::size_t srs_len = KimchiCommitmentParamsType::srs_len;
+                    constexpr static const std::size_t eval_rounds = KimchiCommitmentParamsType::eval_rounds;
 
                     constexpr static std::size_t scalars_len() {
                         return 10;
@@ -111,7 +126,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::array<batch_proof, srs_len> batches;
+                        std::array<batch_proof, BatchSize> batches;
                     };
 
                     struct result_type {
@@ -130,6 +145,10 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
+                        typename BlueprintFieldType::value_type endo_factor =
+                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        std::size_t endo_num_bits = 128;
+
                         var zero = var(0, start_row_index, false, var::column_type::constant);
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
@@ -146,6 +165,22 @@ namespace nil {
                         var sg_rand_base_i = one;
 
                         for (std::size_t i = 0; i < params.batches.size(); i++) {
+                            var cip = params.batches[i].cip;
+
+                            std::array<std::array<var, 2>, eval_rounds> challenges;
+                            for (std::size_t j = 0; j < eval_rounds; j++) {
+                                challenges[j][0] = endo_scalar_component::generate_circuit(
+                                    bp, assignment, 
+                                    {params.batches[i].fq_output.challenges[j],
+                                    endo_factor, endo_num_bits},
+                                    row).output;
+                                row += endo_scalar_component::rows_amount;
+
+                                challenges[j][1] = zk::components::generate_circuit<sub_component>(
+                                    bp, assignment, {zero, challenges[j][0]}, row).output;
+                                row += sub_component::rows_amount;
+                            }
+
                             rand_base_i = zk::components::generate_circuit<mul_component>(
                                 bp, assignment,
                                 {rand_base_i, rand_base}, row).output;
@@ -167,6 +202,10 @@ namespace nil {
                                                             std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
+                        typename BlueprintFieldType::value_type endo_factor =
+                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        std::size_t endo_num_bits = 128;
+
                         var zero = var(0, start_row_index, false, var::column_type::constant);
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
@@ -182,6 +221,22 @@ namespace nil {
                         var sg_rand_base_i = one;
 
                         for (std::size_t i = 0; i < params.batches.size(); i++) {
+                            var cip = params.batches[i].cip;
+
+                            std::array<std::array<var, 2>, eval_rounds> challenges;
+                            for (std::size_t j = 0; j < eval_rounds; j++) {
+                                challenges[j][0] = endo_scalar_component::generate_assignments(
+                                    assignment, 
+                                    {params.batches[i].fq_output.challenges[j],
+                                    endo_factor, endo_num_bits},
+                                    row).output;
+                                row += endo_scalar_component::rows_amount;
+
+                                challenges[j][1] = sub_component::generate_assignments(
+                                    assignment, {zero, challenges[j][0]}, row).output;
+                                row += sub_component::rows_amount;
+                            }
+
                             rand_base_i = mul_component::generate_assignments(assignment,
                                 {rand_base_i, rand_base}, row).output;
                             row += mul_component::rows_amount;
@@ -233,36 +288,6 @@ namespace nil {
                     //         opening,
                     //     } in batch.iter_mut()
                     //     {
-                    //         // TODO: This computation is repeated in ProverProof::oracles
-                    //         let combined_inner_product0 = {
-                    //             let es: Vec<_> = evaluations
-                    //                 .iter()
-                    //                 .map(
-                    //                     |Evaluation {
-                    //                         commitment,
-                    //                         evaluations,
-                    //                         degree_bound,
-                    //                     }| {
-                    //                         let bound: Option<usize> = (|| {
-                    //                             let b = (*degree_bound)?;
-                    //                             let x = commitment.shifted?;
-                    //                             if x.is_zero() {
-                    //                                 None
-                    //                             } else {
-                    //                                 Some(b)
-                    //                             }
-                    //                         })();
-                    //                         (evaluations.clone(), bound)
-                    //                     },
-                    //                 )
-                    //                 .collect();
-                    //             combined_inner_product::<G>(evaluation_points, xi, r, &es, self.g.len())
-                    //         };
-
-                    //         sponge.absorb_fr(&[shift_scalar::<G>(combined_inner_product0)]);
-
-                    //         let t = sponge.challenge_fq();
-                    //         let u: G = to_group(group_map, t);
 
                     //         let Challenges { chal, chal_inv } =
                     //             opening.challenges::<EFqSponge>(&self.endo_r, sponge);
@@ -374,9 +399,6 @@ namespace nil {
 
                     //         scalars.push(rand_base_i);
                     //         points.push(opening.delta);
-
-                    //         rand_base_i *= &rand_base;
-                    //         sg_rand_base_i *= &sg_rand_base;
                     //     }
 
                         return result_type(start_row_index);
