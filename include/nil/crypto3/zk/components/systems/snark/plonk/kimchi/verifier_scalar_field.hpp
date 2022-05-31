@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/perm_scalars.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -75,8 +76,14 @@ namespace nil {
                                 W0, W1, W2, W3, W4, W5,
                                 W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    using perm_scalars_component = perm_scalars<ArithmetizationType, KimchiParamsType,
+                                W0, W1, W2, W3, W4, W5,
+                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType>;
+
+                    using argument_type = typename kimchi_verifier_index_scalar<CurveType>::argument_type;
 
                     constexpr static const std::size_t selector_seed = 0x0f24;
                     
@@ -127,6 +134,15 @@ namespace nil {
                             oracles_output.oracles.zeta}, row).output;
                         row += zkpm_evaluate_component::rows_amount;
 
+                        std::pair<std::size_t, std::size_t> alpha_idxs = 
+                            params.verifier_index.alpha_map[argument_type::Permutation];
+                        var perm_scalars = perm_scalars_component::generate_circuit(bp,
+                            assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
+                            alpha_idxs.first,
+                            params.fq_output.beta, params.fq_output.gamma,
+                            zkp}, row).output;
+                        row += perm_scalars_component::rows_amount;
+
                         return result_type();
                     }
 
@@ -148,6 +164,15 @@ namespace nil {
                             {params.verifier_index.omega, params.verifier_index.domain_size,
                             oracles_output.oracles.zeta}, row).output;
                         row += zkpm_evaluate_component::rows_amount;
+
+                        std::pair<std::size_t, std::size_t> alpha_idxs = 
+                            params.verifier_index.alpha_map[argument_type::Permutation];
+                        var perm_scalars = perm_scalars_component::generate_assignments(
+                            assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
+                            alpha_idxs.first,
+                            params.fq_output.beta, params.fq_output.gamma,
+                            zkp}, row).output;
+                        row += perm_scalars_component::rows_amount;
                         return result_type();
                     }
 

@@ -50,6 +50,9 @@ namespace nil {
                     constexpr static std::size_t permut_size = PermutSize;
                     constexpr static std::size_t lookup_table_size = LookupTableSize;
                     constexpr static bool use_lookup = UseLookup;
+
+                    constexpr static std::size_t permutation_constraints = 3;
+                    constexpr static std::size_t eval_points_amount = 2;
                 };
 
                 template <std::size_t EvalRounds,
@@ -66,6 +69,10 @@ namespace nil {
                     using FieldType = typename CurveType::scalar_field_type;
                     using var = snark::plonk_variable<FieldType>;
 
+                    enum argument_type {
+                        Permutation,
+                    };
+
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;
@@ -78,8 +85,8 @@ namespace nil {
                     var omega;
                     Fr domain_size_inv;
                     // linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
-                    // Alphas<Fr> powers_of_alpha;
                     // ArithmeticSpongeParams<Fr> fr_sponge_params;
+                    std::map<argument_type, std::pair<int, int>> alpha_map;
                 };
 
                 /*struct kimchi_verifier_index_base {
