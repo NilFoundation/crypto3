@@ -89,7 +89,7 @@ template<typename fri_type, typename FieldType>
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    constexpr std::size_t complexity = 1500;
+    constexpr std::size_t complexity = 4000;
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -151,11 +151,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
         component_type::generate_assignments(assignment_bp, component_params, row);
     }
 
-    std::cout << "actual result: " << std::endl;
-    for (std::size_t i = 0; i < complexity; i++) {
-        std::cout << "(" << assignment_bp.var_value(result[i].X).data << ", "
-                  << assignment_bp.var_value(result[i].Y).data << ")" << std::endl;
-    }
+    // std::cout << "actual result: " << std::endl;
+    // for (std::size_t i = 0; i < complexity; i++) {
+    //     std::cout << "(" << assignment_bp.var_value(result[i].X).data << ", "
+    //               << assignment_bp.var_value(result[i].Y).data << ")" << std::endl;
+    // }
 
     assignment_bp.padding();
 

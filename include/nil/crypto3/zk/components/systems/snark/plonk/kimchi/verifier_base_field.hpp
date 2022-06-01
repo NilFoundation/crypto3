@@ -36,12 +36,15 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fq.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType,
+                typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
                 std::size_t n, std::size_t size, std::size_t bases_size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
                          std::size_t... WireIndexes>
                 class base_field;
@@ -49,6 +52,9 @@ namespace nil {
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
+                         typename KimchiParamsType,
+                         typename KimchiCommitmentParamsType,
+                         std::size_t BatchSize,
                          std::size_t n,
                          std::size_t size,
                          std::size_t bases_size,
@@ -72,6 +78,9 @@ namespace nil {
                          std::size_t W14>
                 class base_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
+                                                       KimchiParamsType,
+                                                       KimchiCommitmentParamsType,
+                                                       BatchSize,
                                                        n,
                                                         size,
                                                         bases_size,
@@ -120,6 +129,13 @@ namespace nil {
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, n, bases_size, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
+
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType, KimchiCommitmentParamsType>;
+
+                    using map_fq_component = zk::components::map_fq<ArithmetizationType, 
+                        CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
                     using f_comm = typename batch_verify_component::params_type::f_comm;
 
@@ -172,7 +188,11 @@ namespace nil {
                             std::vector<var_proof> proofs;
                             public_input PI;
                         };
-                        result input;    
+
+                        typename proof_binding::fr_data<var> fr_data;
+                        typename proof_binding::fq_data<var> fq_data;
+
+                        result input;  
                     };
 
                     struct result_type {
@@ -416,6 +436,12 @@ namespace nil {
                         typename batch_verify_component::params_type batch_params = {batch_proofs, pi};
                         batch_verify_component::generate_assignments(assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
+
+                        
+                        typename proof_binding::fq_data<var> fq_data_recalculated;
+                        map_fq_component::generate_assignments(assignment,
+                            {params.fq_data, fq_data_recalculated}, row);
+                        row += map_fq_component::rows_amount;
                         return result_type(component_start_row);
                     }
 
@@ -671,6 +697,12 @@ namespace nil {
                         typename batch_verify_component::params_type batch_params = {batch_proofs, pi};
                         batch_verify_component::generate_circuit(bp, assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
+
+                        typename proof_binding::fq_data<var> fq_data_recalculated;
+                        map_fq_component::generate_circuit(bp, assignment,
+                            {params.fq_data, fq_data_recalculated}, row);
+                        row += map_fq_component::rows_amount;
+                        
                         return result_type(start_row_index);
                     }
 

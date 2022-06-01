@@ -147,6 +147,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
         zk::components::binding<ArithmetizationType, 
         BlueprintFieldType, commitment_params>::fr_data<var>;
 
+    using fq_data_type = typename 
+        zk::components::binding<ArithmetizationType, 
+        BlueprintFieldType, commitment_params>::fq_data<var>;
+
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
     std::size_t domain_size = 128;
@@ -216,8 +220,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
     }
 
     fr_data_type fr_data_public;
+    fq_data_type fq_data_public;
 
-    typename component_type::params_type params = {fr_data_public, 
+    typename component_type::params_type params = {fr_data_public, fq_data_public,
         verifier_index, proofs, fq_outputs};
 
     auto result_check = [](AssignmentType &assignment, 
