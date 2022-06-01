@@ -45,6 +45,16 @@ namespace nil {
                 struct binding {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    template<typename DataType>
+                    struct fr_data {
+
+                    };
+
+                    template<typename DataType>
+                    struct fq_data {
+
+                    };
+
                     struct fq_sponge_output {
                         var joint_combiner;
                         var beta;    // beta and gamma can be combined from limbs in the base circuit

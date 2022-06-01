@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
 //
@@ -41,6 +42,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/perm_scalars.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/generic_scalars.hpp>
@@ -103,6 +105,9 @@ namespace nil {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiCommitmentParamsType>;
 
+                    using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
+                        ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
+
                     using verifier_index_type = kimchi_verifier_index_scalar<CurveType>;
                     using argument_type = typename verifier_index_type::argument_type;
 
@@ -144,7 +149,7 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var output;
+                        batch_proof output;
                     };
 
                     static result_type
@@ -222,7 +227,16 @@ namespace nil {
                             row += index_terms_scalars_component::rows_amount;
                         }
 
-                        return result_type();
+                        result_type res;
+                        res.output = {
+                            oracles_output.cip,
+                            params.fq_output,
+                            oracles_output.eval_points,
+                            oracles_output.oracles.u,
+                            oracles_output.oracles.v
+                        };
+
+                        return res;
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -296,7 +310,16 @@ namespace nil {
                             row += index_terms_scalars_component::rows_amount;
                         }
 
-                        return result_type();
+                        result_type res;
+                        res.output = {
+                            oracles_output.cip,
+                            params.fq_output,
+                            oracles_output.eval_points,
+                            oracles_output.oracles.u,
+                            oracles_output.oracles.v
+                        };
+
+                        return res;
                     }
 
                 private:

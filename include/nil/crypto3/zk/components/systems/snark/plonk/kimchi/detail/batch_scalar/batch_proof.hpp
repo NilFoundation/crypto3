@@ -34,7 +34,6 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_scalar_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 
 namespace nil {
@@ -65,6 +64,7 @@ namespace nil {
                     typename proof_binding::fq_sponge_output fq_output;
                     std::array<var, KimchiParamsType::eval_points_amount> eval_points;
                     var r;
+                    var xi;
                 };
             }    // namespace components
         }        // namespace zk

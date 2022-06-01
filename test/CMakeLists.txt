@@ -77,6 +77,7 @@ set(PLONK_TESTS_FILES
     "merkle_tree/plonk/merkle_tree"
     "verifiers/kimchi/base_field"
     "verifiers/kimchi/prepare_batch_scalar"
+    "verifiers/kimchi/verify_scalar"
     "verifiers/kimchi/basic_verifier"
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles_scalar"

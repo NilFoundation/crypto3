@@ -1,0 +1,211 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+//
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//---------------------------------------------------------------------------//
+// @file Declaration of interfaces for auxiliary components for the SHA256 component.
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFY_SCALAR_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFY_SCALAR_HPP
+
+#include <nil/marshalling/algorithms/pack.hpp>
+
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+
+#include <nil/crypto3/zk/blueprint/plonk.hpp>
+#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/component.hpp>
+
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/prepare_batch_scalar.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_scalar_field.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fr.hpp>
+
+namespace nil {
+    namespace crypto3 {
+        namespace zk {
+            namespace components {
+
+                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
+                    typename KimchiCommitmentParamsType, std::size_t BatchSize, std::size_t... WireIndexes>
+                class verify_scalar;
+
+                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
+                         typename KimchiCommitmentParamsType, std::size_t BatchSize, std::size_t W0, std::size_t W1,
+                         std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
+                         std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
+                         std::size_t W13, std::size_t W14>
+                class verify_scalar<
+                    snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
+                    CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+
+                    using BlueprintFieldType = typename CurveType::scalar_field_type;
+
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
+
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    using batch_verify_component = zk::components::batch_verify_scalar_field<ArithmetizationType, CurveType,
+                        KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                    using prepare_batch_component = zk::components::prepare_batch_scalar<ArithmetizationType, 
+                        CurveType, KimchiParamsType, KimchiCommitmentParamsType,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                    using map_fr_component = zk::components::map_fr<ArithmetizationType, 
+                        CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
+                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType, KimchiCommitmentParamsType>;
+
+                    using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
+                        ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
+
+                    using verifier_index_type = kimchi_verifier_index_scalar<CurveType>;
+
+                    constexpr static const std::size_t selector_seed = 0x0f2A;
+
+                    constexpr static std::size_t rows() {
+                        std::size_t row = 0;
+
+                        for (std::size_t i = 0; i < BatchSize; i++) {
+                            row += prepare_batch_component::rows_amount;
+                        }
+
+                        row += batch_verify_component::rows_amount;
+
+                        row += map_fr_component::rows_amount;
+
+                        return row;
+                    }
+
+                public:
+                    constexpr static const std::size_t rows_amount = rows();
+                    constexpr static const std::size_t gates_amount = 0;
+
+                    struct params_type {
+                        typename proof_binding::fr_data<var> fr_data;
+                        verifier_index_type &verifier_index;
+                        std::array<kimchi_proof_scalar<CurveType, KimchiParamsType,
+                            KimchiCommitmentParamsType::eval_rounds>, BatchSize> &proof;
+                        std::array<typename proof_binding::fq_sponge_output, BatchSize> &fq_output;
+                    };
+
+                    struct result_type {
+                        var output;
+                    };
+
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
+
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
+
+                        std::array<batch_proof, BatchSize> batches;
+                        for (std::size_t i = 0; i < BatchSize; i++) {
+                            batches[i] = prepare_batch_component::generate_circuit(
+                                bp, assignment, {params.verifier_index,
+                                params.proof[i], params.fq_output[i]}, row).output;
+                            row += prepare_batch_component::rows_amount;
+                        }
+
+                        auto res = batch_verify_component::generate_circuit(
+                            bp, assignment, {batches}, row);
+                        row += batch_verify_component::rows_amount;
+
+                        typename proof_binding::fr_data<var> fr_data_recalculated;
+
+                        map_fr_component::generate_circuit(bp, assignment,
+                            {params.fr_data, fr_data_recalculated}, row);
+                        row += map_fr_component::rows_amount;
+
+                        return result_type();
+                    }
+
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t start_row_index) {
+
+                        std::size_t row = start_row_index;
+
+                        std::array<batch_proof, BatchSize> batches;
+                        for (std::size_t i = 0; i < BatchSize; i++) {
+                            batches[i] = prepare_batch_component::generate_assignments(
+                                assignment, {params.verifier_index,
+                                params.proof[i], params.fq_output[i]}, row).output;
+                            row += prepare_batch_component::rows_amount;
+                        }
+
+                        auto res = batch_verify_component::generate_assignments(
+                            assignment, {batches}, row);
+                        row += batch_verify_component::rows_amount;
+
+                        typename proof_binding::fr_data<var> fr_data_recalculated;
+
+                        map_fr_component::generate_assignments(assignment,
+                            {params.fr_data, fr_data_recalculated}, row);
+                        row += map_fr_component::rows_amount;
+                        
+                        return result_type();
+                    }
+
+                private:
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               std::size_t component_start_row = 0) {
+                    }
+
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row = 0) {
+                        
+                    }
+
+                    static void
+                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
+                            std::size_t row = component_start_row;
+                            
+                    }
+                };
+            }    // namespace components
+        }        // namespace zk
+    }            // namespace crypto3
+}    // namespace nil
+
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFY_SCALAR_HPP

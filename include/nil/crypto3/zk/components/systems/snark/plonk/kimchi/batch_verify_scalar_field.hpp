@@ -24,8 +24,8 @@
 // @file Declaration of interfaces for auxiliary components for the BATCH_VERIFY_SCALAR_FIELD component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_BASE_FIELD_HPP
-#define CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_BASE_FIELD_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_SCALAR_FIELD_HPP
+#define CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_SCALAR_FIELD_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -495,4 +495,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_SCALAR_FIELD_HPP

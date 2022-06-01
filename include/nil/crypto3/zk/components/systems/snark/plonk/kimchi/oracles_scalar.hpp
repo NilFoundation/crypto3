@@ -238,6 +238,7 @@ namespace nil {
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
                             eval_points_amount> combined_evals;
                         var cip;
+                        std::array<var, eval_points_amount> eval_points;
                     };
 
                     static result_type
@@ -421,7 +422,8 @@ namespace nil {
                             zeta_pow_n,
                             ft_eval0,
                             combined_evals,
-                            cip
+                            cip, 
+                            {zeta, zeta_omega}
                         };
                     }
 
@@ -585,7 +587,8 @@ namespace nil {
                             zeta_pow_n,
                             ft_eval0,
                             combined_evals,
-                            cip
+                            cip,
+                            {zeta, zeta_omega}
                         };
                     }
 
