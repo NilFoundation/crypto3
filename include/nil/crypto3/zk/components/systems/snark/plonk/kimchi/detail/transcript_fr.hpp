@@ -171,11 +171,20 @@ namespace nil {
                         sponge.absorb_assignment(assignment, absorbing_value, component_start_row);
                     }
 
+                    void absorb_circuit(blueprint<ArithmetizationType> &bp,
+                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                        const var &input,
+                                        std::size_t &component_start_row) {
+                        last_squeezed = {};
+                        sponge.absorb_circuit(bp, assignment, input, component_start_row);
+                    }
+
                     void absorb_evaluations_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                        var public_eval,
                                                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>
                                                            private_eval,
                                                        std::size_t &component_start_row) {
+                        last_squeezed = {};
                         std::vector<var> points = {public_eval, private_eval.z, private_eval.generic_selector, private_eval.poseidon_selector,
                                                 private_eval.w[0], private_eval.w[1], private_eval.w[2], private_eval.w[3], private_eval.w[4],
                                                 private_eval.w[5], private_eval.w[6], private_eval.w[7], private_eval.w[8], private_eval.w[9],
@@ -186,11 +195,21 @@ namespace nil {
                         }
                     }
 
-                    void absorb_circuit(blueprint<ArithmetizationType> &bp,
-                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                        const var &input,
-                                        std::size_t &component_start_row) {
-                        sponge.absorb_circuit(bp, assignment, input, component_start_row);
+                    void absorb_evaluations_circuit(blueprint<ArithmetizationType> &bp,
+                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        var public_eval,
+                                                        kimchi_proof_evaluations<CurveType>
+                                                            private_eval,
+                                                        std::size_t &component_start_row) {
+                        last_squeezed = {};
+                        std::vector<var> points = {public_eval, private_eval.z, private_eval.generic_selector, private_eval.poseidon_selector,
+                                                private_eval.w[0], private_eval.w[1], private_eval.w[2], private_eval.w[3], private_eval.w[4],
+                                                private_eval.w[5], private_eval.w[6], private_eval.w[7], private_eval.w[8], private_eval.w[9],
+                                                private_eval.w[10], private_eval.w[11], private_eval.w[12], private_eval.w[13], private_eval.w[14],
+                                                private_eval.s[0], private_eval.s[1], private_eval.s[2], private_eval.s[3], private_eval.s[4], private_eval.s[5]};
+                        for (auto p : points) {
+                            sponge.absorb_circuit(bp, assignment, p, component_start_row);
+                        }
                     }
 
                     var challenge_assignment(
