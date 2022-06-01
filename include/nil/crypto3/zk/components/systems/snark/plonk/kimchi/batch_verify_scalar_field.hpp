@@ -38,6 +38,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/random.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/prepare_scalars.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly_coefficients.hpp>
@@ -123,6 +124,14 @@ namespace nil {
                         KimchiCommitmentParamsType::eval_rounds, W0, W1, W2, W3, W4, W5,
                         W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    constexpr static std::size_t scalars_len() {
+                        return 10;
+                    }
+                    
+                    using prepare_scalars_component =
+                        zk::components::prepare_scalars<ArithmetizationType, scalars_len(), W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                                                    W9, W10, W11, W12, W13, W14>;
+
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
                         ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
@@ -130,10 +139,6 @@ namespace nil {
 
                     constexpr static const std::size_t srs_len = KimchiCommitmentParamsType::srs_len;
                     constexpr static const std::size_t eval_rounds = KimchiCommitmentParamsType::eval_rounds;
-
-                    constexpr static std::size_t scalars_len() {
-                        return 10;
-                    }
 
                 public:
                     constexpr static const std::size_t rows_amount = 240;
@@ -237,6 +242,10 @@ namespace nil {
                             row += mul_component::rows_amount;
                         }
 
+                        scalars = prepare_scalars_component::generate_circuit(bp, assignment,
+                            {scalars}, row).output;
+                        row += prepare_scalars_component::rows_amount;
+
                         std::cout<<"circuit row: "<<row<<std::endl;
 
                         return result_type(start_row_index);
@@ -320,8 +329,6 @@ namespace nil {
                                 {sg_rand_base_i, sg_rand_base}, row).output;
                             row += mul_component::rows_amount;
                         }
-
-                        std::cout<<"assignment row: "<<row<<std::endl;
 
                     //     // Verifier checks for all i,
                     //     // c_i Q_i + delta_i = z1_i (G_i + b_i U_i) + z2_i H
@@ -455,6 +462,12 @@ namespace nil {
                     //         scalars.push(rand_base_i);
                     //         points.push(opening.delta);
                     //     }
+
+                        scalars = prepare_scalars_component::generate_assignments(assignment,
+                            {scalars}, row).output;
+                        row += prepare_scalars_component::rows_amount;
+
+                        std::cout<<"assignment row: "<<row<<std::endl;
 
                         return result_type(start_row_index);
                     }
