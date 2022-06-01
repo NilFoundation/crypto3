@@ -41,7 +41,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_scalar_field.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/prepare_batch_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
     verifier_index.domain_size = domain_size;
     verifier_index.omega = var(0, 6, false, var::column_type::public_input); 
 
-    using component_type = zk::components::kimchi_verifier_scalar_field<ArithmetizationType, 
+    using component_type = zk::components::prepare_batch_scalar<ArithmetizationType, 
             curve_type, kimchi_params, commitment_params,
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
