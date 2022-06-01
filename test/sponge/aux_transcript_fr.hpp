@@ -36,7 +36,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 
 namespace nil {
     namespace crypto3 {
