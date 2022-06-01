@@ -100,6 +100,10 @@ namespace nil {
                             typename FieldType::value_type coeff = FieldType::value_type::one();
 
                             for (std::size_t i = 0; i < S_id.size(); i++) {
+                                assert(column_polynomials[i].size() == basic_domain->size());
+                                assert(S_id[i].size() == basic_domain->size());
+                                assert(S_sigma[i].size() == basic_domain->size());
+
                                 coeff *= (column_polynomials[i][j - 1] + beta * S_id[i][j - 1] + gamma) /
                                     (column_polynomials[i][j - 1] + beta * S_sigma[i][j - 1] + gamma);
                             }

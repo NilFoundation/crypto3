@@ -131,7 +131,7 @@ namespace nil {
                             f[number] = FieldType::value_type::one();
                         }
 
-                        f.resize(commitment_params.D[0]->size());
+                        // f.resize(commitment_params.D[0]->size());
 
                         return f;
                     }
@@ -315,7 +315,7 @@ namespace nil {
                                 S_id[i][j] = delta.pow(i) * omega.pow(j);
                             }
 
-                            S_id[i].resize(commitment_params.D[0]->size());
+                            // S_id[i].resize(commitment_params.D[0]->size());
                         }
 
                         return S_id;
@@ -339,7 +339,6 @@ namespace nil {
                                 S_perm[i][j] = delta.pow(permutation[key].first) * omega.pow(permutation[key].second);
                             }
 
-                            S_perm[i].resize(commitment_params.D[0]->size());
                         }
 
                         return S_perm;
@@ -356,7 +355,6 @@ namespace nil {
                             q_blind[j] = FieldType::value_type::one();
                         }
 
-                        q_blind.resize(commitment_params.D[0]->size());
                         return q_blind;
                     }
 
@@ -474,11 +472,11 @@ namespace nil {
                             public_polynomial_table =
                                 plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.public_inputs(),
-                                                                                commitment_params.D[0]),
+                                                                                basic_domain),
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.constants(),
-                                                                                commitment_params.D[0]),
+                                                                                basic_domain),
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.selectors(),
-                                                                                commitment_params.D[0]));
+                                                                                basic_domain));
 
                         std::vector<typename FieldType::value_type> Z(N_rows + 1,
                             FieldType::value_type::zero());
@@ -543,7 +541,7 @@ namespace nil {
                             private_polynomial_table =
                                 plonk_private_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
                                     detail::column_range_polynomial_dfs<FieldType>(private_assignment.witnesses(),
-                                                                                commitment_params.D[0]));
+                                                                                basic_domain));
                         return preprocessed_data_type({basic_domain, private_polynomial_table});
                     }
                 };

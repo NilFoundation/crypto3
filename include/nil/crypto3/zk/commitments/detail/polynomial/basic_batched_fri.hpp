@@ -127,7 +127,7 @@ namespace nil {
                             (std::is_same<typename ContainerType::value_type,
                                           math::polynomial_dfs<typename FieldType::value_type>>::value),
                             precommitment_type>::type precommit(
-                                const ContainerType &poly,
+                                ContainerType poly,
                                 const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
@@ -137,7 +137,10 @@ namespace nil {
 #endif
 
                             for (int i = 0; i < poly.size(); ++i) {
-                                assert (poly[i].size() == D->size());
+                                // assert (poly[i].size() == D->size());
+                                if (poly[i].size() != D->size()){
+                                    poly[i].resize( D->size());
+                                }
                             }
 
                             std::size_t list_size = poly.size();
@@ -204,7 +207,7 @@ namespace nil {
                                           math::polynomial_dfs<typename FieldType::value_type>>::value),
                             proof_type>::type
                             proof_eval(ContainerType f,
-                                       const ContainerType &g,
+                                       ContainerType g,
                                        precommitment_type &T,
                                        const params_type &fri_params,
                                        transcript_type &transcript = transcript_type()) {
@@ -216,8 +219,14 @@ namespace nil {
                         std::cout << "--Batched FRI:" << std::endl;
 #endif
 
-                            for (int i = 0; i < g.size(); ++i) {
-                                assert(g[i].size() == fri_params.D[0]->size());
+                            for (int i = 0; i < f.size(); ++i) {
+                                // assert(g[i].size() == fri_params.D[0]->size());
+                                if (f[i].size() != fri_params.D[0]->size()){
+                                    f[i].resize( fri_params.D[0]->size());
+                                }
+                                if (g[i].size() != fri_params.D[0]->size()){
+                                    g[i].resize( fri_params.D[0]->size());
+                                }
                             }
 
                             assert(f.size() == g.size());
