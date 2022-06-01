@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/algorithms/allocate.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 #include "profiling_plonk_circuit.hpp"
 #include "profiling.hpp"
@@ -59,11 +60,10 @@ namespace nil {
             std::size_t r = degree_log - 1;
 
             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-                zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+                math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
 
             params.r = r;
             params.D = domain_set;
-            params.q = q;
             params.max_degree = (1 << degree_log) - 1;
 
             return params;
@@ -130,7 +130,7 @@ namespace nil {
             typename zk::snark::placeholder_private_preprocessor<
                 BlueprintFieldType, placeholder_params>::preprocessed_data_type private_preprocessed_data =
                 zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params>::process(
-                    bp, private_assignment, desc);
+                    bp, private_assignment, desc, fri_params);
 
             return std::make_tuple(desc, bp, fri_params, assignments, public_preprocessed_data,
                                    private_preprocessed_data);
