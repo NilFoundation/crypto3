@@ -108,6 +108,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 
     auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
     auto Q = algebra::random_element<curve_type::template g1_type<>>().to_affine();
+    Q.X = P.X;
+    Q.Y = -P.Y;
 
     auto expected_res = P + Q;
 
