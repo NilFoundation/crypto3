@@ -94,6 +94,7 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/field_operations"
     "algebra/fields/plonk/combined_inner_product"
     "algebra/fields/plonk/element_powers"
+    "algebra/fields/plonk/exponentiation"
     )
 
 set(FIELDS_TESTS_FILES
