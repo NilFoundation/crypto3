@@ -41,7 +41,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_scalar_field.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/prepare_batch_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
     verifier_index.domain_size = domain_size;
     verifier_index.omega = var(0, 6, false, var::column_type::public_input); 
 
-    using component_type = zk::components::kimchi_verifier_scalar_field<ArithmetizationType, 
+    using component_type = zk::components::prepare_batch_scalar<ArithmetizationType, 
             curve_type, kimchi_params, commitment_params,
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
@@ -148,10 +148,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_scalar_field_test_suite) {
     typename BlueprintFieldType::value_type fq_digest = 0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
 
     zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
-    typename zk::components::binding<ArithmetizationType, BlueprintFieldType>::fq_sponge_output fq_output = {
+    std::array<var, eval_rounds> challenges;
+    typename zk::components::binding<ArithmetizationType, BlueprintFieldType, commitment_params>::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
-        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input) 
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+        challenges
     };
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner, beta, gamma, 

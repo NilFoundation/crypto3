@@ -33,8 +33,16 @@
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/combined_inner_product.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/random.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly_coefficients.hpp>
+
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -42,13 +50,17 @@ namespace nil {
             namespace components {
 
                 template<typename ArithmetizationType, 
+                         typename CurveType,
+                         typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
                          std::size_t... WireIndexes>
                 class batch_verify_scalar_field;
 
                 template<typename BlueprintFieldType,
+                         typename CurveType,
                          typename ArithmetizationParams,
+                         typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
                          std::size_t W0,
@@ -67,6 +79,8 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class batch_verify_scalar_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                                       CurveType,
+                                                       KimchiParamsType,
                                                        KimchiCommitmentParamsType,
                                                        BatchSize,
                                                        W0,
@@ -90,28 +104,44 @@ namespace nil {
                     
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
+
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
+                    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
                     using random_component = zk::components::random<ArithmetizationType, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    using batch_proof = batch_evaluation_proof_scalar;
+                    using endo_scalar_component =
+                        zk::components::endo_scalar<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                                                    W9, W10, W11, W12, W13, W14>;
+
+                    using b_poly_component = zk::components::b_poly<ArithmetizationType, 
+                        KimchiCommitmentParamsType::eval_rounds, W0, W1, W2, W3, W4, W5,
+                        W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using b_poly_coeff_component = zk::components::b_poly_coefficients<ArithmetizationType, 
+                        KimchiCommitmentParamsType::eval_rounds, W0, W1, W2, W3, W4, W5,
+                        W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
+                        ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f28;
 
                     constexpr static const std::size_t srs_len = KimchiCommitmentParamsType::srs_len;
+                    constexpr static const std::size_t eval_rounds = KimchiCommitmentParamsType::eval_rounds;
 
                     constexpr static std::size_t scalars_len() {
                         return 10;
                     }
 
                 public:
-                    constexpr static const std::size_t rows_amount = 100;
+                    constexpr static const std::size_t rows_amount = 240;
 
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::array<batch_proof, srs_len> batches;
+                        std::array<batch_proof, BatchSize> batches;
                     };
 
                     struct result_type {
@@ -130,6 +160,10 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
+                        typename BlueprintFieldType::value_type endo_factor =
+                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        std::size_t endo_num_bits = 128;
+
                         var zero = var(0, start_row_index, false, var::column_type::constant);
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
@@ -145,7 +179,53 @@ namespace nil {
                         var rand_base_i = one;
                         var sg_rand_base_i = one;
 
-                        for (std::size_t i = 0; i < params.batches.size(); i++) {
+                        for (std::size_t batch_id = 0; batch_id < params.batches.size(); batch_id++) {
+                            var cip = params.batches[batch_id].cip;
+
+                            std::array<std::array<var, eval_rounds>, 2> challenges;
+                            for (std::size_t j = 0; j < eval_rounds; j++) {
+                                challenges[0][j] = endo_scalar_component::generate_circuit(
+                                    bp, assignment, 
+                                    {params.batches[batch_id].fq_output.challenges[j],
+                                    endo_factor, endo_num_bits},
+                                    row).output;
+                                row += endo_scalar_component::rows_amount;
+
+                                challenges[1][j] = zk::components::generate_circuit<sub_component>(
+                                    bp, assignment, {zero, challenges[0][j]}, row).output;
+                                row += sub_component::rows_amount;
+                            }
+
+                            var c = endo_scalar_component::generate_circuit(
+                                    bp, assignment, 
+                                    {params.batches[batch_id].fq_output.c,
+                                    endo_factor, endo_num_bits},
+                                    row).output;
+                            row += endo_scalar_component::rows_amount;
+
+                            var b0_scale = one;
+                            var b0 = zero;
+
+                            for (std::size_t i = 0; i < KimchiParamsType::eval_points_amount; i++) {
+                                var term = b_poly_component::generate_circuit(
+                                    bp, assignment, 
+                                    {challenges[0], params.batches[batch_id].eval_points[i],
+                                    one}, row).output;
+                                row += b_poly_component::rows_amount;
+                                
+                                var tmp = zk::components::generate_circuit<mul_component>(
+                                    bp, assignment, {b0_scale, term}, row).output;
+                                row += mul_component::rows_amount;
+
+                                b0 = zk::components::generate_circuit<add_component>(
+                                    bp, assignment, {b0, tmp}, row).output;
+                                row += add_component::rows_amount;
+
+                                b0_scale = zk::components::generate_circuit<mul_component>(
+                                    bp, assignment, {b0_scale, params.batches[batch_id].r}, row).output;
+                                row += mul_component::rows_amount;
+                            }
+
                             rand_base_i = zk::components::generate_circuit<mul_component>(
                                 bp, assignment,
                                 {rand_base_i, rand_base}, row).output;
@@ -167,6 +247,10 @@ namespace nil {
                                                             std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
+                        typename BlueprintFieldType::value_type endo_factor =
+                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        std::size_t endo_num_bits = 128;
+
                         var zero = var(0, start_row_index, false, var::column_type::constant);
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
@@ -181,7 +265,53 @@ namespace nil {
                         var rand_base_i = one;
                         var sg_rand_base_i = one;
 
-                        for (std::size_t i = 0; i < params.batches.size(); i++) {
+                        for (std::size_t batch_id = 0; batch_id < params.batches.size(); batch_id++) {
+                            var cip = params.batches[batch_id].cip;
+
+                            std::array<std::array<var, eval_rounds>, 2> challenges;
+                            for (std::size_t j = 0; j < eval_rounds; j++) {
+                                challenges[0][j] = endo_scalar_component::generate_assignments(
+                                    assignment, 
+                                    {params.batches[batch_id].fq_output.challenges[j],
+                                    endo_factor, endo_num_bits},
+                                    row).output;
+                                row += endo_scalar_component::rows_amount;
+
+                                challenges[1][j] = sub_component::generate_assignments(
+                                    assignment, {zero, challenges[0][j]}, row).output;
+                                row += sub_component::rows_amount;
+                            }
+
+                            var c = endo_scalar_component::generate_assignments(
+                                    assignment, 
+                                    {params.batches[batch_id].fq_output.c,
+                                    endo_factor, endo_num_bits},
+                                    row).output;
+                            row += endo_scalar_component::rows_amount;
+
+                            var b0_scale = one;
+                            var b0 = zero;
+
+                            for (std::size_t i = 0; i < KimchiParamsType::eval_points_amount; i++) {
+                                var term = b_poly_component::generate_assignments(
+                                    assignment, 
+                                    {challenges[0], params.batches[batch_id].eval_points[i],
+                                    one}, row).output;
+                                row += b_poly_component::rows_amount;
+                                
+                                var tmp = mul_component::generate_assignments(
+                                    assignment, {b0_scale, term}, row).output;
+                                row += mul_component::rows_amount;
+
+                                b0 = add_component::generate_assignments(
+                                    assignment, {b0, tmp}, row).output;
+                                row += add_component::rows_amount;
+
+                                b0_scale = mul_component::generate_assignments(
+                                    assignment, {b0_scale, params.batches[batch_id].r}, row).output;
+                                row += mul_component::rows_amount;
+                            }
+
                             rand_base_i = mul_component::generate_assignments(assignment,
                                 {rand_base_i, rand_base}, row).output;
                             row += mul_component::rows_amount;
@@ -233,56 +363,6 @@ namespace nil {
                     //         opening,
                     //     } in batch.iter_mut()
                     //     {
-                    //         // TODO: This computation is repeated in ProverProof::oracles
-                    //         let combined_inner_product0 = {
-                    //             let es: Vec<_> = evaluations
-                    //                 .iter()
-                    //                 .map(
-                    //                     |Evaluation {
-                    //                         commitment,
-                    //                         evaluations,
-                    //                         degree_bound,
-                    //                     }| {
-                    //                         let bound: Option<usize> = (|| {
-                    //                             let b = (*degree_bound)?;
-                    //                             let x = commitment.shifted?;
-                    //                             if x.is_zero() {
-                    //                                 None
-                    //                             } else {
-                    //                                 Some(b)
-                    //                             }
-                    //                         })();
-                    //                         (evaluations.clone(), bound)
-                    //                     },
-                    //                 )
-                    //                 .collect();
-                    //             combined_inner_product::<G>(evaluation_points, xi, r, &es, self.g.len())
-                    //         };
-
-                    //         sponge.absorb_fr(&[shift_scalar::<G>(combined_inner_product0)]);
-
-                    //         let t = sponge.challenge_fq();
-                    //         let u: G = to_group(group_map, t);
-
-                    //         let Challenges { chal, chal_inv } =
-                    //             opening.challenges::<EFqSponge>(&self.endo_r, sponge);
-
-                    //         sponge.absorb_g(&[opening.delta]);
-                    //         let c = ScalarChallenge(sponge.challenge()).to_field(&self.endo_r);
-
-                    //         // < s, sum_i r^i pows(evaluation_point[i]) >
-                    //         // ==
-                    //         // sum_i r^i < s, pows(evaluation_point[i]) >
-                    //         let b0 = {
-                    //             let mut scale = ScalarField::<G>::one();
-                    //             let mut res = ScalarField::<G>::zero();
-                    //             for &e in evaluation_points.iter() {
-                    //                 let term = b_poly(&chal, e);
-                    //                 res += &(scale * term);
-                    //                 scale *= *r;
-                    //             }
-                    //             res
-                    //         };
 
                     //         let s = b_poly_coefficients(&chal);
 
@@ -374,9 +454,6 @@ namespace nil {
 
                     //         scalars.push(rand_base_i);
                     //         points.push(opening.delta);
-
-                    //         rand_base_i *= &rand_base;
-                    //         sg_rand_base_i *= &sg_rand_base;
                     //     }
 
                         return result_type(start_row_index);

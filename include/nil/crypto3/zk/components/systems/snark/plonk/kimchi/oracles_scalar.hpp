@@ -47,6 +47,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/combined_inner_product.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/constants.hpp>
 
@@ -119,7 +120,7 @@ namespace nil {
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType>;
+                        BlueprintFieldType, KimchiCommitmentParamsType>;
 
                     constexpr static const std::size_t eval_points_amount = 2;
 
@@ -236,6 +237,7 @@ namespace nil {
                         var ft_eval0;
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
                             eval_points_amount> combined_evals;
+                        var cip;
                     };
 
                     static result_type
@@ -395,6 +397,9 @@ namespace nil {
                         ).output;
                         row += ft_eval_component::rows_amount;
 
+                        //cip
+                        var cip = zeta_pow_n;
+
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         
                         typename result_type::random_oracles random_oracles = {
@@ -415,7 +420,8 @@ namespace nil {
                             prev_challenges,
                             zeta_pow_n,
                             ft_eval0,
-                            combined_evals
+                            combined_evals,
+                            cip
                         };
                     }
 
@@ -557,6 +563,9 @@ namespace nil {
                         ).output;
                         row += ft_eval_component::rows_amount;
 
+                        //cip
+                        var cip = zeta_pow_n;
+
                         typename result_type::random_oracles random_oracles = {
                             alpha,
                             zeta,
@@ -575,7 +584,8 @@ namespace nil {
                             prev_challenges,
                             zeta_pow_n,
                             ft_eval0,
-                            combined_evals
+                            combined_evals,
+                            cip
                         };
                     }
 

@@ -46,6 +46,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
@@ -110,14 +111,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
-    constexpr static std::size_t eval_rounds = 5;
+    constexpr static std::size_t eval_rounds = 3;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
     constexpr static std::size_t lookup_table_size = 1;
     constexpr static bool use_lookup = false;
 
-    constexpr std::size_t srs_len = 10;
+    constexpr std::size_t srs_len = 5;
 
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
@@ -126,6 +127,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
         srs_len>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
+    typename BlueprintFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
     // verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
     //     0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
@@ -135,10 +137,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     verifier_index.domain_size = domain_size;
     verifier_index.omega = var(0, 6, false, var::column_type::public_input); 
 
-    constexpr std::size_t batch_size = 3;
+    constexpr std::size_t batch_size = 2;
 
-    using component_type = zk::components::batch_verify_scalar_field<ArithmetizationType, 
-            commitment_params, batch_size,
+    using component_type = zk::components::batch_verify_scalar_field<ArithmetizationType, curve_type,
+            kimchi_params, commitment_params, batch_size,
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
@@ -147,39 +149,64 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     typename BlueprintFieldType::value_type beta = 0;
     typename BlueprintFieldType::value_type gamma = 0;
     typename BlueprintFieldType::value_type alpha = 0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
-    typename BlueprintFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
     typename BlueprintFieldType::value_type fq_digest = 0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
 
     zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
-    typename zk::components::binding<ArithmetizationType, BlueprintFieldType>::fq_sponge_output fq_output = {
-        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
-        var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
-        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input) 
-    };
+    std::array<var, eval_rounds> challenges;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {};
 
-    // TODO prepare real data
-    for (std::size_t i = 0; i < public_input_size; i++) {
-        typename BlueprintFieldType::value_type tmp = 
-            algebra::random_element<BlueprintFieldType>();
-        public_input.push_back(tmp);
-        proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    std::array<zk::components::batch_evaluation_proof_scalar<BlueprintFieldType, 
+        ArithmetizationType, kimchi_params, commitment_params>, 
+        batch_size> batches;
+
+    for (std::size_t i = 0; i < batch_size; i++) {
+        typename BlueprintFieldType::value_type cip = 12;
+        public_input.push_back(cip);
+        batches[i].cip = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+        typename zk::components::binding<ArithmetizationType, BlueprintFieldType, commitment_params>::fq_sponge_output fq_output;
+
+        std::array<var, eval_rounds> challenges;
+        for (std::size_t j = 0; j < eval_rounds; j++) {
+            public_input.push_back(10);
+            challenges[j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
+        fq_output.challenges = challenges;
+
+        // joint_combiner
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        fq_output.joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // beta
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        fq_output.beta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // gamma
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        fq_output.gamma = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // alpha
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        fq_output.alpha = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // zeta
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        fq_output.zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // fq_digest
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        fq_output.fq_digest = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        // c
+        public_input.push_back(250);
+        fq_output.c = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+        batches[i].fq_output = fq_output;
+
+        public_input.push_back(zeta);
+        public_input.push_back(zeta * omega);
+        batches[i].eval_points = {
+            var(0, public_input.size() - 2, false, var::column_type::public_input),
+            var(0, public_input.size() - 1, false, var::column_type::public_input)};
+
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        batches[i].r = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
-
-    for (std::size_t i = 0; i < eval_rounds; i++) {
-        typename BlueprintFieldType::value_type tmp = 
-            algebra::random_element<BlueprintFieldType>();
-        public_input.push_back(tmp);
-        proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    }
-
-    prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(
-        kimchi_proof, proof, public_input
-    );
-
-    std::array<zk::components::batch_evaluation_proof_scalar, 
-        srs_len> batches;
 
     typename component_type::params_type params = {batches};
 

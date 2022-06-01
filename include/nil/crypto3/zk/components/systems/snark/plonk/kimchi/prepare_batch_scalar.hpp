@@ -26,8 +26,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_SCALAR_FIELD_COMPONENT_15_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_SCALAR_FIELD_COMPONENT_15_WIRES_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -56,14 +56,14 @@ namespace nil {
 
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
                     typename KimchiCommitmentParamsType, std::size_t... WireIndexes>
-                class kimchi_verifier_scalar_field;
+                class prepare_batch_scalar;
 
                 template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
                          typename KimchiCommitmentParamsType, std::size_t W0, std::size_t W1,
                          std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                          std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                          std::size_t W13, std::size_t W14>
-                class kimchi_verifier_scalar_field<
+                class prepare_batch_scalar<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
                     CurveType, KimchiParamsType, KimchiCommitmentParamsType, 
                     W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
@@ -101,7 +101,7 @@ namespace nil {
                         BlueprintFieldType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType>;
+                        BlueprintFieldType, KimchiCommitmentParamsType>;
 
                     using verifier_index_type = kimchi_verifier_index_scalar<CurveType>;
                     using argument_type = typename verifier_index_type::argument_type;
@@ -335,4 +335,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_SCALAR_FIELD_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP

@@ -76,7 +76,7 @@ set(PLONK_TESTS_FILES
     "hashes/plonk/decomposition"
     "merkle_tree/plonk/merkle_tree"
     "verifiers/kimchi/base_field"
-    "verifiers/kimchi/scalar_field"
+    "verifiers/kimchi/prepare_batch_scalar"
     "verifiers/kimchi/basic_verifier"
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles_scalar"
@@ -94,6 +94,7 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/field_operations"
     "algebra/fields/plonk/combined_inner_product"
     "algebra/fields/plonk/element_powers"
+    "algebra/fields/plonk/exponentiation"
     )
 
 set(FIELDS_TESTS_FILES
