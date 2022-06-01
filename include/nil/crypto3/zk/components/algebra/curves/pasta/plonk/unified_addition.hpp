@@ -96,7 +96,7 @@ namespace nil {
                                          const std::size_t start_row_index);
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 5;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -151,32 +151,38 @@ namespace nil {
                         assignment.witness(W3)[j] = Q.Y;
                         assignment.witness(W4)[j] = R.X;
                         assignment.witness(W5)[j] = R.Y;
+                        if (P.X != 0) {
+                            assignment.witness(W6)[j] = P.X.inversed();
+                        } else {
+                            assignment.witness(W6)[j] = 0;
+                        }
 
-                        assignment.witness(W6)[j] = 0;
+                        if (Q.X != 0) {
+                            assignment.witness(W7)[j] = Q.X.inversed();
+                        } else {
+                            assignment.witness(W7)[j] = 0;
+                        }
+
 
                         if (P.X != Q.X) {
-                            assignment.witness(W7)[j] = 0;
-                            assignment.witness(W8)[j] = (P.Y - Q.Y) / (P.X - Q.X);
+                            assignment.witness(W10)[j] = (Q.Y - P.Y) / (Q.X - P.X);
 
                             assignment.witness(W9)[j] = 0;
 
-                            assignment.witness(W10)[j] = (Q.X - P.X).inversed();
+                            assignment.witness(W8)[j] = (Q.X - P.X).inversed();
                         } else {
-                            assignment.witness(W7)[j] = 1;
 
-                            if (P.Y != Q.Y) {
-                                assignment.witness(W9)[j] = (Q.Y - P.Y).inversed();
-                            } else {    // doubling
-                                if (P.Y != 0) {
-                                    assignment.witness(W8)[j] = (3 * (P.X * P.X)) / (2 * P.Y);
-                                } else {
-                                    assignment.witness(W8)[j] = 0;
-                                }
-
+                            if (P.Y != - Q.Y) {
+                               assignment.witness(W9)[j] = (Q.Y + P.Y).inversed();
+                            } else { 
                                 assignment.witness(W9)[j] = 0;
+                            }                           
+                            if (P.Y != 0) {
+                                assignment.witness(W10)[j] = (3 * (P.X * P.X)) / (2 * P.Y);
+                            } else {
+                                assignment.witness(W10)[j] = 0;
                             }
-
-                            assignment.witness(W10)[j] = 0;
+                            assignment.witness(W8)[j] = 0;
                         }
 
                         return result_type(params, start_row_index);
@@ -186,22 +192,33 @@ namespace nil {
                                                const params_type params,
                                                const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint(var(W7, 0) * (var(W2, 0) - var(W0, 0)));
+                        auto constraint_1 = bp.add_constraint((var(W2, 0) - var(W0, 0))*((var(W2, 0) - var(W0, 0))*var(W10, 0) - 
+                        (var(W3, 0) - var(W1, 0))));
                         auto constraint_2 =
-                            bp.add_constraint((var(W2, 0) - var(W0, 0)) * var(W10, 0) - (1 - var(W7, 0)));
-                        auto constraint_3 = bp.add_constraint(
-                            var(W7, 0) * (2 * var(W8, 0) * var(W1, 0) - 3 * (var(W0, 0) * var(W0, 0))) +
-                            (1 - var(W7, 0)) * ((var(W2, 0) - var(W0, 0)) * var(W8, 0) - (var(W3, 0) - var(W1, 0))));
+                            bp.add_constraint((1 - (var(W2, 0) - var(W0, 0))*var(W8, 0))* (2*var(W1, 0)*var(W10, 0) - 3 * var(W0, 0) * var(W0, 0)));
+                            
+                        auto constraint_3 = bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W2, 0) - var(W0, 0) * var(W2, 0)*var(W0, 0)) *(var(W10, 0) *
+                        var(W10, 0) - var(W0, 0) -var(W2, 0)  - var (W4, 0)));
                         auto constraint_4 =
-                            bp.add_constraint((var(W8, 0) * var(W8, 0)) - (var(W0, 0) + var(W2, 0) + var(W4, 0)));
+                            bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W2, 0) - var(W0, 0) * var(W2, 0)* var(W0, 0)) *(var(W10, 0) *
+                        (var(W0, 0) - var(W4, 0)) - var(W1, 0) -var(W5, 0)));
                         auto constraint_5 =
-                            bp.add_constraint(var(W5, 0) - (var(W8, 0) * (var(W0, 0) - var(W4, 0)) - var(W1, 0)));
-                        auto constraint_6 = bp.add_constraint((var(W3, 0) - var(W1, 0)) * (var(W7, 0) - var(W6, 0)));
-                        auto constraint_7 = bp.add_constraint((var(W3, 0) - var(W1, 0)) * var(W9, 0) - var(W6, 0));
+                            bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W3, 0) + var(W0, 0) * var(W2, 0)* var(W1, 0)) *(var(W10, 0) *
+                        var(W10, 0) - var(W0, 0) -var(W2, 0)  - var (W4, 0)));
+                        auto constraint_6 = bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W3, 0) + var(W0, 0) * var(W2, 0)* var(W1, 0)) *(var(W10, 0) *
+                        (var(W0, 0) - var(W4, 0)) - var(W1, 0) -var(W5, 0)));
+                        auto constraint_7 = bp.add_constraint((1 - var(W0, 0) * var(W6, 0))*(var(W4, 0) - var(W2, 0)));
+                        auto constraint_8 = bp.add_constraint((1 - var(W0, 0) * var(W6, 0))*(var(W5, 0) - var(W3, 0)));
+                        auto constraint_9 = bp.add_constraint((1 - var(W2, 0) * var(W7, 0))*(var(W4, 0) - var(W0, 0)));
+                        auto constraint_10 = bp.add_constraint((1 - var(W2, 0) * var(W7, 0))*(var(W5, 0) - var(W1, 0)));
+                        auto constraint_11 = bp.add_constraint((1 - (var(W2, 0) - var(W0, 0))* var(W8, 0) - 
+                        (var(W3, 0) + var(W1, 0)) * var(W9, 0)) * var(W4, 0));
+                        auto constraint_12 = bp.add_constraint((1 - (var(W2, 0) - var(W0, 0))* var(W8, 0) - 
+                        (var(W3, 0) + var(W1, 0)) * var(W9, 0)) * var(W5, 0));
 
                         bp.add_gate(first_selector_index,
                                     {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
-                                     constraint_7});
+                                     constraint_7, constraint_8, constraint_9, constraint_10, constraint_11, constraint_12});
                     }
 
                     static void
@@ -210,8 +227,6 @@ namespace nil {
                                                   const params_type params,
                                                   const std::size_t start_row_index) {
 
-                        bp.add_copy_constraint({{W6, static_cast<int>(start_row_index), false},
-                                                {0, 0, false, var::column_type::constant}});
                     }
                 };
             }    // namespace components
