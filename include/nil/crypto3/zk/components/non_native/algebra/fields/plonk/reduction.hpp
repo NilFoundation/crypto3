@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
+// Copyright (c) 2022 Ekaterina Chukavina <kate@nil.foundation>
 //
 // MIT License
 //
@@ -32,6 +33,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -71,26 +73,18 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = 4;
+                    constexpr static const std::size_t selector_seed = 0x0fFD;
 
+                    constexpr static const std::size_t gates_amount = 3;
                     struct params_type {
-                        std::array<var, 7> k;
-                    };
-
-                    struct allocated_data_type {
-                        allocated_data_type() {
-                            previously_allocated = false;
-                        }
-
-                        // TODO access modifiers
-                        bool previously_allocated;
-                        std::array<std::size_t, 1> selectors;
+                        std::array<var, 8> k;
                     };
 
                     struct result_type {
-                        var output = var(0, 0, false);
+                        var output = var(W4, 1, false);
 
                         result_type(std::size_t component_start_row) {
-                            var(W0, component_start_row + rows_amount - 1, false);
+                            var(W4, component_start_row + rows_amount - 3, false);
                         }
                     };
 
@@ -98,38 +92,172 @@ namespace nil {
                         return bp.allocate_rows(rows_amount);
                     }
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        allocated_data_type &allocated_data,
-                                                        std::size_t component_start_row) {
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         std::size_t start_row_index) {
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
 
-                        generate_gates(bp, assignment, params, allocated_data, component_start_row);
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
-                        return result_type(component_start_row);
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
+                        }
+
+                        assignment.enable_selector(first_selector_index, start_row_index);
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
+
+                        return result_type(start_row_index);
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
+                                                            std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
+                        std::array<typename ArithmetizationType::field_type::integral_type, 8> data = {
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[0]).data),
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[1]).data),
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[2]).data),
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[3]).data),
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[4]).data),
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[5]).data),
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[6]).data),
+                            typename ArithmetizationType::field_type::integral_type(
+                                assignment.var_value(params.k[7]).data)};
 
-                        return result_type(component_start_row);
+                        auto L = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui512;
+                        auto k = 0x00_cppui512;
+                        auto shft = 0x01_cppui512;
+
+                        for (std::size_t i = 0; i < 8; i++) {
+                            assignment.witness(i)[row + 3] = data[i];
+                            k = k + data[i] * (shft % L);
+                            shft = shft * 0x10000000000000000_cppui255;
+                        }
+
+                        auto r = k % L;
+                        auto q = (k / L);
+
+                        assignment.witness(3)[row + 2] = q & 127;
+                        assignment.witness(2)[row + 2] = (q >> 7) &  ((1 << (20)) - 1);
+                        assignment.witness(1)[row + 2] = (q >> 27) &  ((1 << (20)) - 1);
+                        assignment.witness(0)[row + 2] = (q >> 47) &  ((1 << (20)) - 1);
+                        assignment.witness(4)[row + 1] = r;
+
+                        assignment.witness(3)[row + 1] = (r) & ((1 << (13)) - 1);
+                        assignment.witness(2)[row + 1] = (r >> 13) &  ((1 << (20)) - 1);
+                        assignment.witness(1)[row + 1] = (r >> 33) &  ((1 << (20)) - 1);
+                        assignment.witness(0)[row + 1] = (r >> 53) &  ((1 << (20)) - 1);
+                        assignment.witness(8)[row] = (r >> 73) & ((1 << (20)) - 1);
+                        assignment.witness(7)[row] = (r >> 93) &  ((1 << (20)) - 1);
+                        assignment.witness(6)[row] = (r >> 113) &  ((1 << (20)) - 1);
+                        assignment.witness(5)[row] = (r >> 133) &  ((1 << (20)) - 1);
+                        assignment.witness(4)[row] = (r >> 153) &  ((1 << (20)) - 1);
+                        assignment.witness(3)[row] = (r >> 173) &  ((1 << (20)) - 1);
+                        assignment.witness(2)[row] = (r >> 193) &  ((1 << (20)) - 1);
+                        assignment.witness(1)[row] = (r >> 213) &  ((1 << (20)) - 1);
+                        assignment.witness(0)[row] = (r >> 233);
+
+                        auto s_r = assignment.witness(0)[row];
+                        for (size_t i = 1; i < 9; i++) {
+                            s_r += assignment.witness(i)[row];
+                        }
+                        s_r += assignment.witness(0)[row + 1] + assignment.witness(1)[row + 1] +
+                               assignment.witness(2)[row + 1] + assignment.witness(3)[row + 1];
+                        s_r -= 12 * ((1 << (20)) - 1);
+
+                        assignment.witness(5)[row + 1] = 1 / s_r;
+                        assignment.witness(6)[row + 1] = 1;
+
+                        auto v = (data[0] + data[1] * 0x10000000000000000_cppui512 +
+                                  q * (0x165812631a5cf5d3ed_cppui512) - (r & 0x1ffffffffffffffffff_cppui512));
+
+                        assignment.witness(8)[row + 3] = v;
+                        assignment.witness(4)[row + 2] = v >> 41;
+                        assignment.witness(5)[row + 2] = (v >> 21) &  ((1 << (20)) - 1);
+                        assignment.witness(6)[row + 2] = (v >> 1) &  ((1 << (20)) - 1);
+                        assignment.witness(7)[row + 2] = v & 1;
+
+                        return result_type(start_row_index);
                     }
 
                 private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_assignment_table<ArithmetizationType> &assignment,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
-                                               allocated_data_type &allocated_data,
-                                               std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
+                                               std::size_t first_selector_index) {
+
+                        std::size_t selector_index = first_selector_index;
+                        auto L = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui512;
+
+                        auto constraint_1 = bp.add_constraint(
+                            var(W0, +3) * 0x01_cppui512 + var(W1, +3) * 0x10000000000000000_cppui512 +
+                            var(W2, +3) * 0x100000000000000000000000000000000_cppui512 +
+                            var(W3, +3) * 0x1000000000000000000000000000000000000000000000000_cppui512 +
+                            var(W4, +3) * 0xffffffffffffffffffffffffffffffec6ef5bf4737dcf70d6ec31748d98951d_cppui512 +
+                            var(W5, +3) * 0xffffffffffffffeb2106215d086329a93b8c838d39a5e065812631a5cf5d3ed_cppui512 +
+                            var(W6, +3) * 0x2106215d086329a7ed9ce5a30a2c131b64a7f435e4fdd9539822129a02a6271_cppui512 +
+                            var(W7, +3) * 0xed9ce5a30a2c131b399411b7c309a3de24babbe38d1d7a979daf520a00acb65_cppui512 -
+                            var(W4, 1) -
+                            (var(W0, +2) * 0x800000000000_cppui512 + var(W1, +2) * 0x8000000_cppui512 +
+                             var(W2, +2) * 0x80_cppui512 + var(W3, +2)) * L);
+
+                        auto s_r = var(W0, 0) + var(W1, 0) + var(W2, 0) + var(W3, 0) + var(W4, 0) + var(W5, 0) +
+                                   var(W6, 0) + var(W7, 0) + var(W8, 0) + var(W0, 1) + var(W1, 1) + var(W2, 1) +
+                                   var(W3, 1) - 12 * ((1 << (20)) - 1);
+
+                        auto constraint_2 = bp.add_constraint(
+                            var(W4, +1) -
+                            (var(W3, +1) + var(W2, +1) * 0x2000_cppui255 + var(W1, +1) * 0x200000000_cppui255 +
+                             var(W0, +1) * 0x20000000000000_cppui255 + var(W8, +0) * 0x2000000000000000000_cppui255 +
+                             var(W7, +0) * 0x200000000000000000000000_cppui255 +
+                             var(W6, +0) * 0x20000000000000000000000000000_cppui255 +
+                             var(W5, +0) * 0x2000000000000000000000000000000000_cppui255 +
+                             var(W4, +0) * 0x200000000000000000000000000000000000000_cppui255 +
+                             var(W3, +0) * 0x20000000000000000000000000000000000000000000_cppui255 +
+                             var(W2, +0) * 0x2000000000000000000000000000000000000000000000000_cppui255 +
+                             var(W1, +0) * 0x200000000000000000000000000000000000000000000000000000_cppui255 +
+                             var(W0, +0) * 0x20000000000000000000000000000000000000000000000000000000000_cppui255));
+
+                        auto constraint_3 = bp.add_constraint((s_r) * ((s_r)*var(W5, +1) - 1));
+
+                        auto constraint_4 =
+                            bp.add_constraint((s_r)*var(W5, +1) + (1 - (s_r)*var(W5, +1)) * var(W6, +1) - 1);
+
+                        auto constraint_5 = bp.add_constraint(
+                            var(W0, 3) + var(W1, 3) * 0x10000000000000000_cppui512 +
+                            (var(W0, +2) * 0x800000000000_cppui512 + var(W1, +2) * 0x8000000_cppui512 +
+                             var(W2, +2) * 0x80_cppui512 + var(W3, +2)) * (0x165812631a5cf5d3ed_cppui512) -
+                            (var(W3, +1) + var(W2, +1) * 0x2000_cppui512 + var(W1, +1) * 0x200000000_cppui512 +
+                             var(W0, +1) * 0x20000000000000_cppui512) -
+                            var(W8, 3));
+
+                        auto constraint_6 = bp.add_constraint(var(W8, +3) - (var(W4, +2) * 0x20000000000_cppui255 +
+                                                                             var(W5, +2) * 0x200000_cppui255 +
+                                                                             var(W6, +2) * 2 + var(W7, +2)));
+
+                        auto constraint_7 = bp.add_constraint((var(W6, 1) - 1) * var(W6, +1));
+
+                        bp.add_gate(selector_index,
+                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                     constraint_7});
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row) {
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                     }
                 };
