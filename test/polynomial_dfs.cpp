@@ -35,7 +35,10 @@
 
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
+#include <nil/crypto3/math/polynomial/shift.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::math;
@@ -630,6 +633,60 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_division) {
         BOOST_CHECK_EQUAL(R_ans[i].data, R[i].data);
     }
     BOOST_CHECK_EQUAL(R_ans.degree(), R.degree());
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_shift) {
+    
+    polynomial_dfs<typename FieldType::value_type> a = {
+        0,
+        {0x01,
+        0x02,
+        0x03,
+        0x04,
+        0x05,
+        0x06,
+        0x07,
+        0x08}};
+
+    std::vector<typename FieldType::value_type> a_coefficients =
+        a.coefficients();
+
+    polynomial<typename FieldType::value_type> a_normal = 
+        polynomial<typename FieldType::value_type>(a_coefficients);
+
+    polynomial_dfs<typename FieldType::value_type> a_ans;
+    a_ans.from_coefficients(a_coefficients);
+
+    BOOST_CHECK (a.size() == a_ans.size());
+    for (std::size_t i = 0; i < a.size(); i++){
+        BOOST_CHECK(a[i] == a_ans[i]);
+    }
+
+    std::size_t domain_size = a.size() - 1;
+    for (int shift = 0; shift < int(a.size()); shift++){
+
+        polynomial_dfs<typename FieldType::value_type> a_shifted =
+            polynomial_shift(a, shift);
+
+        typename FieldType::value_type omega_shifted =
+            unity_root<FieldType>(domain_size + 1).pow(shift);
+
+        polynomial<typename FieldType::value_type> a_normal_shifted =
+            polynomial_shift(a_normal, omega_shifted);
+
+        std::vector<typename FieldType::value_type> a_normal_shifted_coefs(a_normal_shifted.size());
+        std::copy(a_normal_shifted.begin(), a_normal_shifted.end(), a_normal_shifted_coefs.begin());
+
+        polynomial_dfs<typename FieldType::value_type> a_normal_shifted_dfs;
+        a_normal_shifted_dfs.from_coefficients(a_normal_shifted_coefs);
+
+        BOOST_CHECK (a_shifted.size() == a_normal_shifted_dfs.size());
+
+        for (std::size_t i = 0; i < a_shifted.size(); i++){
+            BOOST_CHECK(a_shifted[i] == a_normal_shifted_dfs[i]);
+        }
+
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -63,6 +63,10 @@ namespace nil {
                  */
                 evaluation_domain(const std::size_t m) : m(m), log2_size(multiprecision::msb(m)) {};
 
+                inline std::size_t size() const {
+                    return m;
+                }
+
                 /**
                  * Get the idx-th element in S.
                  */

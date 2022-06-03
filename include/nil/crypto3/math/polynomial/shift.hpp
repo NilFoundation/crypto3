@@ -27,19 +27,44 @@
 #define CRYPTO3_MATH_POLYNOMIAL_SHIFT_HPP
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace math {
-            template<typename FieldType>
-            static inline polynomial<typename FieldType::value_type>
-                polynomial_shift(const polynomial<typename FieldType::value_type> &f,
-                                 const typename FieldType::value_type &x) {
-                polynomial<typename FieldType::value_type> f_shifted(f);
-                typename FieldType::value_type x_power = x;
+            template<typename FieldValueType>
+            static inline polynomial<FieldValueType>
+                polynomial_shift(const polynomial<FieldValueType> &f,
+                                 const FieldValueType &x) {
+                polynomial<FieldValueType> f_shifted(f);
+                FieldValueType x_power = x;
                 for (int i = 1; i < f.size(); i++) {
                     f_shifted[i] = f_shifted[i] * x_power;
                     x_power *= x;
+                }
+
+                return f_shifted;
+            }
+
+            template<typename FieldValueType>
+            static inline polynomial_dfs<FieldValueType>
+                polynomial_shift(const polynomial_dfs<FieldValueType> &f,
+                                 const int shift,
+                                 std::size_t domain_size = 0) {
+                if (domain_size == 0) {
+                    domain_size = f.size();
+                }
+
+                const std::size_t extended_domain_size = f.size();
+
+                assert((extended_domain_size % domain_size) == 0);
+
+                const std::size_t domain_scale = extended_domain_size/domain_size;
+
+                polynomial_dfs<FieldValueType> f_shifted(f.degree(), extended_domain_size);
+
+                for (std::size_t index = 0; index < extended_domain_size; index++){
+                    f_shifted[index] = f[(extended_domain_size + index + domain_scale * shift) % (extended_domain_size)];
                 }
 
                 return f_shifted;

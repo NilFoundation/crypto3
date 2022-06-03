@@ -98,8 +98,8 @@ namespace nil {
                         }
                     }
 
-                    _basic_radix2_fft<FieldType>(c, omega.squared());
-                    _basic_radix2_fft<FieldType>(e, unity_root<FieldType>(small_m));
+                    detail::basic_radix2_fft<FieldType>(c, omega.squared());
+                    detail::basic_radix2_fft<FieldType>(e, unity_root<FieldType>(small_m));
 
                     for (std::size_t i = 0; i < big_m; ++i) {
                         a[i] = c[i];
@@ -116,8 +116,8 @@ namespace nil {
                     std::vector<value_type> U0(a.begin(), a.begin() + big_m);
                     std::vector<value_type> U1(a.begin() + big_m, a.end());
 
-                    _basic_radix2_fft<FieldType>(U0, omega.squared().inversed());
-                    _basic_radix2_fft<FieldType>(U1, unity_root<FieldType>(small_m).inversed());
+                    detail::basic_radix2_fft<FieldType>(U0, omega.squared().inversed());
+                    detail::basic_radix2_fft<FieldType>(U1, unity_root<FieldType>(small_m).inversed());
 
                     const value_type U0_size_inv = value_type(big_m).inversed();
                     for (std::size_t i = 0; i < big_m; ++i) {

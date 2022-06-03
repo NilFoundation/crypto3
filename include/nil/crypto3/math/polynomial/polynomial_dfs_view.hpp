@@ -288,11 +288,9 @@ namespace nil {
                     typedef typename value_type::field_type FieldType;
 
                     value_type omega = unity_root<FieldType>(this->size());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(it, omega.inversed());
-#endif
+
+                    detail::basic_radix2_fft<FieldType>(it, omega.inversed());
+
                     const value_type sconst = value_type(this->size()).inversed();
                     std::transform(it.begin(),
                                    it.end(),
@@ -301,11 +299,8 @@ namespace nil {
 
                     value_type omega_new = unity_root<FieldType>(_sz);
                     it.resize(_sz);
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega_new);
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(it, omega_new);
-#endif
+
+                    detail::basic_radix2_fft<FieldType>(it, omega_new);
                 }
 
                 //                void resize(size_type _sz, const_reference _x) {
@@ -323,11 +318,9 @@ namespace nil {
                 //                    const std::size_t n = detail::power_of_two(this->_d);
                 //
                 //                    std::vector<FieldValueType> c(this->begin(), this->begin() + n);
-                //#ifdef MULTICORE
-                //                    detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-                //#else
-                //                    detail::basic_serial_radix2_fft<FieldType>(c, (this->_omega).inversed());
-                //#endif
+                //
+                //                    detail::basic_radix2_fft<FieldType>(c, (this->_omega).inversed());
+                //
                 //                    std::vector<FieldValueType> result(value.size(), 0);
                 //                    auto end = c.end();
                 //                    while (end != c.begin()) {
@@ -491,7 +484,7 @@ namespace nil {
                     size_t n = this->size();
                     value_type omega = unity_root<FieldType>(n);
                     q.resize(n);
-                    detail::basic_serial_radix2_fft<FieldType>(q, omega);
+                    detail::basic_radix2_fft<FieldType>(q, omega);
                     this->_d = new_s - 1;
                     this->assign(q.begin(), q.end());
                     return *this;
@@ -547,7 +540,7 @@ namespace nil {
                     size_t n = this->size();
                     value_type omega = unity_root<FieldType>(n);
                     r.resize(n);
-                    detail::basic_serial_radix2_fft<FieldType>(r, omega);
+                    detail::basic_radix2_fft<FieldType>(r, omega);
                     this->_d = r_deg;
                     this->assign(r.begin(), r.end());
                     return *this;
@@ -560,7 +553,7 @@ namespace nil {
                     _d = tmp.size() - 1;
                     it.assign(tmp.begin(), tmp.end());
                     it.resize(n, FieldValueType::zero());
-                    detail::basic_serial_radix2_fft<FieldType>(it, omega);
+                    detail::basic_radix2_fft<FieldType>(it, omega);
                 }
 
                 std::vector<FieldValueType> coefficients() const {
@@ -568,11 +561,9 @@ namespace nil {
 
                     value_type omega = unity_root<FieldType>(this->size());
                     std::vector<FieldValueType> tmp(this->begin(), this->end());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(tmp, omega.inversed());
-#endif
+
+                    detail::basic_radix2_fft<FieldType>(tmp, omega.inversed());
+
                     const value_type sconst = value_type(this->size()).inversed();
                     std::transform(tmp.begin(),
                                    tmp.end(),

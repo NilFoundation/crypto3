@@ -31,6 +31,7 @@
 #include <vector>
 
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -117,11 +118,6 @@ namespace nil {
 
                 polynomial_dfs(polynomial_dfs&& x, const allocator_type& a) : val(x.val, a), _d(x._d) {
                 }
-
-                //                polynomial_dfs(const FieldValueType& value, std::size_t power = 0) : val(power + 1,
-                //                FieldValueType(0)) {
-                //                    this->operator[](power) = value;
-                //                }
 
                 polynomial_dfs(size_t d, const container_type& c) : val(c), _d(d) {
                     BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
@@ -348,63 +344,25 @@ namespace nil {
                 }
 
                 void resize(size_type _sz) {
-                    BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
-                    typedef typename value_type::field_type FieldType;
+                    // BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
 
-                    value_type omega = unity_root<FieldType>(this->size());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(val, omega.inversed());
-#endif
-                    const value_type sconst = value_type(this->size()).inversed();
-                    std::transform(val.begin(),
-                                   val.end(),
-                                   val.begin(),
-                                   std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
+                    if (this->size() == 1){
+                        this->val.resize(_sz, this->val[0]);
+                    } else {
+                        typedef typename value_type::field_type FieldType;
 
-                    value_type omega_new = unity_root<FieldType>(_sz);
-                    val.resize(_sz);
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(val, omega_new);
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(val, omega_new);
-#endif
+                        make_evaluation_domain<FieldType>(this->size())->inverse_fft(this->val);
+                        this->val.resize(_sz, FieldValueType::zero());
+                        make_evaluation_domain<FieldType>(_sz)->fft(this->val);
+                    }
                 }
-
-                //                void resize(size_type _sz, const_reference _x) {
-                //                    BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
-                //                    return val.resize(_sz, _x);
-                //                }
 
                 void swap(polynomial_dfs& other) {
                     val.swap(other.val);
                     std::swap(_d, other._d);
                 }
 
-                //                std::vector<FieldValueType> evaluate(const std::vector<FieldValueType>& value) const {
-                //                    typedef typename value_type::field_type FieldType;
-                //                    const std::size_t n = detail::power_of_two(this->_d);
-                //
-                //                    std::vector<FieldValueType> c(this->begin(), this->begin() + n);
-                //#ifdef MULTICORE
-                //                    detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-                //#else
-                //                    detail::basic_serial_radix2_fft<FieldType>(c, (this->_omega).inversed());
-                //#endif
-                //                    std::vector<FieldValueType> result(value.size(), 0);
-                //                    auto end = c.end();
-                //                    while (end != c.begin()) {
-                //                        for (size_t i = 0; i < value.size(); ++i) {
-                //                            result[i] = result[i] * value[i] + *--end;
-                //                        }
-                //                    }
-                //                    return result;
-                //                }
-
                 FieldValueType evaluate(const FieldValueType& value) const {
-
-                    typedef typename value_type::field_type FieldType;
 
                     std::vector<FieldValueType> tmp = this->coefficients();
                     FieldValueType result = 0;
@@ -485,9 +443,11 @@ namespace nil {
                  * polynomial C.
                  */
                 polynomial_dfs operator*(const polynomial_dfs& other) const {
-                    polynomial_dfs result(this->_d + other._d, this->begin(), this->end());
+                    polynomial_dfs result(this->degree() + other.degree(), this->begin(), this->end());
+
                     size_t polynomial_s =
-                        detail::power_of_two(std::max({this->size(), other.size(), this->_d + other._d + 1}));
+                        detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
+
                     if (result.size() < polynomial_s) {
                         result.resize(polynomial_s);
                     }
@@ -558,7 +518,7 @@ namespace nil {
                     size_t n = this->size();
                     value_type omega = unity_root<FieldType>(n);
                     q.resize(n);
-                    detail::basic_serial_radix2_fft<FieldType>(q, omega);
+                    detail::basic_radix2_fft<FieldType>(q, omega);
                     return polynomial_dfs(new_s - 1, q);
                 }
 
@@ -609,18 +569,19 @@ namespace nil {
                     size_t n = this->size();
                     value_type omega = unity_root<FieldType>(n);
                     r.resize(n);
-                    detail::basic_serial_radix2_fft<FieldType>(r, omega);
+                    detail::basic_radix2_fft<FieldType>(r, omega);
                     return polynomial_dfs(r_deg, r);
                 }
 
-                void from_coefficients(const container_type &tmp) {
+                template<typename ContainerType>
+                void from_coefficients(const ContainerType &tmp) {
                     typedef typename value_type::field_type FieldType;
                     size_t n = detail::power_of_two(tmp.size());
                     value_type omega = unity_root<FieldType>(n);
                     _d = tmp.size() - 1;
                     val.assign(tmp.begin(), tmp.end());
                     val.resize(n, FieldValueType::zero());
-                    detail::basic_serial_radix2_fft<FieldType>(val, omega);
+                    detail::basic_radix2_fft<FieldType>(val, omega);
                 }
 
                 std::vector<FieldValueType> coefficients() const {
@@ -628,24 +589,86 @@ namespace nil {
 
                     value_type omega = unity_root<FieldType>(this->size());
                     std::vector<FieldValueType> tmp(this->begin(), this->end());
-#ifdef MULTICORE
-                    detail::basic_parallel_radix2_fft<FieldType>(c, omega.inversed());
-#else
-                    detail::basic_serial_radix2_fft<FieldType>(tmp, omega.inversed());
-#endif
+
+                    detail::basic_radix2_fft<FieldType>(tmp, omega.inversed());
+
                     const value_type sconst = value_type(this->size()).inversed();
                     std::transform(tmp.begin(),
                                    tmp.end(),
                                    tmp.begin(),
                                    std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
                     size_t r_size = tmp.size();
-                    while (r_size > 0 && tmp[r_size - 1] == FieldValueType(0)) {
+                    while (r_size > 1 && tmp[r_size - 1] == FieldValueType::zero()) {
                         --r_size;
                     }
                     tmp.resize(r_size);
                     return tmp;
                 }
             };
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator+(const polynomial_dfs<FieldValueType, Allocator>& A,
+                                                            const FieldValueType& B) {
+
+                return A + polynomial_dfs<FieldValueType>(0, A.size(), B);
+            }
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator+(const FieldValueType& A,
+                                                            const polynomial_dfs<FieldValueType, Allocator>& B) {
+
+                return polynomial_dfs<FieldValueType>(0, B.size(), A) + B;
+            }
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator-(const polynomial_dfs<FieldValueType, Allocator>& A,
+                                                            const FieldValueType& B) {
+
+                return A - polynomial_dfs<FieldValueType>(0, A.size(), B);
+            }
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator-(const FieldValueType& A,
+                                                            const polynomial_dfs<FieldValueType, Allocator>& B) {
+
+                return polynomial_dfs<FieldValueType>(0, B.size(), A) - B;
+            }
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator*(const polynomial_dfs<FieldValueType, Allocator>& A,
+                                                            const FieldValueType& B) {
+
+                return A * polynomial_dfs<FieldValueType>(0, A.size(), B);
+            }
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator*(const FieldValueType& A,
+                                                            const polynomial_dfs<FieldValueType, Allocator>& B) {
+
+                return polynomial_dfs<FieldValueType>(0, B.size(), A) * B;
+            }
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator/(const polynomial_dfs<FieldValueType, Allocator>& A,
+                                                            const FieldValueType& B) {
+
+                return A / polynomial_dfs<FieldValueType>(0, A.size(), B);
+            }
+
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial_dfs<FieldValueType, Allocator> operator/(const FieldValueType& A,
+                                                            const polynomial_dfs<FieldValueType, Allocator>& B) {
+
+                return polynomial_dfs<FieldValueType>(0, B.size(), A) / B;
+            }
         }    // namespace math
     }        // namespace crypto3
 }    // namespace nil

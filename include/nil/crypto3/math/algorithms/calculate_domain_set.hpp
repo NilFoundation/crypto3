@@ -23,53 +23,31 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MATH_FIELD_UTILS_HPP
-#define CRYPTO3_MATH_FIELD_UTILS_HPP
+#ifndef CRYPTO3_MATH_CALCULATE_DOMAIN_SET_HPP
+#define CRYPTO3_MATH_CALCULATE_DOMAIN_SET_HPP
 
-#include <type_traits>
-#include <complex>
-
-#include <boost/math/constants/constants.hpp>
-#include <nil/crypto3/algebra/fields/params.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace math {
-            namespace detail {
 
-                using namespace nil::crypto3::algebra;
+            template<typename FieldType>
+            std::vector<std::shared_ptr<evaluation_domain<FieldType>>>
+                calculate_domain_set(const std::size_t max_domain_degree, const std::size_t set_size) {
 
-                std::size_t bitreverse(std::size_t n, const std::size_t l) {
-                    std::size_t r = 0;
-                    for (std::size_t k = 0; k < l; ++k) {
-                        r = (r << 1) | (n & 1);
-                        n >>= 1;
-                    }
-                    return r;
+                std::vector<std::shared_ptr<evaluation_domain<FieldType>>> domain_set(set_size);
+                for (std::size_t i = 0; i < set_size; i++) {
+                    const std::size_t domain_size = std::pow(2, max_domain_degree - i);
+                    std::shared_ptr<evaluation_domain<FieldType>> domain =
+                        make_evaluation_domain<FieldType>(domain_size);
+                    domain_set[i] = domain;
                 }
-
-                constexpr std::size_t power_of_two(std::size_t n) {
-                    n--;
-                    n |= n >> 1;
-                    n |= n >> 2;
-                    n |= n >> 4;
-                    n |= n >> 8;
-                    n |= n >> 16;
-                    n++;
-
-                    return n;
-                }
-
-                template<typename FieldType>
-                typename FieldType::value_type coset_shift() {
-                    return
-                        typename FieldType::value_type(fields::arithmetic_params<FieldType>::multiplicative_generator)
-                            .squared();
-                }
-
-            }    // namespace detail
-        }        // namespace fft
-    }            // namespace crypto3
+                return domain_set;
+            }
+        }    // namespace math
+    }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MATH_FIELD_UTILS_HPP
+#endif    // CRYPTO3_MATH_CALCULATE_DOMAIN_SET_HPP
