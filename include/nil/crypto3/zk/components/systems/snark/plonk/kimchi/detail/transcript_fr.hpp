@@ -39,7 +39,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/limbs.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/sponge.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 

@@ -42,7 +42,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/ft_eval.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/limbs.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
