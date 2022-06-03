@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_verify_scalar_field_test_suite)
 template <typename CurveType, typename BlueprintFieldType, typename KimchiParamsType,
     std::size_t EvalRounds>
 void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
-    zk::components::kimchi_proof_scalar<CurveType, KimchiParamsType, EvalRounds> &circuit_proof,
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType, EvalRounds> &circuit_proof,
     std::vector<typename BlueprintFieldType::value_type> &public_input) {
         using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
@@ -100,6 +100,10 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
         public_input.push_back(tmp);
         circuit_proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
+
+    //ft_eval
+    public_input.push_back(algebra::random_element<BlueprintFieldType>());
+    circuit_proof.ft_eval = var(0, public_input.size() - 1, false, var::column_type::public_input);
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
@@ -171,7 +175,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {
         omega};
 
-    std::array<zk::components::kimchi_proof_scalar<curve_type,
+    std::array<zk::components::kimchi_proof_scalar<BlueprintFieldType,
                 kimchi_params, eval_rounds>,
             batch_size> proofs;
 
@@ -180,7 +184,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
     for (std::size_t batch_id = 0; batch_id < batch_size; batch_id++) {
         zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
-        zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
+        zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
 
         prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(
             kimchi_proof, proof, public_input

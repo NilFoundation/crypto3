@@ -82,25 +82,21 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using poseidon_component =
-                            typename zk::components::poseidon<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            typename zk::components::poseidon<ArithmetizationType, BlueprintFieldType,
+                             W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using add_component = typename zk::components::addition<ArithmetizationType,
                                                             W0, W1, W2>;
                     std::size_t state_count = 0;
                     bool state_absorbed = true;
 
-                    std::size_t add_input_gate_index;
-                    std::size_t permute_gate_index;
-
                     std::array<var, poseidon_component::state_size> state = {var(W0, 0), var(W1, 0), var(W2, 0)};
 
                     void permute_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t &component_start_row) {
+                            const std::size_t &component_start_row) {
 
                         typename poseidon_component::result_type poseidon_res = poseidon_component::generate_assignments(assignment,
                             { state }, component_start_row);
-                        
-                        component_start_row += poseidon_component::rows_amount;
 
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
                             state[i] = poseidon_res.output_state[i];
@@ -111,22 +107,19 @@ namespace nil {
                             &assignment,
                             var &input,
                             std::size_t state_index,
-                            std::size_t &component_start_row) {
+                            const std::size_t component_start_row) {
                             
                         auto addition_result = add_component::generate_assignments(assignment, 
                             {input, state[state_index]}, component_start_row);
-                        component_start_row += add_component::rows_amount;
                         state[state_index] = addition_result.output;
                     }
 
                     void permute_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
 
                         typename poseidon_component::result_type poseidon_res = poseidon_component::generate_circuit(bp, assignment,
                             { state }, component_start_row);
-                        
-                        component_start_row += poseidon_component::rows_amount;
 
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
                             state[i] = poseidon_res.output_state[i];
@@ -137,55 +130,57 @@ namespace nil {
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const var &input,
                         std::size_t state_index,
-                        std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
 
                         auto addition_result = zk::components::generate_circuit<add_component>(bp, assignment, 
                             {input, state[state_index]}, component_start_row);
-                        component_start_row += add_component::rows_amount;
                         state[state_index] = addition_result.output;
                     }
 
+                    constexpr static const std::size_t permute_rows = poseidon_component::rows_amount;
+                    constexpr static const std::size_t add_input_rows = add_component::rows_amount;
+
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
-                    constexpr static const std::size_t gates_amount = 1;
+                    constexpr static const std::size_t init_rows = 0;
+                    constexpr static const std::size_t absorb_rows = permute_rows + add_input_rows;
+                    constexpr static const std::size_t squeeze_rows = permute_rows;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     void init_assignment(blueprint_assignment_table<ArithmetizationType>
                             &assignment,
-                            std::size_t &component_start_row) {
+                            var zero,
+                            const std::size_t component_start_row) {
                         
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
-                            assignment.witness(W0 + i)[component_start_row] = 0;
-                            state[i] = var(W0 + i, component_start_row, false);
+                            state[i] = zero;
                         }
-
-                        component_start_row++;
                     }
 
                     void init_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const var &zero,
-                        std::size_t &component_start_row) {
+                        const var zero,
+                        const std::size_t component_start_row) {
 
                         for (std::size_t i = 0; i < poseidon_component::state_size; i++) {
-                            state[i] = var(W0 + i, component_start_row, false);
-                            bp.add_copy_constraint({zero, state[i]});
+                            state[i] = zero;
                         }
-
-                        component_start_row++;
                     }
 
                     void absorb_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
                             var absorbing_value,
-                            std::size_t &component_start_row) {
+                            const std::size_t component_start_row) {
+
+                        std::size_t row = component_start_row;
                         
                         if (this->state_absorbed) {
                             if (this->state_count == poseidon_component::rate) {
                                 permute_assignment(assignment,
                                     component_start_row);
+                                row += permute_rows;
 
                                 add_input_assignment(assignment,
-                                    absorbing_value, 0, component_start_row);
+                                    absorbing_value, 0, row);
 
                                 this->state_count = 1;
                             } else {
@@ -206,15 +201,19 @@ namespace nil {
                     void absorb_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const var &absorbing_value,
-                        std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
+
+                        std::size_t row = component_start_row;
 
                         if (this->state_absorbed) {
                             if (this->state_count == poseidon_component::rate) {
                                 permute_circuit(bp, assignment,
                                     component_start_row);
 
+                                row += permute_rows;
+
                                 add_input_circuit(bp, assignment,
-                                    absorbing_value, 0, component_start_row);
+                                    absorbing_value, 0, row);
 
                                 this->state_count = 1;
                             } else {
@@ -234,7 +233,7 @@ namespace nil {
 
                     var squeeze_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t &component_start_row) {
+                            const std::size_t component_start_row) {
                         if (!this->state_absorbed) { // state = squeezed
                             if (this->state_count == poseidon_component::rate) {
                                 permute_assignment(assignment,
@@ -257,7 +256,7 @@ namespace nil {
 
                     var squeeze_circuit(blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        std::size_t &component_start_row) {
+                        const std::size_t component_start_row) {
 
                         if (!this->state_absorbed) { // state = squeezed
                             if (this->state_count == poseidon_component::rate) {

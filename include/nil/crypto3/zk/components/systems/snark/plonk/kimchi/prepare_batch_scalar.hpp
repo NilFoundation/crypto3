@@ -143,7 +143,7 @@ namespace nil {
 
                     struct params_type {
                         verifier_index_type &verifier_index;
-                        kimchi_proof_scalar<CurveType, KimchiParamsType,
+                        kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                             KimchiCommitmentParamsType::eval_rounds> &proof;
                         typename proof_binding::fq_sponge_output &fq_output;
                     };

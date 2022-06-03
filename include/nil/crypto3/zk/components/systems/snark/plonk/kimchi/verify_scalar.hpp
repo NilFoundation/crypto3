@@ -115,7 +115,7 @@ namespace nil {
                         typename proof_binding::fq_data<var> fq_data;
                         
                         verifier_index_type &verifier_index;
-                        std::array<kimchi_proof_scalar<CurveType, KimchiParamsType,
+                        std::array<kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                             KimchiCommitmentParamsType::eval_rounds>, BatchSize> &proof;
                         std::array<typename proof_binding::fq_sponge_output, BatchSize> &fq_output;
                     };

@@ -76,16 +76,15 @@ namespace nil {
                     }
                 };
 
-                template<typename CurveType, typename KimchiParamsType,
+                template<typename BlueprintFieldType, typename KimchiParamsType,
                     std::size_t EvalRounds>
                 struct kimchi_proof_scalar {
-                    using FieldType = typename CurveType::scalar_field_type;
-                    using var = snark::plonk_variable<FieldType>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t chal_per_round = 2;
 
-                    std::array<kimchi_proof_evaluations<FieldType, KimchiParamsType>, 2> proof_evals;
-                    //var ft_eval;
+                    std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, 2> proof_evals;
+                    var ft_eval;
                     std::array<var, KimchiParamsType::public_input_size> public_input;
                     std::array<var, EvalRounds> prev_challenges;
                 };

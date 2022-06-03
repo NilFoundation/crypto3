@@ -117,7 +117,13 @@ namespace nil {
                     using ft_eval_component =
                             zk::components::ft_eval<ArithmetizationType, CurveType,
                                                         KimchiParamsType, W0, W1, W2, W3,
-                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;   
+                    
+                    using transcript_type = kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
+                                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                                        W11, W12, W13, W14>;
+
+                
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiCommitmentParamsType>;
@@ -132,11 +138,9 @@ namespace nil {
                         // zeta
                         row += endo_scalar_component::rows_amount;
 
-                        // kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                        //                   W11, W12, W13, W14>
-                        //     transcript;
                         //transcript.init_assignment(assignment, row);
-                        //transcript.absorb_assignment(assignment, fq_digest, row);
+                        row += transcript_type::init_rows;
+                        row += transcript_type::absorb_rows;
 
                         // zeta_pow_n
                         row += exponentiation_component::rows_amount;
@@ -160,14 +164,13 @@ namespace nil {
                         // public_eval
                         row += public_eval_component::rows_amount;
                         
-                        // transcript.absorb_evaluations_assignment(
-                        //     assignment, public_eval[0], params.proof.proof_evals[0], row);
-                        // transcript.absorb_evaluations_assignment(
-                        //     assignment, public_eval[1], params.proof.proof_evals[1], row);
+                        row += transcript_type::absorb_evaluations_rows;
+                        row += transcript_type::absorb_evaluations_rows;
 
-                        // transcript.absorb_assignment(assignment, params.proof.ft_eval, row);
+                        row += transcript_type::absorb_rows;
 
                         // var v_challenge = transcript.challenge_assignment(assignment, row);
+                        row += transcript_type::challenge_rows;
                         // var v = endo_scalar_component::generate_assignments(assignment,
                             // {v_challenge, endo_factor, num_bits}, row).output;
                         // row += endo_scalar_component::rows_amount;
@@ -201,12 +204,12 @@ namespace nil {
                         
 
                         kimchi_verifier_index_scalar<CurveType> &verifier_index;
-                        kimchi_proof_scalar<CurveType, KimchiParamsType,
+                        kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                             KimchiCommitmentParamsType::eval_rounds> &proof;
                         typename proof_binding::fq_sponge_output &fq_output;
 
                         params_type(kimchi_verifier_index_scalar<CurveType> &_verifier_index,
-                            kimchi_proof_scalar<CurveType, KimchiParamsType,
+                            kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                                 KimchiCommitmentParamsType::eval_rounds> &_proof,
                             typename proof_binding::fq_sponge_output &_fq_output) : 
                                                         verifier_index(_verifier_index),
@@ -224,10 +227,7 @@ namespace nil {
                             var u_chal;
                         };
 
-                        kimchi_transcript<ArithmetizationType, CurveType, 
-                            KimchiParamsType,
-                            W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                            W11, W12, W13, W14> transcript;
+                        transcript_type transcript;
                         random_oracles oracles;
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
                         std::array<var, eval_points_amount> p_eval;
@@ -276,18 +276,17 @@ namespace nil {
                             bp, assignment, {params.fq_output.zeta, endo_factor, endo_num_bits}, row).output;
                         row += endo_scalar_component::rows_amount;
 
-                        // fr_transcript.absorb(fq_digest)
                         var zero = var(0, start_row_index + 4, false, var::column_type::constant);
                         var one = var(0, start_row_index + 5, false, var::column_type::constant);
                         var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
                         var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
 
-                        kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
-                                          W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14>
-                            transcript;
-                        //transcript.init_circuit(bp, assignment, zero, row);
-                        //transcript.absorb_circuit(bp, assignment, params.fq_output.fq_digest, row);
+                        // fr_transcript.absorb(fq_digest)
+                        transcript_type transcript;
+                        transcript.init_circuit(bp, assignment, zero, row);
+                        row += transcript_type::init_rows;
+                        transcript.absorb_circuit(bp, assignment, params.fq_output.fq_digest, row);
+                        row += transcript_type::absorb_rows;
 
                         // zeta_pow_n = zeta**n
                         var zeta_pow_n = exponentiation_component::generate_circuit(
@@ -330,14 +329,19 @@ namespace nil {
                                         domain_size, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
 
-                        // transcript.absorb_evaluations_circuit(
-                        //     bp, assignment, public_eval[0], params.proof.proof_evals[0], row);
-                        // transcript.absorb_evaluations_circuit(
-                        //     bp, assignment, public_eval[1], params.proof.proof_evals[1], row);
+                        transcript.absorb_evaluations_circuit(
+                             bp, assignment, public_eval[0], params.proof.proof_evals[0], row);
+                        row += transcript_type::absorb_evaluations_rows;
+                        transcript.absorb_evaluations_circuit(
+                            bp, assignment, public_eval[1], params.proof.proof_evals[1], row);
+                        row += transcript_type::absorb_evaluations_rows;
 
-                        //transcript.absorb_circuit(assignment, params.proof.ft_eval, row);
+                        transcript.absorb_circuit(bp, assignment, params.proof.ft_eval, row);
+                        row += transcript_type::absorb_rows;
 
-                        //var v_challenge = transcript.challenge_generate_constraints(bp, assignment, row);
+                        var v_challenge = transcript.challenge_circuit(bp, assignment, row);
+                        row += transcript_type::challenge_rows;
+
                         // var v = endo_scalar_component::generate_circuit(
                         //     bp, assignment, {v_challenge, endo_factor, endo_num_bits}, row).output;
                         // row += endo_scalar_component::rows_amount;
@@ -458,12 +462,11 @@ namespace nil {
                         var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
                         var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
 
-                        kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
-                                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                        W11, W12, W13, W14>
-                            transcript;
-                        //transcript.init_assignment(assignment, row);
-                        //transcript.absorb_assignment(assignment, fq_digest, row);
+                        transcript_type transcript;
+                        transcript.init_assignment(assignment, zero, row);
+                        row += transcript_type::init_rows;
+                        transcript.absorb_assignment(assignment, fq_digest, row);
+                        row += transcript_type::absorb_rows;
 
                         var n = domain_size;
                         var zeta_pow_n = exponentiation_component::generate_assignments(
@@ -502,14 +505,18 @@ namespace nil {
                                         n, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
                         
-                        // transcript.absorb_evaluations_assignment(
-                        //     assignment, public_eval[0], params.proof.proof_evals[0], row);
-                        // transcript.absorb_evaluations_assignment(
-                        //     assignment, public_eval[1], params.proof.proof_evals[1], row);
+                        transcript.absorb_evaluations_assignment(
+                            assignment, public_eval[0], params.proof.proof_evals[0], row);
+                        row += transcript_type::absorb_evaluations_rows;
+                        transcript.absorb_evaluations_assignment(
+                             assignment, public_eval[1], params.proof.proof_evals[1], row);
+                        row += transcript_type::absorb_evaluations_rows;
 
-                        // transcript.absorb_assignment(assignment, params.proof.ft_eval, row);
+                        transcript.absorb_assignment(assignment, params.proof.ft_eval, row);
+                        row += transcript_type::absorb_rows;
 
-                        // var v_challenge = transcript.challenge_assignment(assignment, row);
+                        var v_challenge = transcript.challenge_assignment(assignment, row);
+                        row += transcript_type::challenge_rows;
                         // var v = endo_scalar_component::generate_assignments(assignment,
                             // {v_challenge, endo_factor, num_bits}, row).output;
                         // row += endo_scalar_component::rows_amount;

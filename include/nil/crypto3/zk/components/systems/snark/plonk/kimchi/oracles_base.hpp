@@ -143,7 +143,7 @@ namespace nil {
 
                     struct params_type {
                         kimchi_verifier_index_scalar<CurveType> verifier_index;
-                        kimchi_proof_scalar<CurveType> proof;
+                        kimchi_proof_scalar<BlueprintFieldType> proof;
                         typename BlueprintFieldType::value_type joint_combiner;
                         typename BlueprintFieldType::value_type
                             beta;    // beta and gamma can be combined from limbs in the base circuit

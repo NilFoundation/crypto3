@@ -97,76 +97,72 @@ namespace nil {
                     const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
                     const std::size_t HIGH_ENTROPY_LIMBS = 2;
 
-                    kimchi_sponge<ArithmetizationType, CurveType,
-                       W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> sponge;
+                    using sponge_component = kimchi_sponge<ArithmetizationType, CurveType,
+                       W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    sponge_component sponge;
                     using pack = from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
                     using unpack = to_limbs<ArithmetizationType, CurveType, W0, W1, W2, W3, W4>;
 
                     std::vector<var> last_squeezed;
-                    var result = var(W0, 0, false);
 
                     var pack_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        std::size_t &component_start_row,
+                                        const std::size_t component_start_row,
                                         std::array<var, 2> limbs) {
                         auto pack_res = pack::generate_assignments(assignment, limbs, component_start_row);
-                        component_start_row += pack::rows_amount;
                         return pack_res.result;
                     }
 
                     var pack_circuit(blueprint<ArithmetizationType> &bp,
                                     blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                    std::size_t &component_start_row,
+                                    const std::size_t component_start_row,
                                     std::array<var, 2> limbs) {
                         auto pack_res = pack::generate_circuit(bp, assignment, limbs, component_start_row);
-                        component_start_row += pack::rows_amount;
                         return pack_res.result;
                     }
 
                     std::array<var, 4> unpack_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                    std::size_t &component_start_row,
+                                                    const std::size_t component_start_row,
                                                     var elem) {
                         auto unpack_res = unpack::generate_assignments(assignment, {elem}, component_start_row);
-                        component_start_row += unpack::rows_amount;
                         return unpack_res.result;
                     }
 
                     std::array<var, 4> unpack_circuit(blueprint<ArithmetizationType> &bp,
                                                     blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                    std::size_t &component_start_row,
+                                                    const std::size_t component_start_row,
                                                     var elem) {
                         auto unpack_res = unpack::generate_circuit(bp, assignment, {elem}, component_start_row);
-                        component_start_row += unpack::rows_amount;
                         return unpack_res.result;
                     }
                     
                 public:
                     constexpr static const std::size_t rows_amount = 0;
+                    constexpr static const std::size_t init_rows = sponge_component::init_rows;
+                    constexpr static const std::size_t absorb_rows = sponge_component::absorb_rows;
+                    constexpr static const std::size_t challenge_rows = 
+                        sponge_component::squeeze_rows + unpack::rows_amount 
+                        + pack::rows_amount;
+                    constexpr static const std::size_t absorb_evaluations_rows = 25 * absorb_rows;
 
                     void init_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                         std::size_t &component_start_row) {
-                        sponge.init_assignment(assignment, component_start_row);
+                                         var zero,
+                                         const std::size_t component_start_row) {
+                        sponge.init_assignment(assignment, zero, component_start_row);
                         last_squeezed = {};
-                        result = var(W0, component_start_row, false);
-                        assignment.witness(W0)[component_start_row] = 0;
-
-                        component_start_row++;
                     }
 
                     void init_circuit(blueprint<ArithmetizationType> &bp,
                                       blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                       const var &zero,
-                                      std::size_t &component_start_row) {
+                                      const std::size_t component_start_row) {
                         sponge.init_circuit(bp, assignment, zero, component_start_row);
                         last_squeezed = {};
-                        result = var(W0, component_start_row, false);
-                        bp.add_copy_constraint({zero, result});
-
-                        component_start_row++;
                     }
 
                     void absorb_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                            var absorbing_value,
-                                           std::size_t &component_start_row) {
+                                           const std::size_t component_start_row) {
                         last_squeezed = {};
                         sponge.absorb_assignment(assignment, absorbing_value, component_start_row);
                     }
@@ -174,7 +170,7 @@ namespace nil {
                     void absorb_circuit(blueprint<ArithmetizationType> &bp,
                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                         const var &input,
-                                        std::size_t &component_start_row) {
+                                        const std::size_t component_start_row) {
                         last_squeezed = {};
                         sponge.absorb_circuit(bp, assignment, input, component_start_row);
                     }
@@ -183,67 +179,77 @@ namespace nil {
                                                        var public_eval,
                                                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>
                                                            private_eval,
-                                                       std::size_t &component_start_row) {
+                                                       const std::size_t component_start_row) {
                         last_squeezed = {};
+                        std::size_t row = component_start_row;
                         std::vector<var> points = {public_eval, private_eval.z, private_eval.generic_selector, private_eval.poseidon_selector,
                                                 private_eval.w[0], private_eval.w[1], private_eval.w[2], private_eval.w[3], private_eval.w[4],
                                                 private_eval.w[5], private_eval.w[6], private_eval.w[7], private_eval.w[8], private_eval.w[9],
                                                 private_eval.w[10], private_eval.w[11], private_eval.w[12], private_eval.w[13], private_eval.w[14],
                                                 private_eval.s[0], private_eval.s[1], private_eval.s[2], private_eval.s[3], private_eval.s[4], private_eval.s[5]};
                         for (auto p : points) {
-                            sponge.absorb_assignment(assignment, p, component_start_row);
+                            sponge.absorb_assignment(assignment, p, row);
+                            row += sponge_component::absorb_rows;
                         }
                     }
 
                     void absorb_evaluations_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                         var public_eval,
-                                                        kimchi_proof_evaluations<CurveType>
+                                                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>
                                                             private_eval,
-                                                        std::size_t &component_start_row) {
+                                                        const std::size_t component_start_row) {
                         last_squeezed = {};
+                        std::size_t row = component_start_row;
                         std::vector<var> points = {public_eval, private_eval.z, private_eval.generic_selector, private_eval.poseidon_selector,
                                                 private_eval.w[0], private_eval.w[1], private_eval.w[2], private_eval.w[3], private_eval.w[4],
                                                 private_eval.w[5], private_eval.w[6], private_eval.w[7], private_eval.w[8], private_eval.w[9],
                                                 private_eval.w[10], private_eval.w[11], private_eval.w[12], private_eval.w[13], private_eval.w[14],
                                                 private_eval.s[0], private_eval.s[1], private_eval.s[2], private_eval.s[3], private_eval.s[4], private_eval.s[5]};
                         for (auto p : points) {
-                            sponge.absorb_circuit(bp, assignment, p, component_start_row);
+                            sponge.absorb_circuit(bp, assignment, p, row);
+                            row += sponge_component::absorb_rows;
                         }
                     }
 
                     var challenge_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t &component_start_row) {
+                            const std::size_t component_start_row) {
+                        std::size_t row = component_start_row;
                         if (last_squeezed.size() >= CHALLENGE_LENGTH_IN_LIMBS) {
                             std::array<var, 2> limbs = {last_squeezed[0], last_squeezed[1]};
                             std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, last_squeezed.end()};
                             last_squeezed = remaining;
-                            return pack_assignment(assignment, component_start_row, limbs);
+                            return pack_assignment(assignment, row, limbs);
                         }
-                        var sq = sponge.squeeze_assignment(assignment, component_start_row);
-                        auto x = unpack_assignment(assignment, component_start_row, sq);
+                        var sq = sponge.squeeze_assignment(assignment, row);
+                        row += sponge_component::squeeze_rows;
+                        auto x = unpack_assignment(assignment, row, sq);
+                        row += unpack::rows_amount;
                         for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
                             last_squeezed.push_back(x[i]);
                         }
-                        return challenge_assignment(assignment, component_start_row);
+                        return challenge_assignment(assignment, row);
                     }
 
-                    var challenge_generate_constraints(blueprint<ArithmetizationType> &bp,
+                    var challenge_circuit(blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t &component_start_row) {
+                            const std::size_t component_start_row) {
+                        std::size_t row = component_start_row;
                         if (last_squeezed.size() >= CHALLENGE_LENGTH_IN_LIMBS) {
                             std::array<var, 2> limbs = {last_squeezed[0], last_squeezed[1]};
                             std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, last_squeezed.end()};
                             last_squeezed = remaining;
-                            return pack_circuit(bp, assignment, component_start_row, limbs);
+                            return pack_circuit(bp, assignment, row, limbs);
                         }
-                        var sq = sponge.squeeze_circuit(bp, assignment, component_start_row);
-                        auto x = unpack_circuit(bp, assignment, component_start_row, sq);
+                        var sq = sponge.squeeze_circuit(bp, assignment, row);
+                        row += sponge_component::squeeze_rows;
+                        auto x = unpack_circuit(bp, assignment, row, sq);
+                        row += unpack::rows_amount;
                         for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
                             last_squeezed.push_back(x[i]);
                         }
-                        return challenge_generate_constraints(bp, assignment, component_start_row);
+                        return challenge_circuit(bp, assignment, row);
                     }
                 };
             }    // namespace components
