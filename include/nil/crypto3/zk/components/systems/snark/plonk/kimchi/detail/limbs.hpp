@@ -92,7 +92,7 @@ namespace nil {
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                         const params_type &params,
-                                                        std::size_t component_start_row) {
+                                                        const std::size_t component_start_row) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -106,7 +106,6 @@ namespace nil {
 
                         assignment.enable_selector(first_selector_index, component_start_row);
 
-                        generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
 
                         return result_type(component_start_row);
@@ -114,7 +113,7 @@ namespace nil {
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
+                                                            const std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         typename BlueprintFieldType::value_type first_limb =
@@ -204,7 +203,7 @@ namespace nil {
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                         const params_type &params,
-                                                        std::size_t component_start_row) {
+                                                        const std::size_t component_start_row) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -218,7 +217,6 @@ namespace nil {
 
                         assignment.enable_selector(first_selector_index, component_start_row);
 
-                        generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
 
                         return result_type(component_start_row);
@@ -226,7 +224,7 @@ namespace nil {
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
+                                                            const std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         typename BlueprintFieldType::value_type value =

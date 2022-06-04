@@ -169,16 +169,15 @@ namespace nil {
 
                         row += transcript_type::absorb_rows;
 
-                        // var v_challenge = transcript.challenge_assignment(assignment, row);
+                        // v_challenge
                         row += transcript_type::challenge_rows;
-                        // var v = endo_scalar_component::generate_assignments(assignment,
-                            // {v_challenge, endo_factor, num_bits}, row).output;
-                        // row += endo_scalar_component::rows_amount;
 
-                        // var u_challenge = transcript.challenge_assignment(assignment, row);
-                        // var u = endo_scalar_component::generate_assignments(assignment,
-                            // {u_challenge, endo_factor, num_bits}, row).output;
-                        // row += endo_scalar_component::rows_amount;
+                        row += endo_scalar_component::rows_amount;
+
+                        // u_challenge
+                        row += transcript_type::challenge_rows;
+                        
+                        row += endo_scalar_component::rows_amount;
 
                         // powers_of_eval_points_for_chunks
                         row += 2 * exponentiation_component::rows_amount;
@@ -342,14 +341,15 @@ namespace nil {
                         var v_challenge = transcript.challenge_circuit(bp, assignment, row);
                         row += transcript_type::challenge_rows;
 
-                        // var v = endo_scalar_component::generate_circuit(
-                        //     bp, assignment, {v_challenge, endo_factor, endo_num_bits}, row).output;
-                        // row += endo_scalar_component::rows_amount;
+                        var v = endo_scalar_component::generate_circuit(
+                            bp, assignment, {v_challenge, endo_factor, endo_num_bits}, row).output;
+                        row += endo_scalar_component::rows_amount;
 
-                        // var u_challenge = transcript.challenge_circuit(bp, assignment, row);
-                        // var u = endo_scalar_component::generate_circuit(
-                        //     bp, assignment, {u_challenge, endo_factor, endo_num_bits}, row).output;
-                        // row += endo_scalar_component::rows_amount;
+                        var u_challenge = transcript.challenge_circuit(bp, assignment, row);
+                        row += transcript_type::challenge_rows;
+                        var u = endo_scalar_component::generate_circuit(
+                            bp, assignment, {u_challenge, endo_factor, endo_num_bits}, row).output;
+                        row += endo_scalar_component::rows_amount;
 
 
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks;
@@ -410,10 +410,10 @@ namespace nil {
                         typename result_type::random_oracles random_oracles = {
                             alpha,
                             zeta,
-                            zeta, //v,
-                            zeta, //u,
-                            zeta, //v_challenge,
-                            zeta, //u_challenge
+                            v,
+                            u,
+                            v_challenge,
+                            u_challenge
                         };
 
                         return {
@@ -517,14 +517,15 @@ namespace nil {
 
                         var v_challenge = transcript.challenge_assignment(assignment, row);
                         row += transcript_type::challenge_rows;
-                        // var v = endo_scalar_component::generate_assignments(assignment,
-                            // {v_challenge, endo_factor, num_bits}, row).output;
-                        // row += endo_scalar_component::rows_amount;
+                        var v = endo_scalar_component::generate_assignments(assignment,
+                            {v_challenge, endo_factor, num_bits}, row).output;
+                        row += endo_scalar_component::rows_amount;
 
-                        // var u_challenge = transcript.challenge_assignment(assignment, row);
-                        // var u = endo_scalar_component::generate_assignments(assignment,
-                            // {u_challenge, endo_factor, num_bits}, row).output;
-                        // row += endo_scalar_component::rows_amount;
+                        var u_challenge = transcript.challenge_assignment(assignment, row);
+                        row += transcript_type::challenge_rows;
+                        var u = endo_scalar_component::generate_assignments(assignment,
+                            {u_challenge, endo_factor, num_bits}, row).output;
+                        row += endo_scalar_component::rows_amount;
 
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks = {
                             exponentiation_component::generate_assignments(
@@ -578,10 +579,10 @@ namespace nil {
                         typename result_type::random_oracles random_oracles = {
                             alpha,
                             zeta,
-                            zeta, //v,
-                            zeta, //u,
-                            zeta, //v_challenge,
-                            zeta, //u_challenge
+                            v,
+                            u,
+                            v_challenge,
+                            u_challenge
                         };
 
                         return {
