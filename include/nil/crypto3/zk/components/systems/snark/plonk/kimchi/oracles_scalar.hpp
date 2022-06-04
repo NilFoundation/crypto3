@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/prev_chal_evals.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/combine_proof_evals.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/ft_eval.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/oracles_cip.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/limbs.hpp>
@@ -47,7 +48,6 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/combined_inner_product.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/constants.hpp>
 
@@ -117,7 +117,11 @@ namespace nil {
                     using ft_eval_component =
                             zk::components::ft_eval<ArithmetizationType, CurveType,
                                                         KimchiParamsType, W0, W1, W2, W3,
-                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;   
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
+                                        
+                    using cip_component = zk::components::oracles_cip<ArithmetizationType, KimchiCommitmentParamsType,
+                                                        KimchiParamsType, W0, W1, W2, W3,
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
                     
                     using transcript_type = kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
                                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
@@ -192,6 +196,10 @@ namespace nil {
 
                         // ft_eval0
                         row += ft_eval_component::rows_amount;
+
+                        //cip
+                        row += cip_component::rows_amount;
+
                         return row;
                     }
 
@@ -403,7 +411,15 @@ namespace nil {
                         row += ft_eval_component::rows_amount;
 
                         //cip
-                        var cip = zeta_pow_n;
+                        var cip = cip_component::generate_circuit(bp,
+                            assignment,
+                            {ft_eval0,
+                            params.proof.ft_eval,
+                            prev_challenges_evals,
+                            public_eval,
+                            params.proof.proof_evals},
+                            row).output;
+                        row += cip_component::rows_amount;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         
@@ -574,7 +590,15 @@ namespace nil {
                         row += ft_eval_component::rows_amount;
 
                         //cip
-                        var cip = zeta_pow_n;
+                        var cip = cip_component::generate_assignments(
+                            assignment,
+                            {ft_eval0,
+                            params.proof.ft_eval,
+                            prev_challenges_evals,
+                            public_eval,
+                            params.proof.proof_evals},
+                            row).output;
+                        row += cip_component::rows_amount;
 
                         typename result_type::random_oracles random_oracles = {
                             alpha,
