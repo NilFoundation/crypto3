@@ -142,7 +142,7 @@ namespace nil {
              * result in polynomial C.
              */
             template<typename Range>
-            void fft_multiplication(Range &c, const Range &a, const Range &b) {
+            void multiplication(Range &c, const Range &a, const Range &b) {
 
                 typedef
                     typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
@@ -173,15 +173,6 @@ namespace nil {
                                c.begin(),
                                std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
                 condense(c);
-            }
-
-            /**
-             * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result
-             * in polynomial C.
-             */
-            template<typename Range>
-            void multiplication(Range &c, const Range &a, const Range &b) {
-                fft_multiplication(c, a, b);
             }
 
             /**

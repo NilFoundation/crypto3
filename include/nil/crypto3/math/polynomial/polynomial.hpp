@@ -385,39 +385,14 @@ namespace nil {
                  * polynomial C.
                  */
                 polynomial operator+(const polynomial& other) const {
-                    if (this->is_zero()) {
-                        return other;
-                    } else if (other.is_zero()) {
-                        return *this;
-                    } else {
-                        polynomial result;
-
-                        std::size_t a_size = std::distance(this->begin(), this->end());
-                        std::size_t b_size = std::distance(other.begin(), other.end());
-
-                        if (a_size > b_size) {
-                            result.resize(a_size);
-                            std::transform(other.begin(), other.end(), this->begin(), result.begin(),
-                                           std::plus<FieldValueType>());
-                            std::copy(this->begin() + b_size, this->end(), result.begin() + b_size);
-                        } else {
-                            result.resize(b_size);
-                            std::transform(this->begin(), this->end(), other.begin(), result.begin(),
-                                           std::plus<FieldValueType>());
-                            std::copy(other.begin() + a_size, other.end(), result.begin() + a_size);
-                        }
-
-                        result.condense();
-
-                        return result;
-                    }
+                    polynomial result;
+                    addition(result, *this, other);
+                    return result;
                 }
 
                 polynomial operator-() const {
-
                     polynomial result(this->size());
                     std::transform(this->begin(), this->end(), result.begin(), std::negate<FieldValueType>());
-
                     return result;
                 }
 
@@ -426,33 +401,9 @@ namespace nil {
                  * polynomial C.
                  */
                 polynomial operator-(const polynomial& other) const {
-                    if (this->is_zero()) {
-                        return -(other);
-                    } else if (other.is_zero()) {
-                        return *this;
-                    } else {
-                        polynomial result;
-
-                        std::size_t a_size = std::distance(this->begin(), this->end());
-                        std::size_t b_size = std::distance(other.begin(), other.end());
-
-                        if (a_size > b_size) {
-                            result.resize(a_size);
-                            std::transform(this->begin(), this->begin() + b_size, other.begin(), result.begin(),
-                                           std::minus<FieldValueType>());
-                            std::copy(this->begin() + b_size, this->end(), result.begin() + b_size);
-                        } else {
-                            result.resize(b_size);
-                            std::transform(this->begin(), this->end(), other.begin(), result.begin(),
-                                           std::minus<FieldValueType>());
-                            std::transform(other.begin() + a_size, other.end(), result.begin() + a_size,
-                                           std::negate<FieldValueType>());
-                        }
-
-                        result.condense();
-
-                        return result;
-                    }
+                    polynomial result;
+                    subtraction(result, *this, other);
+                    return result;
                 }
 
                 /**
@@ -461,7 +412,7 @@ namespace nil {
                  */
                 polynomial operator*(const polynomial& other) const {
                     polynomial result;
-                    fft_multiplication(result, *this, other);
+                    multiplication(result, *this, other);
                     return result;
                 }
 
@@ -471,40 +422,8 @@ namespace nil {
                  * Output: Polynomial Q, such that A = (Q * B) + R.
                  */
                 polynomial operator/(const polynomial& other) const {
-
-                    std::size_t d = other.size() - 1;           /* Degree of B */
-                    FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
-
-                    polynomial r(*this);
-                    polynomial q = polynomial(r.size(), FieldValueType::zero());
-
-                    std::size_t r_deg = r.size() - 1;
-                    std::size_t shift;
-
-                    while (r_deg >= d && !r.is_zero()) {
-                        if (r_deg >= d) {
-                            shift = r_deg - d;
-                        } else {
-                            shift = 0;
-                        }
-
-                        FieldValueType lead_coeff = r.back() * c;
-
-                        q[shift] += lead_coeff;
-
-                        if (other.size() + shift + 1 > r.size()) {
-                            r.resize(other.size() + shift + 1);
-                        }
-                        auto glambda = [=](const FieldValueType& x, const FieldValueType& y) {
-                            return y - (x * lead_coeff);
-                        };
-                        std::transform(other.begin(), other.end(), r.begin() + shift, r.begin() + shift, glambda);
-                        r.condense();
-
-                        r_deg = r.size() - 1;
-                    }
-                    q.condense();
-
+                    polynomial r,q;
+                    division(q, r, *this, other);
                     return q;
                 }
 
@@ -514,33 +433,8 @@ namespace nil {
                  * Output: Polynomial R, such that A = (Q * B) + R.
                  */
                 polynomial operator%(const polynomial& other) const {
-                    std::size_t d = other.size() - 1;           /* Degree of B */
-                    FieldValueType c = other.back().inversed(); /* Inverse of Leading Coefficient of B */
-
-                    polynomial r(*this);
-
-                    std::size_t r_deg = r.size() - 1;
-                    std::size_t shift;
-
-                    while (r_deg >= d && !r.is_zero()) {
-                        if (r_deg >= d) {
-                            shift = r_deg - d;
-                        } else {
-                            shift = 0;
-                        }
-
-                        FieldValueType lead_coeff = r.back() * c;
-
-                        if (other.size() + shift + 1 > r.size()) {
-                            r.resize(other.size() + shift + 1);
-                        }
-                        auto glambda = [=](FieldValueType x, FieldValueType y) { return y - (x * lead_coeff); };
-                        std::transform(other.begin(), other.end(), r.begin() + shift, r.begin() + shift, glambda);
-                        r.condense();
-
-                        r_deg = r.size() - 1;
-                    }
-
+                    polynomial r, q;
+                    division(q, r, *this, other);
                     return r;
                 }
             };

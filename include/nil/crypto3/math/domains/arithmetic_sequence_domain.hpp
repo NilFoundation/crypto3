@@ -32,10 +32,6 @@
 
 #include <nil/crypto3/math/polynomial/basis_change.hpp>
 
-#ifdef MULTICORE
-#include <omp.h>
-#endif
-
 namespace nil {
     namespace crypto3 {
         namespace math {
@@ -113,9 +109,6 @@ namespace nil {
                     multiplication(a, a, S);
                     a.resize(this->m);
 
-#ifdef MULTICORE
-#pragma omp parallel for
-#endif
                     for (std::size_t i = 0; i < this->m; i++) {
                         a[i] *= S[i].inversed();
                     }
@@ -242,9 +235,6 @@ namespace nil {
                         multiplication(x, x, t);
                     }
 
-#ifdef MULTICORE
-#pragma omp parallel for
-#endif
                     for (std::size_t i = 0; i < this->m + 1; i++) {
                         H[i] += (x[i] * coeff);
                     }
