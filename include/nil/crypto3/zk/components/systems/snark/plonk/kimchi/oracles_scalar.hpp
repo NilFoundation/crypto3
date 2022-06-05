@@ -507,7 +507,6 @@ namespace nil {
                                     {zeta, zeta_omega, omega_powers, one}, row).output;
                         row += lagrange_denominators_component::rows_amount;
 
-                        // TODO: check on empty public_input
                         std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
                         std::array<var, eval_points_amount> public_eval = public_eval_component::generate_assignments(
                             assignment, {zeta_pow_n, zeta_omega_pow_n, 
