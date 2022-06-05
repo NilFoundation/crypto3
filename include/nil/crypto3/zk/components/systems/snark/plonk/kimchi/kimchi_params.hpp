@@ -53,6 +53,7 @@ namespace nil {
                     constexpr static std::size_t generic_constraints = 2;
 
                     constexpr static std::size_t eval_points_amount = 2;
+                    constexpr static std::size_t scalar_challenge_size = 128;
                 };
 
                 template <std::size_t EvalRounds,

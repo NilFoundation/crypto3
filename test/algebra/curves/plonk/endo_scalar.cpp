@@ -63,7 +63,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
                 ArithmetizationParams>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-    using component_type = zk::components::endo_scalar<ArithmetizationType, curve_type,
+    constexpr static const std::size_t num_bits = 128;
+
+    using component_type = zk::components::endo_scalar<ArithmetizationType, curve_type, num_bits,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -71,12 +73,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     
     typename BlueprintFieldType::value_type challenge = 0x00000000000000000000000000000000FC93536CAE0C612C18FBE5F6D8E8EEF2_cppui255;
-    typename BlueprintFieldType::value_type endo_factor = 0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
     typename BlueprintFieldType::value_type result = 0x004638173549A4C55A118327904B54E5F6F6314225C8C862F5AFA2506C77AC65_cppui255;
-    std::size_t num_bits = 128;
 
     var challenge_var = {0, 0, false, var::column_type::public_input};
-    typename component_type::params_type params = {challenge_var, endo_factor, num_bits};
+    typename component_type::params_type params = {challenge_var};
     std::vector<typename BlueprintFieldType::value_type> public_input = {challenge};
     std::cout<<"Expected result: "<<result.data<<std::endl;
     auto result_check = [&result](AssignmentType &assignment, 

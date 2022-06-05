@@ -31,6 +31,9 @@
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
@@ -42,12 +45,39 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, 
+                    std::size_t ScalarSize, std::size_t... WireIndexes>
                 class endo_scalar;
+
+                template<typename CurveType>
+                struct endo_scalar_params;
+
+                template<>
+                struct endo_scalar_params<algebra::curves::vesta> {
+                    using curve_type = algebra::curves::vesta;
+                    using scalar_field_type = typename curve_type::scalar_field_type;
+                    using base_field_type = typename curve_type::base_field_type;
+                    constexpr static const typename scalar_field_type::value_type endo_r = 
+                        0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                    constexpr static const typename base_field_type::value_type  endo_q = 
+                        0x06819A58283E528E511DB4D81CF70F5A0FED467D47C033AF2AA9D2E050AA0E4F_cppui255;
+                };
+
+                template<>
+                struct endo_scalar_params<algebra::curves::pallas> {
+                    using curve_type = algebra::curves::pallas;
+                    using scalar_field_type = typename curve_type::scalar_field_type;
+                    using base_field_type = typename curve_type::base_field_type;
+                    constexpr static const typename scalar_field_type::value_type endo_r = 
+                        0x397E65A7D7C1AD71AEE24B27E308F0A61259527EC1D4752E619D1840AF55F1B1_cppui255;
+                    constexpr static const typename base_field_type::value_type  endo_q = 
+                        0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
+                };
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
+                         std::size_t ScalarSize,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -65,6 +95,7 @@ namespace nil {
                          std::size_t W14>
                 class endo_scalar<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                   CurveType,
+                                  ScalarSize,
                                   W0,
                                   W1,
                                   W2,
@@ -86,6 +117,11 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    using endo_params = endo_scalar_params<CurveType>;
+
+                    constexpr static const typename BlueprintFieldType::value_type
+                        endo_factor = endo_params::endo_r;
+
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f00;
                     constexpr static const std::size_t rows_amount = 8;
@@ -93,8 +129,6 @@ namespace nil {
 
                     struct params_type {
                         var scalar;
-                        typename BlueprintFieldType::value_type endo_factor;
-                        std::size_t num_bits;
                     };
 
                     struct result_type {
@@ -137,14 +171,14 @@ namespace nil {
                         std::size_t crumbs_per_row = 8;
                         std::size_t bits_per_crumb = 2;
                         std::size_t bits_per_row =
-                            bits_per_crumb * crumbs_per_row;    // we suppose that params.num_bits % bits_per_row = 0
+                            bits_per_crumb * crumbs_per_row;    // we suppose that ScalarSize % bits_per_row = 0
 
-                        std::vector<typename BlueprintFieldType::value_type> bits_msb(params.num_bits);
+                        std::vector<typename BlueprintFieldType::value_type> bits_msb(ScalarSize);
                         typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
                         typename BlueprintFieldType::integral_type integral_scalar =
                             typename BlueprintFieldType::integral_type(scalar.data);
-                        for (std::size_t i = 0; i < params.num_bits; i++) {
-                            bits_msb[params.num_bits - 1 - i] = multiprecision::bit_test(integral_scalar, i);
+                        for (std::size_t i = 0; i < ScalarSize; i++) {
+                            bits_msb[ScalarSize - 1 - i] = multiprecision::bit_test(integral_scalar, i);
                         }
 
                         typename BlueprintFieldType::value_type a = 2;
@@ -185,7 +219,7 @@ namespace nil {
                             assignment.witness(W5)[row] = b;
                             row++;
                         }
-                        auto res = a * params.endo_factor + b;
+                        auto res = a * endo_factor + b;
                         assignment.witness(W6)[row - 1] = res;
                         return result_type(params, start_row_index);
                     }
@@ -240,7 +274,7 @@ namespace nil {
                                           (1 << 4) * var(W12, 0) + (1 << 2) * var(W13, 0) + var(W14, 0)));
 
                         auto constraint_12 =
-                            bp.add_constraint(var(W6, 0) - (params.endo_factor * var(W4, 0) + var(W5, 0)));
+                            bp.add_constraint(var(W6, 0) - (endo_factor * var(W4, 0) + var(W5, 0)));
 
                         bp.add_gate(selector_index_2, {constraint_12});
 

@@ -80,8 +80,10 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0f08;
 
                     using endo_scalar_component =
-                        zk::components::endo_scalar<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
-                                                    W9, W10, W11, W12, W13, W14>;
+                        zk::components::endo_scalar<ArithmetizationType, CurveType,
+                            KimchiParamsType::scalar_challenge_size,
+                            W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                            W9, W10, W11, W12, W13, W14>;
                     using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
 
                     using exponentiation_component =
@@ -265,28 +267,25 @@ namespace nil {
 
                         generate_assignments_constant(bp, assignment, params, start_row_index);
 
+                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
+                        var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
+
                         std::size_t row = start_row_index;
 
                         var beta = params.fq_output.beta;
                         var gamma = params.fq_output.gamma;
                         var joint_combiner = params.fq_output.joint_combiner;
 
-                        typename BlueprintFieldType::value_type endo_factor =
-                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
-                        std::size_t endo_num_bits = 128;
                         // alpha = phi(alpha_challenge)
                         var alpha = endo_scalar_component::generate_circuit(
-                            bp, assignment, {params.fq_output.alpha, endo_factor, endo_num_bits}, row).output;
+                            bp, assignment, {params.fq_output.alpha}, row).output;
                         row += endo_scalar_component::rows_amount;
                         // zeta = phi(zeta_challenge)
                         var zeta = endo_scalar_component::generate_circuit(
-                            bp, assignment, {params.fq_output.zeta, endo_factor, endo_num_bits}, row).output;
+                            bp, assignment, {params.fq_output.zeta}, row).output;
                         row += endo_scalar_component::rows_amount;
-
-                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
-                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
-                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
-                        var max_poly_size = var(0, start_row_index + 7, false, var::column_type::constant);
 
                         // fr_transcript.absorb(fq_digest)
                         transcript_type transcript;
@@ -350,13 +349,13 @@ namespace nil {
                         row += transcript_type::challenge_rows;
 
                         var v = endo_scalar_component::generate_circuit(
-                            bp, assignment, {v_challenge, endo_factor, endo_num_bits}, row).output;
+                            bp, assignment, {v_challenge}, row).output;
                         row += endo_scalar_component::rows_amount;
 
                         var u_challenge = transcript.challenge_circuit(bp, assignment, row);
                         row += transcript_type::challenge_rows;
                         var u = endo_scalar_component::generate_circuit(
-                            bp, assignment, {u_challenge, endo_factor, endo_num_bits}, row).output;
+                            bp, assignment, {u_challenge}, row).output;
                         row += endo_scalar_component::rows_amount;
 
 
@@ -463,15 +462,12 @@ namespace nil {
                         var joint_combiner = params.fq_output.joint_combiner;
 
                         var alpha = endo_scalar_component::generate_assignments(assignment,
-                            {params.fq_output.alpha, endo_factor, num_bits}, row).output;
+                            {params.fq_output.alpha}, row).output;
                         row += endo_scalar_component::rows_amount;
-                        std::cout << "alpha: " << assignment.var_value(alpha).data << std::endl;
 
                         var zeta = endo_scalar_component::generate_assignments(assignment,
-                            {params.fq_output.zeta, endo_factor, num_bits}, row).output;
+                            {params.fq_output.zeta}, row).output;
                         row += endo_scalar_component::rows_amount;
-                        std::cout << "zeta: " << assignment.var_value(zeta).data << std::endl;
-                        std::cout << "params.fq_output.zeta: " << assignment.var_value(params.fq_output.zeta).data << std::endl;
 
                         var zero = var(0, start_row_index + 4, false, var::column_type::constant);
                         var one = var(0, start_row_index + 5, false, var::column_type::constant);
@@ -534,13 +530,13 @@ namespace nil {
                         var v_challenge = transcript.challenge_assignment(assignment, row);
                         row += transcript_type::challenge_rows;
                         var v = endo_scalar_component::generate_assignments(assignment,
-                            {v_challenge, endo_factor, num_bits}, row).output;
+                            {v_challenge}, row).output;
                         row += endo_scalar_component::rows_amount;
 
                         var u_challenge = transcript.challenge_assignment(assignment, row);
                         row += transcript_type::challenge_rows;
                         var u = endo_scalar_component::generate_assignments(assignment,
-                            {u_challenge, endo_factor, num_bits}, row).output;
+                            {u_challenge}, row).output;
                         row += endo_scalar_component::rows_amount;
 
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks = {
