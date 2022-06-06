@@ -133,7 +133,7 @@ namespace nil {
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         auto begin = std::chrono::high_resolution_clock::now();
                         auto last = begin;
-                        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
+                        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last);
 #endif
 
                             for (int i = 0; i < poly.size(); ++i) {
@@ -155,21 +155,21 @@ namespace nil {
                                     y_val.write(write_iter, field_element_type::length());
                                 }
                             }
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                                elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                                std::cout << "------Batched FRI precommit marshalling, time: " << elapsed.count() * 1e-9 << std::endl;
-                                last = std::chrono::high_resolution_clock::now();
-#endif
+//#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+//                                elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last);
+//                                std::cout << "------Batched FRI precommit marshalling, time: " << elapsed.count() << "ms" << std::endl;
+//                                last = std::chrono::high_resolution_clock::now();
+//#endif
 
                             precommitment_type precommitment(y_data.begin(), y_data.end());
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                                elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                                std::cout << "------Batched FRI precommit merkle tree, time: " << elapsed.count() * 1e-9 << std::endl;
-                                last = std::chrono::high_resolution_clock::now();
-                                elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin);
-                                std::cout << "----Batched FRI precommit, time: " << elapsed.count() * 1e-9 << std::endl;
-#endif
+//#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+//                                elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last);
+//                                std::cout << "------Batched FRI precommit merkle tree, time: " << elapsed.count() << "ms"  << std::endl;
+//                                last = std::chrono::high_resolution_clock::now();
+//                                elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - begin);
+//                                std::cout << "----Batched FRI precommit, time: " << elapsed.count() << "ms"  << std::endl;
+//#endif
                             return precommitment;
                         }
 
@@ -212,12 +212,12 @@ namespace nil {
                                        const params_type &fri_params,
                                        transcript_type &transcript = transcript_type()) {
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        auto begin = std::chrono::high_resolution_clock::now();
-                        auto last = begin;
-                        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "--Batched FRI:" << std::endl;
-#endif
+//#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+//                        auto begin = std::chrono::high_resolution_clock::now();
+//                        auto last = begin;
+//                        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last);
+//                        std::cout << "--Batched FRI:" << std::endl;
+//#endif
 
                             for (int i = 0; i < f.size(); ++i) {
                                 // assert(g[i].size() == fri_params.D[0]->size());
@@ -283,7 +283,7 @@ namespace nil {
                                 std::vector<typename FieldType::value_type> colinear_value(leaf_size);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                                last = std::chrono::high_resolution_clock::now();
+//                                last = std::chrono::high_resolution_clock::now();
 #endif
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     if (i == 0) {
@@ -293,11 +293,11 @@ namespace nil {
                                         fold_polynomial<FieldType>(f[polynom_index], alpha, fri_params.D[i]);
                                 }
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                                elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                                std::cout << "----Batched FRI fold polynomial round " << i << ", time: " << elapsed.count() * 1e-9 << std::endl;
-                                last = std::chrono::high_resolution_clock::now();
-#endif
+//#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+//                                elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - last);
+//                                std::cout << "----Batched FRI fold polynomial round " << i << ", time: " << elapsed.count() << "ms" << std::endl;
+//                                last = std::chrono::high_resolution_clock::now();
+//#endif
 
                                 x_index = x_index % (fri_params.D[i + 1]->size());
 
@@ -329,10 +329,10 @@ namespace nil {
 
                             proof_type proof({round_proofs, final_polynomials, commit(T)});
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin);
-                        std::cout << "--Batched FRI, total time: " << elapsed.count() * 1e-9 << std::endl;
-#endif
+//#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+//                        elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - begin);
+//                        std::cout << "--Batched FRI, total time: " << elapsed.count() << "ms" << std::endl;
+//#endif
                             return proof;
                         }
 

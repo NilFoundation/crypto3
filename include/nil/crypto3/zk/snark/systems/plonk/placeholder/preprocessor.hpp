@@ -504,7 +504,7 @@ namespace nil {
                              public_precommitments, common_data});
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin);
-                        std::cout << "Placeholder public preprocessor, total time: " << elapsed.count() * 1e-9 << std::endl;
+                        std::cout << "Placeholder_public_preprocessor_total_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms" << std::endl;
 #endif
                         return preprocessed_data;
                     }
