@@ -44,6 +44,8 @@ namespace nil {
 
                 // Univariate polynomial at point
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L239
+                // Input: challenges, x
+                // Output: (1 + challenges[-1] x)(1 + challenges[-2] x^2)(1 + challenges[-3] x^4)...
                 template<typename ArithmetizationType, std::size_t EvalRounds, 
                     std::size_t... WireIndexes>
                 class b_poly;

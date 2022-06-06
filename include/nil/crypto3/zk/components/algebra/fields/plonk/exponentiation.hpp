@@ -44,6 +44,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Input: scalar, base \in Fp
+                // Output: base**scalar
                 template<typename ArithmetizationType, std::size_t ExponentSize, std::size_t... WireIndexes>
                 class exponentiation;
 

@@ -44,6 +44,8 @@ namespace nil {
 
                 // Coefficients of univariate polynomial
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L251
+                // Input: challenges
+                // Output: f = [c0, c1, ...], where f = (1 + challenges[-1] * X)(1 + challenges[-2] * X^2)(1 + challenges[-3] * X^4)...
                 template<typename ArithmetizationType, std::size_t EvalRounds, 
                     std::size_t... WireIndexes>
                 class b_poly_coefficients;

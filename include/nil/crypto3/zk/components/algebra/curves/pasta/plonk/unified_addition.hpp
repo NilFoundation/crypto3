@@ -41,6 +41,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Input: P, Q - elliptic curve points
+                // Output: R = P + Q
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class curve_element_unified_addition;
 

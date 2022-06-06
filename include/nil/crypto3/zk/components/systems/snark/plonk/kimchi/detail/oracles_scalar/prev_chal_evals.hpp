@@ -44,6 +44,8 @@ namespace nil {
 
                 // evaluate univariate polynomial at points
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L67
+                // Input: prev_challenges, zeta, zeta * omega, zeta^n, (zeta * omega)^n, 
+                // Output: (1 + prev_challenges[-1] x)(1 + prev_challenges[-2] x^2)(1 + prev_challenges[-3] x^4)...
                 template<typename ArithmetizationType, typename KimchiCommitmentParamsType,
                     std::size_t... WireIndexes>
                 class prev_chal_evals;

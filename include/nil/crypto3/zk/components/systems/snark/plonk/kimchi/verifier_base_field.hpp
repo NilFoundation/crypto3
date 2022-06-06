@@ -45,6 +45,10 @@ namespace nil {
 
                 // base field part of batch_verify
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L911
+                // Input: list of mina-proofs (base field part),
+                //     precalculated fq_data and fr_data (the data that used both by scalar and base verifiers)
+                //     verifier index (public data)
+                // Output: - 
                 template<typename ArithmetizationType, typename CurveType,
                 typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
                 std::size_t n, std::size_t size, std::size_t bases_size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,

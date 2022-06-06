@@ -46,6 +46,8 @@ namespace nil {
 
                 // combined inner product from oracles data
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L386-L441
+                // Input:  
+                // Output: 
                 template<typename ArithmetizationType, typename KimchiCommitmentParamsType,
                     typename KimchiParamsType,
                     std::size_t... WireIndexes>

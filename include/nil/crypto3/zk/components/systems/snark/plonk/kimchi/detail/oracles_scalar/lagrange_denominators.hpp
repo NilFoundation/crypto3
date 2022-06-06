@@ -45,6 +45,8 @@ namespace nil {
                 // result = [(zeta - omega^(i))^(-1)] concat. [(zeta_omega - omega^(i))^(-1)] for i in
                 // (0..public_input_size)
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L231-L240
+                // Input: eval_point_0, eval_point_1, [omega^0, omega^1, ..., omega^public_input_size]
+                // Output: [(eval_point_0 - omega^(i))^(-1), (eval_point_1 - omega^(i))^(-1) for i in (0..public_input_size)]
                 template<typename ArithmetizationType, std::size_t PublicInputSize, std::size_t... WireIndexes>
                 class lagrange_denominators;
 

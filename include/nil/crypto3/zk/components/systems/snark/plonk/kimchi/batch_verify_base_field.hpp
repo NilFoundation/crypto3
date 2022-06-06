@@ -41,6 +41,9 @@ namespace nil {
 
                 // batched polynomial commitment verification (base field)
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L610
+                // Input: list of batch evaluation proofs
+                //      https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L881-L888
+                // Output: -
                 template<typename ArithmetizationType, typename CurveType,
                 std::size_t n, std::size_t bases_size,
                          std::size_t... WireIndexes>

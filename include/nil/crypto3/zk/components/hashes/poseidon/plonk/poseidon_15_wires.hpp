@@ -40,6 +40,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
+                // Input: [x_0, x_1, x_2] \in Fp
+                // Output: [y_0, y_1, y_2] - Poseidon permutation of [x_0, x_1, x_2]
                 template<typename ConstFieldType, std::size_t state_size, std::size_t rounds_amount>
                 struct poseidon_constants;
 

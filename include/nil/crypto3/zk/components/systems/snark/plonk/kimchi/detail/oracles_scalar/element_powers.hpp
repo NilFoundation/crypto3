@@ -44,6 +44,8 @@ namespace nil {
 
                 // for (base, n) calculates [base^0, base^1, ..., base^n]
                 // n >= 0
+                // Input: base, n
+                // Output: [base^0, base^1, ..., base^n]
                 template<typename ArithmetizationType, std::size_t n, std::size_t... WireIndexes>
                 class element_powers;
 

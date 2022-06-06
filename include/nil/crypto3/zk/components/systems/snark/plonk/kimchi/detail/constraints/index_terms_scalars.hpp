@@ -44,6 +44,8 @@ namespace nil {
 
                 // constraints scalars (exluding generic constraint)
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L568-L673
+                // Input: constraint
+                // Output: constraint-related scalar x for linearization
                 template<typename ArithmetizationType, typename KimchiParamsType,
                     std::size_t... WireIndexes>
                 class index_terms_scalars;
