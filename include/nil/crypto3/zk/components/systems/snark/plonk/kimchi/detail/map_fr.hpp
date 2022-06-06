@@ -50,6 +50,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // map_fr set copy constraints between input fr_data (which is input for base field components) and 
+                // recalculated fr_data (scalar field components output)
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
                     typename KimchiCommitmentParamsType, std::size_t BatchSize, std::size_t... WireIndexes>
                 class map_fr;

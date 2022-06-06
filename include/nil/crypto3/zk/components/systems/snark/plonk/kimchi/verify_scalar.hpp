@@ -51,6 +51,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // scalar field part of batch_verify
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L911
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
                     typename KimchiCommitmentParamsType, std::size_t BatchSize, std::size_t... WireIndexes>
                 class verify_scalar;

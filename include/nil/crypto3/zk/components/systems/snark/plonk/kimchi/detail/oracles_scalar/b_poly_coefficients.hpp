@@ -42,6 +42,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Coefficients of univariate polynomial
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L251
                 template<typename ArithmetizationType, std::size_t EvalRounds, 
                     std::size_t... WireIndexes>
                 class b_poly_coefficients;
@@ -91,7 +93,7 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f21;
+                    constexpr static const std::size_t selector_seed = 0x0  f21;
                     constexpr static const std::size_t polynomial_len = 1 << EvalRounds;
 
                 public:

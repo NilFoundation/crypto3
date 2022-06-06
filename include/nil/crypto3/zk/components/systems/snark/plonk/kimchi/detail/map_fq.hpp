@@ -50,6 +50,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // map_fq set copy constraints between input fq_data (which is input for scalar field components) and 
+                // recalculated fq_data (base field components output)
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
                     typename KimchiCommitmentParamsType, std::size_t BatchSize, std::size_t... WireIndexes>
                 class map_fq;

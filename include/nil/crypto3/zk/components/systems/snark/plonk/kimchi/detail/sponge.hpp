@@ -46,6 +46,8 @@ namespace nil {
         namespace zk {
             namespace components {
                 
+                // Poseidon sponge construction
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/poseidon.rs#L64
                 template<typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>

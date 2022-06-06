@@ -46,6 +46,9 @@ namespace nil {
             namespace components {
 
                 ///////////////// From Limbs ////////////////////////////////
+                // Recalculate field element from two 64-bit chunks
+                // It's a part of transcript functionality
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L87
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class from_limbs;
 
@@ -156,6 +159,9 @@ namespace nil {
                 };
 
                 ///////////////// To Limbs ////////////////////////////////
+                // Split field element into four 64-bit chunks
+                // It's a part of transcript functionality
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L110
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class to_limbs;
 

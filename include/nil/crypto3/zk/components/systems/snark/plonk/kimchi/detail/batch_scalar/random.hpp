@@ -40,6 +40,7 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // pseudo-random element generation
                 template<typename ArithmetizationType, std::size_t EvalRounds, 
                     std::size_t... WireIndexes>
                 class random;

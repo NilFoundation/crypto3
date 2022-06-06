@@ -42,6 +42,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // constraints scalars (exluding generic constraint)
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L568-L673
                 template<typename ArithmetizationType, typename KimchiParamsType,
                     std::size_t... WireIndexes>
                 class index_terms_scalars;

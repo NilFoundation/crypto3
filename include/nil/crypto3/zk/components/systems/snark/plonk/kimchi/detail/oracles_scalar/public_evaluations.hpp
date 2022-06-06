@@ -42,6 +42,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // evaluate negated public polynomials at evaluation points
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L245-L269
                 // r[0] = (zeta_pow_n - 1) * domain.size_inv * SUM(-l * p * w) 
                     //where l from lagrange, p from public, w from omega_powers for l from 0 to PulicInputSize
                 // r[2] = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w) 

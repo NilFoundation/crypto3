@@ -42,6 +42,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // evaluate univariate polynomial at points
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L67
                 template<typename ArithmetizationType, typename KimchiCommitmentParamsType,
                     std::size_t... WireIndexes>
                 class prev_chal_evals;

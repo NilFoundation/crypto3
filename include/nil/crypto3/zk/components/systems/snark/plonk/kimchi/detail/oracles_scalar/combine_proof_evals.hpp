@@ -44,6 +44,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Proof evals are element of the finite field, so combine works just as scalar multiplication
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/proof.rs#L105
                 template<typename ArithmetizationType,
                     typename KimchiParamsType,
                     std::size_t... WireIndexes>

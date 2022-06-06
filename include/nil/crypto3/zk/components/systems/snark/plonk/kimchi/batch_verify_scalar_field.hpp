@@ -50,6 +50,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // batched polynomial commitment verification (scalar field)
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L610
                 template<typename ArithmetizationType, 
                          typename CurveType,
                          typename KimchiParamsType,

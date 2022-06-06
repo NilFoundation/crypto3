@@ -43,6 +43,8 @@ namespace nil {
             namespace components {
 
                 // (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
+                // zk-polynomial evaluation
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/polynomials/permutation.rs#L91
                 template<typename ArithmetizationType, 
                     std::size_t... WireIndexes>
                 class zkpm_evaluate;

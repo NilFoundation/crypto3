@@ -48,6 +48,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Fiat-Shamir transfotmation (scalar field part)
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L81
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, std::size_t... WireIndexes>
                 class kimchi_transcript;
 

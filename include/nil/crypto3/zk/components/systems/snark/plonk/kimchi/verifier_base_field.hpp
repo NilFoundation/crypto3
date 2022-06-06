@@ -43,6 +43,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // base field part of batch_verify
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L911
                 template<typename ArithmetizationType, typename CurveType,
                 typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
                 std::size_t n, std::size_t size, std::size_t bases_size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
@@ -168,8 +170,6 @@ namespace nil {
                              f_comm psm_comm;
                         };
                         struct var_proof {
-                            /*kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14> transcript;*/
                             commitments comm;
                             opening_proof o;
                             std::vector<var> scalars;

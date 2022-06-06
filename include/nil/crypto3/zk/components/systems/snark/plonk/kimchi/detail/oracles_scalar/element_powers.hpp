@@ -43,6 +43,7 @@ namespace nil {
             namespace components {
 
                 // for (base, n) calculates [base^0, base^1, ..., base^n]
+                // n >= 0
                 template<typename ArithmetizationType, std::size_t n, std::size_t... WireIndexes>
                 class element_powers;
 
@@ -105,10 +106,8 @@ namespace nil {
                         std::array<var, n> output;
 
                         result_type(std::size_t component_start_row) {
+                            output[0] = var(W0, component_start_row, false);
                             if (n > 0) {
-                                output[0] = var(W0, component_start_row, false);
-                            }
-                            if (n > 1) {
                                output[1] = var(W1, component_start_row, false);
                             }
                             for (std::size_t i = 2; i < n; i++) {

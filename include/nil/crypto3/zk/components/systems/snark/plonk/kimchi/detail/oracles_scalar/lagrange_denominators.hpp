@@ -42,11 +42,9 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                //TODO : the naive method for batch inversion is not the optimal one, we can use
-                // Montgomery’s Trick and Fast Implementation of Masked AES
-                // Genelle, Prouff and Quisquater, Section 3.2
                 // result = [(zeta - omega^(i))^(-1)] concat. [(zeta_omega - omega^(i))^(-1)] for i in
                 // (0..public_input_size)
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L231-L240
                 template<typename ArithmetizationType, std::size_t PublicInputSize, std::size_t... WireIndexes>
                 class lagrange_denominators;
 
