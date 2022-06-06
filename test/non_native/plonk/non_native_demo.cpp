@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <boost/test/unit_test.hpp>
 #include <fstream>
+#include <chrono>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
@@ -96,7 +97,9 @@ template<typename fri_type, typename FieldType>
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    constexpr std::size_t complexity = 3;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    constexpr std::size_t complexity = 40;
 
     using curve_type = algebra::curves::pallas;
     using ed25519_type = algebra::curves::ed25519;
@@ -183,6 +186,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, params>::process(
         public_preprocessed_data, placeholder_proof, bp, fri_params);
     std::cout << "Proof check: " << verifier_res << std::endl;
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
