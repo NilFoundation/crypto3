@@ -36,6 +36,8 @@
 
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -89,6 +91,32 @@ namespace nil {
                     var ft_eval;
                     std::array<var, KimchiParamsType::public_input_size> public_input;
                     std::array<var, EvalRounds> prev_challenges;
+                };
+
+                template<typename BlueprintFieldType,
+                         typename ArithmetizationType,
+                         typename KimchiParamsType,
+                         typename KimchiCommitmentParamsType>
+                struct batch_evaluation_proof_scalar {
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    // pub sponge: EFqSponge,
+                    // pub evaluations: Vec<Evaluation<G>>,
+                    // /// vector of evaluation points
+                    // pub evaluation_points: Vec<ScalarField<G>>,
+                    // /// scaling factor for evaluation point powers
+                    // pub xi: ScalarField<G>,
+                    // /// scaling factor for polynomials
+                    // pub r: ScalarField<G>,
+                    // /// batched opening proof
+                    // pub opening: &'a OpeningProof<G>,
+                    var cip;
+                    typename proof_binding::fq_sponge_output fq_output;
+                    std::array<var, KimchiParamsType::eval_points_amount> eval_points;
+                    var r;
+                    var xi;
                 };
 
                 template<typename BlueprintFieldType,
