@@ -41,6 +41,8 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 
 #include "test_plonk_component.hpp"
 
@@ -65,20 +67,41 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr std::size_t Lambda = 40;
 
     constexpr static const std::size_t batch_size = 1;
-    constexpr static const std::size_t lr_rounds = 1;
+    constexpr static const std::size_t eval_rounds = 1;
     constexpr static const std::size_t n = 1;
     constexpr static const std::size_t comm_size = 1;
     //constexpr static const std::size_t n_2 = ceil(log2(n));
     //constexpr static const std::size_t padding = (1 << n_2) - n;
     constexpr static const std::size_t f_comm_size = 2;
-    //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*lr_rounds + f_comm_size + 1)* batch_size;
-    constexpr static const std::size_t bases_size = n + 1 + (1 + 1 + 2*lr_rounds + f_comm_size + 1)* batch_size;
+    //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1)* batch_size;
+    constexpr static const std::size_t bases_size = n + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1)* batch_size;
 
-    using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, n, bases_size,
+    constexpr static std::size_t alpha_powers_n = 5;
+    constexpr static std::size_t public_input_size = 3;
+    constexpr static std::size_t max_poly_size = 32;
+
+    constexpr static std::size_t witness_columns = 15;
+    constexpr static std::size_t perm_size = 7;
+    constexpr static std::size_t lookup_table_size = 1;
+    constexpr static bool use_lookup = false;
+
+    constexpr static std::size_t srs_len = 10;
+
+    using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
+        use_lookup, lookup_table_size,
+        alpha_powers_n, public_input_size>;
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
+        srs_len>;
+
+    using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, 
+                                            commitment_params, n, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, curve_type, bases_size,
-                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14> ;
+    using opening_proof_type = typename 
+                        zk::components::kimchi_opening_proof<BlueprintFieldType, commitment_params::eval_rounds>;
+    using shifted_commitment_type = typename 
+                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                            commitment_params::shifted_commitment_split>;
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
@@ -177,10 +200,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     var cip_var = var(0, 24 + bases_size, false, var::column_type::public_input);   
 
-    typename component_type::params_type::f_comm comm_var = {{shifted_var}, {unshifted_var}};
+    shifted_commitment_type comm_var = {{shifted_var}, {unshifted_var}};
 
     typename component_type::params_type::PE pe_var = {{comm_var}};
-    typename component_type::params_type::opening_proof o_var = {{L_var}, {R_var}, delta_var, G_var};
+    opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
     //zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     //                    11, 12, 13, 14> transcript;
     typename component_type::params_type::var_proof proof_var = {/*transcript,*/ pe_var, o_var}; 

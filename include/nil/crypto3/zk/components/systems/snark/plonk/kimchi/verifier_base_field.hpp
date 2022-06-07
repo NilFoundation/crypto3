@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fq.hpp>
 
@@ -132,7 +133,8 @@ namespace nil {
                         zk::components::curve_element_unified_addition<ArithmetizationType, CurveType, W0, W1, W2, W3,
                                                                        W4, W5, W6, W7, W8, W9, W10>;
                     using batch_verify_component =
-                        zk::components::batch_verify_base_field<ArithmetizationType, CurveType, n, bases_size, W0, W1,
+                        zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
+                                            KimchiCommitmentParamsType, n, bases_size, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
 
@@ -143,10 +145,12 @@ namespace nil {
                         CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
                         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-                    using f_comm = typename batch_verify_component::params_type::f_comm;
+                    using shifted_commitment_type = typename 
+                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                            KimchiCommitmentParamsType::shifted_commitment_split>;
 
-                    using opening_proof = typename batch_verify_component::params_type::opening_proof;
-
+                    using opening_proof_type = typename 
+                        zk::components::kimchi_opening_proof<BlueprintFieldType, KimchiCommitmentParamsType::eval_rounds>;
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -158,24 +162,24 @@ namespace nil {
                     struct params_type {
 
                         struct commitments {
-                             std::vector<f_comm> witness_comm;
-                             std::vector<f_comm> sigma_comm;
-                             std::vector<f_comm> coefficient_comm;
-                             std::vector<f_comm> oracles_poly_comm; // to-do: get in the component from oracles
-                             f_comm lookup_runtime_comm;
-                             f_comm table_comm;
-                             std::vector<f_comm> lookup_sorted_comm;
-                             std::vector<f_comm> lookup_selectors_comm;
-                             std::vector<f_comm> selectors_comm;
-                             f_comm lookup_agg_comm;
-                             f_comm z_comm;
-                             f_comm t_comm;
-                             f_comm generic_comm;
-                             f_comm psm_comm;
+                             std::vector<shifted_commitment_type> witness_comm;
+                             std::vector<shifted_commitment_type> sigma_comm;
+                             std::vector<shifted_commitment_type> coefficient_comm;
+                             std::vector<shifted_commitment_type> oracles_poly_comm; // to-do: get in the component from oracles
+                             shifted_commitment_type lookup_runtime_comm;
+                             shifted_commitment_type table_comm;
+                             std::vector<shifted_commitment_type> lookup_sorted_comm;
+                             std::vector<shifted_commitment_type> lookup_selectors_comm;
+                             std::vector<shifted_commitment_type> selectors_comm;
+                             shifted_commitment_type lookup_agg_comm;
+                             shifted_commitment_type z_comm;
+                             shifted_commitment_type t_comm;
+                             shifted_commitment_type generic_comm;
+                             shifted_commitment_type psm_comm;
                         };
                         struct var_proof {
                             commitments comm;
-                            opening_proof o;
+                            opening_proof_type o;
                             std::vector<var> scalars;
                         };
                         struct public_input {
@@ -261,9 +265,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.witness_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.witness_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.witness_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.witness_comm[j].shifted);
                             } 
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.coefficient_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.coefficient_comm[j].unshifted.size(); k++) {
@@ -272,9 +274,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.coefficient_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.coefficient_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.coefficient_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.coefficient_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.coefficient_comm[j].shifted);
                             }
                             for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.unshifted.size(); k++) {
                                     unshifted_commitments[2].push_back(params.input.proofs[i].comm.z_comm.unshifted[k]);
@@ -282,9 +282,7 @@ namespace nil {
                             if (params.input.proofs[i].comm.z_comm.unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.z_comm.unshifted.size();
                                 }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.z_comm.shifted[k]);
-                                }
+                            shifted_commitments.push_back(params.input.proofs[i].comm.z_comm.shifted);
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_sorted_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size(); k++) {
                                     unshifted_commitments[3].push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted[k]);
@@ -292,9 +290,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].shifted);
                             }
                             for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.unshifted.size(); k++) {
                                     unshifted_commitments[4].push_back(params.input.proofs[i].comm.lookup_agg_comm.unshifted[k]);
@@ -302,9 +298,7 @@ namespace nil {
                             if (params.input.proofs[i].comm.lookup_agg_comm.unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_agg_comm.unshifted.size();
                                 }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_agg_comm.shifted[k]);
-                                }
+                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_agg_comm.shifted);
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_selectors_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size(); k++) {
                                     unshifted_commitments[5].push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted[k]);
@@ -312,9 +306,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_selectors_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].shifted);
                             }
                             for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size(); k++) {
                                     unshifted_commitments[6].push_back(params.input.proofs[i].comm.lookup_runtime_comm.unshifted[k]);
@@ -322,9 +314,7 @@ namespace nil {
                             if (params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size();
                                 }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm.shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_runtime_comm.shifted[k]);
-                                }
+                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_runtime_comm.shifted);
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.selectors_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.selectors_comm[j].unshifted.size(); k++) {
                                     unshifted_commitments[7].push_back(params.input.proofs[i].comm.selectors_comm[j].unshifted[k]);
@@ -332,18 +322,16 @@ namespace nil {
                                 if (params.input.proofs[i].comm.selectors_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.selectors_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.selectors_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.selectors_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.selectors_comm[j].shifted);
                             }
                             //to-do: U = zero()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
                             assignment.witness(W0)[row] = U.X;
                             assignment.witness(W1)[row] = U.Y;
                             std::size_t urow = row;
-                            auto f_comm_shifted = msm_component::generate_assignments(assignment, {params.input.proofs[i].scalars, shifted_commitments}, row);
+                            auto shifted_commitment_type_shifted = msm_component::generate_assignments(assignment, {params.input.proofs[i].scalars, shifted_commitments}, row);
                             row+= msm_component::rows_amount;
-                            std::vector<var_ec_point> f_comm_unshifted; 
+                            std::vector<var_ec_point> shifted_commitment_type_unshifted; 
                             for(std::size_t j = 0; j < max_size; j ++) {
                                 std::vector<var_ec_point> part_unshifted_commitments;
                                 std::vector<var> part_scalars;
@@ -357,24 +345,24 @@ namespace nil {
                                     }
                                 }
                                 auto res = msm_component::generate_assignments(assignment, {part_scalars, part_unshifted_commitments}, row);
-                                f_comm_unshifted.push_back({res.sum.X, res.sum.Y});
+                                shifted_commitment_type_unshifted.push_back({res.sum.X, res.sum.Y});
                                 row+= msm_component::rows_amount;
                             }
-                            auto chunked_f_comm_shifted = f_comm_shifted.sum;
-                            var_ec_point chunked_f_comm_unshifted = {var(0, urow, false), var(1, urow, false)};
+                            auto chunked_shifted_commitment_type_shifted = shifted_commitment_type_shifted.sum;
+                            var_ec_point chunked_shifted_commitment_type_unshifted = {var(0, urow, false), var(1, urow, false)};
                             row++;
 
-                            for(std::size_t j = 0; j < f_comm_unshifted.size(); j ++) {
-                                auto res0 = scalar_mul_component::generate_assignments(assignment, {{chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
+                            for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
+                                auto res0 = scalar_mul_component::generate_assignments(assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
                                 row+=scalar_mul_component::rows_amount;
-                                chunked_f_comm_unshifted = {res0.X, res0.Y};
-                                auto res1 = add_component::generate_assignments(assignment, {{chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}, {f_comm_unshifted[j].X, f_comm_unshifted[j].Y}}, row);
+                                chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
+                                auto res1 = add_component::generate_assignments(assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
                                 row+=add_component::rows_amount;
-                                chunked_f_comm_unshifted = {res1.X, res1.Y};
+                                chunked_shifted_commitment_type_unshifted = {res1.X, res1.Y};
 
                             }
                             auto chunked_t_comm_shifted = scalar_mul_component::generate_assignments(assignment, 
-                            {{ params.input.proofs[i].comm.t_comm.shifted[0].X,  params.input.proofs[i].comm.t_comm.shifted[0].Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
+                            {{ params.input.proofs[i].comm.t_comm.shifted.X,  params.input.proofs[i].comm.t_comm.shifted.Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
                             row+=scalar_mul_component::rows_amount;
                             var_ec_point chunked_t_comm_unshifted = {var(0, urow, false), var(1, urow, false)};;
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.t_comm.unshifted.size(); j++) {
@@ -401,16 +389,16 @@ namespace nil {
                             var_ec_point chunked_t_comm_shifted_res = {chunked_t_comm_shifted.X, const_res_unshifted.output};
 
                             auto ft_comm_unshifted = add_component::generate_assignments(assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}}, row);
+                                 {chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}}, row);
                             row+=add_component::rows_amount;
                             auto ft_comm_shifted = add_component::generate_assignments(assignment, {{chunked_t_comm_shifted_res.X, chunked_t_comm_shifted_res.Y},
-                                 {chunked_f_comm_shifted.X, chunked_f_comm_shifted.Y}}, row);
+                                 {chunked_shifted_commitment_type_shifted.X, chunked_shifted_commitment_type_shifted.Y}}, row);
                             row+=add_component::rows_amount;
-                            f_comm ft_comm = {{{ft_comm_shifted.X, ft_comm_shifted.Y}}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
+                            shifted_commitment_type ft_comm = {{ft_comm_shifted.X, ft_comm_shifted.Y}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
 
-                            std::vector<f_comm> evaluations;
-                            //f_comm p_comm = {none, p_comm_unshifted};
-                            f_comm p_comm = {{{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
+                            std::vector<shifted_commitment_type> evaluations;
+                            //shifted_commitment_type p_comm = {none, p_comm_unshifted};
+                            shifted_commitment_type p_comm = {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
                             evaluations.push_back(p_comm);
                             evaluations.push_back(ft_comm);
                             evaluations.push_back(params.input.proofs[i].comm.z_comm);
@@ -515,9 +503,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.witness_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.witness_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.witness_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.witness_comm[j].shifted);
                             } 
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.coefficient_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.coefficient_comm[j].unshifted.size(); k++) {
@@ -526,9 +512,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.coefficient_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.coefficient_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.coefficient_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.coefficient_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.coefficient_comm[j].shifted);
                             }
                             for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.unshifted.size(); k++) {
                                     unshifted_commitments[2].push_back(params.input.proofs[i].comm.z_comm.unshifted[k]);
@@ -536,9 +520,7 @@ namespace nil {
                             if (params.input.proofs[i].comm.z_comm.unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.z_comm.unshifted.size();
                                 }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.z_comm.shifted[k]);
-                                }
+                            shifted_commitments.push_back(params.input.proofs[i].comm.z_comm.shifted);
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_sorted_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size(); k++) {
                                     unshifted_commitments[3].push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted[k]);
@@ -546,9 +528,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].shifted);
                             }
                             for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.unshifted.size(); k++) {
                                     unshifted_commitments[4].push_back(params.input.proofs[i].comm.lookup_agg_comm.unshifted[k]);
@@ -556,9 +536,7 @@ namespace nil {
                             if (params.input.proofs[i].comm.lookup_agg_comm.unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_agg_comm.unshifted.size();
                                 }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_agg_comm.shifted[k]);
-                                }
+                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_agg_comm.shifted);
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_selectors_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size(); k++) {
                                     unshifted_commitments[5].push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted[k]);
@@ -566,9 +544,7 @@ namespace nil {
                                 if (params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_selectors_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].shifted);
                             }
                             for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size(); k++) {
                                     unshifted_commitments[6].push_back(params.input.proofs[i].comm.lookup_runtime_comm.unshifted[k]);
@@ -576,9 +552,7 @@ namespace nil {
                             if (params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size();
                                 }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm.shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.lookup_runtime_comm.shifted[k]);
-                                }
+                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_runtime_comm.shifted);
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.selectors_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.selectors_comm[j].unshifted.size(); k++) {
                                     unshifted_commitments[7].push_back(params.input.proofs[i].comm.selectors_comm[j].unshifted[k]);
@@ -586,15 +560,13 @@ namespace nil {
                                 if (params.input.proofs[i].comm.selectors_comm[j].unshifted.size() > max_size) {
                                     max_size = params.input.proofs[i].comm.selectors_comm[j].unshifted.size();
                                 }
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.selectors_comm[j].shifted.size(); k++) {
-                                    shifted_commitments.push_back(params.input.proofs[i].comm.selectors_comm[j].shifted[k]);
-                                }
+                                shifted_commitments.push_back(params.input.proofs[i].comm.selectors_comm[j].shifted);
                             }
                             //to-do: U = zero()
                             std::size_t urow = row;
-                            auto f_comm_shifted = msm_component::generate_circuit(bp, assignment, {params.input.proofs[i].scalars, shifted_commitments}, row);
+                            auto shifted_commitment_type_shifted = msm_component::generate_circuit(bp, assignment, {params.input.proofs[i].scalars, shifted_commitments}, row);
                             row+= msm_component::rows_amount;
-                            std::vector<var_ec_point> f_comm_unshifted; 
+                            std::vector<var_ec_point> shifted_commitment_type_unshifted; 
                             for(std::size_t j = 0; j < max_size; j ++) {
                                 std::vector<var_ec_point> part_unshifted_commitments;
                                 std::vector<var> part_scalars;
@@ -608,26 +580,26 @@ namespace nil {
                                     }
                                 }
                                 auto res = msm_component::generate_circuit(bp, assignment, {part_scalars, part_unshifted_commitments}, row);
-                                f_comm_unshifted.push_back({res.sum.X, res.sum.Y});
+                                shifted_commitment_type_unshifted.push_back({res.sum.X, res.sum.Y});
                                 row+= msm_component::rows_amount;
                             }
-                            auto chunked_f_comm_shifted = f_comm_shifted.sum;
-                            var_ec_point chunked_f_comm_unshifted = {var(0, urow, false), var(1, urow, false)};
+                            auto chunked_shifted_commitment_type_shifted = shifted_commitment_type_shifted.sum;
+                            var_ec_point chunked_shifted_commitment_type_unshifted = {var(0, urow, false), var(1, urow, false)};
                             row++;
 
-                            for(std::size_t j = 0; j < f_comm_unshifted.size(); j ++) {
-                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
+                            for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
+                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
                                 row+=scalar_mul_component::rows_amount;
-                                chunked_f_comm_unshifted = {res0.X, res0.Y};
+                                chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
                                 zk::components::generate_circuit<add_component>(bp, assignment, 
-                                {{chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}, {f_comm_unshifted[j].X, f_comm_unshifted[j].Y}}, row);
-                                typename add_component::result_type res1({{chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}, {f_comm_unshifted[j].X, f_comm_unshifted[j].Y}}, row);
+                                {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
+                                typename add_component::result_type res1({{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
                                 row+=add_component::rows_amount;
-                                chunked_f_comm_unshifted = {res1.X, res1.Y};
+                                chunked_shifted_commitment_type_unshifted = {res1.X, res1.Y};
 
                             }
                             auto chunked_t_comm_shifted = scalar_mul_component::generate_circuit(bp, assignment, 
-                            {{ params.input.proofs[i].comm.t_comm.shifted[0].X,  params.input.proofs[i].comm.t_comm.shifted[0].Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
+                            {{ params.input.proofs[i].comm.t_comm.shifted.X,  params.input.proofs[i].comm.t_comm.shifted.Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
                             row+=scalar_mul_component::rows_amount;
                             var_ec_point chunked_t_comm_unshifted = {var(0, urow, false), var(1, urow, false)};;
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.t_comm.unshifted.size(); j++) {
@@ -658,20 +630,20 @@ namespace nil {
                             var_ec_point chunked_t_comm_shifted_res = {chunked_t_comm_shifted.X, const_res_unshifted.output};
 
                             zk::components::generate_circuit<add_component>(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}}, row);
+                                 {chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}}, row);
                                 typename add_component::result_type ft_comm_unshifted({{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {chunked_f_comm_unshifted.X, chunked_f_comm_unshifted.Y}}, row);
+                                 {chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}}, row);
                             row+=add_component::rows_amount;
                             zk::components::generate_circuit<add_component>(bp, assignment, {{chunked_t_comm_shifted_res.X, chunked_t_comm_shifted_res.Y},
-                                 {chunked_f_comm_shifted.X, chunked_f_comm_shifted.Y}}, row);
+                                 {chunked_shifted_commitment_type_shifted.X, chunked_shifted_commitment_type_shifted.Y}}, row);
                                 typename add_component::result_type ft_comm_shifted({{chunked_t_comm_shifted_res.X, chunked_t_comm_shifted_res.Y},
-                                 {chunked_f_comm_shifted.X, chunked_f_comm_shifted.Y}}, row);
+                                 {chunked_shifted_commitment_type_shifted.X, chunked_shifted_commitment_type_shifted.Y}}, row);
                             row+=add_component::rows_amount;
-                            f_comm ft_comm = {{{ft_comm_shifted.X, ft_comm_shifted.Y}}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
+                            shifted_commitment_type ft_comm = {{ft_comm_shifted.X, ft_comm_shifted.Y}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
 
-                            std::vector<f_comm> evaluations;
-                            //f_comm p_comm = {none, p_comm_unshifted};
-                            f_comm p_comm = {{{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
+                            std::vector<shifted_commitment_type> evaluations;
+                            //shifted_commitment_type p_comm = {none, p_comm_unshifted};
+                            shifted_commitment_type p_comm = {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
                             evaluations.push_back(p_comm);
                             evaluations.push_back(ft_comm);
                             evaluations.push_back(params.input.proofs[i].comm.z_comm);

@@ -95,7 +95,7 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0  f21;
+                    constexpr static const std::size_t selector_seed = 0x0f21;
                     constexpr static const std::size_t polynomial_len = 1 << EvalRounds;
 
                 public:

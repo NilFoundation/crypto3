@@ -63,6 +63,8 @@ namespace nil {
                     constexpr static std::size_t eval_rounds = EvalRounds;
                     constexpr static std::size_t res_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
                     constexpr static std::size_t srs_len = SrsLen;
+
+                    constexpr static std::size_t shifted_commitment_split = 7;
                 };
             }    // namespace components
         }        // namespace zk

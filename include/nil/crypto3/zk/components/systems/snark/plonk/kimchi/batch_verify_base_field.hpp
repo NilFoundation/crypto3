@@ -29,7 +29,8 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-//#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>
@@ -45,13 +46,15 @@ namespace nil {
                 //      https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L881-L888
                 // Output: -
                 template<typename ArithmetizationType, typename CurveType,
-                std::size_t n, std::size_t bases_size,
+                    typename KimchiCommitmentParamsType,
+                    std::size_t n, std::size_t bases_size,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
+                         typename KimchiCommitmentParamsType,
                          std::size_t n,
                          std::size_t bases_size,
                          std::size_t W0,
@@ -70,24 +73,25 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class batch_verify_base_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                        n,
-                                                        bases_size,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8,
-                                                       W9,
-                                                       W10,
-                                                       W11,
-                                                       W12,
-                                                       W13,
-                                                       W14 > {
+                                        CurveType,
+                                        KimchiCommitmentParamsType,
+                                        n,
+                                        bases_size,
+                                        W0,
+                                        W1,
+                                        W2,
+                                        W3,
+                                        W4,
+                                        W5,
+                                        W6,
+                                        W7,
+                                        W8,
+                                        W9,
+                                        W10,
+                                        W11,
+                                        W12,
+                                        W13,
+                                        W14 > {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
@@ -97,8 +101,17 @@ namespace nil {
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
                     using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, bases_size,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
+
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+
+                    using opening_proof_type = typename 
+                        zk::components::kimchi_opening_proof<BlueprintFieldType, KimchiCommitmentParamsType::eval_rounds>;
+
+                    using shifted_commitment_type = typename 
+                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                            KimchiCommitmentParamsType::shifted_commitment_split>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -107,24 +120,12 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct f_comm {
-                            std::vector<var_ec_point> shifted;
-                            std::vector<var_ec_point> unshifted;
-                        };
                         struct PE {
-                            std::vector<f_comm> comm;
-                        };
-                        struct opening_proof {
-                            std::vector<var_ec_point> L;
-                            std::vector<var_ec_point> R;
-                            var_ec_point delta;
-                            var_ec_point G;
+                            std::vector<shifted_commitment_type> comm;
                         };
                         struct var_proof {
-                            /*kimchi_transcript<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                          W11, W12, W13, W14> transcript;*/
                             PE pe;
-                            opening_proof o;
+                            opening_proof_type o;
                         };
                         struct public_input {
                             var_ec_point H;
@@ -187,17 +188,13 @@ namespace nil {
                                 bases.push_back(params.input.proofs[i].o.R[j]);
                             }
                             std::size_t unshifted_size = 0;
-                            std::size_t shifted_size = 0;
 
                             for (std::size_t j = 0 ; j < params.input.proofs[i].pe.comm.size(); j++) {
                                 unshifted_size = params.input.proofs[i].pe.comm[j].unshifted.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
                                     bases.push_back(params.input.proofs[i].pe.comm[j].unshifted[k]);
                                 }
-                                shifted_size = params.input.proofs[i].pe.comm[j].shifted.size();
-                                for (std::size_t k =0; k< shifted_size; k++){
-                                    bases.push_back(params.input.proofs[i].pe.comm[j].shifted[k]);
-                                }
+                                bases.push_back(params.input.proofs[i].pe.comm[j].shifted);
                             }
                             bases.push_back({var(0, u_row, false), var(1, u_row, false)});
                             bases.push_back(params.input.proofs[i].o.delta);
@@ -231,9 +228,9 @@ namespace nil {
                         for(std::size_t i = 1; i < n + 1; i ++){
                             bases.push_back(params.input.PI.G[i - 1]);
                         }
-                        /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
-                            bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
-                        }*/
+                        // for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
+                        //     bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
+                        // }
                         for (std::size_t i = 0; i < params.input.proofs.size(); i++) {
                             var cip = params.input.PI.cip[i];
                             typename sub_component::params_type sub_params = {cip, var(0, row + 2, false, var::column_type::constant)};
@@ -257,17 +254,13 @@ namespace nil {
                                 bases.push_back(params.input.proofs[i].o.R[j]);
                             }
                             std::size_t unshifted_size = 0;
-                            std::size_t shifted_size = 0;
 
                             for (std::size_t j = 0 ; j < params.input.proofs[i].pe.comm.size(); j++) {
                                 unshifted_size = params.input.proofs[i].pe.comm[j].unshifted.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
                                     bases.push_back(params.input.proofs[i].pe.comm[j].unshifted[k]);
                                 }
-                                shifted_size = params.input.proofs[i].pe.comm[j].shifted.size();
-                                for (std::size_t k =0; k< shifted_size; k++){
-                                    bases.push_back(params.input.proofs[i].pe.comm[j].shifted[k]);
-                                }
+                                bases.push_back(params.input.proofs[i].pe.comm[j].shifted);
                             }
                             bases.push_back({var(0, u_row, false), var(1, u_row, false)});
                             bases.push_back(params.input.proofs[i].o.delta);
