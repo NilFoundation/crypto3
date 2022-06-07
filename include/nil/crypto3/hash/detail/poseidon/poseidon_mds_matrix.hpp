@@ -85,7 +85,7 @@ namespace nil {
                         if (policy_type::full_rounds == 55) { // TODO: kimchi specialization
                             for (std::size_t i = 0; i < state_words; i++) {
                                 for (std::size_t j = 0; j < state_words; j++) {
-                                    new_mds_matrix[i][j] = poseidon_constants_kimchi_vesta::mds[j][i];
+                                    new_mds_matrix[i][j] = poseidon_constants_kimchi<field_type>::mds[j][i];
                                 }
                             }
 
