@@ -29,8 +29,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../include"
         ${Boost_INCLUDE_DIRS})
 
 macro(define_containers_example example)
-    get_filename_component(name ${example} NAME)
-    set(target_name containers_${name}_example)
+    get_filename_component(test_name ${example} NAME)
+    set(target_name ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}_${test_name}_example)
 
     add_executable(${target_name} ${example}.cpp)
     target_link_libraries(${target_name} PRIVATE
