@@ -77,7 +77,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
     
     constexpr static const std::size_t max_unshifted_size = 1;
-    constexpr static const std::size_t proof_len = 1;
 
     constexpr static std::size_t public_input_size = 1;
     constexpr static std::size_t alpha_powers_n = 5;
@@ -99,7 +98,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     using component_type = zk::components::base_field<ArithmetizationType, curve_type, 
         kimchi_params, commitment_params, batch_size, shifted_commitment_type_size,
-        size, max_unshifted_size, proof_len,
+        size, max_unshifted_size,
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using shifted_commitment_type = typename 

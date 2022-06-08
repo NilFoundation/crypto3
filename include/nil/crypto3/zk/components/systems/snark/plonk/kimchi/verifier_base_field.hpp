@@ -53,7 +53,7 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType,
                 typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
                 std::size_t f_comm_size,
-                std::size_t size, std::size_t max_unshifted_size, std::size_t proof_len,
+                std::size_t size, std::size_t max_unshifted_size,
                          std::size_t... WireIndexes>
                 class base_field;
 
@@ -66,7 +66,6 @@ namespace nil {
                          std::size_t f_comm_size,
                          std::size_t size,
                          std::size_t max_unshifted_size,
-                         std::size_t proof_len,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -90,7 +89,6 @@ namespace nil {
                                                        f_comm_size,
                                                         size,
                                                         max_unshifted_size,
-                                                        proof_len,
                                                        W0,
                                                        W1,
                                                        W2,
@@ -172,7 +170,11 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = (1 + (2 + 2*max_unshifted_size) * (scalar_mul_component::rows_amount + add_component::rows_amount) 
-                    + (max_unshifted_size + 1)*msm_component::rows_amount + lagrange_msm_component::rows_amount + 2 * const_mul_component::rows_amount + batch_verify_component::rows_amount) * proof_len;
+                        + (max_unshifted_size + 1) * msm_component::rows_amount + 
+                        lagrange_msm_component::rows_amount + 2 * const_mul_component::rows_amount 
+                        ) * BatchSize
+                        + batch_verify_component::rows_amount
+                        + map_fq_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
