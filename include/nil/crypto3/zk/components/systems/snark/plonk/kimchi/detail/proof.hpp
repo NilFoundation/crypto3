@@ -113,6 +113,18 @@ namespace nil {
                 };
 
                 template<typename BlueprintFieldType,
+                    std::size_t EvalRounds>
+                struct kimchi_opening_proof {
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+
+                    std::array<var_ec_point, EvalRounds> L;
+                    std::array<var_ec_point, EvalRounds> R;
+                    var_ec_point delta;
+                    var_ec_point G;
+                };
+
+                template<typename BlueprintFieldType,
                          typename ArithmetizationType,
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType>
@@ -125,20 +137,13 @@ namespace nil {
                         zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
                             KimchiCommitmentParamsType::shifted_commitment_split>;
 
+                    using opening_proof_type = typename 
+                        zk::components::kimchi_opening_proof<BlueprintFieldType, 
+                        KimchiCommitmentParamsType::eval_rounds>;
+
                     //typename proof_binding::fq_sponge_output fq_output;
                     std::vector<shifted_commitment_type> comm;
-                };
-
-                template<typename BlueprintFieldType,
-                    std::size_t EvalRounds>
-                struct kimchi_opening_proof {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
-                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
-
-                    std::array<var_ec_point, EvalRounds> L;
-                    std::array<var_ec_point, EvalRounds> R;
-                    var_ec_point delta;
-                    var_ec_point G;
+                    opening_proof_type opening_proof;
                 };
 
                 template<typename BlueprintFieldType, typename KimchiParamsType,

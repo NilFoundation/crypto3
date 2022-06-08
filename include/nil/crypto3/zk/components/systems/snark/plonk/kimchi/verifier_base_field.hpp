@@ -220,7 +220,7 @@ namespace nil {
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         std::size_t p_size = params.input.proofs.size();
-                        std::vector<typename batch_verify_component::params_type::var_proof> batch_proofs;
+                        std::vector<batch_proof_type> batch_proofs;
                         for(std::size_t i = 0; i < p_size; i++) {
                             auto p_comm_unshifted = lagrange_msm_component::generate_assignments(assignment, {params.input.PI.neg_pub, params.input.PI.lagrange_bases}, row);
                             row = row + lagrange_msm_component::rows_amount;
@@ -425,7 +425,7 @@ namespace nil {
                             evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
                             evaluations.push_back(params.input.proofs[i].comm.table_comm);
                             evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ {evaluations},
+                            batch_proof_type p = {/*params.input.proofs[i].transcript,*/ {evaluations},
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
@@ -456,7 +456,7 @@ namespace nil {
                         }
                         std::size_t row = start_row_index;
                         std::size_t p_size = params.input.proofs.size();
-                        std::vector<typename batch_verify_component::params_type::var_proof> batch_proofs;
+                        std::vector<batch_proof_type> batch_proofs;
                         for(std::size_t i = 0; i < p_size; i++) {
                             auto p_comm_unshifted = lagrange_msm_component::generate_circuit(bp, assignment, {params.input.PI.neg_pub, params.input.PI.lagrange_bases}, row);
                             row = row + lagrange_msm_component::rows_amount;
@@ -668,7 +668,7 @@ namespace nil {
                             evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
                             evaluations.push_back(params.input.proofs[i].comm.table_comm);
                             evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ {evaluations},
+                            batch_proof_type p = {/*params.input.proofs[i].transcript,*/ {evaluations},
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }

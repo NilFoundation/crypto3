@@ -209,8 +209,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
     //zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     //                    11, 12, 13, 14> transcript;
-    typename component_type::params_type::var_proof proof_var = {/*transcript,*/ {{comm_var}}, o_var}; 
-    typename component_type::params_type::result input = {{proof_var}, {H_var, {PI_G_var}}};
+    typename component_type::params_type::result input = {{ {{comm_var}, o_var}}, {H_var, {PI_G_var}}};
 
     typename binding::fr_data<var, batch_size> fr_data = {scalars_var, {cip_var}};
 
