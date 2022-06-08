@@ -196,7 +196,6 @@ namespace nil {
                             std::vector<var> neg_pub;
                             var zeta_to_srs_len;
                             var zeta_to_domain_size_minus_1;
-                            std::vector<var> batch_scalars;
                             std::vector<var> cip;
                         };
                         struct result {
@@ -431,8 +430,8 @@ namespace nil {
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.batch_scalars, params.input.PI.cip};
-                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index,  pi};
+                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.cip};
+                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index,  pi}, params.fr_data};
                         batch_verify_component::generate_assignments(assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 
@@ -675,8 +674,8 @@ namespace nil {
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.batch_scalars, params.input.PI.cip};
-                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index, pi};
+                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.cip};
+                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index,  pi}, params.fr_data};
                         batch_verify_component::generate_circuit(bp, assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 

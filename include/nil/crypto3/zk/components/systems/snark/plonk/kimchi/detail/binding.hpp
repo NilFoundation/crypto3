@@ -47,7 +47,7 @@ namespace nil {
 
                     template<typename DataType>
                     struct fr_data {
-
+                        std::vector<DataType> scalars;
                     };
 
                     template<typename DataType>

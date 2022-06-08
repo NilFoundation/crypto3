@@ -123,6 +123,9 @@ namespace nil {
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
                         KimchiCommitmentParamsType>;
 
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType, KimchiCommitmentParamsType>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -136,7 +139,6 @@ namespace nil {
                             opening_proof_type o;
                         };
                         struct public_input {
-                            std::vector<var> scalars;
                             std::vector<var> cip;
                         };
                         struct result {
@@ -144,7 +146,9 @@ namespace nil {
                             verifier_index_type verifier_index;
                             public_input PI;
                         };
-                        result input;    
+                        
+                        result input;  
+                        typename proof_binding::fr_data<var> fr_output;
                     };
 
                     struct result_type {
@@ -206,7 +210,7 @@ namespace nil {
                             bases.push_back({var(0, u_row, false), var(1, u_row, false)});
                             bases.push_back(params.input.proofs[i].o.delta);
                         }
-                        auto res = msm_component::generate_assignments(assignment, {params.input.PI.scalars, bases}, row);
+                        auto res = msm_component::generate_assignments(assignment, {params.fr_output.scalars, bases}, row);
                         return result_type(component_start_row);
                     }
 
@@ -272,7 +276,7 @@ namespace nil {
                             bases.push_back({var(0, u_row, false), var(1, u_row, false)});
                             bases.push_back(params.input.proofs[i].o.delta);
                         }
-                        auto res = msm_component::generate_circuit(bp, assignment, {params.input.PI.scalars, bases}, row);
+                        auto res = msm_component::generate_circuit(bp, assignment, {params.fr_output.scalars, bases}, row);
                         return result_type(start_row_index);
                     }
 

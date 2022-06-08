@@ -102,6 +102,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     using shifted_commitment_type = typename 
                         zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
                             commitment_params::shifted_commitment_split>;
+    
+    using binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType, commitment_params>;
+
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
@@ -206,9 +210,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     //zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     //                    11, 12, 13, 14> transcript;
     typename component_type::params_type::var_proof proof_var = {/*transcript,*/ {{comm_var}}, o_var}; 
-    typename component_type::params_type::public_input PI_var = {scalars_var, {cip_var}};
+    typename component_type::params_type::public_input PI_var = {{cip_var}};
     typename component_type::params_type::result input = {{proof_var}, {H_var, {PI_G_var}}, PI_var};
-    typename component_type::params_type params = {input};
+
+    typename binding::fr_data<var> fr_data = {scalars_var};
+
+    typename component_type::params_type params = {input, fr_data};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {
