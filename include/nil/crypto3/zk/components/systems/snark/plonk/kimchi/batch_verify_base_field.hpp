@@ -48,6 +48,7 @@ namespace nil {
                 // Output: -
                 template<typename ArithmetizationType, typename CurveType,
                     typename KimchiParamsType, typename KimchiCommitmentParamsType,
+                    std::size_t BatchSize,
                     std::size_t n, std::size_t bases_size,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
@@ -57,6 +58,7 @@ namespace nil {
                          typename CurveType,
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
+                         std::size_t BatchSize,
                          std::size_t n,
                          std::size_t bases_size,
                          std::size_t W0,
@@ -78,6 +80,7 @@ namespace nil {
                                         CurveType,
                                         KimchiParamsType,
                                         KimchiCommitmentParamsType,
+                                        BatchSize,
                                         n,
                                         bases_size,
                                         W0,
@@ -138,17 +141,13 @@ namespace nil {
                             batch_proof_type pe;
                             opening_proof_type o;
                         };
-                        struct public_input {
-                            std::vector<var> cip;
-                        };
                         struct result {
                             std::vector<var_proof> proofs;
                             verifier_index_type verifier_index;
-                            public_input PI;
                         };
                         
                         result input;  
-                        typename proof_binding::fr_data<var> fr_output;
+                        typename proof_binding::fr_data<var, BatchSize> fr_output;
                     };
 
                     struct result_type {
@@ -177,7 +176,7 @@ namespace nil {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
                         }*/
                         for (std::size_t i = 0; i < params.input.proofs.size(); i++) {
-                            var cip = params.input.PI.cip[i];
+                            var cip = params.fr_output.cip[i];
                             typename sub_component::params_type sub_params = {cip, var(0, component_start_row + 2, false, var::column_type::constant)};
                             auto sub_res = sub_component::generate_assignments(assignment, sub_params, row);
                             row = row + sub_component::rows_amount;
@@ -243,7 +242,7 @@ namespace nil {
                         //     bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
                         // }
                         for (std::size_t i = 0; i < params.input.proofs.size(); i++) {
-                            var cip = params.input.PI.cip[i];
+                            var cip = params.fr_output.cip[i];
                             typename sub_component::params_type sub_params = {cip, var(0, row + 2, false, var::column_type::constant)};
                             zk::components::generate_circuit<sub_component>(bp, assignment, sub_params,
                                                                         row);

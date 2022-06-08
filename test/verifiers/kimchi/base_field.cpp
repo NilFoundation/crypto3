@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using batch_verify_component = zk::components::batch_verify_base_field<ArithmetizationType, curve_type,
-                                        kimchi_params, commitment_params, n, bases_size,
+                                        kimchi_params, commitment_params, batch_size, n, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     using batch_params = typename batch_verify_component::params_type;
     using shifted_commitment_type = typename 
@@ -271,10 +271,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     typename component_type::params_type::public_input PI_var = {{lagrange_bases_var},
                             {Pub_var},
                             zeta_to_srs_len_var,
-                            zeta_to_domain_size_minus_1_var, {cip_var}};
+                            zeta_to_domain_size_minus_1_var};
     typename component_type::params_type::result input = {{proof_var}, {H_var, {PI_G_var}}, PI_var};
 
-    typename binding::fr_data<var> fr_data = {batch_scalars_var};
+    typename binding::fr_data<var, batch_size> fr_data = {batch_scalars_var, {cip_var}};
     typename binding::fq_data<var> fq_data;
 
     typename component_type::params_type params = {fr_data, fq_data, input};

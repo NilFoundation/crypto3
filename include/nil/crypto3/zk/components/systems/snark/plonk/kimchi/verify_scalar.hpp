@@ -117,7 +117,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        typename proof_binding::fr_data<var> fr_data;
+                        typename proof_binding::fr_data<var, BatchSize> fr_data;
                         typename proof_binding::fq_data<var> fq_data;
                         
                         verifier_index_type &verifier_index;
@@ -151,7 +151,7 @@ namespace nil {
                             bp, assignment, {batches}, row);
                         row += batch_verify_component::rows_amount;
 
-                        typename proof_binding::fr_data<var> fr_data_recalculated;
+                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
 
                         map_fr_component::generate_circuit(bp, assignment,
                             {params.fr_data, fr_data_recalculated}, row);
@@ -178,7 +178,7 @@ namespace nil {
                             assignment, {batches}, row);
                         row += batch_verify_component::rows_amount;
 
-                        typename proof_binding::fr_data<var> fr_data_recalculated;
+                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
 
                         map_fr_component::generate_assignments(assignment,
                             {params.fr_data, fr_data_recalculated}, row);

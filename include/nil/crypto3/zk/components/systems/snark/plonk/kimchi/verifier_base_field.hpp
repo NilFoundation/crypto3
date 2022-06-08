@@ -134,7 +134,7 @@ namespace nil {
                                                                        W4, W5, W6, W7, W8, W9, W10>;
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
-                                            KimchiParamsType, KimchiCommitmentParamsType, n, bases_size, W0, W1,
+                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, n, bases_size, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
 
@@ -196,7 +196,6 @@ namespace nil {
                             std::vector<var> neg_pub;
                             var zeta_to_srs_len;
                             var zeta_to_domain_size_minus_1;
-                            std::vector<var> cip;
                         };
                         struct result {
                             std::vector<var_proof> proofs;
@@ -204,7 +203,7 @@ namespace nil {
                             public_input PI;
                         };
 
-                        typename proof_binding::fr_data<var> fr_data;
+                        typename proof_binding::fr_data<var, BatchSize> fr_data;
                         typename proof_binding::fq_data<var> fq_data;
 
                         result input;  
@@ -430,8 +429,7 @@ namespace nil {
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.cip};
-                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index,  pi}, params.fr_data};
+                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index}, params.fr_data};
                         batch_verify_component::generate_assignments(assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 
@@ -674,8 +672,7 @@ namespace nil {
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.cip};
-                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index,  pi}, params.fr_data};
+                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index}, params.fr_data};
                         batch_verify_component::generate_circuit(bp, assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 

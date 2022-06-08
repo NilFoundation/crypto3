@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
     
     using fr_data_type = typename 
         zk::components::binding<ArithmetizationType, 
-        BlueprintFieldType, commitment_params>::fr_data<var>;
+        BlueprintFieldType, commitment_params>::fr_data<var, batch_size>;
 
     using fq_data_type = typename 
         zk::components::binding<ArithmetizationType, 
