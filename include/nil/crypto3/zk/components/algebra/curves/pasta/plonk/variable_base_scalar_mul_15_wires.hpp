@@ -66,8 +66,8 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f03;
-                    constexpr static const std::size_t rows_amount = add_component::rows_amount + mul_rows_amount;
-                    constexpr static const std::size_t gates_amount = 1;
+                    constexpr static const std::size_t rows_amount = add_component::rows_amount + mul_rows_amount + 1;
+                    constexpr static const std::size_t gates_amount = 2;
 
                     struct params_type {
                         struct var_ec_point {
@@ -80,8 +80,8 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var X = var(0, 0, false);
-                        var Y = var(0, 0, false);
+                        var X;
+                        var Y;
                         result_type(const params_type &params, std::size_t start_row_index) {
                             X = var(W0, start_row_index + rows_amount - 1, false, var::column_type::witness);
                             Y = var(W1, start_row_index + rows_amount - 1, false, var::column_type::witness);
@@ -121,7 +121,7 @@ namespace nil {
                         std::size_t j = start_row_index + add_component::rows_amount;
                         assignment.constant(0)[j] = ArithmetizationType::field_type::value_type::zero();
 
-                        for (std::size_t i = j; i < j + rows_amount - 1; i = i + 2) {
+                        for (std::size_t i = j; i < j + rows_amount - 3; i = i + 2) {
                             assignment.witness(W0)[i] = T.X;
                             assignment.witness(W1)[i] = T.Y;
                             if (i == j) {
@@ -139,37 +139,69 @@ namespace nil {
                             assignment.witness(W5)[i] = n_next;
                             Q.X = T.X;
                             Q.Y = (2 * bits[((i - j) / 2) * 5] - 1) * T.Y;
-                            P[1] = 2 * P[0] + Q;
+                            P[1] = (P[0] + Q) + P[0];
                             assignment.witness(W7)[i] = P[1].X;
                             assignment.witness(W8)[i] = P[1].Y;
                             assignment.witness(W7)[i + 1] = (P[0].Y - Q.Y) * (P[0].X - Q.X).inversed();
                             Q.Y = (2 * bits[((i - j) / 2) * 5 + 1] - 1) * T.Y;
-                            P[2] = 2 * P[1] + Q;
+                            P[2] = (P[1] + Q) + P[1];
                             assignment.witness(W9)[i] = P[2].X;
                             assignment.witness(W10)[i] = P[2].Y;
                             assignment.witness(W8)[i + 1] = (P[1].Y - Q.Y) * (P[1].X - Q.X).inversed();
                             Q.Y = (2 * bits[((i - j) / 2) * 5 + 2] - 1) * T.Y;
-                            P[3] = 2 * P[2] + Q;
+                            P[3] = (P[2] + Q) + P[2];
                             assignment.witness(W11)[i] = P[3].X;
                             assignment.witness(W12)[i] = P[3].Y;
                             assignment.witness(W9)[i + 1] = (P[2].Y - Q.Y) * (P[2].X - Q.X).inversed();
                             Q.Y = (2 * bits[((i - j) / 2) * 5 + 3] - 1) * T.Y;
-                            P[4] = 2 * P[3] + Q;
+                            P[4] = (P[3] + Q) + P[3];
                             assignment.witness(W13)[i] = P[4].X;
                             assignment.witness(W14)[i] = P[4].Y;
                             assignment.witness(W10)[i + 1] = (P[3].Y - Q.Y) * (P[3].X - Q.X).inversed();
                             Q.Y = (2 * bits[((i - j) / 2) * 5 + 4] - 1) * T.Y;
-                            P[5] = 2 * P[4] + Q;
+                            P[5] = (P[4] + Q) + P[4];
                             assignment.witness(W0)[i + 1] = P[5].X;
                             assignment.witness(W1)[i + 1] = P[5].Y;
                             assignment.witness(W11)[i + 1] = (P[4].Y - Q.Y) * (P[4].X - Q.X).inversed();
-
                             assignment.witness(W2)[i + 1] = bits[((i - j) / 2) * 5];
                             assignment.witness(W3)[i + 1] = bits[((i - j) / 2) * 5 + 1];
                             assignment.witness(W4)[i + 1] = bits[((i - j) / 2) * 5 + 2];
                             assignment.witness(W5)[i + 1] = bits[((i - j) / 2) * 5 + 3];
                             assignment.witness(W6)[i + 1] = bits[((i - j) / 2) * 5 + 4];
                         }
+                        typename ArithmetizationType::field_type::value_type m = ((n_next - 0x224698fc0994a8dd8c46eb2100000000_cppui255)*
+                        (n_next - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*(n_next - 0x224698fc0994a8dd8c46eb2100000001_cppui255));
+                        typename ArithmetizationType::field_type::value_type t0 = m.inversed();
+                        typename ArithmetizationType::field_type::value_type t1 = (n_next - 0x224698fc0994a8dd8c46eb2100000000_cppui255).inversed();
+                        typename ArithmetizationType::field_type::value_type t2 = (n_next - 0x224698fc0994a8dd8c46eb2100000001_cppui255).inversed();
+                        typename ArithmetizationType::field_type::value_type x;
+                        typename ArithmetizationType::field_type::value_type y;
+                        if (n_next == 0x224698fc0994a8dd8c46eb2100000000_cppui255) {
+                            x = T.X;
+                            y = -T.Y;
+                        } else  {
+                            if (n_next == 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255) {
+                                x = 0;
+                                y = 0;
+                            } else {
+                                if (n_next == 0x224698fc0994a8dd8c46eb2100000001_cppui255) {
+                                    x = T.X;
+                                    y = T.Y;
+                                } else {
+                                    x = P[5].X;
+                                    y = P[5].Y;
+                                }
+                            }
+                        }
+                        assignment.witness(W2)[start_row_index + rows_amount - 1] = t0;
+                        assignment.witness(W3)[start_row_index + rows_amount - 1] = t1;
+                        assignment.witness(W4)[start_row_index + rows_amount - 1] = t2;
+                        assignment.witness(W5)[start_row_index + rows_amount - 1] = n_next;
+                        assignment.witness(W6)[start_row_index + rows_amount - 1] = T.X;
+                        assignment.witness(W7)[start_row_index + rows_amount - 1] = T.Y;
+                        assignment.witness(W8)[start_row_index + rows_amount - 1] = m;
+                        assignment.witness(W0)[start_row_index + rows_amount - 1] = x;
+                        assignment.witness(W1)[start_row_index + rows_amount - 1] = y;
 
                         return result_type(params, start_row_index);
                     }
@@ -191,7 +223,8 @@ namespace nil {
                         }
 
                         assignment.enable_selector(first_selector_index, start_row_index + add_component::rows_amount,
-                                                   start_row_index + rows_amount - 1, 2);
+                                                   start_row_index + rows_amount - 5, 2);
+                        assignment.enable_selector(first_selector_index + 1, start_row_index + rows_amount - 2);
 
                         typename add_component::params_type addition_params = {{params.T.x, params.T.y},
                                                                                {params.T.x, params.T.y}};
@@ -289,6 +322,114 @@ namespace nil {
                                      constraint_6,  constraint_7,  constraint_8,  constraint_9,  constraint_10,
                                      constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
                                      constraint_16});
+                        std::size_t selector_index_2 = first_selector_index + 1;
+                        bit_check_1 = bp.add_bit_check(var(W2, 0));
+                        bit_check_2 = bp.add_bit_check(var(W3, 0));
+                        bit_check_3 = bp.add_bit_check(var(W4, 0));
+                        bit_check_4 = bp.add_bit_check(var(W5, 0));
+                        bit_check_5 = bp.add_bit_check(var(W6, 0));
+
+                        constraint_1 = bp.add_constraint((var(W2, -1) - var(W0, -1)) * var(W7, 0) -
+                                                              (var(W3, -1) - (2 * var(W2, 0) - 1) * var(W1, -1)));
+                        constraint_2 = bp.add_constraint((var(W7, -1) - var(W0, -1)) * var(W8, 0) -
+                                                              (var(W8, -1) - (2 * var(W3, 0) - 1) * var(W1, -1)));
+                        constraint_3 = bp.add_constraint((var(W9, -1) - var(W0, -1)) * var(W9, 0) -
+                                                              (var(W10, -1) - (2 * var(W4, 0) - 1) * var(W1, -1)));
+                        constraint_4 = bp.add_constraint((var(W11, -1) - var(W0, -1)) * var(W10, 0) -
+                                                              (var(W12, -1) - (2 * var(W5, 0) - 1) * var(W1, -1)));
+                        constraint_5 = bp.add_constraint((var(W13, -1) - var(W0, -1)) * var(W11, 0) -
+                                                              (var(W14, -1) - (2 * var(W6, 0) - 1) * var(W1, -1)));
+
+                        constraint_6 = bp.add_constraint(
+                            (2 * var(W3, -1) - var(W7, 0) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1))) *
+                                (2 * var(W3, -1) - var(W7, 0) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1))) -
+                            ((2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1)) *
+                             (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1)) *
+                             (var(W7, -1) - var(W0, -1) + var(W7, 0).pow(2))));
+                        constraint_7 = bp.add_constraint(
+                            (2 * var(W8, -1) - var(W8, 0) * (2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1))) *
+                                (2 * var(W8, -1) - var(W8, 0) * (2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1))) -
+                            ((2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1)) *
+                             (2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1)) *
+                             (var(W9, -1) - var(W0, -1) + var(W8, 0).pow(2))));
+                        constraint_8 = bp.add_constraint(
+                            (2 * var(W10, -1) - var(W9, 0) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1))) *
+                                (2 * var(W10, -1) - var(W9, 0) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1))) -
+                            ((2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)) *
+                             (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)) *
+                             (var(W11, -1) - var(W0, -1) + var(W9, 0).pow(2))));
+                        constraint_9 = bp.add_constraint(
+                            ((2 * var(W12, -1) - var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) *
+                                (2 * var(W12, -1) -
+                                 var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) -
+                            ((2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
+                             (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
+                             (var(W13, -1) - var(W0, -1) + var(W10, 0).pow(2))))*
+                             var(W8, +1)*var(W2, +1));
+                        constraint_10 = bp.add_constraint(
+                            ((2 * var(W14, -1) - var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) *
+                                (2 * var(W14, -1) -
+                                 var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) -
+                            ((2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
+                             (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
+                             (var(W0, 0) - var(W0, -1) + var(W11, 0).pow(2))))*var(W8, + 1)*var(W2, +1));
+
+                        constraint_11 = bp.add_constraint(
+                            (var(W8, -1) + var(W3, -1)) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1)) -
+                            ((var(W2, -1) - var(W7, -1)) *
+                             (2 * var(W3, -1) - var(W7, 0) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1)))));
+                        constraint_12 = bp.add_constraint(
+                            (var(W10, -1) + var(W8, -1)) * (2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1)) -
+                            ((var(W7, -1) - var(W9, -1)) *
+                             (2 * var(W8, -1) - var(W8, 0) * (2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1)))));
+                        constraint_13 = bp.add_constraint(
+                                                         (var(W12, -1) + var(W10, -1)) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)) -
+                            ((var(W9, -1) - var(W11, -1)) *
+                             (2 * var(W10, -1) - var(W9, 0) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)))));
+                        constraint_14 = bp.add_constraint(
+                            ((var(W14, -1) + var(W12, -1)) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) -
+                            ((var(W11, -1) - var(W13, -1)) *
+                             (2 * var(W12, -1) - var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)))))*
+                             var(W8, +1)*var(W2, +1));
+                        constraint_15 = bp.add_constraint(
+                            ((var(W1, 0) + var(W14, -1)) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) -
+                            ((var(W13, -1) - var(W0, 0)) *
+                             (2 * var(W14, -1) - var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)))))*
+                             var(W8, +1)*var(W2, +1));
+
+                        constraint_16 =
+                            bp.add_constraint(var(W5, -1) - (32 * (var(W4, -1)) + 16 * var(W2, 0) + 8 * var(W3, 0) +
+                                                            4 * var(W4, 0) + 2 * var(W5, 0) + var(W6, 0)));
+                        auto constraint_17 = bp.add_constraint((((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
+                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255))*var(W2, +1) - 1) * ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
+                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)));
+                        auto constraint_18 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *var(W3, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255));
+                        auto constraint_19 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        *var(W4, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255));
+                        auto constraint_20 = bp.add_constraint((((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
+                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255))*var(W2, +1)*var(W0, 0)) + 
+                        ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        *var(W4, +1))* ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        *var(W4, +1)) * var(W6, +1) - var(W0, +1));
+                        auto constraint_21 = bp.add_constraint((((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
+                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255))*var(W2, +1)*var(W1, 0)) + 
+                        ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        *var(W4, +1)) * var(W7, +1) - var(W1, +1));
+                        bp.add_gate(selector_index_2,
+                                    {bit_check_1,   bit_check_2,   bit_check_3,   bit_check_4,   bit_check_5,
+                                     constraint_1,  constraint_2,  constraint_3,  constraint_4,  constraint_5,
+                                     constraint_6,  constraint_7,  constraint_8,  constraint_9,  constraint_10,
+                                     constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
+                                     constraint_16, constraint_17, constraint_18, constraint_19, constraint_20,
+                                     constraint_21});
                     }
 
                     static void
@@ -326,6 +467,15 @@ namespace nil {
                             bp.add_copy_constraint(
                                 {{W4, (std::int32_t)(j + z), false}, {W5, (std::int32_t)(j + z - 2), false}});
                         }
+                        bp.add_copy_constraint(
+                                {{W5, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                 {W5, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint(
+                                {{W6, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                 {W0, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint(
+                                {{W7, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                 {W1, (std::int32_t)(start_row_index + rows_amount - 3), false}});
 
                         std::size_t constant_column_index = 0;
                         bp.add_copy_constraint(
@@ -333,7 +483,7 @@ namespace nil {
                              {constant_column_index, (std::int32_t)(j), false, var::column_type::constant}});
 
                         bp.add_copy_constraint(
-                            {params.b, {W5, (std::int32_t)(j + rows_amount - 3), false}});    // scalar value check
+                            {params.b, {W5, (std::int32_t)(j + rows_amount - 4), false}});    // scalar value check
                     }
                 };
             }    // namespace components

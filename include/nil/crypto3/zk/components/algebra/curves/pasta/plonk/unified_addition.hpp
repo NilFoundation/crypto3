@@ -149,7 +149,7 @@ namespace nil {
                         assignment.witness(W1)[j] = P.Y;
                         assignment.witness(W2)[j] = Q.X;
                         assignment.witness(W3)[j] = Q.Y;
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type::zero();
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = {0, 0};
                         if (P.X == zero.X && P.Y == zero.Y) {
                             assignment.witness(W4)[j] = Q.X;
                             assignment.witness(W5)[j] = Q.Y;
