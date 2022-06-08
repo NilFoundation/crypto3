@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using batch_verify_component = zk::components::batch_verify_base_field<ArithmetizationType, curve_type,
-                                        commitment_params, n, bases_size,
+                                        kimchi_params, commitment_params, n, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     using batch_params = typename batch_verify_component::params_type;
     using shifted_commitment_type = typename 

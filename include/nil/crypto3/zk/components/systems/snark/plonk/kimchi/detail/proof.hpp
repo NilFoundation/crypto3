@@ -37,6 +37,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -102,21 +103,30 @@ namespace nil {
                         BlueprintFieldType, KimchiCommitmentParamsType>;
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    // pub sponge: EFqSponge,
-                    // pub evaluations: Vec<Evaluation<G>>,
-                    // /// vector of evaluation points
-                    // pub evaluation_points: Vec<ScalarField<G>>,
-                    // /// scaling factor for evaluation point powers
-                    // pub xi: ScalarField<G>,
-                    // /// scaling factor for polynomials
-                    // pub r: ScalarField<G>,
-                    // /// batched opening proof
-                    // pub opening: &'a OpeningProof<G>,
                     var cip;
                     typename proof_binding::fq_sponge_output fq_output;
                     std::array<var, KimchiParamsType::eval_points_amount> eval_points;
+                    // scaling factor for polynomials
                     var r;
+                    // scaling factor for evaluation point powers
                     var xi;
+                };
+
+                template<typename BlueprintFieldType,
+                         typename ArithmetizationType,
+                         typename KimchiParamsType,
+                         typename KimchiCommitmentParamsType>
+                struct batch_evaluation_proof_base {
+                    using proof_binding = typename zk::components::binding<ArithmetizationType,
+                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    using shifted_commitment_type = typename 
+                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                            KimchiCommitmentParamsType::shifted_commitment_split>;
+
+                    //typename proof_binding::fq_sponge_output fq_output;
+                    std::vector<shifted_commitment_type> comm;
                 };
 
                 template<typename BlueprintFieldType,

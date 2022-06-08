@@ -46,7 +46,7 @@ namespace nil {
                 //      https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L881-L888
                 // Output: -
                 template<typename ArithmetizationType, typename CurveType,
-                    typename KimchiCommitmentParamsType,
+                    typename KimchiParamsType, typename KimchiCommitmentParamsType,
                     std::size_t n, std::size_t bases_size,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
@@ -54,6 +54,7 @@ namespace nil {
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
+                         typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t n,
                          std::size_t bases_size,
@@ -74,6 +75,7 @@ namespace nil {
                          std::size_t W14>
                 class batch_verify_base_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                         CurveType,
+                                        KimchiParamsType,
                                         KimchiCommitmentParamsType,
                                         n,
                                         bases_size,
@@ -112,6 +114,11 @@ namespace nil {
                         zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
                             KimchiCommitmentParamsType::shifted_commitment_split>;
 
+                    using batch_proof_type = typename 
+                        zk::components::batch_evaluation_proof_base<BlueprintFieldType, 
+                            ArithmetizationType, KimchiParamsType,
+                            KimchiCommitmentParamsType>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -120,11 +127,8 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        struct PE {
-                            std::vector<shifted_commitment_type> comm;
-                        };
                         struct var_proof {
-                            PE pe;
+                            batch_proof_type pe;
                             opening_proof_type o;
                         };
                         struct public_input {

@@ -134,7 +134,7 @@ namespace nil {
                                                                        W4, W5, W6, W7, W8, W9, W10>;
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
-                                            KimchiCommitmentParamsType, n, bases_size, W0, W1,
+                                            KimchiParamsType, KimchiCommitmentParamsType, n, bases_size, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
 
@@ -151,6 +151,12 @@ namespace nil {
 
                     using opening_proof_type = typename 
                         zk::components::kimchi_opening_proof<BlueprintFieldType, KimchiCommitmentParamsType::eval_rounds>;
+
+                    using batch_proof_type = typename 
+                        zk::components::batch_evaluation_proof_base<BlueprintFieldType, 
+                            ArithmetizationType, KimchiParamsType,
+                            KimchiCommitmentParamsType>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -419,8 +425,7 @@ namespace nil {
                             evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
                             evaluations.push_back(params.input.proofs[i].comm.table_comm);
                             evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            typename batch_verify_component::params_type::PE evals = {evaluations};
-                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ evals,
+                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ {evaluations},
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
@@ -664,8 +669,7 @@ namespace nil {
                             evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
                             evaluations.push_back(params.input.proofs[i].comm.table_comm);
                             evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            typename batch_verify_component::params_type::PE evals = {evaluations};
-                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ evals,
+                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ {evaluations},
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }

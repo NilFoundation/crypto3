@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
         srs_len>;
 
     using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, 
-                                            commitment_params, n, bases_size,
+                                            kimchi_params, commitment_params, n, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using opening_proof_type = typename 
@@ -202,11 +202,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     shifted_commitment_type comm_var = {{shifted_var}, {unshifted_var}};
 
-    typename component_type::params_type::PE pe_var = {{comm_var}};
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
     //zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     //                    11, 12, 13, 14> transcript;
-    typename component_type::params_type::var_proof proof_var = {/*transcript,*/ pe_var, o_var}; 
+    typename component_type::params_type::var_proof proof_var = {/*transcript,*/ {{comm_var}}, o_var}; 
     typename component_type::params_type::public_input PI_var = {H_var, {PI_G_var}, scalars_var, {cip_var}};
     typename component_type::params_type::result input = {{proof_var}, PI_var};
     typename component_type::params_type params = {input};
