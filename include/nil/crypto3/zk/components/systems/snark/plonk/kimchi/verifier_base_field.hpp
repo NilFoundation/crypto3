@@ -157,6 +157,9 @@ namespace nil {
                             ArithmetizationType, KimchiParamsType,
                             KimchiCommitmentParamsType>;
 
+                    using verifier_index_type = kimchi_verifier_index_base<CurveType,
+                        KimchiCommitmentParamsType>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -193,13 +196,12 @@ namespace nil {
                             std::vector<var> neg_pub;
                             var zeta_to_srs_len;
                             var zeta_to_domain_size_minus_1;
-                            var_ec_point H;
-                            std::vector<var_ec_point> G;
                             std::vector<var> batch_scalars;
                             std::vector<var> cip;
                         };
                         struct result {
                             std::vector<var_proof> proofs;
+                            verifier_index_type verifier_index;
                             public_input PI;
                         };
 
@@ -429,8 +431,8 @@ namespace nil {
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.H, params.input.PI.G, params.input.PI.batch_scalars, params.input.PI.cip};
-                        typename batch_verify_component::params_type batch_params = {batch_proofs, pi};
+                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.batch_scalars, params.input.PI.cip};
+                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index,  pi};
                         batch_verify_component::generate_assignments(assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 
@@ -673,8 +675,8 @@ namespace nil {
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.H, params.input.PI.G, params.input.PI.batch_scalars, params.input.PI.cip};
-                        typename batch_verify_component::params_type batch_params = {batch_proofs, pi};
+                        typename batch_verify_component::params_type::public_input pi = {params.input.PI.batch_scalars, params.input.PI.cip};
+                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index, pi};
                         batch_verify_component::generate_circuit(bp, assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 

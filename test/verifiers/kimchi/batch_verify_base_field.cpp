@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr static std::size_t lookup_table_size = 1;
     constexpr static bool use_lookup = false;
 
-    constexpr static std::size_t srs_len = 10;
+    constexpr static std::size_t srs_len = 1;
 
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
@@ -206,8 +206,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     //zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     //                    11, 12, 13, 14> transcript;
     typename component_type::params_type::var_proof proof_var = {/*transcript,*/ {{comm_var}}, o_var}; 
-    typename component_type::params_type::public_input PI_var = {H_var, {PI_G_var}, scalars_var, {cip_var}};
-    typename component_type::params_type::result input = {{proof_var}, PI_var};
+    typename component_type::params_type::public_input PI_var = {scalars_var, {cip_var}};
+    typename component_type::params_type::result input = {{proof_var}, {H_var, {PI_G_var}}, PI_var};
     typename component_type::params_type params = {input};
 
     auto result_check = [](AssignmentType &assignment, 

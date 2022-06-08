@@ -271,8 +271,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     typename component_type::params_type::public_input PI_var = {{lagrange_bases_var},
                             {Pub_var},
                             zeta_to_srs_len_var,
-                            zeta_to_domain_size_minus_1_var, H_var, {PI_G_var}, batch_scalars_var, {cip_var}};
-    typename component_type::params_type::result input = {{proof_var}, PI_var};
+                            zeta_to_domain_size_minus_1_var, batch_scalars_var, {cip_var}};
+    typename component_type::params_type::result input = {{proof_var}, {H_var, {PI_G_var}}, PI_var};
 
     typename binding::fr_data<var> fr_data;
     typename binding::fq_data<var> fq_data;

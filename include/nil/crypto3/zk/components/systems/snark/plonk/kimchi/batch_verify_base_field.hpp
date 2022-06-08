@@ -31,6 +31,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>
@@ -119,6 +120,9 @@ namespace nil {
                             ArithmetizationType, KimchiParamsType,
                             KimchiCommitmentParamsType>;
 
+                    using verifier_index_type = kimchi_verifier_index_base<CurveType,
+                        KimchiCommitmentParamsType>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -132,13 +136,12 @@ namespace nil {
                             opening_proof_type o;
                         };
                         struct public_input {
-                            var_ec_point H;
-                            std::vector<var_ec_point> G;
                             std::vector<var> scalars;
                             std::vector<var> cip;
                         };
                         struct result {
                             std::vector<var_proof> proofs;
+                            verifier_index_type verifier_index;
                             public_input PI;
                         };
                         result input;    
@@ -162,9 +165,9 @@ namespace nil {
                         //assignment.constant(0)[row + 1] = zero.Y;
                         assignment.constant(0)[row + 2] = (one << 255);
                         std::vector<var_ec_point> bases;
-                        bases.push_back(params.input.PI.H);
+                        bases.push_back(params.input.verifier_index.H);
                         for(std::size_t i = 1; i < n + 1; i ++){
-                            bases.push_back(params.input.PI.G[i - 1]);
+                            bases.push_back(params.input.verifier_index.G[i - 1]);
                         }
                         /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
@@ -228,9 +231,9 @@ namespace nil {
                         //assignment.constant(0)[row] = zero.X;
                         //assignment.constant(0)[row + 1] = zero.Y;
                         std::vector<var_ec_point> bases;
-                        bases.push_back(params.input.PI.H);
+                        bases.push_back(params.input.verifier_index.H);
                         for(std::size_t i = 1; i < n + 1; i ++){
-                            bases.push_back(params.input.PI.G[i - 1]);
+                            bases.push_back(params.input.verifier_index.G[i - 1]);
                         }
                         // for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
                         //     bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
