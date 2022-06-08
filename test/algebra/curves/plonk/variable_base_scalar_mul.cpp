@@ -30,6 +30,8 @@
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -131,23 +133,34 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
     using component_type = zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 	using var = zk::snark::plonk_variable<BlueprintFieldType>;
-    typename BlueprintScalarType::value_type x = algebra::random_element<BlueprintScalarType>();
-	typename curve_type::scalar_field_type::value_type shift = 2;
-	shift = shift.pow(255) + 1;
-	typename BlueprintScalarType::value_type b = (x - shift) / 2;
-	typename curve_type::scalar_field_type::integral_type integral_b = typename curve_type::scalar_field_type::integral_type(b.data);
-	BlueprintFieldType::value_type b_scalar = integral_b;
+    typename BlueprintScalarType::value_type b_scalar = algebra::random_element<BlueprintScalarType>();
+
+	typename curve_type::scalar_field_type::value_type shift_base = 2;
+	auto shift = shift_base.pow(255) + 1;
+	typename BlueprintScalarType::value_type x = (b_scalar - shift)/2;
+	typename BlueprintScalarType::integral_type integral_x = typename BlueprintScalarType::integral_type(x.data);
+	BlueprintFieldType::value_type x_scalar =  integral_x;
+
+
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
 	var scalar_var = {0, 2, false, var::column_type::public_input};
     var T_X_var = {0, 0, false, var::column_type::public_input};
     var T_Y_var = {0, 1, false, var::column_type::public_input};
-
     typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, b_scalar};
-	std::cout<<"Expected result: "<< (x * T).X.data <<" " << (x * T).Y.data<<std::endl;
-	auto expected = x * T;
-	auto result_check = [&expected](AssignmentType &assignment, 
+	std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, x_scalar};
+	curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type expected;
+	if (b_scalar != 0) {
+	 	expected = b_scalar * T;
+	} else {
+		expected = {0, 0};
+	}
+	std::cout<<"Expected result: "<< expected.X.data <<" " << expected.Y.data<<std::endl;
+	auto result_check = [&expected, T, shift_base](AssignmentType &assignment, 
         component_type::result_type &real_res) {
+			curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type R;
+			R.X = assignment.var_value(real_res.X);
+			R.Y = assignment.var_value(real_res.Y);
+			std::cout<<"Component result: "<< assignment.var_value(real_res.X).data <<" " << assignment.var_value(real_res.Y).data<<std::endl;
 			assert(expected.X == assignment.var_value(real_res.X));
 			assert(expected.Y == assignment.var_value(real_res.Y));
     };

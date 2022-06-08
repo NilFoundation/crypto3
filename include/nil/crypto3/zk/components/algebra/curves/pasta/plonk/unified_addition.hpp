@@ -98,7 +98,7 @@ namespace nil {
                                          const std::size_t start_row_index);
 
                 public:
-                    constexpr static const std::size_t rows_amount = 5;
+                    constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -151,8 +151,24 @@ namespace nil {
                         assignment.witness(W1)[j] = P.Y;
                         assignment.witness(W2)[j] = Q.X;
                         assignment.witness(W3)[j] = Q.Y;
-                        assignment.witness(W4)[j] = R.X;
-                        assignment.witness(W5)[j] = R.Y;
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = {0, 0};
+                        if (P.X == zero.X && P.Y == zero.Y) {
+                            assignment.witness(W4)[j] = Q.X;
+                            assignment.witness(W5)[j] = Q.Y;
+                        } else {
+                            if (Q.X == zero.X && Q.Y == zero.Y) {
+                                assignment.witness(W4)[j] = P.X;
+                                assignment.witness(W5)[j] = P.Y;
+                            } else {
+                                if (Q.X == P.X && Q.Y == -P.Y) {
+                                    assignment.witness(W4)[j] = 0;
+                                    assignment.witness(W5)[j] = 0;
+                                } else {
+                                    assignment.witness(W4)[j] = (P + Q).X;
+                                    assignment.witness(W5)[j] = (P + Q).Y;
+                                }
+                            }
+                        }
                         if (P.X != 0) {
                             assignment.witness(W6)[j] = P.X.inversed();
                         } else {

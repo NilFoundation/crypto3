@@ -108,11 +108,23 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
 
     auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
     auto Q = algebra::random_element<curve_type::template g1_type<>>().to_affine();
-    Q.X = P.X;
-    Q.Y = -P.Y;
-
-    auto expected_res = P + Q;
-
+    typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type zero = {0, 0};
+    typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type expected_res;
+    P.X = Q.X;
+    P.Y = -Q.Y;
+    if (Q.X == zero.X && Q.Y == zero.Y) {
+        expected_res = P;
+    } else {
+        if (P.X == zero.X && P.Y == zero.Y) {
+            expected_res = Q;
+        } else {
+            if (P.X == Q.X && P.Y == -Q.Y) {
+                expected_res = {0, 0};
+            } else {
+                expected_res = P + Q;
+            }
+        }
+    }
     typename component_type::params_type params = {
         {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)},
         {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
