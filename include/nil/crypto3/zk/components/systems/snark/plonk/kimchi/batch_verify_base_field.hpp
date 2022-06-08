@@ -49,7 +49,7 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType,
                     typename KimchiParamsType, typename KimchiCommitmentParamsType,
                     std::size_t BatchSize,
-                    std::size_t bases_size,
+                    std::size_t MsmSize,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
 
@@ -59,7 +59,7 @@ namespace nil {
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
-                         std::size_t bases_size,
+                         std::size_t MsmSize,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -80,7 +80,7 @@ namespace nil {
                                         KimchiParamsType,
                                         KimchiCommitmentParamsType,
                                         BatchSize,
-                                        bases_size,
+                                        MsmSize,
                                         W0,
                                         W1,
                                         W2,
@@ -104,7 +104,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
-                    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, bases_size,
+                    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, MsmSize,
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
 
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;

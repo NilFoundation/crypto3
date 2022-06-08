@@ -92,8 +92,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     constexpr static std::size_t srs_len = 1;
 
-    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
-
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
         alpha_powers_n, public_input_size>;
@@ -101,14 +99,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         srs_len>;
 
     using component_type = zk::components::base_field<ArithmetizationType, curve_type, 
-        kimchi_params, commitment_params, batch_size,
-        size, bases_size,max_unshifted_size, proof_len,lagrange_bases_size,
+        kimchi_params, commitment_params, batch_size, shifted_commitment_type_size,
+        size, max_unshifted_size, proof_len,lagrange_bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
-    using batch_verify_component = zk::components::batch_verify_base_field<ArithmetizationType, curve_type,
-                                        kimchi_params, commitment_params, batch_size, bases_size,
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
-    using batch_params = typename batch_verify_component::params_type;
     using shifted_commitment_type = typename 
                         zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
                             commitment_params::shifted_commitment_split>;
@@ -238,6 +232,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     var_ec_point PI_G_var = {var(0, 72, false, var::column_type::public_input), var(0, 73, false, var::column_type::public_input)};
 
+    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
     std::array<curve_type::base_field_type::value_type, bases_size> batch_scalars;
 
     std::vector<var> batch_scalars_var(bases_size);

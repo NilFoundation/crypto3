@@ -52,7 +52,8 @@ namespace nil {
                 // Output: - 
                 template<typename ArithmetizationType, typename CurveType,
                 typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
-                std::size_t size, std::size_t bases_size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
+                std::size_t f_comm_size,
+                std::size_t size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
                          std::size_t... WireIndexes>
                 class base_field;
 
@@ -62,8 +63,8 @@ namespace nil {
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
+                         std::size_t f_comm_size,
                          std::size_t size,
-                         std::size_t bases_size,
                          std::size_t max_unshifted_size,
                          std::size_t proof_len,
                          std::size_t lagrange_bases_size,
@@ -87,8 +88,8 @@ namespace nil {
                                                        KimchiParamsType,
                                                        KimchiCommitmentParamsType,
                                                        BatchSize,
+                                                       f_comm_size,
                                                         size,
-                                                        bases_size,
                                                         max_unshifted_size,
                                                         proof_len,
                                                         lagrange_bases_size,
@@ -130,11 +131,6 @@ namespace nil {
                     using add_component =
                         zk::components::curve_element_unified_addition<ArithmetizationType, CurveType, W0, W1, W2, W3,
                                                                        W4, W5, W6, W7, W8, W9, W10>;
-                    using batch_verify_component =
-                        zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
-                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, bases_size, W0, W1,
-                                                                               W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
-                                                                               W12, W13, W14>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiCommitmentParamsType>;
@@ -157,6 +153,21 @@ namespace nil {
 
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
                         KimchiCommitmentParamsType>;
+
+                    constexpr static const std::size_t bases_size = KimchiCommitmentParamsType::srs_len // G
+                            + 1 // H
+                            + (1
+                                + 1
+                                + 2 * KimchiCommitmentParamsType::eval_rounds
+                                + f_comm_size
+                                + 1)
+                            * BatchSize;
+
+                    using batch_verify_component =
+                        zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
+                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, bases_size, W0, W1,
+                                                                               W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
+                                                                               W12, W13, W14>;
 
                     constexpr static const std::size_t selector_seed = 0xff91;
 
