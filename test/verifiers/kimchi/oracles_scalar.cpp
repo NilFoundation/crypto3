@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_oracles_test_suite)
 template <typename CurveType, typename BlueprintFieldType, typename KimchiParamsType,
     std::size_t EvelRounds>
 void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
-    zk::components::kimchi_proof_scalar<CurveType, KimchiParamsType, EvelRounds> &circuit_proof,
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType, EvelRounds> &circuit_proof,
     std::vector<typename BlueprintFieldType::value_type> &public_input) {
         using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
@@ -85,6 +85,10 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
         public_input.push_back(original_proof.evals[point_idx].poseidon_selector);
         circuit_proof.proof_evals[point_idx].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
+
+    //ft_eval
+    public_input.push_back(algebra::random_element<BlueprintFieldType>());
+    circuit_proof.ft_eval = var(0, public_input.size() - 1, false, var::column_type::public_input);
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
@@ -94,7 +98,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 10;
+    constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -149,7 +153,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     typename BlueprintFieldType::value_type expected_zeta = 0x3D0F1F3A3D07DC73FBDF3718FFE270122AA367FB5BA667AD4A4AB81167D21BE4_cppui256;
     std::cout<<"Expected zeta: "<<expected_zeta.data<<std::endl;
 
-    zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
     std::array<var, eval_rounds> challenges;
     typename zk::components::binding<ArithmetizationType, BlueprintFieldType, commitment_params>::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 

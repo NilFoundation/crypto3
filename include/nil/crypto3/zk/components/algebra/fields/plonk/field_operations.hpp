@@ -44,6 +44,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Input: x, y \in Fp
+                // Output: z = x * y
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class multiplication;
 
@@ -138,6 +140,8 @@ namespace nil {
                     }
                 };
 
+                // Input: x, y \in Fp
+                // Output: z = x + y
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class addition;
 
@@ -231,6 +235,8 @@ namespace nil {
                     }
                 };
 
+                // Input: x, y \in Fp
+                // Output: z = x / y
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class division;
 
@@ -323,6 +329,8 @@ namespace nil {
                     }
                 };
 
+                // Input: x, y \in Fp
+                // Output: z = x - y
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class subtraction;
 
@@ -418,6 +426,8 @@ namespace nil {
                     }
                 };
 
+                // Input: x, c \in Fp, c is fixed public parameter
+                // Output: z = c * y
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class mul_by_constant;
 

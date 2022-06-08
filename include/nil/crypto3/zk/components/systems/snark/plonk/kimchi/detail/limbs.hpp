@@ -46,6 +46,11 @@ namespace nil {
             namespace components {
 
                 ///////////////// From Limbs ////////////////////////////////
+                // Recalculate field element from two 64-bit chunks
+                // It's a part of transcript functionality
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L87
+                // Input: x1 = [a_0, ..., a_63], x2 = [b_0, ..., b_63]
+                // Output: y = [a_0, ...., a_63, b_0, ..., b_63]
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class from_limbs;
 
@@ -92,7 +97,7 @@ namespace nil {
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                         const params_type &params,
-                                                        std::size_t component_start_row) {
+                                                        const std::size_t component_start_row) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -106,7 +111,6 @@ namespace nil {
 
                         assignment.enable_selector(first_selector_index, component_start_row);
 
-                        generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
 
                         return result_type(component_start_row);
@@ -114,7 +118,7 @@ namespace nil {
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
+                                                            const std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         typename BlueprintFieldType::value_type first_limb =
@@ -157,6 +161,11 @@ namespace nil {
                 };
 
                 ///////////////// To Limbs ////////////////////////////////
+                // Split field element into four 64-bit chunks
+                // It's a part of transcript functionality
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L110
+                // Input: x = [a_0, ...., a255]
+                // Output: y0 = [a_0, ..., a_63], y1 = [a_64, ..., a_127], y2 = [a_128, ..., a_191], y3 = [a_192, ..., a_255]
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class to_limbs;
 
@@ -204,7 +213,7 @@ namespace nil {
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
                                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                         const params_type &params,
-                                                        std::size_t component_start_row) {
+                                                        const std::size_t component_start_row) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -218,7 +227,6 @@ namespace nil {
 
                         assignment.enable_selector(first_selector_index, component_start_row);
 
-                        generate_gates(bp, assignment, params, component_start_row);
                         generate_copy_constraints(bp, assignment, params, component_start_row);
 
                         return result_type(component_start_row);
@@ -226,7 +234,7 @@ namespace nil {
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
+                                                            const std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         typename BlueprintFieldType::value_type value =

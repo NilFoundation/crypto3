@@ -45,12 +45,14 @@ namespace nil {
                 struct binding {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    template<typename DataType>
+                    template<typename VarType,
+                        std::size_t BatchSize>
                     struct fr_data {
-
+                        std::vector<VarType> scalars;
+                        std::array<VarType, BatchSize> cip;
                     };
 
-                    template<typename DataType>
+                    template<typename VarType>
                     struct fq_data {
 
                     };

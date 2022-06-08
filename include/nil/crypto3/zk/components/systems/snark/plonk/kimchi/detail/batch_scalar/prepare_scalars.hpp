@@ -40,6 +40,10 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // prepare scalars for scalar multiplication input
+                // x -> (x - 2^255 - 1) / 2
+                // Input: [x_0, ..., x_InputSize]
+                // Output: [f(x_0), ..., f(x_InputSize)], where f(X): X -> (X - 2^255 - 1) / 2
                 template<typename ArithmetizationType, std::size_t InputSize, 
                     std::size_t... WireIndexes>
                 class prepare_scalars;

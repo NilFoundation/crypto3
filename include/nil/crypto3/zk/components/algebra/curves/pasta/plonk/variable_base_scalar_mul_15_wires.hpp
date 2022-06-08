@@ -43,6 +43,9 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Using results from https://arxiv.org/pdf/math/0208038.pdf
+                // Input: x \in F_p, P \in E(F_p)
+                // Output: y * P, where x = (y - 2^255 - 1) / 2
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class curve_element_variable_base_scalar_mul;
 

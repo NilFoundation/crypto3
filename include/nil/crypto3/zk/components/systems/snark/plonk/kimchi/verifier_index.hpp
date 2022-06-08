@@ -46,7 +46,6 @@ namespace nil {
 
                 template<typename CurveType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
-                    using Fr = typename CurveType::scalar_field_type::value_type;
                     using FieldType = typename CurveType::scalar_field_type;
                     using var = snark::plonk_variable<FieldType>;
 
@@ -60,7 +59,7 @@ namespace nil {
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;
-                    std::array<Fr, Permuts> shift;
+                    std::array<typename FieldType::value_type, Permuts> shift;
 
                     var omega;
                     std::map<argument_type, std::pair<int, int>> alpha_map;
@@ -68,38 +67,17 @@ namespace nil {
                     std::array<constraint_description, constraints_amount> constraints;
                 };
 
-                /*struct kimchi_verifier_index_base {
-                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
-                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
-                    using curve_t = CurveType;
-                    using Fr = typename CurveType::scalar_field_type;
-                    using Fq = typename CurveType::base_field_type;
+                template<typename CurveType,
+                    typename KimchiCommitmentParamsType>
+                struct kimchi_verifier_index_base {
+                    using FieldType = typename CurveType::base_field_type;
 
-                    nil::crypto3::math::evaluation_domain<Fr> domain;
-                    size_t max_poly_size;
-                    size_t max_quot_size;
-                    srs_t<CurveType> srs;
-                    std::array<commitment_type, Permuts> sigma_comm;
-                    std::array<commitment_type, WiresAmount> coefficients_comm;
-                    commitment_type generic_comm;
-                    commitment_type psm_comm;
-                    commitment_type complete_add_comm;
-                    commitment_type mul_comm;
-                    commitment_type emul_comm;
-                    commitment_type endomul_scalar_comm;
-                    std::array<commitment_type, 4> chacha_comm;
-                    std::array<Fr, Permuts> shift;
+                    using var = snark::plonk_variable<FieldType>;
+                    using var_ec_point = typename zk::components::var_ec_point<FieldType>;
 
-                    // Polynomial in coefficients form
-                    nil::crypto3::math::polynomial<Fr> zkpm;
-                    Fr w;
-                    Fr endo;
-                    lookup_verifier_index<CurveType> lookup_index;
-                    linearization_t linearization;    // TODO: Linearization<Vec<PolishToken<Fr<G>>>>
-                    Alphas<Fr> powers_of_alpha;
-                    ArithmeticSpongeParams<Fr> fr_sponge_params;
-                    ArithmeticSpongeParams<Fq> fq_sponge_params;
-                };*/
+                    var_ec_point H;
+                    std::array<var_ec_point, KimchiCommitmentParamsType::srs_len> G;
+                };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3

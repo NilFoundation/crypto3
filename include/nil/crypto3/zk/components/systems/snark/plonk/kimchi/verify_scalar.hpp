@@ -39,7 +39,7 @@
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/prepare_batch_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_scalar_field.hpp>
@@ -51,6 +51,12 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // scalar field part of batch_verify
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L911
+                // Input: list of mina-proofs (scalar field part), 
+                //      precalculated fq_data and fr_data (the data that used both by scalar and base verifiers)
+                //      verifier index (public data)
+                // Output: -
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
                     typename KimchiCommitmentParamsType, std::size_t BatchSize, std::size_t... WireIndexes>
                 class verify_scalar;
@@ -111,11 +117,11 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        typename proof_binding::fr_data<var> fr_data;
+                        typename proof_binding::fr_data<var, BatchSize> fr_data;
                         typename proof_binding::fq_data<var> fq_data;
                         
                         verifier_index_type &verifier_index;
-                        std::array<kimchi_proof_scalar<CurveType, KimchiParamsType,
+                        std::array<kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                             KimchiCommitmentParamsType::eval_rounds>, BatchSize> &proof;
                         std::array<typename proof_binding::fq_sponge_output, BatchSize> &fq_output;
                     };
@@ -145,7 +151,7 @@ namespace nil {
                             bp, assignment, {batches}, row);
                         row += batch_verify_component::rows_amount;
 
-                        typename proof_binding::fr_data<var> fr_data_recalculated;
+                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
 
                         map_fr_component::generate_circuit(bp, assignment,
                             {params.fr_data, fr_data_recalculated}, row);
@@ -172,7 +178,7 @@ namespace nil {
                             assignment, {batches}, row);
                         row += batch_verify_component::rows_amount;
 
-                        typename proof_binding::fr_data<var> fr_data_recalculated;
+                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
 
                         map_fr_component::generate_assignments(assignment,
                             {params.fr_data, fr_data_recalculated}, row);

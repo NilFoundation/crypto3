@@ -42,6 +42,10 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // generic constraint scalars
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/polynomials/generic.rs#L242
+                // Input:
+                // Output: generic-gate-related scalar x for linearization
                 template<typename ArithmetizationType, typename KimchiParamsType,
                     std::size_t... WireIndexes>
                 class generic_scalars;

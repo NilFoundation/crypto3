@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
         alpha_powers[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
 
     typename component_type::params_type params = {verifier_index, 
         zeta_pow_n,

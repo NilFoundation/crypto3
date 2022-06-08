@@ -42,10 +42,14 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // r[0] = (zeta_pow_n - 1) * domain.size_inv * SUM(-l * p * w) 
-                    //where l from lagrange, p from public, w from omega_powers for l from 0 to PulicInputSize
-                // r[2] = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w) 
-                    //where l from lagrange, p from public, w from omega_powers for l from PulicInputSize to 2 * PulicInputSize
+                // evaluate negated public polynomials at evaluation points
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L245-L269
+                // Input: zeta^n, (zeta * omega)^n, lagrange_denominators, public_input, omega_powers
+                // Output: r = {r_0, r_1}
+                //         r_0 = (zeta_pow_n - 1) * domain.size_inv * SUM(-l * p * w) 
+                //              where l from lagrange_denominators, p from public_input, w from omega_powers for l from 0 to PulicInputSize
+                //         r_1 = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w) 
+                //              where l from lagrange_denominators, p from public_input, w from omega_powers for l from PulicInputSize to 2 * PulicInputSize
                 template<typename ArithmetizationType, std::size_t PublicInputSize, std::size_t... WireIndexes>
                 class public_evaluations;
 

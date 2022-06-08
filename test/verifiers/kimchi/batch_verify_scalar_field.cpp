@@ -46,7 +46,6 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
@@ -58,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_su
 template <typename CurveType, typename BlueprintFieldType, typename KimchiParamsType,
     std::size_t EvelRounds>
 void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
-    zk::components::kimchi_proof_scalar<CurveType, KimchiParamsType, EvelRounds> &circuit_proof,
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType, EvelRounds> &circuit_proof,
     std::vector<typename BlueprintFieldType::value_type> &public_input) {
         using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
@@ -88,6 +87,10 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
         public_input.push_back(original_proof.evals[point_idx].poseidon_selector);
         circuit_proof.proof_evals[point_idx].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
+
+    //ft_eval
+    public_input.push_back(algebra::random_element<BlueprintFieldType>());
+    circuit_proof.ft_eval = var(0, public_input.size() - 1, false, var::column_type::public_input);
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_suite) {
@@ -151,7 +154,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     typename BlueprintFieldType::value_type alpha = 0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type fq_digest = 0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
 
-    zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
     std::array<var, eval_rounds> challenges;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {};

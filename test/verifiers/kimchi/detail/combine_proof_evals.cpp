@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_combine_proof_evals_test_suite)
 template <typename CurveType, typename BlueprintFieldType, typename KimchiParamsType,
     std::size_t EvelRounds>
 void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
-    zk::components::kimchi_proof_scalar<CurveType, KimchiParamsType, EvelRounds> &circuit_proof,
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType, EvelRounds> &circuit_proof,
     std::vector<typename BlueprintFieldType::value_type> &public_input) {
         using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
     var one(0, 1, false, var::column_type::public_input);
     var zero(0, 2, false, var::column_type::public_input);
 
-    zk::components::kimchi_proof_scalar<curve_type, kimchi_params, eval_rounds> proof;
+    zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
 
     prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(
         kimchi_proof, proof, public_input

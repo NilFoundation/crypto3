@@ -44,6 +44,10 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // Proof evals are element of the finite field, so combine works just as scalar multiplication
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/proof.rs#L105
+                // Input: x, proof_evaluations (see kimchi_proof_evaluations): {w_0, ... w_14, z, ..., poseidon_selector}
+                // Output: proof_evaluations: {x * w_0, ... x * w_14, x * z, ..., x * poseidon_selector}
                 template<typename ArithmetizationType,
                     typename KimchiParamsType,
                     std::size_t... WireIndexes>

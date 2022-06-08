@@ -37,7 +37,6 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/random.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/batch_proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/prepare_scalars.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly.hpp>
@@ -50,6 +49,11 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // batched polynomial commitment verification (scalar field)
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L610
+                // Input: list of batch evaluation proofs
+                //      https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L881-L888
+                // Output: list of scalars for MSM in batch verify base
                 template<typename ArithmetizationType, 
                          typename CurveType,
                          typename KimchiParamsType,
@@ -114,8 +118,10 @@ namespace nil {
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using endo_scalar_component =
-                        zk::components::endo_scalar<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
-                                                    W9, W10, W11, W12, W13, W14>;
+                        zk::components::endo_scalar<ArithmetizationType, CurveType, 
+                            KimchiParamsType::scalar_challenge_size, 
+                                W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                                W9, W10, W11, W12, W13, W14>;
 
                     using b_poly_component = zk::components::b_poly<ArithmetizationType, 
                         KimchiCommitmentParamsType::eval_rounds, W0, W1, W2, W3, W4, W5,
@@ -165,10 +171,6 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        typename BlueprintFieldType::value_type endo_factor =
-                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
-                        std::size_t endo_num_bits = 128;
-
                         var zero = var(0, start_row_index, false, var::column_type::constant);
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
@@ -191,8 +193,7 @@ namespace nil {
                             for (std::size_t j = 0; j < eval_rounds; j++) {
                                 challenges[0][j] = endo_scalar_component::generate_circuit(
                                     bp, assignment, 
-                                    {params.batches[batch_id].fq_output.challenges[j],
-                                    endo_factor, endo_num_bits},
+                                    {params.batches[batch_id].fq_output.challenges[j]},
                                     row).output;
                                 row += endo_scalar_component::rows_amount;
 
@@ -203,8 +204,7 @@ namespace nil {
 
                             var c = endo_scalar_component::generate_circuit(
                                     bp, assignment, 
-                                    {params.batches[batch_id].fq_output.c,
-                                    endo_factor, endo_num_bits},
+                                    {params.batches[batch_id].fq_output.c},
                                     row).output;
                             row += endo_scalar_component::rows_amount;
 
@@ -281,8 +281,7 @@ namespace nil {
                             for (std::size_t j = 0; j < eval_rounds; j++) {
                                 challenges[0][j] = endo_scalar_component::generate_assignments(
                                     assignment, 
-                                    {params.batches[batch_id].fq_output.challenges[j],
-                                    endo_factor, endo_num_bits},
+                                    {params.batches[batch_id].fq_output.challenges[j]},
                                     row).output;
                                 row += endo_scalar_component::rows_amount;
 
@@ -293,8 +292,7 @@ namespace nil {
 
                             var c = endo_scalar_component::generate_assignments(
                                     assignment, 
-                                    {params.batches[batch_id].fq_output.c,
-                                    endo_factor, endo_num_bits},
+                                    {params.batches[batch_id].fq_output.c},
                                     row).output;
                             row += endo_scalar_component::rows_amount;
 

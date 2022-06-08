@@ -22,8 +22,10 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_BATCH_SCALAR_RANDOM_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_BATCH_SCALAR_RANDOM_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ORACLES_CIP_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ORACLES_CIP_HPP
+
+#include <nil/marshalling/algorithms/pack.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
@@ -31,8 +33,10 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 
-#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/combined_inner_product.hpp>
+
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
@@ -40,15 +44,19 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // pseudo-random element generation
-                // Input:
+                // combined inner product from oracles data
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L386-L441
+                // Input:  
                 // Output: 
-                template<typename ArithmetizationType, std::size_t EvalRounds, 
+                template<typename ArithmetizationType, typename KimchiCommitmentParamsType,
+                    typename KimchiParamsType,
                     std::size_t... WireIndexes>
-                class random;
+                class oracles_cip;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
+                         typename KimchiCommitmentParamsType,
+                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -64,8 +72,10 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class random<
+                class oracles_cip<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    KimchiCommitmentParamsType,
+                    KimchiParamsType,
                     W0,
                     W1,
                     W2,
@@ -87,24 +97,39 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-                    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
+                    constexpr static const std::size_t cip_size = 1;
+                    constexpr static const std::size_t eval_points_amount = 2;
 
-                    constexpr static const std::size_t selector_seed = 0x0f29;
+                    using component_type = zk::components::combined_inner_product<ArithmetizationType, cip_size, 
+                                                        W0, W1, W2, W3,
+                                                        W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
+
+                    constexpr static const std::size_t selector_seed = 0xf2e;
 
                 public:
                     constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        var one;
+                        var ft_eval0;
+                        var ft_eval1;
+                        std::array<std::array<var, KimchiCommitmentParamsType::res_size>, 
+                            eval_points_amount> polys;
+                        std::array<var, eval_points_amount> p_eval;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            eval_points_amount> evals;
                     };
 
                     struct result_type {
                         var output;
 
                         result_type(std::size_t start_row_index) {
-                            output = typename mul_component::result_type(start_row_index).output;
+                            
+                        }
+
+                        result_type(const params_type &params,
+                            std::size_t start_row_index) {
+                            output = params.ft_eval0;
                         }
                     };
 
@@ -115,12 +140,8 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.one, params.one}, row);
-                        row += mul_component::rows_amount;
-
                         generate_copy_constraints(bp, assignment, params, start_row_index);
-                        return result_type(start_row_index);
+                        return result_type(params, start_row_index);
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -129,11 +150,7 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        mul_component::generate_assignments(assignment,
-                                {params.one, params.one}, row);
-                        row += mul_component::rows_amount;
-
-                        return result_type(start_row_index);
+                        return result_type(params, start_row_index);
                     }
 
                 private:
@@ -155,4 +172,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_BATCH_SCALAR_RANDOM_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ORACLES_CIP_HPP

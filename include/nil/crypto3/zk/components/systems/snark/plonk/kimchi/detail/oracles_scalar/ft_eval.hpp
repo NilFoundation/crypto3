@@ -42,6 +42,10 @@ namespace nil {
         namespace zk {
             namespace components {
 
+                // ft polynomial at zeta
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L320-L384
+                // Input:
+                // Output: ft(zeta)
                 template<typename ArithmetizationType,
                     typename CurveType,
                     typename KimchiParamsType,

@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 //
 // MIT License
@@ -24,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_BATCH_PROOF_SCALAR_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_BATCH_PROOF_SCALAR_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMMITMENT_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMMITMENT_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -34,41 +33,28 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationType,
-                         typename KimchiParamsType,
-                         typename KimchiCommitmentParamsType>
-                struct batch_evaluation_proof_scalar {
-                    using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                template<typename BlueprintFieldType>
+                struct kimchi_commimtment_type {
+                            using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+                            var_ec_point unshifted;
+                };
 
-                    // pub sponge: EFqSponge,
-                    // pub evaluations: Vec<Evaluation<G>>,
-                    // /// vector of evaluation points
-                    // pub evaluation_points: Vec<ScalarField<G>>,
-                    // /// scaling factor for evaluation point powers
-                    // pub xi: ScalarField<G>,
-                    // /// scaling factor for polynomials
-                    // pub r: ScalarField<G>,
-                    // /// batched opening proof
-                    // pub opening: &'a OpeningProof<G>,
-                    var cip;
-                    typename proof_binding::fq_sponge_output fq_output;
-                    std::array<var, KimchiParamsType::eval_points_amount> eval_points;
-                    var r;
-                    var xi;
+                template<typename BlueprintFieldType, std::size_t SplitSize>
+                struct kimchi_shifted_commitment_type {
+                            using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+                            var_ec_point shifted;
+                            std::array<var_ec_point, SplitSize> unshifted;
                 };
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_BATCH_PROOF_SCALAR_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMMITMENT_HPP
