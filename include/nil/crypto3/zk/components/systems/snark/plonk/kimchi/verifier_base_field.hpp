@@ -53,7 +53,7 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType,
                 typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
                 std::size_t f_comm_size,
-                std::size_t size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
+                std::size_t size, std::size_t max_unshifted_size, std::size_t proof_len,
                          std::size_t... WireIndexes>
                 class base_field;
 
@@ -67,7 +67,6 @@ namespace nil {
                          std::size_t size,
                          std::size_t max_unshifted_size,
                          std::size_t proof_len,
-                         std::size_t lagrange_bases_size,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -92,7 +91,6 @@ namespace nil {
                                                         size,
                                                         max_unshifted_size,
                                                         proof_len,
-                                                        lagrange_bases_size,
                                                        W0,
                                                        W1,
                                                        W2,
@@ -121,8 +119,9 @@ namespace nil {
 
                     using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, size,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    using lagrange_msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, lagrange_bases_size,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
+                    using lagrange_msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, 
+                        KimchiParamsType::public_input_size,
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
 
                     using scalar_mul_component =
                         zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType, W0, W1,
