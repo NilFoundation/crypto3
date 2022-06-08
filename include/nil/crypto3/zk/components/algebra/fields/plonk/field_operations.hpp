@@ -446,21 +446,6 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0x0fc5;
 
-                    template<typename ComponentType, typename ArithmetizationType>
-                    friend typename std::enable_if<
-                        (!(has_static_member_function_generate_circuit<
-                            ComponentType,
-                            typename ComponentType::result_type,
-                            boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                               blueprint_public_assignment_table<ArithmetizationType> &,
-                                               const typename ComponentType::params_type &,
-                                               const std::size_t>>::value)),
-                        typename ComponentType::result_type>::type
-                        generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                         const typename ComponentType::params_type &params,
-                                         const std::size_t start_row_index);
-
                 public:
                     constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 1;
@@ -482,6 +467,31 @@ namespace nil {
                         }
                     };
 
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         std::size_t start_row_index) {
+
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
+
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
+                            generate_gates(bp, assignment, params, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
+                        }
+
+                        assignment.enable_selector(first_selector_index, start_row_index);
+
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
+
+                        return result_type(params, start_row_index);
+                    }
+
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type params,
                                                             const std::size_t start_row_index) {
@@ -490,7 +500,6 @@ namespace nil {
 
                         assignment.witness(W0)[j] = assignment.var_value(params.x);
                         assignment.witness(W1)[j] = params.constant * assignment.witness(W0)[j];
-                        assignment.constant(0)[j] = params.constant;
 
                         return result_type(params, start_row_index);
                     }
@@ -512,6 +521,15 @@ namespace nil {
                                                   const std::size_t start_row_index) {
                         var component_x = var(W0, static_cast<int>(start_row_index), false);
                         bp.add_copy_constraint({component_x, params.x});
+                    }
+
+                    static void
+                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
+                            std::size_t row = component_start_row;
+                            assignment.constant(0)[row] = params.constant;  
                     }
                 };
             }    // namespace components
