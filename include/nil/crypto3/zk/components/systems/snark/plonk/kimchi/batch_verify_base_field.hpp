@@ -49,7 +49,7 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType,
                     typename KimchiParamsType, typename KimchiCommitmentParamsType,
                     std::size_t BatchSize,
-                    std::size_t n, std::size_t bases_size,
+                    std::size_t bases_size,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
 
@@ -59,7 +59,6 @@ namespace nil {
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
-                         std::size_t n,
                          std::size_t bases_size,
                          std::size_t W0,
                          std::size_t W1,
@@ -81,7 +80,6 @@ namespace nil {
                                         KimchiParamsType,
                                         KimchiCommitmentParamsType,
                                         BatchSize,
-                                        n,
                                         bases_size,
                                         W0,
                                         W1,
@@ -161,8 +159,8 @@ namespace nil {
                         assignment.constant(0)[row + 2] = (one << 255);
                         std::vector<var_ec_point> bases;
                         bases.push_back(params.verifier_index.H);
-                        for(std::size_t i = 1; i < n + 1; i ++){
-                            bases.push_back(params.verifier_index.G[i - 1]);
+                        for(std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i++) {
+                            bases.push_back(params.verifier_index.G[i]);
                         }
                         /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
                             bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
@@ -227,8 +225,8 @@ namespace nil {
                         //assignment.constant(0)[row + 1] = zero.Y;
                         std::vector<var_ec_point> bases;
                         bases.push_back(params.verifier_index.H);
-                        for(std::size_t i = 1; i < n + 1; i ++){
-                            bases.push_back(params.verifier_index.G[i - 1]);
+                        for(std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i ++) {
+                            bases.push_back(params.verifier_index.G[i]);
                         }
                         // for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
                         //     bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});

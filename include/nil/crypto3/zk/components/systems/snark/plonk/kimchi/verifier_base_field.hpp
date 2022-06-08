@@ -52,7 +52,7 @@ namespace nil {
                 // Output: - 
                 template<typename ArithmetizationType, typename CurveType,
                 typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
-                std::size_t n, std::size_t size, std::size_t bases_size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
+                std::size_t size, std::size_t bases_size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
                          std::size_t... WireIndexes>
                 class base_field;
 
@@ -62,7 +62,6 @@ namespace nil {
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
-                         std::size_t n,
                          std::size_t size,
                          std::size_t bases_size,
                          std::size_t max_unshifted_size,
@@ -88,7 +87,6 @@ namespace nil {
                                                        KimchiParamsType,
                                                        KimchiCommitmentParamsType,
                                                        BatchSize,
-                                                       n,
                                                         size,
                                                         bases_size,
                                                         max_unshifted_size,
@@ -134,7 +132,7 @@ namespace nil {
                                                                        W4, W5, W6, W7, W8, W9, W10>;
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
-                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, n, bases_size, W0, W1,
+                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, bases_size, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
 

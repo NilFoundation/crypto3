@@ -68,13 +68,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     constexpr static const std::size_t batch_size = 1;
     constexpr static const std::size_t eval_rounds = 1;
-    constexpr static const std::size_t n = 1;
     constexpr static const std::size_t comm_size = 1;
     //constexpr static const std::size_t n_2 = ceil(log2(n));
     //constexpr static const std::size_t padding = (1 << n_2) - n;
     constexpr static const std::size_t f_comm_size = 2;
     //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1)* batch_size;
-    constexpr static const std::size_t bases_size = n + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1)* batch_size;
 
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
@@ -87,6 +85,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     constexpr static std::size_t srs_len = 1;
 
+    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1)* batch_size;
+
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
         alpha_powers_n, public_input_size>;
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
         srs_len>;
 
     using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, 
-                                            kimchi_params, commitment_params, batch_size, n, bases_size,
+                                            kimchi_params, commitment_params, batch_size, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using opening_proof_type = typename 

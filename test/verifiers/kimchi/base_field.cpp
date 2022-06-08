@@ -67,7 +67,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
     constexpr std::size_t Lambda = 40;
-    constexpr static const std::size_t n = 1;
     constexpr static const std::size_t batch_size = 1;
     constexpr static const std::size_t lr_rounds = 1;
     constexpr static const std::size_t lagrange_bases_size = 1;
@@ -77,7 +76,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     //constexpr static const std::size_t padding = (1 << n_2) - n;
     constexpr static const std::size_t shifted_commitment_type_size = 2;
     //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
-    constexpr static const std::size_t bases_size = n + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
+    
     constexpr static const std::size_t max_unshifted_size = 1;
     constexpr static const std::size_t proof_len = 1;
 
@@ -91,7 +90,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr static std::size_t lookup_table_size = 1;
     constexpr static bool use_lookup = false;
 
-    constexpr static std::size_t srs_len = 10;
+    constexpr static std::size_t srs_len = 1;
+
+    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
 
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
@@ -101,11 +102,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     using component_type = zk::components::base_field<ArithmetizationType, curve_type, 
         kimchi_params, commitment_params, batch_size,
-        n, size, bases_size,max_unshifted_size, proof_len,lagrange_bases_size,
+        size, bases_size,max_unshifted_size, proof_len,lagrange_bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using batch_verify_component = zk::components::batch_verify_base_field<ArithmetizationType, curve_type,
-                                        kimchi_params, commitment_params, batch_size, n, bases_size,
+                                        kimchi_params, commitment_params, batch_size, bases_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     using batch_params = typename batch_verify_component::params_type;
     using shifted_commitment_type = typename 
