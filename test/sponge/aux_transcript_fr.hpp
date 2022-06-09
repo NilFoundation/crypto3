@@ -91,6 +91,12 @@ namespace nil {
 
                     constexpr static const std::size_t index_terms = 0;
 
+                    constexpr static const std::size_t eval_rounds = 1;
+                    constexpr static const std::size_t max_poly_size = 1;
+                    constexpr static const std::size_t srs_len = 1;
+
+                    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
+                            srs_len>;
                     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
                         use_lookup, lookup_table_size,
                         alpha_powers_n, public_input_size, index_terms>;

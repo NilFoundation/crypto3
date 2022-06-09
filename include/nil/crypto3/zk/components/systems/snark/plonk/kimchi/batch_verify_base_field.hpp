@@ -49,7 +49,6 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType,
                     typename KimchiParamsType, typename KimchiCommitmentParamsType,
                     std::size_t BatchSize,
-                    std::size_t MsmSize,
                          std::size_t... WireIndexes>
                 class batch_verify_base_field;
 
@@ -59,7 +58,6 @@ namespace nil {
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
-                         std::size_t MsmSize,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -80,7 +78,6 @@ namespace nil {
                                         KimchiParamsType,
                                         KimchiCommitmentParamsType,
                                         BatchSize,
-                                        MsmSize,
                                         W0,
                                         W1,
                                         W2,
@@ -104,7 +101,9 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
-                    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, MsmSize,
+                    constexpr static const std::size_t final_msm_size = KimchiParamsType::final_msm_size(BatchSize);
+
+                    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, final_msm_size,
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
 
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
@@ -150,24 +149,16 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        //std::size_t n_2 = ceil(log2(n));
-                        //std::size_t padding = (1 << n_2) - n;
                         typename BlueprintFieldType::integral_type one = 1;
-                        //typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type::zero();
-                        //assignment.constant(0)[row] = zero.X;
-                        //assignment.constant(0)[row + 1] = zero.Y;
-                        assignment.constant(0)[row + 2] = (one << 255);
+                        var two_pow_255(0, row, false, var::column_type::constant);
                         std::vector<var_ec_point> bases;
                         bases.push_back(params.verifier_index.H);
                         for(std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i++) {
                             bases.push_back(params.verifier_index.G[i]);
                         }
-                        /*for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
-                            bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
-                        }*/
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
                             var cip = params.fr_output.cip[i];
-                            typename sub_component::params_type sub_params = {cip, var(0, component_start_row + 2, false, var::column_type::constant)};
+                            typename sub_component::params_type sub_params = {cip, two_pow_255};
                             auto sub_res = sub_component::generate_assignments(assignment, sub_params, row);
                             row = row + sub_component::rows_amount;
 
@@ -208,32 +199,19 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index){
 
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
+                        generate_assignments_constant(bp, assignment,
+                            params, start_row_index);
+
                         std::size_t row = start_row_index;
-                        //std::size_t n_2 = ceil(log2(n));
-                        //std::size_t padding = (1 << n_2) - n;
-                        typename BlueprintFieldType::integral_type one = 1;
-                        //typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type::zero();
-                        //assignment.constant(0)[row] = zero.X;
-                        //assignment.constant(0)[row + 1] = zero.Y;
+                        var two_pow_255(0, row, false, var::column_type::constant);
                         std::vector<var_ec_point> bases;
                         bases.push_back(params.verifier_index.H);
                         for(std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i ++) {
                             bases.push_back(params.verifier_index.G[i]);
                         }
-                        // for (std::size_t i = n + 1; i < n + 1 + padding; i++) {
-                        //     bases.push_back({var(0, component_start_row + 1, false, var::column_type::constant), var(0, component_start_row + 1, false, var::column_type::constant)});
-                        // }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
                             var cip = params.fr_output.cip[i];
-                            typename sub_component::params_type sub_params = {cip, var(0, row + 2, false, var::column_type::constant)};
+                            typename sub_component::params_type sub_params = {cip, two_pow_255};
                             zk::components::generate_circuit<sub_component>(bp, assignment, sub_params,
                                                                         row);
                             typename sub_component::result_type sub_res(sub_params, row);
@@ -285,6 +263,16 @@ namespace nil {
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
+                    }
+
+                    static void
+                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
+                            std::size_t row = component_start_row;
+                            typename BlueprintFieldType::integral_type tmp = 1;
+                            assignment.constant(0)[row] = (tmp << 255);
                     }
                 };
 

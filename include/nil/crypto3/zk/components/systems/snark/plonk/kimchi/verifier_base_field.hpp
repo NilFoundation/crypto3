@@ -144,18 +144,9 @@ namespace nil {
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
                         KimchiCommitmentParamsType>;
 
-                    constexpr static const std::size_t bases_size = KimchiCommitmentParamsType::srs_len // G
-                            + 1 // H
-                            + (1
-                                + 1
-                                + 2 * KimchiCommitmentParamsType::eval_rounds
-                                + KimchiParamsType::evaluations_in_batch_size
-                                + 1)
-                            * BatchSize;
-
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
-                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, bases_size, W0, W1,
+                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
 

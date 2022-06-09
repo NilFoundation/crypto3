@@ -38,7 +38,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template<std::size_t WitnessColumns, std::size_t PermutSize,
+                template<typename CommitmentParamsType, 
+                    std::size_t WitnessColumns, std::size_t PermutSize,
                     bool UseLookup, std::size_t LookupTableSize,
                     std::size_t AlphaPowersN, std::size_t PublicInputSize,
                     std::size_t IndexTermSize>
@@ -60,6 +61,17 @@ namespace nil {
                         + 5 // generic gate
                         + IndexTermSize;
                     constexpr static std::size_t evaluations_in_batch_size = 1;
+
+                    constexpr static std::size_t final_msm_size(const std::size_t batch_size) {
+                        return CommitmentParamsType::srs_len 
+                            + 1  // H
+                            + (1
+                                + 1
+                                + 2 * CommitmentParamsType::eval_rounds
+                                + evaluations_in_batch_size
+                                + 1) 
+                            * batch_size;
+                    }
                 };
 
                 template <std::size_t EvalRounds,
