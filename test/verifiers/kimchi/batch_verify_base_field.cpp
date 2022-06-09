@@ -68,13 +68,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     constexpr static const std::size_t batch_size = 1;
     constexpr static const std::size_t eval_rounds = 1;
-    constexpr static const std::size_t n = 1;
     constexpr static const std::size_t comm_size = 1;
     //constexpr static const std::size_t n_2 = ceil(log2(n));
     //constexpr static const std::size_t padding = (1 << n_2) - n;
     constexpr static const std::size_t f_comm_size = 2;
-    //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1)* batch_size;
-    constexpr static const std::size_t bases_size = n + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1)* batch_size;
 
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
@@ -86,15 +83,19 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 1;
+    constexpr static const std::size_t index_terms = 0;
 
-    using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
-        use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
+    using kimchi_params = zk::components::kimchi_params_type<commitment_params,
+        witness_columns, perm_size,
+        use_lookup, lookup_table_size,
+        alpha_powers_n, public_input_size, index_terms>;
+
+    constexpr static const std::size_t bases_size = kimchi_params::final_msm_size(batch_size);
 
     using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, 
-                                            kimchi_params, commitment_params, batch_size, n, bases_size,
+                                            kimchi_params, commitment_params, batch_size,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using opening_proof_type = typename 
@@ -209,12 +210,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
     //zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     //                    11, 12, 13, 14> transcript;
-    typename component_type::params_type::var_proof proof_var = {/*transcript,*/ {{comm_var}}, o_var}; 
-    typename component_type::params_type::result input = {{proof_var}, {H_var, {PI_G_var}}};
 
     typename binding::fr_data<var, batch_size> fr_data = {scalars_var, {cip_var}};
 
-    typename component_type::params_type params = {input, fr_data};
+    typename component_type::params_type params = {{ {{comm_var}, o_var}}, {H_var, {PI_G_var}}, fr_data};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {

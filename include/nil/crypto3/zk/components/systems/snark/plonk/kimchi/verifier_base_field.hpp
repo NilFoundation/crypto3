@@ -52,7 +52,6 @@ namespace nil {
                 // Output: - 
                 template<typename ArithmetizationType, typename CurveType,
                 typename KimchiParamsType, typename KimchiCommitmentParamsType, std::size_t BatchSize,
-                std::size_t n, std::size_t size, std::size_t bases_size, std::size_t max_unshifted_size, std::size_t proof_len, std::size_t lagrange_bases_size,
                          std::size_t... WireIndexes>
                 class base_field;
 
@@ -62,12 +61,6 @@ namespace nil {
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType,
                          std::size_t BatchSize,
-                         std::size_t n,
-                         std::size_t size,
-                         std::size_t bases_size,
-                         std::size_t max_unshifted_size,
-                         std::size_t proof_len,
-                         std::size_t lagrange_bases_size,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -88,12 +81,6 @@ namespace nil {
                                                        KimchiParamsType,
                                                        KimchiCommitmentParamsType,
                                                        BatchSize,
-                                                       n,
-                                                        size,
-                                                        bases_size,
-                                                        max_unshifted_size,
-                                                        proof_len,
-                                                        lagrange_bases_size,
                                                        W0,
                                                        W1,
                                                        W2,
@@ -120,10 +107,12 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using const_mul_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
 
-                    using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, size,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    using lagrange_msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, lagrange_bases_size,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
+                    using msm_component = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, CurveType, 
+                        KimchiParamsType::f_comm_base_size,
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using lagrange_msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, 
+                        KimchiParamsType::public_input_size,
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
 
                     using scalar_mul_component =
                         zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType, W0, W1,
@@ -132,11 +121,6 @@ namespace nil {
                     using add_component =
                         zk::components::curve_element_unified_addition<ArithmetizationType, CurveType, W0, W1, W2, W3,
                                                                        W4, W5, W6, W7, W8, W9, W10>;
-                    using batch_verify_component =
-                        zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
-                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, n, bases_size, W0, W1,
-                                                                               W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
-                                                                               W12, W13, W14>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiCommitmentParamsType>;
@@ -160,11 +144,21 @@ namespace nil {
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
                         KimchiCommitmentParamsType>;
 
+                    using batch_verify_component =
+                        zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
+                                            KimchiParamsType, KimchiCommitmentParamsType, BatchSize, W0, W1,
+                                                                               W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
+                                                                               W12, W13, W14>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
-                    constexpr static const std::size_t rows_amount = (1 + (2 + 2*max_unshifted_size) * (scalar_mul_component::rows_amount + add_component::rows_amount) 
-                    + (max_unshifted_size + 1)*msm_component::rows_amount + lagrange_msm_component::rows_amount + 2 * const_mul_component::rows_amount + batch_verify_component::rows_amount) * proof_len;
+                    constexpr static const std::size_t rows_amount = (1 + (2 + 2*KimchiCommitmentParamsType::shifted_commitment_split) * (scalar_mul_component::rows_amount + add_component::rows_amount) 
+                        + (KimchiCommitmentParamsType::shifted_commitment_split + 1) * msm_component::rows_amount + 
+                        lagrange_msm_component::rows_amount + 2 * const_mul_component::rows_amount 
+                        ) * BatchSize
+                        + batch_verify_component::rows_amount
+                        + map_fq_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -220,7 +214,7 @@ namespace nil {
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         std::size_t p_size = params.input.proofs.size();
-                        std::vector<typename batch_verify_component::params_type::var_proof> batch_proofs;
+                        std::vector<batch_proof_type> batch_proofs;
                         for(std::size_t i = 0; i < p_size; i++) {
                             auto p_comm_unshifted = lagrange_msm_component::generate_assignments(assignment, {params.input.PI.neg_pub, params.input.PI.lagrange_bases}, row);
                             row = row + lagrange_msm_component::rows_amount;
@@ -262,7 +256,7 @@ namespace nil {
                             //get digest from transcript
                             std::vector<var_ec_point> shifted_commitments;
                             std::size_t max_size = 0;
-                            std::vector<std::vector<var_ec_point>> unshifted_commitments(size);
+                            std::vector<std::vector<var_ec_point>> unshifted_commitments(KimchiParamsType::f_comm_base_size);
 
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.witness_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].unshifted.size(); k++) {
@@ -341,7 +335,7 @@ namespace nil {
                             for(std::size_t j = 0; j < max_size; j ++) {
                                 std::vector<var_ec_point> part_unshifted_commitments;
                                 std::vector<var> part_scalars;
-                                for (std::size_t k = 0; k < size; k++) {
+                                for (std::size_t k = 0; k < KimchiParamsType::f_comm_base_size; k++) {
                                     if (k < unshifted_commitments[j].size()){ 
                                         part_unshifted_commitments.push_back(unshifted_commitments[j][k]);
                                         part_scalars.push_back(params.input.proofs[i].scalars[k]);
@@ -425,11 +419,11 @@ namespace nil {
                             evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
                             evaluations.push_back(params.input.proofs[i].comm.table_comm);
                             evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ {evaluations},
+                            batch_proof_type p = {/*params.input.proofs[i].transcript,*/ {evaluations},
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index}, params.fr_data};
+                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index, params.fr_data};
                         batch_verify_component::generate_assignments(assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 
@@ -456,7 +450,7 @@ namespace nil {
                         }
                         std::size_t row = start_row_index;
                         std::size_t p_size = params.input.proofs.size();
-                        std::vector<typename batch_verify_component::params_type::var_proof> batch_proofs;
+                        std::vector<batch_proof_type> batch_proofs;
                         for(std::size_t i = 0; i < p_size; i++) {
                             auto p_comm_unshifted = lagrange_msm_component::generate_circuit(bp, assignment, {params.input.PI.neg_pub, params.input.PI.lagrange_bases}, row);
                             row = row + lagrange_msm_component::rows_amount;
@@ -498,7 +492,7 @@ namespace nil {
                             //get digest from transcript
                             std::vector<var_ec_point> shifted_commitments;
                             std::size_t max_size = 0;
-                            std::vector<std::vector<var_ec_point>> unshifted_commitments(size);
+                            std::vector<std::vector<var_ec_point>> unshifted_commitments(KimchiParamsType::f_comm_base_size);
 
                             for(std::size_t j = 0; j < params.input.proofs[i].comm.witness_comm.size(); j ++) {
                                 for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].unshifted.size(); k++) {
@@ -574,7 +568,7 @@ namespace nil {
                             for(std::size_t j = 0; j < max_size; j ++) {
                                 std::vector<var_ec_point> part_unshifted_commitments;
                                 std::vector<var> part_scalars;
-                                for (std::size_t k = 0; k < size; k++) {
+                                for (std::size_t k = 0; k < KimchiParamsType::f_comm_base_size; k++) {
                                     if (k < unshifted_commitments[j].size()){
                                         part_unshifted_commitments.push_back(unshifted_commitments[j][k]);
                                         part_scalars.push_back(params.input.proofs[i].scalars[k]);
@@ -668,11 +662,11 @@ namespace nil {
                             evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
                             evaluations.push_back(params.input.proofs[i].comm.table_comm);
                             evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            typename batch_verify_component::params_type::var_proof p = {/*params.input.proofs[i].transcript,*/ {evaluations},
+                            batch_proof_type p = {/*params.input.proofs[i].transcript,*/ {evaluations},
                              params.input.proofs[i].o};
                             batch_proofs.push_back(p);
                         }
-                        typename batch_verify_component::params_type batch_params = {{batch_proofs, params.input.verifier_index}, params.fr_data};
+                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index, params.fr_data};
                         batch_verify_component::generate_circuit(bp, assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 

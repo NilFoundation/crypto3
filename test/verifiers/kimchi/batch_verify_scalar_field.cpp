@@ -122,12 +122,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     constexpr static bool use_lookup = false;
 
     constexpr std::size_t srs_len = 5;
+    constexpr static const std::size_t index_terms = 0;
 
-    using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
-        use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
+    using kimchi_params = zk::components::kimchi_params_type<commitment_params,
+        witness_columns, perm_size,
+        use_lookup, lookup_table_size,
+        alpha_powers_n, public_input_size, index_terms>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
