@@ -69,14 +69,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr std::size_t Lambda = 40;
     constexpr static const std::size_t batch_size = 1;
     constexpr static const std::size_t lr_rounds = 1;
-    constexpr static const std::size_t size = 8;
     constexpr static const std::size_t comm_size = 1;
     //constexpr static const std::size_t n_2 = ceil(log2(n));
     //constexpr static const std::size_t padding = (1 << n_2) - n;
-    constexpr static const std::size_t shifted_commitment_type_size = 2;
-    //constexpr static const std::size_t bases_size = n + padding + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
-    
-    constexpr static const std::size_t max_unshifted_size = 1;
 
     constexpr static std::size_t public_input_size = 1;
     constexpr static std::size_t alpha_powers_n = 5;
@@ -89,16 +84,16 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 1;
+    constexpr static const std::size_t index_terms = 2;
 
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size>;
+        alpha_powers_n, public_input_size, index_terms>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
 
     using component_type = zk::components::base_field<ArithmetizationType, curve_type, 
-        kimchi_params, commitment_params, batch_size, shifted_commitment_type_size,
-        size, max_unshifted_size,
+        kimchi_params, commitment_params, batch_size,
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using shifted_commitment_type = typename 
@@ -183,11 +178,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
 
-    std::array<curve_type::base_field_type::value_type, size> scalars;
+    std::array<curve_type::base_field_type::value_type, kimchi_params::f_comm_base_size> scalars;
 
-    std::vector<var> scalars_var(size);
+    std::vector<var> scalars_var(kimchi_params::f_comm_base_size);
 
-    for (std::size_t i = 0; i < size; i++) {
+    for (std::size_t i = 0; i < kimchi_params::f_comm_base_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();
         public_input.push_back(scalars[i]);
         scalars_var[i] = var(0, 74 + i, false, var::column_type::public_input);
@@ -230,7 +225,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     var_ec_point PI_G_var = {var(0, 72, false, var::column_type::public_input), var(0, 73, false, var::column_type::public_input)};
 
-    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*lr_rounds + shifted_commitment_type_size + 1)* batch_size;
+    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*lr_rounds + kimchi_params::evaluations_in_batch_size + 1)* batch_size;
     std::array<curve_type::base_field_type::value_type, bases_size> batch_scalars;
 
     std::vector<var> batch_scalars_var(bases_size);

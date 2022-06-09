@@ -113,9 +113,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
     constexpr static std::size_t lookup_table_size = 1;
     constexpr static bool use_lookup = false;
 
+    constexpr static const std::size_t index_terms = 0;
+
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size>;
+        alpha_powers_n, public_input_size, index_terms>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
 
     using component_type = zk::components::combine_proof_evals<ArithmetizationType, kimchi_params,

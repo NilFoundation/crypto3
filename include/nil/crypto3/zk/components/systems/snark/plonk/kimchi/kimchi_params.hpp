@@ -40,7 +40,8 @@ namespace nil {
             namespace components {
                 template<std::size_t WitnessColumns, std::size_t PermutSize,
                     bool UseLookup, std::size_t LookupTableSize,
-                    std::size_t AlphaPowersN, std::size_t PublicInputSize>
+                    std::size_t AlphaPowersN, std::size_t PublicInputSize,
+                    std::size_t IndexTermSize>
                 struct kimchi_params_type {
                     constexpr static std::size_t alpha_powers_n = AlphaPowersN;
                     constexpr static std::size_t public_input_size = PublicInputSize;
@@ -54,6 +55,11 @@ namespace nil {
 
                     constexpr static std::size_t eval_points_amount = 2;
                     constexpr static std::size_t scalar_challenge_size = 128;
+
+                    constexpr static std::size_t f_comm_base_size = 1 // permuation-argument
+                        + 5 // generic gate
+                        + IndexTermSize;
+                    constexpr static std::size_t evaluations_in_batch_size = 1;
                 };
 
                 template <std::size_t EvalRounds,

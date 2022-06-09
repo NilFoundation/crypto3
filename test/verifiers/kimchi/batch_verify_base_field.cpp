@@ -84,14 +84,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 1;
-
-    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*eval_rounds + f_comm_size + 1) * batch_size;
+    constexpr static const std::size_t index_terms = 0;
 
     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
         use_lookup, lookup_table_size,
         alpha_powers_n, public_input_size>;
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
+
+    constexpr static const std::size_t bases_size = srs_len + 1 + (1 + 1 + 2*eval_rounds + kimchi_params::f_comm_base_size + 1) * batch_size;
 
     using component_type = zk::components::batch_verify_base_field<ArithmetizationType, curve_type, 
                                             kimchi_params, commitment_params, batch_size, bases_size,

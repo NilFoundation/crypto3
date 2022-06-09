@@ -89,9 +89,11 @@ namespace nil {
                     constexpr static std::size_t lookup_table_size = 1;
                     constexpr static bool use_lookup = false;
 
+                    constexpr static const std::size_t index_terms = 0;
+
                     using kimchi_params = zk::components::kimchi_params_type<witness_columns, perm_size,
                         use_lookup, lookup_table_size,
-                        alpha_powers_n, public_input_size>;
+                        alpha_powers_n, public_input_size, index_terms>;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using transcript_type =
