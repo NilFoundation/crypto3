@@ -123,7 +123,7 @@ namespace nil {
                                                                        W4, W5, W6, W7, W8, W9, W10>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
 
                     using map_fq_component = zk::components::map_fq<ArithmetizationType, 
                         CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,

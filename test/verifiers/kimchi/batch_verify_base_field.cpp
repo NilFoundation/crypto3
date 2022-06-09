@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
                             commitment_params::shifted_commitment_split>;
     
     using binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, commitment_params>;
+                        BlueprintFieldType, kimchi_params>;
 
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     std::array<curve_type::base_field_type::value_type, bases_size> scalars;
 
-    std::vector<var> scalars_var(bases_size);
+    std::array<var, bases_size> scalars_var;
 
     for (std::size_t i = 0; i < bases_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();

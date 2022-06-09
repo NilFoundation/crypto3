@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     using binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, commitment_params>;
+                        BlueprintFieldType, kimchi_params>;
 
     //zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 

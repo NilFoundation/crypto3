@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
         public_input.push_back(cip);
         batches[i].cip = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-        typename zk::components::binding<ArithmetizationType, BlueprintFieldType, commitment_params>::fq_sponge_output fq_output;
+        typename zk::components::binding<ArithmetizationType, BlueprintFieldType, kimchi_params>::fq_sponge_output fq_output;
 
         std::array<var, eval_rounds> challenges;
         for (std::size_t j = 0; j < eval_rounds; j++) {

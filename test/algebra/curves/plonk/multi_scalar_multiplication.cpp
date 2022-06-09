@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multi_scalar_mul) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 2;
+    constexpr std::size_t SelectorColumns = 3;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multi_scalar_mul) {
         var scalar_var = {0, (std::int32_t)(3 * i), false, var::column_type::public_input};
         var T_X_var = {0, (std::int32_t)(3 * i + 1), false, var::column_type::public_input};
         var T_Y_var = {0, (std::int32_t)(3 * i + 2), false, var::column_type::public_input};
-        assignment_params.scalars.push_back(scalar_var);
-        assignment_params.bases.push_back({T_X_var, T_Y_var});
+        assignment_params.scalars[i] = scalar_var;
+        assignment_params.bases[i] = {T_X_var, T_Y_var};
         sum = sum + x * T;
     }
 

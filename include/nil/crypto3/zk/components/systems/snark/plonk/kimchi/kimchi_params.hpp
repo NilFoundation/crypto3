@@ -44,6 +44,8 @@ namespace nil {
                     std::size_t AlphaPowersN, std::size_t PublicInputSize,
                     std::size_t IndexTermSize>
                 struct kimchi_params_type {
+                    using commitment_params_type = CommitmentParamsType;
+
                     constexpr static std::size_t alpha_powers_n = AlphaPowersN;
                     constexpr static std::size_t public_input_size = PublicInputSize;
                     constexpr static std::size_t witness_columns = WitnessColumns;
@@ -60,16 +62,17 @@ namespace nil {
                     constexpr static std::size_t f_comm_base_size = 1 // permuation-argument
                         + 5 // generic gate
                         + IndexTermSize;
-                    constexpr static std::size_t evaluations_in_batch_size = 1;
+                    constexpr static std::size_t evaluations_in_batch_size = 2;
 
                     constexpr static std::size_t final_msm_size(const std::size_t batch_size) {
-                        return CommitmentParamsType::srs_len 
-                            + 1  // H
-                            + (1
-                                + 1
+                        return 1 // H
+                            + CommitmentParamsType::srs_len   // G
+                            + (1 // opening.G
+                                + 1 // U
                                 + 2 * CommitmentParamsType::eval_rounds
                                 + evaluations_in_batch_size
-                                + 1) 
+                                + 1 // U
+                                + 1) // opening.delta 
                             * batch_size;
                     }
                 };

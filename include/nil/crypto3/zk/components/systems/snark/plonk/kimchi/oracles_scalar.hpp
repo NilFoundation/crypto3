@@ -139,7 +139,7 @@ namespace nil {
                 
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
 
                     constexpr static const std::size_t eval_points_amount = 2;
 

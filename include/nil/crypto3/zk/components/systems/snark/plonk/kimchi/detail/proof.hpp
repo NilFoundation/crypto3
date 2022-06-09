@@ -100,7 +100,7 @@ namespace nil {
                          typename KimchiCommitmentParamsType>
                 struct batch_evaluation_proof_scalar {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     var cip;
@@ -130,7 +130,7 @@ namespace nil {
                          typename KimchiCommitmentParamsType>
                 struct batch_evaluation_proof_base {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using shifted_commitment_type = typename 

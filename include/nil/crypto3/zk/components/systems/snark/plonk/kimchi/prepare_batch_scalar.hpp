@@ -110,7 +110,7 @@ namespace nil {
                         BlueprintFieldType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
 
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
                         ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;

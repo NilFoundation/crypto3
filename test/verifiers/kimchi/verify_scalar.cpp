@@ -148,15 +148,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
 
     using fq_output_type = typename 
         zk::components::binding<ArithmetizationType, 
-        BlueprintFieldType, commitment_params>::fq_sponge_output;
+        BlueprintFieldType, kimchi_params>::fq_sponge_output;
     
     using fr_data_type = typename 
         zk::components::binding<ArithmetizationType, 
-        BlueprintFieldType, commitment_params>::fr_data<var, batch_size>;
+        BlueprintFieldType, kimchi_params>::fr_data<var, batch_size>;
 
     using fq_data_type = typename 
         zk::components::binding<ArithmetizationType, 
-        BlueprintFieldType, commitment_params>::fq_data<var>;
+        BlueprintFieldType, kimchi_params>::fq_data<var>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
