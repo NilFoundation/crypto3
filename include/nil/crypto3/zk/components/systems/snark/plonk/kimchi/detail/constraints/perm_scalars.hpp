@@ -93,14 +93,16 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                    using mul_const_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f26;
 
-                    constexpr static const std::size_t zk_rows = 3;
+                    constexpr static const std::size_t scalar_rows = KimchiParamsType::eval_points_amount < KimchiParamsType::permut_size - 1? KimchiParamsType::eval_points_amount:KimchiParamsType::permut_size - 1;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 3*mul_component::rows_amount +
+                     scalar_rows*(2*mul_component::rows_amount + 2*add_component::rows_amount) + mul_const_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -118,7 +120,7 @@ namespace nil {
                         var output;
 
                         result_type(std::size_t start_row_index) {
-                            std::size_t row = start_row_index;
+                            output = {var(W1, start_row_index + rows_amount - 1, false)};
                         }
                     };
 
@@ -128,8 +130,47 @@ namespace nil {
                                          const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
+                        std::array<var, KimchiParamsType::witness_columns> w;
+                        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i ++){
+                            w[i] = params.evals[0].w[i];
+                        }
+                        std::array<var, KimchiParamsType::permut_size - 1> s;
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i ++){
+                            s[i] = params.evals[0].s[i];
+                        }
+                        var z = params.evals[1].z;
+                        std::size_t size;
+                        if (KimchiParamsType::witness_columns < KimchiParamsType::permut_size - 1) {
+                            size = KimchiParamsType::witness_columns;
+                        } else {
+                            size = KimchiParamsType::permut_size - 1;
+                        }
+                        zk::components::generate_circuit<mul_component>(bp, assignment, {z, params.beta}, row);
+                        auto res = typename mul_component::result_type({z, params.beta}, row);
+                            row+=mul_component::rows_amount;
+                        zk::components::generate_circuit<mul_component>(bp, assignment, {res.output, params.alphas[params.start_idx]}, row);
+                        res = typename mul_component::result_type({res.output, params.alphas[params.start_idx]}, row);
+                        row += mul_component::rows_amount;
+                        zk::components::generate_circuit<mul_component>(bp, assignment, {res.output, params.zkp_zeta}, row);
+                        res = typename mul_component::result_type({res.output, params.zkp_zeta}, row);
+                        row += mul_component::rows_amount;
 
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
+                        for(std::size_t i = 0; i < size; i ++) {
+                            zk::components::generate_circuit<mul_component>(bp,assignment, {s[i], params.beta}, row);
+                            auto tmp =  typename mul_component::result_type({s[i], params.beta}, row);
+                           row += mul_component::rows_amount;
+                           zk::components::generate_circuit<add_component>(bp,assignment, {tmp.output, params.gamma}, row);
+                           auto add_tmp = typename add_component::result_type({tmp.output, params.gamma}, row);
+                           row += add_component::rows_amount;
+                           zk::components::generate_circuit<add_component>(bp,assignment, {add_tmp.output, w[i]}, row);
+                           add_tmp = typename add_component::result_type({add_tmp.output, w[i]}, row);
+                           row += add_component::rows_amount;
+                           zk::components::generate_circuit<mul_component>(bp,assignment, {add_tmp.output, res.output}, row);
+                           res = typename mul_component::result_type( {add_tmp.output, res.output}, row);
+                           row += mul_component::rows_amount;
+                        }
+                        zk::components::generate_circuit<mul_const_component>(bp,assignment,  {res.output, -1}, row);
+                        auto const_res = typename mul_const_component::result_type ({res.output, -1}, row);
                         return result_type(start_row_index);
                     }
 
@@ -138,7 +179,39 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
+                        std::array<var, KimchiParamsType::witness_columns> w;
+                        for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i ++){
+                            w[i] = params.evals[0].w[i];
+                        }
+                        std::array<var, KimchiParamsType::permut_size - 1> s;
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i ++){
+                            s[i] = params.evals[0].s[i];
+                        }
+                        var z = params.evals[1].z;
+                        std::size_t size;
+                        if (KimchiParamsType::witness_columns < KimchiParamsType::permut_size - 1) {
+                            size = KimchiParamsType::witness_columns;
+                        } else {
+                            size = KimchiParamsType::permut_size - 1;
+                        }
+                        auto res = mul_component::generate_assignments(assignment, {z, params.beta}, row);
+                        row += mul_component::rows_amount;
+                        res = mul_component::generate_assignments(assignment, {res.output, params.alphas[params.start_idx]}, row);
+                        row += mul_component::rows_amount;
+                        res = mul_component::generate_assignments(assignment, {res.output, params.zkp_zeta}, row);
+                        row += mul_component::rows_amount;
 
+                        for(std::size_t i = 0; i < size; i ++) {
+                           auto tmp = mul_component::generate_assignments(assignment, {s[i], params.beta}, row);
+                           row += mul_component::rows_amount;
+                           auto add_tmp = add_component::generate_assignments(assignment, {tmp.output, params.gamma}, row);
+                           row += add_component::rows_amount;
+                           add_tmp = add_component::generate_assignments(assignment, {add_tmp.output, w[i]}, row);
+                           row += add_component::rows_amount;
+                           res = mul_component::generate_assignments(assignment, {add_tmp.output, res.output}, row);
+                           row += add_component::rows_amount;
+                        }
+                        auto const_res = mul_const_component::generate_assignments(assignment, {res.output, -1}, row);
                         return result_type(start_row_index);
                     }
 
@@ -160,6 +233,7 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
+
                     }
                 };
             }    // namespace components
