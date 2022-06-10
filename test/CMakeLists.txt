@@ -98,6 +98,7 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/element_powers"
     "algebra/fields/plonk/exponentiation"
     "detail/prepare_scalars"
+    "detail/zkpm_evaluate"
     )
 
 set(FIELDS_TESTS_FILES
