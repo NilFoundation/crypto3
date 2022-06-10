@@ -96,7 +96,7 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0f2C;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = InputSize * (add_component::rows_amount + mul_component::rows_amount);
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -114,8 +114,8 @@ namespace nil {
 
                         generate_assignments_constants(bp, assignment, params, start_row_index);
 
-                        var shift = var(0, start_row_index + 4, false, var::column_type::constant);
-                        var coef = var(0, start_row_index + 5, false, var::column_type::constant);
+                        var shift = var(0, start_row_index, false, var::column_type::constant);
+                        var coef = var(0, start_row_index + 1, false, var::column_type::constant);
 
                         std::size_t row = start_row_index;
 
@@ -138,8 +138,8 @@ namespace nil {
                                                             const params_type &params,
                                                             const std::size_t start_row_index) {
 
-                        var shift = var(0, start_row_index + 4, false, var::column_type::constant);
-                        var coef = var(0, start_row_index + 5, false, var::column_type::constant);
+                        var shift = var(0, start_row_index, false, var::column_type::constant);
+                        var coef = var(0, start_row_index + 1, false, var::column_type::constant);
 
                         std::size_t row = start_row_index;
 
@@ -174,7 +174,7 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
-                        std::size_t row = start_row_index + 4;
+                        std::size_t row = start_row_index;
                         typename BlueprintFieldType::value_type base = 2;
                         assignment.constant(0)[row] = -base.pow(255) - 1;
                         row++;
