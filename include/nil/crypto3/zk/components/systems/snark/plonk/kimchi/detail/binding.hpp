@@ -51,6 +51,10 @@ namespace nil {
                     struct fr_data {
                         std::array<VarType, KimchiParamsType::final_msm_size(BatchSize)> scalars;
                         std::array<VarType, BatchSize> cip;
+
+                        std::array<var, KimchiParamsType::public_input_size> neg_pub;
+                        var zeta_to_srs_len;
+                        var zeta_to_domain_size_minus_1;
                     };
 
                     template<typename VarType>

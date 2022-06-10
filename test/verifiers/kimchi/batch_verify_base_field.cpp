@@ -110,6 +110,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
+    using batch_proof_type = typename 
+                        zk::components::batch_evaluation_proof_base<BlueprintFieldType, 
+                            ArithmetizationType, kimchi_params,
+                            commitment_params>;
+
     //zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
@@ -213,7 +218,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     typename binding::fr_data<var, batch_size> fr_data = {scalars_var, {cip_var}};
 
-    typename component_type::params_type params = {{ {{comm_var}, o_var}}, {H_var, {PI_G_var}}, fr_data};
+    std::array<batch_proof_type, batch_size> prepared_proofs = {{{{comm_var}, o_var}}};
+
+    typename component_type::params_type params = {prepared_proofs, {H_var, {PI_G_var}, {PI_G_var}}, fr_data};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {

@@ -121,7 +121,7 @@ namespace nil {
                             KimchiCommitmentParamsType>;
 
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
-                        KimchiCommitmentParamsType>;
+                        KimchiParamsType>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiParamsType>;
@@ -134,7 +134,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::vector<batch_proof_type> proofs;
+                        std::array<batch_proof_type, BatchSize> proofs;
                         verifier_index_type verifier_index;
                         typename proof_binding::fr_data<var, BatchSize> fr_output;
                     };
@@ -195,7 +195,7 @@ namespace nil {
                             bases[bases_idx++] = params.proofs[i].opening_proof.delta;
                         }
 
-                        assert(bases_idx == final_msm_size - 1);
+                        assert(bases_idx == final_msm_size);
 
                         auto res = msm_component::generate_assignments(assignment, {params.fr_output.scalars, bases}, row);
                         return result_type(component_start_row);
@@ -245,7 +245,7 @@ namespace nil {
 
                             for (std::size_t j = 0 ; j < params.proofs[i].comm.size(); j++) {
                                 unshifted_size = params.proofs[i].comm[j].unshifted.size();
-                                for (std::size_t k =0; k< unshifted_size; k++){
+                                for (std::size_t k =0; k < unshifted_size; k++){
                                     bases[bases_idx++] = params.proofs[i].comm[j].unshifted[k];
                                 }
                                 bases[bases_idx++] = params.proofs[i].comm[j].shifted;
@@ -254,7 +254,7 @@ namespace nil {
                             bases[bases_idx++] = params.proofs[i].opening_proof.delta;
                         }
 
-                        assert(bases_idx == final_msm_size - 1);
+                        assert(bases_idx == final_msm_size);
 
                         auto res = msm_component::generate_circuit(bp, assignment, {params.fr_output.scalars, bases}, row);
                         return result_type(start_row_index);

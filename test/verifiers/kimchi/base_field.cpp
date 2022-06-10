@@ -108,6 +108,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     using binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, kimchi_params>;
 
+    using verifier_index_type = zk::components::kimchi_verifier_index_base<curve_type,
+                        kimchi_params>;
+
+    using proof_type = zk::components::kimchi_proof_base<BlueprintFieldType, kimchi_params>;
+
     //zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
@@ -181,7 +186,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     std::array<curve_type::base_field_type::value_type, kimchi_params::f_comm_base_size> scalars;
 
-    std::vector<var> scalars_var(kimchi_params::f_comm_base_size);
+    std::array<var, kimchi_params::f_comm_base_size> scalars_var;
 
     for (std::size_t i = 0; i < kimchi_params::f_comm_base_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();
@@ -229,7 +234,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr static const std::size_t bases_size = kimchi_params::final_msm_size(batch_size);
     std::array<curve_type::base_field_type::value_type, bases_size> batch_scalars;
 
-    std::vector<var> batch_scalars_var(bases_size);
+    std::array<var, bases_size> batch_scalars_var;
 
     for (std::size_t i = 0; i < bases_size; i++) {
         batch_scalars[i] = algebra::random_element<curve_type::base_field_type>();
@@ -242,32 +247,42 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     var cip_var = var(0, 74 + bases_size, false, var::column_type::public_input);   
 
-    typename component_type::params_type::commitments commitments = {{witness_comm}, {sigma_comm},
-                             {coefficient_comm},
+    typename proof_type::commitments commitments = {{witness_comm},
                              {oracles_poly_comm}, // to-do: get in the component from oracles
                             lookup_runtime_comm,
                              table_comm,
                              {lookup_sorted_comm},
-                             {lookup_selectors_comm},
-                             {selectors_comm}, 
                              lookup_agg_comm,
                              z_comm,
                              t_comm,
-                             generic_comm,
-                             psm_comm};
+                             };
     /*zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                         11, 12, 13, 14> transcript;*/
-    typename component_type::params_type::var_proof proof_var = {/*transcript, */ commitments, o_var, {scalars_var}}; 
-    typename component_type::params_type::public_input PI_var = {{lagrange_bases_var},
-                            {Pub_var},
-                            zeta_to_srs_len_var,
-                            zeta_to_domain_size_minus_1_var};
-    typename component_type::params_type::result input = {{proof_var}, {H_var, {PI_G_var}}, PI_var};
+    proof_type proof_var = {/*transcript, */ commitments, o_var, {scalars_var}}; 
+    verifier_index_type verifier_index = {
+        H_var,
+        {PI_G_var},
+        {lagrange_bases_var},
+        {{sigma_comm},
+            {coefficient_comm},
+            generic_comm,
+            psm_comm,
+            {selectors_comm},
+            {lookup_selectors_comm}
+        }
+    };
 
-    typename binding::fr_data<var, batch_size> fr_data = {batch_scalars_var, {cip_var}};
+    typename binding::fr_data<var, batch_size> fr_data = {batch_scalars_var,
+        {cip_var},
+        {Pub_var},
+        zeta_to_srs_len_var,
+        zeta_to_domain_size_minus_1_var};
     typename binding::fq_data<var> fq_data;
 
-    typename component_type::params_type params = {fr_data, fq_data, input};
+    typename component_type::params_type params = {
+        {proof_var}, 
+        verifier_index,
+        fr_data, fq_data};
  
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {
