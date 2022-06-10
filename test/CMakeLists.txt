@@ -27,27 +27,28 @@ endif()
 
 macro(define_zk_test test)
     get_filename_component(name ${test} NAME)
-    cm_test(NAME zk_${name}_test SOURCES ${test}.cpp)
+    string(REPLACE "/" "_" full_test_name ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}_${test}_test)
+    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
 
-    target_include_directories(zk_${name}_test PRIVATE
+    target_include_directories(${full_test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(zk_${name}_test PROPERTIES CXX_STANDARD 17)
+    set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(zk_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
+        target_compile_definitions(${full_test_name} PRIVATE BOOST_TEST_DYN_LINK)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(zk_${name}_test PRIVATE "-fconstexpr-steps=2147483647")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647")
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(zk_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
     endif()
 
 endmacro()
@@ -98,4 +99,4 @@ foreach(TEST_NAME ${TESTS_NAMES})
 endforeach()
 
 string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/systems/plonk/pickles/data/kimchi.json")
-target_compile_definitions(zk_kimchi_test PRIVATE TEST_DATA="${TEST_DATA}")
+target_compile_definitions(crypto3_zk_systems_plonk_pickles_kimchi_test PRIVATE TEST_DATA="${TEST_DATA}")
