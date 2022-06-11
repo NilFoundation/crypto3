@@ -138,13 +138,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
     constexpr static std::size_t batch_size = 2;
 
     constexpr static const std::size_t index_terms = 0;
+    constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
     using kimchi_params = zk::components::kimchi_params_type<commitment_params,
         witness_columns, perm_size,
         use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size, index_terms>;
+        alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
 
     using fq_output_type = typename 
         zk::components::binding<ArithmetizationType, 

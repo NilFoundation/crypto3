@@ -137,14 +137,17 @@ namespace nil {
                         commitment_params_type::eval_rounds>;
 
                     struct commitments {
-                        std::vector<shifted_commitment_type> witness_comm;
-                        std::vector<shifted_commitment_type> oracles_poly_comm; // to-do: get in the component from oracles
+                        std::array<shifted_commitment_type,
+                            KimchiParamsType::witness_columns> witness_comm;
                         shifted_commitment_type lookup_runtime_comm;
                         shifted_commitment_type table_comm;
                         std::vector<shifted_commitment_type> lookup_sorted_comm;
                         shifted_commitment_type lookup_agg_comm;
                         shifted_commitment_type z_comm;
                         shifted_commitment_type t_comm;
+                        std::array<shifted_commitment_type, 
+                            KimchiParamsType::prev_challenges_size>
+                            prev_challenges; // to-do: get in the component from oracles
                     };
 
                     constexpr static const std::size_t f_comm_base_size = 1 // permuation-argument

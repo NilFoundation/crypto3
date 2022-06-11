@@ -42,7 +42,7 @@ namespace nil {
                     std::size_t WitnessColumns, std::size_t PermutSize,
                     bool UseLookup, std::size_t LookupTableSize,
                     std::size_t AlphaPowersN, std::size_t PublicInputSize,
-                    std::size_t IndexTermSize>
+                    std::size_t IndexTermSize, std::size_t PrevChalSize>
                 struct kimchi_params_type {
                     using commitment_params_type = CommitmentParamsType;
 
@@ -59,7 +59,7 @@ namespace nil {
                     constexpr static std::size_t eval_points_amount = 2;
                     constexpr static std::size_t scalar_challenge_size = 128;
 
-                    constexpr static std::size_t prev_challenges_size = 1;
+                    constexpr static std::size_t prev_challenges_size = PrevChalSize;
 
                     constexpr static std::size_t lookup_comm_size = 0;
                     constexpr static std::size_t index_term_size = IndexTermSize;

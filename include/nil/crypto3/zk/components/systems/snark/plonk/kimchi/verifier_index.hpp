@@ -81,7 +81,8 @@ namespace nil {
                     using var_ec_point = typename zk::components::var_ec_point<FieldType>;
 
                     struct commitments {
-                        std::vector<shifted_commitment_type> sigma_comm;
+                        std::array<shifted_commitment_type,
+                            KimchiParamsType::permut_size> sigma_comm;
                         std::vector<shifted_commitment_type> coefficient_comm;
                         shifted_commitment_type generic_comm;
                         shifted_commitment_type psm_comm;

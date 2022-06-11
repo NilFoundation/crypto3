@@ -432,6 +432,11 @@ namespace nil {
                             std::array<shifted_commitment_type,
                                 KimchiParamsType::evaluations_in_batch_size> evaluations;
                             std::size_t eval_idx = 0;
+
+                            for (auto chal : params.proofs[i].comm.prev_challenges) {
+                                evaluations[eval_idx++] = chal;
+                            }
+
                             //shifted_commitment_type p_comm = {none, p_comm_unshifted};
                             shifted_commitment_type p_comm = {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
                             evaluations[eval_idx++] = p_comm;
@@ -439,24 +444,24 @@ namespace nil {
                             evaluations[eval_idx++] = params.proofs[i].comm.z_comm;
                             evaluations[eval_idx++] = params.verifier_index.comm.generic_comm;
                             evaluations[eval_idx++] = params.verifier_index.comm.psm_comm;
-                            for(std::size_t j = 0; j < params.proofs[i].comm.oracles_poly_comm.size(); j++){
-                                evaluations[eval_idx++] = params.proofs[i].comm.oracles_poly_comm[j];
-                            }
+
                             for(std::size_t j = 0; j < params.proofs[i].comm.witness_comm.size(); j++){
                                 evaluations[eval_idx++] = params.proofs[i].comm.witness_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.verifier_index.comm.sigma_comm.size(); j++){
+                            for(std::size_t j = 0; j < params.verifier_index.comm.sigma_comm.size() - 1; j++){
                                 evaluations[eval_idx++] = params.verifier_index.comm.sigma_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted_comm.size(); j++){
-                                evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted_comm[j];
-                            }
-                            evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg_comm;
-                            evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
-                            evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
+
+                            //to-do lookups
+                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted_comm.size(); j++){
+                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted_comm[j];
+                            // }
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
 
                             assert(eval_idx == KimchiParamsType::evaluations_in_batch_size);
-                            
+
                             batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
                                 params.proofs[i].o};
                         
@@ -615,6 +620,9 @@ namespace nil {
                             std::array<shifted_commitment_type,
                                 KimchiParamsType::evaluations_in_batch_size> evaluations;
                             std::size_t eval_idx = 0;
+                            for (auto chal : params.proofs[i].comm.prev_challenges) {
+                                evaluations[eval_idx++] = chal;
+                            }
                             //shifted_commitment_type p_comm = {none, p_comm_unshifted};
                             shifted_commitment_type p_comm = {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
                             evaluations[eval_idx++] = p_comm;
@@ -622,21 +630,20 @@ namespace nil {
                             evaluations[eval_idx++] = params.proofs[i].comm.z_comm;
                             evaluations[eval_idx++] = params.verifier_index.comm.generic_comm;
                             evaluations[eval_idx++] = params.verifier_index.comm.psm_comm;
-                            for(std::size_t j = 0; j < params.proofs[i].comm.oracles_poly_comm.size(); j++){
-                                evaluations[eval_idx++] = params.proofs[i].comm.oracles_poly_comm[j];
-                            }
+
                             for(std::size_t j = 0; j < params.proofs[i].comm.witness_comm.size(); j++){
                                 evaluations[eval_idx++] = params.proofs[i].comm.witness_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.verifier_index.comm.sigma_comm.size(); j++){
+                            for(std::size_t j = 0; j < params.verifier_index.comm.sigma_comm.size() - 1; j++){
                                 evaluations[eval_idx++] = params.verifier_index.comm.sigma_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted_comm.size(); j++){
-                                evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted_comm[j];
-                            }
-                            evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg_comm;
-                            evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
-                            evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
+
+                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted_comm.size(); j++){
+                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted_comm[j];
+                            // }
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
 
                             assert(eval_idx == KimchiParamsType::evaluations_in_batch_size);
 
