@@ -54,15 +54,26 @@ namespace nil {
                     constexpr static bool use_lookup = UseLookup;
 
                     constexpr static std::size_t permutation_constraints = 3;
-                    constexpr static std::size_t generic_constraints = 2;
+                    constexpr static std::size_t ft_generic_size = 2 * 5;
 
                     constexpr static std::size_t eval_points_amount = 2;
                     constexpr static std::size_t scalar_challenge_size = 128;
 
-                    constexpr static std::size_t f_comm_base_size = 1 // permuation-argument
-                        + 5 // generic gate
-                        + IndexTermSize;
-                    constexpr static std::size_t evaluations_in_batch_size = 2;
+                    constexpr static std::size_t prev_challenges_size = 1;
+
+                    constexpr static std::size_t lookup_comm_size = 0;
+                    constexpr static std::size_t index_term_size = IndexTermSize;
+
+                    constexpr static std::size_t evaluations_in_batch_size = 
+                        prev_challenges_size // recursion
+                        + 1 // p_comm
+                        + 1 // ft_comm
+                        + 1 // z_comm
+                        + 1 // generic_comm
+                        + 1 // psm_comm
+                        + witness_columns // w_comm
+                        + permut_size - 1
+                        + lookup_comm_size;
 
                     constexpr static std::size_t final_msm_size(const std::size_t batch_size) {
                         return 1 // H

@@ -89,7 +89,7 @@ namespace nil {
                     std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, 2> proof_evals;
                     var ft_eval;
                     std::array<var, KimchiParamsType::public_input_size> public_input;
-                    std::array<var, EvalRounds> prev_challenges;
+                    std::array<std::array<var, EvalRounds>, KimchiParamsType::prev_challenges_size> prev_challenges;
                 };
 
                 template<typename BlueprintFieldType,
@@ -147,9 +147,13 @@ namespace nil {
                         shifted_commitment_type t_comm;
                     };
 
+                    constexpr static const std::size_t f_comm_base_size = 1 // permuation-argument
+                        + 5 // generic gate
+                        + KimchiParamsType::index_term_size;
+
                     commitments comm;
                     opening_proof_type o;
-                    std::array<var, KimchiParamsType::f_comm_base_size> scalars;
+                    std::array<var, f_comm_base_size> scalars;
                 };
 
                 template<typename BlueprintFieldType,
@@ -170,7 +174,8 @@ namespace nil {
                         KimchiCommitmentParamsType::eval_rounds>;
 
                     //typename proof_binding::fq_sponge_output fq_output;
-                    std::vector<shifted_commitment_type> comm;
+                    std::array<shifted_commitment_type, 
+                        KimchiParamsType::evaluations_in_batch_size> comm;
                     opening_proof_type opening_proof;
                 };
             }    // namespace components
