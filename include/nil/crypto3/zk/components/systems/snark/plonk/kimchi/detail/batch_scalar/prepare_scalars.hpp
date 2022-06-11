@@ -30,7 +30,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+// #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -96,7 +96,7 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0f2C;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = InputSize * (add_component::rows_amount + mul_component::rows_amount);
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -112,20 +112,48 @@ namespace nil {
                                          const params_type &params,
                                          const std::size_t start_row_index) {
 
+                        generate_assignments_constants(bp, assignment, params, start_row_index);
+
+                        var shift = var(0, start_row_index, false, var::column_type::constant);
+                        var coef = var(0, start_row_index + 1, false, var::column_type::constant);
+
                         std::size_t row = start_row_index;
+
+                        std::array<var, InputSize> shifted;
+                        result_type result;
+
+                        for (std::size_t i = 0; i < InputSize; ++i) {
+                            shifted[i] = zk::components::generate_circuit<add_component>(bp, assignment, {params.scalars[i], shift}, row).output;
+                            row += add_component::rows_amount;
+                            result.output[i] = zk::components::generate_circuit<mul_component>(bp, assignment, {shifted[i], coef}, row).output;
+                            row += mul_component::rows_amount;
+                        }
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         
-                        return result_type {params.scalars};
+                        return result;
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
                                                             const std::size_t start_row_index) {
 
+                        var shift = var(0, start_row_index, false, var::column_type::constant);
+                        var coef = var(0, start_row_index + 1, false, var::column_type::constant);
+
                         std::size_t row = start_row_index;
 
-                        return result_type {params.scalars};
+                        std::array<var, InputSize> shifted;
+                        result_type result;
+
+                        for (std::size_t i = 0; i < InputSize; ++i) {
+                            shifted[i] = add_component::generate_assignments(assignment, {params.scalars[i], shift}, row).output;
+                            row += add_component::rows_amount;
+                            result.output[i] = mul_component::generate_assignments(assignment, {shifted[i], coef}, row).output;
+                            row += mul_component::rows_amount;
+                        }
+
+                        return result;
                     }
 
                 private:
@@ -140,6 +168,17 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
+                    }
+
+                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  const std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
+                        typename BlueprintFieldType::value_type base = 2;
+                        assignment.constant(0)[row] = -base.pow(255) - 1;
+                        row++;
+                        assignment.constant(0)[row] = 1 / base;
                     }
                 };
             }    // namespace components
