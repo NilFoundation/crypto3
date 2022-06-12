@@ -96,11 +96,11 @@ namespace nil {
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f21;
-                    constexpr static const std::size_t polynomial_len = 1 << EvalRounds;
 
                 public:
                     constexpr static const std::size_t rows_amount = 0;
                     constexpr static const std::size_t gates_amount = 0;
+                    constexpr static const std::size_t polynomial_len = 1 << EvalRounds;
 
                     struct params_type {
                         std::array<var, EvalRounds> &challenges;

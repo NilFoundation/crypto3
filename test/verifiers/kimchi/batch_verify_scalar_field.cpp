@@ -212,6 +212,16 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
 
         public_input.push_back(algebra::random_element<BlueprintFieldType>());
         batches[i].r = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        batches[i].opening = {var(0, public_input.size() - 2, false, var::column_type::public_input),
+            var(0, public_input.size() - 1, false, var::column_type::public_input)};
+
+        for (std::size_t j = 0; j < kimchi_params::evaluations_in_batch_size; j++) {
+            public_input.push_back(algebra::random_element<BlueprintFieldType>());
+            batches[i].evaluations[j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
     }
 
     typename component_type::params_type params = {batches};

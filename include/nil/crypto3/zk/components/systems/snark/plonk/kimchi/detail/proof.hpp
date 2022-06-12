@@ -81,6 +81,14 @@ namespace nil {
                     }
                 };
 
+                template<typename BlueprintFieldType>
+                struct kimchi_opening_proof_scalar {
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    var z1;
+                    var z2;
+                };
+
                 template<typename BlueprintFieldType, typename KimchiParamsType,
                     std::size_t EvalRounds>
                 struct kimchi_proof_scalar {
@@ -90,6 +98,9 @@ namespace nil {
                     var ft_eval;
                     std::array<var, KimchiParamsType::public_input_size> public_input;
                     std::array<std::array<var, EvalRounds>, KimchiParamsType::prev_challenges_size> prev_challenges;
+
+                    kimchi_opening_proof_scalar<BlueprintFieldType> 
+                        opening;
                 };
 
                 template<typename BlueprintFieldType,
@@ -108,11 +119,16 @@ namespace nil {
                     var r;
                     // scaling factor for evaluation point powers
                     var xi;
+
+                    std::array<var, 
+                        KimchiParamsType::evaluations_in_batch_size> evaluations;
+                    kimchi_opening_proof_scalar<BlueprintFieldType> 
+                        opening;
                 };
 
                 template<typename BlueprintFieldType,
                     std::size_t EvalRounds>
-                struct kimchi_opening_proof {
+                struct kimchi_opening_proof_base {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 
@@ -133,7 +149,7 @@ namespace nil {
                             commitment_params_type::shifted_commitment_split>;
 
                     using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType,
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType,
                         commitment_params_type::eval_rounds>;
 
                     struct commitments {
@@ -173,7 +189,7 @@ namespace nil {
                             KimchiCommitmentParamsType::shifted_commitment_split>;
 
                     using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType, 
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType, 
                         KimchiCommitmentParamsType::eval_rounds>;
 
                     //typename proof_binding::fq_sponge_output fq_output;

@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType, commitment_params::eval_rounds>;
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType, commitment_params::eval_rounds>;
     using shifted_commitment_type = typename 
                         zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
                             commitment_params::shifted_commitment_split>;

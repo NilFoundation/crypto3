@@ -240,7 +240,8 @@ namespace nil {
                             params.fq_output,
                             oracles_output.eval_points,
                             oracles_output.oracles.u,
-                            oracles_output.oracles.v
+                            oracles_output.oracles.v,
+                            params.proof.opening
                         };
 
                         return res;

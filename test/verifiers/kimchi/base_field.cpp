@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
                             commitment_params::shifted_commitment_split>;
 
     using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType, commitment_params::eval_rounds>;
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType, commitment_params::eval_rounds>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     using binding = typename zk::components::binding<ArithmetizationType,
