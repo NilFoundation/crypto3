@@ -65,6 +65,11 @@ namespace nil {
                     std::map<argument_type, std::pair<int, int>> alpha_map;
 
                     std::array<constraint_description, constraints_amount> constraints;
+
+                    kimchi_verifier_index_scalar() {
+                        alpha_map[argument_type::Permutation] = {0, 0};
+                        alpha_map[argument_type::Generic] = {1, 1};
+                    }
                 };
 
                 template<typename CurveType,

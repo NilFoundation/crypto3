@@ -94,11 +94,13 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
         circuit_proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    for (std::size_t i = 0; i < EvalRounds; i++) {
-        typename BlueprintFieldType::value_type tmp = 
-            algebra::random_element<BlueprintFieldType>();
-        public_input.push_back(tmp);
-        circuit_proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; i++) {
+        for (std::size_t j = 0; j < EvalRounds; j++) {
+            typename BlueprintFieldType::value_type tmp = 
+                algebra::random_element<BlueprintFieldType>();
+            public_input.push_back(tmp);
+            circuit_proof.prev_challenges[i][j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
     }
 
     //ft_eval
@@ -113,7 +115,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 10;
+    constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,

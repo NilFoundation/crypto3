@@ -103,7 +103,8 @@ namespace nil {
                     constexpr static const std::size_t zk_rows = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = exp_component::rows_amount + 4 * mul_component::rows_amount + 3 * sub_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = exp_component::rows_amount 
+                        + 4 * mul_component::rows_amount + 3 * sub_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {

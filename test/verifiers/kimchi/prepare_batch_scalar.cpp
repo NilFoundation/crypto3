@@ -84,7 +84,7 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
         circuit_proof.proof_evals[point_idx].generic_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // poseidon_selector
         public_input.push_back(original_proof.evals[point_idx].poseidon_selector);
-        circuit_proof.proof_evals[point_idx].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);a
+        circuit_proof.proof_evals[point_idx].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
     //ft_eval
     public_input.push_back(algebra::random_element<BlueprintFieldType>());
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prepare_batch_scalar_test_suite) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 10;
+    constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -175,11 +175,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prepare_batch_scalar_test_suite) {
         proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    for (std::size_t i = 0; i < eval_rounds; i++) {
-        typename BlueprintFieldType::value_type tmp = 
-            algebra::random_element<BlueprintFieldType>();
-        public_input.push_back(tmp);
-        proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    for (std::size_t i = 0; i < kimchi_params::prev_challenges_size; i++) {
+        for (std::size_t j = 0; j < eval_rounds; j++) {
+            typename BlueprintFieldType::value_type tmp = 
+                algebra::random_element<BlueprintFieldType>();
+            public_input.push_back(tmp);
+            proof.prev_challenges[i][j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
     }
 
     prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(

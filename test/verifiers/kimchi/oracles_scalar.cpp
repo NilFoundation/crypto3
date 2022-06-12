@@ -177,11 +177,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
         proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    for (std::size_t i = 0; i < eval_rounds; i++) {
-        typename BlueprintFieldType::value_type tmp = 
-            algebra::random_element<BlueprintFieldType>();
-        public_input.push_back(tmp);
-        proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    for (std::size_t i = 0; i < kimchi_params::prev_challenges_size; i++) {
+        for (std::size_t j = 0; j < eval_rounds; j++) {
+            typename BlueprintFieldType::value_type tmp = 
+                algebra::random_element<BlueprintFieldType>();
+            public_input.push_back(tmp);
+            proof.prev_challenges[i][j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
     }
 
     prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(

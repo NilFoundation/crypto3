@@ -96,13 +96,15 @@ namespace nil {
                     using mul_const_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f26;
+                    constexpr static const std::size_t selector_seed = 0x0f2E;
 
-                    constexpr static const std::size_t scalar_rows = KimchiParamsType::eval_points_amount < KimchiParamsType::permut_size - 1? KimchiParamsType::eval_points_amount:KimchiParamsType::permut_size - 1;
+                    constexpr static const std::size_t scalar_rows = KimchiParamsType::permut_size - 1;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 3*mul_component::rows_amount +
-                     scalar_rows*(2*mul_component::rows_amount + 2*add_component::rows_amount) + mul_const_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 3 * mul_component::rows_amount
+                        + scalar_rows * (
+                            2 * mul_component::rows_amount + 2*add_component::rows_amount)
+                        + mul_const_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -139,12 +141,8 @@ namespace nil {
                             s[i] = params.evals[0].s[i];
                         }
                         var z = params.evals[1].z;
-                        std::size_t size;
-                        if (KimchiParamsType::witness_columns < KimchiParamsType::permut_size - 1) {
-                            size = KimchiParamsType::witness_columns;
-                        } else {
-                            size = KimchiParamsType::permut_size - 1;
-                        }
+                        std::size_t size  = KimchiParamsType::permut_size - 1;
+
                         zk::components::generate_circuit<mul_component>(bp, assignment, {z, params.beta}, row);
                         auto res = typename mul_component::result_type({z, params.beta}, row);
                             row+=mul_component::rows_amount;
@@ -188,12 +186,8 @@ namespace nil {
                             s[i] = params.evals[0].s[i];
                         }
                         var z = params.evals[1].z;
-                        std::size_t size;
-                        if (KimchiParamsType::witness_columns < KimchiParamsType::permut_size - 1) {
-                            size = KimchiParamsType::witness_columns;
-                        } else {
-                            size = KimchiParamsType::permut_size - 1;
-                        }
+                        std::size_t size = KimchiParamsType::permut_size - 1;
+
                         auto res = mul_component::generate_assignments(assignment, {z, params.beta}, row);
                         row += mul_component::rows_amount;
                         res = mul_component::generate_assignments(assignment, {res.output, params.alphas[params.start_idx]}, row);
@@ -201,7 +195,7 @@ namespace nil {
                         res = mul_component::generate_assignments(assignment, {res.output, params.zkp_zeta}, row);
                         row += mul_component::rows_amount;
 
-                        for(std::size_t i = 0; i < size; i ++) {
+                        for (std::size_t i = 0; i < size; i ++) {
                            auto tmp = mul_component::generate_assignments(assignment, {s[i], params.beta}, row);
                            row += mul_component::rows_amount;
                            auto add_tmp = add_component::generate_assignments(assignment, {tmp.output, params.gamma}, row);
