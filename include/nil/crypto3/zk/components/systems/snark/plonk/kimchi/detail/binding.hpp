@@ -41,15 +41,20 @@ namespace nil {
 
                 template<typename ArithmetizationType, 
                     typename BlueprintFieldType,
-                    typename KimchiCommitmentParamsType>
+                    typename KimchiParamsType>
                 struct binding {
                     using var = snark::plonk_variable<BlueprintFieldType>;
+                    using commitment_parms_type = typename KimchiParamsType::commitment_params_type;
 
                     template<typename VarType,
                         std::size_t BatchSize>
                     struct fr_data {
-                        std::vector<VarType> scalars;
+                        std::array<VarType, KimchiParamsType::final_msm_size(BatchSize)> scalars;
                         std::array<VarType, BatchSize> cip;
+
+                        std::array<var, KimchiParamsType::public_input_size> neg_pub;
+                        var zeta_to_srs_len;
+                        var zeta_to_domain_size_minus_1;
                     };
 
                     template<typename VarType>
@@ -64,7 +69,7 @@ namespace nil {
                         var alpha;
                         var zeta;
                         var fq_digest;    // TODO overflow check
-                        std::array<var, KimchiCommitmentParamsType::eval_rounds> challenges;
+                        std::array<var, commitment_parms_type::eval_rounds> challenges;
                         var c;
 
 
@@ -77,11 +82,11 @@ namespace nil {
                                 typename BlueprintFieldType::value_type zeta,
                                 typename BlueprintFieldType::value_type fq_digest,
                                 std::array<typename BlueprintFieldType::value_type,
-                                    KimchiCommitmentParamsType::eval_rounds> challenges,
+                                    commitment_parms_type::eval_rounds> challenges,
                                 typename BlueprintFieldType::value_type c) {
 
-                            std::array<var, KimchiCommitmentParamsType::eval_rounds> chals;
-                            for (std::size_t i = 0; i < KimchiCommitmentParamsType::eval_rounds; i++) {
+                            std::array<var, commitment_parms_type::eval_rounds> chals;
+                            for (std::size_t i = 0; i < commitment_parms_type::eval_rounds; i++) {
                                 chals[i] = assignment.allocate_public_input(challenges[i]);
                             }
 

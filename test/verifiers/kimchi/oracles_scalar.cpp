@@ -121,13 +121,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     constexpr static std::size_t srs_len = 10;
     constexpr static const std::size_t index_terms = 0;
+    constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
     using kimchi_params = zk::components::kimchi_params_type<commitment_params,
         witness_columns, perm_size,
         use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size, index_terms>;
+        alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
@@ -157,7 +158,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
 
     zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
     std::array<var, eval_rounds> challenges;
-    typename zk::components::binding<ArithmetizationType, BlueprintFieldType, commitment_params>::fq_sponge_output fq_output = {
+    typename zk::components::binding<ArithmetizationType, BlueprintFieldType, kimchi_params>::fq_sponge_output fq_output = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), 
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
         var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
@@ -176,11 +177,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
         proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    for (std::size_t i = 0; i < eval_rounds; i++) {
-        typename BlueprintFieldType::value_type tmp = 
-            algebra::random_element<BlueprintFieldType>();
-        public_input.push_back(tmp);
-        proof.prev_challenges[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    for (std::size_t i = 0; i < kimchi_params::prev_challenges_size; i++) {
+        for (std::size_t j = 0; j < eval_rounds; j++) {
+            typename BlueprintFieldType::value_type tmp = 
+                algebra::random_element<BlueprintFieldType>();
+            public_input.push_back(tmp);
+            proof.prev_challenges[i][j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
     }
 
     prepare_proof<curve_type, BlueprintFieldType, kimchi_params, eval_rounds>(

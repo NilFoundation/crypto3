@@ -84,13 +84,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     constexpr static std::size_t srs_len = 1;
     constexpr static const std::size_t index_terms = 0;
+    constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
     using kimchi_params = zk::components::kimchi_params_type<commitment_params,
         witness_columns, perm_size,
         use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size, index_terms>;
+        alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
 
     constexpr static const std::size_t bases_size = kimchi_params::final_msm_size(batch_size);
 
@@ -99,16 +100,21 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType, commitment_params::eval_rounds>;
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType, commitment_params::eval_rounds>;
     using shifted_commitment_type = typename 
                         zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
                             commitment_params::shifted_commitment_split>;
     
     using binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, commitment_params>;
+                        BlueprintFieldType, kimchi_params>;
 
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    using batch_proof_type = typename 
+                        zk::components::batch_evaluation_proof_base<BlueprintFieldType, 
+                            ArithmetizationType, kimchi_params,
+                            commitment_params>;
 
     //zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
@@ -192,7 +198,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     std::array<curve_type::base_field_type::value_type, bases_size> scalars;
 
-    std::vector<var> scalars_var(bases_size);
+    std::array<var, bases_size> scalars_var;
 
     for (std::size_t i = 0; i < bases_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();
@@ -213,7 +219,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     typename binding::fr_data<var, batch_size> fr_data = {scalars_var, {cip_var}};
 
-    typename component_type::params_type params = {{ {{comm_var}, o_var}}, {H_var, {PI_G_var}}, fr_data};
+    std::array<batch_proof_type, batch_size> prepared_proofs = {{{{comm_var}, o_var}}};
+
+    typename component_type::params_type params = {prepared_proofs, {H_var, {PI_G_var}, {PI_G_var}}, fr_data};
 
     auto result_check = [](AssignmentType &assignment, 
         component_type::result_type &real_res) {

@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_zkpm) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 3;
-    constexpr std::size_t SelectorColumns = 10;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 4;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_zkpm) {
                                                                             11, 12, 13, 14>;
 
     typename BlueprintFieldType::value_type group_gen = algebra::random_element<BlueprintFieldType>();
-    std::size_t domain_size = 12;
+    std::size_t domain_size = 1000;
     typename BlueprintFieldType::value_type x = algebra::random_element<BlueprintFieldType>();
     typename BlueprintFieldType::value_type group_gen_pow = group_gen.pow(domain_size - 3);
     typename BlueprintFieldType::value_type expected_res = (x - group_gen_pow) * (x - group_gen_pow * group_gen) * 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_zkpm) {
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "multiplication: " << duration.count() << "ms" << std::endl;
+    std::cout << "zkpm_evaluate: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

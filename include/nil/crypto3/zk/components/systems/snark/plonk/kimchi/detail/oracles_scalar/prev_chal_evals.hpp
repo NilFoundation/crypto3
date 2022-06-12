@@ -106,12 +106,12 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0f0f;
                     constexpr static const std::size_t eval_points_amount = 2;
                     constexpr static const std::size_t eval_rounds = KimchiCommitmentParamsType::eval_rounds;
-                    constexpr static const std::size_t res_size = KimchiCommitmentParamsType::res_size;
+                    constexpr static const std::size_t size_for_max_poly = KimchiCommitmentParamsType::size_for_max_poly;
                     constexpr static const std::size_t max_poly_size = KimchiCommitmentParamsType::max_poly_size;
                     constexpr static const std::size_t b_len = 1 << eval_rounds;
 
                 public:
-                    constexpr static const std::size_t rows_amount = res_size == 1 ? 
+                    constexpr static const std::size_t rows_amount = size_for_max_poly == 1 ? 
                         eval_points_amount * b_poly_component::rows_amount :
                         b_poly_coeff_component::rows_amount
                             + eval_points_amount * (b_poly_component::rows_amount
@@ -132,14 +132,14 @@ namespace nil {
                     };
 
                     struct result_type {
-                        std::array<std::array<var, res_size>, eval_points_amount> output;
+                        std::array<std::array<var, size_for_max_poly>, eval_points_amount> output;
 
                         result_type(std::size_t component_start_row) {
                             std::size_t row = component_start_row;
                             for (std::size_t i = 0; i < eval_points_amount; i++) {
                                 var full = typename b_poly_component::result_type(row).output;
                                 row += b_poly_component::rows_amount;
-                                if (res_size == 1) {
+                                if (size_for_max_poly == 1) {
                                     output[i][0] = full;
                                     continue;
                                 }
@@ -173,12 +173,12 @@ namespace nil {
                         std::size_t row = start_row_index;
 
                         std::array<var, b_len> b;
-                        std::array<std::array<var, res_size>, eval_points_amount> res;
+                        std::array<std::array<var, size_for_max_poly>, eval_points_amount> res;
                         for (std::size_t i = 0; i < eval_points_amount; i++) {
                             var full = b_poly_component::generate_circuit(bp, assignment, 
                                 {params.prev_challenges, params.eval_points[i], params.one}, row).output;
                             row += b_poly_component::rows_amount;
-                            if (res_size == 1) {
+                            if (size_for_max_poly == 1) {
                                 res[i][0] = full;
                                 continue;
                             }
@@ -227,12 +227,12 @@ namespace nil {
                         std::size_t row = start_row_index;
 
                         std::array<var, b_len> b;
-                        std::array<std::array<var, res_size>, eval_points_amount> res;
+                        std::array<std::array<var, size_for_max_poly>, eval_points_amount> res;
                         for (std::size_t i = 0; i < eval_points_amount; i++) {
                             var full = b_poly_component::generate_assignments(assignment, 
                                 {params.prev_challenges, params.eval_points[i], params.one}, row).output;
                             row += b_poly_component::rows_amount;
-                            if (res_size == 1) {
+                            if (size_for_max_poly == 1) {
                                 res[i][0] = full;
                                 continue;
                             }

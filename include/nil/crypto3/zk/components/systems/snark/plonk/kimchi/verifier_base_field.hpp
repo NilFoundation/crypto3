@@ -107,8 +107,11 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using const_mul_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
 
+                    using proof_type = kimchi_proof_base<BlueprintFieldType, KimchiParamsType>;
+                    constexpr static const std::size_t f_comm_base_size = proof_type::f_comm_base_size;
+
                     using msm_component = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, CurveType, 
-                        KimchiParamsType::f_comm_base_size,
+                        f_comm_base_size,
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using lagrange_msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, 
                         KimchiParamsType::public_input_size,
@@ -123,18 +126,11 @@ namespace nil {
                                                                        W4, W5, W6, W7, W8, W9, W10>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
 
                     using map_fq_component = zk::components::map_fq<ArithmetizationType, 
                         CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
                         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
-
-                    using shifted_commitment_type = typename 
-                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
-                            KimchiCommitmentParamsType::shifted_commitment_split>;
-
-                    using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType, KimchiCommitmentParamsType::eval_rounds>;
 
                     using batch_proof_type = typename 
                         zk::components::batch_evaluation_proof_base<BlueprintFieldType, 
@@ -142,7 +138,11 @@ namespace nil {
                             KimchiCommitmentParamsType>;
 
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
-                        KimchiCommitmentParamsType>;
+                        KimchiParamsType>;
+
+                    using shifted_commitment_type = typename 
+                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                            KimchiCommitmentParamsType::shifted_commitment_split>;
 
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
@@ -163,44 +163,11 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-
-                        struct commitments {
-                             std::vector<shifted_commitment_type> witness_comm;
-                             std::vector<shifted_commitment_type> sigma_comm;
-                             std::vector<shifted_commitment_type> coefficient_comm;
-                             std::vector<shifted_commitment_type> oracles_poly_comm; // to-do: get in the component from oracles
-                             shifted_commitment_type lookup_runtime_comm;
-                             shifted_commitment_type table_comm;
-                             std::vector<shifted_commitment_type> lookup_sorted_comm;
-                             std::vector<shifted_commitment_type> lookup_selectors_comm;
-                             std::vector<shifted_commitment_type> selectors_comm;
-                             shifted_commitment_type lookup_agg_comm;
-                             shifted_commitment_type z_comm;
-                             shifted_commitment_type t_comm;
-                             shifted_commitment_type generic_comm;
-                             shifted_commitment_type psm_comm;
-                        };
-                        struct var_proof {
-                            commitments comm;
-                            opening_proof_type o;
-                            std::vector<var> scalars;
-                        };
-                        struct public_input {
-                            std::vector<var_ec_point> lagrange_bases;
-                            std::vector<var> neg_pub;
-                            var zeta_to_srs_len;
-                            var zeta_to_domain_size_minus_1;
-                        };
-                        struct result {
-                            std::vector<var_proof> proofs;
-                            verifier_index_type verifier_index;
-                            public_input PI;
-                        };
-
+                        std::array<proof_type, BatchSize> proofs;
+                        verifier_index_type verifier_index;
+                        
                         typename proof_binding::fr_data<var, BatchSize> fr_data;
                         typename proof_binding::fq_data<var> fq_data;
-
-                        result input;  
                     };
 
                     struct result_type {
@@ -209,143 +176,202 @@ namespace nil {
                         }
                     };
 
+                    private:
+
+                    static std::array<var_ec_point, f_comm_base_size>
+                        prepare_f_comm_shifted(const params_type &params)
+                    {
+                        std::array<var_ec_point, f_comm_base_size> shifted_commitments;
+
+                        std::size_t comm_idx = 0;
+
+                        shifted_commitments[comm_idx++] = 
+                            params.verifier_index.comm.sigma_comm[KimchiParamsType::permut_size - 1].shifted;
+
+                        // take generic_size coeff_comm
+                        std::array<shifted_commitment_type, KimchiParamsType::ft_generic_size> generic_comm;
+                        for (std::size_t i = 0; i < generic_comm.size(); i++) {
+                            generic_comm[i] = params.verifier_index.comm.coefficient_comm[i];
+                        }
+
+                        for (auto commitment : generic_comm) {
+                            shifted_commitments[comm_idx++] = commitment.shifted;
+                        }
+
+                        // for term in terms:
+                        // fill_shifted_commitments(params.proofs[i].comm.witness_comm,
+                        //     params.proofs[i].comm.witness_comm.size());
+
+                        // fill_shifted_commitments(params.verifier_index.comm.coefficient_comm,
+                        //     params.verifier_index.comm.coefficient_comm.size());
+
+                        // fill_shifted_commitments({params.proofs[i].comm.z_comm},
+                        //     1);
+
+                        // fill_shifted_commitments(params.proofs[i].comm.lookup_sorted_comm,
+                        //     params.proofs[i].comm.lookup_sorted_comm.size());
+
+                        // fill_shifted_commitments({params.proofs[i].comm.lookup_agg_comm},
+                        //     1);
+
+                        // fill_shifted_commitments(params.verifier_index.comm.lookup_selectors_comm,
+                        //     params.verifier_index.comm.lookup_selectors_comm.size());
+
+                        // fill_shifted_commitments({params.proofs[i].comm.lookup_runtime_comm},
+                        //     1);
+
+                        // fill_shifted_commitments(params.verifier_index.comm.selectors_comm,
+                        //     params.verifier_index.comm.selectors_comm.size());
+
+                        return shifted_commitments;
+                    }
+
+                    template<std::size_t CommSize>
+                    static void parse_commitments(
+                        std::array<std::array<var_ec_point, KimchiCommitmentParamsType::shifted_commitment_split>, 
+                            f_comm_base_size> &unshifted_commitments,
+                        const std::array<shifted_commitment_type, CommSize> comms,
+                        std::size_t &comm_idx) {
+                        
+                        for(std::size_t j = 0; j < CommSize; j ++) {
+                            for(std::size_t k = 0; k < comms[j].unshifted.size(); k++) {
+                                unshifted_commitments[comm_idx][k] = comms[j].unshifted[k];
+                            }
+                            comm_idx++;
+                        } 
+                    }
+
+                    static std::array<std::array<var_ec_point, KimchiCommitmentParamsType::shifted_commitment_split>, 
+                        f_comm_base_size> prepare_f_comm_unshifted(const params_type &params) {
+
+                        std::array<std::array<var_ec_point, KimchiCommitmentParamsType::shifted_commitment_split>, 
+                            f_comm_base_size> unshifted_commitments;
+                        std::size_t comm_idx = 0;
+
+                        parse_commitments<1>(unshifted_commitments, 
+                            {params.verifier_index.comm.sigma_comm[KimchiParamsType::permut_size - 1]}, 
+                            comm_idx);
+
+                        // take generic_size coeff_comm
+                        std::array<shifted_commitment_type, KimchiParamsType::ft_generic_size> generic_comm;
+                        for (std::size_t i = 0; i < generic_comm.size(); i++) {
+                            generic_comm[i] = params.verifier_index.comm.coefficient_comm[i];
+                        }
+
+                        parse_commitments<KimchiParamsType::ft_generic_size>(
+                            unshifted_commitments,
+                            generic_comm,
+                            comm_idx
+                        );
+
+                        // for term in terms:
+                        // fill_shifted_commitments(params.proofs[i].comm.witness_comm,
+                        //     params.proofs[i].comm.witness_comm.size());
+
+                        // fill_shifted_commitments(params.verifier_index.comm.coefficient_comm,
+                        //     params.verifier_index.comm.coefficient_comm.size());
+
+                        // fill_shifted_commitments({params.proofs[i].comm.z_comm},
+                        //     1);
+
+                        // fill_shifted_commitments(params.proofs[i].comm.lookup_sorted_comm,
+                        //     params.proofs[i].comm.lookup_sorted_comm.size());
+
+                        // fill_shifted_commitments({params.proofs[i].comm.lookup_agg_comm},
+                        //     1);
+
+                        // fill_shifted_commitments(params.verifier_index.comm.lookup_selectors_comm,
+                        //     params.verifier_index.comm.lookup_selectors_comm.size());
+
+                        // fill_shifted_commitments({params.proofs[i].comm.lookup_runtime_comm},
+                        //     1);
+
+                        // fill_shifted_commitments(params.verifier_index.comm.selectors_comm,
+                        //     params.verifier_index.comm.selectors_comm.size());
+
+                        return unshifted_commitments;
+                    }
+
+                    public:
+
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        std::size_t p_size = params.input.proofs.size();
-                        std::vector<batch_proof_type> batch_proofs;
-                        for(std::size_t i = 0; i < p_size; i++) {
-                            auto p_comm_unshifted = lagrange_msm_component::generate_assignments(assignment, {params.input.PI.neg_pub, params.input.PI.lagrange_bases}, row);
+                        std::array<batch_proof_type, BatchSize> batch_proofs;
+
+                        for(std::size_t i = 0; i < BatchSize; i++) {
+
+                            auto p_comm_unshifted = lagrange_msm_component::generate_assignments(assignment, 
+                                {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row);
                             row = row + lagrange_msm_component::rows_amount;
-                            //params.input.proofs[i].transcript.absorb_assignment(assignment, neg_res[0], row);
-                            //params.input.proofs[i].transcript.absorb_assignment(assignment, neg_res[1], row);
-                            /* for(std::size_t j = 0-; j < params.input.proofs[i].comm.witness_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].unshifted[k].size(); k++) {
-                                    params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.witness_comm[j].unshifted[k], row);
+
+                            //Oracles
+                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[0], row);
+                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[1], row);
+                            /* for(std::size_t j = 0-; j < params.proofs[i].comm.witness_comm.size(); j ++) {
+                                for(std::size_t k = 0; k < params.proofs[i].comm.witness_comm[j].unshifted[k].size(); k++) {
+                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.witness_comm[j].unshifted[k], row);
                                 }
                             } 
                             */
                             //joint_combiner = transcript.squeeze().to_field() add to public input
-                            //for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm[j].unshifted[k].size(); k++) {
-                            // params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.lookup_runtime_comm.unshifted[k], row);
+                            //for(std::size_t k = 0; k < params.proofs[i].comm.lookup_runtime_comm[j].unshifted[k].size(); k++) {
+                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.lookup_runtime_comm.unshifted[k], row);
                             //}
                             /* for(std::size_t j = 0-; j < n_wires; j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm.unshifted[k].size(); k++) {
-                                    params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].lookup_sorted_comm[j].unshifted[k], row);
+                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_sorted_comm.unshifted[k].size(); k++) {
+                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_sorted_comm[j].unshifted[k], row);
                                 }
                             } 
                             */
                            //  auto beta, gamma = transcript.squeeze()
                            /*
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.unshifted[k].size(); k++) {
-                                    params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].lookup_agg_comm[j].unshifted[k], row);
+                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_agg_comm.unshifted[k].size(); k++) {
+                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_agg_comm[j].unshifted[k], row);
 
                             } 
                             */
-                            //for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.unshifted[k].size(); k++) {
-                            // params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.z_comm.unshifted[k], row);
+                            //for(std::size_t k = 0; k < params.proofs[i].comm.z_comm.unshifted[k].size(); k++) {
+                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.z_comm.unshifted[k], row);
                             //}
                             // auto alfa = transcript.squeeze(). to_field();
 
                             //for(std::size_t k = 0; k < permuts; k++) {
-                            // params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.t_comm.unshifted[k], row);
+                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.t_comm.unshifted[k], row);
                             //}
 
                             // auto zeta = transcript.squeeze(). to_field();
                             //get digest from transcript
-                            std::vector<var_ec_point> shifted_commitments;
-                            std::size_t max_size = 0;
-                            std::vector<std::vector<var_ec_point>> unshifted_commitments(KimchiParamsType::f_comm_base_size);
 
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.witness_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[0].push_back(params.input.proofs[i].comm.witness_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.witness_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.witness_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.witness_comm[j].shifted);
-                            } 
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.coefficient_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.coefficient_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[1].push_back(params.input.proofs[i].comm.coefficient_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.coefficient_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.coefficient_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.coefficient_comm[j].shifted);
-                            }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.unshifted.size(); k++) {
-                                    unshifted_commitments[2].push_back(params.input.proofs[i].comm.z_comm.unshifted[k]);
-                                }
-                            if (params.input.proofs[i].comm.z_comm.unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.z_comm.unshifted.size();
-                                }
-                            shifted_commitments.push_back(params.input.proofs[i].comm.z_comm.shifted);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_sorted_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[3].push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].shifted);
-                            }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.unshifted.size(); k++) {
-                                    unshifted_commitments[4].push_back(params.input.proofs[i].comm.lookup_agg_comm.unshifted[k]);
-                                }
-                            if (params.input.proofs[i].comm.lookup_agg_comm.unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_agg_comm.unshifted.size();
-                                }
-                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_agg_comm.shifted);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_selectors_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[5].push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].shifted);
-                            }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size(); k++) {
-                                    unshifted_commitments[6].push_back(params.input.proofs[i].comm.lookup_runtime_comm.unshifted[k]);
-                                }
-                            if (params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size();
-                                }
-                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_runtime_comm.shifted);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.selectors_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.selectors_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[7].push_back(params.input.proofs[i].comm.selectors_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.selectors_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.selectors_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.selectors_comm[j].shifted);
-                            }
+
+                            // ft_comm
+                            std::array<var_ec_point, f_comm_base_size> shifted_commitments =
+                                prepare_f_comm_shifted(params);
+                            std::array<std::array<var_ec_point, 
+                                KimchiCommitmentParamsType::shifted_commitment_split>, f_comm_base_size>
+                                unshifted_commitments = prepare_f_comm_unshifted(params);
+
                             //to-do: U = zero()
-                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
+                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = 
+                                algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
                             assignment.witness(W0)[row] = U.X;
                             assignment.witness(W1)[row] = U.Y;
                             std::size_t urow = row;
-                            auto shifted_commitment_type_shifted = msm_component::generate_assignments(assignment, {params.input.proofs[i].scalars, shifted_commitments}, row);
+                            auto shifted_commitment_type_shifted = msm_component::generate_assignments(
+                                assignment, {params.proofs[i].scalars, shifted_commitments}, row);
                             row+= msm_component::rows_amount;
-                            std::vector<var_ec_point> shifted_commitment_type_unshifted; 
-                            for(std::size_t j = 0; j < max_size; j ++) {
-                                std::vector<var_ec_point> part_unshifted_commitments;
-                                std::vector<var> part_scalars;
-                                for (std::size_t k = 0; k < KimchiParamsType::f_comm_base_size; k++) {
-                                    if (k < unshifted_commitments[j].size()){ 
-                                        part_unshifted_commitments.push_back(unshifted_commitments[j][k]);
-                                        part_scalars.push_back(params.input.proofs[i].scalars[k]);
-                                    } else {
-                                        part_unshifted_commitments.push_back({var(W0, urow, false), var(W1, urow, false)});
-                                        part_scalars.push_back(params.input.proofs[i].scalars[k]);
-                                    }
+                            std::array<var_ec_point, 
+                                KimchiCommitmentParamsType::shifted_commitment_split> shifted_commitment_type_unshifted; 
+                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::shifted_commitment_split; j ++) {
+                                std::array<var_ec_point, f_comm_base_size> part_unshifted_commitments;
+                                std::array<var, f_comm_base_size> part_scalars;
+                                for (std::size_t k = 0; k < f_comm_base_size; k++) {
+                                    part_unshifted_commitments[k] = unshifted_commitments[j][k];
+                                    part_scalars[k] = params.proofs[i].scalars[k];
                                 }
                                 auto res = msm_component::generate_assignments(assignment, {part_scalars, part_unshifted_commitments}, row);
-                                shifted_commitment_type_unshifted.push_back({res.sum.X, res.sum.Y});
+                                shifted_commitment_type_unshifted[j] = {res.sum.X, res.sum.Y};
                                 row+= msm_component::rows_amount;
                             }
                             auto chunked_shifted_commitment_type_shifted = shifted_commitment_type_shifted.sum;
@@ -353,29 +379,36 @@ namespace nil {
                             row++;
 
                             for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
-                                auto res0 = scalar_mul_component::generate_assignments(assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
+                                auto res0 = scalar_mul_component::generate_assignments(assignment, 
+                                    {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, 
+                                    params.fr_data.zeta_to_srs_len}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
-                                auto res1 = add_component::generate_assignments(assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
+                                auto res1 = add_component::generate_assignments(assignment,
+                                    {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y},
+                                    {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
                                 row+=add_component::rows_amount;
                                 chunked_shifted_commitment_type_unshifted = {res1.X, res1.Y};
 
                             }
                             auto chunked_t_comm_shifted = scalar_mul_component::generate_assignments(assignment, 
-                            {{ params.input.proofs[i].comm.t_comm.shifted.X,  params.input.proofs[i].comm.t_comm.shifted.Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
+                                {{ params.proofs[i].comm.t_comm.shifted.X,  params.proofs[i].comm.t_comm.shifted.Y},
+                                params.fr_data.zeta_to_domain_size_minus_1}, row);
                             row+=scalar_mul_component::rows_amount;
                             var_ec_point chunked_t_comm_unshifted = {var(0, urow, false), var(1, urow, false)};;
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.t_comm.unshifted.size(); j++) {
-                                auto res0 = scalar_mul_component::generate_assignments(assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
+                            for(std::size_t j = 0; j < params.proofs[i].comm.t_comm.unshifted.size(); j++) {
+                                auto res0 = scalar_mul_component::generate_assignments(assignment, 
+                                    {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y}, 
+                                    params.fr_data.zeta_to_srs_len}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_t_comm_unshifted = {res0.X, res0.Y};
                                 auto res1 = add_component::generate_assignments(assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {params.input.proofs[i].comm.t_comm.unshifted[j].X, params.input.proofs[i].comm.t_comm.unshifted[j].Y}}, row);
+                                 {params.proofs[i].comm.t_comm.unshifted[j].X, params.proofs[i].comm.t_comm.unshifted[j].Y}}, row);
                                 row+=add_component::rows_amount;
                                 chunked_t_comm_unshifted = {res1.X, res1.Y};
                             }
                             auto chunk_res_unshifted = scalar_mul_component::generate_assignments(assignment, 
-                            {{ chunked_t_comm_unshifted.X,  chunked_t_comm_unshifted.Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
+                            {{ chunked_t_comm_unshifted.X,  chunked_t_comm_unshifted.Y}, params.fr_data.zeta_to_domain_size_minus_1}, row);
                             row+=scalar_mul_component::rows_amount;
                             typename BlueprintFieldType::value_type minus_1 = -1;
                             auto const_res_unshifted = const_mul_component::generate_assignments(assignment, 
@@ -396,34 +429,45 @@ namespace nil {
                             row+=add_component::rows_amount;
                             shifted_commitment_type ft_comm = {{ft_comm_shifted.X, ft_comm_shifted.Y}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
 
-                            std::vector<shifted_commitment_type> evaluations;
+                            std::array<shifted_commitment_type,
+                                KimchiParamsType::evaluations_in_batch_size> evaluations;
+                            std::size_t eval_idx = 0;
+
+                            for (auto chal : params.proofs[i].comm.prev_challenges) {
+                                evaluations[eval_idx++] = chal;
+                            }
+
                             //shifted_commitment_type p_comm = {none, p_comm_unshifted};
                             shifted_commitment_type p_comm = {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
-                            evaluations.push_back(p_comm);
-                            evaluations.push_back(ft_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.z_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.generic_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.psm_comm);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.oracles_poly_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.oracles_poly_comm[j]);
+                            evaluations[eval_idx++] = p_comm;
+                            evaluations[eval_idx++] = ft_comm;
+                            evaluations[eval_idx++] = params.proofs[i].comm.z_comm;
+                            evaluations[eval_idx++] = params.verifier_index.comm.generic_comm;
+                            evaluations[eval_idx++] = params.verifier_index.comm.psm_comm;
+
+                            for(std::size_t j = 0; j < params.proofs[i].comm.witness_comm.size(); j++){
+                                evaluations[eval_idx++] = params.proofs[i].comm.witness_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.witness_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.witness_comm[j]);
+                            for(std::size_t j = 0; j < params.verifier_index.comm.sigma_comm.size() - 1; j++){
+                                evaluations[eval_idx++] = params.verifier_index.comm.sigma_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.sigma_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.sigma_comm[j]);
-                            }
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_sorted_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j]);
-                            }
-                            evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.table_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            batch_proof_type p = {/*params.input.proofs[i].transcript,*/ {evaluations},
-                             params.input.proofs[i].o};
-                            batch_proofs.push_back(p);
+
+                            //to-do lookups
+                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted_comm.size(); j++){
+                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted_comm[j];
+                            // }
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
+
+                            assert(eval_idx == KimchiParamsType::evaluations_in_batch_size);
+
+                            batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
+                                params.proofs[i].o};
+                        
+                            batch_proofs[i] = p;
                         }
-                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index, params.fr_data};
+                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.verifier_index, params.fr_data};
                         batch_verify_component::generate_assignments(assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 
@@ -449,136 +493,70 @@ namespace nil {
                             first_selector_index = selector_iterator->second;
                         }
                         std::size_t row = start_row_index;
-                        std::size_t p_size = params.input.proofs.size();
-                        std::vector<batch_proof_type> batch_proofs;
-                        for(std::size_t i = 0; i < p_size; i++) {
-                            auto p_comm_unshifted = lagrange_msm_component::generate_circuit(bp, assignment, {params.input.PI.neg_pub, params.input.PI.lagrange_bases}, row);
+                        std::array<batch_proof_type, BatchSize> batch_proofs;
+                        for(std::size_t i = 0; i < BatchSize; i++) {
+                            auto p_comm_unshifted = lagrange_msm_component::generate_circuit(bp, assignment,
+                                 {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row);
                             row = row + lagrange_msm_component::rows_amount;
-                            //params.input.proofs[i].transcript.absorb_assignment(assignment, neg_res[0], row);
-                            //params.input.proofs[i].transcript.absorb_assignment(assignment, neg_res[1], row);
-                            /* for(std::size_t j = 0-; j < params.input.proofs[i].comm.witness_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].unshifted[k].size(); k++) {
-                                    params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.witness_comm[j].unshifted[k], row);
+                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[0], row);
+                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[1], row);
+                            /* for(std::size_t j = 0-; j < params.proofs[i].comm.witness_comm.size(); j ++) {
+                                for(std::size_t k = 0; k < params.proofs[i].comm.witness_comm[j].unshifted[k].size(); k++) {
+                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.witness_comm[j].unshifted[k], row);
                                 }
                             } 
                             */
                             //joint_combiner = transcript.squeeze().to_field() add to public input
-                            //for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm[j].unshifted[k].size(); k++) {
-                            // params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.lookup_runtime_comm.unshifted[k], row);
+                            //for(std::size_t k = 0; k < params.proofs[i].comm.lookup_runtime_comm[j].unshifted[k].size(); k++) {
+                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.lookup_runtime_comm.unshifted[k], row);
                             //}
                             /* for(std::size_t j = 0-; j < n_wires; j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm.unshifted[k].size(); k++) {
-                                    params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].lookup_sorted_comm[j].unshifted[k], row);
+                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_sorted_comm.unshifted[k].size(); k++) {
+                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_sorted_comm[j].unshifted[k], row);
                                 }
                             } 
                             */
                            //  auto beta, gamma = transcript.squeeze()
                            /*
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.unshifted[k].size(); k++) {
-                                    params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].lookup_agg_comm[j].unshifted[k], row);
+                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_agg_comm.unshifted[k].size(); k++) {
+                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_agg_comm[j].unshifted[k], row);
 
                             } 
                             */
-                            //for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.unshifted[k].size(); k++) {
-                            // params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.z_comm.unshifted[k], row);
+                            //for(std::size_t k = 0; k < params.proofs[i].comm.z_comm.unshifted[k].size(); k++) {
+                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.z_comm.unshifted[k], row);
                             //}
                             // auto alfa = transcript.squeeze(). to_field();
 
                             //for(std::size_t k = 0; k < permuts; k++) {
-                            // params.input.proofs[i].transcript.absorb_assignment(assignment, params.input.proofs[i].comm.t_comm.unshifted[k], row);
+                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.t_comm.unshifted[k], row);
                             //}
 
                             // auto zeta = transcript.squeeze(). to_field();
                             //get digest from transcript
-                            std::vector<var_ec_point> shifted_commitments;
-                            std::size_t max_size = 0;
-                            std::vector<std::vector<var_ec_point>> unshifted_commitments(KimchiParamsType::f_comm_base_size);
-
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.witness_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.witness_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[0].push_back(params.input.proofs[i].comm.witness_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.witness_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.witness_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.witness_comm[j].shifted);
-                            } 
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.coefficient_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.coefficient_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[1].push_back(params.input.proofs[i].comm.coefficient_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.coefficient_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.coefficient_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.coefficient_comm[j].shifted);
-                            }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.z_comm.unshifted.size(); k++) {
-                                    unshifted_commitments[2].push_back(params.input.proofs[i].comm.z_comm.unshifted[k]);
-                                }
-                            if (params.input.proofs[i].comm.z_comm.unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.z_comm.unshifted.size();
-                                }
-                            shifted_commitments.push_back(params.input.proofs[i].comm.z_comm.shifted);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_sorted_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[3].push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_sorted_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j].shifted);
-                            }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_agg_comm.unshifted.size(); k++) {
-                                    unshifted_commitments[4].push_back(params.input.proofs[i].comm.lookup_agg_comm.unshifted[k]);
-                                }
-                            if (params.input.proofs[i].comm.lookup_agg_comm.unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_agg_comm.unshifted.size();
-                                }
-                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_agg_comm.shifted);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_selectors_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[5].push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_selectors_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.lookup_selectors_comm[j].shifted);
-                            }
-                            for(std::size_t k = 0; k < params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size(); k++) {
-                                    unshifted_commitments[6].push_back(params.input.proofs[i].comm.lookup_runtime_comm.unshifted[k]);
-                                }
-                            if (params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.lookup_runtime_comm.unshifted.size();
-                                }
-                            shifted_commitments.push_back(params.input.proofs[i].comm.lookup_runtime_comm.shifted);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.selectors_comm.size(); j ++) {
-                                for(std::size_t k = 0; k < params.input.proofs[i].comm.selectors_comm[j].unshifted.size(); k++) {
-                                    unshifted_commitments[7].push_back(params.input.proofs[i].comm.selectors_comm[j].unshifted[k]);
-                                }
-                                if (params.input.proofs[i].comm.selectors_comm[j].unshifted.size() > max_size) {
-                                    max_size = params.input.proofs[i].comm.selectors_comm[j].unshifted.size();
-                                }
-                                shifted_commitments.push_back(params.input.proofs[i].comm.selectors_comm[j].shifted);
-                            }
+                            
+                            std::array<var_ec_point, f_comm_base_size> shifted_commitments =
+                                prepare_f_comm_shifted(params);
+                            std::array<std::array<var_ec_point, 
+                                KimchiCommitmentParamsType::shifted_commitment_split>, f_comm_base_size>
+                                unshifted_commitments = prepare_f_comm_unshifted(params);
+                                
                             //to-do: U = zero()
                             std::size_t urow = row;
-                            auto shifted_commitment_type_shifted = msm_component::generate_circuit(bp, assignment, {params.input.proofs[i].scalars, shifted_commitments}, row);
+                            auto shifted_commitment_type_shifted = msm_component::generate_circuit(
+                                bp, assignment, {params.proofs[i].scalars, shifted_commitments}, row);
                             row+= msm_component::rows_amount;
-                            std::vector<var_ec_point> shifted_commitment_type_unshifted; 
-                            for(std::size_t j = 0; j < max_size; j ++) {
-                                std::vector<var_ec_point> part_unshifted_commitments;
-                                std::vector<var> part_scalars;
-                                for (std::size_t k = 0; k < KimchiParamsType::f_comm_base_size; k++) {
-                                    if (k < unshifted_commitments[j].size()){
-                                        part_unshifted_commitments.push_back(unshifted_commitments[j][k]);
-                                        part_scalars.push_back(params.input.proofs[i].scalars[k]);
-                                    } else {
-                                        part_unshifted_commitments.push_back({var(W0, urow, false), var(W1, urow, false)});
-                                        part_scalars.push_back(params.input.proofs[i].scalars[k]);
-                                    }
+                            std::array<var_ec_point,
+                                KimchiCommitmentParamsType::shifted_commitment_split> shifted_commitment_type_unshifted; 
+                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::shifted_commitment_split; j ++) {
+                                std::array<var_ec_point, f_comm_base_size> part_unshifted_commitments;
+                                std::array<var, f_comm_base_size> part_scalars;
+                                for (std::size_t k = 0; k < f_comm_base_size; k++) {
+                                    part_unshifted_commitments[k] = unshifted_commitments[j][k];
+                                    part_scalars[k] = params.proofs[i].scalars[k];
                                 }
                                 auto res = msm_component::generate_circuit(bp, assignment, {part_scalars, part_unshifted_commitments}, row);
-                                shifted_commitment_type_unshifted.push_back({res.sum.X, res.sum.Y});
+                                shifted_commitment_type_unshifted[j] = {res.sum.X, res.sum.Y};
                                 row+= msm_component::rows_amount;
                             }
                             auto chunked_shifted_commitment_type_shifted = shifted_commitment_type_shifted.sum;
@@ -586,7 +564,7 @@ namespace nil {
                             row++;
 
                             for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
-                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
+                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, params.fr_data.zeta_to_srs_len}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
                                 zk::components::generate_circuit<add_component>(bp, assignment, 
@@ -597,22 +575,22 @@ namespace nil {
 
                             }
                             auto chunked_t_comm_shifted = scalar_mul_component::generate_circuit(bp, assignment, 
-                            {{ params.input.proofs[i].comm.t_comm.shifted.X,  params.input.proofs[i].comm.t_comm.shifted.Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
+                            {{ params.proofs[i].comm.t_comm.shifted.X,  params.proofs[i].comm.t_comm.shifted.Y}, params.fr_data.zeta_to_domain_size_minus_1}, row);
                             row+=scalar_mul_component::rows_amount;
                             var_ec_point chunked_t_comm_unshifted = {var(0, urow, false), var(1, urow, false)};;
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.t_comm.unshifted.size(); j++) {
-                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y}, params.input.PI.zeta_to_srs_len}, row);
+                            for(std::size_t j = 0; j < params.proofs[i].comm.t_comm.unshifted.size(); j++) {
+                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y}, params.fr_data.zeta_to_srs_len}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_t_comm_unshifted = {res0.X, res0.Y};
                                 zk::components::generate_circuit<add_component>(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {params.input.proofs[i].comm.t_comm.unshifted[j].X, params.input.proofs[i].comm.t_comm.unshifted[j].Y}}, row);
+                                 {params.proofs[i].comm.t_comm.unshifted[j].X, params.proofs[i].comm.t_comm.unshifted[j].Y}}, row);
                                 typename add_component::result_type res1({{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {params.input.proofs[i].comm.t_comm.unshifted[j].X, params.input.proofs[i].comm.t_comm.unshifted[j].Y}}, row);
+                                 {params.proofs[i].comm.t_comm.unshifted[j].X, params.proofs[i].comm.t_comm.unshifted[j].Y}}, row);
                                 row+=add_component::rows_amount;
                                 chunked_t_comm_unshifted = {res1.X, res1.Y};
                             }
                             auto chunk_res_unshifted = scalar_mul_component::generate_circuit(bp, assignment, 
-                            {{ chunked_t_comm_unshifted.X,  chunked_t_comm_unshifted.Y}, params.input.PI.zeta_to_domain_size_minus_1}, row);
+                            {{ chunked_t_comm_unshifted.X,  chunked_t_comm_unshifted.Y}, params.fr_data.zeta_to_domain_size_minus_1}, row);
                             row+=scalar_mul_component::rows_amount;
                             typename BlueprintFieldType::value_type minus_1 = -1;
                             zk::components::generate_circuit<const_mul_component>(bp, assignment, 
@@ -639,34 +617,42 @@ namespace nil {
                             row+=add_component::rows_amount;
                             shifted_commitment_type ft_comm = {{ft_comm_shifted.X, ft_comm_shifted.Y}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
 
-                            std::vector<shifted_commitment_type> evaluations;
+                            std::array<shifted_commitment_type,
+                                KimchiParamsType::evaluations_in_batch_size> evaluations;
+                            std::size_t eval_idx = 0;
+                            for (auto chal : params.proofs[i].comm.prev_challenges) {
+                                evaluations[eval_idx++] = chal;
+                            }
                             //shifted_commitment_type p_comm = {none, p_comm_unshifted};
                             shifted_commitment_type p_comm = {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}, {{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
-                            evaluations.push_back(p_comm);
-                            evaluations.push_back(ft_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.z_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.generic_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.psm_comm);
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.oracles_poly_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.oracles_poly_comm[j]);
+                            evaluations[eval_idx++] = p_comm;
+                            evaluations[eval_idx++] = ft_comm;
+                            evaluations[eval_idx++] = params.proofs[i].comm.z_comm;
+                            evaluations[eval_idx++] = params.verifier_index.comm.generic_comm;
+                            evaluations[eval_idx++] = params.verifier_index.comm.psm_comm;
+
+                            for(std::size_t j = 0; j < params.proofs[i].comm.witness_comm.size(); j++){
+                                evaluations[eval_idx++] = params.proofs[i].comm.witness_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.witness_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.witness_comm[j]);
+                            for(std::size_t j = 0; j < params.verifier_index.comm.sigma_comm.size() - 1; j++){
+                                evaluations[eval_idx++] = params.verifier_index.comm.sigma_comm[j];
                             }
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.sigma_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.sigma_comm[j]);
-                            }
-                            for(std::size_t j = 0; j < params.input.proofs[i].comm.lookup_sorted_comm.size(); j++){
-                                evaluations.push_back(params.input.proofs[i].comm.lookup_sorted_comm[j]);
-                            }
-                            evaluations.push_back(params.input.proofs[i].comm.lookup_agg_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.table_comm);
-                            evaluations.push_back(params.input.proofs[i].comm.lookup_runtime_comm);
-                            batch_proof_type p = {/*params.input.proofs[i].transcript,*/ {evaluations},
-                             params.input.proofs[i].o};
-                            batch_proofs.push_back(p);
+
+                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted_comm.size(); j++){
+                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted_comm[j];
+                            // }
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
+                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
+
+                            assert(eval_idx == KimchiParamsType::evaluations_in_batch_size);
+
+                            batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
+                                params.proofs[i].o};
+                            
+                            batch_proofs[i] = p;
                         }
-                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.input.verifier_index, params.fr_data};
+                        typename batch_verify_component::params_type batch_params = {batch_proofs, params.verifier_index, params.fr_data};
                         batch_verify_component::generate_circuit(bp, assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 

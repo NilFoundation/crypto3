@@ -139,9 +139,11 @@ namespace nil {
                 
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
 
                     constexpr static const std::size_t eval_points_amount = 2;
+                    using prev_chal_output = 
+                            std::array<std::array<var, KimchiCommitmentParamsType::size_for_max_poly>, eval_points_amount>;
 
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
@@ -248,7 +250,9 @@ namespace nil {
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
                         std::array<var, eval_points_amount> p_eval;
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks;
-                        std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges;
+                        std::array<
+                            std::array<var, KimchiCommitmentParamsType::eval_rounds>,
+                            KimchiParamsType::prev_challenges_size> prev_challenges;
                         var zeta_pow_n;
                         var ft_eval0;
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
@@ -378,16 +382,20 @@ namespace nil {
                                              .output;
                         row += exponentiation_component::rows_amount;
 
-                        std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
-                            params.proof.prev_challenges;
-                        std::array<std::array<var, KimchiCommitmentParamsType::res_size>, eval_points_amount> 
-                            prev_challenges_evals = 
-                            prev_chal_evals_component::generate_circuit(bp, assignment,
-                                {prev_challenges, 
-                                {{zeta, zeta_omega}},
-                                powers_of_eval_points_for_chunks, 
-                                one, zero}, row).output;
-                        row += prev_chal_evals_component::rows_amount;
+                        
+                        std::array<prev_chal_output, KimchiParamsType::prev_challenges_size> prev_challenges_evals;
+
+                        for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; i++) {
+                            std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
+                                params.proof.prev_challenges[i];
+                            prev_challenges_evals[i] = 
+                                prev_chal_evals_component::generate_circuit(bp, assignment,
+                                    {prev_challenges, 
+                                    {{zeta, zeta_omega}},
+                                    powers_of_eval_points_for_chunks, 
+                                    one, zero}, row).output;
+                            row += prev_chal_evals_component::rows_amount;
+                        }
 
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
                             eval_points_amount> combined_evals;
@@ -444,7 +452,7 @@ namespace nil {
                             alpha_powers,
                             public_eval,
                             powers_of_eval_points_for_chunks,
-                            prev_challenges,
+                            params.proof.prev_challenges,
                             zeta_pow_n,
                             ft_eval0,
                             combined_evals,
@@ -554,16 +562,19 @@ namespace nil {
                         };
                         row += 2 * exponentiation_component::rows_amount;
 
-                        std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
-                            params.proof.prev_challenges;
-                        std::array<std::array<var, KimchiCommitmentParamsType::res_size>, eval_points_amount> 
-                            prev_challenges_evals = 
-                            prev_chal_evals_component::generate_assignments(assignment,
-                                {prev_challenges, 
-                                {{zeta, zeta_omega}},
-                                powers_of_eval_points_for_chunks, 
-                                one, zero}, row).output;
-                        row += prev_chal_evals_component::rows_amount;
+                        std::array<prev_chal_output, KimchiParamsType::prev_challenges_size> prev_challenges_evals;
+
+                        for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; i++) {
+                            std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
+                                params.proof.prev_challenges[i];
+                            prev_challenges_evals[i] = 
+                                prev_chal_evals_component::generate_assignments(assignment,
+                                    {prev_challenges, 
+                                    {{zeta, zeta_omega}},
+                                    powers_of_eval_points_for_chunks, 
+                                    one, zero}, row).output;
+                            row += prev_chal_evals_component::rows_amount;
+                        }
 
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
                             eval_points_amount> combined_evals;
@@ -617,7 +628,7 @@ namespace nil {
                             alpha_powers,
                             public_eval,
                             powers_of_eval_points_for_chunks,
-                            prev_challenges,
+                            params.proof.prev_challenges,
                             zeta_pow_n,
                             ft_eval0,
                             combined_evals,

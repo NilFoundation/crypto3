@@ -76,7 +76,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
 
                     using fq_data = typename proof_binding::fq_data<var>;
 

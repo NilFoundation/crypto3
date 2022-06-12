@@ -42,8 +42,10 @@ namespace nil {
                     std::size_t WitnessColumns, std::size_t PermutSize,
                     bool UseLookup, std::size_t LookupTableSize,
                     std::size_t AlphaPowersN, std::size_t PublicInputSize,
-                    std::size_t IndexTermSize>
+                    std::size_t IndexTermSize, std::size_t PrevChalSize>
                 struct kimchi_params_type {
+                    using commitment_params_type = CommitmentParamsType;
+
                     constexpr static std::size_t alpha_powers_n = AlphaPowersN;
                     constexpr static std::size_t public_input_size = PublicInputSize;
                     constexpr static std::size_t witness_columns = WitnessColumns;
@@ -52,24 +54,36 @@ namespace nil {
                     constexpr static bool use_lookup = UseLookup;
 
                     constexpr static std::size_t permutation_constraints = 3;
-                    constexpr static std::size_t generic_constraints = 2;
+                    constexpr static std::size_t ft_generic_size = 2 * 5;
 
                     constexpr static std::size_t eval_points_amount = 2;
                     constexpr static std::size_t scalar_challenge_size = 128;
 
-                    constexpr static std::size_t f_comm_base_size = 1 // permuation-argument
-                        + 5 // generic gate
-                        + IndexTermSize;
-                    constexpr static std::size_t evaluations_in_batch_size = 1;
+                    constexpr static std::size_t prev_challenges_size = PrevChalSize;
+
+                    constexpr static std::size_t lookup_comm_size = 0;
+                    constexpr static std::size_t index_term_size = IndexTermSize;
+
+                    constexpr static std::size_t evaluations_in_batch_size = 
+                        prev_challenges_size // recursion
+                        + 1 // p_comm
+                        + 1 // ft_comm
+                        + 1 // z_comm
+                        + 1 // generic_comm
+                        + 1 // psm_comm
+                        + witness_columns // w_comm
+                        + permut_size - 1
+                        + lookup_comm_size;
 
                     constexpr static std::size_t final_msm_size(const std::size_t batch_size) {
-                        return CommitmentParamsType::srs_len 
-                            + 1  // H
-                            + (1
-                                + 1
+                        return 1 // H
+                            + CommitmentParamsType::srs_len   // G
+                            + (1 // opening.G
+                                + 1 // U
                                 + 2 * CommitmentParamsType::eval_rounds
-                                + evaluations_in_batch_size
-                                + 1) 
+                                + evaluations_in_batch_size * (commitment_params_type::shifted_commitment_split + 1)
+                                + 1 // U
+                                + 1) // opening.delta 
                             * batch_size;
                     }
                 };
@@ -79,10 +93,10 @@ namespace nil {
                 struct kimchi_commitment_params_type {
                     constexpr static std::size_t max_poly_size = MaxPolySize;
                     constexpr static std::size_t eval_rounds = EvalRounds;
-                    constexpr static std::size_t res_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
+                    constexpr static std::size_t size_for_max_poly = max_poly_size == (1 << eval_rounds) ? 1 : 2;
                     constexpr static std::size_t srs_len = SrsLen;
 
-                    constexpr static std::size_t shifted_commitment_split = 7;
+                    constexpr static std::size_t shifted_commitment_split = 1; // todo
                 };
             }    // namespace components
         }        // namespace zk

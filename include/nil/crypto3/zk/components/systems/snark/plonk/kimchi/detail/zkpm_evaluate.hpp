@@ -103,7 +103,8 @@ namespace nil {
                     constexpr static const std::size_t zk_rows = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = exp_component::rows_amount 
+                        + 4 * mul_component::rows_amount + 3 * sub_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -124,64 +125,71 @@ namespace nil {
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
+
+                        generate_assignments_constants(bp, assignment, params, start_row_index);
+
+                        var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index + 2, false, var::column_type::constant);
+                        
                         std::size_t row = start_row_index;
 
-                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
-                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
-                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
+                        result_type result(row);
 
                         var w1 = exp_component::generate_circuit(bp, assignment, {params.group_gen, domain_size, zero, one}, row).output;
                         row += exp_component::rows_amount;
-                        var w2 = zk::components::generate_circuit<mul_component>(bp, assignment, {w1, params.group_gen}, row).res;
+                        var w2 = zk::components::generate_circuit<mul_component>(bp, assignment, {w1, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
-                        var w3 = zk::components::generate_circuit<mul_component>(bp, assignment, {w2, params.group_gen}, row).res;
-                        row += mul_component::rows_amount;
-
-                        var a1 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w1}, row).res;
-                        row += sub_component::rows_amount;
-                        var a2 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w2}, row).res;
-                        row += sub_component::rows_amount;
-                        var a3 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w3}, row).res;
-                        row += sub_component::rows_amount;
-
-                        var ans1 = zk::components::generate_circuit<mul_component>(bp, assignment, {a1, a2}, row).res;
-                        row += mul_component::rows_amount;
-                        var ans2 = zk::components::generate_circuit<mul_component>(bp, assignment, {ans1, a3}, row).res;
+                        var w3 = zk::components::generate_circuit<mul_component>(bp, assignment, {w2, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
 
-                        return result_type(row);
+                        var a1 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w1}, row).output;
+                        row += sub_component::rows_amount;
+                        var a2 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w2}, row).output;
+                        row += sub_component::rows_amount;
+                        var a3 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w3}, row).output;
+                        row += sub_component::rows_amount;
+
+                        var ans1 = zk::components::generate_circuit<mul_component>(bp, assignment, {a1, a2}, row).output;
+                        row += mul_component::rows_amount;
+                        result.output = zk::components::generate_circuit<mul_component>(bp, assignment, {ans1, a3}, row).output;
+                        row += mul_component::rows_amount;
+
+                        return result;
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
                                                             const std::size_t start_row_index) {
 
+                        var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index + 2, false, var::column_type::constant);
+
                         std::size_t row = start_row_index;
 
-                        var zero = var(0, start_row_index + 4, false, var::column_type::constant);
-                        var one = var(0, start_row_index + 5, false, var::column_type::constant);
-                        var domain_size = var(0, start_row_index + 6, false, var::column_type::constant);
+                        result_type result(row);
 
                         var w1 = exp_component::generate_assignments(assignment, {params.group_gen, domain_size, zero, one}, row).output;
                         row += exp_component::rows_amount;
-                        var w2 = mul_component::generate_assignments(assignment, {w1, params.group_gen}, row).res;
+                        var w2 = mul_component::generate_assignments(assignment, {w1, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
-                        var w3 = mul_component::generate_assignments(assignment, {w2, params.group_gen}, row).res;
-                        row += mul_component::rows_amount;
-
-                        var a1 = sub_component::generate_assignments(assignment, {params.x, w1}, row).res;
-                        row += sub_component::rows_amount;
-                        var a2 = sub_component::generate_assignments(assignment, {params.x, w2}, row).res;
-                        row += sub_component::rows_amount;
-                        var a3 = sub_component::generate_assignments(assignment, {params.x, w3}, row).res;
-                        row += sub_component::rows_amount;
-
-                        var ans1 = mul_component::generate_assignments(assignment, {a1, a2}, row).res;
-                        row += mul_component::rows_amount;
-                        var ans2 = mul_component::generate_assignments(assignment, {ans1, a3}, row).res;
+                        var w3 = mul_component::generate_assignments(assignment, {w2, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
 
-                        return result_type(row);
+                        var a1 = sub_component::generate_assignments(assignment, {params.x, w1}, row).output;
+                        row += sub_component::rows_amount;
+                        var a2 = sub_component::generate_assignments(assignment, {params.x, w2}, row).output;
+                        row += sub_component::rows_amount;
+                        var a3 = sub_component::generate_assignments(assignment, {params.x, w3}, row).output;
+                        row += sub_component::rows_amount;
+
+                        var ans1 = mul_component::generate_assignments(assignment, {a1, a2}, row).output;
+                        row += mul_component::rows_amount;
+                        result.output = mul_component::generate_assignments(assignment, {ans1, a3}, row).output;
+                        row += mul_component::rows_amount;
+
+                        return result;
                     }
 
                 private:
@@ -202,7 +210,7 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
-                        std::size_t row = start_row_index + 4;
+                        std::size_t row = start_row_index;
                         assignment.constant(0)[row] = 0;
                         row++;
                         assignment.constant(0)[row] = 1;

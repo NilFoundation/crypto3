@@ -109,7 +109,7 @@ namespace nil {
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 
                     using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType, KimchiCommitmentParamsType::eval_rounds>;
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType, KimchiCommitmentParamsType::eval_rounds>;
 
                     using shifted_commitment_type = typename 
                         zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
@@ -121,10 +121,10 @@ namespace nil {
                             KimchiCommitmentParamsType>;
 
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
-                        KimchiCommitmentParamsType>;
+                        KimchiParamsType>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
 
                     constexpr static const std::size_t selector_seed = 0xff91;
 
@@ -134,7 +134,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::vector<batch_proof_type> proofs;
+                        std::array<batch_proof_type, BatchSize> proofs;
                         verifier_index_type verifier_index;
                         typename proof_binding::fr_data<var, BatchSize> fr_output;
                     };
@@ -151,10 +151,13 @@ namespace nil {
                         std::size_t row = component_start_row;
                         typename BlueprintFieldType::integral_type one = 1;
                         var two_pow_255(0, row, false, var::column_type::constant);
-                        std::vector<var_ec_point> bases;
-                        bases.push_back(params.verifier_index.H);
+                        std::array<var_ec_point, final_msm_size> bases;
+                        std::size_t bases_idx = 0;
+
+                        bases[bases_idx++] = params.verifier_index.H;
+                        
                         for(std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i++) {
-                            bases.push_back(params.verifier_index.G[i]);
+                            bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
                             var cip = params.fr_output.cip[i];
@@ -164,32 +167,36 @@ namespace nil {
 
                             //params.proofs[i].transcript.absorb_assignment(assignment, sub_res.output, row);
                             //U = transcript.squeeze.to_group()
-                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
-                            assignment.witness(W0)[row] = U.X;
-                            assignment.witness(W1)[row] = U.Y;
-                            std::size_t u_row = row;
+                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U_value =
+                                 algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
+                            assignment.witness(W0)[row] = U_value.X;
+                            assignment.witness(W1)[row] = U_value.Y;
+                            var_ec_point U = {var(0, row), var(1, row)};
                             row++;
 
                             //params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].o.delta.x, row);
                             //params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].o.delta.y, row);
-                            bases.push_back(params.proofs[i].opening_proof.G);
-                            bases.push_back({var(0, row), var(1, row)});
+                            bases[bases_idx++] = params.proofs[i].opening_proof.G;
+                            bases[bases_idx++] = U;
                             for (std::size_t j = 0 ; j < params.proofs[i].opening_proof.L.size(); j++) {
-                                bases.push_back(params.proofs[i].opening_proof.L[j]);
-                                bases.push_back(params.proofs[i].opening_proof.R[j]);
+                                bases[bases_idx++] = params.proofs[i].opening_proof.L[j];
+                                bases[bases_idx++] = params.proofs[i].opening_proof.R[j];
                             }
                             std::size_t unshifted_size = 0;
 
                             for (std::size_t j = 0 ; j < params.proofs[i].comm.size(); j++) {
                                 unshifted_size = params.proofs[i].comm[j].unshifted.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
-                                    bases.push_back(params.proofs[i].comm[j].unshifted[k]);
+                                    bases[bases_idx++] = params.proofs[i].comm[j].unshifted[k];
                                 }
-                                bases.push_back(params.proofs[i].comm[j].shifted);
+                                bases[bases_idx++] = params.proofs[i].comm[j].shifted;
                             }
-                            bases.push_back({var(0, u_row, false), var(1, u_row, false)});
-                            bases.push_back(params.proofs[i].opening_proof.delta);
+                            bases[bases_idx++] = U;
+                            bases[bases_idx++] = params.proofs[i].opening_proof.delta;
                         }
+
+                        assert(bases_idx == final_msm_size);
+
                         auto res = msm_component::generate_assignments(assignment, {params.fr_output.scalars, bases}, row);
                         return result_type(component_start_row);
                     }
@@ -204,10 +211,13 @@ namespace nil {
 
                         std::size_t row = start_row_index;
                         var two_pow_255(0, row, false, var::column_type::constant);
-                        std::vector<var_ec_point> bases;
-                        bases.push_back(params.verifier_index.H);
+                        
+                        std::array<var_ec_point, final_msm_size> bases;
+                        std::size_t bases_idx = 0;
+
+                        bases[bases_idx++] = params.verifier_index.H;
                         for(std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i ++) {
-                            bases.push_back(params.verifier_index.G[i]);
+                            bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
                             var cip = params.fr_output.cip[i];
@@ -219,30 +229,33 @@ namespace nil {
 
                             //params.proofs[i].transcript.absorb_assignment(assignment, sub_res.output, row);
                             //U = transcript.squeeze.to_group()
-                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
-                            std::size_t u_row = row;
+                            var_ec_point U = {var(0, row), var(1, row)};
+                            
                             row++;
 
                             //params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].o.delta.x, row);
                             //params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].o.delta.y, row);
-                            bases.push_back(params.proofs[i].opening_proof.G);
-                            bases.push_back({var(0, row), var(1, row)});
+                            bases[bases_idx++] = params.proofs[i].opening_proof.G;
+                            bases[bases_idx++] = U;
                             for (std::size_t j = 0 ; j < params.proofs[i].opening_proof.L.size(); j++) {
-                                bases.push_back(params.proofs[i].opening_proof.L[j]);
-                                bases.push_back(params.proofs[i].opening_proof.R[j]);
+                                bases[bases_idx++] = params.proofs[i].opening_proof.L[j];
+                                bases[bases_idx++] = params.proofs[i].opening_proof.R[j];
                             }
                             std::size_t unshifted_size = 0;
 
                             for (std::size_t j = 0 ; j < params.proofs[i].comm.size(); j++) {
                                 unshifted_size = params.proofs[i].comm[j].unshifted.size();
-                                for (std::size_t k =0; k< unshifted_size; k++){
-                                    bases.push_back(params.proofs[i].comm[j].unshifted[k]);
+                                for (std::size_t k =0; k < unshifted_size; k++){
+                                    bases[bases_idx++] = params.proofs[i].comm[j].unshifted[k];
                                 }
-                                bases.push_back(params.proofs[i].comm[j].shifted);
+                                bases[bases_idx++] = params.proofs[i].comm[j].shifted;
                             }
-                            bases.push_back({var(0, u_row, false), var(1, u_row, false)});
-                            bases.push_back(params.proofs[i].opening_proof.delta);
+                            bases[bases_idx++] = U;
+                            bases[bases_idx++] = params.proofs[i].opening_proof.delta;
                         }
+
+                        assert(bases_idx == final_msm_size);
+
                         auto res = msm_component::generate_circuit(bp, assignment, {params.fr_output.scalars, bases}, row);
                         return result_type(start_row_index);
                     }

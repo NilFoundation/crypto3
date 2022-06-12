@@ -78,9 +78,8 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-
-                        std::vector<var> scalars;
-                        std::vector<var_ec_point> bases;
+                        std::array<var, PointsAmount> scalars;
+                        std::array<var_ec_point, PointsAmount> bases;
                     };
 
                     struct result_type {

@@ -113,8 +113,11 @@ namespace nil {
                     struct params_type {
                         var ft_eval0;
                         var ft_eval1;
-                        std::array<std::array<var, KimchiCommitmentParamsType::res_size>, 
-                            eval_points_amount> polys;
+                        std::array<
+                            std::array<
+                            std::array<var, KimchiCommitmentParamsType::size_for_max_poly>, 
+                            eval_points_amount>,
+                            KimchiParamsType::prev_challenges_size> polys;
                         std::array<var, eval_points_amount> p_eval;
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
                             eval_points_amount> evals;

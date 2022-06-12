@@ -123,13 +123,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
 
     constexpr std::size_t srs_len = 5;
     constexpr static const std::size_t index_terms = 0;
+    constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
         srs_len>;
     using kimchi_params = zk::components::kimchi_params_type<commitment_params,
         witness_columns, perm_size,
         use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size, index_terms>;
+        alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
 
     zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
     typename BlueprintFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
@@ -170,7 +171,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
         public_input.push_back(cip);
         batches[i].cip = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-        typename zk::components::binding<ArithmetizationType, BlueprintFieldType, commitment_params>::fq_sponge_output fq_output;
+        typename zk::components::binding<ArithmetizationType, BlueprintFieldType, kimchi_params>::fq_sponge_output fq_output;
 
         std::array<var, eval_rounds> challenges;
         for (std::size_t j = 0; j < eval_rounds; j++) {
@@ -211,6 +212,16 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
 
         public_input.push_back(algebra::random_element<BlueprintFieldType>());
         batches[i].r = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        batches[i].opening = {var(0, public_input.size() - 2, false, var::column_type::public_input),
+            var(0, public_input.size() - 1, false, var::column_type::public_input)};
+
+        for (std::size_t j = 0; j < kimchi_params::evaluations_in_batch_size; j++) {
+            public_input.push_back(algebra::random_element<BlueprintFieldType>());
+            batches[i].evaluations[j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+        }
     }
 
     typename component_type::params_type params = {batches};

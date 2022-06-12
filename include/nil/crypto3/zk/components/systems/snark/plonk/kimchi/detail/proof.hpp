@@ -81,17 +81,26 @@ namespace nil {
                     }
                 };
 
+                template<typename BlueprintFieldType>
+                struct kimchi_opening_proof_scalar {
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    var z1;
+                    var z2;
+                };
+
                 template<typename BlueprintFieldType, typename KimchiParamsType,
                     std::size_t EvalRounds>
                 struct kimchi_proof_scalar {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    constexpr static const std::size_t chal_per_round = 2;
-
                     std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, 2> proof_evals;
                     var ft_eval;
                     std::array<var, KimchiParamsType::public_input_size> public_input;
-                    std::array<var, EvalRounds> prev_challenges;
+                    std::array<std::array<var, EvalRounds>, KimchiParamsType::prev_challenges_size> prev_challenges;
+
+                    kimchi_opening_proof_scalar<BlueprintFieldType> 
+                        opening;
                 };
 
                 template<typename BlueprintFieldType,
@@ -100,7 +109,7 @@ namespace nil {
                          typename KimchiCommitmentParamsType>
                 struct batch_evaluation_proof_scalar {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     var cip;
@@ -110,11 +119,16 @@ namespace nil {
                     var r;
                     // scaling factor for evaluation point powers
                     var xi;
+
+                    std::array<var, 
+                        KimchiParamsType::evaluations_in_batch_size> evaluations;
+                    kimchi_opening_proof_scalar<BlueprintFieldType> 
+                        opening;
                 };
 
                 template<typename BlueprintFieldType,
                     std::size_t EvalRounds>
-                struct kimchi_opening_proof {
+                struct kimchi_opening_proof_base {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 
@@ -124,13 +138,50 @@ namespace nil {
                     var_ec_point G;
                 };
 
+                template<typename BlueprintFieldType, typename KimchiParamsType>
+                struct kimchi_proof_base {
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using commitment_params_type = typename 
+                        KimchiParamsType::commitment_params_type;
+
+                    using shifted_commitment_type = typename 
+                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                            commitment_params_type::shifted_commitment_split>;
+
+                    using opening_proof_type = typename 
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType,
+                        commitment_params_type::eval_rounds>;
+
+                    struct commitments {
+                        std::array<shifted_commitment_type,
+                            KimchiParamsType::witness_columns> witness_comm;
+                        shifted_commitment_type lookup_runtime_comm;
+                        shifted_commitment_type table_comm;
+                        std::vector<shifted_commitment_type> lookup_sorted_comm;
+                        shifted_commitment_type lookup_agg_comm;
+                        shifted_commitment_type z_comm;
+                        shifted_commitment_type t_comm;
+                        std::array<shifted_commitment_type, 
+                            KimchiParamsType::prev_challenges_size>
+                            prev_challenges; // to-do: get in the component from oracles
+                    };
+
+                    constexpr static const std::size_t f_comm_base_size = 1 // permuation-argument
+                        + 5 // generic gate
+                        + KimchiParamsType::index_term_size;
+
+                    commitments comm;
+                    opening_proof_type o;
+                    std::array<var, f_comm_base_size> scalars;
+                };
+
                 template<typename BlueprintFieldType,
                          typename ArithmetizationType,
                          typename KimchiParamsType,
                          typename KimchiCommitmentParamsType>
                 struct batch_evaluation_proof_base {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiCommitmentParamsType>;
+                        BlueprintFieldType, KimchiParamsType>;
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using shifted_commitment_type = typename 
@@ -138,22 +189,13 @@ namespace nil {
                             KimchiCommitmentParamsType::shifted_commitment_split>;
 
                     using opening_proof_type = typename 
-                        zk::components::kimchi_opening_proof<BlueprintFieldType, 
+                        zk::components::kimchi_opening_proof_base<BlueprintFieldType, 
                         KimchiCommitmentParamsType::eval_rounds>;
 
                     //typename proof_binding::fq_sponge_output fq_output;
-                    std::vector<shifted_commitment_type> comm;
+                    std::array<shifted_commitment_type, 
+                        KimchiParamsType::evaluations_in_batch_size> comm;
                     opening_proof_type opening_proof;
-                };
-
-                template<typename BlueprintFieldType, typename KimchiParamsType,
-                    std::size_t EvalRounds>
-                struct kimchi_proof_base {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
-
-                    constexpr static const std::size_t chal_per_round = 2;
-
-                    
                 };
             }    // namespace components
         }        // namespace zk

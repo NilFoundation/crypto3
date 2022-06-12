@@ -65,18 +65,40 @@ namespace nil {
                     std::map<argument_type, std::pair<int, int>> alpha_map;
 
                     std::array<constraint_description, constraints_amount> constraints;
+
+                    kimchi_verifier_index_scalar() {
+                        alpha_map[argument_type::Permutation] = {0, 0};
+                        alpha_map[argument_type::Generic] = {1, 1};
+                    }
                 };
 
                 template<typename CurveType,
-                    typename KimchiCommitmentParamsType>
+                    typename KimchiParamsType>
                 struct kimchi_verifier_index_base {
                     using FieldType = typename CurveType::base_field_type;
+                    using commitment_params_type = typename KimchiParamsType::commitment_params_type;
+
+                    using shifted_commitment_type = typename 
+                        zk::components::kimchi_shifted_commitment_type<FieldType    , 
+                            commitment_params_type::shifted_commitment_split>;
 
                     using var = snark::plonk_variable<FieldType>;
                     using var_ec_point = typename zk::components::var_ec_point<FieldType>;
 
+                    struct commitments {
+                        std::array<shifted_commitment_type,
+                            KimchiParamsType::permut_size> sigma_comm;
+                        std::vector<shifted_commitment_type> coefficient_comm;
+                        shifted_commitment_type generic_comm;
+                        shifted_commitment_type psm_comm;
+                        std::vector<shifted_commitment_type> selectors_comm;
+                        std::vector<shifted_commitment_type> lookup_selectors_comm;
+                    };
+
                     var_ec_point H;
-                    std::array<var_ec_point, KimchiCommitmentParamsType::srs_len> G;
+                    std::array<var_ec_point, commitment_params_type::srs_len> G;
+                    std::array<var_ec_point, KimchiParamsType::public_input_size> lagrange_bases;
+                    commitments comm;
                 };
             }    // namespace components
         }        // namespace zk
