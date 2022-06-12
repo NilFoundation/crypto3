@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 73;
+    constexpr std::size_t SelectorColumns = 800;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -64,6 +64,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
     using component_type = zk::components::sha256_process<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8>;
@@ -79,9 +80,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     for (int i = 0; i<16; i++) {
         input_words_var[i]= var(0, 8 + i, false, var::column_type::public_input);
     }
-
+    auto result_check = [](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+    };
     typename component_type::params_type params = {input_state_var, input_words_var};
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

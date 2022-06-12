@@ -89,10 +89,6 @@ namespace nil {
                         }
                     };
 
-                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
-                        return bp.allocate_rows(rows_amount);
-                    }
-
                     static result_type
                         generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
