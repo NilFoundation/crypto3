@@ -221,12 +221,12 @@ namespace nil {
                     struct params_type {
                         
 
-                        kimchi_verifier_index_scalar<CurveType> &verifier_index;
+                        kimchi_verifier_index_scalar<BlueprintFieldType> &verifier_index;
                         kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                             KimchiCommitmentParamsType::eval_rounds> &proof;
                         typename proof_binding::fq_sponge_output &fq_output;
 
-                        params_type(kimchi_verifier_index_scalar<CurveType> &_verifier_index,
+                        params_type(kimchi_verifier_index_scalar<BlueprintFieldType> &_verifier_index,
                             kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                                 KimchiCommitmentParamsType::eval_rounds> &_proof,
                             typename proof_binding::fq_sponge_output &_fq_output) : 
@@ -250,9 +250,8 @@ namespace nil {
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
                         std::array<var, eval_points_amount> p_eval;
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks;
-                        std::array<
-                            std::array<var, KimchiCommitmentParamsType::eval_rounds>,
-                            KimchiParamsType::prev_challenges_size> prev_challenges;
+                        std::array<prev_chal_output, KimchiParamsType::prev_challenges_size>
+                            prev_challenges_evals;
                         var zeta_pow_n;
                         var ft_eval0;
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
@@ -452,7 +451,7 @@ namespace nil {
                             alpha_powers,
                             public_eval,
                             powers_of_eval_points_for_chunks,
-                            params.proof.prev_challenges,
+                            prev_challenges_evals,
                             zeta_pow_n,
                             ft_eval0,
                             combined_evals,
@@ -628,7 +627,7 @@ namespace nil {
                             alpha_powers,
                             public_eval,
                             powers_of_eval_points_for_chunks,
-                            params.proof.prev_challenges,
+                            prev_challenges_evals,
                             zeta_pow_n,
                             ft_eval0,
                             combined_evals,

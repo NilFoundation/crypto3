@@ -80,13 +80,13 @@ namespace nil {
 
                     using batch_verify_component = zk::components::batch_verify_scalar_field<ArithmetizationType, CurveType,
                         KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
-                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using prepare_batch_component = zk::components::prepare_batch_scalar<ArithmetizationType, 
                         CurveType, KimchiParamsType, KimchiCommitmentParamsType,
-                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using map_fr_component = zk::components::map_fr<ArithmetizationType, 
                         CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
-                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiParamsType>;
@@ -94,7 +94,7 @@ namespace nil {
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
                         ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
-                    using verifier_index_type = kimchi_verifier_index_scalar<CurveType>;
+                    using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f2A;
 
@@ -139,19 +139,23 @@ namespace nil {
 
                         generate_assignments_constant(bp, assignment, params, start_row_index);
 
+                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
+
                         std::array<batch_proof, BatchSize> batches;
                         for (std::size_t i = 0; i < BatchSize; i++) {
-                            batches[i] = prepare_batch_component::generate_circuit(
+                            auto prepare_output = prepare_batch_component::generate_circuit(
                                 bp, assignment, {params.verifier_index,
-                                params.proof[i], params.fq_output[i]}, row).output;
+                                params.proof[i], params.fq_output[i]}, row);
+                            batches[i] = prepare_output.prepared_proof;
+                            fr_data_recalculated.f_comm_scalars[i] = prepare_output.f_comm_scalars;
+                            fr_data_recalculated.zeta_to_srs_len[i] = prepare_output.zeta_to_srs_len;
+                            
                             row += prepare_batch_component::rows_amount;
                         }
 
                         auto res = batch_verify_component::generate_circuit(
                             bp, assignment, {batches}, row);
                         row += batch_verify_component::rows_amount;
-
-                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
 
                         map_fr_component::generate_circuit(bp, assignment,
                             {params.fr_data, fr_data_recalculated}, row);
@@ -166,19 +170,22 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
+                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
+
                         std::array<batch_proof, BatchSize> batches;
                         for (std::size_t i = 0; i < BatchSize; i++) {
-                            batches[i] = prepare_batch_component::generate_assignments(
+                            auto prepare_output = prepare_batch_component::generate_assignments(
                                 assignment, {params.verifier_index,
-                                params.proof[i], params.fq_output[i]}, row).output;
+                                params.proof[i], params.fq_output[i]}, row);
+                            batches[i] = prepare_output.prepared_proof;
+                            fr_data_recalculated.f_comm_scalars[i] = prepare_output.f_comm_scalars;
+                            fr_data_recalculated.zeta_to_srs_len[i] = prepare_output.zeta_to_srs_len;
                             row += prepare_batch_component::rows_amount;
                         }
 
                         auto res = batch_verify_component::generate_assignments(
                             assignment, {batches}, row);
                         row += batch_verify_component::rows_amount;
-
-                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
 
                         map_fr_component::generate_assignments(assignment,
                             {params.fr_data, fr_data_recalculated}, row);

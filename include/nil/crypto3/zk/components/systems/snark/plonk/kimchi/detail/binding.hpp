@@ -34,6 +34,8 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -49,11 +51,20 @@ namespace nil {
                     template<typename VarType,
                         std::size_t BatchSize>
                     struct fr_data {
+                        private:
+                        using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
+
+                        constexpr static const std::size_t f_comm_msm_size = 1 
+                                + 10 // generic_scalars_component::output_size
+                                + verifier_index_type::constraints_amount;
+                        public: 
                         std::array<VarType, KimchiParamsType::final_msm_size(BatchSize)> scalars;
+                        std::array<std::array<VarType, f_comm_msm_size>,
+                            BatchSize> f_comm_scalars;
                         std::array<VarType, BatchSize> cip;
 
                         std::array<var, KimchiParamsType::public_input_size> neg_pub;
-                        var zeta_to_srs_len;
+                        std::array<var, BatchSize> zeta_to_srs_len;
                         var zeta_to_domain_size_minus_1;
                     };
 

@@ -115,14 +115,10 @@ namespace nil {
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
                         ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
-                    using verifier_index_type = kimchi_verifier_index_scalar<CurveType>;
+                    using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
                     using argument_type = typename verifier_index_type::argument_type;
 
                     constexpr static const std::size_t selector_seed = 0x0f24;
-                    
-                    constexpr static const std::size_t f_comm_msm_size = 1 
-                                + generic_scalars_component::output_size
-                                + verifier_index_type::constraints_amount;
 
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
@@ -148,6 +144,10 @@ namespace nil {
                     constexpr static const std::size_t rows_amount = rows();
                     constexpr static const std::size_t gates_amount = 0;
 
+                    constexpr static const std::size_t f_comm_msm_size = 1 
+                                + generic_scalars_component::output_size
+                                + verifier_index_type::constraints_amount;
+
                     struct params_type {
                         verifier_index_type &verifier_index;
                         kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
@@ -156,7 +156,9 @@ namespace nil {
                     };
 
                     struct result_type {
-                        batch_proof output;
+                        batch_proof prepared_proof;
+                        var zeta_to_srs_len;
+                        std::array<var, f_comm_msm_size> f_comm_scalars;
                     };
 
                     static result_type
@@ -221,7 +223,7 @@ namespace nil {
                         auto mds = poseidon_component::mds_constants();
 
                         for(std::size_t i = 0; i < verifier_index_type::constraints_amount; i++) {
-                            f_comm_scalars[f_comm_idx] = index_terms_scalars_component::generate_circuit(
+                            f_comm_scalars[f_comm_idx++] = index_terms_scalars_component::generate_circuit(
                                 bp, assignment, {params.verifier_index.constraints[i],
                                 vanishing_eval, oracles_output.oracles.zeta,
                                 oracles_output.combined_evals,
@@ -234,14 +236,19 @@ namespace nil {
                             row += index_terms_scalars_component::rows_amount;
                         }
 
-                        result_type res;
-                        res.output = {
-                            oracles_output.cip,
+                        var zeta_to_srs_len = oracles_output.powers_of_eval_points_for_chunks[0];
+
+                        assert(row == rows_amount);
+
+                        result_type res = {
+                            {oracles_output.cip,
                             params.fq_output,
                             oracles_output.eval_points,
                             oracles_output.oracles.u,
                             oracles_output.oracles.v,
-                            params.proof.opening
+                            params.proof.opening},
+                            zeta_to_srs_len,
+                            f_comm_scalars
                         };
 
                         return res;
@@ -318,13 +325,19 @@ namespace nil {
                             row += index_terms_scalars_component::rows_amount;
                         }
 
-                        result_type res;
-                        res.output = {
-                            oracles_output.cip,
+                        var zeta_to_srs_len = oracles_output.powers_of_eval_points_for_chunks[0];
+
+                        assert(row == rows_amount);
+
+                        result_type res = {
+                            {oracles_output.cip,
                             params.fq_output,
                             oracles_output.eval_points,
                             oracles_output.oracles.u,
-                            oracles_output.oracles.v
+                            oracles_output.oracles.v,
+                            params.proof.opening},
+                            zeta_to_srs_len,
+                            f_comm_scalars
                         };
 
                         return res;

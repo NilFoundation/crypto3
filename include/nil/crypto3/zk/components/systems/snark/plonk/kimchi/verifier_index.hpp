@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -44,10 +45,9 @@ namespace nil {
 
                 struct constraint_description {};
 
-                template<typename CurveType, std::size_t Permuts = 7>
+                template<typename BlueprintFieldType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
-                    using FieldType = typename CurveType::scalar_field_type;
-                    using var = snark::plonk_variable<FieldType>;
+                    using var = snark::plonk_variable<BlueprintFieldType>;
 
                     enum argument_type {
                         Permutation,
@@ -59,7 +59,7 @@ namespace nil {
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;
-                    std::array<typename FieldType::value_type, Permuts> shift;
+                    std::array<typename BlueprintFieldType::value_type, Permuts> shift;
 
                     var omega;
                     std::map<argument_type, std::pair<int, int>> alpha_map;
@@ -79,7 +79,7 @@ namespace nil {
                     using commitment_params_type = typename KimchiParamsType::commitment_params_type;
 
                     using shifted_commitment_type = typename 
-                        zk::components::kimchi_shifted_commitment_type<FieldType    , 
+                        zk::components::kimchi_shifted_commitment_type<FieldType, 
                             commitment_params_type::shifted_commitment_split>;
 
                     using var = snark::plonk_variable<FieldType>;

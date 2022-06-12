@@ -120,8 +120,6 @@ namespace nil {
                     // scaling factor for evaluation point powers
                     var xi;
 
-                    std::array<var, 
-                        KimchiParamsType::evaluations_in_batch_size> evaluations;
                     kimchi_opening_proof_scalar<BlueprintFieldType> 
                         opening;
                 };
