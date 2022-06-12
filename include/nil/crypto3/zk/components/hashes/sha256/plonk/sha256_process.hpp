@@ -70,11 +70,11 @@ namespace nil {
                                           0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
                 public:
-                    constexpr static const std::size_t rows_amount = 755;
+                    constexpr static const std::size_t rows_amount = 1023;
 
-                    constexpr static const std::size_t selector_seed = 0x0f11;
+                    constexpr static const std::size_t selector_seed = 0x0f1c;
                     //        constexpr static const std::size_t rows_amount = 8;
-                    constexpr static const std::size_t gates_amount = 2;
+                    constexpr static const std::size_t gates_amount = 700;
                     struct params_type {
                         std::array<var, 8> input_state;
                         std::vector<var> input_words;
@@ -97,14 +97,11 @@ namespace nil {
                         }
                     };
 
-                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
-                        return bp.allocate_rows(rows_amount);
-                    }
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                         const params_type &params,
-                                                        size_t start_row_index) {
+                                                        const std::size_t start_row_index) {
                         std::size_t j = start_row_index;
                         j = j + 3;
                         j++;
@@ -114,7 +111,7 @@ namespace nil {
 
                         if (selector_iterator == assignment.selectors_end()) {
                             first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index, start_row_index + 9 + 4 * 58);
+                            generate_gates(bp, assignment, first_selector_index);
                         } else {
                             first_selector_index = selector_iterator->second;
                         }
@@ -210,8 +207,8 @@ namespace nil {
                             std::vector<bool> a(32);
                             typename CurveType::scalar_field_type::integral_type integral_a =
                                 typename CurveType::scalar_field_type::integral_type(
-                                    message_scheduling_words[i / 5 + 1].data);
-                            assignment.witness(W0)[i] = message_scheduling_words[i / 5 + 1];
+                                    message_scheduling_words[(i - row) / 5 + 1].data);
+                            assignment.witness(W0)[i] = message_scheduling_words[(i - row) / 5 + 1];
                             for (std::size_t i = 0; i < 32; i++) {
                                 a[32 - i - 1] = multiprecision::bit_test(integral_a, i);
                             }
@@ -222,8 +219,8 @@ namespace nil {
                             assignment.witness(W3)[i] = a_chunks[0][2];
                             assignment.witness(W4)[i] = a_chunks[0][3];
                             assignment.witness(W7)[i] = a_chunks[1][0];
-                            assignment.witness(W0)[i + 1] = message_scheduling_words[i / 5 + 9];
-                            assignment.witness(W1)[i + 1] = message_scheduling_words[i / 5];
+                            assignment.witness(W0)[i + 1] = message_scheduling_words[(i - row) / 5 + 9];
+                            assignment.witness(W1)[i + 1] = message_scheduling_words[(i - row) / 5];
                             assignment.witness(W2)[i + 1] = a_chunks[1][1];
                             assignment.witness(W3)[i + 1] = a_chunks[1][2];
                             assignment.witness(W4)[i + 1] = a_chunks[1][3];
@@ -246,13 +243,13 @@ namespace nil {
                             std::vector<bool> b(32);
                             typename CurveType::scalar_field_type::integral_type integral_b =
                                 typename CurveType::scalar_field_type::integral_type(
-                                    message_scheduling_words[i / 5 + 14].data);
+                                    message_scheduling_words[(i - row) / 5 + 14].data);
                             for (std::size_t i = 0; i < 32; i++) {
                                 b[32 - i - 1] = multiprecision::bit_test(integral_b, i);
                             }
                             std::vector<std::size_t> b_sizes = {10, 7, 2, 13};
                             std::array<std::vector<uint64_t>, 2> b_chunks = split_and_sparse(b, b_sizes, base4);
-                            assignment.witness(W0)[i + 4] = message_scheduling_words[i / 5 + 14];
+                            assignment.witness(W0)[i + 4] = message_scheduling_words[(i - row) / 5 + 14];
                             assignment.witness(W1)[i + 4] = b_chunks[0][0];
                             assignment.witness(W2)[i + 4] = b_chunks[0][1];
                             assignment.witness(W3)[i + 4] = b_chunks[0][2];
@@ -279,13 +276,13 @@ namespace nil {
                             assignment.witness(W6)[i + 2] = sigma1_chunks[0][1];
                             assignment.witness(W7)[i + 2] = sigma1_chunks[0][2];
                             assignment.witness(W8)[i + 2] = sigma1_chunks[0][3];
-                            message_scheduling_words[i / 5 + 16] =
-                                message_scheduling_words[i / 5 + 14] + message_scheduling_words[i / 5] +
+                            message_scheduling_words[(i - row) / 5 + 16] =
+                                message_scheduling_words[(i - row) / 5 + 14] + message_scheduling_words[(i - row) / 5] +
                                 sigma1_chunks[0][0] + sigma0_chunks[0][0] +
                                 (1 << 14) * (sigma1_chunks[0][1] + sigma0_chunks[0][1]) +
                                 (1 << 28) * (sigma1_chunks[0][2] + sigma0_chunks[0][2]) +
                                 (1 << 30) * (sigma1_chunks[0][3] + sigma0_chunks[0][3]);
-                            assignment.witness(W0)[i + 2] = message_scheduling_words[i / 5 + 16];
+                            assignment.witness(W0)[i + 2] = message_scheduling_words[(i - row) / 5 + 16];
                         }
                         row = row + 240;
                         for (std::size_t i = row; i < row + 512; i = i + 8) {
@@ -443,7 +440,7 @@ namespace nil {
                             a = a_new;
                         }
 
-                        std::vector<std::size_t> value_sizes = {14};
+                        /*std::vector<std::size_t> value_sizes = {14};
                         // lookup table for sparse values with base = 4
                         for (typename CurveType::scalar_field_type::integral_type i = 0;
                              i < typename CurveType::scalar_field_type::integral_type(16384);
@@ -489,17 +486,15 @@ namespace nil {
                                 value = reversed_sparse_and_split(i, value_sizes, base7);
                             assignment.constant(4)[start_row_index + std::size_t(i)] = value[0][0];
                             assignment.constant(5)[start_row_index + std::size_t(i)] = i;
-                        }
+                        }*/
 
                         return result_type(start_row_index);
                     }
 
                 private:
                     static void generate_sigma0_gates(blueprint<ArithmetizationType> &bp,
-                                                      blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                      size_t first_selector_index,
-                                                      size_t start_row_index) {
-                        std::size_t j = start_row_index;
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
                         std::size_t selector_index_2 = first_selector_index + 2;
 
                         auto constraint_1 =
@@ -520,8 +515,7 @@ namespace nil {
                         bp.add_gate(selector_index_2,
                                     {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5});
 
-                        std::size_t selector_lookup_index = assignment.add_selector(j, j + 237, 5);
-                        auto lookup_constraint_1 = bp.add_lookup_constraint(
+                        /*auto lookup_constraint_1 = bp.add_lookup_constraint(
                             {var(W1, -1), var(W7, -1)},
                             {{0, 0, false, var::column_type::constant}, {1, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 =
@@ -553,15 +547,13 @@ namespace nil {
                                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                             lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                             lookup_constraint_7, lookup_constraint_8, lookup_constraint_9,
-                                            lookup_constraint_10});
+                                            lookup_constraint_10});*/
                     }
 
                     static void generate_sigma1_gates(blueprint<ArithmetizationType> &bp,
-                                                      blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                      size_t first_selector_index,
-                                                      size_t start_row_index) {
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
 
-                        std::size_t j = start_row_index;
                         std::size_t selector_index = first_selector_index;
 
                         auto constraint_1 =
@@ -581,7 +573,7 @@ namespace nil {
                         bp.add_gate(selector_index,
                                     {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5});
 
-                        std::size_t selector_lookup_index = assignment.add_selector(j);
+                        /*std::size_t selector_lookup_index = assignment.add_selector(j);
                         auto lookup_constraint_1 =
                             bp.add_lookup_constraint({var(W1, +1) * 16}, {{0, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint(
@@ -616,18 +608,14 @@ namespace nil {
                                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                             lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                             lookup_constraint_7, lookup_constraint_8, lookup_constraint_9,
-                                            lookup_constraint_10, lookup_constraint_11});
+                                            lookup_constraint_10, lookup_constraint_11});*/
                     }
 
                     static void
                         generate_message_scheduling_gates(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                          size_t first_selector_index,
-                                                          size_t start_row_index) {
-                        std::size_t j = start_row_index;
-                        j++;
-                        generate_sigma0_gates(bp, assignment, first_selector_index, j);
-                        j++;
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
+                        generate_sigma0_gates(bp, assignment, first_selector_index);
                         std::size_t selector_index_1 = first_selector_index + 1;
 
                         auto constraint_1 = bp.add_constraint(
@@ -635,14 +623,12 @@ namespace nil {
                                           var(W3, 0) * (1 << 7) + var(W4, 0) * (1 << 18) + var(W5, 0) +
                                           var(W6, 0) * (1 << 10) + var(W7, 0) * (1 << 17) + var(W8, 0) * (1 << 19)));
                         bp.add_gate(selector_index_1, {constraint_1});
-                        j++;
-                        generate_sigma1_gates(bp, assignment, first_selector_index, j);
+                        generate_sigma1_gates(bp, assignment, first_selector_index);
                     }
 
                     static void generate_Sigma0_gates(blueprint<ArithmetizationType> &bp,
-                                                      blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                      size_t first_selector_index,
-                                                      size_t start_row_index) {
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
                         std::size_t selector_index_70 = first_selector_index + 70;
 
                         auto constraint_1 =
@@ -665,7 +651,7 @@ namespace nil {
                         bp.add_gate(
                             selector_index_70,
                             {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6});
-                        std::size_t selector_lookup_index = assignment.add_selector(start_row_index);
+                        /*std::size_t selector_lookup_index = assignment.add_selector(start_row_index);
                         auto lookup_constraint_1 =
                             bp.add_lookup_constraint({var(W3, +1) * 8}, {{0, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint(
@@ -700,14 +686,12 @@ namespace nil {
                                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                             lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                             lookup_constraint_7, lookup_constraint_8, lookup_constraint_9,
-                                            lookup_constraint_10, lookup_constraint_11});
+                                            lookup_constraint_10, lookup_constraint_11});*/
                     }
 
                     static void generate_Sigma1_gates(blueprint<ArithmetizationType> &bp,
-                                                      blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                      const std::size_t first_selector_index,
-                                                      const std::size_t &start_row_index) {
-                        std::size_t j = start_row_index;
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
                         std::size_t selector_index_3 = first_selector_index + 3;
 
                         auto constraint_1 =
@@ -729,7 +713,7 @@ namespace nil {
                         bp.add_gate(selector_index_3,
                                     {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5});
 
-                        std::size_t selector_lookup_index = assignment.add_selector(j);
+                        /*std::size_t selector_lookup_index = assignment.add_selector(j);
                         auto lookup_constraint_1 =
                             bp.add_lookup_constraint({var(W3, -1) * 256}, {{2, 0, false, var::column_type::constant}});
                         auto lookup_constraint_2 = bp.add_lookup_constraint(
@@ -764,14 +748,12 @@ namespace nil {
                                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3,
                                             lookup_constraint_4, lookup_constraint_5, lookup_constraint_6,
                                             lookup_constraint_7, lookup_constraint_8, lookup_constraint_9,
-                                            lookup_constraint_10, lookup_constraint_11});
+                                            lookup_constraint_10, lookup_constraint_11});*/
                     }
 
                     static void generate_Maj_gates(blueprint<ArithmetizationType> &bp,
-                                                   blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                   size_t first_selector_index,
-                                                   size_t start_row_index) {
-                        std::size_t j = start_row_index;
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
                         std::size_t selector_index_69 = first_selector_index + 69;
 
                         auto constraint_1 =
@@ -779,7 +761,7 @@ namespace nil {
                                               var(W3, 0) * (1 << 64) - (var(W0, +1) + var(W1, +1) + var(W4, +1)));
                         bp.add_gate(selector_index_69, {constraint_1});
 
-                        std::size_t selector_lookup_index = assignment.add_selector(j);
+                        /*std::size_t selector_lookup_index = assignment.add_selector(j);
                         auto lookup_constraint_1 = bp.add_lookup_constraint(
                             {var(W5, 0), var(W0, 0)},
                             {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
@@ -794,14 +776,12 @@ namespace nil {
                             {{4, 0, false, var::column_type::constant}, {5, 0, false, var::column_type::constant}});
                         bp.add_lookup_gate(
                             selector_lookup_index,
-                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3, lookup_constraint_4});
+                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3, lookup_constraint_4});*/
                     }
 
                     static void generate_Ch_gates(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                  size_t first_selector_index,
-                                                  size_t start_row_index) {
-                        std::size_t j = start_row_index;
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
                         std::size_t selector_index_4 = first_selector_index + 4;
 
                         typename ArithmetizationType::field_type::value_type base7_value = base7;
@@ -809,7 +789,7 @@ namespace nil {
                             var(W0, 0) + var(W1, 0) * base7_value.pow(8) + var(W2, 0) * base7_value.pow(16) +
                             var(W3, 0) * base7_value.pow(24) - (var(W0, -1) + 2 * var(W1, -1) + 3 * var(W1, +1)));
                         bp.add_gate(selector_index_4, {constraint_1});
-                        std::size_t selector_lookup_index = assignment.add_selector(j);
+                        /*std::size_t selector_lookup_index = assignment.add_selector(j);
                         auto lookup_constraint_1 = bp.add_lookup_constraint(
                             {var(W5, +1), var(W0, 0)},
                             {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
@@ -824,43 +804,34 @@ namespace nil {
                             {{6, 0, false, var::column_type::constant}, {7, 0, false, var::column_type::constant}});
                         bp.add_lookup_gate(
                             selector_lookup_index,
-                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3, lookup_constraint_4});
+                            {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3, lookup_constraint_4});*/
                     }
 
                     static void generate_compression_gates(blueprint<ArithmetizationType> &bp,
-                                                           blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                           std::size_t first_selector_index,
-                                                           std::size_t start_row_index) {
-                        std::size_t j = start_row_index;
-                        j++;
-                        generate_Sigma1_gates(bp, assignment, first_selector_index, j);
-                        j++;
-                        generate_Ch_gates(bp, assignment, first_selector_index, j);
-                        j++;
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
+                        generate_Sigma1_gates(bp, assignment, first_selector_index);
+                        generate_Ch_gates(bp, assignment, first_selector_index);
 
                         std::size_t selector_index_68 = first_selector_index + 68;
                         std::size_t selector_out_index_1 = first_selector_index + 71;
                         std::size_t selector_out_index_2 = first_selector_index + 72;
-                        for (std::size_t i = j; i < 508; i = i + 8) {
+                        for (std::size_t i = 0; i < 508; i = i + 8) {
                             auto constraint_1 = bp.add_constraint(
                                 var(W4, 0) - (var(W1, 0) + var(W2, 0) + var(W5, -1) + var(W6, -1) * (1 << 14) -
                                               var(W7, -1) * (1 << 28) + var(W8, -1) * (1 << 30) + var(W5, 0) +
                                               var(W6, 0) * (1 << 8) + var(W7, 0) * (1 << 16) + var(W8, 0) * (1 << 24) +
-                                              round_constant[(i - j) / 8] + var(W3, 0)));
-                            bp.add_gate(first_selector_index + 5 + i - j, {constraint_1});
+                                              round_constant[(i - 0) / 8] + var(W3, 0)));
+                            bp.add_gate(first_selector_index + 5 + i - 0, {constraint_1});
                         }
-                        j++;
 
                         auto constraint_1 = bp.add_constraint(
                             var(W4, 0) - (var(W4, -1) + var(W1, -1) + var(W5, +1) + var(W6, +1) * (1 << 14) -
                                           var(W7, +1) * (1 << 28) + var(W8, +1) * (1 << 30) + var(W5, 0) +
                                           var(W6, 0) * (1 << 8) + var(W7, 0) * (1 << 16) + var(W8, 0) * (1 << 24)));
                         bp.add_gate(selector_index_68, {constraint_1});
-                        generate_Maj_gates(bp, assignment, j);
-                        j++;
-                        j++;
-                        generate_Sigma0_gates(bp, assignment, j);
-                        j = j + 8 * 63 + 2;
+                        generate_Maj_gates(bp, assignment, selector_out_index_1);
+                        generate_Sigma0_gates(bp, assignment, selector_out_index_1);
 
                         auto constraint_out_1 = bp.add_constraint(var(W0, 0) - (var(W0, -1) + var(W0, +1)));
                         auto constraint_out_2 = bp.add_constraint(var(W1, 0) - (var(W1, -1) + var(W1, +1)));
@@ -872,7 +843,6 @@ namespace nil {
                                     {constraint_out_1, constraint_out_2, constraint_out_3, constraint_out_4,
                                      constraint_out_5, constraint_out_6});
 
-                        j++;
                         auto constraint_out_7 = bp.add_constraint(var(W0, +1) - (var(W2, +1) + var(W4, +1)));
                         auto constraint_out_8 = bp.add_constraint(var(W1, +1) - (var(W3, +1) + var(W5, +1)));
 
@@ -927,18 +897,14 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_assignment_table<ArithmetizationType> &assignment,
-                                               size_t first_selector_index,
-                                               size_t start_row_index) {
-                        std::size_t j = start_row_index;
-                        j = j + 3;
-                        generate_message_scheduling_gates(bp, assignment, first_selector_index, j);
-                        j = j + 5 * 48;
-                        generate_compression_gates(bp, assignment, first_selector_index, j);
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const std::size_t first_selector_index) {
+                        generate_message_scheduling_gates(bp, assignment, first_selector_index);
+                        generate_compression_gates(bp, assignment, first_selector_index);
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                           const params_type &params,
                                                           size_t start_row_index) {
                     }
