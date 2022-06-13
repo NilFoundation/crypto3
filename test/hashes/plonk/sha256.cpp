@@ -71,8 +71,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
 
     std::array<typename ArithmetizationType::field_type::value_type, 4> public_input = {0, 0, 0, 0};
     std::array<var, 4> input_state_var = {
-        var(1, 0, false, var::column_type::public_input), var(1, 1, false, var::column_type::public_input),
-        var(1, 2, false, var::column_type::public_input), var(1, 3, false, var::column_type::public_input)};
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+        var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {input_state_var};
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
