@@ -49,6 +49,11 @@
 #include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
+#include <nil/crypto3/zk/algorithms/commit.hpp>
+#include <nil/crypto3/zk/algorithms/precommit.hpp>
+#include <nil/crypto3/zk/algorithms/proof_eval.hpp>
+#include <nil/crypto3/zk/algorithms/verify_eval.hpp>
+
 using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(lpc_test_suite)
@@ -100,7 +105,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
 
-    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+    merkle_tree_type tree = zk::precommit<lpc_type>(f, D[0]);
 
     // TODO: take a point outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_points = {
@@ -109,12 +114,12 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = zk::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+    BOOST_CHECK(zk::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
@@ -166,7 +171,7 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     math::polynomial_dfs<typename FieldType::value_type> f;
     f.from_coefficients(f_data);
 
-    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+    merkle_tree_type tree = zk::precommit<lpc_type>(f, D[0]);
 
     // TODO: take a point outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_points = {
@@ -175,12 +180,12 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = zk::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+    BOOST_CHECK(zk::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -232,10 +237,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
             {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}
         }};
 
-    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+    merkle_tree_type tree = zk::precommit<lpc_type>(f, D[0]);
 
     // TODO: take a point outside of the basic domain
-    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = 
+    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points =
         {{
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}
         }};
@@ -243,12 +248,12 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = zk::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+    BOOST_CHECK(zk::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
@@ -297,10 +302,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
             {1, 2, 5, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}
         }};
 
-    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+    merkle_tree_type tree = zk::precommit<lpc_type>(f, D[0]);
 
     // TODO: take a point outside of the basic domain
-    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = 
+    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points =
         {{
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}
@@ -309,12 +314,12 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = zk::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+    BOOST_CHECK(zk::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
@@ -366,10 +371,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
         f[polynom_index].from_coefficients(f_data[polynom_index]);
     }
 
-    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+    merkle_tree_type tree = zk::precommit<lpc_type>(f, D[0]);
 
     // TODO: take a point outside of the basic domain
-    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = 
+    std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points =
         {{
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}
@@ -378,12 +383,12 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = zk::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+    BOOST_CHECK(zk::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
@@ -432,10 +437,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
             {1, 2, 5, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}
         };
 
-    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+    merkle_tree_type tree = zk::precommit<lpc_type>(f, D[0]);
 
     // TODO: take a point outside of the basic domain
-    std::vector<std::vector<typename FieldType::value_type>> evaluation_points = 
+    std::vector<std::vector<typename FieldType::value_type>> evaluation_points =
         {
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}
@@ -444,12 +449,12 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = zk::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+    BOOST_CHECK(zk::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
@@ -503,10 +508,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
         f[polynom_index].from_coefficients(f_data[polynom_index]);
     }
 
-    merkle_tree_type tree = lpc_type::precommit(f, D[0]);
+    merkle_tree_type tree = zk::precommit<lpc_type>(f, D[0]);
 
     // TODO: take a point outside of the basic domain
-    std::vector<std::vector<typename FieldType::value_type>> evaluation_points = 
+    std::vector<std::vector<typename FieldType::value_type>> evaluation_points =
         {
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}
@@ -515,12 +520,12 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = lpc_type::proof_eval(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = zk::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier));
+    BOOST_CHECK(zk::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

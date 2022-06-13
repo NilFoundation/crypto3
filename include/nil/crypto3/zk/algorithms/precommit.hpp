@@ -28,12 +28,17 @@
 #ifndef CRYPTO3_ZK_SNARK_ALGORITHMS_PRECOMMIT_HPP
 #define CRYPTO3_ZK_SNARK_ALGORITHMS_PRECOMMIT_HPP
 
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
             // basic_fri
             template<typename FRI,
-                     typename std::enable_if<std::is_base_of<basic_fri<typename FRI::field_type,
+                     typename std::enable_if<std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
                                                                        typename FRI::merkle_tree_hash_type,
                                                                        typename FRI::transcript_hash_type,
                                                                        FRI::m>,
@@ -60,7 +65,7 @@ namespace nil {
             }
 
             template<typename FRI,
-                     typename std::enable_if<std::is_base_of<basic_fri<typename FRI::field_type,
+                     typename std::enable_if<std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
                                                                        typename FRI::merkle_tree_hash_type,
                                                                        typename FRI::transcript_hash_type,
                                                                        FRI::m>,
@@ -79,7 +84,7 @@ namespace nil {
             template<typename FRI,
                      std::size_t list_size,
                      typename PolynomialType,
-                     typename std::enable_if<std::is_base_of<basic_fri<typename FRI::field_type,
+                     typename std::enable_if<std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
                                                                        typename FRI::merkle_tree_hash_type,
                                                                        typename FRI::transcript_hash_type,
                                                                        FRI::m>,
@@ -98,7 +103,11 @@ namespace nil {
             // fri
 
             // basic_batched_fri
-            template<typename FRI, typename ContainerType>
+            template<typename FRI, typename ContainerType, typename std::enable_if<std::is_base_of<commitments::detail::basic_batched_fri<
+                                                                                                       typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                                                                                                       typename FRI::transcript_hash_type, FRI::m>,
+                                                                                                   FRI>::value,
+                                                                                   bool>::type = true>
             static typename std::enable_if<
                 (std::is_same<typename ContainerType::value_type,
                               math::polynomial_dfs<typename FRI::field_type::value_type>>::value),
@@ -112,7 +121,6 @@ namespace nil {
                 auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::high_resolution_clock::now() - last);
 #endif
-
                 for (int i = 0; i < poly.size(); ++i) {
                     // assert (poly[i].size() == D->size());
                     if (poly[i].size() != D->size()) {
@@ -132,32 +140,16 @@ namespace nil {
                         y_val.write(write_iter, FRI::field_element_type::length());
                     }
                 }
-                //#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                //                                elapsed =
-                //                                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()
-                //                                - last); std::cout << "------Batched FRI precommit
-                //                                marshalling, time: " << elapsed.count() << "ms" << std::endl;
-                //                                last = std::chrono::high_resolution_clock::now();
-                //#endif
 
-                typename FRI::precommitment_type precommitment =
-                    containers::make_merkle_tree<typename FRI::merkle_tree_hash_type, 2>(y_data.begin(),
-                                                                                         y_data.end());
-
-                //#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                //                                elapsed =
-                //                                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()
-                //                                - last); std::cout << "------Batched FRI precommit merkle
-                //                                tree, time: " << elapsed.count() << "ms"  << std::endl; last =
-                //                                std::chrono::high_resolution_clock::now(); elapsed =
-                //                                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()
-                //                                - begin); std::cout << "----Batched FRI precommit, time: " <<
-                //                                elapsed.count() << "ms"  << std::endl;
-                //#endif
-                return precommitment;
+                return containers::make_merkle_tree<typename FRI::merkle_tree_hash_type, 2>(y_data.begin(),
+                                                                                                y_data.end());
             }
 
-            template<typename FRI, typename ContainerType>
+            template<typename FRI, typename ContainerType, typename std::enable_if<std::is_base_of<commitments::detail::basic_batched_fri<
+                                                               typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                                                               typename FRI::transcript_hash_type, FRI::m>,
+                                                           FRI>::value,
+                                       bool>::type = true>
             static typename std::enable_if<
                 (std::is_same<typename ContainerType::value_type,
                               math::polynomial<typename FRI::field_type::value_type>>::value),
