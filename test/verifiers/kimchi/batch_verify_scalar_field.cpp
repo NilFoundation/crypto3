@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
 
         std::array<var, eval_rounds> challenges;
         for (std::size_t j = 0; j < eval_rounds; j++) {
-            public_input.push_back(10);
+            public_input.emplace_back(10);
             challenges[j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
         }
         fq_output.challenges = challenges;
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
         public_input.push_back(algebra::random_element<BlueprintFieldType>());
         fq_output.fq_digest = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // c
-        public_input.push_back(250);
+        public_input.emplace_back(250);
         fq_output.c = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
         batches[i].fq_output = fq_output;

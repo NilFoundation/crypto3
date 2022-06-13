@@ -136,7 +136,7 @@ namespace nil {
                     struct params_type {
                         std::array<batch_proof_type, BatchSize> proofs;
                         verifier_index_type verifier_index;
-                        typename proof_binding::fr_data<var, BatchSize> fr_output;
+                        typename proof_binding::template fr_data<var, BatchSize> fr_output;
                     };
 
                     struct result_type {

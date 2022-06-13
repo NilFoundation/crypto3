@@ -125,8 +125,8 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        typename proof_binding::fr_data<var, BatchSize> fr_data;
-                        typename proof_binding::fq_data<var> fq_data;
+                        typename proof_binding::template fr_data<var, BatchSize> fr_data;
+                        typename proof_binding::template fq_data<var> fq_data;
                         
                         verifier_index_type &verifier_index;
                         std::array<kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
@@ -147,7 +147,7 @@ namespace nil {
 
                         generate_assignments_constant(bp, assignment, params, start_row_index);
 
-                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
+                        typename proof_binding::template fr_data<var, BatchSize> fr_data_recalculated;
 
                         std::array<batch_proof, BatchSize> batches;
                         for (std::size_t i = 0; i < BatchSize; i++) {
@@ -182,7 +182,7 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        typename proof_binding::fr_data<var, BatchSize> fr_data_recalculated;
+                        typename proof_binding::template fr_data<var, BatchSize> fr_data_recalculated;
 
                         std::array<batch_proof, BatchSize> batches;
                         for (std::size_t i = 0; i < BatchSize; i++) {
