@@ -40,16 +40,18 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // prepare scalars for scalar multiplication input
-                // x -> (x - 2^255 - 1) / 2
+                // shift scalars for scalar multiplication input
+                // f(X) = X -> X - 2^255 when the scalar field is larger than the base field and
+                // f(X) = X -> (X - 2^255 - 1) / 2 otherwise
                 // Input: [x_0, ..., x_InputSize]
-                // Output: [f(x_0), ..., f(x_InputSize)], where f(X): X -> (X - 2^255 - 1) / 2
-                template<typename ArithmetizationType, std::size_t InputSize, 
+                // Output: [f(x_0), ..., f(x_InputSize)]
+                template<typename ArithmetizationType, typename CurveType, std::size_t InputSize,
                     std::size_t... WireIndexes>
                 class prepare_scalars;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
+                         typename CurveType,
                          std::size_t InputSize,
                          std::size_t W0,
                          std::size_t W1,
@@ -68,6 +70,7 @@ namespace nil {
                          std::size_t W14>
                 class prepare_scalars<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    CurveType,
                     InputSize,
                     W0,
                     W1,
@@ -94,6 +97,16 @@ namespace nil {
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f2C;
+
+                    constexpr static bool scalar_larger() {
+                        using ScalarField = typename CurveType::scalar_field_type;
+                        using BaseField = typename CurveType::base_field_type;
+
+                        auto n1 = ScalarField::modulus;
+                        auto n2 = BaseField::modulus;
+
+                        return n1 > n2;
+                    }
 
                 public:
                     constexpr static const std::size_t rows_amount = InputSize * (add_component::rows_amount + mul_component::rows_amount);
@@ -176,9 +189,15 @@ namespace nil {
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                         typename BlueprintFieldType::value_type base = 2;
-                        assignment.constant(0)[row] = -base.pow(255) - 1;
-                        row++;
-                        assignment.constant(0)[row] = 1 / base;
+                        if (scalar_larger()) {
+                            assignment.constant(0)[row] = -base.pow(255);
+                            row++;
+                            assignment.constant(0)[row] = 1 / base;
+                        } else {
+                            assignment.constant(0)[row] = -base.pow(255) - 1;
+                            row++;
+                            assignment.constant(0)[row] = 1;
+                        }
                     }
                 };
             }    // namespace components

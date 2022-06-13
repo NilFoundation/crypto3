@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
         use_lookup, lookup_table_size,
         alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
 
-    zk::components::kimchi_verifier_index_scalar<curve_type> verifier_index;
+    zk::components::kimchi_verifier_index_scalar<BlueprintFieldType> verifier_index;
     typename BlueprintFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
     typename BlueprintFieldType::value_type omega = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
     // verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
@@ -217,11 +217,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
         public_input.push_back(algebra::random_element<BlueprintFieldType>());
         batches[i].opening = {var(0, public_input.size() - 2, false, var::column_type::public_input),
             var(0, public_input.size() - 1, false, var::column_type::public_input)};
-
-        for (std::size_t j = 0; j < kimchi_params::evaluations_in_batch_size; j++) {
-            public_input.push_back(algebra::random_element<BlueprintFieldType>());
-            batches[i].evaluations[j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
-        }
     }
 
     typename component_type::params_type params = {batches};

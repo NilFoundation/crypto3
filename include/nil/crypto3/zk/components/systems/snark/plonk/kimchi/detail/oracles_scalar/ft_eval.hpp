@@ -106,7 +106,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        kimchi_verifier_index_scalar<CurveType> verifier_index;
+                        kimchi_verifier_index_scalar<BlueprintFieldType> verifier_index;
                         var zeta_pow_n;
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount> combined_evals;
