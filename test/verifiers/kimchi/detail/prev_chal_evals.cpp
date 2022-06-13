@@ -46,9 +46,8 @@ using namespace nil::crypto3;
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 template<typename FieldType, std::size_t ChalAmount>
-typename FieldType::value_type b_poly(
-        const std::array<typename FieldType::value_type, ChalAmount>& chals,
-        typename FieldType::value_type x) {
+typename FieldType::value_type b_poly(const std::array<typename FieldType::value_type, ChalAmount> &chals,
+                                      typename FieldType::value_type x) {
     std::vector<typename FieldType::value_type> pow_twos;
     pow_twos.push_back(x);
     for (int i = 1; i < ChalAmount; ++i) {
@@ -87,8 +86,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prev_chal_evals) {
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size>;
 
-    using component_type = zk::components::prev_chal_evals<ArithmetizationType, commitment_params, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    using component_type = zk::components::
+        prev_chal_evals<ArithmetizationType, commitment_params, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0};
     var one(0, 0, false, var::column_type::public_input);
@@ -119,31 +118,26 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prev_chal_evals) {
     std::array<var, 2> evals = {zeta, zeta_omega};
     std::array<var, 2> evals_power = {zeta_pow_n, zeta_omega_pow_n};
 
-    typename component_type::params_type params = {
-        prev_challenges,
-        evals,
-        evals_power,
-        one,
-        zero};
+    typename component_type::params_type params = {prev_challenges, evals, evals_power, one, zero};
 
-    // r[0] = (zeta_pow_n - 1) * domain.size_inv * SUM(-l * p * w) 
-        //where l from lagrange, p from public, w from omega_powers for l from 0 to PulicInputSize
-    // r[2] = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w) 
-        //where l from lagrange, p from public, w from omega_powers for l from PulicInputSize to 2 * PulicInputSize    
-    std::array<typename BlueprintFieldType::value_type, 2> expected_result; 
+    // r[0] = (zeta_pow_n - 1) * domain.size_inv * SUM(-l * p * w)
+    // where l from lagrange, p from public, w from omega_powers for l from 0 to PulicInputSize
+    // r[2] = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w)
+    // where l from lagrange, p from public, w from omega_powers for l from PulicInputSize to 2 * PulicInputSize
+    std::array<typename BlueprintFieldType::value_type, 2> expected_result;
     expected_result[0] = b_poly<BlueprintFieldType, eval_rounds>(prev_challenges_values, zeta_value);
     expected_result[1] = b_poly<BlueprintFieldType, eval_rounds>(prev_challenges_values, zeta_omega_value);
 
-
-    auto result_check = [&expected_result](AssignmentType &assignment, 
-        component_type::result_type &real_res) { 
-            assert(expected_result[0] == assignment.var_value(real_res.output[0][0]));
-            assert(expected_result[1] == assignment.var_value(real_res.output[1][0]));
+    auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
+        assert(expected_result[0] == assignment.var_value(real_res.output[0][0]));
+        assert(expected_result[1] == assignment.var_value(real_res.output[1][0]));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "prev_chal_evals_component: " << duration.count() << "ms" << std::endl;
 }
 
