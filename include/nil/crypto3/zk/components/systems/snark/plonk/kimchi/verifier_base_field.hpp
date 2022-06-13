@@ -381,7 +381,7 @@ namespace nil {
                             for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
                                 auto res0 = scalar_mul_component::generate_assignments(assignment, 
                                     {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, 
-                                    params.fr_data.zeta_to_srs_len}, row);
+                                    params.fr_data.zeta_to_srs_len[i]}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
                                 auto res1 = add_component::generate_assignments(assignment,
@@ -399,7 +399,7 @@ namespace nil {
                             for(std::size_t j = 0; j < params.proofs[i].comm.t_comm.unshifted.size(); j++) {
                                 auto res0 = scalar_mul_component::generate_assignments(assignment, 
                                     {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y}, 
-                                    params.fr_data.zeta_to_srs_len}, row);
+                                    params.fr_data.zeta_to_srs_len[i]}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_t_comm_unshifted = {res0.X, res0.Y};
                                 auto res1 = add_component::generate_assignments(assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
@@ -564,7 +564,9 @@ namespace nil {
                             row++;
 
                             for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
-                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, params.fr_data.zeta_to_srs_len}, row);
+                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment,
+                                    {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y},
+                                    params.fr_data.zeta_to_srs_len[i]}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
                                 zk::components::generate_circuit<add_component>(bp, assignment, 
@@ -579,7 +581,9 @@ namespace nil {
                             row+=scalar_mul_component::rows_amount;
                             var_ec_point chunked_t_comm_unshifted = {var(0, urow, false), var(1, urow, false)};;
                             for(std::size_t j = 0; j < params.proofs[i].comm.t_comm.unshifted.size(); j++) {
-                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y}, params.fr_data.zeta_to_srs_len}, row);
+                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment,
+                                    {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
+                                    params.fr_data.zeta_to_srs_len[i]}, row);
                                 row+=scalar_mul_component::rows_amount;
                                 chunked_t_comm_unshifted = {res0.X, res0.Y};
                                 zk::components::generate_circuit<add_component>(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
