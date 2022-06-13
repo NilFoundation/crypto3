@@ -78,7 +78,7 @@ namespace nil {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiParamsType>;
 
-                    using fr_data = typename proof_binding::fr_data<var, BatchSize>;
+                    using fr_data = typename proof_binding::template fr_data<var, BatchSize>;
 
                     constexpr static const std::size_t selector_seed = 0x0f2B;
 

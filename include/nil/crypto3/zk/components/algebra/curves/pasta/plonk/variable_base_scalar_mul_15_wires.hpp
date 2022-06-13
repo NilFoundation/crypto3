@@ -403,36 +403,32 @@ namespace nil {
                         constraint_16 =
                             bp.add_constraint(var(W5, -1) - (32 * (var(W4, -1)) + 16 * var(W2, 0) + 8 * var(W3, 0) +
                                                             4 * var(W4, 0) + 2 * var(W5, 0) + var(W6, 0)));
-                        auto constraint_17 = bp.add_constraint((((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
-                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255))*var(W2, +1) - 1) * ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
-                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)));
+
+                        auto constraint_17 = bp.add_constraint((var(W8, +1)*var(W2, +1) - 1) * var(W8, +1));
                         auto constraint_18 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
                         *var(W3, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255));
                         auto constraint_19 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
                         *var(W4, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255));
-                        auto constraint_20 = bp.add_constraint((((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
-                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255))*var(W2, +1)*var(W0, 0)) + 
+                        auto constraint_20 = bp.add_constraint((var(W8, +1)*var(W2, +1)*var(W0, 0)) + 
                         ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
                         *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
                         *var(W4, +1))* ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
                         *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
                         *var(W4, +1)) * var(W6, +1) - var(W0, +1));
-                        auto constraint_21 = bp.add_constraint((((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
-                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255))*var(W2, +1)*var(W1, 0)) + 
+                        auto constraint_21 = bp.add_constraint((var(W8, +1)*var(W2, +1)*var(W1, 0)) + 
                         ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
                         *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
                         *var(W4, +1)) * var(W7, +1) - var(W1, +1));
+                        auto constraint_22 = bp.add_constraint(var(W8, +1) - ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
+                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
+                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)));
                         bp.add_gate(selector_index_2,
                                     {bit_check_1,   bit_check_2,   bit_check_3,   bit_check_4,   bit_check_5,
                                      constraint_1,  constraint_2,  constraint_3,  constraint_4,  constraint_5,
                                      constraint_6,  constraint_7,  constraint_8,  constraint_9,  constraint_10,
                                      constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
                                      constraint_16, constraint_17, constraint_18, constraint_19, constraint_20,
-                                     constraint_21});
+                                     constraint_21, constraint_22});
                     }
 
                     static void

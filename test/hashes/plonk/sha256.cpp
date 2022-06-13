@@ -44,11 +44,14 @@
 
 #include "../../test_plonk_component.hpp"
 
+#include <chrono>
+
 using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
+    auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -78,6 +81,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

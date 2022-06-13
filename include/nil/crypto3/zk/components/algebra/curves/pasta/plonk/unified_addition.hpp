@@ -151,7 +151,8 @@ namespace nil {
                         assignment.witness(W1)[j] = P.Y;
                         assignment.witness(W2)[j] = Q.X;
                         assignment.witness(W3)[j] = Q.Y;
-                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = {0, 0};
+                        typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type zero = {
+                            0, 0};
                         if (P.X == zero.X && P.Y == zero.Y) {
                             assignment.witness(W4)[j] = Q.X;
                             assignment.witness(W5)[j] = Q.Y;
@@ -181,7 +182,6 @@ namespace nil {
                             assignment.witness(W7)[j] = 0;
                         }
 
-
                         if (P.X != Q.X) {
                             assignment.witness(W10)[j] = (Q.Y - P.Y) / (Q.X - P.X);
 
@@ -190,11 +190,11 @@ namespace nil {
                             assignment.witness(W8)[j] = (Q.X - P.X).inversed();
                         } else {
 
-                            if (P.Y != - Q.Y) {
-                               assignment.witness(W9)[j] = (Q.Y + P.Y).inversed();
-                            } else { 
+                            if (P.Y != -Q.Y) {
+                                assignment.witness(W9)[j] = (Q.Y + P.Y).inversed();
+                            } else {
                                 assignment.witness(W9)[j] = 0;
-                            }                           
+                            }
                             if (P.Y != 0) {
                                 assignment.witness(W10)[j] = (3 * (P.X * P.X)) / (2 * P.Y);
                             } else {
@@ -210,33 +210,44 @@ namespace nil {
                                                const params_type params,
                                                const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint((var(W2, 0) - var(W0, 0))*((var(W2, 0) - var(W0, 0))*var(W10, 0) - 
-                        (var(W3, 0) - var(W1, 0))));
+                        auto constraint_1 =
+                            bp.add_constraint((var(W2, 0) - var(W0, 0)) *
+                                              ((var(W2, 0) - var(W0, 0)) * var(W10, 0) - (var(W3, 0) - var(W1, 0))));
                         auto constraint_2 =
-                            bp.add_constraint((1 - (var(W2, 0) - var(W0, 0))*var(W8, 0))* (2*var(W1, 0)*var(W10, 0) - 3 * var(W0, 0) * var(W0, 0)));
-                            
-                        auto constraint_3 = bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W2, 0) - var(W0, 0) * var(W2, 0)*var(W0, 0)) *(var(W10, 0) *
-                        var(W10, 0) - var(W0, 0) -var(W2, 0)  - var (W4, 0)));
-                        auto constraint_4 =
-                            bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W2, 0) - var(W0, 0) * var(W2, 0)* var(W0, 0)) *(var(W10, 0) *
-                        (var(W0, 0) - var(W4, 0)) - var(W1, 0) -var(W5, 0)));
-                        auto constraint_5 =
-                            bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W3, 0) + var(W0, 0) * var(W2, 0)* var(W1, 0)) *(var(W10, 0) *
-                        var(W10, 0) - var(W0, 0) -var(W2, 0)  - var (W4, 0)));
-                        auto constraint_6 = bp.add_constraint( (var(W0, 0) * var(W2, 0)* var(W3, 0) + var(W0, 0) * var(W2, 0)* var(W1, 0)) *(var(W10, 0) *
-                        (var(W0, 0) - var(W4, 0)) - var(W1, 0) -var(W5, 0)));
-                        auto constraint_7 = bp.add_constraint((1 - var(W0, 0) * var(W6, 0))*(var(W4, 0) - var(W2, 0)));
-                        auto constraint_8 = bp.add_constraint((1 - var(W0, 0) * var(W6, 0))*(var(W5, 0) - var(W3, 0)));
-                        auto constraint_9 = bp.add_constraint((1 - var(W2, 0) * var(W7, 0))*(var(W4, 0) - var(W0, 0)));
-                        auto constraint_10 = bp.add_constraint((1 - var(W2, 0) * var(W7, 0))*(var(W5, 0) - var(W1, 0)));
-                        auto constraint_11 = bp.add_constraint((1 - (var(W2, 0) - var(W0, 0))* var(W8, 0) - 
-                        (var(W3, 0) + var(W1, 0)) * var(W9, 0)) * var(W4, 0));
-                        auto constraint_12 = bp.add_constraint((1 - (var(W2, 0) - var(W0, 0))* var(W8, 0) - 
-                        (var(W3, 0) + var(W1, 0)) * var(W9, 0)) * var(W5, 0));
+                            bp.add_constraint((1 - (var(W2, 0) - var(W0, 0)) * var(W8, 0)) *
+                                              (2 * var(W1, 0) * var(W10, 0) - 3 * var(W0, 0) * var(W0, 0)));
+
+                        auto constraint_3 = bp.add_constraint(
+                            (var(W0, 0) * var(W2, 0) * var(W2, 0) - var(W0, 0) * var(W2, 0) * var(W0, 0)) *
+                            (var(W10, 0) * var(W10, 0) - var(W0, 0) - var(W2, 0) - var(W4, 0)));
+                        auto constraint_4 = bp.add_constraint(
+                            (var(W0, 0) * var(W2, 0) * var(W2, 0) - var(W0, 0) * var(W2, 0) * var(W0, 0)) *
+                            (var(W10, 0) * (var(W0, 0) - var(W4, 0)) - var(W1, 0) - var(W5, 0)));
+                        auto constraint_5 = bp.add_constraint(
+                            (var(W0, 0) * var(W2, 0) * var(W3, 0) + var(W0, 0) * var(W2, 0) * var(W1, 0)) *
+                            (var(W10, 0) * var(W10, 0) - var(W0, 0) - var(W2, 0) - var(W4, 0)));
+                        auto constraint_6 = bp.add_constraint(
+                            (var(W0, 0) * var(W2, 0) * var(W3, 0) + var(W0, 0) * var(W2, 0) * var(W1, 0)) *
+                            (var(W10, 0) * (var(W0, 0) - var(W4, 0)) - var(W1, 0) - var(W5, 0)));
+                        auto constraint_7 =
+                            bp.add_constraint((1 - var(W0, 0) * var(W6, 0)) * (var(W4, 0) - var(W2, 0)));
+                        auto constraint_8 =
+                            bp.add_constraint((1 - var(W0, 0) * var(W6, 0)) * (var(W5, 0) - var(W3, 0)));
+                        auto constraint_9 =
+                            bp.add_constraint((1 - var(W2, 0) * var(W7, 0)) * (var(W4, 0) - var(W0, 0)));
+                        auto constraint_10 =
+                            bp.add_constraint((1 - var(W2, 0) * var(W7, 0)) * (var(W5, 0) - var(W1, 0)));
+                        auto constraint_11 = bp.add_constraint(
+                            (1 - (var(W2, 0) - var(W0, 0)) * var(W8, 0) - (var(W3, 0) + var(W1, 0)) * var(W9, 0)) *
+                            var(W4, 0));
+                        auto constraint_12 = bp.add_constraint(
+                            (1 - (var(W2, 0) - var(W0, 0)) * var(W8, 0) - (var(W3, 0) + var(W1, 0)) * var(W9, 0)) *
+                            var(W5, 0));
 
                         bp.add_gate(first_selector_index,
                                     {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
-                                     constraint_7, constraint_8, constraint_9, constraint_10, constraint_11, constraint_12});
+                                     constraint_7, constraint_8, constraint_9, constraint_10, constraint_11,
+                                     constraint_12});
                     }
 
                     static void
@@ -244,7 +255,6 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type params,
                                                   const std::size_t start_row_index) {
-
                     }
                 };
             }    // namespace components
