@@ -71,14 +71,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr static const std::size_t comm_size = 1;
     //constexpr static const std::size_t n_2 = ceil(log2(n));
     //constexpr static const std::size_t padding = (1 << n_2) - n;
-    constexpr static const std::size_t f_comm_size = 2;
 
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
 
-    constexpr static std::size_t witness_columns = 15;
-    constexpr static std::size_t perm_size = 7;
+    constexpr static std::size_t witness_columns = 5;
+    constexpr static std::size_t perm_size = 5;
     constexpr static std::size_t lookup_table_size = 1;
     constexpr static bool use_lookup = false;
 

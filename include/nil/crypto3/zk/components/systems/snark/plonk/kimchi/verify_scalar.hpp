@@ -45,6 +45,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_scalar_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fr.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/prepare_scalars.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -94,6 +95,11 @@ namespace nil {
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
                         ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
+                    using prepare_scalars_component =
+                        zk::components::prepare_scalars<ArithmetizationType, CurveType, 
+                            1, W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                                                    W9, W10, W11, W12, W13, W14>;
+
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f2A;
@@ -103,6 +109,8 @@ namespace nil {
 
                         for (std::size_t i = 0; i < BatchSize; i++) {
                             row += prepare_batch_component::rows_amount;
+
+                            row += prepare_scalars_component::rows_amount;
                         }
 
                         row += batch_verify_component::rows_amount;
@@ -149,8 +157,12 @@ namespace nil {
                             batches[i] = prepare_output.prepared_proof;
                             fr_data_recalculated.f_comm_scalars[i] = prepare_output.f_comm_scalars;
                             fr_data_recalculated.zeta_to_srs_len[i] = prepare_output.zeta_to_srs_len;
-                            
                             row += prepare_batch_component::rows_amount;
+
+                            var cip_shifted = prepare_scalars_component::generate_circuit(bp, assignment,
+                                {{prepare_output.prepared_proof.cip}}, row).output[0];
+                            fr_data_recalculated.cip_shifted[i] = cip_shifted;
+                            row += prepare_scalars_component::rows_amount;
                         }
 
                         auto res = batch_verify_component::generate_circuit(
@@ -181,6 +193,11 @@ namespace nil {
                             fr_data_recalculated.f_comm_scalars[i] = prepare_output.f_comm_scalars;
                             fr_data_recalculated.zeta_to_srs_len[i] = prepare_output.zeta_to_srs_len;
                             row += prepare_batch_component::rows_amount;
+
+                            var cip_shifted = prepare_scalars_component::generate_assignments(assignment,
+                                {{prepare_output.prepared_proof.cip}}, row).output[0];
+                            fr_data_recalculated.cip_shifted[i] = cip_shifted;
+                            row += prepare_scalars_component::rows_amount;
                         }
 
                         auto res = batch_verify_component::generate_assignments(

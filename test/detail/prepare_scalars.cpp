@@ -68,7 +68,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_prepare_scalars) {
 
     constexpr std::size_t InputSize = 5;
 
-    using component_type = zk::components::prepare_scalars<ArithmetizationType, InputSize, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    using component_type = zk::components::prepare_scalars<ArithmetizationType, curve_type, 
+        InputSize, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                             11, 12, 13, 14>;
 
     std::vector<typename BlueprintFieldType::value_type> scalars;

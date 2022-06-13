@@ -129,7 +129,7 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + sub_component::rows_amount + msm_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 1 + msm_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -160,12 +160,7 @@ namespace nil {
                             bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            var cip = params.fr_output.cip[i];
-                            typename sub_component::params_type sub_params = {cip, two_pow_255};
-                            auto sub_res = sub_component::generate_assignments(assignment, sub_params, row);
-                            row = row + sub_component::rows_amount;
-
-                            //params.proofs[i].transcript.absorb_assignment(assignment, sub_res.output, row);
+                            //params.proofs[i].transcript.absorb_assignment(assignment, params.fr_output.cip_shifted[i], row);
                             //U = transcript.squeeze.to_group()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U_value =
                                  algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
@@ -220,14 +215,7 @@ namespace nil {
                             bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            var cip = params.fr_output.cip[i];
-                            typename sub_component::params_type sub_params = {cip, two_pow_255};
-                            zk::components::generate_circuit<sub_component>(bp, assignment, sub_params,
-                                                                        row);
-                            typename sub_component::result_type sub_res(sub_params, row);
-                            row = row + sub_component::rows_amount;
-
-                            //params.proofs[i].transcript.absorb_assignment(assignment, sub_res.output, row);
+                            //params.proofs[i].transcript.absorb_assignment(assignment, params.fr_output.cip_shifted[i], row);
                             //U = transcript.squeeze.to_group()
                             var_ec_point U = {var(0, row), var(1, row)};
                             

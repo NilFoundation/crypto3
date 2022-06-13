@@ -61,7 +61,7 @@ namespace nil {
                         std::array<VarType, KimchiParamsType::final_msm_size(BatchSize)> scalars;
                         std::array<std::array<VarType, f_comm_msm_size>,
                             BatchSize> f_comm_scalars;
-                        std::array<VarType, BatchSize> cip;
+                        std::array<VarType, BatchSize> cip_shifted;
 
                         std::array<var, KimchiParamsType::public_input_size> neg_pub;
                         std::array<var, BatchSize> zeta_to_srs_len;

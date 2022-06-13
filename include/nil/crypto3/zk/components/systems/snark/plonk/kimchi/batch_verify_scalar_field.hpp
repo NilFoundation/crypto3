@@ -136,7 +136,8 @@ namespace nil {
                     }
                     
                     using prepare_scalars_component =
-                        zk::components::prepare_scalars<ArithmetizationType, scalars_len(), W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                        zk::components::prepare_scalars<ArithmetizationType, CurveType, 
+                            scalars_len(), W0, W1, W2, W3, W4, W5, W6, W7, W8,
                                                     W9, W10, W11, W12, W13, W14>;
 
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
