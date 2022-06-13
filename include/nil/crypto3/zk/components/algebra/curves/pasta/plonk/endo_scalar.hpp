@@ -45,8 +45,10 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, 
-                    std::size_t ScalarSize, std::size_t... WireIndexes>
+                template<typename ArithmetizationType,
+                         typename CurveType,
+                         std::size_t ScalarSize,
+                         std::size_t... WireIndexes>
                 class endo_scalar;
 
                 template<typename CurveType>
@@ -57,9 +59,9 @@ namespace nil {
                     using curve_type = algebra::curves::vesta;
                     using scalar_field_type = typename curve_type::scalar_field_type;
                     using base_field_type = typename curve_type::base_field_type;
-                    constexpr static const typename scalar_field_type::value_type endo_r = 
+                    constexpr static const typename scalar_field_type::value_type endo_r =
                         0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
-                    constexpr static const typename base_field_type::value_type  endo_q = 
+                    constexpr static const typename base_field_type::value_type endo_q =
                         0x06819A58283E528E511DB4D81CF70F5A0FED467D47C033AF2AA9D2E050AA0E4F_cppui255;
                 };
 
@@ -68,9 +70,9 @@ namespace nil {
                     using curve_type = algebra::curves::pallas;
                     using scalar_field_type = typename curve_type::scalar_field_type;
                     using base_field_type = typename curve_type::base_field_type;
-                    constexpr static const typename scalar_field_type::value_type endo_r = 
+                    constexpr static const typename scalar_field_type::value_type endo_r =
                         0x397E65A7D7C1AD71AEE24B27E308F0A61259527EC1D4752E619D1840AF55F1B1_cppui255;
-                    constexpr static const typename base_field_type::value_type  endo_q = 
+                    constexpr static const typename base_field_type::value_type endo_q =
                         0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
                 };
 
@@ -119,8 +121,7 @@ namespace nil {
 
                     using endo_params = endo_scalar_params<CurveType>;
 
-                    constexpr static const typename BlueprintFieldType::value_type
-                        endo_factor = endo_params::endo_r;
+                    constexpr static const typename BlueprintFieldType::value_type endo_factor = endo_params::endo_r;
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f00;
@@ -273,8 +274,7 @@ namespace nil {
                                           (1 << 10) * var(W9, 0) + (1 << 8) * var(W10, 0) + (1 << 6) * var(W11, 0) +
                                           (1 << 4) * var(W12, 0) + (1 << 2) * var(W13, 0) + var(W14, 0)));
 
-                        auto constraint_12 =
-                            bp.add_constraint(var(W6, 0) - (endo_factor * var(W4, 0) + var(W5, 0)));
+                        auto constraint_12 = bp.add_constraint(var(W6, 0) - (endo_factor * var(W4, 0) + var(W5, 0)));
 
                         bp.add_gate(selector_index_2, {constraint_12});
 
