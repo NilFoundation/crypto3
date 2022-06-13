@@ -59,9 +59,7 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType,
-                         typename MerkleTreeHashType,
-                         typename TranscriptHashType,
+                template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
                          std::size_t M = 2>
                 struct fri : public detail::basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
 

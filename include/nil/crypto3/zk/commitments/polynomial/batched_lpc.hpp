@@ -64,10 +64,8 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams, std::size_t BatchSize>
                 struct batched_list_polynomial_commitment<FieldType, LPCParams, BatchSize, false>
-                    : public detail::basic_batched_fri<FieldType,
-                                                       typename LPCParams::merkle_hash_type,
-                                                       typename LPCParams::transcript_hash_type,
-                                                       LPCParams::m> {
+                    : public detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
+                                                       typename LPCParams::transcript_hash_type, LPCParams::m> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
@@ -80,10 +78,8 @@ namespace nil {
 
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    using basic_fri = detail::basic_batched_fri<FieldType,
-                                                                typename LPCParams::merkle_hash_type,
-                                                                typename LPCParams::transcript_hash_type,
-                                                                m>;
+                    using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
+                                                                typename LPCParams::transcript_hash_type, m>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
@@ -106,10 +102,8 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams>
                 struct batched_list_polynomial_commitment<FieldType, LPCParams, 0, true>
-                    : public detail::basic_batched_fri<FieldType,
-                                                       typename LPCParams::merkle_hash_type,
-                                                       typename LPCParams::transcript_hash_type,
-                                                       LPCParams::m> {
+                    : public detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
+                                                       typename LPCParams::transcript_hash_type, LPCParams::m> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
@@ -121,10 +115,8 @@ namespace nil {
 
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    using basic_fri = detail::basic_batched_fri<FieldType,
-                                                                typename LPCParams::merkle_hash_type,
-                                                                typename LPCParams::transcript_hash_type,
-                                                                m>;
+                    using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
+                                                                typename LPCParams::transcript_hash_type, m>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
