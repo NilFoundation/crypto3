@@ -116,8 +116,8 @@ namespace nil {
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
-                                return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial
-                                && target_commitment == rhs.target_commitment;
+                                return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial &&
+                                       target_commitment == rhs.target_commitment;
                             }
                             bool operator!=(const proof_type &rhs) const {
                                 return !(rhs == *this);
@@ -133,7 +133,7 @@ namespace nil {
                             precommit(math::polynomial_dfs<typename FieldType::value_type> f,
                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
-                            if (f.size() != D->size()){
+                            if (f.size() != D->size()) {
                                 f.resize(D->size());
                             }
                             std::vector<std::array<std::uint8_t, field_element_type::length()>> y_data;
@@ -184,7 +184,7 @@ namespace nil {
                             return commits;
                         }
 
-                        template <typename PolynomialType>
+                        template<typename PolynomialType>
                         static commitment_type commit(PolynomialType &f,
                                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
                             return commit(precommit(f, D));
@@ -201,7 +201,7 @@ namespace nil {
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->size();
                             f.resize(domain_size);
-                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
+                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
 
                             std::size_t r = fri_params.r;
 
@@ -221,7 +221,7 @@ namespace nil {
                                 std::array<std::size_t, m> s_indices;
                                 if constexpr (m == 2) {
                                     s_indices[0] = x_index;
-                                    s_indices[1] = (x_index + domain_size/2)%domain_size;
+                                    s_indices[1] = (x_index + domain_size / 2) % domain_size;
                                 } else {
                                     return {};
                                 }
@@ -269,10 +269,9 @@ namespace nil {
 
                             // TODO: how to sample x?
                             std::size_t domain_size = fri_params.D[0]->size();
-                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>())%domain_size;
-                            
-                            typename FieldType::value_type x =
-                                fri_params.D[0]->get_domain_element(x_index);
+                            std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
+
+                            typename FieldType::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                             std::size_t r = fri_params.r;
 
@@ -309,11 +308,11 @@ namespace nil {
                                 }
 
                                 x_index %= fri_params.D[i + 1]->size();
-                                
-                                x = fri_params.D[i+1]->get_domain_element(x_index);
+
+                                x = fri_params.D[i + 1]->get_domain_element(x_index);
 
                                 // create polynomial of degree (degree(f) / 2)
-                                    f = fold_polynomial<FieldType>(f, alpha);
+                                f = fold_polynomial<FieldType>(f, alpha);
 
                                 typename FieldType::value_type colinear_value =
                                     f.evaluate(x);    // polynomial evaluation
@@ -340,7 +339,7 @@ namespace nil {
                                                 transcript_type &transcript = transcript_type()) {
 
                             transcript(proof.target_commitment);
-                            
+
                             std::uint64_t idx = transcript.template int_challenge<std::uint64_t>();
                             typename FieldType::value_type x = fri_params.D[0]->get_domain_element(idx);
 

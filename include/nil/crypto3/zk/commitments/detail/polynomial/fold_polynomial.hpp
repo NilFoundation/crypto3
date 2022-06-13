@@ -69,25 +69,25 @@ namespace nil {
                     math::polynomial_dfs<typename FieldType::value_type>
                         fold_polynomial(math::polynomial_dfs<typename FieldType::value_type> &f,
                                         const typename FieldType::value_type &alpha,
-                                        std::shared_ptr<math::evaluation_domain<FieldType>> domain) {
+                                        std::shared_ptr<math::evaluation_domain<FieldType>>
+                                            domain) {
 
                         std::size_t d = f.degree();
-                        
-                        //codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
-                        // + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in range(len(codeword)//2)]
+
+                        // codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
+                        //  + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in
+                        //  range(len(codeword)//2)]
                         math::polynomial_dfs<typename FieldType::value_type> f_folded(
                             domain->size() / 2 - 1, domain->size() / 2, FieldType::value_type::zero());
 
-                        typename FieldType::value_type two_inversed = 2; 
+                        typename FieldType::value_type two_inversed = 2;
                         two_inversed = two_inversed.inversed();
                         typename FieldType::value_type omega_inversed = domain->get_domain_element(domain->size() - 1);
-                        
+
                         typename FieldType::value_type acc = alpha;
 
                         for (std::size_t i = 0; i <= f_folded.degree(); i++) {
-                            f_folded[i] = two_inversed * (
-                                (1 + acc) * f[i] + (1 - acc) * f[domain->size() / 2 + i]
-                            );
+                            f_folded[i] = two_inversed * ((1 + acc) * f[i] + (1 - acc) * f[domain->size() / 2 + i]);
                             acc *= omega_inversed;
                         }
 
