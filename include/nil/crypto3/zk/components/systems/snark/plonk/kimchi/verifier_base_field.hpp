@@ -166,8 +166,8 @@ namespace nil {
                         std::array<proof_type, BatchSize> proofs;
                         verifier_index_type verifier_index;
                         
-                        typename proof_binding::fr_data<var, BatchSize> fr_data;
-                        typename proof_binding::fq_data<var> fq_data;
+                        typename proof_binding::template fr_data<var, BatchSize> fr_data;
+                        typename proof_binding::template fq_data<var> fq_data;
                     };
 
                     struct result_type {
@@ -472,7 +472,7 @@ namespace nil {
                         row+=batch_verify_component::rows_amount;
 
                         
-                        typename proof_binding::fq_data<var> fq_data_recalculated;
+                        typename proof_binding::template fq_data<var> fq_data_recalculated;
                         map_fq_component::generate_assignments(assignment,
                             {params.fq_data, fq_data_recalculated}, row);
                         row += map_fq_component::rows_amount;
@@ -660,7 +660,7 @@ namespace nil {
                         batch_verify_component::generate_circuit(bp, assignment, batch_params, row);
                         row+=batch_verify_component::rows_amount;
 
-                        typename proof_binding::fq_data<var> fq_data_recalculated;
+                        typename proof_binding::template fq_data<var> fq_data_recalculated;
                         map_fq_component::generate_circuit(bp, assignment,
                             {params.fq_data, fq_data_recalculated}, row);
                         row += map_fq_component::rows_amount;

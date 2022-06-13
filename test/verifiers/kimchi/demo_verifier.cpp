@@ -26,7 +26,6 @@
 
 #define BOOST_TEST_MODULE blueprint_plonk_kimchi_basic_verifier_test
 
-#include <assert.h>
 #include <boost/test/unit_test.hpp>
 #include <fstream>
 

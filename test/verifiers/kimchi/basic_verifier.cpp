@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
         fq_output_type_scalar fq_output;
         std::array<var_scalar, eval_rounds> challenges;
         for (std::size_t j = 0; j < eval_rounds; j++) {
-            public_input_scalar.push_back(10);
+            public_input_scalar.emplace_back(10);
             challenges[j] = var_scalar(0, public_input_scalar.size() - 1, false, var_scalar::column_type::public_input);
         }
         fq_output.challenges = challenges;
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
         public_input_scalar.push_back(fq_digest);
         fq_output.fq_digest = var_scalar(0, public_input_scalar.size() - 1, false, var_scalar::column_type::public_input);
         // c
-        public_input_scalar.push_back(250);
+        public_input_scalar.emplace_back(250);
         fq_output.c = var_scalar(0, public_input_scalar.size() - 1, false, var_scalar::column_type::public_input);
 
         fq_outputs[batch_id] = fq_output;
@@ -396,11 +396,11 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     std::array<var, batch_size> zeta_to_srs_len_var;
     for (std::size_t i = 0; i < batch_size; i++) {
-        public_input.push_back(typename BaseFieldType::value_type(typename BaseFieldType::integral_type(zeta_to_srs_len[i].data)));
+        public_input.emplace_back(typename BaseFieldType::integral_type(zeta_to_srs_len[i].data));
         zeta_to_srs_len_var[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    public_input.push_back(typename BaseFieldType::value_type(typename BaseFieldType::integral_type(zeta_to_domain_size_minus_1.data)));
+    public_input.emplace_back(typename BaseFieldType::integral_type(zeta_to_domain_size_minus_1.data));
     var zeta_to_domain_size_minus_1_var = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
 
@@ -424,7 +424,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     std::array<var, bases_size> batch_scalars_var;
 
     for (std::size_t i = 0; i < bases_size; i++) {
-        public_input.push_back(typename BaseFieldType::value_type(typename BaseFieldType::integral_type(batch_scalars[i].data)));
+        public_input.emplace_back(typename BaseFieldType::integral_type(batch_scalars[i].data));
         batch_scalars_var[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
     curve_type::base_field_type::value_type cip = algebra::random_element<curve_type::base_field_type>();
