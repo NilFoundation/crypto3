@@ -61,7 +61,7 @@ namespace nil {
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
                     template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                             std::size_t M = 2>
+                            std::size_t M = 2>
                     struct basic_batched_fri {
 
                         constexpr static const std::size_t m = M;
@@ -75,14 +75,14 @@ namespace nil {
 
                         using Endianness = nil::marshalling::option::big_endian;
                         using field_element_type =
-                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
-                                                                            typename FieldType::value_type>;
+                                nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
+                                        typename FieldType::value_type>;
 
                         using precommitment_type = merkle_tree_type;
                         using commitment_type = typename precommitment_type::value_type;
                         using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
                         using params_type =
-                            typename basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>::params_type;
+                                typename basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>::params_type;
 
                         struct round_proof_type {
                             // bool operator==(const round_proof_type &rhs) const {
@@ -123,17 +123,17 @@ namespace nil {
 
                         template<typename ContainerType>
                         static typename std::enable_if<
-                            (std::is_same<typename ContainerType::value_type,
-                                          math::polynomial_dfs<typename FieldType::value_type>>::value),
-                            precommitment_type>::type
-                            precommit(ContainerType poly,
-                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+                                (std::is_same<typename ContainerType::value_type,
+                                        math::polynomial_dfs<typename FieldType::value_type>>::value),
+                                precommitment_type>::type
+                        precommit(ContainerType poly,
+                                  const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                             auto begin = std::chrono::high_resolution_clock::now();
                             auto last = begin;
                             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                std::chrono::high_resolution_clock::now() - last);
+                                    std::chrono::high_resolution_clock::now() - last);
 #endif
 
                             for (int i = 0; i < poly.size(); ++i) {
@@ -175,17 +175,18 @@ namespace nil {
                             //                                - begin); std::cout << "----Batched FRI precommit, time: "
                             //                                << elapsed.count() << "ms"  << std::endl;
                             //#endif
-                            return containers::make_merkle_tree<precommitment_type::hash_type>(y_data.begin(),
-                                                                                               y_data.end());
+                            return containers::make_merkle_tree<typename precommitment_type::hash_type, m>(
+                                    y_data.begin(),
+                                    y_data.end());
                         }
 
                         template<typename ContainerType>
                         static typename std::enable_if<
-                            (std::is_same<typename ContainerType::value_type,
-                                          math::polynomial<typename FieldType::value_type>>::value),
-                            precommitment_type>::type
-                            precommit(const ContainerType &poly,
-                                      const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
+                                (std::is_same<typename ContainerType::value_type,
+                                        math::polynomial<typename FieldType::value_type>>::value),
+                                precommitment_type>::type
+                        precommit(const ContainerType &poly,
+                                  const std::shared_ptr<math::evaluation_domain<FieldType>> &D) {
 
                             std::size_t list_size = poly.size();
                             std::vector<math::polynomial_dfs<typename FieldType::value_type>> poly_dfs(list_size);
@@ -209,14 +210,14 @@ namespace nil {
 
                         template<typename ContainerType>
                         static typename std::enable_if<
-                            (std::is_same<typename ContainerType::value_type,
-                                          math::polynomial_dfs<typename FieldType::value_type>>::value),
-                            proof_type>::type
-                            proof_eval(ContainerType f,
-                                       ContainerType g,
-                                       precommitment_type &T,
-                                       const params_type &fri_params,
-                                       transcript_type &transcript = transcript_type()) {
+                                (std::is_same<typename ContainerType::value_type,
+                                        math::polynomial_dfs<typename FieldType::value_type>>::value),
+                                proof_type>::type
+                        proof_eval(ContainerType f,
+                                   ContainerType g,
+                                   precommitment_type &T,
+                                   const params_type &fri_params,
+                                   transcript_type &transcript = transcript_type()) {
 
                             //#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                             //                        auto begin = std::chrono::high_resolution_clock::now();
@@ -274,8 +275,8 @@ namespace nil {
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     for (std::size_t j = 0; j < m; j++) {
                                         y[polynom_index][j] =
-                                            (i == 0 ? g[polynom_index][s_indices[j]] :
-                                                      f[polynom_index][s_indices[j]]);    // polynomial evaluation
+                                                (i == 0 ? g[polynom_index][s_indices[j]] :
+                                                 f[polynom_index][s_indices[j]]);    // polynomial evaluation
                                     }
                                 }
 
@@ -297,7 +298,7 @@ namespace nil {
                                         f[polynom_index].resize(fri_params.D[i]->size());
                                     }
                                     f[polynom_index] =
-                                        fold_polynomial<FieldType>(f[polynom_index], alpha, fri_params.D[i]);
+                                            fold_polynomial<FieldType>(f[polynom_index], alpha, fri_params.D[i]);
                                 }
 
                                 //#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
@@ -313,7 +314,7 @@ namespace nil {
 
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     colinear_value[polynom_index] =
-                                        f[polynom_index][x_index];    // polynomial evaluation
+                                            f[polynom_index][x_index];    // polynomial evaluation
                                 }
 
                                 T_next = precommit(f, fri_params.D[i + 1]);    // new merkle tree
@@ -323,7 +324,7 @@ namespace nil {
                                 merkle_proof_type colinear_path = merkle_proof_type(T_next, x_index);
 
                                 round_proofs.push_back(
-                                    round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+                                        round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
                                 p_tree = std::make_unique<merkle_tree_type>(T_next);
                             }
@@ -332,7 +333,8 @@ namespace nil {
 
                             for (std::size_t polynom_index = 0; polynom_index < f.size(); polynom_index++) {
                                 final_polynomials[polynom_index] =
-                                    math::polynomial<typename FieldType::value_type>(f[polynom_index].coefficients());
+                                        math::polynomial<typename FieldType::value_type>(
+                                                f[polynom_index].coefficients());
                             }
 
                             proof_type proof({round_proofs, final_polynomials, commit(T)});
@@ -348,14 +350,14 @@ namespace nil {
 
                         template<typename ContainerType>
                         static typename std::enable_if<
-                            (std::is_same<typename ContainerType::value_type,
-                                          math::polynomial<typename FieldType::value_type>>::value),
-                            proof_type>::type
-                            proof_eval(ContainerType f,
-                                       const ContainerType &g,
-                                       precommitment_type &T,
-                                       const params_type &fri_params,
-                                       transcript_type &transcript = transcript_type()) {
+                                (std::is_same<typename ContainerType::value_type,
+                                        math::polynomial<typename FieldType::value_type>>::value),
+                                proof_type>::type
+                        proof_eval(ContainerType f,
+                                   const ContainerType &g,
+                                   precommitment_type &T,
+                                   const params_type &fri_params,
+                                   transcript_type &transcript = transcript_type()) {
 
                             assert(f.size() == g.size());
                             std::size_t leaf_size = f.size();
@@ -400,8 +402,8 @@ namespace nil {
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     for (std::size_t j = 0; j < m; j++) {
                                         y[polynom_index][j] =
-                                            (i == 0 ? g[polynom_index].evaluate(s[j]) :
-                                                      f[polynom_index].evaluate(s[j]));    // polynomial evaluation
+                                                (i == 0 ? g[polynom_index].evaluate(s[j]) :
+                                                 f[polynom_index].evaluate(s[j]));    // polynomial evaluation
                                     }
                                 }
 
@@ -424,7 +426,7 @@ namespace nil {
 
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                     colinear_value[polynom_index] =
-                                        f[polynom_index].evaluate(x);    // polynomial evaluation
+                                            f[polynom_index].evaluate(x);    // polynomial evaluation
                                 }
 
                                 T_next = precommit(f, fri_params.D[i + 1]);    // new merkle tree
@@ -433,7 +435,7 @@ namespace nil {
                                 merkle_proof_type colinear_path = merkle_proof_type(T_next, x_index);
 
                                 round_proofs.push_back(
-                                    round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+                                        round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
 
                                 p_tree = std::make_unique<merkle_tree_type>(T_next);
                             }
@@ -485,7 +487,7 @@ namespace nil {
 
                                         field_element_type leaf_val(leaf);
                                         auto write_iter =
-                                            leaf_data.begin() + field_element_type::length() * polynom_index;
+                                                leaf_data.begin() + field_element_type::length() * polynom_index;
                                         leaf_val.write(write_iter, field_element_type::length());
                                     }
 
@@ -511,17 +513,17 @@ namespace nil {
                                     }
 
                                     std::vector<
-                                        std::pair<typename FieldType::value_type, typename FieldType::value_type>>
-                                        interpolation_points {
+                                            std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                                            interpolation_points{
                                             std::make_pair(s[0], y[0]),
                                             std::make_pair(s[1], y[1]),
-                                        };
+                                    };
 
                                     math::polynomial<typename FieldType::value_type> interpolant =
-                                        math::lagrange_interpolation(interpolation_points);
+                                            math::lagrange_interpolation(interpolation_points);
 
                                     typename FieldType::value_type leaf =
-                                        proof.round_proofs[i].colinear_value[polynom_index];
+                                            proof.round_proofs[i].colinear_value[polynom_index];
 
                                     field_element_type leaf_val(leaf);
                                     auto write_iter = leaf_data.begin() + field_element_type::length() * polynom_index;
@@ -561,7 +563,7 @@ namespace nil {
                                                 params_type &fri_params,
                                                 const ContainerType U,
                                                 const math::polynomial<typename FieldType::value_type>
-                                                    V,
+                                                V,
                                                 transcript_type &transcript = transcript_type()) {
 
                             std::size_t leaf_size = U.size();
@@ -596,7 +598,7 @@ namespace nil {
 
                                         field_element_type leaf_val(leaf);
                                         auto write_iter =
-                                            leaf_data.begin() + field_element_type::length() * polynom_index;
+                                                leaf_data.begin() + field_element_type::length() * polynom_index;
                                         leaf_val.write(write_iter, field_element_type::length());
                                     }
 
@@ -622,17 +624,17 @@ namespace nil {
                                     }
 
                                     std::vector<
-                                        std::pair<typename FieldType::value_type, typename FieldType::value_type>>
-                                        interpolation_points {
+                                            std::pair<typename FieldType::value_type, typename FieldType::value_type>>
+                                            interpolation_points{
                                             std::make_pair(s[0], y[0]),
                                             std::make_pair(s[1], y[1]),
-                                        };
+                                    };
 
                                     math::polynomial<typename FieldType::value_type> interpolant =
-                                        math::lagrange_interpolation(interpolation_points);
+                                            math::lagrange_interpolation(interpolation_points);
 
                                     typename FieldType::value_type leaf =
-                                        proof.round_proofs[i].colinear_value[polynom_index];
+                                            proof.round_proofs[i].colinear_value[polynom_index];
 
                                     field_element_type leaf_val(leaf);
                                     auto write_iter = leaf_data.begin() + field_element_type::length() * polynom_index;
