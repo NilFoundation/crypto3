@@ -59,10 +59,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 10;
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -82,41 +81,45 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     constexpr static const std::size_t srs_len = 1;
     constexpr static const std::size_t prev_chal_size = 1;
 
-    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
-        srs_len>;
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using kimchi_params = zk::components::kimchi_params_type<commitment_params,
-        witness_columns, perm_size,
-        use_lookup, lookup_table_size,
-        alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
+                                                             witness_columns,
+                                                             perm_size,
+                                                             use_lookup,
+                                                             lookup_table_size,
+                                                             alpha_powers_n,
+                                                             public_input_size,
+                                                             index_terms,
+                                                             prev_chal_size>;
 
     zk::components::kimchi_verifier_index_scalar<BlueprintFieldType> verifier_index;
-    typename BlueprintFieldType::value_type omega_value = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
+    typename BlueprintFieldType::value_type omega_value =
+        0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
     verifier_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
-        0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
-        0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
-        0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
+                           0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
+                           0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
+                           0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
     std::size_t domain_size_value = 128;
     verifier_index.public_input_size = public_input_size;
     verifier_index.alpha_powers = alpha_powers_n;
 
-    using component_type = zk::components::ft_eval<ArithmetizationType, curve_type, kimchi_params,
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    using component_type = zk::components::
+        ft_eval<ArithmetizationType, curve_type, kimchi_params, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
     typename BlueprintFieldType::value_type joint_combiner_value = 15;
     typename BlueprintFieldType::value_type beta_value = 3;
     typename BlueprintFieldType::value_type gamma_value = 5;
-    typename BlueprintFieldType::value_type alpha_value = 0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
-    typename BlueprintFieldType::value_type zeta_value = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type alpha_value =
+        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
+    typename BlueprintFieldType::value_type zeta_value =
+        0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {joint_combiner_value, beta_value, gamma_value, 
-        power(zeta_value, domain_size_value),
-        //verifier_index
-        domain_size_value,
-        omega_value,
-        zeta_value,
-        1, 0};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {
+        joint_combiner_value, beta_value, gamma_value, power(zeta_value, domain_size_value),
+        // verifier_index
+        domain_size_value, omega_value, zeta_value, 1, 0};
 
     var joint_combiner(0, 0, false, var::column_type::public_input);
     var beta(0, 1, false, var::column_type::public_input);
@@ -128,7 +131,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     var one(0, 7, false, var::column_type::public_input);
     var zero(0, 8, false, var::column_type::public_input);
     verifier_index.domain_size = domain_size;
-    verifier_index.omega = omega; 
+    verifier_index.omega = omega;
 
     // TODO prepare real data
     std::array<var, alpha_powers_n> alpha_powers;
@@ -139,21 +142,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
 
     zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
 
-    typename component_type::params_type params = {verifier_index, 
-        zeta_pow_n,
-        alpha_powers,
-        proof.proof_evals,
-        gamma,
-        beta,
-        proof.proof_evals,
-        zeta,
-        joint_combiner};
+    typename component_type::params_type params = {verifier_index,    zeta_pow_n, alpha_powers,
+                                                   proof.proof_evals, gamma,      beta,
+                                                   proof.proof_evals, zeta,       joint_combiner};
 
-    auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-    };
+    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

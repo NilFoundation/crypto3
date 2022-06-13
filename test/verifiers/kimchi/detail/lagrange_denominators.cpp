@@ -64,8 +64,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_denominators) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::lagrange_denominators<ArithmetizationType, n, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    using component_type =
+        zk::components::lagrange_denominators<ArithmetizationType, n, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     var one(0, 0, false, var::column_type::public_input);
     var zeta(0, 1, false, var::column_type::public_input);
@@ -92,18 +92,18 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_lagrange_denominators) {
         expected_result[n + i] = (zeta_omega_value - omega_powers_values[i]).inversed();
     }
 
-
-    auto result_check = [&expected_result](AssignmentType &assignment, 
-        component_type::result_type &real_res) { 
-            for (std::size_t i = 0; i < n; i++) {
-                assert(expected_result[i] == assignment.var_value(real_res.output[i]));
-                assert(expected_result[n + i] == assignment.var_value(real_res.output[n + i]));
-            }
+    auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
+        for (std::size_t i = 0; i < n; i++) {
+            assert(expected_result[i] == assignment.var_value(real_res.output[i]));
+            assert(expected_result[n + i] == assignment.var_value(real_res.output[n + i]));
+        }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "lagrange_denominators_component: " << duration.count() << "ms" << std::endl;
 }
 
