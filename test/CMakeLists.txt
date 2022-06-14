@@ -88,6 +88,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/batch_verify_scalar_field"
     "verifiers/kimchi/detail/lagrange_denominators"
     "verifiers/kimchi/detail/b_poly"
+    "verifiers/kimchi/detail/b_poly_coefficients"
     "verifiers/kimchi/detail/public_evaluations"
     "verifiers/kimchi/detail/prev_chal_evals"
     "verifiers/kimchi/detail/ft_eval"

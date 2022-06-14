@@ -94,7 +94,6 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-                    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f26;
 
