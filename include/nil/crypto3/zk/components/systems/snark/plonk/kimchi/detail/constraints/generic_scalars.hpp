@@ -98,10 +98,10 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0x0f26;
 
-                    constexpr static const std::size_t generic_offset = 3;
+                    constexpr static const std::size_t generic_registers = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 12 * mul_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     constexpr static const std::size_t output_size = 10;
@@ -118,6 +118,30 @@ namespace nil {
 
                         result_type(std::size_t start_row_index) {
                             std::size_t row = start_row_index;
+
+                            constexpr std::size_t parts = 2;
+
+                            for (std::size_t i = 0; i < parts; i++) {
+                                var alpha_generic = typename mul_component::result_type(row).output;
+                                row += mul_component::rows_amount;
+
+                                // addition part
+                                // alpha_generic * w_zeta[register_offset + j]
+                                for (std::size_t j = 0; j < 3; j++) {
+                                    output[5 * i + j] = typename mul_component::result_type(row).output;
+                                    row += mul_component::rows_amount;
+                                }
+
+                                // multiplication
+                                var tmp = typename mul_component::result_type(row).output;
+                                row += mul_component::rows_amount;
+                                output[5 * i + 3] = typename mul_component::result_type(row).output;
+                                row += mul_component::rows_amount;
+
+                                // constant
+                                output[5 * i + 4] = alpha_generic;
+                            }
+
                         }
                     };
 
@@ -127,6 +151,48 @@ namespace nil {
                                          const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
+                        std::array<var, output_size> output;
+
+                        constexpr std::size_t parts = 2;
+
+                        std::array<var, parts> alpha_pows = {
+                            params.alphas[params.start_idx],
+                            params.alphas[params.start_idx + 1],
+                        };
+                        std::array<std::size_t, parts> offsets = {
+                            0, generic_registers
+                        };
+
+                        for (std::size_t i = 0; i < parts; i++) {
+                            var alpha_generic = zk::components::generate_circuit<mul_component>(
+                                bp, assignment, 
+                                {alpha_pows[i], params.evals[0].generic_selector}, row).output;
+                            row += mul_component::rows_amount;
+
+                            // addition part
+                            // alpha_generic * w_zeta[register_offset + j]
+                            for (std::size_t j = 0; j < 3; j++) {
+                                output[5 * i + j] = zk::components::generate_circuit<mul_component>(
+                                    bp, assignment, 
+                                    {alpha_generic, params.evals[0].w[offsets[i] + j]}, row).output;
+                                row += mul_component::rows_amount;
+                            }
+
+                            // multiplication
+                            var tmp = zk::components::generate_circuit<mul_component>(
+                                bp, assignment, 
+                                {params.evals[0].w[offsets[i]],
+                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                            row += mul_component::rows_amount;
+                            output[5 * i + 3] = zk::components::generate_circuit<mul_component>(
+                                bp, assignment, 
+                                {alpha_generic,
+                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                            row += mul_component::rows_amount;
+
+                            // constant
+                            output[5 * i + 4] = alpha_generic;
+                        }
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
@@ -135,8 +201,49 @@ namespace nil {
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
                                                             const std::size_t start_row_index) {
-
                         std::size_t row = start_row_index;
+                        std::array<var, output_size> output;
+
+                        constexpr std::size_t parts = 2;
+
+                        std::array<var, parts> alpha_pows = {
+                            params.alphas[params.start_idx],
+                            params.alphas[params.start_idx + 1],
+                        };
+                        std::array<std::size_t, parts> offsets = {
+                            0, generic_registers
+                        };
+
+                        for (std::size_t i = 0; i < parts; i++) {
+                            var alpha_generic = mul_component::generate_assignments(
+                                assignment, 
+                                {alpha_pows[i], params.evals[0].generic_selector}, row).output;
+                            row += mul_component::rows_amount;
+
+                            // addition part
+                            // alpha_generic * w_zeta[register_offset + j]
+                            for (std::size_t j = 0; j < 3; j++) {
+                                output[5 * i + j] = mul_component::generate_assignments(
+                                    assignment, 
+                                    {alpha_generic, params.evals[0].w[offsets[i] + j]}, row).output;
+                                row += mul_component::rows_amount;
+                            }
+
+                            // multiplication
+                            var tmp = mul_component::generate_assignments(
+                                assignment, 
+                                {params.evals[0].w[offsets[i]],
+                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                            row += mul_component::rows_amount;
+                            output[5 * i + 3] = mul_component::generate_assignments(
+                                assignment, 
+                                {alpha_generic,
+                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                            row += mul_component::rows_amount;
+
+                            // constant
+                            output[5 * i + 4] = alpha_generic;
+                        }
 
                         return result_type(start_row_index);
                     }
