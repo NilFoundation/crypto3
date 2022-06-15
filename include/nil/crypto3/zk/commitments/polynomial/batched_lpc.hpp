@@ -140,6 +140,780 @@ namespace nil {
                 template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsRunTimeSize = false>
                 using batched_lpc = batched_list_polynomial_commitment<FieldType, LPCParams, BatchSize, IsRunTimeSize>;
             }    // namespace commitments
+
+            namespace algorithms {
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                 typename LPC::field_type, typename LPC::lpc_params, LPC::leaf_size, false>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::array<math::polynomial_dfs<typename LPC::field_type::value_type>, LPC::leaf_size> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size> z;
+                    std::array<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>,
+                        LPC::leaf_size>
+                        U_interpolation_points;
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> g_normal;
+                    for (int polynom_index = 0; polynom_index < g.size(); ++polynom_index) {
+                        g_normal[polynom_index] =
+                            math::polynomial<typename LPC::field_type::value_type>(g[polynom_index].coefficients());
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
+                        z[polynom_index].resize(evaluation_points[polynom_index].size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+
+                            z[polynom_index][point_index] = g_normal[polynom_index].evaluate(
+                                evaluation_points[polynom_index][point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[polynom_index][point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> Q_normal;
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q_normal[polynom_index] = (g_normal[polynom_index] - U);
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+                            denominator_polynom =
+                                denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
+                                                          -evaluation_points[polynom_index][point_index], 1};
+                        }
+                        Q_normal[polynom_index] = Q_normal[polynom_index] / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    std::array<math::polynomial_dfs<typename LPC::field_type::value_type>, LPC::leaf_size> Q;
+                    for (int polynom_index = 0; polynom_index < Q_normal.size(); ++polynom_index) {
+                        Q[polynom_index].from_coefficients(Q_normal[polynom_index]);
+                        Q[polynom_index].resize(fri_params.D[0]->size());
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                    }
+
+                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                }
+
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                 typename LPC::field_type, typename LPC::lpc_params, LPC::leaf_size, false>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size> z;
+                    std::array<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>,
+                        LPC::leaf_size>
+                        U_interpolation_points;
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
+                        z[polynom_index].resize(evaluation_points[polynom_index].size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+
+                            z[polynom_index][point_index] = g[polynom_index].evaluate(
+                                evaluation_points[polynom_index][point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[polynom_index][point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> Q;
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q[polynom_index] = (g[polynom_index] - U);
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+                            denominator_polynom =
+                                denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
+                                                          -evaluation_points[polynom_index][point_index], 1};
+                        }
+                        Q[polynom_index] = Q[polynom_index] / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                    }
+
+                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                }
+
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                 typename LPC::field_type, typename LPC::lpc_params, LPC::leaf_size, false>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::array<math::polynomial_dfs<typename LPC::field_type::value_type>, LPC::leaf_size> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size> z;
+                    std::array<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>,
+                        LPC::leaf_size>
+                        U_interpolation_points;
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> g_normal;
+                    for (int polynom_index = 0; polynom_index < g.size(); ++polynom_index) {
+                        g_normal[polynom_index] =
+                            math::polynomial<typename LPC::field_type::value_type>(g[polynom_index].coefficients());
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points.size());
+                        z[polynom_index].resize(evaluation_points.size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+
+                            z[polynom_index][point_index] = g_normal[polynom_index].evaluate(
+                                evaluation_points[point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                    for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+                        denominator_polynom = denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
+                                                                        -evaluation_points[point_index], 1};
+                    }
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> Q_normal;
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q_normal[polynom_index] = (g_normal[polynom_index] - U) / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    std::array<math::polynomial_dfs<typename LPC::field_type::value_type>, LPC::leaf_size> Q;
+                    for (int polynom_index = 0; polynom_index < Q_normal.size(); ++polynom_index) {
+                        Q[polynom_index].from_coefficients(Q_normal[polynom_index]);
+                        Q[polynom_index].resize(fri_params.D[0]->size());
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = typename LPC::basic_fri::proof_eval(Q, g, T, fri_params, transcript);
+                    }
+
+                    return proof_type({z, typename LPC::basic_fri::commit(T), fri_proof});
+                }
+
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                 typename LPC::field_type, typename LPC::lpc_params, LPC::leaf_size, false>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size> z;
+                    std::array<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>,
+                        LPC::leaf_size>
+                        U_interpolation_points;
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points.size());
+                        z[polynom_index].resize(evaluation_points.size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+
+                            z[polynom_index][point_index] = g[polynom_index].evaluate(
+                                evaluation_points[point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                    for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+                        denominator_polynom = denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
+                                                                        -evaluation_points[point_index], 1};
+                    }
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> Q;
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q[polynom_index] = (g[polynom_index] - U) / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = typename LPC::basic_fri::proof_eval(Q, g, T, fri_params, transcript);
+                    }
+
+                    return proof_type({z, typename LPC::basic_fri::commit(T), fri_proof});
+                }
+
+                template<
+                    typename LPC,
+                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
+                                                                                                            typename LPC::lpc_params,
+                                                                                                            LPC::leaf_size,
+                                                                                                            false>,
+                                                            LPC>::value,
+                                            bool>::type = true>
+                static bool verify_eval(
+                    const std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size>
+                        &evaluation_points,
+                    typename LPC::proof_type &proof,
+                    typename LPC::basic_fri::params_type fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::array<std::vector<std::pair<typename LPC::field_type::value_type,
+                                                     typename LPC::field_type::value_type>>,
+                               LPC::leaf_size>
+                        U_interpolation_points;
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+
+                        U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+
+                            U_interpolation_points[polynom_index][point_index] = std::make_pair(
+                                evaluation_points[polynom_index][point_index], proof.z[polynom_index][point_index]);
+                        }
+                    }
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> U;
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        U[polynom_index] = math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+                    }
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> V;
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        V[polynom_index] = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+                            V[polynom_index] =
+                                V[polynom_index] * (math::polynomial<typename LPC::field_type::value_type>(
+                                                       {-evaluation_points[polynom_index][point_index], 1}));
+                        }
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        if (!verify_eval<typename LPC::basic_fri>(
+                                proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                template<
+                    typename LPC,
+                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
+                                                                                                            typename LPC::lpc_params,
+                                                                                                            LPC::leaf_size,
+                                                                                                            false>,
+                                                            LPC>::value,
+                                            bool>::type = true>
+                static bool verify_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::proof_type &proof,
+                    typename LPC::basic_fri::params_type fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::array<std::vector<std::pair<typename LPC::field_type::value_type,
+                                                     typename LPC::field_type::value_type>>,
+                               LPC::leaf_size>
+                        U_interpolation_points;
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+
+                        U_interpolation_points[polynom_index].resize(evaluation_points.size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[point_index], proof.z[polynom_index][point_index]);
+                        }
+                    }
+
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, LPC::leaf_size> U;
+
+                    for (std::size_t polynom_index = 0; polynom_index < LPC::leaf_size; polynom_index++) {
+                        U[polynom_index] = math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+                    }
+
+                    math::polynomial<typename LPC::field_type::value_type> V = {1};
+                    for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+                        V = V * (math::polynomial<typename LPC::field_type::value_type>(
+                                    {-evaluation_points[point_index], 1}));
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        if (!typename LPC::basic_fri::verify_eval(
+                                proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+
+            namespace algorithms {
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params, 0, true>,
+                                                           LPC>::value,
+                                           bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<std::vector<typename LPC::field_type::value_type>> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    assert(evaluation_points.size() == g.size());
+                    std::size_t leaf_size = g.size();
+
+                    std::vector<std::vector<typename LPC::field_type::value_type>> z(leaf_size);
+                    std::vector<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>>
+                        U_interpolation_points(leaf_size);
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> g_normal(leaf_size);
+                    for (int polynom_index = 0; polynom_index < leaf_size; ++polynom_index) {
+                        g_normal[polynom_index] =
+                            math::polynomial<typename LPC::field_type::value_type>(g[polynom_index].coefficients());
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
+                        z[polynom_index].resize(evaluation_points[polynom_index].size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+
+                            z[polynom_index][point_index] = g_normal[polynom_index].evaluate(
+                                evaluation_points[polynom_index][point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[polynom_index][point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> Q_normal(leaf_size);
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q_normal[polynom_index] = (g_normal[polynom_index] - U);
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+                            denominator_polynom =
+                                denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
+                                                          -evaluation_points[polynom_index][point_index], 1};
+                        }
+                        Q_normal[polynom_index] = Q_normal[polynom_index] / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>> Q(leaf_size);
+                    for (int polynom_index = 0; polynom_index < Q_normal.size(); ++polynom_index) {
+                        Q[polynom_index].from_coefficients(Q_normal[polynom_index]);
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                    }
+
+                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                }
+
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params, 0, true>,
+                                                           LPC>::value,
+                                           bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<std::vector<typename LPC::field_type::value_type>> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::vector<math::polynomial<typename LPC::field_type::value_type>> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    assert(evaluation_points.size() == g.size());
+                    std::size_t leaf_size = g.size();
+
+                    std::vector<std::vector<typename LPC::field_type::value_type>> z(leaf_size);
+                    std::vector<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>>
+                        U_interpolation_points(leaf_size);
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
+                        z[polynom_index].resize(evaluation_points[polynom_index].size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+
+                            z[polynom_index][point_index] = g[polynom_index].evaluate(
+                                evaluation_points[polynom_index][point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[polynom_index][point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> Q(leaf_size);
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q[polynom_index] = (g[polynom_index] - U);
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+                            denominator_polynom =
+                                denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
+                                                          -evaluation_points[polynom_index][point_index], 1};
+                        }
+                        Q[polynom_index] = Q[polynom_index] / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                    }
+
+                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                }
+
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params, 0, true>,
+                                                           LPC>::value,
+                                           bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::size_t leaf_size = g.size();
+
+                    std::vector<std::vector<typename LPC::field_type::value_type>> z(leaf_size);
+                    std::vector<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>>
+                        U_interpolation_points(leaf_size);
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> g_normal(leaf_size);
+                    for (int polynom_index = 0; polynom_index < leaf_size; ++polynom_index) {
+                        g_normal[polynom_index] =
+                            math::polynomial<typename LPC::field_type::value_type>(g[polynom_index].coefficients());
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points.size());
+                        z[polynom_index].resize(evaluation_points.size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+
+                            z[polynom_index][point_index] = g_normal[polynom_index].evaluate(
+                                evaluation_points[point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> Q_normal(leaf_size);
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q_normal[polynom_index] = (g_normal[polynom_index] - U);
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+                            denominator_polynom =
+                                denominator_polynom *
+                                math::polynomial<typename LPC::field_type::value_type> {-evaluation_points[point_index], 1};
+                        }
+                        Q_normal[polynom_index] = Q_normal[polynom_index] / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>> Q(leaf_size);
+                    for (int polynom_index = 0; polynom_index < Q_normal.size(); ++polynom_index) {
+                        Q[polynom_index].from_coefficients(Q_normal[polynom_index]);
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                    }
+
+                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                }
+
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params, 0, true>,
+                                                           LPC>::value,
+                                           bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const std::vector<math::polynomial<typename LPC::field_type::value_type>> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::size_t leaf_size = g.size();
+
+                    std::vector<std::vector<typename LPC::field_type::value_type>> z(leaf_size);
+                    std::vector<
+                        std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>>
+                        U_interpolation_points(leaf_size);
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_points.size());
+                        z[polynom_index].resize(evaluation_points.size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+
+                            z[polynom_index][point_index] = g[polynom_index].evaluate(
+                                evaluation_points[point_index]);    // transform to point-representation
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[point_index],
+                                               z[polynom_index][point_index]);    // prepare points for interpolation
+                        }
+                    }
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> Q(leaf_size);
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                        math::polynomial<typename LPC::field_type::value_type> U =
+                            math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        Q[polynom_index] = (g[polynom_index] - U);
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+                            denominator_polynom =
+                                denominator_polynom *
+                                math::polynomial<typename LPC::field_type::value_type> {-evaluation_points[point_index], 1};
+                        }
+                        Q[polynom_index] = Q[polynom_index] / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = typename LPC::basic_fri::proof_eval(Q, g, T, fri_params, transcript);
+                    }
+
+                    return proof_type({z, typename LPC::basic_fri::commit(T), fri_proof});
+                }
+
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
+                                                                                             typename LPC::lpc_params,
+                                                                                             0,
+                                                                                             true>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static bool verify_eval(
+                    const std::vector<std::vector<typename LPC::field_type::value_type>> &evaluation_points,
+                    typename LPC::proof_type &proof,
+                    typename LPC::basic_fri::params_type fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::size_t leaf_size = proof.z.size();
+
+                    std::vector<std::vector<
+                        std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>>
+                        U_interpolation_points(leaf_size);
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                        U_interpolation_points[polynom_index].resize(evaluation_points[polynom_index].size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+
+                            U_interpolation_points[polynom_index][point_index] = std::make_pair(
+                                evaluation_points[polynom_index][point_index], proof.z[polynom_index][point_index]);
+                        }
+                    }
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> U(leaf_size);
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U[polynom_index] = math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+                    }
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> V(leaf_size);
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        V[polynom_index] = {1};
+                        for (std::size_t point_index = 0; point_index < evaluation_points[polynom_index].size();
+                             point_index++) {
+                            V[polynom_index] =
+                                V[polynom_index] * (math::polynomial<typename LPC::field_type::value_type>(
+                                                       {-evaluation_points[polynom_index][point_index], 1}));
+                        }
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        if (!verify_eval<typename LPC::basic_fri>(
+                                proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
+                                                                                             typename LPC::lpc_params,
+                                                                                             0,
+                                                                                             true>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static bool verify_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::proof_type &proof,
+                    typename LPC::basic_fri::params_type fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::size_t leaf_size = proof.z.size();
+
+                    std::vector<std::vector<
+                        std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>>
+                        U_interpolation_points(leaf_size);
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                        U_interpolation_points[polynom_index].resize(evaluation_points.size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_points[point_index], proof.z[polynom_index][point_index]);
+                        }
+                    }
+
+                    std::vector<math::polynomial<typename LPC::field_type::value_type>> U(leaf_size);
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U[polynom_index] = math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+                    }
+
+                    math::polynomial<typename LPC::field_type::value_type> V = {1};
+
+                    for (std::size_t point_index = 0; point_index < evaluation_points.size(); point_index++) {
+                        V = V * (math::polynomial<typename LPC::field_type::value_type>(
+                                    {-evaluation_points[point_index], 1}));
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        if (!verify_eval<typename LPC::basic_fri>(
+                                proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

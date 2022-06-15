@@ -60,7 +60,7 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType, std::size_t M,
-                         std::size_t BatchSize>
+                    std::size_t BatchSize>
                 struct batched_fri
                     : public detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
 
@@ -82,6 +82,47 @@ namespace nil {
                     using commitment_type = typename basic_fri::commitment_type;
                 };
             }    // namespace commitments
+
+            namespace algorithms {
+                template<typename FRI, typename ContainerType,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
+                                                                                    typename FRI::merkle_tree_hash_type,
+                                                                                    typename FRI::transcript_hash_type,
+                                                                                    FRI::m>,
+                                             FRI>::value,
+                             bool>::type = true>
+                static typename FRI::basic_fri::proof_type proof_eval(
+                    const ContainerType &g,
+                    typename FRI::precommitment_type &T,
+                    const typename FRI::basic_fri::params_type &fri_params,
+                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
+
+                    return proof_eval<typename FRI::basic_fri>(g, g, T, fri_params, transcript);
+                }
+
+                template<typename FRI,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
+                                                                                    typename FRI::merkle_tree_hash_type,
+                                                                                    typename FRI::transcript_hash_type,
+                                                                                    FRI::m>,
+                                             FRI>::value,
+                             bool>::type = true>
+                static bool verify_eval(
+                    typename FRI::basic_fri::proof_type &proof,
+                    typename FRI::basic_fri::params_type &fri_params,
+                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
+
+                    std::size_t leaf_size = proof.final_polynomials.size();
+
+                    std::vector<math::polynomial<typename FRI::field_type::value_type>> U(leaf_size, {0});
+
+                    math::polynomial<typename FRI::field_type::value_type> V = {1};
+
+                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
+                }
+            }    // namespace algorithms
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

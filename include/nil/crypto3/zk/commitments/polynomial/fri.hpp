@@ -80,6 +80,40 @@ namespace nil {
                     using commitment_type = typename basic_fri::commitment_type;
                 };
             }    // namespace commitments
+
+            namespace algorithms {
+                template<typename FRI, typename PolynomialType,
+                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
+                                                                                  typename FRI::merkle_tree_hash_type,
+                                                                                  typename FRI::transcript_hash_type,
+                                                                                  FRI::m>, FRI>::value,
+                                                 bool>::type = true>
+                static typename FRI::basic_fri::proof_type proof_eval(
+                    const PolynomialType &g,
+                    typename FRI::precommitment_type &T,
+                    const typename FRI::basic_fri::params_type &fri_params,
+                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
+
+                    return proof_eval<typename FRI::basic_fri>(g, g, T, fri_params, transcript);
+                }
+
+                template<typename FRI,
+                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
+                                                                                  typename FRI::merkle_tree_hash_type,
+                                                                                  typename FRI::transcript_hash_type,
+                                                                                  FRI::m>,
+                                                                 FRI>::value,
+                                                 bool>::type = true>
+                static bool verify_eval(
+                    typename FRI::basic_fri::proof_type &proof,
+                    typename FRI::basic_fri::params_type &fri_params,
+                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
+
+                    math::polynomial<typename FRI::field_type::value_type> U = {0};
+                    math::polynomial<typename FRI::field_type::value_type> V = {1};
+                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
+                }
+            }    // namespace algorithms
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil

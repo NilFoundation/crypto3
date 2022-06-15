@@ -42,11 +42,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
-                template<typename MerkleTreeHashType,
-                         typename TranscriptHashType,
-                         std::size_t Lambda = 40,
-                         std::size_t R = 1,
-                         std::size_t M = 2>
+                template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda = 40,
+                         std::size_t R = 1, std::size_t M = 2>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -113,6 +110,140 @@ namespace nil {
                 template<typename FieldType, typename LPCParams>
                 using lpc = list_polynomial_commitment<FieldType, LPCParams>;
             }    // namespace commitments
+
+            namespace algorithms {
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::list_polynomial_commitment<typename LPC::field_type,
+                                                                                     typename LPC::lpc_params>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const math::polynomial_dfs<typename LPC::field_type::value_type> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::size_t k = evaluation_points.size();
+                    std::vector<typename LPC::field_type::value_type> z(k);
+                    std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>
+                        U_interpolation_points(k);
+
+                    math::polynomial<typename LPC::field_type::value_type> g_normal(g.coefficients());
+
+                    for (std::size_t j = 0; j < k; j++) {
+                        z[j] = g_normal.evaluate(evaluation_points[j]);    // transform to point-representation
+                        U_interpolation_points[j] =
+                            std::make_pair(evaluation_points[j], z[j]);    // prepare points for interpolation
+                    }
+
+                    math::polynomial<typename LPC::field_type::value_type> U =
+                        math::lagrange_interpolation(U_interpolation_points);    // k is small => iterpolation goes fast
+
+                    math::polynomial<typename LPC::field_type::value_type> Q_normal = (g_normal - U);
+                    for (std::size_t j = 0; j < k; j++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {
+                            -evaluation_points[j], 1};
+
+                        Q_normal = Q_normal / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    math::polynomial_dfs<typename LPC::field_type::value_type> Q;
+                    Q.from_coefficients(Q_normal);
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                    }
+
+                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                }
+
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::list_polynomial_commitment<typename LPC::field_type,
+                                                                                     typename LPC::lpc_params>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static typename LPC::proof_type proof_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::precommitment_type &T,
+                    const math::polynomial<typename LPC::field_type::value_type> &g,
+                    const typename LPC::basic_fri::params_type &fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::size_t k = evaluation_points.size();
+                    std::vector<typename LPC::field_type::value_type> z(k);
+                    std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>
+                        U_interpolation_points(k);
+
+                    for (std::size_t j = 0; j < k; j++) {
+                        z[j] = g.evaluate(evaluation_points[j]);    // transform to point-representation
+                        U_interpolation_points[j] =
+                            std::make_pair(evaluation_points[j], z[j]);    // prepare points for interpolation
+                    }
+
+                    math::polynomial<typename LPC::field_type::value_type> U =
+                        math::lagrange_interpolation(U_interpolation_points);    // k is small => iterpolation goes fast
+
+                    math::polynomial<typename LPC::field_type::value_type> Q = (g - U);
+                    for (std::size_t j = 0; j < k; j++) {
+                        math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {
+                            -evaluation_points[j], 1};
+                        Q = Q / denominator_polynom;
+                    }
+
+                    std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                    }
+
+                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                }
+
+                template<typename LPC,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::list_polynomial_commitment<typename LPC::field_type,
+                                                                                     typename LPC::lpc_params>,
+                                             LPC>::value,
+                             bool>::type = true>
+                static bool verify_eval(
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    typename LPC::proof_type &proof,
+                    typename LPC::basic_fri::params_type fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
+                    std::size_t k = evaluation_points.size();
+
+                    std::vector<std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>>
+                        U_interpolation_points(k);
+
+                    for (std::size_t j = 0; j < k; j++) {
+                        U_interpolation_points[j] = std::make_pair(evaluation_points[j], proof.z[j]);
+                    }
+
+                    math::polynomial<typename LPC::field_type::value_type> U =
+                        math::lagrange_interpolation(U_interpolation_points);
+
+                    math::polynomial<typename LPC::field_type::value_type> V = {1};
+
+                    for (std::size_t j = 0; j < k; j++) {
+                        V = V * (math::polynomial<typename LPC::field_type::value_type>({-evaluation_points[j], 1}));
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        if (!verify_eval<typename LPC::basic_fri>(
+                                proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }    // namespace algorithms
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
