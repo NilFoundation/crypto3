@@ -93,14 +93,14 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-                    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f21;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 0;
-                    constexpr static const std::size_t gates_amount = 0;
                     constexpr static const std::size_t polynomial_len = 1 << EvalRounds;
+
+                    constexpr static const std::size_t rows_amount = mul_component::rows_amount * polynomial_len;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
                         std::array<var, EvalRounds> &challenges;
@@ -109,10 +109,6 @@ namespace nil {
 
                     struct result_type {
                         std::array<var, polynomial_len> output;
-
-                        result_type(std::size_t start_row_index) {
-                            std::size_t row = start_row_index;
-                        }
                     };
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
@@ -122,8 +118,26 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
+                        std::array<var, polynomial_len> output;
+                        output[0] = params.one;
+                        std::size_t k = 0;
+                        std::size_t pow = 1;
+
+                        for (std::size_t i = 1; i < polynomial_len; i++) {
+                            std::size_t shift = i == pow ? 1 : 0;
+                            k  += shift;
+                            pow <<= shift;
+                            output[i] = zk::components::generate_circuit<mul_component>(
+                                bp, assignment, 
+                                {output[i - (pow >> 1)], params.challenges[EvalRounds - 1 - (k - 1)]}, 
+                                row).output;
+                            row += mul_component::rows_amount;                 
+                        }
+
                         generate_copy_constraints(bp, assignment, params, start_row_index);
-                        return result_type(start_row_index);
+                        result_type res;
+                        res.output = output;
+                        return res;
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -132,7 +146,25 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        return result_type(start_row_index);
+                        std::array<var, polynomial_len> output;
+                        output[0] = params.one;
+                        std::size_t k = 0;
+                        std::size_t pow = 1;
+
+                        for (std::size_t i = 1; i < polynomial_len; i++) {
+                            std::size_t shift = i == pow ? 1 : 0;
+                            k  += shift;
+                            pow <<= shift;
+                            output[i] = mul_component::generate_assignments(
+                                assignment, 
+                                {output[i - (pow >> 1)], params.challenges[EvalRounds - 1 - (k - 1)]}, 
+                                row).output;
+                            row += mul_component::rows_amount;                 
+                        }
+
+                        result_type res;
+                        res.output = output;
+                        return res;
                     }
 
                 private:

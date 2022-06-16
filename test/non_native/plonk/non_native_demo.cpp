@@ -64,6 +64,7 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
 
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/fixed_base_multiplication_edwards25519.hpp>
+#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256.hpp>
 
 using namespace nil::crypto3;
 
@@ -99,7 +100,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    constexpr std::size_t complexity = 40;
+    constexpr std::size_t complexity = 1;
 
     using curve_type = algebra::curves::pallas;
     using ed25519_type = algebra::curves::ed25519;
@@ -107,7 +108,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 6;
+    constexpr std::size_t SelectorColumns = 800;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -117,14 +118,18 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
+    using mul_component_type = zk::components::fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8>;
+    using sha256_component_type = zk::components::sha256<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     var var_b = var(0, 0, false, var::column_type::public_input);
+    std::array<var, 4> sha_input_state_var = {
+        var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input),
+        var(0, 3, false, var::column_type::public_input), var(0, 4, false, var::column_type::public_input)};
 
     ed25519_type::scalar_field_type::value_type b = algebra::random_element<ed25519_type::scalar_field_type>();
 
-    typename component_type::params_type component_params = {{var_b}};
+    typename mul_component_type::params_type component_params = {{var_b}};
 
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type B = ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type P = b*B;
@@ -133,7 +138,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     typename ed25519_type::base_field_type::integral_type base = 1;
     typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {typename curve_type::base_field_type::integral_type(b.data)};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {typename curve_type::base_field_type::integral_type(b.data),
+        0, 0, 0, 0};
 
     zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
 
@@ -142,17 +148,23 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
     zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
-    std::size_t start_row = zk::components::allocate<component_type>(bp, complexity);
+    std::size_t start_row = 0;
+    zk::components::allocate<mul_component_type>(bp, complexity);
+    zk::components::allocate<sha256_component_type>(bp, 1);
 
     bp.allocate_rows(public_input.size());
 
+    zk::components::generate_circuit<sha256_component_type>(bp, public_assignment, {sha_input_state_var}, start_row);
+    sha256_component_type::generate_assignments(assignment_bp, {sha_input_state_var}, start_row);
+    start_row += sha256_component_type::rows_amount;
+
     for (std::size_t i = 0; i < complexity; i++) {
 
-        std::size_t row = start_row + i*component_type::rows_amount;
+        std::size_t row = start_row + i*mul_component_type::rows_amount;
 
-        zk::components::generate_circuit<component_type>(bp, public_assignment, component_params, row);
+        zk::components::generate_circuit<mul_component_type>(bp, public_assignment, component_params, row);
 
-        component_type::generate_assignments(assignment_bp, component_params, row);
+        mul_component_type::generate_assignments(assignment_bp, component_params, row);
     }
 
     assignment_bp.padding();

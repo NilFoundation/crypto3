@@ -192,11 +192,11 @@ namespace nil {
                         if (scalar_larger()) {
                             assignment.constant(0)[row] = -base.pow(255);
                             row++;
-                            assignment.constant(0)[row] = 1 / base;
+                            assignment.constant(0)[row] = 1;
                         } else {
                             assignment.constant(0)[row] = -base.pow(255) - 1;
                             row++;
-                            assignment.constant(0)[row] = 1;
+                            assignment.constant(0)[row] = 1 / base;
                         }
                     }
                 };
