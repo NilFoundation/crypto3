@@ -108,15 +108,6 @@ namespace nil {
                             std::array<var, 4> y;
                         };
                         var_ec_point output;
-
-                        /*result_type(std::size_t component_start_row) {
-                            output.x = {var(W0, component_start_row, false), var(W1, component_start_row, false),
-                             var(W2, component_start_row, false), var(W3, component_start_row, false)};
-                            output.y = {var(W0, component_start_row + non_native_range_component::rows_amount, false),
-                             var(W1, component_start_row + non_native_range_component::rows_amount, false),
-                             var(W2, component_start_row + non_native_range_component::rows_amount, false),
-                              var(W3, component_start_row + non_native_range_component::rows_amount, false)};
-                        }*/
                     };
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,

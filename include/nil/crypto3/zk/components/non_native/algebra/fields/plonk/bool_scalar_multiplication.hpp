@@ -69,7 +69,7 @@ namespace nil {
                         ArithmetizationParams> ArithmetizationType;
                     
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    constexpr static const std::size_t selector_seed = 0xfc82;
+                    constexpr static const std::size_t selector_seed = 0xf182;
 
                 public:
                     constexpr static const std::size_t rows_amount = 2;
@@ -94,9 +94,9 @@ namespace nil {
                         var_ec_point output;
 
                         result_type(std::size_t component_start_row) {
-                            output.x = {var(W5, component_start_row, false), var(W6, component_start_row, false),
+                            output.y = {var(W5, component_start_row, false), var(W6, component_start_row, false),
                              var(W7, component_start_row, false), var(W8, component_start_row, false)};
-                            output.y = {var(W5, component_start_row + 1, false),
+                            output.x = {var(W5, component_start_row + 1, false),
                              var(W6, component_start_row + 1, false),
                              var(W7, component_start_row + 1, false),
                               var(W8, component_start_row + 1, false)};
@@ -184,6 +184,10 @@ namespace nil {
                             var(W7, +1) - var(W2, +1) * var(W4, +1));
                         auto constraint_8 = bp.add_constraint(
                             var(W8, +1) - var(W3, +1) * var(W4, +1));
+                        auto constraint_9 = bp.add_constraint(
+                             var(W4, 0)*( var(W4, 0) - 1));
+                        auto constraint_10 = bp.add_constraint(
+                             var(W4, 0) - var(W4, +1));
 
                         bp.add_gate(first_selector_index, 
                             { constraint_1, constraint_2, constraint_3, constraint_4,

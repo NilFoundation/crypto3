@@ -59,6 +59,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/doubling"
     "non_native/plonk/non_native_range"
     "non_native/plonk/fixed_base_mul"
+    "non_native/plonk/variable_base_multiplication"
     "non_native/plonk/non_native_demo"
     )
 
