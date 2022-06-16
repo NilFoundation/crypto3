@@ -48,7 +48,9 @@ namespace nil {
         namespace zk {
             namespace commitments {
                 namespace detail {
-                    template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
+                    template<typename FieldType,
+                             typename MerkleTreeHashType,
+                             typename TranscriptHashType,
                              std::size_t M>
                     struct basic_batched_fri;
                     /**
@@ -64,7 +66,9 @@ namespace nil {
                      * Matter Labs,
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
-                    template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
+                    template<typename FieldType,
+                             typename MerkleTreeHashType,
+                             typename TranscriptHashType,
                              std::size_t M = 2>
                     struct basic_fri {
 
@@ -135,27 +139,32 @@ namespace nil {
             }        // namespace commitments
 
             namespace algorithms {
-                template<typename FRI,
+                template<
+                    typename FRI,
                     typename std::enable_if<
                         std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
                                                                        typename FRI::merkle_tree_hash_type,
                                                                        typename FRI::transcript_hash_type,
-                                                                       FRI::m>, FRI>::value ||
+                                                                       FRI::m>,
+                                        FRI>::value ||
                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                    typename FRI::merkle_tree_hash_type,
                                                                                    typename FRI::transcript_hash_type,
-                                                                                   FRI::m>, FRI>::value,
+                                                                                   FRI::m>,
+                                            FRI>::value,
                         bool>::type = true>
                 static typename FRI::commitment_type commit(typename FRI::precommitment_type P) {
                     return P.root();
                 }
 
-                template<typename FRI, std::size_t list_size,
+                template<typename FRI,
+                         std::size_t list_size,
                          typename std::enable_if<
                              std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
                                                                             typename FRI::transcript_hash_type,
-                                                                            FRI::m>, FRI>::value,
+                                                                            FRI::m>,
+                                             FRI>::value,
                              bool>::type = true>
                 static std::array<typename FRI::commitment_type, list_size>
                     commit(std::array<typename FRI::precommitment_type, list_size> P) {
@@ -168,12 +177,13 @@ namespace nil {
                 }
 
                 template<typename FRI,
-                         typename std::enable_if<std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
-                                                                                                typename FRI::merkle_tree_hash_type,
-                                                                                                typename FRI::transcript_hash_type,
-                                                                                                FRI::m>,
-                                                                 FRI>::value,
-                                                 bool>::type = true>
+                         typename std::enable_if<
+                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                                                                            typename FRI::merkle_tree_hash_type,
+                                                                            typename FRI::transcript_hash_type,
+                                                                            FRI::m>,
+                                             FRI>::value,
+                             bool>::type = true>
                 static typename FRI::precommitment_type
                     precommit(math::polynomial_dfs<typename FRI::field_type::value_type> f,
                               const std::shared_ptr<math::evaluation_domain<typename FRI::field_type>> &D) {
@@ -195,12 +205,13 @@ namespace nil {
                 }
 
                 template<typename FRI,
-                         typename std::enable_if<std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
-                                                                                                typename FRI::merkle_tree_hash_type,
-                                                                                                typename FRI::transcript_hash_type,
-                                                                                                FRI::m>,
-                                                                 FRI>::value,
-                                                 bool>::type = true>
+                         typename std::enable_if<
+                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                                                                            typename FRI::merkle_tree_hash_type,
+                                                                            typename FRI::transcript_hash_type,
+                                                                            FRI::m>,
+                                             FRI>::value,
+                             bool>::type = true>
                 static typename FRI::precommitment_type
                     precommit(const math::polynomial<typename FRI::field_type::value_type> &f,
                               const std::shared_ptr<math::evaluation_domain<typename FRI::field_type>> &D) {
@@ -211,12 +222,16 @@ namespace nil {
                     return precommit<FRI>(f_dfs, D);
                 }
 
-                template<typename FRI, std::size_t list_size, typename PolynomialType,
-                         typename std::enable_if<std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
-                                                                                                typename FRI::merkle_tree_hash_type,
-                                                                                                typename FRI::transcript_hash_type,
-                                                                                                FRI::m>, FRI>::value,
-                                                 bool>::type = true>
+                template<typename FRI,
+                         std::size_t list_size,
+                         typename PolynomialType,
+                         typename std::enable_if<
+                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                                                                            typename FRI::merkle_tree_hash_type,
+                                                                            typename FRI::transcript_hash_type,
+                                                                            FRI::m>,
+                                             FRI>::value,
+                             bool>::type = true>
                 static std::array<typename FRI::precommitment_type, list_size>
                     precommit(const std::array<PolynomialType, list_size> &poly,
                               const std::shared_ptr<math::evaluation_domain<typename FRI::field_type>> &domain) {
@@ -227,106 +242,33 @@ namespace nil {
                     return precommits;
                 }
 
-                template<typename FRI,
+                template<typename FRI, typename PolynomType,
                          typename std::enable_if<
                              std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
-                                                                            typename FRI::transcript_hash_type, FRI::m>,
+                                                                            typename FRI::transcript_hash_type,
+                                                                            FRI::m>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename FRI::proof_type
-                    proof_eval(math::polynomial_dfs<typename FRI::field_type::value_type> f,
-                               const math::polynomial_dfs<typename FRI::field_type::value_type> &g,
+                    proof_eval(PolynomType f,
+                               const PolynomType &g,
                                typename FRI::precommitment_type &T,
                                const typename FRI::params_type &fri_params,
                                typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
-
                     transcript(commit<FRI>(T));
 
                     // TODO: how to sample x?
                     std::size_t domain_size = fri_params.D[0]->size();
-                    f.resize(domain_size);
-                    std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
-
-                    std::size_t r = fri_params.r;
-
-                    std::vector<typename FRI::round_proof_type> round_proofs;
-                    std::unique_ptr<typename FRI::merkle_tree_type> p_tree =
-                        std::make_unique<typename FRI::merkle_tree_type>(T);
-                    typename FRI::merkle_tree_type T_next;
-
-                    for (std::size_t i = 0; i < r - 1; i++) {
-
-                        std::size_t domain_size = fri_params.D[i]->size();
-
-                        typename FRI::field_type::value_type alpha =
-                            transcript.template challenge<typename FRI::field_type>();
-
-                        x_index %= domain_size;
-
-                        // m = 2, so:
-                        std::array<std::size_t, FRI::m> s_indices;
-                        if constexpr (FRI::m == 2) {
-                            s_indices[0] = x_index;
-                            s_indices[1] = (x_index + domain_size / 2) % domain_size;
-                        } else {
-                            return {};
-                        }
-
-                        std::array<typename FRI::field_type::value_type, FRI::m> y;
-                        std::array<typename FRI::merkle_proof_type, FRI::m> p;
-
-                        for (std::size_t j = 0; j < FRI::m; j++) {
-                            y[j] = (i == 0 ? g[s_indices[j]] : f[s_indices[j]]);
-                            p[j] = typename FRI::merkle_proof_type(*p_tree, s_indices[j]);
-                        }
-
-                        x_index %= fri_params.D[i + 1]->size();
-
-                        // create polynomial of degree (degree(f) / 2)
-                        if (i == 0) {
-                            f.resize(fri_params.D[i]->size());
-                        }
-                        f = commitments::detail::fold_polynomial<typename FRI::field_type>(f, alpha, fri_params.D[i]);
-
-                        typename FRI::field_type::value_type colinear_value = f[x_index];
-
-                        T_next = precommit<FRI>(f, fri_params.D[i + 1]);    // new merkle tree
-                        transcript(commit<FRI>(T_next));
-
-                        typename FRI::merkle_proof_type colinear_path = typename FRI::merkle_proof_type(T_next, x_index);
-
-                        round_proofs.push_back(
-                            typename FRI::round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
-
-                        p_tree = std::make_unique<typename FRI::merkle_tree_type>(T_next);
+                    if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
+                                                 PolynomType>) {
+                        f.resize(domain_size);
                     }
+                    std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) %
+                    domain_size;
 
-                    math::polynomial<typename FRI::field_type::value_type> f_normal(f.coefficients());
-                    return typename FRI::proof_type({round_proofs, f_normal, commit<FRI>(T)});
-                }
-
-                template<typename FRI,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
-                                                                            typename FRI::merkle_tree_hash_type,
-                                                                            typename FRI::transcript_hash_type, FRI::m>,
-                                             FRI>::value,
-                             bool>::type = true>
-                static typename FRI::proof_type
-                    proof_eval(math::polynomial<typename FRI::field_type::value_type> f,
-                               const math::polynomial<typename FRI::field_type::value_type> &g,
-                               typename FRI::precommitment_type &T,
-                               const typename FRI::params_type &fri_params,
-                               typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
-
-                    transcript(commit<FRI>(T));
-
-                    // TODO: how to sample x?
-                    std::size_t domain_size = fri_params.D[0]->size();
-                    std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
-
-                    typename FRI::field_type::value_type x = fri_params.D[0]->get_domain_element(x_index);
+                    typename FRI::field_type::value_type x =
+                                            fri_params.D[0]->get_domain_element(x_index);
 
                     std::size_t r = fri_params.r;
 
@@ -360,32 +302,54 @@ namespace nil {
                         std::array<typename FRI::merkle_proof_type, FRI::m> p;
 
                         for (std::size_t j = 0; j < FRI::m; j++) {
-                            y[j] = (i == 0 ? g.evaluate(s[j]) : f.evaluate(s[j]));    // polynomial evaluation
+                            if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
+                                                         PolynomType>) {
+                                y[j] = (i == 0 ? g[s_indices[j]] : f[s_indices[j]]);
+                            } else {
+                                y[j] = (i == 0 ? g.evaluate(s[j]) : f.evaluate(s[j]));
+                            }
                             p[j] = typename FRI::merkle_proof_type(*p_tree, s_indices[j]);
                         }
 
                         x_index %= fri_params.D[i + 1]->size();
-
                         x = fri_params.D[i + 1]->get_domain_element(x_index);
 
+                        typename FRI::field_type::value_type colinear_value;
                         // create polynomial of degree (degree(f) / 2)
-                        f = commitments::detail::fold_polynomial<typename FRI::field_type>(f, alpha);
-
-                        typename FRI::field_type::value_type colinear_value = f.evaluate(x);    // polynomial evaluation
+                        if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
+                                                     PolynomType>) {
+                            if (i == 0) {
+                                f.resize(fri_params.D[i]->size());
+                            }
+                            f = commitments::detail::fold_polynomial<typename FRI::field_type>(f, alpha,
+                                                                                               fri_params.D[i]);
+                            colinear_value = f[x_index];
+                        } else {
+                            f = commitments::detail::fold_polynomial<typename FRI::field_type>(f, alpha);
+                            colinear_value = f.evaluate(x);
+                        }
 
                         T_next = precommit<FRI>(f, fri_params.D[i + 1]);    // new merkle tree
                         transcript(commit<FRI>(T_next));
 
-                        typename FRI::merkle_proof_type colinear_path = typename FRI::merkle_proof_type(T_next, x_index);
+                        typename FRI::merkle_proof_type colinear_path = typename
+                        FRI::merkle_proof_type(T_next, x_index);
 
                         round_proofs.push_back(
-                            typename FRI::round_proof_type({y, p, p_tree->root(), colinear_value, colinear_path}));
+                            typename FRI::round_proof_type({y, p, p_tree->root(), colinear_value,
+                            colinear_path}));
 
                         p_tree = std::make_unique<typename FRI::merkle_tree_type>(T_next);
                     }
 
-                    // last round contains only final_polynomial without queries
-                    return typename FRI::proof_type({round_proofs, f, commit<FRI>(T)});
+                    if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
+                                                 PolynomType>) {
+                        math::polynomial<typename FRI::field_type::value_type> f_normal(f.coefficients());
+                        return typename FRI::proof_type({round_proofs, f_normal, commit<FRI>(T)});
+                    } else {
+                        return typename FRI::proof_type({round_proofs, f, commit<FRI>(T)});
+                    }
+                    return {};
                 }
 
                 template<typename FRI,
@@ -449,7 +413,8 @@ namespace nil {
                             }
                         }
 
-                        std::vector<std::pair<typename FRI::field_type::value_type, typename FRI::field_type::value_type>>
+                        std::vector<
+                            std::pair<typename FRI::field_type::value_type, typename FRI::field_type::value_type>>
                             interpolation_points {
                                 std::make_pair(s[0], y[0]),
                                 std::make_pair(s[1], y[1]),
@@ -480,7 +445,8 @@ namespace nil {
                     if (final_root != proof.round_proofs[r - 2].colinear_path.root()) {
                         return false;
                     }
-                    if (proof.final_polynomial.degree() > std::pow(2, std::log2(fri_params.max_degree + 1) - r + 1) - 1) {
+                    if (proof.final_polynomial.degree() >
+                        std::pow(2, std::log2(fri_params.max_degree + 1) - r + 1) - 1) {
                         return false;
                     }
 
