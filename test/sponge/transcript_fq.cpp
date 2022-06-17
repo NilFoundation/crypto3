@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <../test/transcript/aux_transcript_fq.hpp>
+#include <../test/sponge/aux_transcript_fq.hpp>
 
 #include "test_plonk_component.hpp"
 
@@ -50,29 +50,31 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::vesta;
-    using BlueprintFieldType = typename curve_type::scalar_field_type;
+    using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 16;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 20;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-    constexpr size_t num_squeezes = 1;
-    using component_type = zk::components::aux_fq<num_squeezes, ArithmetizationType, curve_type,
+    constexpr size_t num_challenges = 1;        //works
+    constexpr size_t num_challenges_fq = 1;     //works
+    constexpr bool digest = true;               //works
+    using component_type = zk::components::aux_fq<num_challenges, num_challenges_fq, digest, ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     
-    std::vector<var> input;
-    var zero(0, 0, false, var::column_type::public_input);
-    typename component_type::params_type params = {input, zero};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0};
+    std::vector<std::array<var, 2>> input_fr = {{var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)}};
+    std::vector<std::array<var, 2>> input_g = {{var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
+    typename component_type::params_type params = {input_fr, input_g};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {0, 1, 0x163D7168231DC2F1193A09CC265E59BB166F796B00B6F5D3C0F9A2C2FFEC68FE_cppui256, 0x163D7168231DC2F1193A09CC265E59BB166F796B00B6F5D3C0F9A2C2FFEC6800_cppui256};
     typename BlueprintFieldType::value_type result = 0x163D7168231DC2F1193A09CC265E59BB166F796B00B6F5D3C0F9A2C2FFEC68FE_cppui256;
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
@@ -83,7 +85,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "kimchi transcript_fr: " << duration.count() << "ms" << std::endl;
+    std::cout << "kimchi transcript_fq: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

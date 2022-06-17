@@ -97,6 +97,7 @@ set(PLONK_TESTS_FILES
     "sponge/sponge"
     "sponge/oracles"
     "sponge/transcript_fr"
+    "sponge/transcript_fq"
     "sponge/compare"
     "algebra/fields/plonk/field_operations"
     "algebra/fields/plonk/combined_inner_product"
