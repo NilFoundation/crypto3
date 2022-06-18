@@ -43,16 +43,13 @@
 
 #include <nil/crypto3/zk/commitments/detail/polynomial/fold_polynomial.hpp>
 
+//#include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
                 namespace detail {
-                    template<typename FieldType,
-                             typename MerkleTreeHashType,
-                             typename TranscriptHashType,
-                             std::size_t M>
-                    struct basic_batched_fri;
                     /**
                      * @brief Based on the FRI Commitment description from \[ResShift].
                      * @tparam d ...
@@ -69,10 +66,11 @@ namespace nil {
                     template<typename FieldType,
                              typename MerkleTreeHashType,
                              typename TranscriptHashType,
-                             std::size_t M = 2>
-                    struct basic_fri {
+                             std::size_t M, std::size_t BatchSize>
+                    struct basic_batched_fri {
 
                         constexpr static const std::size_t m = M;
+                        constexpr static const std::size_t leaf_size = BatchSize;
 
                         typedef FieldType field_type;
                         typedef MerkleTreeHashType merkle_tree_hash_type;
@@ -111,18 +109,21 @@ namespace nil {
                             // bool operator!=(const round_proof_type &rhs) const {
                             //     return !(rhs == *this);
                             // }
-                            std::array<typename FieldType::value_type, m> y;
+                            typename std::conditional<leaf_size == 1, std::array<std::array<typename FieldType::value_type, m>, 1>, std::vector<std::array<typename FieldType::value_type, m>>>::type y;
+//                            std::array<typename FieldType::value_type, m> y;
                             std::array<merkle_proof_type, m> p;
 
                             typename merkle_tree_type::value_type T_root;
 
-                            typename FieldType::value_type colinear_value;
+                            typename std::conditional<leaf_size == 1, std::array<typename FieldType::value_type, 1>, std::vector<typename FieldType::value_type>>::type colinear_value;
+
+//                            typename FieldType::value_type colinear_value;
                             merkle_proof_type colinear_path;
                         };
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
-                                return round_proofs == rhs.round_proofs && final_polynomial == rhs.final_polynomial &&
+                                return round_proofs == rhs.round_proofs && final_polynomials == rhs.final_polynomials &&
                                        target_commitment == rhs.target_commitment;
                             }
                             bool operator!=(const proof_type &rhs) const {
@@ -131,7 +132,9 @@ namespace nil {
 
                             std::vector<round_proof_type> round_proofs;    // 0..r-2
 
-                            math::polynomial<typename FieldType::value_type> final_polynomial;
+                            typename std::conditional<leaf_size == 1,  std::array<math::polynomial<typename FieldType::value_type>, 1>, std::vector<math::polynomial<typename FieldType::value_type>>>::type final_polynomials;
+//                            typename std::conditional<leaf_size == 1,  math::polynomial<typename FieldType::value_type>, math::polynomial<typename FieldType::value_type>>::type final_polynomial;
+//                            math::polynomial<typename FieldType::value_type> final_polynomial;
                             commitment_type target_commitment;
                         };
                     };
@@ -142,15 +145,15 @@ namespace nil {
                 template<
                     typename FRI,
                     typename std::enable_if<
-                        std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                        std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                        typename FRI::merkle_tree_hash_type,
                                                                        typename FRI::transcript_hash_type,
-                                                                       FRI::m>,
+                                                                       FRI::m, 1>,
                                         FRI>::value ||
                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                    typename FRI::merkle_tree_hash_type,
                                                                                    typename FRI::transcript_hash_type,
-                                                                                   FRI::m>,
+                                                                                   FRI::m, 0>,
                                             FRI>::value,
                         bool>::type = true>
                 static typename FRI::commitment_type commit(typename FRI::precommitment_type P) {
@@ -160,10 +163,10 @@ namespace nil {
                 template<typename FRI,
                          std::size_t list_size,
                          typename std::enable_if<
-                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
                                                                             typename FRI::transcript_hash_type,
-                                                                            FRI::m>,
+                                                                            FRI::m, 1>,
                                              FRI>::value,
                              bool>::type = true>
                 static std::array<typename FRI::commitment_type, list_size>
@@ -178,10 +181,10 @@ namespace nil {
 
                 template<typename FRI,
                          typename std::enable_if<
-                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
                                                                             typename FRI::transcript_hash_type,
-                                                                            FRI::m>,
+                                                                            FRI::m, 1>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename FRI::precommitment_type
@@ -206,10 +209,10 @@ namespace nil {
 
                 template<typename FRI,
                          typename std::enable_if<
-                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
                                                                             typename FRI::transcript_hash_type,
-                                                                            FRI::m>,
+                                                                            FRI::m, 1>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename FRI::precommitment_type
@@ -226,10 +229,10 @@ namespace nil {
                          std::size_t list_size,
                          typename PolynomialType,
                          typename std::enable_if<
-                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
                                                                             typename FRI::transcript_hash_type,
-                                                                            FRI::m>,
+                                                                            FRI::m, 1>,
                                              FRI>::value,
                              bool>::type = true>
                 static std::array<typename FRI::precommitment_type, list_size>
@@ -244,10 +247,10 @@ namespace nil {
 
                 template<typename FRI, typename PolynomType,
                          typename std::enable_if<
-                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
                                                                             typename FRI::transcript_hash_type,
-                                                                            FRI::m>,
+                                                                            FRI::m, 1>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename FRI::proof_type
@@ -354,10 +357,10 @@ namespace nil {
 
                 template<typename FRI,
                          typename std::enable_if<
-                             std::is_base_of<commitments::detail::basic_fri<typename FRI::field_type,
+                             std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                             typename FRI::merkle_tree_hash_type,
                                                                             typename FRI::transcript_hash_type,
-                                                                            FRI::m>,
+                                                                            FRI::m, 1>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(typename FRI::proof_type &proof,
@@ -391,8 +394,8 @@ namespace nil {
 
                         for (std::size_t j = 0; j < FRI::m; j++) {
                             std::array<std::uint8_t, FRI::field_element_type::length()> leaf_data;
-
-                            typename FRI::field_type::value_type leaf = proof.round_proofs[i].y[j];
+// zerg_remove
+                            typename FRI::field_type::value_type leaf = proof.round_proofs[i].y[0][j];
 
                             typename FRI::field_element_type leaf_val(leaf);
                             auto write_iter = leaf_data.begin();
@@ -407,9 +410,10 @@ namespace nil {
 
                         for (std::size_t j = 0; j < FRI::m; j++) {
                             if (i == 0) {
-                                y[j] = (proof.round_proofs[i].y[j] - U.evaluate(s[j])) / V.evaluate(s[j]);
+                                // zerg_remove
+                                y[j] = (proof.round_proofs[i].y[0][j] - U.evaluate(s[j])) / V.evaluate(s[j]);
                             } else {
-                                y[j] = proof.round_proofs[i].y[j];
+                                y[j] = proof.round_proofs[i].y[0][j];
                             }
                         }
 
@@ -423,14 +427,14 @@ namespace nil {
                         math::polynomial<typename FRI::field_type::value_type> interpolant =
                             math::lagrange_interpolation(interpolation_points);
 
-                        typename FRI::field_type::value_type leaf = proof.round_proofs[i].colinear_value;
+                        typename FRI::field_type::value_type leaf = proof.round_proofs[i].colinear_value[0];
 
                         std::array<std::uint8_t, FRI::field_element_type::length()> leaf_data;
                         typename FRI::field_element_type leaf_val(leaf);
                         auto write_iter = leaf_data.begin();
                         leaf_val.write(write_iter, FRI::field_element_type::length());
 
-                        if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value) {
+                        if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value[0]) {
                             return false;
                         }
                         transcript(proof.round_proofs[i].colinear_path.root());
@@ -441,11 +445,11 @@ namespace nil {
                     }
 
                     // check the final polynomial against its root
-                    auto final_root = commit<FRI>(precommit<FRI>(proof.final_polynomial, fri_params.D[r - 1]));
+                    auto final_root = commit<FRI>(precommit<FRI>(proof.final_polynomials[0], fri_params.D[r - 1]));
                     if (final_root != proof.round_proofs[r - 2].colinear_path.root()) {
                         return false;
                     }
-                    if (proof.final_polynomial.degree() >
+                    if (proof.final_polynomials[0].degree() >
                         std::pow(2, std::log2(fri_params.max_degree + 1) - r + 1) - 1) {
                         return false;
                     }

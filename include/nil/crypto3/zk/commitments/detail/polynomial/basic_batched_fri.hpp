@@ -61,69 +61,82 @@ namespace nil {
                      * Matter Labs,
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
-                    template<typename FieldType,
-                             typename MerkleTreeHashType,
-                             typename TranscriptHashType,
-                             std::size_t M = 2>
-                    struct basic_batched_fri {
-
-                        constexpr static const std::size_t m = M;
-
-                        typedef FieldType field_type;
-                        typedef MerkleTreeHashType merkle_tree_hash_type;
-                        typedef TranscriptHashType transcript_hash_type;
-
-                        typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
-                        typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
-
-                        using Endianness = nil::marshalling::option::big_endian;
-                        using field_element_type =
-                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
-                                                                            typename FieldType::value_type>;
-
-                        using precommitment_type = merkle_tree_type;
-                        using commitment_type = typename precommitment_type::value_type;
-                        using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
-                        using params_type =
-                            typename basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>::params_type;
-
-                        struct round_proof_type {
-                            // bool operator==(const round_proof_type &rhs) const {
-                            //     return y == rhs.y && p == rhs.p && T_root == rhs.T_root &&
-                            //            colinear_value == rhs.colinear_value && colinear_path == rhs.colinear_path;
-                            // }
-                            // bool operator!=(const round_proof_type &rhs) const {
-                            //     return !(rhs == *this);
-                            // }
-                            // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y;
-                            std::vector<std::array<typename FieldType::value_type, m>> y;
-                            std::array<merkle_proof_type, m> p;
-
-                            typename merkle_tree_type::value_type T_root;
-
-                            // std::array<typename FieldType::value_type, leaf_size> colinear_value;
-                            std::vector<typename FieldType::value_type> colinear_value;
-                            merkle_proof_type colinear_path;
-                        };
-
-                        struct proof_type {
-                            // bool operator==(const proof_type &rhs) const {
-                            //     return round_proofs == rhs.round_proofs && final_polynomials ==
-                            //     rhs.final_polynomials;
-                            // }
-                            // bool operator!=(const proof_type &rhs) const {
-                            //     return !(rhs == *this);
-                            // }
-
-                            std::vector<round_proof_type> round_proofs;    // 0..r-2
-
-                            // std::array<math::polynomial<typename FieldType::value_type>,
-                            //     leaf_size> final_polynomials;
-                            std::vector<math::polynomial<typename FieldType::value_type>> final_polynomials;
-
-                            commitment_type target_commitment;
-                        };
-                    };
+//                    template<typename FieldType,
+//                             typename MerkleTreeHashType,
+//                             typename TranscriptHashType,
+//                             std::size_t M>
+//                    struct basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, 0> {
+//
+//                        constexpr static const std::size_t m = M;
+//                        constexpr static const std::size_t leaf_size = 0;
+//
+//                        typedef FieldType field_type;
+//                        typedef MerkleTreeHashType merkle_tree_hash_type;
+//                        typedef TranscriptHashType transcript_hash_type;
+//
+//                        typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
+//                        typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
+//
+//                        using Endianness = nil::marshalling::option::big_endian;
+//                        using field_element_type =
+//                            nil::crypto3::marshalling::types::field_element<nil::marshalling::field_type<Endianness>,
+//                                                                            typename FieldType::value_type>;
+//
+//                        using precommitment_type = merkle_tree_type;
+//                        using commitment_type = typename precommitment_type::value_type;
+//                        using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
+////                        using params_type =
+////                            typename basic_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>::params_type;
+//                        struct params_type {
+//                            bool operator==(const params_type &rhs) const {
+//                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D;
+//                            }
+//                            bool operator!=(const params_type &rhs) const {
+//                                return !(rhs == *this);
+//                            }
+//
+//                            std::size_t r;
+//                            std::size_t max_degree;
+//                            std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
+//                        };
+//
+//                        struct round_proof_type {
+//                            // bool operator==(const round_proof_type &rhs) const {
+//                            //     return y == rhs.y && p == rhs.p && T_root == rhs.T_root &&
+//                            //            colinear_value == rhs.colinear_value && colinear_path == rhs.colinear_path;
+//                            // }
+//                            // bool operator!=(const round_proof_type &rhs) const {
+//                            //     return !(rhs == *this);
+//                            // }
+//                            // std::array<std::array<typename FieldType::value_type, m>, leaf_size> y;
+//                            std::vector<std::array<typename FieldType::value_type, m>> y;
+//                            std::array<merkle_proof_type, m> p;
+//
+//                            typename merkle_tree_type::value_type T_root;
+//
+//                            // std::array<typename FieldType::value_type, leaf_size> colinear_value;
+//                            std::vector<typename FieldType::value_type> colinear_value;
+//                            merkle_proof_type colinear_path;
+//                        };
+//
+//                        struct proof_type {
+//                            // bool operator==(const proof_type &rhs) const {
+//                            //     return round_proofs == rhs.round_proofs && final_polynomials ==
+//                            //     rhs.final_polynomials;
+//                            // }
+//                            // bool operator!=(const proof_type &rhs) const {
+//                            //     return !(rhs == *this);
+//                            // }
+//
+//                            std::vector<round_proof_type> round_proofs;    // 0..r-2
+//
+//                            // std::array<math::polynomial<typename FieldType::value_type>,
+//                            //     leaf_size> final_polynomials;
+//                            std::vector<math::polynomial<typename FieldType::value_type>> final_polynomials;
+//
+//                            commitment_type target_commitment;
+//                        };
+//                    };
                 }    // namespace detail
             }        // namespace commitments
 
@@ -134,7 +147,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m>,
+                                                                                    FRI::m, 0>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<
@@ -180,7 +193,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m>,
+                                                                                    FRI::m, 0>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<
@@ -206,7 +219,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m>,
+                                                                                    FRI::m, 0>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename FRI::proof_type
@@ -354,7 +367,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m>,
+                                                                                    FRI::m, 0>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(typename FRI::proof_type &proof,
@@ -472,7 +485,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m>,
+                                                                                    FRI::m, 0>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(typename FRI::proof_type &proof,

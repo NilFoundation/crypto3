@@ -40,6 +40,7 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_batched_fri.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -62,9 +63,9 @@ namespace nil {
                 template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType, std::size_t M,
                     std::size_t BatchSize>
                 struct batched_fri
-                    : public detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
+                    : public detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, 0> {
 
-                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
+                    using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, 0>;
 
                     constexpr static const std::size_t m = basic_fri::m;
 
@@ -89,7 +90,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m>,
+                                                                                    FRI::m, 0>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
@@ -106,7 +107,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m>,
+                                                                                    FRI::m, 0>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(
