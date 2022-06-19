@@ -51,10 +51,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    constexpr std::size_t WitnessColumns = 5;
+    constexpr std::size_t WitnessColumns = 17;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 5;
+    constexpr std::size_t SelectorColumns = 1;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4>;
+    using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>;
     
     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
     typename BlueprintFieldType::value_type value = nil::crypto3::algebra::random_element<BlueprintFieldType>();
@@ -89,10 +89,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
 //     using curve_type = algebra::curves::vesta;
 //     using BlueprintFieldType = typename curve_type::base_field_type;
-//     constexpr std::size_t WitnessColumns = 5;
+//     constexpr std::size_t WitnessColumns = 17;
 //     constexpr std::size_t PublicInputColumns = 1;
 //     constexpr std::size_t ConstantColumns = 1;
-//     constexpr std::size_t SelectorColumns = 5;
+//     constexpr std::size_t SelectorColumns = 1;
 //     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
 //         PublicInputColumns, ConstantColumns, SelectorColumns>;
 //     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
 //     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-//     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4>;
+//     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>;
     
 //     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
 //     std::vector<typename BlueprintFieldType::value_type> public_input = {0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255};
