@@ -99,28 +99,11 @@ namespace nil {
                 }
 
                 template<typename FRI,
-                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
-                                                                                  typename FRI::merkle_tree_hash_type,
-                                                                                  typename FRI::transcript_hash_type,
-                                                                                  FRI::m, FRI::leaf_size>,
-                                                                 FRI>::value  && (FRI::leaf_size != 0),
-                                                 bool>::type = true>
-                static bool verify_eval(
-                    typename FRI::basic_fri::proof_type &proof,
-                    typename FRI::basic_fri::params_type &fri_params,
-                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
-
-                    math::polynomial<typename FRI::field_type::value_type> U = {0};
-                    math::polynomial<typename FRI::field_type::value_type> V = {1};
-                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
-                }
-
-                template<typename FRI,
                          typename std::enable_if<
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m, 0>,
+                                                                                    FRI::m, FRI::leaf_size>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(
@@ -128,11 +111,22 @@ namespace nil {
                     typename FRI::basic_fri::params_type &fri_params,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
 
-                    std::size_t leaf_size = proof.final_polynomials.size();
-                    std::vector<math::polynomial<typename FRI::field_type::value_type>> U(leaf_size, {0});
-                    math::polynomial<typename FRI::field_type::value_type> V = {1};
+                    if constexpr (FRI::leaf_size == 0) {
+                        std::size_t leaf_size = proof.final_polynomials.size();
+                        std::vector<math::polynomial<typename FRI::field_type::value_type>> U(leaf_size, {0});
+                        math::polynomial<typename FRI::field_type::value_type> V = {1};
 
-                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
+                        return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
+                    }
+                    else {
+                        std::array<math::polynomial<typename FRI::field_type::value_type>, FRI::leaf_size> U;
+                        std::array<math::polynomial<typename FRI::field_type::value_type>, FRI::leaf_size> V;
+                        for (auto i = 0; i < FRI::leaf_size; ++i) {
+                            U[i] = {0};
+                            V[i] = {1};
+                        }
+                        return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
+                    }
                 }
             }    // namespace algorithms
         }        // namespace zk
