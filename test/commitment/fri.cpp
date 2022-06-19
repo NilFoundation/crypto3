@@ -47,7 +47,6 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 using namespace nil::crypto3;
@@ -178,7 +177,7 @@ BOOST_AUTO_TEST_SUITE(batched_fri_test_suite)
 //    constexpr static const std::size_t m = 2;
 //    constexpr static const std::size_t leaf_size = 2;
 //
-//    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+//    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
 //
 //    static_assert(zk::is_commitment<fri_type>::value);
 //    static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -239,7 +238,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_runtime_size_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -431,7 +430,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t leaf_size = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -503,7 +502,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_test_2) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t leaf_size = 7;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
