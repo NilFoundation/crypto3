@@ -69,9 +69,7 @@ namespace nil {
                          std::size_t W11,
                          std::size_t W12,
                          std::size_t W13,
-                         std::size_t W14,
-                         std::size_t W15,
-                         std::size_t W16>
+                         std::size_t W14>
                 class compare_with_const<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     CurveType,
@@ -89,9 +87,7 @@ namespace nil {
                     W11,
                     W12,
                     W13,
-                    W14,
-                    W15,
-                    W16> {
+                    W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -151,9 +147,10 @@ namespace nil {
 
                         typename BlueprintFieldType::value_type value = assignment.var_value(params.value);
                         assignment.witness(W0)[row] = value;
-
+                        row++;
                         typename BlueprintFieldType::value_type b = assignment.var_value(constant) - value;
-                        assignment.witness(W1)[row] = b;
+                        assignment.witness(W0)[row] = b;
+                        row++;
 
                         auto b_for_bits = b.data;
                         typename BlueprintFieldType::value_type bit;
@@ -161,18 +158,18 @@ namespace nil {
                         typename BlueprintFieldType::value_type b1 = 0;
                         for (std::size_t i = 0; i < 87; ++i) {
                             bit.data = b_for_bits - (b_for_bits >> 1 << 1);
-                            assignment.witness(W4 + i / 7)[i % 7] = bit * (1 - bit);
+                            assignment.witness(W2 + i / 7)[i % 7] = bit * (1 - bit);
                             b_for_bits = b_for_bits >> 1;
                             b1 += bit * times;
                             times *= 2;
                         }
-                        assignment.witness(W2)[row] = b1;
+                        assignment.witness(W0)[row] = b1;
 
                         typename BlueprintFieldType::value_type res = 1;
                         if (b1 != b) {
                             res = 0;
                         }
-                        assignment.witness(W3)[row] = res;
+                        assignment.witness(W1)[component_start_row] = res;
 
                         return result_type(row);
                     }
@@ -183,8 +180,8 @@ namespace nil {
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint(var(0, 0, false, var::column_type::constant) - var(W0, 0) - var(W1, 0));
-                        auto constraint_2 = bp.add_constraint((var(W2, 0) - var(W1, 0)) * var(W3, 0));
+                        auto constraint_1 = bp.add_constraint(var(0, 0, false, var::column_type::constant) - var(W0, 0) - var(W0, 1));
+                        auto constraint_2 = bp.add_constraint((var(W0, 2) - var(W0, 1)) * var(W1, 0));
 
                         bp.add_gate(first_selector_index, {constraint_1, constraint_2});
                     }
@@ -198,7 +195,7 @@ namespace nil {
                                                 {params.value.index, params.value.rotation,
                                                  false, params.value.type}});
                         for (int i = 0; i < 87; ++i) {
-                            bp.add_copy_constraint({{W4 + i / 7, i % 7, false}, {0, static_cast<int>(component_start_row) + 1, false, var::column_type::constant}});
+                            bp.add_copy_constraint({{W2 + i / 7, i % 7, false}, {0, static_cast<int>(component_start_row) + 1, false, var::column_type::constant}});
                         }
                     }
 

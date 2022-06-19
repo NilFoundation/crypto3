@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>;
+    using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     
     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
     typename BlueprintFieldType::value_type value = nil::crypto3::algebra::random_element<BlueprintFieldType>();
