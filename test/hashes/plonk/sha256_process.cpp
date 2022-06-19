@@ -68,15 +68,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
 
     using component_type = zk::components::sha256_process<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8>;
-
-    std::array<typename ArithmetizationType::field_type::value_type, 24> public_input = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c,
-     0x1f83d9ab, 0x5be0cd19, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(30);
+    std::array<typename ArithmetizationType::field_type::value_type, 24> public_input = {s - 2, s + 2, s - 1, s + 1, s - 3, s + 3,
+     s - 4, s + 4, s - 5, s + 5, s - 6, s + 6, s - 7, s + 7, s - 8, s + 8, s - 9, s + 9, s + 10, s - 10, s + 11, s - 11, s + 12, s - 12};
     std::array<var, 8> input_state_var = {var(0, 0, false, var::column_type::public_input),
      var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
      var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input), var(0, 6, false, var::column_type::public_input),
      var(0, 7, false, var::column_type::public_input)};
 
-    std::vector<var> input_words_var(16, var(0,0));
+    std::array<var, 16> input_words_var;
     for (int i = 0; i<16; i++) {
         input_words_var[i]= var(0, 8 + i, false, var::column_type::public_input);
     }
