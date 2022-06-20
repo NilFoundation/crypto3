@@ -29,6 +29,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/scalar_non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/complete_addition_edwards25519.hpp>
 
 
@@ -72,6 +73,8 @@ namespace nil {
 
                     using non_native_range_component = zk::components::non_native_range<ArithmetizationType, CurveType, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8>; 
+                    using scalar_non_native_range_component = zk::components::scalar_non_native_range<ArithmetizationType, CurveType, Ed25519Type, 0, 1, 2, 3,
+                                                                          4, 5, 6, 7, 8>; 
 
                     using complete_addition_component = complete_addition<ArithmetizationType, CurveType, Ed25519Type,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
@@ -81,9 +84,9 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xff88;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 2 + 13 + 11 * complete_addition_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = scalar_non_native_range_component::rows_amount + 13 + 11 * complete_addition_component::rows_amount;
 
-                    constexpr static const std::size_t gates_amount = 1;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
                         var k;
@@ -106,34 +109,19 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
+                        auto k_chunks_vars = scalar_non_native_range_component::generate_assignments(assignment,
+                        typename scalar_non_native_range_component::params_type({params.k}), row).output;
+                        row+=scalar_non_native_range_component::rows_amount;
                         typename Ed25519Type::scalar_field_type::integral_type base = 1;
-                        typename Ed25519Type::scalar_field_type::integral_type mask = (base << 22) - 1;
-                        typename CurveType::base_field_type::integral_type pasta_k = typename CurveType::base_field_type::integral_type(assignment.var_value(params.k).data);
-                        typename Ed25519Type::scalar_field_type::integral_type k = typename Ed25519Type::scalar_field_type::integral_type(pasta_k);
-                        std::array<typename Ed25519Type::scalar_field_type::integral_type, 12> k_chunks;
-                        for (std::size_t i = 0; i < 12 ; i++){
-                            k_chunks[i] = (k >> i*22) & mask;
+                        std::array<typename Ed25519Type::scalar_field_type::integral_type, 12> k_chunks; 
+                        for (std::size_t i = 0; i < 12; i ++){
+                            k_chunks[i] = typename Ed25519Type::scalar_field_type::integral_type(assignment.var_value(k_chunks_vars[i]).data);
                         }
-                        assignment.witness(W0)[row] = k;
-                        assignment.witness(W1)[row] = k_chunks[0];
-                        assignment.witness(W2)[row] = k_chunks[1];
-                        assignment.witness(W3)[row] = k_chunks[2];
-                        assignment.witness(W4)[row] = k_chunks[3];
-                        assignment.witness(W5)[row] = k_chunks[4];
-                        assignment.witness(W6)[row] = k_chunks[5];
-                        assignment.witness(W7)[row] = k_chunks[6];
-                        assignment.witness(W8)[row] = k_chunks[7];
-                        row++;
-                        assignment.witness(W0)[row] = k_chunks[8];
-                        assignment.witness(W1)[row] = k_chunks[9];
-                        assignment.witness(W2)[row] = k_chunks[10];
-                        assignment.witness(W3)[row] = k_chunks[11];
-                        row++;
 
                         typename Ed25519Type::template 
                         g1_type<algebra::curves::coordinates::affine>::value_type B = Ed25519Type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
 
-                        mask = (base << 66) - 1;
+                        typename Ed25519Type::scalar_field_type::integral_type mask = (base << 66) - 1;
 
                         typename Ed25519Type::template 
                         g1_type<algebra::curves::coordinates::affine>::value_type P = typename Ed25519Type::scalar_field_type::value_type(k_chunks[0]) * B;
@@ -232,18 +220,11 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index){
 
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
                         std::size_t row = start_row_index;
-                        assignment.enable_selector(first_selector_index, row);
-                        row = row + 2;
-
+                        auto k_chunks = scalar_non_native_range_component::generate_circuit(bp, assignment,
+                        typename scalar_non_native_range_component::params_type({params.k}), row).output;
+                        row+=scalar_non_native_range_component::rows_amount;
+                        
                         std::array<var, 4>  P_x = {var(W0, row), var(W1, row),
                         var(W2, row), var(W3, row)};
                         std::array<var, 4>  P_y = {var(W4, row), var(W5, row),
@@ -275,12 +256,6 @@ namespace nil {
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const params_type &params,
                         const std::size_t first_selector_index) {
-                        typename CurveType::base_field_type::integral_type base = 1;
-                        auto constraint_1 = bp.add_constraint(var(W0, 0) - (var(W1, 0) + var(W2, 0) * (base<< 22) + var(W3, 0) * (base << 44) +
-                        var(W4, 0)* (base << 66) + var(W5, 0) * (base <<88) + var(W6, 0) * (base << 110) + var(W7, 0) * (base << 132) + 
-                        var(W8, 0) * (base << 154) + var(W0, + 1)* (base << 176) + var(W1, +1) * (base << 198) + var(W2, + 1) * (base << 220) +
-                        var(W3, + 1) * (base << 242))); 
-                        bp.add_gate(first_selector_index, {constraint_1});
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,

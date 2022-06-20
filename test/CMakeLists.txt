@@ -59,6 +59,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/doubling"
     "non_native/plonk/non_native_range"
     "non_native/plonk/fixed_base_mul"
+    "non_native/plonk/variable_base_multiplication"
     "non_native/plonk/non_native_demo"
     )
 
@@ -96,6 +97,8 @@ set(PLONK_TESTS_FILES
     "sponge/sponge"
     "sponge/oracles"
     "sponge/transcript_fr"
+    "sponge/transcript_fq"
+    "sponge/compare"
     "algebra/fields/plonk/field_operations"
     "algebra/fields/plonk/combined_inner_product"
     "algebra/fields/plonk/element_powers"

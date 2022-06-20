@@ -46,23 +46,48 @@ namespace nil {
             namespace components {
 
                 ///////////////// Compare Value with Constant ////////////////////////////////
-                // Constatnt is pallas base field modulus
+                // Constant is pallas base field modulus
                 // Return 0, if value >= constant
                 // Return 1 otherwise
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class compare_with_const;
 
-                template<typename ArithmetizationParams,
+                template<typename BlueprintFieldType, 
+                         typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
-                         std::size_t W1>
+                         std::size_t W1,
+                         std::size_t W2,
+                         std::size_t W3,
+                         std::size_t W4,
+                         std::size_t W5,
+                         std::size_t W6,
+                         std::size_t W7,
+                         std::size_t W8,
+                         std::size_t W9,
+                         std::size_t W10,
+                         std::size_t W11,
+                         std::size_t W12,
+                         std::size_t W13,
+                         std::size_t W14>
                 class compare_with_const<
-                    snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
+                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     CurveType,
                     W0,
-                    W1> {
-
-                    using BlueprintFieldType = typename CurveType::scalar_field_type;
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8,
+                    W9,
+                    W10,
+                    W11,
+                    W12,
+                    W13,
+                    W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -72,7 +97,7 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0ff8;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 7;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -81,10 +106,10 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var result = var(0, 0);
+                        var output = var(0, 0);
 
                         result_type(std::size_t component_start_row) {
-                            result = var(W1, static_cast<int>(component_start_row), false, var::column_type::witness);
+                            output = var(W3, static_cast<int>(component_start_row), false, var::column_type::witness);
                         }
                     };
 
@@ -93,8 +118,7 @@ namespace nil {
                                                         const params_type &params,
                                                         const std::size_t component_start_row) {
 
-                        generate_assignments_constants(bp, assignment, params, start_row_index);
-                        var const = var(0, start_row_index, false, var::column_type::constant);
+                        generate_assignments_constants(bp, assignment, params, component_start_row);
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -116,13 +140,38 @@ namespace nil {
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
                                                             const std::size_t component_start_row) {
-
                         std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type value =
-                            assignment.var_value(params.value);
-                        assignment.witness(W0)[row] = value;
 
-                        return result_type(component_start_row);
+                        var constant = var(0, component_start_row, false, var::column_type::constant);
+                        // assignment.witness(W0)[row] = assignment.var_value(constant);
+
+                        typename BlueprintFieldType::value_type value = assignment.var_value(params.value);
+                        assignment.witness(W0)[row] = value;
+                        row++;
+                        typename BlueprintFieldType::value_type b = assignment.var_value(constant) - value;
+                        assignment.witness(W0)[row] = b;
+                        row++;
+
+                        auto b_for_bits = b.data;
+                        typename BlueprintFieldType::value_type bit;
+                        typename BlueprintFieldType::value_type times = 1;
+                        typename BlueprintFieldType::value_type b1 = 0;
+                        for (std::size_t i = 0; i < 87; ++i) {
+                            bit.data = b_for_bits - (b_for_bits >> 1 << 1);
+                            assignment.witness(W2 + i / 7)[i % 7] = bit * (1 - bit);
+                            b_for_bits = b_for_bits >> 1;
+                            b1 += bit * times;
+                            times *= 2;
+                        }
+                        assignment.witness(W0)[row] = b1;
+
+                        typename BlueprintFieldType::value_type res = 1;
+                        if (b1 != b) {
+                            res = 0;
+                        }
+                        assignment.witness(W1)[component_start_row] = res;
+
+                        return result_type(row);
                     }
 
                 private:
@@ -131,9 +180,10 @@ namespace nil {
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint();
+                        auto constraint_1 = bp.add_constraint(var(0, 0, false, var::column_type::constant) - var(W0, 0) - var(W0, 1));
+                        auto constraint_2 = bp.add_constraint((var(W0, 2) - var(W0, 1)) * var(W1, 0));
 
-                        bp.add_gate(first_selector_index, {constraint_1});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2});
                     }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
@@ -144,14 +194,20 @@ namespace nil {
                         bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false},
                                                 {params.value.index, params.value.rotation,
                                                  false, params.value.type}});
+                        for (int i = 0; i < 87; ++i) {
+                            bp.add_copy_constraint({{W2 + i / 7, i % 7, false}, {0, static_cast<int>(component_start_row) + 1, false, var::column_type::constant}});
+                        }
                     }
 
                     static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
-                                                  const std::size_t start_row_index) {
-
-                        assignment.constant(0)[start_row_index] = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255;
+                                                  const std::size_t component_start_row) {
+                        std::size_t row = component_start_row;
+                        typename BlueprintFieldType::value_type base = 2;
+                        assignment.constant(0)[row] = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255 + base.pow(87) - 1;
+                        row++;
+                        assignment.constant(0)[row] = 0;
                     }
 
                 };
