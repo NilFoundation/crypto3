@@ -36,6 +36,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
+#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
@@ -92,12 +94,16 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
+                    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
+                    using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
+                    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
+
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0ff8;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 7;
+                    constexpr static const std::size_t rows_amount = 5 + 5 * 87;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -109,7 +115,7 @@ namespace nil {
                         var output = var(0, 0);
 
                         result_type(std::size_t component_start_row) {
-                            output = var(W3, static_cast<int>(component_start_row), false, var::column_type::witness);
+                            output = var(W1, static_cast<int>(component_start_row), false, var::column_type::witness);
                         }
                     };
 
@@ -143,60 +149,74 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         var constant = var(0, component_start_row, false, var::column_type::constant);
-                        // assignment.witness(W0)[row] = assignment.var_value(constant);
+                        var one = var(0, component_start_row + 2, false, var::column_type::constant);
+                        var two = var(0, component_start_row + 3, false, var::column_type::constant);
 
-                        typename BlueprintFieldType::value_type value = assignment.var_value(params.value);
-                        assignment.witness(W0)[row] = value;
-                        row++;
-                        typename BlueprintFieldType::value_type b = assignment.var_value(constant) - value;
-                        assignment.witness(W0)[row] = b;
+                        var b_var = sub_component::generate_assignments(assignment, {constant, params.value}, row).output;
                         row++;
 
-                        auto b_for_bits = b.data;
+                        auto b_for_bits = assignment.var_value(b_var).data;
                         typename BlueprintFieldType::value_type bit;
-                        typename BlueprintFieldType::value_type times = 1;
-                        typename BlueprintFieldType::value_type b1 = 0;
+                        assignment.witness(W0)[row] = 1;
+                        var times_var(W0, row, false);
+                        row++;
+                        assignment.witness(W0)[row] = 0;
+                        var b1_var(W0, row, false);
+                        row++;
+
                         for (std::size_t i = 0; i < 87; ++i) {
                             bit.data = b_for_bits - (b_for_bits >> 1 << 1);
                             assignment.witness(W2 + i / 7)[i % 7] = bit * (1 - bit);
+                            var bit_var(W2 + i / 7, i % 7, false);
+                            var bit_check = sub_component::generate_assignments(assignment, {one, bit_var}, row).output;
+                            row++;
+                            bit_check = mul_component::generate_assignments(assignment, {bit_var, bit_check}, row).output;
+                            row++;
                             b_for_bits = b_for_bits >> 1;
-                            b1 += bit * times;
-                            times *= 2;
+                            bit_var = mul_component::generate_assignments(assignment, {bit_var, times_var}, row).output;
+                            row++;
+                            b1_var = add_component::generate_assignments(assignment, {bit_var, b1_var}, row).output;
+                            row++;
+                            times_var = mul_component::generate_assignments(assignment, {times_var, two}, row).output;
+                            row++;
                         }
-                        assignment.witness(W0)[row] = b1;
 
                         typename BlueprintFieldType::value_type res = 1;
-                        if (b1 != b) {
+                        if (assignment.var_value(b1_var) != assignment.var_value(b_var)) {
                             res = 0;
                         }
                         assignment.witness(W1)[component_start_row] = res;
+                        var res_var(W1, component_start_row, false);
+                        var res_check = sub_component::generate_assignments(assignment, {b1_var, b_var}, row).output;
+                        row++;
+                        res_check = mul_component::generate_assignments(assignment, {res_check, res_var}, row).output;
 
-                        return result_type(row);
+                        return result_type(component_start_row);
                     }
 
                 private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
-                                               const std::size_t first_selector_index) {
-
-                        auto constraint_1 = bp.add_constraint(var(0, 0, false, var::column_type::constant) - var(W0, 0) - var(W0, 1));
-                        auto constraint_2 = bp.add_constraint((var(W0, 2) - var(W0, 1)) * var(W1, 0));
-
-                        bp.add_gate(first_selector_index, {constraint_1, constraint_2});
-                    }
+                                               const std::size_t first_selector_index) {}
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                           blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                           const params_type &params,
                                                           std::size_t component_start_row = 0) {
 
-                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false},
-                                                {params.value.index, params.value.rotation,
-                                                 false, params.value.type}});
+                        var zero = var(0, component_start_row + 1, false, var::column_type::constant);
+
+                        std::size_t row = component_start_row + 4;
+                        var bit_check;
                         for (int i = 0; i < 87; ++i) {
-                            bp.add_copy_constraint({{W2 + i / 7, i % 7, false}, {0, static_cast<int>(component_start_row) + 1, false, var::column_type::constant}});
+                            bit_check = typename mul_component::result_type(row).output;
+                            row += 5;
+                            bp.add_copy_constraint({bit_check, zero});
                         }
+                        row += 4;
+                        var res_check = typename mul_component::result_type(row).output;
+                        bp.add_copy_constraint({res_check, zero});
                     }
 
                     static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
@@ -208,6 +228,10 @@ namespace nil {
                         assignment.constant(0)[row] = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255 + base.pow(87) - 1;
                         row++;
                         assignment.constant(0)[row] = 0;
+                        row++;
+                        assignment.constant(0)[row] = 1;
+                        row++;
+                        assignment.constant(0)[row] = 2;
                     }
 
                 };
