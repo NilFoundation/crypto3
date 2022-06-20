@@ -97,7 +97,11 @@ namespace nil {
                             }
 
                             // TODO: Better if we can construct params_type from any batch size to another
-                            params_type(const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, 1>::params_type &obj) {
+                            params_type(const typename basic_batched_fri<FieldType,
+                                                                         MerkleTreeHashType,
+                                                                         TranscriptHashType,
+                                                                         M,
+                                                                         1>::params_type &obj) {
                                 r = obj.r;
                                 max_degree = obj.max_degree;
                                 D = obj.D;
@@ -164,8 +168,7 @@ namespace nil {
                     return P.root();
                 }
 
-                template<typename FRI,
-                         std::size_t list_size,
+                template<typename FRI, std::size_t list_size,
                          typename std::enable_if<
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
@@ -218,8 +221,7 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m,
-                                                                                    FRI::leaf_size>,
+                                                                                    FRI::m, FRI::leaf_size>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename FRI::precommitment_type
@@ -232,14 +234,12 @@ namespace nil {
                     return precommit<FRI>(f_dfs, D);
                 }
 
-                template<typename FRI,
-                         typename ContainerType,
+                template<typename FRI, typename ContainerType,
                          typename std::enable_if<
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m,
-                                                                                    FRI::leaf_size>,
+                                                                                    FRI::m, FRI::leaf_size>,
                                              FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<
@@ -279,8 +279,7 @@ namespace nil {
                                                                                                      y_data.end());
                 }
 
-                template<typename FRI,
-                         typename ContainerType,
+                template<typename FRI, typename ContainerType,
                          typename std::enable_if<
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
@@ -306,15 +305,12 @@ namespace nil {
                     return precommit<FRI>(poly_dfs, D);
                 }
 
-                template<
-                    typename FRI,
-                    typename ContainerType,
+                template<typename FRI, typename ContainerType,
                     typename std::enable_if<
                         std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                typename FRI::merkle_tree_hash_type,
                                                                                typename FRI::transcript_hash_type,
-                                                                               FRI::m,
-                                                                               FRI::leaf_size>,
+                                                                               FRI::m, FRI::leaf_size>,
                                         FRI>::value &&
                             (!std::is_same_v<typename ContainerType::value_type, typename FRI::field_type::value_type>),
                         bool>::type = true>
@@ -470,15 +466,12 @@ namespace nil {
                     return typename FRI::proof_type({round_proofs, final_polynomials, commit<FRI>(T)});
                 }
 
-                template<
-                    typename FRI,
-                    typename PolynomType,
+                template<typename FRI, typename PolynomType,
                     typename std::enable_if<
                         std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                typename FRI::merkle_tree_hash_type,
                                                                                typename FRI::transcript_hash_type,
-                                                                               FRI::m,
-                                                                               FRI::leaf_size>,
+                                                                               FRI::m, FRI::leaf_size>,
                                         FRI>::value &&
                             (std::is_same_v<typename PolynomType::value_type, typename FRI::field_type::value_type>),
                         bool>::type = true>
@@ -494,15 +487,12 @@ namespace nil {
                     return proof_eval<FRI>(f_new, g_new, T, fri_params, transcript);
                 }
 
-                template<
-                    typename FRI,
-                    typename ContainerType,
+                template<typename FRI, typename ContainerType,
                     typename std::enable_if<
                         std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                typename FRI::merkle_tree_hash_type,
                                                                                typename FRI::transcript_hash_type,
-                                                                               FRI::m,
-                                                                               FRI::leaf_size>,
+                                                                               FRI::m, FRI::leaf_size>,
                                         FRI>::value &&
                             !std::is_same_v<typename ContainerType::value_type, typename FRI::field_type::value_type>,
                         bool>::type = true>
