@@ -161,8 +161,6 @@ namespace nil {
                                 row += add_component::rows_amount;
                             }
                         }
-                        std::cout << "X: " << assignment.var_value(res[0]).data
-                                  << " Y: " << assignment.var_value(res[1]).data << std::endl;
 
                         auto result = result_type(params, start_row_index);
                         result.sum.X = res[0];

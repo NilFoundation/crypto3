@@ -537,4 +537,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_UNIFIED_ADDITION_COMPONENT_11_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
