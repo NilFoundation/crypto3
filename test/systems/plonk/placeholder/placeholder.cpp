@@ -136,7 +136,7 @@ constexpr static const std::size_t table_columns =
     placeholder_test_params::witness_columns + placeholder_test_params::public_input_columns;
 
 typedef commitments::fri<FieldType, placeholder_test_params::merkle_hash_type,
-                         placeholder_test_params::transcript_hash_type, m>
+                         placeholder_test_params::transcript_hash_type, m, 1>
     fri_type;
 
 typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
@@ -325,8 +325,9 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-    typedef commitments::list_polynomial_commitment<FieldType,
-        circuit_3_params::batched_commitment_params_type> lpc_type;
+//    typedef commitments::list_polynomial_commitment<FieldType,
+//        circuit_3_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 1, true> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -537,8 +538,9 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
-    typedef commitments::list_polynomial_commitment<FieldType,
-        circuit_2_params::batched_commitment_params_type> lpc_type;
+//    typedef commitments::list_polynomial_commitment<FieldType,
+//        circuit_2_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type, 0, false> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 

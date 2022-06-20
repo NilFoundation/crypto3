@@ -178,15 +178,15 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type>(F_perm_value.coefficients());
                         
                         typename CommitmentSchemeTypePermutation::precommitment_type F_perm_input_tree =
-                            CommitmentSchemeTypePermutation::precommit(F_perm_input, fri_params.D[0]);
+                            algorithms::precommit<CommitmentSchemeTypePermutation>(F_perm_input, fri_params.D[0]);
                         typename CommitmentSchemeTypePermutation::commitment_type F_perm_input_commitment =
-                            CommitmentSchemeTypePermutation::commit(F_perm_input_tree);
+                            algorithms::commit<CommitmentSchemeTypePermutation>(F_perm_input_tree);
                         transcript(F_perm_input_commitment);
 
                         typename CommitmentSchemeTypePermutation::precommitment_type F_perm_value_tree =
-                            CommitmentSchemeTypePermutation::precommit(F_perm_value, fri_params.D[0]);
+                            algorithms::precommit<CommitmentSchemeTypePermutation>(F_perm_value, fri_params.D[0]);
                         typename CommitmentSchemeTypePermutation::commitment_type F_perm_value_commitment =
-                            CommitmentSchemeTypePermutation::commit(F_perm_value_tree);
+                            algorithms::commit<CommitmentSchemeTypePermutation>(F_perm_value_tree);
                         transcript(F_perm_value_commitment);
 
                         // Compute $V_L(X)$
@@ -208,9 +208,9 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type>(V_L.coefficients());
 
                         typename CommitmentSchemeTypePermutation::precommitment_type V_L_tree =
-                            CommitmentSchemeTypePermutation::precommit(V_L, fri_params.D[0]);
+                            algorithms::precommit<CommitmentSchemeTypePermutation>(V_L, fri_params.D[0]);
                         typename CommitmentSchemeTypePermutation::commitment_type V_L_commitment =
-                            CommitmentSchemeTypePermutation::commit(V_L_tree);
+                            algorithms::commit<CommitmentSchemeTypePermutation>(V_L_tree);
                         transcript(V_L_commitment);
 
                         // Calculate lookup-related numerators of the quotinent polynomial

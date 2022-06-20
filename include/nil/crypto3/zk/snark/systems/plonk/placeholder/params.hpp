@@ -2,6 +2,7 @@
 // Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -59,25 +60,25 @@ namespace nil {
                     constexpr static const typename FieldType::value_type delta =
                         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                    typedef typename commitments::detail::basic_fri<FieldType, MerkleTreeHashType,
-                        TranscriptHashType, M>::params_type commitment_params_type;
+                    typedef typename commitments::fri<FieldType, MerkleTreeHashType,
+                        TranscriptHashType, M, 1>::params_type commitment_params_type;
                     
                     typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, 
                             TranscriptHashType, Lambda, R, M>
                             batched_commitment_params_type;
 
                     using runtime_size_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type, 0, true>;
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, 0, false>;
                     using witness_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type, witness_columns>;
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, witness_columns, true>;
                     using public_input_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type, public_input_columns>;
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, public_input_columns, true>;
                     using constant_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type, constant_columns>;
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, constant_columns, true>;
                     using selector_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type, selector_columns>;
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, selector_columns, true>;
                     using special_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type, 2>;
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, 2, true>;
                     using permutation_commitment_scheme_type =
                         commitments::list_polynomial_commitment<FieldType, batched_commitment_params_type>;
                     using quotient_commitment_scheme_type =

@@ -368,26 +368,26 @@ namespace nil {
 
 
                         typename runtime_size_commitment_scheme_type::precommitment_type id_permutation =
-                            runtime_size_commitment_scheme_type::precommit(id_perm_polys, commitment_params.D[0]);
+                            algorithms::precommit<runtime_size_commitment_scheme_type>(id_perm_polys, commitment_params.D[0]);
 
                         typename runtime_size_commitment_scheme_type::precommitment_type sigma_permutation =
-                            runtime_size_commitment_scheme_type::precommit(
+                            algorithms::precommit<runtime_size_commitment_scheme_type>(
                                 sigma_perm_polys, commitment_params.D[0]);
 
                         typename public_input_commitment_scheme_type::precommitment_type public_input_precommitment =
-                            public_input_commitment_scheme_type::precommit(
+                            algorithms::precommit<public_input_commitment_scheme_type>(
                                 public_table.public_inputs(), commitment_params.D[0]);
 
                         typename constant_commitment_scheme_type::precommitment_type constant_precommitment =
-                            constant_commitment_scheme_type::precommit(
+                            algorithms::precommit<constant_commitment_scheme_type>(
                                 public_table.constants(), commitment_params.D[0]);
 
                         typename selector_commitment_scheme_type::precommitment_type selector_precommitment =
-                            selector_commitment_scheme_type::precommit(
+                            algorithms::precommit<selector_commitment_scheme_type>(
                                 public_table.selectors(), commitment_params.D[0]);
 
                         typename special_commitment_scheme_type::precommitment_type special_selector_precommitment =
-                            special_commitment_scheme_type::precommit(
+                            algorithms::precommit<special_commitment_scheme_type>(
                                 q_last_q_blind, commitment_params.D[0]);
 
                         return typename preprocessed_data_type::public_precommitments_type {
@@ -399,22 +399,22 @@ namespace nil {
                         commitments(const typename preprocessed_data_type::public_precommitments_type &precommitments) {
 
                         typename runtime_size_commitment_scheme_type::commitment_type id_permutation =
-                            runtime_size_commitment_scheme_type::commit(precommitments.id_permutation);
+                            algorithms::commit<runtime_size_commitment_scheme_type>(precommitments.id_permutation);
 
                         typename runtime_size_commitment_scheme_type::commitment_type sigma_permutation =
-                            runtime_size_commitment_scheme_type::commit(precommitments.sigma_permutation);
+                            algorithms::commit<runtime_size_commitment_scheme_type>(precommitments.sigma_permutation);
 
                         typename public_input_commitment_scheme_type::commitment_type public_input_commitment =
-                            public_input_commitment_scheme_type::commit(precommitments.public_input);
+                            algorithms::commit<public_input_commitment_scheme_type>(precommitments.public_input);
 
                         typename constant_commitment_scheme_type::commitment_type constant_commitment =
-                            constant_commitment_scheme_type::commit(precommitments.constant);
+                            algorithms::commit<constant_commitment_scheme_type>(precommitments.constant);
 
                         typename selector_commitment_scheme_type::commitment_type selector_commitment =
-                            selector_commitment_scheme_type::commit(precommitments.selector);
+                            algorithms::commit<selector_commitment_scheme_type>(precommitments.selector);
 
                         typename special_commitment_scheme_type::commitment_type special_selector_commitment =
-                            special_commitment_scheme_type::commit(precommitments.special_selectors);
+                            algorithms::commit<special_commitment_scheme_type>(precommitments.special_selectors);
 
                         return typename preprocessed_data_type::public_commitments_type {
                             id_permutation,           sigma_permutation,
