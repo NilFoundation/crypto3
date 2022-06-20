@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -105,6 +106,12 @@ namespace nil {
                                           has_available_static_member_function_proof_eval<T>::value &&
                                           has_available_static_member_function_verify_eval<T>::value;
                 typedef T type;
+            };
+
+            template<bool Condition, typename Type, std::size_t Size>
+            struct select_container {
+                using type = typename std::
+                    conditional<Condition, std::array<Type, Size>, std::vector<Type>>::type;
             };
 
         }    // namespace zk

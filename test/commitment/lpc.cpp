@@ -46,7 +46,6 @@
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 using namespace nil::crypto3;
@@ -72,9 +71,9 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0, false> lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
@@ -136,9 +135,9 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0, false> lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
@@ -207,10 +206,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
 
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
-    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type, leaf_size> lpc_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, leaf_size, true> lpc_params_type;
+    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     typedef typename lpc_type::proof_type proof_type;
 
@@ -271,10 +270,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
 
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
-    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type, leaf_size> lpc_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, leaf_size, true> lpc_params_type;
+    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     typedef typename lpc_type::proof_type proof_type;
 
@@ -337,10 +336,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
 
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
-    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type, leaf_size> lpc_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, leaf_size, true> lpc_params_type;
+    typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     typedef typename lpc_type::proof_type proof_type;
 
@@ -406,9 +405,9 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0, false> lpc_params_type;
     typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     typedef typename lpc_type::proof_type proof_type;
@@ -472,9 +471,9 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0, false> lpc_params_type;
     typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     typedef typename lpc_type::proof_type proof_type;

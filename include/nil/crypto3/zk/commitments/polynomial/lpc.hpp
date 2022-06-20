@@ -46,7 +46,8 @@ namespace nil {
                          typename TranscriptHashType,
                          std::size_t Lambda = 40,
                          std::size_t R = 1,
-                         std::size_t M = 2>
+                         std::size_t M = 2,
+                         std::size_t BatchSize = 0, bool ConstSize = false>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -54,6 +55,8 @@ namespace nil {
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t r = R;
                     constexpr static const std::size_t m = M;
+                    constexpr static const std::size_t leaf_size = BatchSize;
+                    constexpr static const bool const_size = ConstSize;
                 };
 
                 /**
@@ -70,16 +73,18 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType, typename LPCParams>
-                struct list_polynomial_commitment : public detail::basic_fri<FieldType,
+                struct list_polynomial_commitment : public detail::basic_batched_fri<FieldType,
                                                                              typename LPCParams::merkle_hash_type,
                                                                              typename LPCParams::transcript_hash_type,
-                                                                             LPCParams::m> {
+                                                                             LPCParams::m, LPCParams::leaf_size> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
                     constexpr static const std::size_t lambda = LPCParams::lambda;
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
+                    constexpr static const std::size_t leaf_size = LPCParams::leaf_size;
+                    constexpr static const bool const_size = LPCParams::const_size;
 
                     typedef LPCParams lpc_params;
 
@@ -88,7 +93,7 @@ namespace nil {
                     using fri_type = fri<FieldType,
                                          typename LPCParams::merkle_hash_type,
                                          typename LPCParams::transcript_hash_type,
-                                         m>;
+                                         m, leaf_size>;
                     using basic_fri = typename fri_type::basic_fri;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
@@ -110,8 +115,8 @@ namespace nil {
                     };
                 };
 
-                template<typename FieldType, typename LPCParams>
-                using lpc = list_polynomial_commitment<FieldType, LPCParams>;
+                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool ConstSize>
+                using lpc = list_polynomial_commitment<FieldType, list_polynomial_commitment_params<typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type, LPCParams::lambda, LPCParams::r, LPCParams::m, BatchSize, ConstSize>>;
             }    // namespace commitments
 
             namespace algorithms {
@@ -197,13 +202,15 @@ namespace nil {
                         U_interpolation_points[j] = std::make_pair(evaluation_points[j], proof.z[j]);
                     }
 
-                    math::polynomial<typename LPC::field_type::value_type> U =
-                        math::lagrange_interpolation(U_interpolation_points);
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, 1> U =
+                    {math::lagrange_interpolation(U_interpolation_points)};
 
-                    math::polynomial<typename LPC::field_type::value_type> V = {1};
+                    std::array<math::polynomial<typename LPC::field_type::value_type>, 1> V;
+                    V[0] = {1};
 
+                    // TODO: Can we do something with V[0]
                     for (std::size_t j = 0; j < k; j++) {
-                        V = V * (math::polynomial<typename LPC::field_type::value_type>({-evaluation_points[j], 1}));
+                        V[0] = V[0] * (math::polynomial<typename LPC::field_type::value_type>({-evaluation_points[j], 1}));
                     }
 
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
