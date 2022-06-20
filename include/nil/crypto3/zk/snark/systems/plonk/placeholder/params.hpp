@@ -30,7 +30,6 @@
 
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 
 namespace nil {
     namespace crypto3 {

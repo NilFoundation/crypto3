@@ -31,7 +31,6 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
@@ -130,8 +129,8 @@ namespace nil {
                             placeholder_permutation_argument<FieldType, ParamsType>::
                                 verify_eval(preprocessed_public_data,
                                             proof.eval_proof.challenge, f,
-                                            proof.eval_proof.permutation.z[0],
-                                            proof.eval_proof.permutation.z[1],
+                                            proof.eval_proof.permutation.z[0][0],
+                                            proof.eval_proof.permutation.z[0][1],
                                             proof.v_perm_commitment, transcript);
 
                         
@@ -202,9 +201,9 @@ namespace nil {
                                 placeholder_lookup_argument<FieldType, public_input_commitment_scheme_type, ParamsType>::
                                     verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
                                                 proof.eval_proof.challenge, columns_at_y,
-                                                proof.eval_proof.lookups[1].z[0], proof.eval_proof.lookups[1].z[1],
-                                                proof.eval_proof.lookups[2].z[0], proof.eval_proof.lookups[0].z[0],
-                                                proof.eval_proof.lookups[0].z[1], proof.input_perm_commitment,
+                                                proof.eval_proof.lookups[1].z[0][0], proof.eval_proof.lookups[1].z[0][1],
+                                                proof.eval_proof.lookups[2].z[0][0], proof.eval_proof.lookups[0].z[0][0],
+                                                proof.eval_proof.lookups[0].z[0][1], proof.input_perm_commitment,
                                                 proof.value_perm_commitment, proof.v_l_perm_commitment, transcript);
                         } else {
                             for (std::size_t i = 0; i < lookup_parts; i++) {
