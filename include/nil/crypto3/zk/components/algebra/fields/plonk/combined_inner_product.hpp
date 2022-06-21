@@ -89,6 +89,8 @@ namespace nil {
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          std::size_t start_row_index) {
+                        
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -129,8 +131,6 @@ namespace nil {
                         }
                         typename BlueprintFieldType::value_type s = 0;
                         typename BlueprintFieldType::value_type acc_xi = 1;
-                        assignment.constant(0)[row] = 0;
-                        assignment.constant(0)[row + 1] = 1;
 
                         for (std::size_t i = row; i < row + rows_amount - 1; i++){
                             assignment.witness(W0)[i] = r;
@@ -195,6 +195,17 @@ namespace nil {
                             bp.add_copy_constraint({{3 + (2*i) % 10, static_cast<int>(component_start_row + (i/5)), false}, params.f_zeta1[i]});
                             bp.add_copy_constraint({{4 + (2*i) % 10, static_cast<int>(component_start_row + (i/5)), false}, params.f_zeta2[i]});
                         }
+                    }
+
+                    static void
+                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                const params_type &params,
+                                                std::size_t component_start_row) {
+                        std::size_t row = component_start_row + add_component::rows_amount;
+
+                        assignment.constant(0)[row] = 0;
+                        assignment.constant(0)[row + 1] = 1;
                     }
                 };
             }    // namespace components

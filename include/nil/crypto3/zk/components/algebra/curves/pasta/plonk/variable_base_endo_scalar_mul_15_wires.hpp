@@ -146,8 +146,6 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t j = start_row_index;
-                        assignment.constant(0)[j] = ArithmetizationType::field_type::value_type::zero();
-                        assignment.constant(0)[j + 1] = endo;
                         typename multiplication_component::params_type multiplication_params = {
                             params.T.x, var(W0, j + 1, false, var::column_type::constant)};
                         auto mul_res = multiplication_component::generate_assignments(assignment, multiplication_params, j);
@@ -245,6 +243,8 @@ namespace nil {
                                          const params_type &params,
                                          const std::size_t start_row_index) {
 
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
+
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
                         if (selector_iterator == assignment.selectors_end()) {
@@ -330,7 +330,7 @@ namespace nil {
                         std::size_t j = start_row_index;
 
                         typename multiplication_component::params_type multiplication_params = {
-                            params.T.x, var(W0, j + 1, false, var::column_type::constant)};
+                            params.T.x, var(0, j, false, var::column_type::constant)};
                         typename multiplication_component::result_type mul_res(multiplication_params, start_row_index);
                         j++;
 
@@ -356,11 +356,22 @@ namespace nil {
                                 {{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 1), false}});
                         }
                         bp.add_copy_constraint(
-                            {{W6, (std::int32_t)(j + 0), false}, {0, (std::int32_t)(j - 1), false, var::column_type::constant}});
+                            {{W6, (std::int32_t)(j + 0), false}, {0, (std::int32_t)(start_row_index + 1), false, var::column_type::constant}});
 
                         // TODO link to params.b
 
                         bp.add_copy_constraint({{W6, (std::int32_t)(j + 32), false}, params.b});
+                    }
+
+                    static void
+                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                const params_type &params,
+                                                std::size_t component_start_row) {
+                        std::size_t row = component_start_row;
+
+                        assignment.constant(0)[row] = ArithmetizationType::field_type::value_type::zero();
+                        assignment.constant(0)[row + 1] = endo;
                     }
                 };
             }    // namespace components

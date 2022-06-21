@@ -122,7 +122,6 @@ namespace nil {
                             T_doubled(assignment.var_value(addition_res.X), assignment.var_value(addition_res.Y));
 
                         std::size_t j = start_row_index + add_component::rows_amount;
-                        assignment.constant(0)[j] = ArithmetizationType::field_type::value_type::zero();
 
                         for (std::size_t i = j; i < j + rows_amount - 3; i = i + 2) {
                             assignment.witness(W0)[i] = T.X;
@@ -215,6 +214,8 @@ namespace nil {
                                          const params_type &params,
                                          const std::size_t start_row_index) {
 
+                        generate_assignments_constant(bp, assignment, params, start_row_index);
+                        
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
 
@@ -476,13 +477,22 @@ namespace nil {
                                 {{W7, (std::int32_t)(start_row_index + rows_amount - 1), false},
                                  {W1, (std::int32_t)(start_row_index + rows_amount - 3), false}});
 
-                        std::size_t constant_column_index = 0;
                         bp.add_copy_constraint(
                             {{W4, (std::int32_t)(j), false},
-                             {constant_column_index, (std::int32_t)(j), false, var::column_type::constant}});
+                             {0, (std::int32_t)(j), false, var::column_type::constant}});
 
                         bp.add_copy_constraint(
                             {params.b, {W5, (std::int32_t)(j + rows_amount - 4), false}});    // scalar value check
+                    }
+
+                    static void
+                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                const params_type &params,
+                                                std::size_t component_start_row) {
+                        std::size_t row = component_start_row + add_component::rows_amount;
+
+                        assignment.constant(0)[row] = ArithmetizationType::field_type::value_type::zero();
                     }
                 };
             }    // namespace components

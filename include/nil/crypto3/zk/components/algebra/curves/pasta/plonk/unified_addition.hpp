@@ -132,7 +132,6 @@ namespace nil {
 
                         const std::size_t j = start_row_index;
 
-                        assignment.constant(0)[0] = ArithmetizationType::field_type::value_type::zero();
 
                         typename BlueprintFieldType::value_type p_x = assignment.var_value(params.P.x);
                         typename BlueprintFieldType::value_type p_y = assignment.var_value(params.P.y);
