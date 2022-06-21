@@ -115,7 +115,7 @@ namespace nil {
                         var output = var(0, 0);
 
                         result_type(std::size_t component_start_row) {
-                            output = var(W1, static_cast<int>(component_start_row), false, var::column_type::witness);
+                            output = var(W0, static_cast<int>(component_start_row), false, var::column_type::witness);
                         }
                     };
 
@@ -149,24 +149,23 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         var constant = var(0, component_start_row, false, var::column_type::constant);
+                        var zero = var(0, component_start_row + 1, false, var::column_type::constant);
                         var one = var(0, component_start_row + 2, false, var::column_type::constant);
-                        var two = var(0, component_start_row + 3, false, var::column_type::constant);
+                        var two = var(0, component_start_row + 3, false, var::column_type::constant);\
 
                         var b_var = sub_component::generate_assignments(assignment, {constant, params.value}, row).output;
+                        std::cout << "b: " << assignment.var_value(b_var).data << '\n';
                         row++;
 
                         auto b_for_bits = assignment.var_value(b_var).data;
                         typename BlueprintFieldType::value_type bit;
-                        assignment.witness(W0)[row] = 1;
-                        var times_var(W0, row, false);
-                        row++;
-                        assignment.witness(W0)[row] = 0;
-                        var b1_var(W0, row, false);
-                        row++;
+
+                        var times_var = one;
+                        var b1_var = zero;
 
                         for (std::size_t i = 0; i < 87; ++i) {
                             bit.data = b_for_bits - (b_for_bits >> 1 << 1);
-                            assignment.witness(W2 + i / 7)[i % 7] = bit * (1 - bit);
+                            assignment.witness(W2 + i / 7)[i % 7] = bit;\
                             var bit_var(W2 + i / 7, i % 7, false);
                             var bit_check = sub_component::generate_assignments(assignment, {one, bit_var}, row).output;
                             row++;
@@ -181,12 +180,16 @@ namespace nil {
                             row++;
                         }
 
+                        b_var = sub_component::generate_assignments(assignment, {constant, params.value}, row).output;
+                        row++;
+                        std::cout << "b1: " << assignment.var_value(b1_var).data << '\n';
+
                         typename BlueprintFieldType::value_type res = 1;
                         if (assignment.var_value(b1_var) != assignment.var_value(b_var)) {
                             res = 0;
                         }
-                        assignment.witness(W1)[component_start_row] = res;
-                        var res_var(W1, component_start_row, false);
+                        assignment.witness(W0)[component_start_row] = res;
+                        var res_var(W0, component_start_row, false);
                         var res_check = sub_component::generate_assignments(assignment, {b1_var, b_var}, row).output;
                         row++;
                         res_check = mul_component::generate_assignments(assignment, {res_check, res_var}, row).output;
@@ -207,14 +210,14 @@ namespace nil {
 
                         var zero = var(0, component_start_row + 1, false, var::column_type::constant);
 
-                        std::size_t row = component_start_row + 4;
+                        std::size_t row = component_start_row + 2;
                         var bit_check;
                         for (int i = 0; i < 87; ++i) {
                             bit_check = typename mul_component::result_type(row).output;
                             row += 5;
                             bp.add_copy_constraint({bit_check, zero});
                         }
-                        row += 4;
+                        row += 6;
                         var res_check = typename mul_component::result_type(row).output;
                         bp.add_copy_constraint({res_check, zero});
                     }
