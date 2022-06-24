@@ -43,28 +43,24 @@ namespace nil {
                 template<typename FieldType, typename ParamsType>
                 struct placeholder_proof {
                     typedef FieldType field_type;
-                    
+                    typedef ParamsType params_type;
+
                     using runtime_size_commitment_scheme_type =
                         typename ParamsType::runtime_size_commitment_scheme_type;
-                    using witness_commitment_scheme_type =
-                        typename ParamsType::witness_commitment_scheme_type;
+                    using witness_commitment_scheme_type = typename ParamsType::witness_commitment_scheme_type;
                     using public_input_commitment_scheme_type =
                         typename ParamsType::public_input_commitment_scheme_type;
-                    using constant_commitment_scheme_type =
-                        typename ParamsType::constant_commitment_scheme_type;
-                    using selector_commitment_scheme_type =
-                        typename ParamsType::selector_commitment_scheme_type;
-                    using special_commitment_scheme_type =
-                        typename ParamsType::special_commitment_scheme_type;
-                    using permutation_commitment_scheme_type =
-                        typename ParamsType::permutation_commitment_scheme_type;
-                    using quotient_commitment_scheme_type =
-                        typename ParamsType::quotient_commitment_scheme_type;
+                    using constant_commitment_scheme_type = typename ParamsType::constant_commitment_scheme_type;
+                    using selector_commitment_scheme_type = typename ParamsType::selector_commitment_scheme_type;
+                    using special_commitment_scheme_type = typename ParamsType::special_commitment_scheme_type;
+                    using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
+                    using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
+                        typename FieldType::value_type lagrange_0;
                         typename witness_commitment_scheme_type::proof_type witness;
-                        
+
                         typename permutation_commitment_scheme_type::proof_type permutation;
                         typename runtime_size_commitment_scheme_type::proof_type quotient;
                         std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
@@ -77,12 +73,12 @@ namespace nil {
                         typename special_commitment_scheme_type::proof_type special_selectors;
 
                         bool operator==(const evaluation_proof &rhs) const {
-                            return challenge == rhs.challenge && witness == rhs.witness &&
-                                   permutation == rhs.permutation && quotient == rhs.quotient &&
-                                   lookups == rhs.lookups && id_permutation == rhs.id_permutation &&
-                                   sigma_permutation == rhs.sigma_permutation && public_input == rhs.public_input &&
-                                   constant == rhs.constant && selector == rhs.selector &&
-                                   special_selectors == rhs.special_selectors;
+                            return challenge == rhs.challenge && lagrange_0 == rhs.lagrange_0 &&
+                                   witness == rhs.witness && permutation == rhs.permutation &&
+                                   quotient == rhs.quotient && lookups == rhs.lookups &&
+                                   id_permutation == rhs.id_permutation && sigma_permutation == rhs.sigma_permutation &&
+                                   public_input == rhs.public_input && constant == rhs.constant &&
+                                   selector == rhs.selector && special_selectors == rhs.special_selectors;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);

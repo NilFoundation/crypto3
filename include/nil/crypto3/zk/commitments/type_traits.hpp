@@ -26,6 +26,7 @@
 #ifndef CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 #define CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 
+#include <type_traits>
 #include <boost/tti/tti.hpp>
 
 namespace nil {
@@ -46,7 +47,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::commit;
                     };
                 }
@@ -65,7 +66,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::proof_eval;
                     };
                 }
@@ -84,7 +85,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::verify_eval;
                     };
                 }
@@ -107,6 +108,30 @@ namespace nil {
                 typedef T type;
             };
 
+            namespace commitments {
+                namespace detail {
+                    template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
+                             std::size_t M>
+                    struct basic_batched_fri_runtime_size;
+
+                    template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
+                             std::size_t M, std::size_t BatchSize>
+                    struct basic_batched_fri_compile_time_size;
+                }    // namespace detail
+            }        // namespace commitments
+
+            template<typename T>
+            struct is_batched_fri : public std::bool_constant<false> { };
+
+            template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType, std::size_t M>
+            struct is_batched_fri<commitments::detail::basic_batched_fri_runtime_size<FieldType, MerkleTreeHashType,
+                                                                                      TranscriptHashType, M>>
+                : public std::bool_constant<true> { };
+
+            template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType, std::size_t M,
+                     std::size_t BatchSize>
+            struct is_batched_fri<commitments::detail::basic_batched_fri_compile_time_size<
+                FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>> : public std::bool_constant<true> { };
         }    // namespace zk
     }        // namespace crypto3
 }    // namespace nil

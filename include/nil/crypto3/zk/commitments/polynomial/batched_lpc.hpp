@@ -74,6 +74,7 @@ namespace nil {
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
                     constexpr static const std::size_t leaf_size = BatchSize;
+                    constexpr static const bool is_run_time_size = false;
 
                     typedef LPCParams lpc_params;
 
@@ -456,6 +457,8 @@ namespace nil {
                     constexpr static const std::size_t lambda = LPCParams::lambda;
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
+                    constexpr static const std::size_t leaf_size = 0;
+                    constexpr static const bool is_run_time_size = true;
 
                     typedef LPCParams lpc_params;
 
