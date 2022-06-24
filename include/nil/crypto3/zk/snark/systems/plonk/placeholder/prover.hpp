@@ -35,7 +35,6 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
@@ -170,13 +169,13 @@ namespace nil {
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         typename witness_commitment_scheme_type::precommitment_type witness_precommitment =
-                                witness_commitment_scheme_type::precommit(witness_polynomials, fri_params.D[0]);
+                            algorithms::precommit<witness_commitment_scheme_type>(witness_polynomials, fri_params.D[0]);
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
                         std::cout << "witness_precommit_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        proof.witness_commitment = witness_commitment_scheme_type::commit(witness_precommitment);
+                        proof.witness_commitment = algorithms::commit<witness_commitment_scheme_type>(witness_precommitment);
                         transcript(proof.witness_commitment);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
@@ -210,6 +209,7 @@ namespace nil {
                                                           permutation_commitment_scheme_type,
                                                           ParamsType>::prover_lookup_result lookup_argument;
                         if (is_lookup_enabled) {
+
                             lookup_argument =
                                 placeholder_lookup_argument<FieldType,
                                                           permutation_commitment_scheme_type,
@@ -293,14 +293,14 @@ namespace nil {
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         typename runtime_size_commitment_scheme_type::precommitment_type T_precommitment =
-                            runtime_size_commitment_scheme_type::precommit(T_splitted, fri_params.D[0]);
+                            algorithms::precommit<runtime_size_commitment_scheme_type>(T_splitted, fri_params.D[0]);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
                         std::cout << "T_splitted_precommit_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        proof.T_commitment = runtime_size_commitment_scheme_type::commit(T_precommitment);
+                        proof.T_commitment = algorithms::commit<runtime_size_commitment_scheme_type>(T_precommitment);
                         transcript(proof.T_commitment);
 
                         // 8. Run evaluation proofs
@@ -328,7 +328,7 @@ namespace nil {
                         std::cout << "witness_evaluation_points_generated_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        proof.eval_proof.witness = witness_commitment_scheme_type::proof_eval(witness_evaluation_points,
+                        proof.eval_proof.witness = algorithms::proof_eval<witness_commitment_scheme_type>(witness_evaluation_points,
                                                                        witness_precommitment,
                                                                        witness_polynomials,
                                                                        fri_params,
@@ -342,7 +342,7 @@ namespace nil {
                         std::vector<typename FieldType::value_type> evaluation_points_v_p = {challenge,
                                                                                                challenge * omega};
                         proof.eval_proof.permutation =
-                            permutation_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<permutation_commitment_scheme_type>(
                                 evaluation_points_v_p,
                                 permutation_argument.permutation_poly_precommitment,
                                 permutation_argument.permutation_polynomial,
@@ -359,7 +359,7 @@ namespace nil {
                             std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
                                                                                                 challenge * omega};
                             typename permutation_commitment_scheme_type::proof_type v_l_evaluation =
-                                permutation_commitment_scheme_type::proof_eval(
+                                algorithms::proof_eval<permutation_commitment_scheme_type>(
                                     evaluation_points_v_l,
                                     lookup_argument.V_L_precommitment,
                                     lookup_argument.V_L_polynomial,
@@ -375,7 +375,7 @@ namespace nil {
                             std::vector<typename FieldType::value_type> evaluation_points_input = {challenge,
                                                                                                 challenge * omega.inversed()};
                             typename permutation_commitment_scheme_type::proof_type input_evaluation =
-                                permutation_commitment_scheme_type::proof_eval(
+                                algorithms::proof_eval<permutation_commitment_scheme_type>(
                                     evaluation_points_input,
                                     lookup_argument.input_precommitment,
                                     lookup_argument.input_polynomial,
@@ -390,7 +390,7 @@ namespace nil {
 #endif
                             std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
                             typename permutation_commitment_scheme_type::proof_type value_evaluation =
-                                permutation_commitment_scheme_type::proof_eval(
+                                algorithms::proof_eval<permutation_commitment_scheme_type>(
                                     evaluation_points_value,
                                     lookup_argument.value_precommitment,
                                     lookup_argument.value_polynomial,
@@ -408,7 +408,7 @@ namespace nil {
                         // quotient
                         std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
                         proof.eval_proof.quotient =
-                            runtime_size_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<runtime_size_commitment_scheme_type>(
                                 {challenge}, T_precommitment, T_splitted, fri_params, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
@@ -421,7 +421,7 @@ namespace nil {
                             evaluation_points_quotient;
 
                         proof.eval_proof.id_permutation =
-                            runtime_size_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<runtime_size_commitment_scheme_type>(
                                 evaluation_points_public, preprocessed_public_data.precommitments.id_permutation, 
                                     preprocessed_public_data.identity_polynomials, fri_params, transcript);
 
@@ -432,7 +432,7 @@ namespace nil {
 #endif
 
                         proof.eval_proof.sigma_permutation =
-                            runtime_size_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<runtime_size_commitment_scheme_type>(
                                 evaluation_points_public, preprocessed_public_data.precommitments.sigma_permutation, 
                                     preprocessed_public_data.permutation_polynomials, fri_params, transcript);
 
@@ -443,7 +443,7 @@ namespace nil {
 #endif
 
                         proof.eval_proof.public_input =
-                            public_input_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<public_input_commitment_scheme_type>(
                                 evaluation_points_public, preprocessed_public_data.precommitments.public_input, 
                                     preprocessed_public_data.public_polynomial_table.public_inputs(), fri_params, transcript);
 
@@ -454,7 +454,7 @@ namespace nil {
 #endif
 
                         proof.eval_proof.constant =
-                            constant_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<constant_commitment_scheme_type>(
                                 evaluation_points_public, preprocessed_public_data.precommitments.constant, 
                                     preprocessed_public_data.public_polynomial_table.constants(), fri_params, transcript);
 
@@ -465,7 +465,7 @@ namespace nil {
 #endif
 
                         proof.eval_proof.selector =
-                            selector_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<selector_commitment_scheme_type>(
                                 evaluation_points_public, preprocessed_public_data.precommitments.selector, 
                                     preprocessed_public_data.public_polynomial_table.selectors(), fri_params, transcript);
 
@@ -476,7 +476,7 @@ namespace nil {
 #endif
 
                         proof.eval_proof.special_selectors =
-                            special_commitment_scheme_type::proof_eval(
+                            algorithms::proof_eval<special_commitment_scheme_type>(
                                 evaluation_points_public, preprocessed_public_data.precommitments.special_selectors, 
                                 {{preprocessed_public_data.q_last, preprocessed_public_data.q_blind}},
                                 fri_params, transcript);

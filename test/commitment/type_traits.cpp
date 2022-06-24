@@ -37,7 +37,6 @@
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/pedersen.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
