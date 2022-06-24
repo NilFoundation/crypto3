@@ -27,6 +27,7 @@
 #ifndef CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 #define CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 
+#include <type_traits>
 #include <boost/tti/tti.hpp>
 
 namespace nil {
@@ -47,7 +48,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::commit;
                     };
                 }
@@ -66,7 +67,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::proof_eval;
                     };
                 }
@@ -85,7 +86,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::verify_eval;
                     };
                 }

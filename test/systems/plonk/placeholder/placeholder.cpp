@@ -96,7 +96,7 @@ constexpr static const std::size_t m = 2;
 constexpr static const std::size_t table_rows_log = 4;
 constexpr static const std::size_t table_rows = 1 << table_rows_log;
 constexpr static const std::size_t permutation_size = 4;
-constexpr static const std::size_t usable_rows = 1 << table_rows_log;
+constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
 
 struct placeholder_test_params {
     using merkle_hash_type = hashes::keccak_1600<512>;
