@@ -19,6 +19,12 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES})
 
+option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
+
+if(ZK_PLACEHOLDER_PROFILING)
+    add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)
+endif()
+
 macro(define_zk_test test)
     get_filename_component(name ${test} NAME)
     cm_test(NAME zk_${name}_test SOURCES ${test}.cpp)
@@ -49,6 +55,7 @@ endmacro()
 set(TESTS_NAMES
     "commitment/lpc"
     "commitment/fri"
+    "commitment/fold_polynomial"
     "commitment/lpc_performance"
     "commitment/pedersen"
     "commitment/type_traits"
