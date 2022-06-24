@@ -41,6 +41,7 @@
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -49,7 +50,8 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/lookup_argument.hpp>
+// #include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
@@ -73,11 +75,10 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     std::size_t r = degree_log - 1;
 
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-        zk::commitments::detail::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
 
     params.r = r;
     params.D = domain_set;
-    params.q = q;
     params.max_degree = (1 << degree_log) - 1;
 
     return params;
@@ -198,9 +199,9 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
     typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
         preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-                                                                               assignments.private_table(), desc);
+                                                                               assignments.private_table(), desc, fri_params);
 
-    auto polynomial_table = plonk_polynomial_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::shared_ptr<math::evaluation_domain<FieldType>> domain = preprocessed_public_data.common_data.basic_domain;
@@ -276,9 +277,9 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
         preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-                                                                               assignments.private_table(), desc);
+                                                                               assignments.private_table(), desc, fri_params);
 
-    auto polynomial_table = plonk_polynomial_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -346,10 +347,10 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
     typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
         preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_3_params>::process(constraint_system,
-                                                                               assignments.private_table(), desc);
+                                                                               assignments.private_table(), desc, fri_params);
 
     auto polynomial_table =
-        plonk_polynomial_table<FieldType, typename placeholder_test_params_lookups::arithmetization_params>(
+        plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params_lookups::arithmetization_params>(
             preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -454,9 +455,9 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
     typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
         preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-                                                                               assignments.private_table(), desc);
+                                                                               assignments.private_table(), desc, fri_params);
 
-    auto polynomial_table = plonk_polynomial_table<FieldType, typename placeholder_test_params::arithmetization_params>(
+    auto polynomial_table = plonk_polynomial_dfs_table<FieldType, typename placeholder_test_params::arithmetization_params>(
         preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -561,7 +562,7 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
     typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
         preprocessed_private_data =
         placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-                                                                               assignments.private_table(), desc);
+                                                                               assignments.private_table(), desc, fri_params);
 
     auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
