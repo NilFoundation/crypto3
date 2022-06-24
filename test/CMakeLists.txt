@@ -22,9 +22,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
 
 if(ZK_PLACEHOLDER_PROFILING)
-    
     add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)
-    
 endif()
 
 macro(define_zk_test test)

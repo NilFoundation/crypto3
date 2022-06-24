@@ -124,7 +124,7 @@ namespace nil {
                         return gt1 == gt2;
                     }
                 };
-            };    // namespace commitments 
+            };    // namespace commitments
         }         // namespace zk
     }             // namespace crypto3
 }    // namespace nil

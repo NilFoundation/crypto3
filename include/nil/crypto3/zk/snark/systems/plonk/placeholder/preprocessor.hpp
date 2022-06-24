@@ -131,7 +131,7 @@ namespace nil {
                             f[number] = FieldType::value_type::one();
                         }
 
-                        f.resize(commitment_params.D[0]->size());
+                        // f.resize(commitment_params.D[0]->size());
 
                         return f;
                     }
@@ -315,7 +315,7 @@ namespace nil {
                                 S_id[i][j] = delta.pow(i) * omega.pow(j);
                             }
 
-                            S_id[i].resize(commitment_params.D[0]->size());
+                            // S_id[i].resize(commitment_params.D[0]->size());
                         }
 
                         return S_id;
@@ -339,7 +339,6 @@ namespace nil {
                                 S_perm[i][j] = delta.pow(permutation[key].first) * omega.pow(permutation[key].second);
                             }
 
-                            S_perm[i].resize(commitment_params.D[0]->size());
                         }
 
                         return S_perm;
@@ -356,7 +355,6 @@ namespace nil {
                             q_blind[j] = FieldType::value_type::one();
                         }
 
-                        q_blind.resize(commitment_params.D[0]->size());
                         return q_blind;
                     }
 
@@ -433,6 +431,13 @@ namespace nil {
                         const typename ParamsType::commitment_params_type &commitment_params,
                         std::size_t columns_with_copy_constraints) {
 
+#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+                        auto begin = std::chrono::high_resolution_clock::now();
+                        auto last = begin;
+                        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "Placeholder public preprocessor:" << std::endl;
+#endif
+
                         std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = table_description.usable_rows_amount;
 
@@ -467,11 +472,11 @@ namespace nil {
                             public_polynomial_table =
                                 plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.public_inputs(),
-                                                                                commitment_params.D[0]),
+                                                                                basic_domain),
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.constants(),
-                                                                                commitment_params.D[0]),
+                                                                                basic_domain),
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.selectors(),
-                                                                                commitment_params.D[0]));
+                                                                                basic_domain));
 
                         std::vector<typename FieldType::value_type> Z(N_rows + 1,
                             FieldType::value_type::zero());
@@ -493,10 +498,15 @@ namespace nil {
                             basic_domain, nil::crypto3::math::polynomial<typename FieldType::value_type> {Z},
                             lagrange_0, public_commitments, c_rotations, N_rows};
 
-                        return preprocessed_data_type(
+                        preprocessed_data_type preprocessed_data(
                             {public_polynomial_table, sigma_perm_polys, id_perm_polys, q_last_q_blind[0],
                                 q_last_q_blind[1],
                              public_precommitments, common_data});
+#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin);
+                        std::cout << "Placeholder_public_preprocessor_total_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms" << std::endl;
+#endif
+                        return preprocessed_data;
                     }
                 };
 
@@ -531,7 +541,7 @@ namespace nil {
                             private_polynomial_table =
                                 plonk_private_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
                                     detail::column_range_polynomial_dfs<FieldType>(private_assignment.witnesses(),
-                                                                                commitment_params.D[0]));
+                                                                                basic_domain));
                         return preprocessed_data_type({basic_domain, private_polynomial_table});
                     }
                 };

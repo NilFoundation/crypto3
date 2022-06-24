@@ -63,9 +63,8 @@ namespace nil {
                          typename TranscriptHashType,
                          std::size_t M,
                          std::size_t BatchSize>
-                struct batched_fri:
-                    public detail::basic_batched_fri<
-                        FieldType, MerkleTreeHashType, TranscriptHashType, M> {
+                struct batched_fri
+                    : public detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M> {
 
                     using basic_fri = detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M>;
 
@@ -85,12 +84,11 @@ namespace nil {
                     using commitment_type = typename basic_fri::commitment_type;
 
                     template<typename ContainerType>
-                    static typename basic_fri::proof_type
-                        proof_eval(const ContainerType &g,
-                                   precommitment_type &T,
-                                   const typename basic_fri::params_type &fri_params,
-                                   typename basic_fri::transcript_type &transcript =
-                                       typename basic_fri::transcript_type()) {
+                    static typename basic_fri::proof_type proof_eval(
+                        const ContainerType &g,
+                        precommitment_type &T,
+                        const typename basic_fri::params_type &fri_params,
+                        typename basic_fri::transcript_type &transcript = typename basic_fri::transcript_type()) {
 
                         return basic_fri::proof_eval(g, g, T, fri_params, transcript);
                     }
