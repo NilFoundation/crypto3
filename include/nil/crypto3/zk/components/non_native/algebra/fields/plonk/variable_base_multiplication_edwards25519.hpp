@@ -29,6 +29,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/bit_decomposition.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/variable_base_multiplication_per_bit_edwards25519.hpp>
 
 namespace nil {
