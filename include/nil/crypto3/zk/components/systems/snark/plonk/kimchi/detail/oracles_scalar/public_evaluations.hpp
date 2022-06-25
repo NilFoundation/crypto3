@@ -96,7 +96,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
-                    using div_component = zk::components::division<ArithmetizationType, W0, W1, W2>;
+                    using div_component = zk::components::division<ArithmetizationType, W0, W1, W2, W3>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using mul_by_const_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
