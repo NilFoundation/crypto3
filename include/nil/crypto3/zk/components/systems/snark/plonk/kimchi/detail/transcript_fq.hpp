@@ -175,7 +175,6 @@ namespace nil {
 
                         auto n1 = ScalarField::modulus;
                         auto n2 = BaseField::modulus;
-                        std::cout << "scalar larger: " << (n1 > n2) << '\n';
                         return n1 > n2;
                     }
                     
