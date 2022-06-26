@@ -238,7 +238,7 @@ namespace nil {
 
                         var zeta_to_srs_len = oracles_output.powers_of_eval_points_for_chunks[0];
 
-                        assert(row == rows_amount);
+                        assert(row == start_row_index + rows_amount);
 
                         result_type res = {
                             {oracles_output.cip,
@@ -327,7 +327,7 @@ namespace nil {
 
                         var zeta_to_srs_len = oracles_output.powers_of_eval_points_for_chunks[0];
 
-                        assert(row == rows_amount);
+                        assert(row == start_row_index + rows_amount);
 
                         result_type res = {
                             {oracles_output.cip,
