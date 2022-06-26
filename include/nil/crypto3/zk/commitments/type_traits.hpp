@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -26,6 +27,7 @@
 #ifndef CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 #define CRYPTO3_ZK_COMMITMENTS_TYPE_TRAITS_HPP
 
+#include <type_traits>
 #include <boost/tti/tti.hpp>
 
 namespace nil {
@@ -46,7 +48,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::commit;
                     };
                 }
@@ -65,7 +67,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::proof_eval;
                     };
                 }
@@ -84,7 +86,7 @@ namespace nil {
             protected:
                 template<typename C>
                 static void test(std::nullptr_t) {
-                    struct t{
+                    struct t {
                         using C::verify_eval;
                     };
                 }
@@ -105,6 +107,12 @@ namespace nil {
                                           has_available_static_member_function_proof_eval<T>::value &&
                                           has_available_static_member_function_verify_eval<T>::value;
                 typedef T type;
+            };
+
+            template<bool Condition, typename Type, std::size_t Size>
+            struct select_container {
+                using type = typename std::
+                    conditional<Condition, std::array<Type, Size>, std::vector<Type>>::type;
             };
 
         }    // namespace zk

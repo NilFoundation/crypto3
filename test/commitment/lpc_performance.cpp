@@ -41,10 +41,11 @@
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/redshift/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
@@ -119,7 +120,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        zk::commitments::detail::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r);
 
     typename fri_type::params_type fri_params;
 

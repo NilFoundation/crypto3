@@ -48,7 +48,7 @@ namespace nil {
              */
             template<typename VariableType>
             struct non_linear_combination;
-        }        // namespace math
+        }    // namespace math
         namespace zk {
             namespace snark {
 
@@ -67,22 +67,28 @@ namespace nil {
                     /**
                      * Mnemonic typedefs.
                      */
-                    int rotation;
-                    enum column_type { witness, public_input, constant, selector } type;
+                    std::int32_t rotation;
+                    enum column_type : std::uint8_t { witness, public_input, constant, selector } type;
                     std::size_t index;
                     bool relative;
 
-                    constexpr plonk_variable(const std::size_t index, 
-                        int rotation,
-                        bool relative = true,
-                        column_type type = column_type::witness) :
-                        index(index), rotation(rotation), relative(relative), type(type) {};
+                    constexpr plonk_variable() :
+                        index(0),
+                        rotation(0), relative(false), type(column_type::witness) {};
+
+                    constexpr plonk_variable(const std::size_t index,
+                                             std::int32_t rotation,
+                                             bool relative = true,
+                                             column_type type = column_type::witness) :
+                        index(index),
+                        rotation(rotation), relative(relative), type(type) {};
 
                     math::non_linear_term<plonk_variable<FieldType>> pow(const std::size_t power) const {
                         return math::non_linear_term<plonk_variable<FieldType>>(*this).pow(power);
                     }
 
-                    math::non_linear_term<plonk_variable<FieldType>> operator*(const assignment_type &field_coeff) const {
+                    math::non_linear_term<plonk_variable<FieldType>>
+                        operator*(const assignment_type &field_coeff) const {
                         return math::non_linear_term<plonk_variable<FieldType>>(*this) * field_coeff;
                     }
 
@@ -114,7 +120,8 @@ namespace nil {
                     }
 
                     bool operator==(const plonk_variable &other) const {
-                        return ((this->index == other.index) && (this->rotation == other.rotation));
+                        return ((this->index == other.index) && (this->rotation == other.rotation)
+                            && this->type == other.type);
                     }
 
                     bool operator<(const plonk_variable &other) const {
@@ -124,8 +131,8 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                math::non_linear_term<plonk_variable<FieldType>> operator*(const typename FieldType::value_type &field_coeff,
-                                                                     const plonk_variable<FieldType> &var) {
+                math::non_linear_term<plonk_variable<FieldType>>
+                    operator*(const typename FieldType::value_type &field_coeff, const plonk_variable<FieldType> &var) {
                     return var * field_coeff;
                 }
 
@@ -138,7 +145,7 @@ namespace nil {
                 template<typename FieldType>
                 math::non_linear_combination<plonk_variable<FieldType>>
                     operator-(const typename FieldType::value_type &field_val, const plonk_variable<FieldType> &var) {
-                    return - (var - field_val);
+                    return -(var - field_val);
                 }
 
             }    // namespace snark

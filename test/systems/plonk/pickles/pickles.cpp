@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE pickles
+#define BOOST_TEST_MODULE pickles_struct_test
 
 #include <string>
 

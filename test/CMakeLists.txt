@@ -19,29 +19,36 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES})
 
+option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
+
+if(ZK_PLACEHOLDER_PROFILING)
+    add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)
+endif()
+
 macro(define_zk_test test)
     get_filename_component(name ${test} NAME)
-    cm_test(NAME zk_${name}_test SOURCES ${test}.cpp)
+    string(REPLACE "/" "_" full_test_name ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}_${test}_test)
+    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
 
-    target_include_directories(zk_${name}_test PRIVATE
+    target_include_directories(${full_test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(zk_${name}_test PROPERTIES CXX_STANDARD 17)
+    set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(zk_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
+        target_compile_definitions(${full_test_name} PRIVATE BOOST_TEST_DYN_LINK)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(zk_${name}_test PRIVATE "-fconstexpr-steps=2147483647")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647")
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(zk_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
     endif()
 
 endmacro()
@@ -49,8 +56,11 @@ endmacro()
 set(TESTS_NAMES
     "commitment/lpc"
     "commitment/fri"
+    "commitment/fold_polynomial"
     "commitment/lpc_performance"
     "commitment/pedersen"
+    "commitment/type_traits"
+
 
     "routing_algorithms/test_routing_algorithms"
 
@@ -63,7 +73,7 @@ set(TESTS_NAMES
     "systems/plonk/pickles/oracles"
     "systems/plonk/pickles/to_field"
     
-    "systems/plonk/redshift/redshift"
+    "systems/plonk/placeholder/placeholder"
 
     "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
@@ -89,4 +99,4 @@ foreach(TEST_NAME ${TESTS_NAMES})
 endforeach()
 
 string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/systems/plonk/pickles/data/kimchi.json")
-target_compile_definitions(zk_kimchi_test PRIVATE TEST_DATA="${TEST_DATA}")
+target_compile_definitions(crypto3_zk_systems_plonk_pickles_kimchi_test PRIVATE TEST_DATA="${TEST_DATA}")

@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
-#define CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
+#ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP
+#define CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 
@@ -236,9 +236,24 @@ namespace nil {
                     plonk_table<FieldType, ArithmetizationParams,
                         math::polynomial<typename FieldType::value_type>>;
 
+                template<typename FieldType, typename ArithmetizationParams>
+                using plonk_private_polynomial_dfs_table =
+                    plonk_private_table<FieldType, ArithmetizationParams,
+                        math::polynomial_dfs<typename FieldType::value_type>>;
+
+                template<typename FieldType, typename ArithmetizationParams>
+                using plonk_public_polynomial_dfs_table =
+                    plonk_public_table<FieldType, ArithmetizationParams,
+                        math::polynomial_dfs<typename FieldType::value_type>>;
+
+                template<typename FieldType, typename ArithmetizationParams>
+                using plonk_polynomial_dfs_table =
+                    plonk_table<FieldType, ArithmetizationParams,
+                        math::polynomial_dfs<typename FieldType::value_type>>;
+
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_REDSHIFT_TABLE_HPP
+#endif    // CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP
