@@ -100,7 +100,7 @@ namespace nil {
             zk::components::generate_circuit<component_type>(bp, public_assignment, params, start_row);
             typename component_type::result_type component_result =
                 component_type::generate_assignments(assignment_bp, params, start_row);
-            result_check(assignment_bp, component_result);
+            std::bind(result_check, assignment_bp, component_result);
 
             assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
