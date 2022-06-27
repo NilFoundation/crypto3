@@ -88,7 +88,8 @@ namespace nil {
                     struct commitments {
                         std::array<shifted_commitment_type,
                             KimchiParamsType::permut_size> sigma_comm;
-                        std::vector<shifted_commitment_type> coefficient_comm;
+                        std::array<shifted_commitment_type,
+                            KimchiParamsType::witness_columns> coefficient_comm;
                         shifted_commitment_type generic_comm;
                         shifted_commitment_type psm_comm;
                         std::vector<shifted_commitment_type> selectors_comm;

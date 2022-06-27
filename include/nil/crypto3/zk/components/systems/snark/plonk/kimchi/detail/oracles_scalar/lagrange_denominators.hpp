@@ -93,7 +93,7 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
-                    using div_component = zk::components::division<ArithmetizationType, W0, W1, W2>;
+                    using div_component = zk::components::division<ArithmetizationType, W0, W1, W2, W3>;
 
                     constexpr static const std::size_t selector_seed = 0x0f0d;
 

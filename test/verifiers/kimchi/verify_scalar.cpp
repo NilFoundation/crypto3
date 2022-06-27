@@ -91,22 +91,20 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
     }
 
     for (std::size_t i = 0; i < KimchiParamsType::public_input_size; i++) {
-        typename BlueprintFieldType::value_type tmp = algebra::random_element<BlueprintFieldType>();
-        public_input.push_back(tmp);
+        public_input.push_back(original_proof.public_input[i]);
         circuit_proof.public_input[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
     for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; i++) {
         for (std::size_t j = 0; j < EvalRounds; j++) {
-            typename BlueprintFieldType::value_type tmp = algebra::random_element<BlueprintFieldType>();
-            public_input.push_back(tmp);
+            public_input.push_back(original_proof.prev_challenges[i].first[j]);
             circuit_proof.prev_challenges[i][j] =
                 var(0, public_input.size() - 1, false, var::column_type::public_input);
         }
     }
 
     // ft_eval
-    public_input.push_back(algebra::random_element<BlueprintFieldType>());
+    public_input.push_back(original_proof.ft_eval1);
     circuit_proof.ft_eval = var(0, public_input.size() - 1, false, var::column_type::public_input);
 }
 
@@ -200,13 +198,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
         fq_output.challenges = challenges;
 
         // joint_combiner
-        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        public_input.push_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
         fq_output.joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // beta
-        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        public_input.push_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
         fq_output.beta = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // gamma
-        public_input.push_back(algebra::random_element<BlueprintFieldType>());
+        public_input.push_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
         fq_output.gamma = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // alpha
         public_input.push_back(alpha);

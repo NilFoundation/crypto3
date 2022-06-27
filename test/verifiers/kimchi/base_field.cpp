@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 1;
-    constexpr static const std::size_t index_terms = 2;
+    constexpr static const std::size_t index_terms = 0;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
@@ -165,7 +165,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     for (std::size_t i = 0; i < perm_size; i++) {
         witness_comm[i] = {{shifted_var[1]}, {unshifted_var[1]}};
     }
-    std::vector<shifted_commitment_type> coefficient_comm = {{{shifted_var[2]}, {unshifted_var[2]}}};
+    std::array<shifted_commitment_type, kimchi_params::witness_columns> 
+        coefficient_comm;
+    for (std::size_t i = 0; i < coefficient_comm.size(); i++) {
+        coefficient_comm[i] = {{shifted_var[2]}, {unshifted_var[2]}};
+    }
     std::vector<shifted_commitment_type> oracles_poly_comm = {
         {{shifted_var[3]}, {unshifted_var[3]}}};    // to-do: get in the component from oracles
     shifted_commitment_type lookup_runtime_comm = {{shifted_var[4]}, {unshifted_var[4]}};

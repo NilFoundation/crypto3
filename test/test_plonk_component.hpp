@@ -100,7 +100,7 @@ namespace nil {
             zk::components::generate_circuit<component_type>(bp, public_assignment, params, start_row);
             typename component_type::result_type component_result =
                 component_type::generate_assignments(assignment_bp, params, start_row);
-            result_check(assignment_bp, component_result);
+            std::bind(result_check, assignment_bp, component_result);
 
             assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
@@ -115,7 +115,7 @@ namespace nil {
 
             using fri_type =
                 typename zk::commitments::fri<BlueprintFieldType, typename placeholder_params::merkle_hash_type,
-                                              typename placeholder_params::transcript_hash_type, 2>;
+                                              typename placeholder_params::transcript_hash_type, 2, 1>;
 
             std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
 

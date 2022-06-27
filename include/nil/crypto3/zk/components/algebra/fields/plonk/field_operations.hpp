@@ -236,7 +236,7 @@ namespace nil {
                 };
 
                 // Input: x, y \in Fp
-                // Output: z = x / y
+                // Output: z = x / y, y != 0
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class division;
 
@@ -244,8 +244,9 @@ namespace nil {
                          typename ArithmetizationParams,
                          std::size_t W0,
                          std::size_t W1,
-                         std::size_t W2>
-                class division<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2> {
+                         std::size_t W2,
+                         std::size_t W3>
+                class division<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -299,6 +300,7 @@ namespace nil {
                         assignment.witness(W0)[j] = assignment.var_value(params.x);
                         assignment.witness(W1)[j] = assignment.var_value(params.y);
                         assignment.witness(W2)[j] = assignment.var_value(params.x) / assignment.var_value(params.y);
+                        assignment.witness(W3)[j] = assignment.var_value(params.y).inversed();
 
                         return result_type(params, start_row_index);
                     }
@@ -309,8 +311,9 @@ namespace nil {
                                                const std::size_t first_selector_index) {
 
                         auto constraint_1 = bp.add_constraint(var(W1, 0) * var(W2, 0) - var(W0, 0));
+                        auto constraint_2 = bp.add_constraint(var(W1, 0) * var(W3, 0) - 1);
 
-                        bp.add_gate(first_selector_index, {constraint_1});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2});
                     }
 
                     static void
@@ -530,6 +533,107 @@ namespace nil {
                                                   std::size_t component_start_row) {
                             std::size_t row = component_start_row;
                             assignment.constant(0)[row] = params.constant;  
+                    }
+                };
+
+                // Input: x, y \in Fp
+                // Output: z = x / y, if y != 0 else 0
+                template<typename ArithmetizationType, std::size_t... WireIndexes>
+                class division_or_zero;
+
+                template<typename BlueprintFieldType,
+                         typename ArithmetizationParams,
+                         std::size_t W0,
+                         std::size_t W1,
+                         std::size_t W2,
+                         std::size_t W3>
+                class division_or_zero<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
+
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
+
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    constexpr static const std::size_t selector_seed = 0x0fc7;
+
+                    template<typename ComponentType, typename ArithmetizationType>
+                    friend typename std::enable_if<
+                        (!(has_static_member_function_generate_circuit<
+                            ComponentType,
+                            typename ComponentType::result_type,
+                            boost::mpl::vector<blueprint<ArithmetizationType> &,
+                                               blueprint_public_assignment_table<ArithmetizationType> &,
+                                               const typename ComponentType::params_type &,
+                                               const std::size_t>>::value)),
+                        typename ComponentType::result_type>::type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const typename ComponentType::params_type &params,
+                                         const std::size_t start_row_index);
+
+                public:
+                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t gates_amount = 1;
+
+                    struct params_type {
+                        var x = var(0, 0, false);
+                        var y = var(0, 0, false);
+                    };
+
+                    struct result_type {
+                        var output = var(0, 0, false);
+                        result_type(const params_type &params, std::size_t start_row_index) {
+                            output = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type(std::size_t start_row_index) {
+                            output = var(W2, start_row_index, false, var::column_type::witness);
+                        }
+                        result_type() {
+                        }
+                    };
+
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            const std::size_t start_row_index) {
+
+                        const std::size_t j = start_row_index;
+
+                        assignment.witness(W0)[j] = assignment.var_value(params.x);
+                        assignment.witness(W1)[j] = assignment.var_value(params.y);
+                        if (assignment.var_value(params.y) != 0) {
+                            assignment.witness(W2)[j] = assignment.var_value(params.x) / assignment.var_value(params.y);
+                        } else {
+                            assignment.witness(W2)[j] = 0;
+                        }
+                        assignment.witness(3)[j] = assignment.var_value(params.y) == 0 ? 0 : assignment.var_value(params.y).inversed();
+
+                        return result_type(params, start_row_index);
+                    }
+
+                    static void generate_gates(blueprint<ArithmetizationType> &bp,
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
+                                               const std::size_t first_selector_index) {
+
+                        auto constraint_1 = bp.add_constraint(var(W0, 0) * var(W3, 0) - var(W2, 0));
+                        auto constraint_2 = bp.add_constraint(var(W1, 0) * var(W3, 0) * var(W1, 0) - var(W1, 0));
+
+                        bp.add_gate(first_selector_index, {constraint_1});
+                    }
+
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  const std::size_t start_row_index) {
+
+                        std::size_t public_input_column_index = 0;
+
+                        const std::size_t j = start_row_index;
+                        var component_x = var(W0, static_cast<int>(j), false);
+                        var component_y = var(W1, static_cast<int>(j), false);
+                        bp.add_copy_constraint({component_x, params.x});
+                        bp.add_copy_constraint({component_y, params.y});
                     }
                 };
             }    // namespace components

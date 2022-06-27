@@ -51,10 +51,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t WitnessColumns = 3;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t SelectorColumns = 5;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -65,21 +65,19 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
     
     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
     typename BlueprintFieldType::value_type value = nil::crypto3::algebra::random_element<BlueprintFieldType>();
     std::vector<typename BlueprintFieldType::value_type> public_input = {value};
-    typename BlueprintFieldType::value_type result = 1;
+    typename BlueprintFieldType::value_type result = 0;
     if (value < 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255) {
-        result = 0;
+        result = 1;
     }
-    std::cout << "value < pallas_mod: " << (value < 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255) << '\n';
+
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        std::cout << "expected: " << result.data << '\n';
-        std::cout << "real: " << assignment.var_value(real_res.output).data << '\n';
-        // assert(result == assignment.var_value(real_res.output));
+        assert(result == assignment.var_value(real_res.output));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 
@@ -92,10 +90,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
 //     using curve_type = algebra::curves::vesta;
 //     using BlueprintFieldType = typename curve_type::base_field_type;
-//     constexpr std::size_t WitnessColumns = 15;
+//     constexpr std::size_t WitnessColumns = 3;
 //     constexpr std::size_t PublicInputColumns = 1;
 //     constexpr std::size_t ConstantColumns = 1;
-//     constexpr std::size_t SelectorColumns = 1;
+//     constexpr std::size_t SelectorColumns = 5;
 //     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
 //         PublicInputColumns, ConstantColumns, SelectorColumns>;
 //     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -106,11 +104,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
 //     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-//     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+//     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
     
 //     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
 //     std::vector<typename BlueprintFieldType::value_type> public_input = {0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255};
-//     typename BlueprintFieldType::value_type result = 1;
+//     typename BlueprintFieldType::value_type result = 0;
 
 //     auto result_check = [&result](AssignmentType &assignment, 
 //         component_type::result_type &real_res) {
@@ -127,10 +125,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
 //     using curve_type = algebra::curves::vesta;
 //     using BlueprintFieldType = typename curve_type::base_field_type;
-//     constexpr std::size_t WitnessColumns = 15;
+//     constexpr std::size_t WitnessColumns = 3;
 //     constexpr std::size_t PublicInputColumns = 1;
 //     constexpr std::size_t ConstantColumns = 1;
-//     constexpr std::size_t SelectorColumns = 1;
+//     constexpr std::size_t SelectorColumns = 5;
 //     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
 //         PublicInputColumns, ConstantColumns, SelectorColumns>;
 //     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -141,17 +139,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
 
 //     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-//     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+//     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
     
 //     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
-//     std::vector<typename BlueprintFieldType::value_type> public_input = {0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui255};
+//     std::vector<typename BlueprintFieldType::value_type> public_input = {0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000000_cppui255};
 //     typename BlueprintFieldType::value_type result = 1;
-
+    
 //     auto result_check = [&result](AssignmentType &assignment, 
 //         component_type::result_type &real_res) {
-//         std::cout << "expected: " << result.data << '\n';
-//         std::cout << "real: " << assignment.var_value(real_res.output).data << '\n';
-//         // assert(result == assignment.var_value(real_res.output));
+//         assert(result == assignment.var_value(real_res.output));
 //     };
 //     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 

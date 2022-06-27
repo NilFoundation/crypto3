@@ -48,7 +48,7 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-/*BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_double) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_double) {
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -61,6 +61,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
@@ -73,16 +74,24 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
     auto Q(P);
 
     typename component_type::params_type params = {
-        {var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)},
-        {var(0, 3, false, var::column_type::public_input), var(0, 4, false, var::column_type::public_input)}};
+        {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)},
+        {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0, P.X, P.Y, Q.X, Q.Y};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {P.X, P.Y, Q.X, Q.Y};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input);
+    typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type expected_res = P + Q;
+
+    auto result_check = [&expected_res](AssignmentType &assignment, 
+        component_type::result_type &real_res) {
+        assert(expected_res.X == assignment.var_value(real_res.X));
+        assert(expected_res.Y == assignment.var_value(real_res.Y));
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "unified_addition: " << duration.count() << "ms" << std::endl;
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     auto start = std::chrono::high_resolution_clock::now();

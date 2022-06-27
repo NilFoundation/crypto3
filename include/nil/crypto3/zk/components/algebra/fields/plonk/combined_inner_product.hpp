@@ -202,7 +202,7 @@ namespace nil {
                                                 blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                 const params_type &params,
                                                 std::size_t component_start_row) {
-                        std::size_t row = component_start_row + add_component::rows_amount;
+                        std::size_t row = component_start_row;
 
                         assignment.constant(0)[row] = 0;
                         assignment.constant(0)[row + 1] = 1;

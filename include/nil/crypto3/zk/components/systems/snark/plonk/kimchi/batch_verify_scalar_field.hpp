@@ -434,7 +434,7 @@ namespace nil {
                             {scalars}, row).output;
                         row += prepare_scalars_component::rows_amount;
 
-                        assert(row == rows_amount);
+                        assert(row == start_row_index + rows_amount);
                         std::size_t msm_size = KimchiParamsType::final_msm_size(BatchSize);
                         assert(scalar_idx == KimchiParamsType::final_msm_size(BatchSize) - 1);
 
@@ -635,7 +635,7 @@ namespace nil {
                             {scalars}, row).output;
                         row += prepare_scalars_component::rows_amount;
 
-                        assert(row == rows_amount);
+                        assert(row == start_row_index + rows_amount);
                         assert(scalar_idx == KimchiParamsType::final_msm_size(BatchSize) - 1);
 
                         result_type res(start_row_index);
