@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_var_base_mul_per_bit) {
 
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<ed25519_type::template g1_type<algebra::curves::coordinates::affine>>();
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type R = 2 * T;
-    ed25519_type::scalar_field_type::value_type b_val = 0;
+    ed25519_type::scalar_field_type::value_type b_val = 1;
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type P = 2*R + b_val*T;
 
     ed25519_type::base_field_type::integral_type Tx = ed25519_type::base_field_type::integral_type(T.X.data);

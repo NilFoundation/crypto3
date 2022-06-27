@@ -169,7 +169,7 @@ namespace nil {
                         const params_type &params,
                         const std::size_t first_selector_index) {
                         auto constraint_1 = bp.add_constraint(
-                            var(W5, 0) - var(W0, 0) * var(W4, 0) + (1 - var(W4, 0)));
+                            var(W5, 0) - (var(W0, 0) * var(W4, 0) + (1 - var(W4, 0))));
                         auto constraint_2 = bp.add_constraint(
                             var(W6, 0) - var(W1, 0) * var(W4, 0));
                         auto constraint_3 = bp.add_constraint(
