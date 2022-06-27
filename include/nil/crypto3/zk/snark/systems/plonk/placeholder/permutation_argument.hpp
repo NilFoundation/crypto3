@@ -116,9 +116,9 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type>(V_P.coefficients());
                         // 4. Compute and add commitment to $V_P$ to $\text{transcript}$.
                         typename permutation_commitment_scheme_type::precommitment_type V_P_tree =
-                            permutation_commitment_scheme_type::precommit(V_P, fri_params.D[0]);
+                            algorithms::precommit<permutation_commitment_scheme_type>(V_P, fri_params.D[0]);
                         typename permutation_commitment_scheme_type::commitment_type V_P_commitment =
-                            permutation_commitment_scheme_type::commit(V_P_tree);
+                            algorithms::commit<permutation_commitment_scheme_type>(V_P_tree);
                         transcript(V_P_commitment);
                         // 5. Calculate g_perm, h_perm
                         math::polynomial_dfs<typename FieldType::value_type> g;

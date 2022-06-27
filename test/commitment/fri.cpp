@@ -47,7 +47,6 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_fri.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 using namespace nil::crypto3;
@@ -70,7 +69,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 1> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -95,18 +94,18 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     // commit
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
 
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle = zk::algorithms::precommit<fri_type>(f, D[0]);
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
+    BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
@@ -129,7 +128,7 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 1> fri_type;
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
@@ -146,15 +145,15 @@ BOOST_AUTO_TEST_CASE(fri_steps_count_test) {
     params.max_degree = d - 1;
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle =zk::algorithms::precommit<fri_type>(f, D[0]);
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
-    math::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomial;
-    BOOST_CHECK_EQUAL(proof.final_polynomial.degree(), 1);
+    math::polynomial<typename FieldType::value_type> final_polynomial = proof.final_polynomials[0];
+    BOOST_CHECK_EQUAL(proof.final_polynomials[0].degree(), 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -178,7 +177,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_compile_time_size_test) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t leaf_size = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -205,18 +204,18 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_compile_time_size_test) {
         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1},
         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}}};
 
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle = zk::algorithms::precommit<fri_type>(f, D[0]);
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
+    BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
@@ -239,7 +238,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_runtime_size_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -266,18 +265,18 @@ BOOST_AUTO_TEST_CASE(batched_fri_basic_runtime_size_test) {
         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1},
         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 6, 1, 2, 1, 1}};
 
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle = zk::algorithms::precommit<fri_type>(f, D[0]);
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
+    BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
@@ -304,7 +303,7 @@ BOOST_AUTO_TEST_CASE(fri_dfs_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 1> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -331,18 +330,18 @@ BOOST_AUTO_TEST_CASE(fri_dfs_basic_test) {
     math::polynomial_dfs<typename FieldType::value_type> f;
     f.from_coefficients(f_data);
 
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle = zk::algorithms::precommit<fri_type>(f, D[0]);
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
+    BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
@@ -365,7 +364,7 @@ BOOST_AUTO_TEST_CASE(fri_dfs_test_2) {
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 1> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -392,18 +391,18 @@ BOOST_AUTO_TEST_CASE(fri_dfs_test_2) {
     math::polynomial_dfs<typename FieldType::value_type> f;
     f.from_coefficients(f_data);
 
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle = zk::algorithms::precommit<fri_type>(f, D[0]);
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
+    BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
@@ -431,7 +430,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t leaf_size = 2;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -463,7 +462,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
         f[polynom_index].from_coefficients(f_data[polynom_index]);
     }
 
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle = zk::algorithms::precommit<fri_type>(f, D[0]);
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -474,12 +473,12 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_basic_test) {
                                           math::polynomial<typename FieldType::value_type>>::value);
     static_assert(std::is_same<typename ContainerType::value_type,
                                           math::polynomial_dfs<typename FieldType::value_type>>::value);
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
+    BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
@@ -503,7 +502,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_test_2) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t leaf_size = 7;
 
-    typedef zk::commitments::batched_fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -540,7 +539,7 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_test_2) {
         f[polynom_index].from_coefficients(f_data[polynom_index]);
     }
 
-    merkle_tree_type commit_merkle = fri_type::precommit(f, D[0]);
+    merkle_tree_type commit_merkle = zk::algorithms::precommit<fri_type>(f, D[0]);
 
     // eval
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -551,12 +550,12 @@ BOOST_AUTO_TEST_CASE(batched_fri_dfs_test_2) {
                                           math::polynomial<typename FieldType::value_type>>::value);
     static_assert(std::is_same<typename ContainerType::value_type,
                                           math::polynomial_dfs<typename FieldType::value_type>>::value);
-    proof_type proof = fri_type::proof_eval(f, commit_merkle, params, transcript);
+    proof_type proof = zk::algorithms::proof_eval<fri_type>(f, commit_merkle, params, transcript);
 
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
-    BOOST_CHECK(fri_type::verify_eval(proof, params, transcript_verifier));
+    BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, params, transcript_verifier));
 
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();

@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -108,30 +109,12 @@ namespace nil {
                 typedef T type;
             };
 
-            namespace commitments {
-                namespace detail {
-                    template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                             std::size_t M>
-                    struct basic_batched_fri_runtime_size;
+            template<bool Condition, typename Type, std::size_t Size>
+            struct select_container {
+                using type = typename std::
+                    conditional<Condition, std::array<Type, Size>, std::vector<Type>>::type;
+            };
 
-                    template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                             std::size_t M, std::size_t BatchSize>
-                    struct basic_batched_fri_compile_time_size;
-                }    // namespace detail
-            }        // namespace commitments
-
-            template<typename T>
-            struct is_batched_fri : public std::bool_constant<false> { };
-
-            template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType, std::size_t M>
-            struct is_batched_fri<commitments::detail::basic_batched_fri_runtime_size<FieldType, MerkleTreeHashType,
-                                                                                      TranscriptHashType, M>>
-                : public std::bool_constant<true> { };
-
-            template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType, std::size_t M,
-                     std::size_t BatchSize>
-            struct is_batched_fri<commitments::detail::basic_batched_fri_compile_time_size<
-                FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchSize>> : public std::bool_constant<true> { };
         }    // namespace zk
     }        // namespace crypto3
 }    // namespace nil

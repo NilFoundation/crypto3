@@ -63,8 +63,8 @@ namespace nil {
 
                 return ProofSystemType::prove(pk, pubkey, primary_input, auxiliary_input, r);
             }
-        }    // namespace snark
-    }        // namespace zk
-}    // namespace crypto3
+        }    // namespace zk
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_ZK_SNARK_ALGORITHMS_PROVE_HPP
