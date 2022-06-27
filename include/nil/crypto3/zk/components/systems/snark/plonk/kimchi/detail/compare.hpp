@@ -3,6 +3,7 @@
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 // Copyright (c) 2022 Polina Chernyshova <pockvokhbtra@nil.foundation>
+// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
 //
@@ -81,19 +82,19 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0ff8;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 10 + 5 * 87 + 1; //(+ 5 * 87) if you want to use c_var
-                    constexpr static const std::size_t gates_amount = 1;
+                    constexpr static const std::size_t rows_amount = 15 + 8 * 87;
+                    constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        var value = var(0, 0, false);
+                        var value;
                         params_type(var val) : value(val) {}
                     };
 
                     struct result_type {
-                        var output = var(0, 0);
+                        var output;
 
-                        result_type(std::size_t component_start_row) {
-                            output = var(W0, static_cast<int>(component_start_row), false, var::column_type::witness);
+                        result_type(std::size_t row) {
+                            output = var(W2, static_cast<int>(row), false, var::column_type::witness);
                         }
                     };
 
@@ -110,7 +111,6 @@ namespace nil {
                         var power87 = var(0, component_start_row + 1, false, var::column_type::constant);
                         var zero = var(0, component_start_row + 2, false, var::column_type::constant);
                         var one = var(0, component_start_row + 3, false, var::column_type::constant);
-                        var two = var(0, component_start_row + 4, false, var::column_type::constant);
 
                         var c_var = zk::components::generate_circuit<sub_component>(bp, assignment, {zero, params.value}, row).output;
                         row++;
@@ -121,26 +121,22 @@ namespace nil {
                         row++;
                         b_var = zk::components::generate_circuit<add_component>(bp, assignment, {b_var, c_var}, row).output;
                         row++;
-
-                        typename BlueprintFieldType::value_type times = 1;
-                        // var c1_var = zero;
+                        var c1_var = zero;
                         var b1_var = zero;
                         var bit_var;
+                        typename BlueprintFieldType::value_type times = 1;
 
                         for (int i = 0; i < 87; ++i) {
-                            // bit_var = var(W0, row, false);
-                            // row++;
-                            // var bit_check_c = zk::components::generate_circuit<sub_component>(bp, assignment, {one, bit_var}, row).output;
-                            // row++;
-                            // bit_check_c = zk::components::generate_circuit<mul_component>(bp, assignment, {bit_var, bit_check_c}, row).output;
-                            // row++;
-                            // bit_var = zk::components::generate_circuit<mul_by_const_component>(bp, assignment, {bit_var, times}, row).output;
-                            // row++;
-                            // c1_var = zk::components::generate_circuit<add_component>(bp, assignment, {bit_var, c1_var}, row).output;
-                            // row++;
-
-                            bit_var = var(W0, row, false);
+                            bit_var = var(W1, row, false);
+                            var bit_check_c = zk::components::generate_circuit<sub_component>(bp, assignment, {one, bit_var}, row).output;
                             row++;
+                            bit_check_c = zk::components::generate_circuit<mul_component>(bp, assignment, {bit_var, bit_check_c}, row).output;
+                            row++;
+                            bit_var = zk::components::generate_circuit<mul_by_const_component>(bp, assignment, {bit_var, times}, row).output;
+                            row++;
+                            c1_var = zk::components::generate_circuit<add_component>(bp, assignment, {bit_var, c1_var}, row).output;
+                            row++;
+                            bit_var = var(W1, row, false);
                             var bit_check_b = zk::components::generate_circuit<sub_component>(bp, assignment, {one, bit_var}, row).output;
                             row++;
                             bit_check_b = zk::components::generate_circuit<mul_component>(bp, assignment, {bit_var, bit_check_b}, row).output;
@@ -149,31 +145,36 @@ namespace nil {
                             row++;
                             b1_var = zk::components::generate_circuit<add_component>(bp, assignment, {bit_var, b1_var}, row).output;
                             row++;
-
                             times *= 2;
                         }
 
-                        var res_var(W0, row, false);
-                        auto result_row = row;
+                        var delta_b_var = zk::components::generate_circuit<sub_component>(bp, assignment, {b_var, b1_var}, row).output;
+                        row++;
+                        var b1_inv_var = var(W1, row, false);
+                        var inv_check_b1 = zk::components::generate_circuit<mul_component>(bp, assignment, {delta_b_var, b1_inv_var}, row).output;
+                        row++;
+                        var inv_check_one = zk::components::generate_circuit<sub_component>(bp, assignment, {one, inv_check_b1}, row).output;
+                        row++;
+                        var inv_check = zk::components::generate_circuit<mul_component>(bp, assignment, {inv_check_one, delta_b_var}, row).output;
                         row++;
 
-                        // var delta_c = zk::components::generate_circuit<sub_component>(bp, assignment, {c_var, c1_var}, row).output;
-                        // row++;
-                        // delta_c = zk::components::generate_circuit<div_component>(bp, assignment, {delta_c, delta_c}, row).output;
-                        // row++;
-                        // var result_c = zk::components::generate_circuit<sub_component>(bp, assignment, {delta_c, res_var}, row).output;
-                        // row++;
-
-                        var delta_b = zk::components::generate_circuit<sub_component>(bp, assignment, {b_var, b1_var}, row).output;
+                        
+                        var delta_c_var = zk::components::generate_circuit<sub_component>(bp, assignment, {c_var, c1_var}, row).output;
                         row++;
-                        delta_b = zk::components::generate_circuit<div_component>(bp, assignment, {delta_b, delta_b}, row).output;
+                        var c1_inv_var = var(W1, row, false);
+                        var inv_check_c1 = zk::components::generate_circuit<mul_component>(bp, assignment, {delta_c_var, c1_inv_var}, row).output;
                         row++;
-                        var result_b = zk::components::generate_circuit<sub_component>(bp, assignment, {delta_b, res_var}, row).output;
+                        inv_check_one = zk::components::generate_circuit<sub_component>(bp, assignment, {one, inv_check_c1}, row).output;
+                        row++;
+                        inv_check = zk::components::generate_circuit<mul_component>(bp, assignment, {inv_check_one, delta_c_var}, row).output;
                         row++;
 
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
-
-                        return result_type(result_row);
+                        var result_check_mul = zk::components::generate_circuit<mul_component>(bp, assignment, {inv_check_c1, inv_check_b1}, row).output;
+                        row++;
+                        var result_check_sum = zk::components::generate_circuit<add_component>(bp, assignment, {inv_check_c1, inv_check_b1}, row).output;
+                        row++;
+                        var result_check = zk::components::generate_circuit<add_component>(bp, assignment, {result_check_sum, result_check_mul}, row).output;
+                        return result_type(row);
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -182,53 +183,46 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         var k = var(0, component_start_row, false, var::column_type::constant);
-                        std::cout << "k: " << assignment.var_value(k).data << '\n';
                         var power87 = var(0, component_start_row + 1, false, var::column_type::constant);
                         var zero = var(0, component_start_row + 2, false, var::column_type::constant);
                         var one = var(0, component_start_row + 3, false, var::column_type::constant);
-                        var two = var(0, component_start_row + 4, false, var::column_type::constant);
 
                         var c_var = sub_component::generate_assignments(assignment, {zero, params.value}, row).output;
                         row++;
 
                         var b_var = sub_component::generate_assignments(assignment, {power87, k}, row).output;
-                        std::cout << "b: " << assignment.var_value(b_var).data << '\n';
                         row++;
                         b_var = sub_component::generate_assignments(assignment, {b_var, one}, row).output;
-                        std::cout << "b: " << assignment.var_value(b_var).data << '\n';
                         row++;
                         b_var = add_component::generate_assignments(assignment, {b_var, c_var}, row).output;
                         row++;
-                        std::cout << "b: " << assignment.var_value(b_var).data << '\n';
 
                         auto b_for_bits = assignment.var_value(b_var).data;
-                        // auto c_for_bits = assignment.var_value(c_var).data;
+                        auto c_for_bits = assignment.var_value(c_var).data;
                         typename BlueprintFieldType::value_type bit;
 
                         typename BlueprintFieldType::value_type times = 1;
-                        // var c1_var = zero;
+                        var c1_var = zero;
                         var b1_var = zero;
                         var bit_var;
 
-                        for (int i = 0; i < 87; ++i) {
-                            // bit.data = c_for_bits - (c_for_bits >> 1 << 1);
-                            // assignment.witness(W0)[row] = bit;
-                            // bit_var = var(W0, row, false);
-                            // row++;
-                            // var bit_check_c = sub_component::generate_assignments(assignment, {one, bit_var}, row).output;
-                            // row++;
-                            // bit_check_c = mul_component::generate_assignments(assignment, {bit_var, bit_check_c}, row).output;
-                            // row++;
-                            // c_for_bits = c_for_bits >> 1;
-                            // bit_var = mul_by_const_component::generate_assignments(assignment, {bit_var, times}, row).output;
-                            // row++;
-                            // c1_var = add_component::generate_assignments(assignment, {bit_var, c1_var}, row).output;
-                            // row++;
+                       for (int i = 0; i < 87; ++i) {
+                            bit.data = c_for_bits - (c_for_bits >> 1 << 1);
+                            assignment.witness(W1)[row] = bit;
+                            bit_var = var(W1, row, false);
+                            var bit_check_c = sub_component::generate_assignments(assignment, {one, bit_var}, row).output;
+                            row++;
+                            bit_check_c = mul_component::generate_assignments(assignment, {bit_var, bit_check_c}, row).output;
+                            row++;
+                            c_for_bits = c_for_bits >> 1;
+                            bit_var = mul_by_const_component::generate_assignments(assignment, {bit_var, times}, row).output;
+                            row++;
+                            c1_var = add_component::generate_assignments(assignment, {bit_var, c1_var}, row).output;
+                            row++;
 
                             bit.data = b_for_bits - (b_for_bits >> 1 << 1);
-                            assignment.witness(W0)[row] = bit;
-                            bit_var = var(W0, row, false);
-                            row++;
+                            assignment.witness(W1)[row] = bit;
+                            bit_var = var(W1, row, false);
                             var bit_check_b = sub_component::generate_assignments(assignment, {one, bit_var}, row).output;
                             row++;
                             bit_check_b = mul_component::generate_assignments(assignment, {bit_var, bit_check_b}, row).output;
@@ -238,38 +232,40 @@ namespace nil {
                             row++;
                             b1_var = add_component::generate_assignments(assignment, {bit_var, b1_var}, row).output;
                             row++;
-
                             times *= 2;
                         }
 
-                        typename BlueprintFieldType::value_type res = 0;
-                        std::cout << "b1: " << assignment.var_value(b1_var).data << '\n';
-                        std::cout << "b: " << assignment.var_value(b_var).data << '\n';
-                        // std::cout << "c1: " << assignment.var_value(c1_var).data << '\n';
-                        // std::cout << "c: " << assignment.var_value(c_var).data << '\n';
-                        if (assignment.var_value(b1_var) != assignment.var_value(b_var)) {
-                            res = 1;
-                        }
-                        assignment.witness(W0)[row] = res;
-                        var res_var(W0, row, false);
-                        auto result_row = row;
+                        var delta_b_var = sub_component::generate_assignments(assignment, {b_var, b1_var}, row).output;
+                        row++;
+                        typename BlueprintFieldType::value_type b1_inv = assignment.var_value(delta_b_var).inversed();
+                        assignment.witness(W1)[row] = b1_inv;
+                        var b1_inv_var = var(W1, row, false);
+                        var inv_check_b1 = mul_component::generate_assignments(assignment, {delta_b_var, b1_inv_var}, row).output;
+                        row++;
+                        var inv_check_one = sub_component::generate_assignments(assignment, {one, inv_check_b1}, row).output;
+                        row++;
+                        var inv_check = mul_component::generate_assignments(assignment, {inv_check_one, delta_b_var}, row).output;
                         row++;
 
-                        // var delta_c = sub_component::generate_assignments(assignment, {c_var, c1_var}, row).output;
-                        // row++;
-                        // delta_c = div_component::generate_assignments(assignment, {delta_c, delta_c}, row).output;
-                        // row++;
-                        // var result_c = sub_component::generate_assignments(assignment, {delta_c, res_var}, row).output;
-                        // row++;
+                        
+                        var delta_c_var = sub_component::generate_assignments(assignment, {c_var, c1_var}, row).output;
+                        row++;
+                        typename BlueprintFieldType::value_type c1_inv = assignment.var_value(delta_c_var).inversed();
+                        assignment.witness(W1)[row] = c1_inv;
+                        var c1_inv_var = var(W1, row, false);
+                        var inv_check_c1 = mul_component::generate_assignments(assignment, {delta_c_var, c1_inv_var}, row).output;
+                        row++;
+                        inv_check_one = sub_component::generate_assignments(assignment, {one, inv_check_c1}, row).output;
+                        row++;
+                        inv_check = mul_component::generate_assignments(assignment, {inv_check_one, delta_c_var}, row).output;
+                        row++;
 
-                        var delta_b = sub_component::generate_assignments(assignment, {b_var, b1_var}, row).output;
+                        var result_check_mul = mul_component::generate_assignments(assignment, {inv_check_c1, inv_check_b1}, row).output;
                         row++;
-                        delta_b = div_component::generate_assignments(assignment, {delta_b, delta_b}, row).output;
+                        var result_check_sum = add_component::generate_assignments(assignment, {inv_check_c1, inv_check_b1}, row).output;
                         row++;
-                        var result_b = sub_component::generate_assignments(assignment, {delta_b, res_var}, row).output;
-                        row++;
-
-                        return result_type(result_row);
+                        var result_check = add_component::generate_assignments(assignment, {result_check_sum, result_check_mul}, row).output;
+                        return result_type(row); 
                     }
 
                 private:
@@ -287,22 +283,22 @@ namespace nil {
 
                         var zero = var(0, component_start_row + 2, false, var::column_type::constant);
 
-                        std::size_t row = component_start_row + 6;
+                        std::size_t row = component_start_row + 5;
                         var bit_check;
                         for (int i = 0; i < 87; ++i) {
-                            // bit_check = typename mul_component::result_type(row).output;
-                            // row += 5;
-                            // bp.add_copy_constraint({bit_check, zero});
                             bit_check = typename mul_component::result_type(row).output;
-                            row += 5;
                             bp.add_copy_constraint({bit_check, zero});
+                            row += 4;
+                            bit_check = typename mul_component::result_type(row).output;
+                            bp.add_copy_constraint({bit_check, zero});
+                            row += 4;
                         }
-                        row++;
-                        // var result_c = typename sub_component::result_type(row).output;
-                        // row += 3;
-                        var result_b = typename sub_component::result_type(row).output;
-                        // bp.add_copy_constraint({result_c, zero});
-                        bp.add_copy_constraint({result_b, zero});
+                        row+=2;
+                        var inv_check = typename mul_component::result_type(row).output;
+                        bp.add_copy_constraint({inv_check, zero});
+                        row += 4;
+                        inv_check = typename mul_component::result_type(row).output;
+                        bp.add_copy_constraint({inv_check, zero});
                     }
 
                     static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
@@ -318,8 +314,6 @@ namespace nil {
                         assignment.constant(0)[row] = 0;
                         row++;
                         assignment.constant(0)[row] = 1;
-                        row++;
-                        assignment.constant(0)[row] = 2;
                     }
 
                 };
