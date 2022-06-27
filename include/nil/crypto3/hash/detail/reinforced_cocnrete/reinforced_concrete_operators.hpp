@@ -83,8 +83,9 @@ namespace nil {
                         element_type product = element_type(integral_type(1));
                         element_type sum = element_type(integral_type(0));
 
-                        for(int i = bucket_size - 1; i >= 0; ++i){
-                            x_bucket[i] = (element - sum) * product.inversed(); // TODO % bucket[i];
+                        for(int i = bucket_size - 1; i >= 0; --i){
+
+                            x_bucket[i] = (element - sum) * (product.inversed()); // TODO % bucket[i];
                             sum += x_bucket[i] * product;
                             product *= bucket[i];
                         }
@@ -95,7 +96,7 @@ namespace nil {
                         element_type comp(integral_type(0));
                         element_type product(integral_type(1));
 
-                        for(int i = bucket_size - 1; i >= 0; ++i){
+                        for(int i = bucket_size - 1; i >= 0; --i){
                             comp += y_bucket[i] * product;
                             product *= bucket[i];
                         }
@@ -120,6 +121,7 @@ namespace nil {
 
                     static inline void Bars(state_vector_type& A){
                         for(int i = 0; i < state_words; ++i){
+
                             bucket_type temp_bucket = decompose(A[i]);
                             for(auto &a : temp_bucket){
                                 a = S(a);

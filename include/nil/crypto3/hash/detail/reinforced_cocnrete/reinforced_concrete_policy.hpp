@@ -38,7 +38,7 @@ namespace nil {
                 };
 
                 template <typename FieldType>
-                struct reinforced_concrete_policy : base_reinforced_concrete_policy<FieldType> { };
+                struct reinforced_concrete_policy;
 
                 template <>
                 struct reinforced_concrete_policy<nil::crypto3::algebra::fields::bls12_fr<381> > : 
