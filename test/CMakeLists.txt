@@ -77,6 +77,7 @@ set(PLONK_TESTS_FILES
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
     "hashes/plonk/sha256_process"
+    "hashes/plonk/sha512_process"
     "hashes/plonk/decomposition"
     "merkle_tree/plonk/merkle_tree"
     "verifiers/kimchi/base_field"

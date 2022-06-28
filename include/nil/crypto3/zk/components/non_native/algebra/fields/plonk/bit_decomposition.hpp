@@ -178,103 +178,103 @@ namespace nil {
                         for (std::size_t i = 0; i < 11; i++) {
                             assignment.witness(W0)[row] = b[25*i];
                             if (i != 0) {
-                                t = t*2 + b[25*i - 22];
+                                t = t*2 + b[25*i];
                             }
                             assignment.witness(W1)[row] = b[25*i + 1];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 1 - 22];
+                                t = t*2 + b[25*i + 1];
                             }
                             assignment.witness(W2)[row] = b[25*i + 2];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 2 - 22];
+                                t = t*2 + b[25*i + 2];
                             }
                             assignment.witness(W3)[row] = b[25*i + 3];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 3 - 22];
+                                t = t*2 + b[25*i + 3];
                             }
                             assignment.witness(W4)[row] = b[25*i + 4];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 4 - 22];
+                                t = t*2 + b[25*i + 4];
                             }
                             assignment.witness(W5)[row] = b[25*i + 5];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 5 - 22];
+                                t = t*2 + b[25*i + 5];
                             }
                             assignment.witness(W6)[row] = b[25*i + 6];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 6 - 22];
+                                t = t*2 + b[25*i + 6];
                             }
                             assignment.witness(W7)[row] = b[25*i + 7];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 7 - 22];
+                                t = t*2 + b[25*i + 7];
                             }
                             assignment.witness(W8)[row] = n;
                             row++;
 
                             assignment.witness(W0)[row] = b[25*i + 8];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 8 - 22];
+                                t = t*2 + b[25*i + 8];
                             }
                             assignment.witness(W1)[row] = b[25*i + 9];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 9 - 22];
+                                t = t*2 + b[25*i + 9];
                             }
                             assignment.witness(W2)[row] = b[25*i + 10];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 10 - 22];
+                                t = t*2 + b[25*i + 10];
                             }
                             assignment.witness(W3)[row] = b[25*i + 11];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 11 - 22];
+                                t = t*2 + b[25*i + 11];
                             }
                             assignment.witness(W4)[row] = b[25*i + 12];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 12 - 22];
+                                t = t*2 + b[25*i + 12];
                             }
                             assignment.witness(W5)[row] = b[25*i + 13];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 13 - 22];
+                                t = t*2 + b[25*i + 13];
                             }
                             assignment.witness(W6)[row] = b[25*i + 14];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 14 - 22];
+                                t = t*2 + b[25*i + 14];
                             }
                             assignment.witness(W7)[row] = b[25*i + 15];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 15 - 22];
+                                t = t*2 + b[25*i + 15];
                             }
                             row++;
 
                             assignment.witness(W0)[row] = b[25*i + 16];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 16 - 22];
+                                t = t*2 + b[25*i + 16];
                             }
                             assignment.witness(W1)[row] = b[25*i + 17];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 17 - 22];
+                                t = t*2 + b[25*i + 17];
                             }
                             assignment.witness(W2)[row] = b[25*i + 18];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 18 - 22];
+                                t = t*2 + b[25*i + 18];
                             }
                             assignment.witness(W3)[row] = b[25*i + 19];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 19 - 22];
+                                t = t*2 + b[25*i + 19];
                             }
                             assignment.witness(W4)[row] = b[25*i + 20];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 20 - 22];
+                                t = t*2 + b[25*i + 20];
                             }
                             assignment.witness(W5)[row] = b[25*i + 21];
                             if (i != 0) {
-                                t = t*2 + b[25*i + 21 - 22];
+                                t = t*2 + b[25*i + 21];
                             }
                             assignment.witness(W6)[row] = b[25*i + 22];
-                            t = t*2 + b[25*i];
+                            t = t*2 + b[25*i + 22];
                             assignment.witness(W7)[row] = b[25*i + 23];
-                            t = t*2 + b[25*i + 1];
+                            t = t*2 + b[25*i + 23];
                             assignment.witness(W8)[row] = b[25*i + 24];
-                            t = t*2 + b[25*i + 2];
+                            t = t*2 + b[25*i + 24];
                             n = t;
                             assignment.witness(W8)[row - 1] = n;
                             row++;
@@ -374,7 +374,7 @@ namespace nil {
                         bp.add_copy_constraint({{3, (std::int32_t)(row + 2), false}, {0, (std::int32_t)(row), false, var::column_type::constant}});
                         bp.add_copy_constraint({{4, (std::int32_t)(row + 2), false}, {0, (std::int32_t)(row), false, var::column_type::constant}});
                         bp.add_copy_constraint({{5, (std::int32_t)(row + 2), false}, {0, (std::int32_t)(row), false, var::column_type::constant}});
-                        
+                        bp.add_copy_constraint({{8, (std::int32_t)(row + rows_amount - 2), false}, params.k});
                     }
                 };
 

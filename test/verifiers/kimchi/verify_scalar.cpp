@@ -198,13 +198,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
         fq_output.challenges = challenges;
 
         // joint_combiner
-        public_input.push_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
+        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
         fq_output.joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // beta
-        public_input.push_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
+        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
         fq_output.beta = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // gamma
-        public_input.push_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
+        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
         fq_output.gamma = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // alpha
         public_input.push_back(alpha);

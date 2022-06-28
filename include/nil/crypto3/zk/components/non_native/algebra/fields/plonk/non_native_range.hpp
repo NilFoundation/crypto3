@@ -148,7 +148,11 @@ namespace nil {
                                 }
                             }
                         }
-                        xi = xi.inversed();
+                        if (xi != 0) {
+                            xi = xi.inversed(); }
+                        else {
+                            xi = 0;
+                        }
                         assignment.witness(W4)[row] = range_chunks[0];
                         assignment.witness(W5)[row] = range_chunks[1];
                         assignment.witness(W6)[row] = range_chunks[2];
@@ -163,9 +167,9 @@ namespace nil {
                         assignment.witness(W5)[row] = range_chunks[9];
                         assignment.witness(W6)[row] = range_chunks[10];
                         assignment.witness(W7)[row] = range_chunks[11];
-                        bool c = 0;
-                        if (range_chunks[11] < (base << 15) - 20) {
-                            c = 1;
+                        bool c = 1;
+                        if (range_chunks[0] > (base << 22) - 20) {
+                            c = 0;
                         }
                         assignment.witness(W8)[row] = c;
                         return result_type(component_start_row);
