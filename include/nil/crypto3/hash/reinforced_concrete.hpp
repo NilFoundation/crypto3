@@ -1,8 +1,8 @@
 #ifndef CRYPTO3_HASH_REINFORCED_COCNRETE_HPP
 #define CRYPTO3_HASH_REINFORCED_COCNRETE_HPP
 
-#include "detail/reinforced_cocnrete/reinforced_concrete_policy.hpp"
-#include "detail/reinforced_cocnrete/reinforced_concrete_functions.hpp"
+#include "detail/reinforced_concrete/reinforced_concrete_policy.hpp"
+#include "detail/reinforced_concrete/reinforced_concrete_functions.hpp"
 namespace nil{
     namespace crypto3{
         namespace hashes{
