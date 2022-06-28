@@ -60,10 +60,10 @@ namespace nil {
                         std::copy(A_vector.begin(), A_vector.end(), A.begin());
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hashes
+    }            // namespace crypto3
+}    // namespace nil
 
 
-#endif
+#endif // REINFORCED_CONCRETE_FUNCTIONS_HPP

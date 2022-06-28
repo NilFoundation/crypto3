@@ -58,9 +58,9 @@ namespace nil {
                                                                 element_type(integral_type(688)), element_type(integral_type(703)), element_type(integral_type(679))};
                     constexpr static const element_type p_min = element_type(integral_type(659ul));
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hashes
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif
+#endif // CRYPTO3_HASH_REINFORCED_CONCRETE_POLICY_HPP

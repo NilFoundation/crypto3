@@ -9,6 +9,8 @@
 #include <nil/crypto3/algebra/vector/math.hpp>
 #include <nil/crypto3/algebra/vector/operators.hpp>
 
+#include <nil/crypto3/hash/detail/reinforced_cocnrete/reinforced_concrete_lfsr.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hashes {
@@ -39,12 +41,14 @@ namespace nil {
                     typedef typename policy_type::state_type state_type;
                     typedef algebra::vector<element_type, state_words> state_vector_type;
                     typedef algebra::matrix<element_type, state_words, state_words> mds_matrix_type;
-                    typedef std::array<state_vector_type, policy_type::part_rounds> round_constants_type; 
+
+                    typedef reinforced_concrete_lfsr<FieldType> lsfr_policy;
+                    typedef typename lsfr_policy::round_constants_type round_constants_type; 
                     
                     mds_matrix_type mds_matrix;
-                    round_constants_type round_constants;
+                    lsfr_policy lsfr;
 
-                    reinforced_concrete_operators() : mds_matrix(generate_mds_matrix()), round_constants(generate_round_constants()) { }
+                    reinforced_concrete_operators() : mds_matrix(generate_mds_matrix()), lsfr(lsfr_policy()) { }
 
                     static inline mds_matrix_type generate_mds_matrix(){
                         state_vector_type circulant = {element_type(integral_type(2)), element_type(integral_type(1)), element_type(integral_type(1))};
@@ -58,15 +62,11 @@ namespace nil {
                         return new_matrix;
                     }
 
-                    static inline round_constants_type generate_round_constants(){
-                        return round_constants_type();
-                    }
-
                     inline void concrete(state_vector_type &A, std::size_t round) const {
                         A = algebra::matvectmul(mds_matrix, A);
 
                         for(int i = 0; i < state_words; ++i){
-                            A[i] += round_constants[round][i];
+                            A[i] += lsfr.round_constants[round * state_words + i];
                         }
                     }
 
@@ -85,7 +85,7 @@ namespace nil {
 
                         for(int i = bucket_size - 1; i >= 0; --i){
 
-                            x_bucket[i] = (element - sum) * (product.inversed()); // TODO % bucket[i];
+                            x_bucket[i] = element_type(((element - sum) * product.inversed()).data % bucket[i].data);
                             sum += x_bucket[i] * product;
                             product *= bucket[i];
                         }
@@ -130,9 +130,9 @@ namespace nil {
                         }
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hashes
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif
+#endif // REINFORCED_CONCRETE_OPERATORS_HPP
