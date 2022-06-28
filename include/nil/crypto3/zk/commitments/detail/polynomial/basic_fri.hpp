@@ -126,9 +126,10 @@ namespace nil {
                                 typename select_container<(bool)leaf_size,
                                                           std::vector<std::array<typename FieldType::value_type, m>>,
                                                           leaf_size>::type y_type;
-                            typedef typename select_container<(bool)leaf_size,
-                                                              std::array<typename FieldType::value_type, m>,
-                                                              leaf_size>::type colinear_value_type;
+                            typedef
+                                typename select_container<(bool)leaf_size,
+                                                          std::vector<std::array<typename FieldType::value_type, m>>,
+                                                          leaf_size>::type colinear_value_type;
 
                             y_type y;
 
@@ -281,7 +282,6 @@ namespace nil {
                     precommit(ContainerType poly,
                               const std::shared_ptr<math::evaluation_domain<typename FRI::field_type>> &D,
                               const std::size_t fri_step = 1) {
-                    std::cout << "precommit:" << std::endl;
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                     auto begin = std::chrono::high_resolution_clock::now();
@@ -305,7 +305,6 @@ namespace nil {
                         std::vector<std::uint8_t>(coset_size * FRI::field_element_type::length() * list_size));
 
                     for (std::size_t x_index = 0; x_index < leafs_number; x_index++) {
-                        std::cout << "leaf index: " << x_index << std::endl;
                         auto write_iter = y_data[x_index].begin();
                         for (std::size_t polynom_index = 0; polynom_index < list_size; polynom_index++) {
                             std::vector<std::array<std::size_t, FRI::m>> s_indices(coset_size / FRI::m);
@@ -414,6 +413,9 @@ namespace nil {
                         // FRI total reduction cannot be greater than the trace length
                         return false;
                     }
+                    if (fri_params.step_list.back() != 1) {
+                        return false;
+                    }
                     return true;
                 }
 
@@ -511,7 +513,6 @@ namespace nil {
                                ContainerType g,
                                const typename FRI::params_type &fri_params,
                                typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
-                    std::cout << "proof_eval:" << std::endl;
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
 
                     if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
@@ -616,15 +617,22 @@ namespace nil {
                             x = fri_params.D[basis_index + 1]->get_domain_element(x_index);
                         }
 
+                        std::tie(s, s_indices) =
+                            calculate_s<FRI>(x, x_index, fri_params.step_list[i + 1], fri_params.D[basis_index]);
+                        coset_size = 1 << fri_params.step_list[i + 1];
+                        BOOST_ASSERT(coset_size / FRI::m == s.size());
+                        BOOST_ASSERT(coset_size / FRI::m == s_indices.size());
                         for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                            if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
-                                                         typename ContainerType::value_type>) {
-                                colinear_value[polynom_index][0] = f[polynom_index][x_index];
-                                colinear_value[polynom_index][1] =
-                                    f[polynom_index][get_paired_index<FRI>(x_index, fri_params.D[basis_index]->size())];
-                            } else {
-                                colinear_value[polynom_index][0] = f[polynom_index].evaluate(x);
-                                colinear_value[polynom_index][1] = f[polynom_index].evaluate(-x);
+                            colinear_value[polynom_index].resize(coset_size / FRI::m);
+                            for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
+                                if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
+                                                             typename ContainerType::value_type>) {
+                                    colinear_value[polynom_index][j][0] = f[polynom_index][s_indices[j][0]];
+                                    colinear_value[polynom_index][j][1] = f[polynom_index][s_indices[j][1]];
+                                } else {
+                                    colinear_value[polynom_index][j][0] = f[polynom_index].evaluate(s[j][0]);
+                                    colinear_value[polynom_index][j][1] = f[polynom_index].evaluate(s[j][1]);
+                                }
                             }
                         }
 
@@ -699,7 +707,6 @@ namespace nil {
                                         const ContainerType U,
                                         const ContainerType V,
                                         typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
-                    std::cout << "verify_eval:" << std::endl;
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
 
                     BOOST_ASSERT(U.size() == V.size());
@@ -709,6 +716,8 @@ namespace nil {
                     std::size_t domain_size = fri_params.D[0]->size();
                     std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
                     typename FRI::field_type::value_type x = fri_params.D[0]->get_domain_element(x_index);
+                    std::uint64_t x_index_next;
+                    typename FRI::field_type::value_type x_next;
 
                     std::size_t r = fri_params.r;
 
@@ -748,9 +757,6 @@ namespace nil {
                                 return false;
                             }
                         }
-
-                        std::vector<std::uint8_t> leaf_data(FRI::m * FRI::field_element_type::length() * leaf_size);
-                        // x_index %= fri_params.D[i + 1]->size();
 
                         typename FRI::round_proof_type::y_type y;
                         if constexpr (FRI::leaf_size == 0) {
@@ -802,12 +808,23 @@ namespace nil {
 
                             x_index = x_index % (fri_params.D[basis_index + 1]->size());
                             x = x * x;
-                            std::cout << x.data << std::endl;
                             if (step_i < fri_params.step_list[i] - 1) {
                                 std::tie(s, s_indices) = calculate_s<FRI>(
                                     x, x_index, fri_params.step_list[i] - 1 - step_i, fri_params.D[basis_index + 1]);
                             }
                         }
+
+                        basis_index++;
+                        x_index_next = x_index % (fri_params.D[basis_index]->size());
+                        x_next = x * x;
+                        std::tie(s, s_indices) = calculate_s<FRI>(x_next, x_index_next, fri_params.step_list[i + 1],
+                                                                  fri_params.D[basis_index]);
+
+                        const std::size_t coset_size = 1 << fri_params.step_list[i + 1];
+                        auto correct_order_idx = get_correct_order<FRI>(x_index_next, fri_params.D[basis_index]->size(),
+                                                                        fri_params.step_list[i + 1], s_indices);
+                        std::vector<std::uint8_t> leaf_data(coset_size * FRI::field_element_type::length() * leaf_size);
+                        auto write_iter = leaf_data.begin();
 
                         typename FRI::field_type::value_type alpha =
                             transcript.template challenge<typename FRI::field_type>();
@@ -823,32 +840,28 @@ namespace nil {
                             math::polynomial<typename FRI::field_type::value_type> interpolant =
                                 math::lagrange_interpolation(interpolation_points);
 
-                            if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value[polynom_index][0]) {
+                            if (interpolant.evaluate(alpha) !=
+                                proof.round_proofs[i].colinear_value[polynom_index][0][0]) {
                                 return false;
                             }
 
-                            // auto write_iter =
-                            //     leaf_data.begin() + polynom_index * FRI::m * FRI::field_element_type::length();
-                            // for (std::size_t j = 0; j < FRI::m; j++) {
-                            //     if (is_order_reversed(x_index,
-                            //                           get_paired_index<FRI>(x_index, fri_params.D[i + 1]->size()))) {
-                            //         typename FRI::field_element_type leaf_val(
-                            //             proof.round_proofs[i].colinear_value[polynom_index][FRI::m - j - 1]);
-                            //         leaf_val.write(write_iter, FRI::field_element_type::length());
-                            //     } else {
-                            //         typename FRI::field_element_type leaf_val(
-                            //             proof.round_proofs[i].colinear_value[polynom_index][j]);
-                            //         leaf_val.write(write_iter, FRI::field_element_type::length());
-                            //     }
-                            // }
+                            for (auto [idx, pair_idx] : correct_order_idx) {
+                                typename FRI::field_element_type leaf_val0(
+                                    proof.round_proofs[i].colinear_value[polynom_index][idx][pair_idx]);
+                                leaf_val0.write(write_iter, FRI::field_element_type::length());
+                                typename FRI::field_element_type leaf_val1(
+                                    proof.round_proofs[i].colinear_value[polynom_index][idx][(pair_idx + 1) % FRI::m]);
+                                leaf_val1.write(write_iter, FRI::field_element_type::length());
+                            }
                         }
 
                         transcript(proof.round_proofs[i].colinear_path.root());
                         if (!proof.round_proofs[i].colinear_path.validate(leaf_data)) {
                             return false;
                         }
-                        basis_index++;
-                        x = x * x;
+
+                        x_index = x_index_next;
+                        x = x_next;
                     }
 
                     // auto final_root = commit(precommit(proof.final_polynomials, fri_params.D[r - 1]));
