@@ -102,6 +102,7 @@ namespace nil {
                                 r = obj.r;
                                 max_degree = obj.max_degree;
                                 D = obj.D;
+                                step_list = obj.step_list;
                             }
 
                             params_type() {};
@@ -282,6 +283,7 @@ namespace nil {
                     precommit(ContainerType poly,
                               const std::shared_ptr<math::evaluation_domain<typename FRI::field_type>> &D,
                               const std::size_t fri_step = 1) {
+                    // std::cout << "precommit:" << std::endl;
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                     auto begin = std::chrono::high_resolution_clock::now();
@@ -305,11 +307,14 @@ namespace nil {
                         std::vector<std::uint8_t>(coset_size * FRI::field_element_type::length() * list_size));
 
                     for (std::size_t x_index = 0; x_index < leafs_number; x_index++) {
+                        // std::cout << "x_index: " << x_index << std::endl;
                         auto write_iter = y_data[x_index].begin();
                         for (std::size_t polynom_index = 0; polynom_index < list_size; polynom_index++) {
                             std::vector<std::array<std::size_t, FRI::m>> s_indices(coset_size / FRI::m);
                             s_indices[0][0] = x_index;
                             s_indices[0][1] = get_paired_index<FRI>(x_index, domain_size);
+                            // std::cout << poly[polynom_index][s_indices[0][0]].data << std::endl;
+                            // std::cout << poly[polynom_index][s_indices[0][1]].data << std::endl;
 
                             typename FRI::field_element_type y_val0(poly[polynom_index][s_indices[0][0]]);
                             y_val0.write(write_iter, FRI::field_element_type::length());
@@ -323,6 +328,8 @@ namespace nil {
                                 for (std::size_t j = 0; j < prev_half_size; j++) {
                                     s_indices[i][0] = (base_index + s_indices[j][0]) % domain_size;
                                     s_indices[i][1] = get_paired_index<FRI>(s_indices[i][0], domain_size);
+                                    // std::cout << poly[polynom_index][s_indices[i][0]].data << std::endl;
+                                    // std::cout << poly[polynom_index][s_indices[i][1]].data << std::endl;
 
                                     typename FRI::field_element_type y_val0(poly[polynom_index][s_indices[i][0]]);
                                     y_val0.write(write_iter, FRI::field_element_type::length());
@@ -513,6 +520,7 @@ namespace nil {
                                ContainerType g,
                                const typename FRI::params_type &fri_params,
                                typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
+                    // std::cout << "fri: proof_eval:" << std::endl;
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
 
                     if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
@@ -531,7 +539,8 @@ namespace nil {
                     BOOST_ASSERT(f.size() == g.size());
                     std::size_t leaf_size = f.size();
 
-                    typename FRI::precommitment_type T = precommit<FRI>(f, fri_params.D[0], fri_params.step_list[0]);
+                    // TODO: f or g should be commited first
+                    typename FRI::precommitment_type T = precommit<FRI>(g, fri_params.D[0], fri_params.step_list[0]);
 
                     transcript(commit<FRI>(T));
 
@@ -549,6 +558,7 @@ namespace nil {
                     std::vector<std::array<typename FRI::field_type::value_type, FRI::m>> s;
                     std::vector<std::array<std::size_t, FRI::m>> s_indices;
                     for (std::size_t i = 0; i < fri_params.step_list.size() - 1; i++) {
+                        // std::cout << "step_i: " << i << std::endl;
                         domain_size = fri_params.D[basis_index]->size();
                         x_index %= domain_size;
 
@@ -707,6 +717,7 @@ namespace nil {
                                         const ContainerType U,
                                         const ContainerType V,
                                         typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
+                    // std::cout << "fri: verify_eval:" << std::endl;
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
 
                     BOOST_ASSERT(U.size() == V.size());
@@ -725,6 +736,7 @@ namespace nil {
                     std::vector<std::array<typename FRI::field_type::value_type, FRI::m>> s;
                     std::vector<std::array<std::size_t, FRI::m>> s_indices;
                     for (std::size_t i = 0; i < fri_params.step_list.size() - 1; i++) {
+                        // std::cout << "step_i: " << i << std::endl;
                         domain_size = fri_params.D[basis_index]->size();
                         x_index %= domain_size;
 
@@ -751,6 +763,9 @@ namespace nil {
                                     typename FRI::field_element_type leaf_val1(
                                         proof.round_proofs[i].y[polynom_index][idx][(pair_idx + 1) % FRI::m]);
                                     leaf_val1.write(write_iter, FRI::field_element_type::length());
+                                    // std::cout << proof.round_proofs[i].y[polynom_index][idx][pair_idx].data <<
+                                    // std::endl; std::cout << proof.round_proofs[i].y[polynom_index][idx][(pair_idx +
+                                    // 1) % FRI::m].data << std::endl;
                                 }
                             }
                             if (!proof.round_proofs[i].p.validate(leaf_data)) {

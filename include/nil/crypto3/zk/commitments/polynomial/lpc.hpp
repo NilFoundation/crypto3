@@ -42,8 +42,13 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
-                template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda = 40,
-                         std::size_t R = 1, std::size_t M = 2, std::size_t BatchSize = 0, bool ConstSize = false>
+                template<typename MerkleTreeHashType,
+                         typename TranscriptHashType,
+                         std::size_t Lambda = 40,
+                         std::size_t R = 1,
+                         std::size_t M = 2,
+                         std::size_t BatchSize = 0,
+                         bool ConstSize = false>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -72,8 +77,10 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams>
                 struct batched_list_polynomial_commitment
-                    : public detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
-                                                       typename LPCParams::transcript_hash_type, LPCParams::m,
+                    : public detail::basic_batched_fri<FieldType,
+                                                       typename LPCParams::merkle_hash_type,
+                                                       typename LPCParams::transcript_hash_type,
+                                                       LPCParams::m,
                                                        LPCParams::leaf_size> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
@@ -88,8 +95,10 @@ namespace nil {
 
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
-                                                                typename LPCParams::transcript_hash_type, m,
+                    using basic_fri = detail::basic_batched_fri<FieldType,
+                                                                typename LPCParams::merkle_hash_type,
+                                                                typename LPCParams::transcript_hash_type,
+                                                                m,
                                                                 leaf_size>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
@@ -118,15 +127,21 @@ namespace nil {
                     FieldType,
                     commitments::list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
                                                                    typename LPCParams::transcript_hash_type,
-                                                                   LPCParams::lambda, LPCParams::r, LPCParams::m,
-                                                                   BatchSize, ConstSize>>;
+                                                                   LPCParams::lambda,
+                                                                   LPCParams::r,
+                                                                   LPCParams::m,
+                                                                   BatchSize,
+                                                                   ConstSize>>;
                 template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool ConstSize>
                 using lpc = batched_list_polynomial_commitment<
                     FieldType,
                     list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
                                                       typename LPCParams::transcript_hash_type,
-                                                      LPCParams::lambda, LPCParams::r,LPCParams::m,
-                                                      BatchSize, ConstSize>>;
+                                                      LPCParams::lambda,
+                                                      LPCParams::r,
+                                                      LPCParams::m,
+                                                      BatchSize,
+                                                      ConstSize>>;
 
                 template<typename FieldType, typename LPCParams>
                 using list_polynomial_commitment = batched_list_polynomial_commitment<FieldType, LPCParams>;
@@ -134,16 +149,18 @@ namespace nil {
             }    // namespace commitments
 
             namespace algorithms {
-                template<typename LPC, typename ContainerType, // TODO: check for value_type == std::vector<typename LPC::field_type::value_type>?
+                template<typename LPC,
+                         typename ContainerType,    // TODO: check for value_type == std::vector<typename
+                                                    // LPC::field_type::value_type>?
                          typename std::enable_if<
                              std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
                                                                                              typename LPC::lpc_params>,
-                                             LPC>::value  &&
-                                 std::is_same_v<typename ContainerType::value_type, std::vector<typename LPC::field_type::value_type>>,
+                                             LPC>::value &&
+                                 std::is_same_v<typename ContainerType::value_type,
+                                                std::vector<typename LPC::field_type::value_type>>,
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
-                    typename LPC::precommitment_type &T,
                     const typename select_container<LPC::const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
@@ -174,8 +191,7 @@ namespace nil {
                         U_interpolation_points[polynom_index].resize(evaluation_point.size());
                         z[polynom_index].resize(evaluation_point.size());
 
-                        for (std::size_t point_index = 0; point_index < evaluation_point.size();
-                             point_index++) {
+                        for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
 
                             z[polynom_index][point_index] = g[polynom_index].evaluate(
                                 evaluation_point[point_index]);    // transform to point-representation
@@ -208,8 +224,7 @@ namespace nil {
                             evaluation_point = evaluation_points[polynom_index];
                         }
 
-                        for (std::size_t point_index = 0; point_index < evaluation_point.size();
-                             point_index++) {
+                        for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
                             denominator_polynom =
                                 denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
                                                           -evaluation_point[point_index], 1};
@@ -219,24 +234,30 @@ namespace nil {
 
                     std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
 
+                    std::shared_ptr<typename LPC::basic_fri::proof_type> p_fri_proof;
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
-                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, fri_params, transcript);
+                        if (p_fri_proof) {
+                            BOOST_ASSERT(fri_proof[round_id].target_commitment == p_fri_proof->target_commitment);
+                        }
+                        p_fri_proof = std::make_shared<typename LPC::basic_fri::proof_type>(fri_proof[round_id]);
                     }
 
-                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                    return typename LPC::proof_type({z, fri_proof.front().target_commitment, fri_proof});
                 }
 
-                template<typename LPC, typename ContainerType, // TODO: check for value_type == std::vector<typename LPC::field_type::value_type>?
+                template<typename LPC,
+                         typename ContainerType,    // TODO: check for value_type == std::vector<typename
+                                                    // LPC::field_type::value_type>?
                          typename std::enable_if<
                              std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
                                                                                              typename LPC::lpc_params>,
                                              LPC>::value &&
-                             std::is_same_v<typename ContainerType::value_type, std::vector<typename LPC::field_type::value_type>>,
+                                 std::is_same_v<typename ContainerType::value_type,
+                                                std::vector<typename LPC::field_type::value_type>>,
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
-
-                    typename LPC::precommitment_type &T,
                     const typename select_container<LPC::const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
@@ -255,7 +276,7 @@ namespace nil {
                             math::polynomial<typename LPC::field_type::value_type>(g[polynom_index].coefficients());
                     }
 
-                    return proof_eval<LPC>(evaluation_points, T, g_normal, fri_params, transcript);
+                    return proof_eval<LPC>(evaluation_points, g_normal, fri_params, transcript);
                 }
 
                 template<typename LPC,
@@ -266,7 +287,6 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
                     const typename select_container<LPC::const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
@@ -347,11 +367,16 @@ namespace nil {
                         Q[polynom_index].resize(fri_params.D[0]->size());
                     }
 
+                    std::shared_ptr<typename LPC::basic_fri::proof_type> p_fri_proof;
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
-                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, fri_params, transcript);
+                        if (p_fri_proof) {
+                            BOOST_ASSERT(fri_proof[round_id].target_commitment == p_fri_proof->target_commitment);
+                        }
+                        p_fri_proof = std::make_shared<typename LPC::basic_fri::proof_type>(fri_proof[round_id]);
                     }
 
-                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                    return typename LPC::proof_type({z, fri_proof.front().target_commitment, fri_proof});
                 }
 
                 template<typename LPC,
@@ -362,7 +387,6 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
                     const typename select_container<LPC::const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
@@ -370,7 +394,7 @@ namespace nil {
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp = {evaluation_points};
-                  return proof_eval<LPC>(tmp, T, g, fri_params, transcript);
+                    return proof_eval<LPC>(tmp, g, fri_params, transcript);
                 }
 
                 template<typename LPC,
@@ -484,7 +508,6 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
                     const math::polynomial<typename LPC::field_type::value_type> &g,
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
@@ -519,11 +542,16 @@ namespace nil {
 
                     std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
 
+                    std::shared_ptr<typename LPC::basic_fri::proof_type> p_fri_proof;
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
-                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, fri_params, transcript);
+                        if (p_fri_proof) {
+                            BOOST_ASSERT(fri_proof[round_id].target_commitment == p_fri_proof->target_commitment);
+                        }
+                        p_fri_proof = std::make_shared<typename LPC::basic_fri::proof_type>(fri_proof[round_id]);
                     }
 
-                    return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
+                    return typename LPC::proof_type({z, fri_proof.front().target_commitment, fri_proof});
                 }
 
                 template<typename LPC,
@@ -534,14 +562,13 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
                     const math::polynomial_dfs<typename LPC::field_type::value_type> &g,
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     math::polynomial<typename LPC::field_type::value_type> g_normal(g.coefficients());
 
-                    return proof_eval<LPC>(evaluation_points, T, g_normal, fri_params, transcript);
+                    return proof_eval<LPC>(evaluation_points, g_normal, fri_params, transcript);
                 }
             }    // namespace algorithms
         }        // namespace zk
