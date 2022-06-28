@@ -128,7 +128,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_batch_verifier_scalar_field_test_sui
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<commitment_params,
+    using kimchi_params = zk::components::kimchi_params_type<curve_type,
+                                                             commitment_params,
                                                              witness_columns,
                                                              perm_size,
                                                              use_lookup,

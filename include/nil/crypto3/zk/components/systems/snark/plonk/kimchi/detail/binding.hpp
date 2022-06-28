@@ -57,6 +57,7 @@ namespace nil {
                         constexpr static const std::size_t f_comm_msm_size = 1 
                                 + 10 // generic_scalars_component::output_size
                                 + verifier_index_type::constraints_amount;
+                                
                         public: 
                         std::array<VarType, KimchiParamsType::final_msm_size(BatchSize)> scalars;
                         std::array<std::array<VarType, f_comm_msm_size>,

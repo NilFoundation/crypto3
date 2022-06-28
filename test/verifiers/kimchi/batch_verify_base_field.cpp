@@ -43,6 +43,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 
 #include "test_plonk_component.hpp"
 
@@ -85,7 +86,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<commitment_params,
+    using kimchi_params = zk::components::kimchi_params_type<curve_type,
+                                                             commitment_params,
                                                              witness_columns,
                                                              perm_size,
                                                              use_lookup,
@@ -123,6 +125,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     using shifted_commitment_type =
         typename zk::components::kimchi_shifted_commitment_type<BlueprintFieldType,
                                                                 commitment_params::shifted_commitment_split>;
+
+    using transcript_type = kimchi_transcript_fq<ArithmetizationType, CurveType,
+                                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                                    W11, W12, W13, W14>;
 
     using binding = typename zk::components::binding<ArithmetizationType, BlueprintFieldType, kimchi_params>;
 
@@ -238,12 +244,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     shifted_commitment_type comm_var = {{shifted_var}, {unshifted_var}};
 
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
-    // zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-    //                     11, 12, 13, 14> transcript;
+    transcript_type transcript;
 
     typename binding::fr_data<var, batch_size> fr_data = {scalars_var, {cip_var}};
 
-    std::array<batch_proof_type, batch_size> prepared_proofs = {{{{comm_var}, o_var}}};
+    std::array<batch_proof_type, batch_size> prepared_proofs = {{{{comm_var}, o_var, transcript}}};
 
     typename component_type::params_type params = {prepared_proofs, {H_var, {PI_G_var}, {PI_G_var}}, fr_data};
 

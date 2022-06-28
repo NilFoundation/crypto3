@@ -51,23 +51,19 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L87
                 // Input: x1 = [a_0, ..., a_63], x2 = [b_0, ..., b_63]
                 // Output: y = [a_0, ...., a_63, b_0, ..., b_63]
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class from_limbs;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
-                         typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2>
                 class from_limbs<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    CurveType,
                     W0,
                     W1,
                     W2> {
-
-                    // using BlueprintFieldType = typename CurveType::scalar_field_type;
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -167,12 +163,11 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L110
                 // Input: x = [a_0, ...., a255]
                 // Output: y0 = [a_0, ..., a_63], y1 = [a_64, ..., a_127], y2 = [a_128, ..., a_191], y3 = [a_192, ..., a_255]
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class to_limbs;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
-                         typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -180,9 +175,7 @@ namespace nil {
                          std::size_t W4>
                 class to_limbs<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    CurveType, W0, W1, W2, W3, W4> {
-
-                    // using BlueprintFieldType = typename CurveType::scalar_field_type;
+                    W0, W1, W2, W3, W4> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;

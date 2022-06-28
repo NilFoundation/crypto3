@@ -31,6 +31,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
@@ -126,6 +127,10 @@ namespace nil {
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiParamsType>;
 
+                    using transcript_type = kimchi_transcript_fq<ArithmetizationType, CurveType,
+                                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                                    W11, W12, W13, W14>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
@@ -160,7 +165,9 @@ namespace nil {
                             bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            //params.proofs[i].transcript.absorb_assignment(assignment, params.fr_output.cip_shifted[i], row);
+                            transcript_type transcript = params.proofs[i].transcript;
+                            transcript.absorb_fr_assignment(assignment, {params.fr_output.cip_shifted[i]}, row);
+                            row += transcript_type::absorb_rows;
                             //U = transcript.squeeze.to_group()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U_value =
                                  algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
@@ -215,7 +222,8 @@ namespace nil {
                             bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            //params.proofs[i].transcript.absorb_assignment(assignment, params.fr_output.cip_shifted[i], row);
+                            params.proofs[i].transcript.absorb_fr_circuit(bp, assignment, params.fr_output.cip_shifted[i], row);
+                            row += transcript_type::absorb_rows;
                             //U = transcript.squeeze.to_group()
                             var_ec_point U = {var(0, row), var(1, row)};
                             

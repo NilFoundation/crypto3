@@ -38,13 +38,14 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template<typename CommitmentParamsType, 
+                template<typename CurveType, typename CommitmentParamsType, 
                     std::size_t WitnessColumns, std::size_t PermutSize,
                     bool UseLookup, std::size_t LookupTableSize,
                     std::size_t AlphaPowersN, std::size_t PublicInputSize,
                     std::size_t IndexTermSize, std::size_t PrevChalSize>
                 struct kimchi_params_type {
                     using commitment_params_type = CommitmentParamsType;
+                    using curve_type = CurveType;
 
                     constexpr static std::size_t alpha_powers_n = AlphaPowersN;
                     constexpr static std::size_t public_input_size = PublicInputSize;

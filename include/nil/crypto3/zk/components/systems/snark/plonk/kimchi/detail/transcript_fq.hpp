@@ -123,8 +123,8 @@ namespace nil {
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
-                    using pack = from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
-                    using unpack = to_limbs<ArithmetizationType, CurveType, W0, W1, W2, W3, W4>;
+                    using pack = from_limbs<ArithmetizationType, W0, W1, W2>;
+                    using unpack = to_limbs<ArithmetizationType, W0, W1, W2, W3, W4>;
                     using compare = compare_with_const<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     // using compare = compare_with_const<ArithmetizationType, CurveType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>;
 
