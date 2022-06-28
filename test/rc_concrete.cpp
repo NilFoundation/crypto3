@@ -8,6 +8,7 @@ using namespace nil::crypto3::algebra;
 
 using rc_default_field_t = fields::bls12_fr<381>;
 
+
 int main(){
     // std::flu
     using rc_functions_t = hashes::detail::reinforced_concrete_functions<rc_default_field_t>;
