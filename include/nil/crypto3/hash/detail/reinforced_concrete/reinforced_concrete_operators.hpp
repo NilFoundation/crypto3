@@ -9,7 +9,7 @@
 #include <nil/crypto3/algebra/vector/math.hpp>
 #include <nil/crypto3/algebra/vector/operators.hpp>
 
-#include <nil/crypto3/hash/detail/reinforced_cocnrete/reinforced_concrete_lfsr.hpp>
+#include <nil/crypto3/hash/detail/reinforced_concrete/reinforced_concrete_lfsr.hpp>
 
 namespace nil {
     namespace crypto3 {

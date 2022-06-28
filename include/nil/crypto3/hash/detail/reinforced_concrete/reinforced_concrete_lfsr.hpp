@@ -3,7 +3,7 @@
 
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/algebra/vector/vector.hpp>
-#include <nil/crypto3/hash/detail/reinforced_cocnrete/reinforced_concrete_policy.hpp>
+#include <nil/crypto3/hash/detail/reinforced_concrete/reinforced_concrete_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
