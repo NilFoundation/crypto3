@@ -21,15 +21,6 @@ namespace nil {
 
                     typedef typename policy_type::element_type element_type;
                     typedef typename element_type::integral_type integral_type;
-                    constexpr static const std::size_t word_bits = policy_type::word_bits;
-                    typedef typename policy_type::word_type word_type;
-
-                    constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                    typedef typename policy_type::digest_type digest_type;
-
-                    constexpr static const std::size_t block_words = policy_type::block_words;
-                    constexpr static const std::size_t block_bits = policy_type::block_bits;
-                    typedef typename policy_type::block_type block_type;
 
                     typedef typename policy_type::bucket_type bucket_type;
                     constexpr static const std::size_t bucket_size = policy_type::bucket_size;
@@ -37,8 +28,6 @@ namespace nil {
                     constexpr static const element_type p_min = policy_type::p_min;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;
-                    constexpr static const std::size_t state_bits = policy_type::state_bits;
-                    typedef typename policy_type::state_type state_type;
                     typedef algebra::vector<element_type, state_words> state_vector_type;
                     typedef algebra::matrix<element_type, state_words, state_words> mds_matrix_type;
 
@@ -112,7 +101,7 @@ namespace nil {
                     }
 
                     static inline element_type f(element_type& element){
-                        return SBox_inverse(element);
+                        return element == 0 ? element_type(integral_type(0)) : SBox_inverse(element);
                     }
 
                     static inline element_type S(element_type& element){
