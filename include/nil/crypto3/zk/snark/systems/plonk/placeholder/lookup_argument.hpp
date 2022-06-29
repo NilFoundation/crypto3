@@ -67,16 +67,16 @@ namespace nil {
                         math::polynomial<typename FieldType::value_type> V_L_polynomial;
                         typename CommitmentSchemeTypePermutation::precommitment_type V_L_precommitment;
                     };
-                    static inline prover_lookup_result
-                        prove_eval(plonk_constraint_system<FieldType,
-                                        typename ParamsType::arithmetization_params> &constraint_system,
-                                   const typename placeholder_public_preprocessor<FieldType, ParamsType>::
-                                        preprocessed_data_type preprocessed_data,
-                                   const plonk_assignment_table<FieldType, typename ParamsType::arithmetization_params>
-                                       &plonk_columns,
-                                   typename CommitmentSchemeTypePermutation::params_type fri_params,
-                                   transcript_type &transcript = transcript_type()) {
-                            
+                    static inline prover_lookup_result prove_eval(
+                        plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                            &constraint_system,
+                        const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
+                            preprocessed_data,
+                        const plonk_assignment_table<FieldType, typename ParamsType::arithmetization_params>
+                            &plonk_columns,
+                        typename CommitmentSchemeTypePermutation::params_type fri_params,
+                        transcript_type &transcript = transcript_type()) {
+
                         // $/theta = \challenge$
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
                         // Construct lookup gates
@@ -88,11 +88,11 @@ namespace nil {
 
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
 
-                        math::polynomial_dfs<typename FieldType::value_type> F_compr_input(
-                            basic_domain->m - 1, basic_domain->m, 0);
+                        math::polynomial_dfs<typename FieldType::value_type> F_compr_input(basic_domain->m - 1,
+                                                                                           basic_domain->m, 0);
 
-                        math::polynomial_dfs<typename FieldType::value_type> F_compr_value(
-                            basic_domain->m - 1, basic_domain->m, 0);
+                        math::polynomial_dfs<typename FieldType::value_type> F_compr_value(basic_domain->m - 1,
+                                                                                           basic_domain->m, 0);
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
@@ -176,15 +176,17 @@ namespace nil {
                             math::polynomial<typename FieldType::value_type>(F_perm_input.coefficients());
                         math::polynomial<typename FieldType::value_type> F_perm_value_normal =
                             math::polynomial<typename FieldType::value_type>(F_perm_value.coefficients());
-                        
+
                         typename CommitmentSchemeTypePermutation::precommitment_type F_perm_input_tree =
-                            algorithms::precommit<CommitmentSchemeTypePermutation>(F_perm_input, fri_params.D[0]);
+                            algorithms::precommit<CommitmentSchemeTypePermutation>(F_perm_input, fri_params.D[0],
+                                                                                   fri_params.step_list.front());
                         typename CommitmentSchemeTypePermutation::commitment_type F_perm_input_commitment =
                             algorithms::commit<CommitmentSchemeTypePermutation>(F_perm_input_tree);
                         transcript(F_perm_input_commitment);
 
                         typename CommitmentSchemeTypePermutation::precommitment_type F_perm_value_tree =
-                            algorithms::precommit<CommitmentSchemeTypePermutation>(F_perm_value, fri_params.D[0]);
+                            algorithms::precommit<CommitmentSchemeTypePermutation>(F_perm_value, fri_params.D[0],
+                                                                                   fri_params.step_list.front());
                         typename CommitmentSchemeTypePermutation::commitment_type F_perm_value_commitment =
                             algorithms::commit<CommitmentSchemeTypePermutation>(F_perm_value_tree);
                         transcript(F_perm_value_commitment);
@@ -193,22 +195,20 @@ namespace nil {
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
-                        math::polynomial_dfs<typename FieldType::value_type> V_L(
-                            basic_domain->m - 1, basic_domain->m);
+                        math::polynomial_dfs<typename FieldType::value_type> V_L(basic_domain->m - 1, basic_domain->m);
 
                         V_L[0] = FieldType::value_type::one();
                         for (std::size_t j = 1; j < basic_domain->m; j++) {
-                            V_L[j] =
-                                (V_L[j - 1] * (F_compr_input[j - 1] + beta) *
-                                 (F_compr_value[j - 1] + gamma)) *
-                                ((F_perm_input[j - 1] + beta) * (F_perm_value[j - 1] + gamma)).inversed();
+                            V_L[j] = (V_L[j - 1] * (F_compr_input[j - 1] + beta) * (F_compr_value[j - 1] + gamma)) *
+                                     ((F_perm_input[j - 1] + beta) * (F_perm_value[j - 1] + gamma)).inversed();
                         }
 
                         math::polynomial<typename FieldType::value_type> V_L_normal =
                             math::polynomial<typename FieldType::value_type>(V_L.coefficients());
 
                         typename CommitmentSchemeTypePermutation::precommitment_type V_L_tree =
-                            algorithms::precommit<CommitmentSchemeTypePermutation>(V_L, fri_params.D[0]);
+                            algorithms::precommit<CommitmentSchemeTypePermutation>(V_L, fri_params.D[0],
+                                                                                   fri_params.step_list.front());
                         typename CommitmentSchemeTypePermutation::commitment_type V_L_commitment =
                             algorithms::commit<CommitmentSchemeTypePermutation>(V_L_tree);
                         transcript(V_L_commitment);
@@ -219,7 +219,7 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> h =
                             (F_perm_input + beta) * (F_perm_value + gamma);
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
-                            basic_domain->m-1, basic_domain->m, FieldType::value_type::one());
+                            basic_domain->m - 1, basic_domain->m, FieldType::value_type::one());
 
                         math::polynomial_dfs<typename FieldType::value_type> V_L_shifted =
                             math::polynomial_shift(V_L, 1, basic_domain->m);
@@ -228,29 +228,34 @@ namespace nil {
                             math::polynomial_shift(F_perm_input, -1, basic_domain->m);
 
                         F[0] = math::polynomial<typename FieldType::value_type>(
-                               (preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_L)).coefficients());
+                            (preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_L)).coefficients());
                         F[1] = math::polynomial<typename FieldType::value_type>(
-                               ((one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
-                               (V_L_shifted * h - V_L * g)).coefficients());
+                            ((one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
+                             (V_L_shifted * h - V_L * g))
+                                .coefficients());
                         F[2] = math::polynomial<typename FieldType::value_type>(
-                               (preprocessed_data.q_last * (V_L * V_L - V_L)).coefficients());
+                            (preprocessed_data.q_last * (V_L * V_L - V_L)).coefficients());
                         F[3] = math::polynomial<typename FieldType::value_type>(
-                               (preprocessed_data.common_data.lagrange_0 * (F_perm_input - F_perm_value)).coefficients());
+                            (preprocessed_data.common_data.lagrange_0 * (F_perm_input - F_perm_value)).coefficients());
                         F[4] = math::polynomial<typename FieldType::value_type>(
-                               ((one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
-                               (F_perm_input - F_perm_value) *
-                               (F_perm_input - F_perm_input_shifted)).coefficients());
+                            ((one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
+                             (F_perm_input - F_perm_value) * (F_perm_input - F_perm_input_shifted))
+                                .coefficients());
 
-                        prover_lookup_result res = {
-                            F,   F_perm_input_normal, F_perm_input_tree, F_perm_value_normal, F_perm_value_tree,
-                            V_L_normal, V_L_tree};
+                        prover_lookup_result res = {F,
+                                                    F_perm_input_normal,
+                                                    F_perm_input_tree,
+                                                    F_perm_value_normal,
+                                                    F_perm_value_tree,
+                                                    V_L_normal,
+                                                    V_L_tree};
 
                         return res;
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
-                        const typename placeholder_public_preprocessor<FieldType, ParamsType>::
-                                    preprocessed_data_type preprocessed_data,
+                        const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
+                            preprocessed_data,
                         const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates,
                         // y
                         const typename FieldType::value_type &challenge,
