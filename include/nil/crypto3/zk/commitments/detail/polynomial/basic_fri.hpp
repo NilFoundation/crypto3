@@ -3,6 +3,7 @@
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 // Copyright (c) 2021-2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
+// Copyright (c) 2022 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
 //
