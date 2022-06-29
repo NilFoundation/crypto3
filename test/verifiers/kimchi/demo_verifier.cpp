@@ -28,7 +28,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <fstream>
-#include <experimental/random>
+#include <random>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
@@ -69,6 +69,9 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
 }
 
 inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+    using dist_type = std::uniform_int_distribution<int>;
+    static std::random_device random_engine;
+
     std::vector<std::size_t> step_list;
     std::size_t steps_sum = 0;
     while (steps_sum != r) {
@@ -80,7 +83,7 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
             step_list.emplace_back(1);
             steps_sum += step_list.back();
         } else {
-            step_list.emplace_back(std::experimental::randint(1, max_step));
+            step_list.emplace_back(dist_type(1, max_step)(random_engine));
             steps_sum += step_list.back();
         }
     }

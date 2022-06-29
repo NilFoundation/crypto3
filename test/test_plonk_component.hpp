@@ -29,7 +29,7 @@
 #define CRYPTO3_TEST_PLONK_COMPONENT_HPP
 
 #include <fstream>
-#include <experimental/random>
+#include <random>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
@@ -53,6 +53,9 @@
 namespace nil {
     namespace crypto3 {
         inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+            using dist_type = std::uniform_int_distribution<int>;
+            static std::random_device random_engine;
+
             std::vector<std::size_t> step_list;
             std::size_t steps_sum = 0;
             while (steps_sum != r) {
@@ -64,7 +67,7 @@ namespace nil {
                     step_list.emplace_back(1);
                     steps_sum += step_list.back();
                 } else {
-                    step_list.emplace_back(std::experimental::randint(1, max_step));
+                    step_list.emplace_back(dist_type(1, max_step)(random_engine));
                     steps_sum += step_list.back();
                 }
             }
