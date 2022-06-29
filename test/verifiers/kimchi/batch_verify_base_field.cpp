@@ -126,9 +126,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
         typename zk::components::kimchi_shifted_commitment_type<BlueprintFieldType,
                                                                 commitment_params::shifted_commitment_split>;
 
-    using transcript_type = kimchi_transcript_fq<ArithmetizationType, CurveType,
-                                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                    W11, W12, W13, W14>;
+    // using transcript_type = kimchi_transcript_fq<ArithmetizationType, CurveType,
+    //                                 W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+    //                                 W11, W12, W13, W14>;
 
     using binding = typename zk::components::binding<ArithmetizationType, BlueprintFieldType, kimchi_params>;
 
@@ -244,11 +244,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     shifted_commitment_type comm_var = {{shifted_var}, {unshifted_var}};
 
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
-    transcript_type transcript;
+    //transcript_type transcript;
 
     typename binding::fr_data<var, batch_size> fr_data = {scalars_var, {cip_var}};
 
-    std::array<batch_proof_type, batch_size> prepared_proofs = {{{{comm_var}, o_var, transcript}}};
+    std::array<batch_proof_type, batch_size> prepared_proofs = {{{{comm_var}, o_var}}};
 
     typename component_type::params_type params = {prepared_proofs, {H_var, {PI_G_var}, {PI_G_var}}, fr_data};
 

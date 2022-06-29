@@ -133,9 +133,7 @@ namespace nil {
 
                         row += sub_component::rows_amount;
 
-                        for(std::size_t i = 0; i < verifier_index_type::constraints_amount; i++) {
-                            row += index_terms_scalars_component::rows_amount;
-                        }
+                        row += index_terms_scalars_component::rows_amount;
 
                         return row;
                     }
@@ -219,9 +217,8 @@ namespace nil {
 
                         auto mds = poseidon_component::mds_constants();
 
-                        for(std::size_t i = 0; i < verifier_index_type::constraints_amount; i++) {
-                            f_comm_scalars[f_comm_idx++] = index_terms_scalars_component::generate_circuit(
-                                bp, assignment, {params.verifier_index.constraints[i],
+                        auto index_scalars = index_terms_scalars_component::generate_circuit(
+                                bp, assignment, {
                                 vanishing_eval, oracles_output.oracles.zeta,
                                 oracles_output.combined_evals,
                                 oracles_output.oracles.alpha,
@@ -229,7 +226,10 @@ namespace nil {
                                 params.fq_output.joint_combiner,
                                 mds}, row
                             ).output;
-                            row += index_terms_scalars_component::rows_amount;
+                        row += index_terms_scalars_component::rows_amount;
+
+                        for(std::size_t i = 0; i < index_scalars.size(); i++) {
+                            f_comm_scalars[f_comm_idx++] = index_scalars[i];
                         }
 
                         var zeta_to_srs_len = oracles_output.powers_of_eval_points_for_chunks[0];
@@ -303,22 +303,20 @@ namespace nil {
                         row += sub_component::rows_amount;
 
                         // TODO: make endo_factor generic for different curves
-                        typename BlueprintFieldType::value_type endo_factor =
-                            0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
                         auto mds = poseidon_component::mds_constants();
 
-                        for(std::size_t i = 0; i < verifier_index_type::constraints_amount; i++) {
-                            f_comm_scalars[f_comm_idx] = index_terms_scalars_component::generate_assignments(
-                                assignment, {params.verifier_index.constraints[i],
+                        auto index_scalars = index_terms_scalars_component::generate_assignments(
+                                assignment, {
                                 vanishing_eval, oracles_output.oracles.zeta,
                                 oracles_output.combined_evals,
                                 oracles_output.oracles.alpha,
                                 params.fq_output.beta, params.fq_output.gamma,
                                 params.fq_output.joint_combiner,
-                                endo_factor,
                                 mds}, row
                             ).output;
                             row += index_terms_scalars_component::rows_amount;
+                        for(std::size_t i = 0; i < index_scalars.size(); i++) {
+                            f_comm_scalars[f_comm_idx] = index_scalars[i];
                         }
 
                         var zeta_to_srs_len = oracles_output.powers_of_eval_points_for_chunks[0];

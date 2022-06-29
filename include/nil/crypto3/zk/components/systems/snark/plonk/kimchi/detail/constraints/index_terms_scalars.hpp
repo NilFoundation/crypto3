@@ -99,21 +99,27 @@ namespace nil {
 
                     constexpr static const std::size_t mds_size = 3;
 
+                    /*static var w1_scalar_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t row) {
+                            
+                    }*/
+
                 public:
                     constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        // var vanishing_polynomial_eval;
+                        var vanishing_polynomial_eval;
                         var zeta; 
-                        // std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
-                        //     KimchiParamsType::eval_points_amount> evals;
+                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
+                            KimchiParamsType::eval_points_amount> evals;
 
-                        // var alpha;
-                        // var beta;
-                        // var gamma;
-                        // var joint_combiner;
-                        // std::array<std::array<typename BlueprintFieldType::value_type, mds_size>, mds_size> mds;
+                        var alpha;
+                        var beta;
+                        var gamma;
+                        var joint_combiner;
+                        std::array<std::array<typename BlueprintFieldType::value_type, mds_size>, mds_size> mds;
                     };
 
                     struct result_type {

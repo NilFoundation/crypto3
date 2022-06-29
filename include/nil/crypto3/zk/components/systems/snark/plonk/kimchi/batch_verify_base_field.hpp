@@ -134,7 +134,8 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + msm_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = transcript_type::absorb_rows + 
+                        1 + msm_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -165,8 +166,8 @@ namespace nil {
                             bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            transcript_type transcript = params.proofs[i].transcript;
-                            transcript.absorb_fr_assignment(assignment, {params.fr_output.cip_shifted[i]}, row);
+                            //transcript_type transcript = params.proofs[i].transcript;
+                            //transcript.absorb_fr_assignment(assignment, {params.fr_output.cip_shifted[i]}, row);
                             row += transcript_type::absorb_rows;
                             //U = transcript.squeeze.to_group()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U_value =
@@ -222,7 +223,7 @@ namespace nil {
                             bases[bases_idx++] = params.verifier_index.G[i];
                         }
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            params.proofs[i].transcript.absorb_fr_circuit(bp, assignment, params.fr_output.cip_shifted[i], row);
+                            //params.proofs[i].transcript.absorb_fr_circuit(bp, assignment, params.fr_output.cip_shifted[i], row);
                             row += transcript_type::absorb_rows;
                             //U = transcript.squeeze.to_group()
                             var_ec_point U = {var(0, row), var(1, row)};

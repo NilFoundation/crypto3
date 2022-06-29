@@ -91,7 +91,6 @@ namespace nil {
                             KimchiParamsType::scalar_challenge_size,
                             W0, W1, W2, W3, W4, W5, W6, W7, W8,
                             W9, W10, W11, W12, W13, W14>;
-                    using from_limbs = zk::components::from_limbs<ArithmetizationType, CurveType, W0, W1, W2>;
 
                     using exponentiation_component =
                         zk::components::exponentiation<ArithmetizationType, 60, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
