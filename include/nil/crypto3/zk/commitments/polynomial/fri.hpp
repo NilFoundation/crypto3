@@ -59,8 +59,11 @@ namespace nil {
                  * Matter Labs,
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
-                template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                         std::size_t M, std::size_t BatchedSize>
+                template<typename FieldType,
+                         typename MerkleTreeHashType,
+                         typename TranscriptHashType,
+                         std::size_t M,
+                         std::size_t BatchedSize>
                 struct fri : public detail::
                                  basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize> {
 
@@ -85,11 +88,30 @@ namespace nil {
             }    // namespace commitments
 
             namespace algorithms {
-                template<typename FRI, typename PolynomialType,
+                template<typename FRI,
+                         typename PolynomialType,
                          typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
                                                                                   typename FRI::merkle_tree_hash_type,
                                                                                   typename FRI::transcript_hash_type,
-                                                                                  FRI::m,FRI::leaf_size>,
+                                                                                  FRI::m,
+                                                                                  FRI::leaf_size>,
+                                                                 FRI>::value,
+                                                 bool>::type = true>
+                static typename FRI::basic_fri::proof_type proof_eval(
+                    const PolynomialType &g,
+                    const typename FRI::basic_fri::params_type &fri_params,
+                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
+
+                    return proof_eval<typename FRI::basic_fri>(g, g, fri_params, transcript);
+                }
+
+                template<typename FRI,
+                         typename PolynomialType,
+                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
+                                                                                  typename FRI::merkle_tree_hash_type,
+                                                                                  typename FRI::transcript_hash_type,
+                                                                                  FRI::m,
+                                                                                  FRI::leaf_size>,
                                                                  FRI>::value,
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
@@ -106,7 +128,8 @@ namespace nil {
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
-                                                                                    FRI::m, FRI::leaf_size>,
+                                                                                    FRI::m,
+                                                                                    FRI::leaf_size>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(
