@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 3;
+    constexpr std::size_t SelectorColumns = 10;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
