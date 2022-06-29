@@ -212,7 +212,7 @@ namespace nil {
                         using default_ops::eval_divide;
                         using default_ops::eval_msb;
 
-                        m_barrett_mu = static_cast<internal_limb_type>(0u);
+                        m_barrett_mu = static_cast<limb_type>(0u);
 
                         eval_bit_set(m_barrett_mu, 2u * (1u + eval_msb(m_mod.backend())));
                         eval_divide(m_barrett_mu, m_mod.backend());
