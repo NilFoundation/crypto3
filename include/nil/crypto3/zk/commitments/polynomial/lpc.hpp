@@ -436,7 +436,7 @@ namespace nil {
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp = {evaluation_points};
-                    return proof_eval<LPC>(tmp, g, T, fri_params, transcript);
+                    return proof_eval<LPC>(tmp, T, g, fri_params, transcript);
                 }
 
                 template<typename LPC,

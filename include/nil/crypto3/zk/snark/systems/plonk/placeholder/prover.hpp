@@ -82,20 +82,14 @@ namespace nil {
 
                     using runtime_size_commitment_scheme_type =
                         typename ParamsType::runtime_size_commitment_scheme_type;
-                    using witness_commitment_scheme_type =
-                        typename ParamsType::witness_commitment_scheme_type;
+                    using witness_commitment_scheme_type = typename ParamsType::witness_commitment_scheme_type;
                     using public_input_commitment_scheme_type =
                         typename ParamsType::public_input_commitment_scheme_type;
-                    using constant_commitment_scheme_type =
-                        typename ParamsType::constant_commitment_scheme_type;
-                    using selector_commitment_scheme_type =
-                        typename ParamsType::selector_commitment_scheme_type;
-                    using special_commitment_scheme_type =
-                        typename ParamsType::special_commitment_scheme_type;
-                    using permutation_commitment_scheme_type =
-                        typename ParamsType::permutation_commitment_scheme_type;
-                    using quotient_commitment_scheme_type =
-                        typename ParamsType::quotient_commitment_scheme_type;
+                    using constant_commitment_scheme_type = typename ParamsType::constant_commitment_scheme_type;
+                    using selector_commitment_scheme_type = typename ParamsType::selector_commitment_scheme_type;
+                    using special_commitment_scheme_type = typename ParamsType::special_commitment_scheme_type;
+                    using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
+                    using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
 
                     using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
                     using private_preprocessor_type = placeholder_private_preprocessor<FieldType, ParamsType>;
@@ -126,21 +120,22 @@ namespace nil {
                     }
 
                 public:
-                    static inline placeholder_proof<FieldType, ParamsType>
-                        process(typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
-                                const typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
-                                const plonk_table_description<FieldType,
-                                    typename ParamsType::arithmetization_params> &table_description,
-                                plonk_constraint_system<FieldType,
-                                    typename ParamsType::arithmetization_params> &constraint_system,
-                                const typename policy_type::variable_assignment_type &assignments,
-                                const typename ParamsType::commitment_params_type
-                                    &fri_params) {    // TODO: fri_type are the same for each lpc_type here
+                    static inline placeholder_proof<FieldType, ParamsType> process(
+                        typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
+                        const typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
+                        const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
+                            &table_description,
+                        plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                            &constraint_system,
+                        const typename policy_type::variable_assignment_type &assignments,
+                        const typename ParamsType::commitment_params_type
+                            &fri_params) {    // TODO: fri_type are the same for each lpc_type here
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         auto begin = std::chrono::high_resolution_clock::now();
                         auto last = begin;
-                        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
+                        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
                         std::cout << "Placeholder prover:" << std::endl;
 #endif
 
@@ -148,12 +143,14 @@ namespace nil {
 
                         plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             polynomial_table =
-                            plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
-                                preprocessed_private_data.private_polynomial_table,
-                                preprocessed_public_data.public_polynomial_table);
+                                plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
+                                    preprocessed_private_data.private_polynomial_table,
+                                    preprocessed_public_data.public_polynomial_table);
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "polynomial_table_generated_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms" << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "polynomial_table_generated_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         // 1. Add circuit definition to transcript
@@ -162,37 +159,42 @@ namespace nil {
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         // 2. Commit witness columns
-                        std::array<math::polynomial_dfs<typename FieldType::value_type>, witness_columns> witness_polynomials =
-                            preprocessed_private_data.private_polynomial_table.witnesses();
+                        std::array<math::polynomial_dfs<typename FieldType::value_type>, witness_columns>
+                            witness_polynomials = preprocessed_private_data.private_polynomial_table.witnesses();
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         typename witness_commitment_scheme_type::precommitment_type witness_precommitment =
-                            algorithms::precommit<witness_commitment_scheme_type>(witness_polynomials, fri_params.D[0]);
+                            algorithms::precommit<witness_commitment_scheme_type>(witness_polynomials, fri_params.D[0],
+                                                                                  fri_params.step_list.front());
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "witness_precommit_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms" << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "witness_precommit_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        proof.witness_commitment = algorithms::commit<witness_commitment_scheme_type>(witness_precommitment);
+                        proof.witness_commitment =
+                            algorithms::commit<witness_commitment_scheme_type>(witness_precommitment);
                         transcript(proof.witness_commitment);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         // 4. permutation_argument
-                        auto permutation_argument =
-                                placeholder_permutation_argument<FieldType, ParamsType>::
-                                    prove_eval(constraint_system,
-                                               preprocessed_public_data,
-                                               table_description,
-                                               polynomial_table,
-                                               fri_params,
-                                               transcript);
+                        auto permutation_argument = placeholder_permutation_argument<FieldType, ParamsType>::prove_eval(
+                            constraint_system,
+                            preprocessed_public_data,
+                            table_description,
+                            polynomial_table,
+                            fri_params,
+                            transcript);
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "permutation_argument_prove_eval_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "permutation_argument_prove_eval_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         proof.v_perm_commitment = permutation_argument.permutation_poly_precommitment.root();
@@ -205,19 +207,17 @@ namespace nil {
 
                         // 5. lookup_argument
                         bool is_lookup_enabled = constraint_system.lookup_gates().size() > 0;
-                        typename placeholder_lookup_argument<FieldType,
-                                                          permutation_commitment_scheme_type,
-                                                          ParamsType>::prover_lookup_result lookup_argument;
+                        typename placeholder_lookup_argument<FieldType, permutation_commitment_scheme_type,
+                                                             ParamsType>::prover_lookup_result lookup_argument;
                         if (is_lookup_enabled) {
 
                             lookup_argument =
-                                placeholder_lookup_argument<FieldType,
-                                                          permutation_commitment_scheme_type,
-                                                          ParamsType>::prove_eval(constraint_system,
-                                                                                  preprocessed_public_data,
-                                                                                  assignments,
-                                                                                  fri_params,
-                                                                                  transcript);
+                                placeholder_lookup_argument<FieldType, permutation_commitment_scheme_type,
+                                                            ParamsType>::prove_eval(constraint_system,
+                                                                                    preprocessed_public_data,
+                                                                                    assignments,
+                                                                                    fri_params,
+                                                                                    transcript);
                         } else {
 
                             for (std::size_t i = 0; i < lookup_argument.F.size(); i++) {
@@ -240,31 +240,36 @@ namespace nil {
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         F[8] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
-                                constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, transcript)[0];
+                            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
+                            transcript)[0];
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "gate_argument_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms" << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "gate_argument_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-
 
                         /////TEST
                         /*for (std::size_t i = 0; i < f_parts; i++) {
                             for (std::size_t j = 0; j < table_description.rows_amount; j++) {
-                                if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != FieldType::value_type::zero()) {
-                                    std::cout<<"F["<<i<<"] != 0 at j = "<<j<<std::endl;
+                                if
+                        (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) !=
+                        FieldType::value_type::zero()) { std::cout<<"F["<<i<<"] != 0 at j = "<<j<<std::endl;
                                 }
                             }
                         }
 
-                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
+                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates =
+                        constraint_system.gates();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
                                 math::polynomial<typename FieldType::value_type> constraint_result =
-                                    gates[i].constraints[j].evaluate(polynomial_table, preprocessed_public_data.common_data.basic_domain);
-                                if (constraint_result.evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(0)) != FieldType::value_type::zero()) {
-                                    std::cout<<"constraint "<<j<<" from gate "<<i<<std::endl;
+                                    gates[i].constraints[j].evaluate(polynomial_table,
+                        preprocessed_public_data.common_data.basic_domain); if
+                        (constraint_result.evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(0))
+                        != FieldType::value_type::zero()) { std::cout<<"constraint "<<j<<" from gate "<<i<<std::endl;
                                 }
                             }
                         }*/
@@ -277,8 +282,10 @@ namespace nil {
                             quotient_polynomial(preprocessed_public_data, F, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "quotient_polynomial_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "quotient_polynomial_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
 
@@ -286,16 +293,21 @@ namespace nil {
                             detail::split_polynomial<FieldType>(T, fri_params.max_degree);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "split_polynomial_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "split_polynomial_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         typename runtime_size_commitment_scheme_type::precommitment_type T_precommitment =
-                            algorithms::precommit<runtime_size_commitment_scheme_type>(T_splitted, fri_params.D[0]);
+                            algorithms::precommit<runtime_size_commitment_scheme_type>(T_splitted, fri_params.D[0],
+                                                                                       fri_params.step_list.front());
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "T_splitted_precommit_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "T_splitted_precommit_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         proof.T_commitment = algorithms::commit<runtime_size_commitment_scheme_type>(T_precommitment);
@@ -308,53 +320,62 @@ namespace nil {
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
-                        std::array<std::vector<typename FieldType::value_type>, witness_columns> witness_evaluation_points;
+                        std::array<std::vector<typename FieldType::value_type>, witness_columns>
+                            witness_evaluation_points;
 
                         // witness polynomials (table columns)
                         for (std::size_t witness_index = 0; witness_index < witness_columns; witness_index++) {
 
                             std::vector<int> witness_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[witness_index];
-                                
-                            for (std::size_t rotation_index = 0; rotation_index < witness_rotation.size(); rotation_index++) {
-                                witness_evaluation_points[witness_index].push_back(challenge * omega.pow(witness_rotation[rotation_index]));
+
+                            for (std::size_t rotation_index = 0; rotation_index < witness_rotation.size();
+                                 rotation_index++) {
+                                witness_evaluation_points[witness_index].push_back(
+                                    challenge * omega.pow(witness_rotation[rotation_index]));
                             }
                         }
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "witness_evaluation_points_generated_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "witness_evaluation_points_generated_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        proof.eval_proof.witness = algorithms::proof_eval<witness_commitment_scheme_type>(witness_evaluation_points,
-                                                                       witness_precommitment,
-                                                                       witness_polynomials,
-                                                                       fri_params,
-                                                                       transcript);
+                        proof.eval_proof.witness =
+                            algorithms::proof_eval<witness_commitment_scheme_type>(witness_evaluation_points,
+                                                                                   witness_precommitment,
+                                                                                   witness_polynomials,
+                                                                                   fri_params,
+                                                                                   transcript);
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "witness proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "witness proof_eval, time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         // permutation polynomial evaluation
                         std::vector<typename FieldType::value_type> evaluation_points_v_p = {challenge,
-                                                                                               challenge * omega};
-                        proof.eval_proof.permutation =
-                            algorithms::proof_eval<permutation_commitment_scheme_type>(
-                                evaluation_points_v_p,
-                                permutation_argument.permutation_poly_precommitment,
-                                permutation_argument.permutation_polynomial,
-                                fri_params,
-                                transcript);
+                                                                                             challenge * omega};
+                        proof.eval_proof.permutation = algorithms::proof_eval<permutation_commitment_scheme_type>(
+                            evaluation_points_v_p,
+                            permutation_argument.permutation_poly_precommitment,
+                            permutation_argument.permutation_polynomial,
+                            fri_params,
+                            transcript);
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "permutation_proof_eval_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "permutation_proof_eval_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
 
                         // lookup polynomials evaluation
                         if (is_lookup_enabled) {
                             std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
-                                                                                                challenge * omega};
+                                                                                                 challenge * omega};
                             typename permutation_commitment_scheme_type::proof_type v_l_evaluation =
                                 algorithms::proof_eval<permutation_commitment_scheme_type>(
                                     evaluation_points_v_l,
@@ -365,12 +386,14 @@ namespace nil {
                             proof.eval_proof.lookups.push_back(v_l_evaluation);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "v_l_evaluation proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
+                            elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                std::chrono::high_resolution_clock::now() - last);
+                            std::cout << "v_l_evaluation proof_eval, time: " << std::fixed << std::setprecision(3)
+                                      << elapsed.count() * 1e-6 << "ms" << std::endl;
+                            last = std::chrono::high_resolution_clock::now();
 #endif
-                            std::vector<typename FieldType::value_type> evaluation_points_input = {challenge,
-                                                                                                challenge * omega.inversed()};
+                            std::vector<typename FieldType::value_type> evaluation_points_input = {
+                                challenge, challenge * omega.inversed()};
                             typename permutation_commitment_scheme_type::proof_type input_evaluation =
                                 algorithms::proof_eval<permutation_commitment_scheme_type>(
                                     evaluation_points_input,
@@ -381,9 +404,11 @@ namespace nil {
                             proof.eval_proof.lookups.push_back(input_evaluation);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "input_evaluation proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
+                            elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                std::chrono::high_resolution_clock::now() - last);
+                            std::cout << "input_evaluation proof_eval, time: " << std::fixed << std::setprecision(3)
+                                      << elapsed.count() * 1e-6 << "ms" << std::endl;
+                            last = std::chrono::high_resolution_clock::now();
 #endif
                             std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
                             typename permutation_commitment_scheme_type::proof_type value_evaluation =
@@ -396,94 +421,106 @@ namespace nil {
                             proof.eval_proof.lookups.push_back(value_evaluation);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "value_evaluation proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
+                            elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                std::chrono::high_resolution_clock::now() - last);
+                            std::cout << "value_evaluation proof_eval, time: " << std::fixed << std::setprecision(3)
+                                      << elapsed.count() * 1e-6 << "ms" << std::endl;
+                            last = std::chrono::high_resolution_clock::now();
 #endif
                         }
 
                         // quotient
                         std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
-                        proof.eval_proof.quotient =
-                            algorithms::proof_eval<runtime_size_commitment_scheme_type>(
-                                {challenge}, T_precommitment, T_splitted, fri_params, transcript);
+                        proof.eval_proof.quotient = algorithms::proof_eval<runtime_size_commitment_scheme_type>(
+                            {challenge}, T_precommitment, T_splitted, fri_params, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "quotient_proof_eval_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "quotient_proof_eval_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
                         // public
                         std::vector<typename FieldType::value_type> &evaluation_points_public =
                             evaluation_points_quotient;
 
-                        proof.eval_proof.id_permutation =
-                            algorithms::proof_eval<runtime_size_commitment_scheme_type>(
-                                evaluation_points_public, preprocessed_public_data.precommitments.id_permutation, 
-                                    preprocessed_public_data.identity_polynomials, fri_params, transcript);
+                        proof.eval_proof.id_permutation = algorithms::proof_eval<runtime_size_commitment_scheme_type>(
+                            evaluation_points_public, preprocessed_public_data.precommitments.id_permutation,
+                            preprocessed_public_data.identity_polynomials, fri_params, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "id_permutation proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "id_permutation proof_eval, time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
 
                         proof.eval_proof.sigma_permutation =
                             algorithms::proof_eval<runtime_size_commitment_scheme_type>(
-                                evaluation_points_public, preprocessed_public_data.precommitments.sigma_permutation, 
-                                    preprocessed_public_data.permutation_polynomials, fri_params, transcript);
+                                evaluation_points_public, preprocessed_public_data.precommitments.sigma_permutation,
+                                preprocessed_public_data.permutation_polynomials, fri_params, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "sigma_permutation proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "sigma_permutation proof_eval, time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
 
-                        proof.eval_proof.public_input =
-                            algorithms::proof_eval<public_input_commitment_scheme_type>(
-                                evaluation_points_public, preprocessed_public_data.precommitments.public_input, 
-                                    preprocessed_public_data.public_polynomial_table.public_inputs(), fri_params, transcript);
+                        proof.eval_proof.public_input = algorithms::proof_eval<public_input_commitment_scheme_type>(
+                            evaluation_points_public, preprocessed_public_data.precommitments.public_input,
+                            preprocessed_public_data.public_polynomial_table.public_inputs(), fri_params, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "public_input_proof_eval_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "public_input_proof_eval_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
 
-                        proof.eval_proof.constant =
-                            algorithms::proof_eval<constant_commitment_scheme_type>(
-                                evaluation_points_public, preprocessed_public_data.precommitments.constant, 
-                                    preprocessed_public_data.public_polynomial_table.constants(), fri_params, transcript);
+                        proof.eval_proof.constant = algorithms::proof_eval<constant_commitment_scheme_type>(
+                            evaluation_points_public, preprocessed_public_data.precommitments.constant,
+                            preprocessed_public_data.public_polynomial_table.constants(), fri_params, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "constant proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "constant proof_eval, time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
 
-                        proof.eval_proof.selector =
-                            algorithms::proof_eval<selector_commitment_scheme_type>(
-                                evaluation_points_public, preprocessed_public_data.precommitments.selector, 
-                                    preprocessed_public_data.public_polynomial_table.selectors(), fri_params, transcript);
+                        proof.eval_proof.selector = algorithms::proof_eval<selector_commitment_scheme_type>(
+                            evaluation_points_public, preprocessed_public_data.precommitments.selector,
+                            preprocessed_public_data.public_polynomial_table.selectors(), fri_params, transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "selector proof_eval, time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "selector proof_eval, time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
 
-                        proof.eval_proof.special_selectors =
-                            algorithms::proof_eval<special_commitment_scheme_type>(
-                                evaluation_points_public, preprocessed_public_data.precommitments.special_selectors, 
-                                {{preprocessed_public_data.q_last, preprocessed_public_data.q_blind}},
-                                fri_params, transcript);
+                        proof.eval_proof.special_selectors = algorithms::proof_eval<special_commitment_scheme_type>(
+                            evaluation_points_public, preprocessed_public_data.precommitments.special_selectors,
+                            {{preprocessed_public_data.q_last, preprocessed_public_data.q_blind}}, fri_params,
+                            transcript);
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "special_selectors_proof_eval_time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - last);
+                        std::cout << "special_selectors_proof_eval_time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - begin);
-                        std::cout << "Placeholder prover, total time: " << std::fixed << std::setprecision(3) << elapsed.count() * 1e-6 << "ms"  << std::endl;
+                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::high_resolution_clock::now() - begin);
+                        std::cout << "Placeholder prover, total time: " << std::fixed << std::setprecision(3)
+                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
 #endif
 
                         return proof;
