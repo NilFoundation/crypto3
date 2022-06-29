@@ -28,6 +28,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <fstream>
+#include <experimental/random>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
@@ -67,8 +68,27 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
     os << std::endl << std::dec;
 }
 
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+    std::vector<std::size_t> step_list;
+    std::size_t steps_sum = 0;
+    while (steps_sum != r) {
+        if (r - steps_sum <= max_step) {
+            while (r - steps_sum != 1) {
+                step_list.emplace_back(r - steps_sum - 1);
+                steps_sum += step_list.back();
+            }
+            step_list.emplace_back(1);
+            steps_sum += step_list.back();
+        } else {
+            step_list.emplace_back(std::experimental::randint(1, max_step));
+            steps_sum += step_list.back();
+        }
+    }
+    return step_list;
+}
+
 template<typename fri_type, typename FieldType>
-typename fri_type::params_type create_fri_params(std::size_t degree_log) {
+typename fri_type::params_type create_fri_params(std::size_t degree_log, const int max_step = 1) {
     typename fri_type::params_type params;
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
@@ -81,6 +101,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
     params.r = r;
     params.D = domain_set;
     params.max_degree = (1 << degree_log) - 1;
+    params.step_list = generate_random_step_list(r, max_step);
 
     return params;
 }
@@ -88,7 +109,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log) {
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    constexpr std::size_t complexity = 4000;
+    constexpr std::size_t complexity = 8000;
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -159,7 +180,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
         zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
-                                                   typename params::transcript_hash_type, 2>;
+                                                   typename params::transcript_hash_type, 2, 1>;
 
     std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
 
