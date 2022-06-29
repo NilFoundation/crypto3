@@ -58,7 +58,8 @@
 #include <nil/crypto3/algebra/fields/secp/secp_r1/scalar_field.hpp>
 // #include <nil/crypto3/algebra/fields/dsa_botan.hpp>
 // #include <nil/crypto3/algebra/fields/dsa_jce.hpp>
-#include <nil/crypto3/algebra/fields/ed25519.hpp>
+#include <nil/crypto3/algebra/fields/curve25519/base_field.hpp>
+#include <nil/crypto3/algebra/fields/curve25519/scalar_field.hpp>
 // #include <nil/crypto3/algebra/fields/ffdhe_ietf.hpp>
 // #include <nil/crypto3/algebra/fields/field.hpp>
 // #include <nil/crypto3/algebra/fields/modp_ietf.hpp>
