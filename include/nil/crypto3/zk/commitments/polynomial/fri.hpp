@@ -106,6 +106,24 @@ namespace nil {
                 }
 
                 template<typename FRI,
+                         typename PolynomialType,
+                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
+                                                                                  typename FRI::merkle_tree_hash_type,
+                                                                                  typename FRI::transcript_hash_type,
+                                                                                  FRI::m,
+                                                                                  FRI::leaf_size>,
+                                                                 FRI>::value,
+                                                 bool>::type = true>
+                static typename FRI::basic_fri::proof_type proof_eval(
+                    const PolynomialType &g,
+                    typename FRI::precommitment_type &T,
+                    const typename FRI::basic_fri::params_type &fri_params,
+                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
+
+                    return proof_eval<typename FRI::basic_fri>(g, g, T, fri_params, transcript);
+                }
+
+                template<typename FRI,
                          typename std::enable_if<
                              std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                     typename FRI::merkle_tree_hash_type,
