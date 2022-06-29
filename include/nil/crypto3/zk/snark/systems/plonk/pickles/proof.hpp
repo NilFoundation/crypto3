@@ -83,11 +83,11 @@ namespace nil {
                     typename CurveType::scalar_field_type::value_type ft_eval1;
 
                     // public
-                    std::vector<typename CurveType::scalar_field_type::value_type> public_p;
+                    std::vector<typename CurveType::scalar_field_type::value_type> public_input;
 
                     // Previous challenges
                     std::vector<
-                        std::tuple<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_scheme>>
+                        std::pair<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_type>>
                         prev_challenges;
                 };
             }    // namespace snark

@@ -125,6 +125,10 @@ namespace nil {
                         }
                         
                         // 5. permutation argument
+                        if (preprocessed_public_data.common_data.lagrange_0.evaluate(proof.eval_proof.challenge) !=
+                            proof.eval_proof.lagrange_0) {
+                            return false;
+                        }
                         std::array<typename FieldType::value_type, permutation_parts> permutation_argument =
                             placeholder_permutation_argument<FieldType, ParamsType>::
                                 verify_eval(preprocessed_public_data,

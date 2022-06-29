@@ -137,7 +137,7 @@ namespace nil {
                     q_mul[0] = FieldType::value_type::zero();
 
                     // fill rows with ADD gate
-                    for (std::size_t i = 1; i < test_circuit.table_rows - 2; i++) {
+                    for (std::size_t i = 1; i < test_circuit.table_rows - 5; i++) {
                         table[0][i] = algebra::random_element<FieldType>();
                         table[1][i] = algebra::random_element<FieldType>();
                         table[2][i] = table[0][i] + table[1][i];
@@ -146,7 +146,7 @@ namespace nil {
                     }
 
                     // fill rows with MUL gate
-                    for (std::size_t i = test_circuit.table_rows - 2; i < test_circuit.table_rows; i++) {
+                    for (std::size_t i = test_circuit.table_rows - 5; i < test_circuit.table_rows - 3; i++) {
                         table[0][i] = algebra::random_element<FieldType>();
                         table[1][i] = algebra::random_element<FieldType>();
                         table[2][i] = table[0][i] * table[1][i];
@@ -264,7 +264,7 @@ namespace nil {
                     q_mul[0] = FieldType::value_type::zero();
 
                     // fill rows with ADD gate
-                    for (std::size_t i = 1; i < test_circuit.table_rows - 2; i++) {
+                    for (std::size_t i = 1; i < test_circuit.table_rows - 5; i++) {
                         table[0][i] = algebra::random_element<FieldType>();
                         table[1][i] = table[2][i - 1];
                         table[2][i] = table[0][i] + table[1][i];
@@ -280,7 +280,7 @@ namespace nil {
                     }
 
                     // fill rows with MUL gate
-                    for (std::size_t i = test_circuit.table_rows - 2; i < test_circuit.table_rows; i++) {
+                    for (std::size_t i = test_circuit.table_rows - 5; i < test_circuit.table_rows - 3; i++) {
                         table[0][i] = algebra::random_element<FieldType>();
                         table[1][i] = table[3][0];
                         table[2][i] = table[0][i] * table[1][i] + table[0][i - 1];
