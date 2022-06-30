@@ -133,22 +133,3 @@ BOOST_AUTO_TEST_CASE(permute){
     for(auto &test_set : test_sets)
         test_permute<rc_functions_t>(test_set);
 }
-
-// BOOST_AUTO_TEST_CASE(permute_in_FP64){
-//     using rc_functions_t_64 = hashes::detail::reinforced_concrete_functions<fields::maxprime<64>>;
-//     using operators_64 = rc_functions_t_64::reinforced_concrete_operators_type;
-//     using element_type_64 = rc_functions_t_64::element_type;
-//     using integral_type_64 = rc_functions_t_64::integral_type;
-//     using state_type_64 = rc_functions_t_64::state_type;
-
-//     // element_type_64 a = element_type_64(integral_type_64(222));
-//     using fp = fields::maxprime<64>;
-//     // fp::value_type a = fp::value_type(fp::integral_type(64));
-//     // fp::value_type b = fp::value_type(fp::integral_type(63));
-//     // std::cout << (a * b).data << std::flush;
-//     // state_type_64 temp_state = {element_type_64(integral_type_64(0)), element_type_64(integral_type_64(0)), element_type_64(integral_type_64(0))};
-//     // rc_functions_t_64::permute(temp_state);
-//     // BOOST_CHECK_EQUAL(temp_state[0], element_type(integral_type(0x000000000000000046c0b8fcb05a39eb)));
-//     // BOOST_CHECK_EQUAL(temp_state[1], element_type(integral_type(0x0000000000000000054581b45d897fcb)));
-//     // BOOST_CHECK_EQUAL(temp_state[2], element_type(integral_type(0x00000000000000009a68e1181bd6971d)));
-// }
