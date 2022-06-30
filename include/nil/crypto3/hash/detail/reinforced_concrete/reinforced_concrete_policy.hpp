@@ -30,10 +30,8 @@ namespace nil {
 
                     constexpr static const std::size_t part_rounds = 3;
                     constexpr static const std::size_t constant_ab_size = 2;
-                    constexpr static const std::size_t bucket_size = 27;
                     typedef std::array<element_type, constant_ab_size> alphas_type;
                     typedef std::array<element_type, constant_ab_size> betas_type;
-                    typedef std::array<element_type, bucket_size> bucket_type;
                     
                 };
 
@@ -42,7 +40,9 @@ namespace nil {
 
                 template <>
                 struct reinforced_concrete_policy<nil::crypto3::algebra::fields::bls12_fr<381> > : 
-                    public base_reinforced_concrete_policy<nil::crypto3::algebra::fields::bls12_fr<381> > {
+                  public base_reinforced_concrete_policy<nil::crypto3::algebra::fields::bls12_fr<381> > {
+                    constexpr static const std::size_t bucket_size = 27;
+                    typedef std::array<element_type, bucket_size> bucket_type;
 
                     constexpr static const alphas_type alphas = {element_type(integral_type(1ul)), element_type(integral_type(3ul))};
                     constexpr static const betas_type betas = {element_type(integral_type(2ul)), element_type(integral_type(4ul))};
