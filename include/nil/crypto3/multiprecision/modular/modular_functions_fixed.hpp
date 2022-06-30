@@ -212,7 +212,7 @@ namespace nil {
                         using default_ops::eval_divide;
                         using default_ops::eval_msb;
 
-                        m_barrett_mu = static_cast<limb_type>(0u);
+                        m_barrett_mu = static_cast<internal_limb_type>(0u);
 
                         eval_bit_set(m_barrett_mu, 2u * (1u + eval_msb(m_mod.backend())));
                         eval_divide(m_barrett_mu, m_mod.backend());
@@ -403,7 +403,8 @@ namespace nil {
                         Backend_doubled_padded_limbs accum(result);
                         Backend_doubled_padded_limbs prod;
 #if BOOST_ARCH_X86_64
-                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == m_mod.backend().size()) {
+                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == m_mod.backend().size()
+                            && !is_trivial_cpp_int<Backend1>::value) {
                             bool carry =
                                 reduce_limb_asm(m_mod.backend().size(), accum.limbs(), m_mod.backend().limbs(),
                                                 static_cast<double_limb_type>(m_montgomery_p_dash));
@@ -456,7 +457,8 @@ namespace nil {
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 #if BOOST_ARCH_X86_64
-                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == y.size() && result.size() == m_mod.backend().size()) {
+                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == y.size()
+                            && result.size() == m_mod.backend().size() && !is_trivial_cpp_int<Backend1>::value) {
                             add_mod_asm(limbs_count, result.limbs(), y.limbs(), m_mod.backend().limbs());
                             result.resize(limbs_count, limbs_count);
                             result.normalize();

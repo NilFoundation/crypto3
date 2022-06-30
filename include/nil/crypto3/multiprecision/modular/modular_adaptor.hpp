@@ -307,7 +307,8 @@ namespace nil {
                     using default_ops::eval_lt;
 #if BOOST_ARCH_X86_64
                     auto limbs_count = get_limbs_count<cpp_int_backend<MinBits, MaxBits, SignType, Checked>>();
-                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) &&
+                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs() &&
+                                                     !is_trivial_cpp_int<Backend1>::value) &&
                         result.base_data().size() == o.base_data().size() &&
                         result.base_data().size() == result.mod_data().get_mod().backend().size()) {
                         sub_mod_asm(limbs_count, result.base_data().limbs(), o.base_data().limbs(),
