@@ -1,17 +1,42 @@
-
 #define BOOST_TEST_MAIN
 
 #include <iostream>
+#include <array>
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include "nil/crypto3/hash/reinforced_concrete.hpp"
 #include "nil/crypto3/algebra/fields/bls12/scalar_field.hpp"
-#include <iostream>
+#include "nil/crypto3/algebra/fields/field.hpp"
+#include "nil/crypto3/hash/reinforced_concrete.hpp"
+// #include "nil/crypto3/algebra/fields/maxprime.hpp"
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
+
+
+// namespace nil {
+//     namespace crypto3 {
+//         namespace hashes {
+//             namespace detail {
+//                 template <>
+//                 struct reinforced_concrete_policy<nil::crypto3::algebra::fields::maxprime<64>> : 
+//                     public base_reinforced_concrete_policy<nil::crypto3::algebra::fields::maxprime<64>> {
+//                     constexpr static const std::size_t bucket_size = 7;
+//                     typedef std::array<element_type, bucket_size> bucket_type;
+
+//                     constexpr static const alphas_type alphas = {element_type(integral_type(1)), element_type(integral_type(3))};
+//                     constexpr static const betas_type betas = {element_type(integral_type(2)), element_type(integral_type(4))};
+//                     constexpr static const std::size_t d = 3;
+//                     constexpr static const bucket_type bucket = {element_type(integral_type(570)), element_type(integral_type(577)), element_type(integral_type(549)), 
+//                                                                 element_type(integral_type(579)), element_type(integral_type(553)), element_type(integral_type(577)), 
+//                                                                 element_type(integral_type(553))};
+//                     constexpr static const element_type p_min = element_type(integral_type(541));
+//                 };
+//             }
+//         }
+//     }
+// }
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
@@ -44,6 +69,19 @@ using element_type = rc_functions_t::element_type;
 using integral_type = rc_functions_t::integral_type;
 using state_type = rc_functions_t::state_type;
 
+template <typename rc_functions>
+void test_permute(std::array<std::pair<typename rc_functions::element_type, typename rc_functions::element_type>, 3>& test_set){
+    using state_type = typename rc_functions::state_type;
+
+    state_type in = {test_set[0].first, test_set[1].first, test_set[2].first};
+    state_type out = {test_set[0].second, test_set[1].second, test_set[2].second};
+
+    rc_functions::permute(in);
+    BOOST_CHECK_EQUAL(in[0], out[0]);
+    BOOST_CHECK_EQUAL(in[1], out[1]);
+    BOOST_CHECK_EQUAL(in[2], out[2]);
+
+}
 BOOST_AUTO_TEST_CASE(check_inversity_of_compose_decompose_for_0){
     element_type zero = element_type(integral_type(0));
     operators::bucket_type after_decompose = operators::decompose(zero);
@@ -68,6 +106,49 @@ BOOST_AUTO_TEST_CASE(bricks_for_bls12fr381){
 }
 
 BOOST_AUTO_TEST_CASE(permute){
-    state_type temp_state = {element_type(integral_type(0)), element_type(integral_type(0)), element_type(integral_type(0))};
-    rc_functions_t::permute(temp_state);
+    typedef std::array<std::pair<element_type, element_type>, 3> states_type;
+    std::vector<states_type> test_sets;
+    test_sets.emplace_back(states_type({
+        std::pair<element_type, element_type>(element_type(integral_type("50917230419308163733470192369465914281470471790130294745848939712028772983060")), 
+                                            element_type(integral_type("24739598089584454475621966183939257820166234533866965673492546376895264019128"))),
+
+        std::pair<element_type, element_type>(element_type(integral_type("29642283130329487301988235868162751576403275281027830771209987540575428383637")), 
+                                            element_type(integral_type("37521142756452916806081885515487491075534340094499376737812166523163578355714"))),
+
+        std::pair<element_type, element_type>(element_type(integral_type("23663775015144813469379634606587938210554610024644297430818232620868959459552")), 
+                                            element_type(integral_type("28549386537327608580836266150865810307117966330419940567643306094099488987233")))
+                                           }));
+                                            
+    test_sets.emplace_back(states_type({
+        std::pair<element_type, element_type>(element_type(integral_type("33510179140755347895375425370352023727694444228069440239293572206565074736884")), 
+                                            element_type(integral_type("18174659052144177138751950570163950544332769998004183128651038977303979699219"))),
+
+        std::pair<element_type, element_type>(element_type(integral_type("21603135348740703879430592411306870931346051097828213275497380996270715042141")), 
+                                            element_type(integral_type("45812904386624376072737388526521613814601111711231627564052185515112943150536"))),
+
+        std::pair<element_type, element_type>(element_type(integral_type("18632482287926004637041478199651776515736102069097516336082032841334185966107")), 
+                                            element_type(integral_type("37231969806958808374977231216847168420099752393260010793385011955298357714262")))
+                                           }));
+                                            
+    for(auto &test_set : test_sets)
+        test_permute<rc_functions_t>(test_set);
 }
+
+// BOOST_AUTO_TEST_CASE(permute_in_FP64){
+//     using rc_functions_t_64 = hashes::detail::reinforced_concrete_functions<fields::maxprime<64>>;
+//     using operators_64 = rc_functions_t_64::reinforced_concrete_operators_type;
+//     using element_type_64 = rc_functions_t_64::element_type;
+//     using integral_type_64 = rc_functions_t_64::integral_type;
+//     using state_type_64 = rc_functions_t_64::state_type;
+
+//     // element_type_64 a = element_type_64(integral_type_64(222));
+//     using fp = fields::maxprime<64>;
+//     // fp::value_type a = fp::value_type(fp::integral_type(64));
+//     // fp::value_type b = fp::value_type(fp::integral_type(63));
+//     // std::cout << (a * b).data << std::flush;
+//     // state_type_64 temp_state = {element_type_64(integral_type_64(0)), element_type_64(integral_type_64(0)), element_type_64(integral_type_64(0))};
+//     // rc_functions_t_64::permute(temp_state);
+//     // BOOST_CHECK_EQUAL(temp_state[0], element_type(integral_type(0x000000000000000046c0b8fcb05a39eb)));
+//     // BOOST_CHECK_EQUAL(temp_state[1], element_type(integral_type(0x0000000000000000054581b45d897fcb)));
+//     // BOOST_CHECK_EQUAL(temp_state[2], element_type(integral_type(0x00000000000000009a68e1181bd6971d)));
+// }
