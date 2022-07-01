@@ -64,7 +64,8 @@ set(TESTS_NAMES
     "sha2"
     "sha3"
     "static_digest"
-    "tiger")
+    "tiger"
+    "reinforced_concrete")
 
 if(CRYPTO3_HASH_PEDERSEN OR CRYPTO3_HASH_POSEIDON)
     list(APPEND TESTS_NAMES

@@ -14,7 +14,8 @@ cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0077 NEW)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_WORKSPACE_NAME}::multiprecision
+${CMAKE_WORKSPACE_NAME}::algebra
      "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
@@ -70,6 +71,7 @@ option(CRYPTO3_HASH_TIGER "Build with Tiger hash support" TRUE)
 option(CRYPTO3_HASH_WHIRLPOOL "Build with Whirlpool hash support" TRUE)
 option(CRYPTO3_HASH_POSEIDON "Build with Poseidon hash support" TRUE)
 option(CRYPTO3_HASH_PEDERSEN "Build with Pedersen hash support" TRUE)
+option(CRYPTO3_HASH_REINFORCED_CONCRETE "Build with reinforced concrete hash support" TRUE)
 
 set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
 
@@ -194,6 +196,21 @@ if(CRYPTO3_HASH_POSEIDON)
          marshalling::crypto3_algebra)
 endif()
 
+if(CRYPTO3_HASH_REINFORCED_CONCRETE)
+    list(APPEND ${CURRENT_PROJECT_NAME}_REINFORCED_CONCRETE_HEADERS
+         include/nil/crypto3/hash/reinforced_concrete.hpp)
+
+    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_REINFORCED_CONCRETE)
+    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
+         ${${CURRENT_PROJECT_NAME}_REINFORCED_CONCRETE_HEADERS})
+
+    list(APPEND ${CURRENT_PROJECT_NAME}_INTERFACE_LIBRARIES
+         ${CMAKE_WORKSPACE_NAME}::algebra
+         ${CMAKE_WORKSPACE_NAME}::multiprecision
+
+         marshalling::crypto3_algebra)
+endif()
+
 if(CRYPTO3_HASH_PEDERSEN)
     list(APPEND ${CURRENT_PROJECT_NAME}_PEDERSEN_HEADERS
          include/nil/crypto3/hash/pedersen.hpp)
@@ -220,7 +237,8 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${${CURRENT_PROJECT_NAME}_INTERFACE_LIBRARIES}
-
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision
+                      ${CMAKE_WORKSPACE_NAME}::algebra
                       ${CMAKE_WORKSPACE_NAME}::block
 
                       ${Boost_LIBRARIES})
