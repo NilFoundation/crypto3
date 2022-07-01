@@ -3,9 +3,8 @@
 
 #include <iostream>
 #include <array>
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/data/monomorphic.hpp>
 
 #include "nil/crypto3/algebra/fields/bls12/scalar_field.hpp"
 #include "nil/crypto3/algebra/fields/field.hpp"
