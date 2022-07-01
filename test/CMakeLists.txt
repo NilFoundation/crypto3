@@ -97,6 +97,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/detail/ft_eval"
     "verifiers/kimchi/detail/combine_proof_evals"
     "verifiers/kimchi/detail/index_terms_scalars"
+    "verifiers/kimchi/detail/rpn_expression"
     "sponge/sponge"
     "sponge/oracles"
     "sponge/transcript_fr"

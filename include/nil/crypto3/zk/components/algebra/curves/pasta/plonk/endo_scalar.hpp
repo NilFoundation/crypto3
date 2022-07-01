@@ -121,12 +121,12 @@ namespace nil {
 
                     using endo_params = endo_scalar_params<CurveType>;
 
-                    constexpr static const typename BlueprintFieldType::value_type endo_factor = endo_params::endo_r;
-
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f00;
                     constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 2;
+
+                    constexpr static const typename BlueprintFieldType::value_type endo_factor = endo_params::endo_r;
 
                     struct params_type {
                         var scalar;
