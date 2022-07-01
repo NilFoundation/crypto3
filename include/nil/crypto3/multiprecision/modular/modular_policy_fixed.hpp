@@ -66,13 +66,10 @@ namespace nil {
 
                     /// real limb_type depending on is_trivial_cpp_int property
                     /// such logic is necessary due to local_limb_type could be uint128
-//                    typedef typename std::conditional<is_trivial_cpp_int<Backend>::value,
-//                                                      typename trivial_limb_type<MinBits>::type,
-//                                                      limb_type>::type
-//                        internal_limb_type;
-                    typedef
-                        typename std::conditional<is_trivial_cpp_int<Backend>::value, double_limb_type, limb_type>::type
-                            internal_limb_type;
+                    typedef typename std::conditional<is_trivial_cpp_int<Backend>::value,
+                                                      typename trivial_limb_type<MinBits>::type,
+                                                      limb_type>::type
+                        internal_limb_type;
                     typedef typename std::conditional<
                         is_trivial_cpp_int<Backend>::value,
                         number<cpp_int_backend<2u * limb_bits, 2u * limb_bits, cpp_integer_type::unsigned_magnitude,

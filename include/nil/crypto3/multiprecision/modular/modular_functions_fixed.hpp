@@ -212,7 +212,7 @@ namespace nil {
                         using default_ops::eval_divide;
                         using default_ops::eval_msb;
 
-                        m_barrett_mu = static_cast<internal_limb_type>(0u);
+                        m_barrett_mu = static_cast<limb_type>(0u);
 
                         eval_bit_set(m_barrett_mu, 2u * (1u + eval_msb(m_mod.backend())));
                         eval_divide(m_barrett_mu, m_mod.backend());
@@ -404,7 +404,7 @@ namespace nil {
                         Backend_doubled_padded_limbs prod;
 #if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == m_mod.backend().size()
-                            && !is_trivial_cpp_int<Backend1>::value) {
+                            && !is_trivial_cpp_int<Backend1>::value && result.size() > 1) {
                             bool carry =
                                 reduce_limb_asm(m_mod.backend().size(), accum.limbs(), m_mod.backend().limbs(),
                                                 static_cast<double_limb_type>(m_montgomery_p_dash));
@@ -426,10 +426,10 @@ namespace nil {
                         {
                             for (auto i = 0; i < m_mod.backend().size(); ++i) {
                                 eval_multiply(prod, m_mod.backend(),
-                                              static_cast<internal_limb_type>(
+                                              static_cast<double_limb_type>(static_cast<internal_limb_type>(
                                                   custom_get_limb_value<internal_limb_type>(accum, i) *
                                                   /// to prevent overflow error in constexpr
-                                                  static_cast<double_limb_type>(m_montgomery_p_dash)));
+                                                  static_cast<double_limb_type>(m_montgomery_p_dash))));
                                 eval_left_shift(prod, i * limb_bits);
                                 eval_add(accum, prod);
                             }
