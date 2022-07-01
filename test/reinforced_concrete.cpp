@@ -1,4 +1,5 @@
-#define BOOST_TEST_MAIN
+// #define BOOST_TEST_MAIN
+#define BOOST_TEST_MODULE reinforced_concrete_test
 
 #include <iostream>
 #include <array>
@@ -9,7 +10,7 @@
 #include "nil/crypto3/algebra/fields/bls12/scalar_field.hpp"
 #include "nil/crypto3/algebra/fields/field.hpp"
 #include "nil/crypto3/hash/reinforced_concrete.hpp"
-// #include "nil/crypto3/algebra/fields/maxprime.hpp"
+#include "nil/crypto3/algebra/fields/maxprime.hpp"
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
@@ -133,3 +134,27 @@ BOOST_AUTO_TEST_CASE(permute){
     for(auto &test_set : test_sets)
         test_permute<rc_functions_t>(test_set);
 }
+
+
+// BOOST_AUTO_TEST_CASE(permute_in_FP64){
+//     using rc_functions_t = hashes::detail::reinforced_concrete_functions<fields::maxprime<64>>;
+//     using element_type = rc_functions_t::element_type;
+//     using integral_type = rc_functions_t::integral_type;
+//     using state_type = rc_functions_t::state_type;
+
+//     // typedef std::array<std::pair<element_type, element_type>, 3> states_type;
+//     // std::vector<states_type> test_sets;
+//     // test_sets.emplace_back(states_type({
+//     //     std::pair<element_type, element_type>(element_type(integral_type(0x00000000000000000000000000000000ull)), 
+//     //                                         element_type(integral_type(0x000000000000000046c0b8fcb05a39ebull))),
+
+//     //     std::pair<element_type, element_type>(element_type(integral_type(0x00000000000000000000000000000000ull)), 
+//     //                                         element_type(integral_type(0x0000000000000000054581b45d897fcbull))),
+
+//     //     std::pair<element_type, element_type>(element_type(integral_type(0x00000000000000000000000000000000ull)), 
+//     //                                         element_type(integral_type(0x00000000000000009a68e1181bd6971dull)))
+//     //                                        }));
+                                            
+//     // for(auto &test_set : test_sets)
+//     //     test_permute<rc_functions_t>(test_set);
+// }
