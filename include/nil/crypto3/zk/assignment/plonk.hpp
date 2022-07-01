@@ -130,6 +130,8 @@ namespace nil {
 
                 std::size_t next_selector_index = 0;
 
+                std::size_t allocated_public_input_rows = 0;
+
             public:
 
                 blueprint_public_assignment_table(
@@ -308,7 +310,7 @@ namespace nil {
                 }
 
                 var allocate_public_input(typename BlueprintFieldType::value_type data) {
-                    static std::size_t allocated_public_input_rows = 0;
+
 
                     public_input(0)[allocated_public_input_rows] = data;
                     allocated_public_input_rows++;
