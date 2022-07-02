@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
      var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input), var(0, 6, false, var::column_type::public_input),
      var(0, 7, false, var::column_type::public_input)};
 
-     std::array<typename BlueprintFieldType::value_type, 80>
+     std::array<typename BlueprintFieldType::integral_type, 80>
                         round_constant = {
                             0x428a2f98d728ae22_cppui64, 0x7137449123ef65cd_cppui64, 0xb5c0fbcfec4d3b2f_cppui64, 0xe9b5dba58189dbbc_cppui64,
                             0x3956c25bf348b538_cppui64, 0x59f111f1b605d019_cppui64, 0x923f82a4af194f9b_cppui64, 0xab1c5ed5da6d8118_cppui64,
@@ -102,23 +102,23 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
     for (int i = 0; i<16; i++) {
         input_words_var[i]= var(0, 8 + i, false, var::column_type::public_input);
     }
-    /*std::array<typename BlueprintFieldType::integral_type, 64> message_schedule_array;
+    std::array<typename BlueprintFieldType::integral_type, 80> message_schedule_array;
     for(std::size_t i = 0; i < 16; i++){
         message_schedule_array[i] = typename BlueprintFieldType::integral_type(public_input[8 + i].data);
     }
-    for(std::size_t i = 16; i < 64; i ++){
-        typename BlueprintFieldType::integral_type s0 = ((message_schedule_array[i - 15] >> 7)|((message_schedule_array[i - 15] << (32 - 7)) 
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data))) ^
-        ((message_schedule_array[i - 15] >> 18)|((message_schedule_array[i - 15] << (32 - 18))
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)))
+    for(std::size_t i = 16; i < 80; i ++){
+        typename BlueprintFieldType::integral_type s0 = ((message_schedule_array[i - 15] >> 7)|((message_schedule_array[i - 15] << (64 - 7)) 
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data))) ^
+        ((message_schedule_array[i - 15] >> 18)|((message_schedule_array[i - 15] << (64 - 18))
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)))
          ^ (message_schedule_array[i - 15] >> 3);
-        typename BlueprintFieldType::integral_type s1 = ((message_schedule_array[i - 2] >> 17)|((message_schedule_array[i - 2] << (32 - 17))
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data))) ^
-        ((message_schedule_array[i - 2] >> 19)|((message_schedule_array[i - 2] << (32 - 19))
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)))
+        typename BlueprintFieldType::integral_type s1 = ((message_schedule_array[i - 2] >> 17)|((message_schedule_array[i - 2] << (64 - 17))
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data))) ^
+        ((message_schedule_array[i - 2] >> 19)|((message_schedule_array[i - 2] << (64 - 19))
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)))
          ^ (message_schedule_array[i - 2] >> 10);
         message_schedule_array[i] = (message_schedule_array[i - 16] + s0 + s1 + message_schedule_array[i - 7])%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data); 
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data); 
     }
     typename ArithmetizationType::field_type::integral_type a = typename ArithmetizationType::field_type::integral_type(public_input[0].data);
     typename ArithmetizationType::field_type::integral_type b = typename ArithmetizationType::field_type::integral_type(public_input[1].data);
@@ -128,23 +128,23 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
     typename ArithmetizationType::field_type::integral_type f = typename ArithmetizationType::field_type::integral_type(public_input[5].data);
     typename ArithmetizationType::field_type::integral_type g = typename ArithmetizationType::field_type::integral_type(public_input[6].data);
     typename ArithmetizationType::field_type::integral_type h = typename ArithmetizationType::field_type::integral_type(public_input[7].data);
-    for(std::size_t i = 0; i < 64; i ++){
-        typename BlueprintFieldType::integral_type S0 = ((a >> 2)|((a << (32 - 2)) 
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data))) ^
-        ((a >> 13)|((a << (32 - 13))
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)))
-         ^ ((a >> 22)|((a << (32 - 22))
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)));
-        typename BlueprintFieldType::integral_type S1 = ((e >> 6)|((e << (32 - 6)) 
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data))) ^
-        ((e >> 11)|((e << (32 - 11))
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)))
-         ^ ((e >> 25)|((e << (32 - 25))
-        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)));
+    for(std::size_t i = 0; i < 80; i ++){
+        typename BlueprintFieldType::integral_type S0 = ((a >> 2)|((a << (64 - 2)) 
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data))) ^
+        ((a >> 13)|((a << (64 - 13))
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)))
+         ^ ((a >> 22)|((a << (64 - 22))
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)));
+        typename BlueprintFieldType::integral_type S1 = ((e >> 6)|((e << (64 - 6)) 
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data))) ^
+        ((e >> 11)|((e << (64 - 11))
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)))
+         ^ ((e >> 25)|((e << (64 - 25))
+        & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)));
         typename BlueprintFieldType::integral_type maj = (a & b) ^ (a & c) ^ (b & c);
         typename BlueprintFieldType::integral_type ch = (e & f) ^ ((~e)& g);
 
-        std::vector<bool> e_bits(32);
+        /*std::vector<bool> e_bits(32);
         for (std::size_t j = 0; j < 32; j++) {
             e_bits[32 - j - 1] = multiprecision::bit_test(e, j);
         }
@@ -165,41 +165,41 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
         component_type::split_and_sparse(f_bits, sizes, base);
 
         std::array<std::vector<typename curve_type::base_field_type::integral_type>, 2> g_s =
-        component_type::split_and_sparse(g_bits, sizes, base);
+        component_type::split_and_sparse(g_bits, sizes, base);*/
         typename BlueprintFieldType::integral_type tmp1 = h + S1 + ch + round_constant[i] + message_schedule_array[i];
         typename BlueprintFieldType::integral_type tmp2 = S0 + maj;
         h = g;
         g = f;
         f = e;
         e = (d + tmp1)%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data);
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data);
         d = c;
         c = b;
         b = a;
         a = (tmp1 + tmp2)%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data);
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data);
     }
     std::array<typename BlueprintFieldType::integral_type, 8> result_state = {(a + typename ArithmetizationType::field_type::integral_type(public_input[0].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data),
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
     (b + typename ArithmetizationType::field_type::integral_type(public_input[1].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data), 
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data), 
     (c + typename ArithmetizationType::field_type::integral_type(public_input[2].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data),
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
     (d + typename ArithmetizationType::field_type::integral_type(public_input[3].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data),
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
     (e + typename ArithmetizationType::field_type::integral_type(public_input[4].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data),
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
     (f + typename ArithmetizationType::field_type::integral_type(public_input[5].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data),
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
     (g + typename ArithmetizationType::field_type::integral_type(public_input[6].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data),
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
     (h + typename ArithmetizationType::field_type::integral_type(public_input[7].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(32).data)};*/
-    auto result_check = [](AssignmentType &assignment, 
+        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data)};
+    auto result_check = [result_state](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-            /*for (std::size_t i = 0; i < 8; i++) {
+            for (std::size_t i = 0; i < 8; i++) {
                 assert(result_state[i] == typename ArithmetizationType::field_type::integral_type(assignment.var_value(real_res.output_state[i]).data)); 
-            }*/
+            }
     };
     typename component_type::params_type params = {input_state_var, input_words_var};
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
