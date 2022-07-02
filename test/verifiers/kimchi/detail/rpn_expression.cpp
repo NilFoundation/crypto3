@@ -102,9 +102,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite) {
 
     var alpha = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    typename component_type::params_type params = {{}, alpha};
+    std::string expression_str = "Alpha;";
 
-    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
+    auto expression = component_type::rpn_from_string(expression_str);
+
+    typename component_type::params_type params = {expression, alpha};
+
+    auto result_check = [&alpha_val](AssignmentType &assignment, component_type::result_type &real_res) {
+        assert(alpha_val == assignment.var_value(real_res.output));
+    };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
