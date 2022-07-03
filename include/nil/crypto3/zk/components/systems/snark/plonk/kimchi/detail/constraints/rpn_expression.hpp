@@ -34,9 +34,10 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
 
@@ -99,6 +100,7 @@ namespace nil {
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
+                    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
                     using endo_scalar_component =
                         zk::components::endo_scalar<ArithmetizationType, typename KimchiParamsType::curve_type,
@@ -108,15 +110,22 @@ namespace nil {
 
                     using poseidon_component = zk::components::poseidon<ArithmetizationType, 
                         BlueprintFieldType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                    
+                    using exponentiation_component =
+                        zk::components::exponentiation<ArithmetizationType, 64, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
+                                                       W10, W11, W12, W13, W14>;
 
-                    constexpr static const std::size_t selector_seed = 0x0f27;
+                    using evaluations_type = typename zk::components::kimchi_proof_evaluations<
+                        BlueprintFieldType, KimchiParamsType>;
+
+                    constexpr static const std::size_t selector_seed = 0x0f31;
 
                     constexpr static const std::size_t mds_size = 3;
 
                     static std::array<std::array<var, mds_size>, mds_size> mds_vars(
                             const std::size_t start_row) {
                         std::array<std::array<var, mds_size>, mds_size> result;
-                        std::size_t mds_start_row = start_row + 1;
+                        std::size_t mds_start_row = start_row;
 
                         for (std::size_t i = 0; i < mds_size; ++i) {
                             for (std::size_t j = 0; j < mds_size; ++j) {
@@ -125,6 +134,45 @@ namespace nil {
                             }
                         }
                         return result;
+                    }
+
+                    static var var_from_evals(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                        const std::array<evaluations_type, KimchiParamsType::eval_points_amount> evaluations,
+                                        const std::size_t var_column,
+                                        const std::size_t var_row) {
+                        auto evals = evaluations[var_row];
+
+                        /// 0 - witness_columns: witnesses
+                        /// witness_columns + 1: z
+                        /// witness_columns + 2: PoseidonSelector
+                        /// witness_columns + 3: GenericSelector
+                        /// witness_columns + 4: LookupAggreg
+                        /// witness_columns + 5: LookupTable
+                        /// witness_columns + 6: LookupRuntimeTable
+                        /// witness_columns + 7+: LookupSorted
+                        
+                        switch(var_column) {
+                            case KimchiParamsType::witness_columns + 1:
+                                return evals.z;
+                            case KimchiParamsType::witness_columns + 2:
+                                return evals.poseidon_selector;
+                            case KimchiParamsType::witness_columns + 3:
+                                return evals.generic_selector;
+                            case KimchiParamsType::witness_columns + 4:
+                                // TODO: lookups
+                                return evals.z;
+                            case KimchiParamsType::witness_columns + 5:
+                                // TODO: lookups
+                                return evals.z;
+                            case KimchiParamsType::witness_columns + 6:
+                                // TODO: lookups
+                                return evals.z;
+                            case KimchiParamsType::witness_columns + 7:
+                                // TODO: lookups
+                                return evals.z;
+                            default:
+                                throw std::runtime_error("Unknown column type");
+                        }
                     }
 
                 public:
@@ -164,6 +212,9 @@ namespace nil {
                         var beta;
                         var gamma;
                         var joint_combiner;
+
+                        std::array<evaluations_type, KimchiParamsType::eval_points_amount>
+                            evaluations;
                     };
 
                     static std::vector<typename params_type::token_value_type> 
@@ -215,15 +266,62 @@ namespace nil {
                             }
                             else if (token_str.find("Literal")) {
                                 token.type = token_type::literal;
+                                //std::size_t value_pos = token_str.find("value");
+                                // TODO: get multiprecision from string
                             }
                             else if (token_str.find("Cell")) {
                                 token.type = token_type::cell;
+
+                                std::size_t row_pos = token_str.find("row");
+                                std::size_t row;
+                                if (token_str.find("Curr", row_pos) != std::string::npos) {
+                                    row = 0;
+                                } else { // Next
+                                    row = 1;
+                                }
+
+                                std::size_t col_pos = token_str.find("col");
+                                std::size_t col;
+                                if (token_str.find("Witness", col_pos) != std::string::npos) {
+                                    // Witness(col)
+                                    std::size_t witness_pos = token_str.find("Witness", col_pos);
+                                    std::size_t col_start_pow = witness_pos + 8;
+                                    std::size_t col_end_pow = token_str.find(")", col_start_pow);
+                                    std::string col_str = token_str.substr(col_start_pow, col_end_pow - col_start_pow);
+                                    col = std::stoi(col_str);
+                                } else {
+                                    std::array<std::string, 6> column_types = 
+                                        {"Z", "Poseidon", "Generic", "LookupAggreg", 
+                                        "LookupTable", "LookupRuntimeTable"};
+                                    for (std::size_t i = 0; i < column_types.size(); i++) {
+                                        if (token_str.find(column_types[i]) != std::string::npos) {
+                                            col = KimchiParamsType::witness_columns + i + 1;
+                                            break;
+                                        }
+                                    }
+
+                                    // lookup_sorted
+                                    if (token_str.find("LookupSorted") != std::string::npos) {
+                                        std::size_t col_start_pos = token_str.find("LookupSorted", col_pos) + 14;
+                                        std::size_t col_end_pos = token_str.find(")", col_start_pos);
+                                        std::string col_str = token_str.substr(col_start_pos, col_end_pos - col_start_pos);
+                                        col = KimchiParamsType::witness_columns + 6 + std::stoi(col_str);
+                                    }
+                                }
+
+                                token.value = col;
+                                token.value_second = row;
                             }
                             else if (token_str.find("Dup")) {
                                 token.type = token_type::dup;
                             }
                             else if (token_str.find("Pow")) {
                                 token.type = token_type::pow;
+
+                                std::size_t exp_start_pos = token_str.find("Pow") + 4;
+                                std::size_t exp_end_pos = token_str.find(")", exp_start_pos);
+                                std::string exp_str = token_str.substr(exp_start_pos, exp_end_pos - exp_start_pos);
+                                token.value = std::stoi(exp_str);
                             }
                             else if (token_str.find("Add")) {
                                 token.type = token_type::add;
@@ -245,6 +343,11 @@ namespace nil {
                             }
                             else if (token_str.find("Load")) {
                                 token.type = token_type::load;
+
+                                std::size_t idx_start_pos = token_str.find("Load") + 5;
+                                std::size_t idx_end_pos = token_str.find(")", idx_start_pos);
+                                std::string idx_str = token_str.substr(idx_start_pos, idx_end_pos - idx_start_pos);
+                                token.value = std::stoi(idx_str);
                             }
                             else {
                                 throw std::runtime_error("Unknown token type");
@@ -289,8 +392,10 @@ namespace nil {
                         std::vector<var> cache;
 
                         var endo_factor(0, row, false, var::column_type::constant);
+                        var zero(0, row + 1, false, var::column_type::constant);
+                        var one(0, row + 2, false, var::column_type::constant);
 
-                        auto mds = mds_vars(start_row_index);
+                        auto mds = mds_vars(row + 3);
 
 
                         for (typename params_type::token_value_type t : params.tokens) {
@@ -318,27 +423,90 @@ namespace nil {
                                     break;
                                 }
                                 case token_type::literal:
+                                {
+                                    assignment.witness(W0)[row] = t.value;
+                                    var literal(W0, row, false, var::column_type::witness);
+                                    stack.emplace_back(literal);
+                                    row++;
                                     break;
+                                }
                                 case token_type::cell:
+                                {
+                                    std::size_t cell_col = typename BlueprintFieldType::integral_type(t.value.data);
+                                    std::size_t cell_row = typename BlueprintFieldType::integral_type(t.value_second.data);
+                                    var cell_val = var_from_evals(assignment, params.evaluations, cell_col, cell_row);
                                     break;
+                                }
                                 case token_type::dup:
+                                    stack.emplace_back(stack.back());
                                     break;
                                 case token_type::pow:
+                                {
+                                    assignment.witness(W0)[row] = t.value;
+                                    var exponent(W0, row, false, var::column_type::witness);
+                                    row++;
+
+                                    var res = exponentiation_component::generate_assignments(
+                                        assignment, {stack.back(), exponent, zero, one}, row).output;
+                                    row += exponentiation_component::rows_amount;
+
+                                    stack[stack.size() - 1] = res;
                                     break;
+                                }
                                 case token_type::add:
+                                {
+                                    var x = stack.back();
+                                    stack.pop_back();
+                                    var y = stack.back();
+                                    stack.pop_back();
+                                    var res = add_component::generate_assignments(
+                                        assignment, {x, y}, row).output;
+                                    row += add_component::rows_amount;
+                                    stack.push_back(res);
                                     break;
+                                }
                                 case token_type::mul:
+                                {
+                                    var x = stack.back();
+                                    stack.pop_back();
+                                    var y = stack.back();
+                                    stack.pop_back();
+                                    var res = mul_component::generate_assignments(
+                                        assignment, {x, y}, row).output;
+                                    row += mul_component::rows_amount;
+                                    stack.push_back(res);
                                     break;
+                                }
                                 case token_type::sub:
+                                {
+                                    var x = stack.back();
+                                    stack.pop_back();
+                                    var y = stack.back();
+                                    stack.pop_back();
+                                    var res = sub_component::generate_assignments(
+                                        assignment, {x, y}, row).output;
+                                    row += sub_component::rows_amount;
+                                    stack.push_back(res);
                                     break;
+                                }
                                 case token_type::vanishes_on_last_4_rows:
+                                    // TODO: lookups
                                     break;
                                 case token_type::unnormalized_lagrange_basis:
+                                    // TODO: lookups
                                     break;
                                 case token_type::store:
+                                {
+                                    var x = stack.back();
+                                    cache.emplace_back(x);
                                     break;
+                                }
                                 case token_type::load:
+                                {
+                                    std::size_t idx = typename BlueprintFieldType::integral_type(t.value.data);
+                                    stack.push_back(cache[idx]);
                                     break;
+                                }
                             }
                         }
 
@@ -367,6 +535,11 @@ namespace nil {
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                         assignment.constant(0)[row] = endo_scalar_component::endo_factor;
+                        row++;
+
+                        assignment.constant(0)[row] = 0;
+                        row++;
+                        assignment.constant(0)[row] = 1;
                         row++;
 
                         std::array<std::array<typename BlueprintFieldType::value_type, mds_size>, 

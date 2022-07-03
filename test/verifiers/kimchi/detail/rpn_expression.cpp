@@ -43,6 +43,7 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 
@@ -94,22 +95,52 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite) {
 
     typename BlueprintFieldType::value_type alpha_val =
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
+    typename BlueprintFieldType::value_type beta_val =
+        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8D5_cppui256;
+    typename BlueprintFieldType::value_type gamma_val =
+        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8D3_cppui256;
+    typename BlueprintFieldType::value_type joint_combiner_val =
+        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
-    public_input.push_back(alpha_val);
 
+    public_input.push_back(alpha_val);
     var alpha = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    std::string expression_str = "Alpha;";
+    public_input.push_back(beta_val);
+    var beta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(gamma_val);
+    var gamma = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(joint_combiner_val);
+    var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    std::string expression_str = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;";
 
     auto expression = component_type::rpn_from_string(expression_str);
 
-    typename component_type::params_type params = {expression, alpha};
+    using evaluations_type = typename zk::components::kimchi_proof_evaluations<
+                        BlueprintFieldType, kimchi_params>;
+    std::array<evaluations_type, 2> evals; 
+    evals[0].w[3] = gamma;
 
-    auto result_check = [&alpha_val](AssignmentType &assignment, component_type::result_type &real_res) {
-        assert(alpha_val == assignment.var_value(real_res.output));
+    typename component_type::params_type params = {expression, 
+        alpha, beta, gamma, joint_combiner,
+        evals};
+
+    // s: Fp256 "(3BF91D9CBAB4826F2C2A0BFA421A66615BF403C45BB4096846C4326CC0DFF586)"
+    // s2: Fp256(BigInteger256([1, 2, 3, 4]))
+    typename BlueprintFieldType::value_type s = 0x3BF91D9CBAB4826F2C2A0BFA421A66615BF403C45BB4096846C4326CC0DFF586_cppui256;
+    typename BlueprintFieldType::integral_type s_integral = typename BlueprintFieldType::integral_type (s.data);
+    std::cout<<"s: "<<s.data<<std::endl;
+    std::cout<<"s_integral: "<<s_integral<<std::endl;
+    typename BlueprintFieldType::value_type s2 = 0;
+
+    auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
+        assert((gamma_val + beta_val) == assignment.var_value(real_res.output));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,

@@ -93,7 +93,7 @@ namespace nil {
                             W9, W10, W11, W12, W13, W14>;
 
                     using exponentiation_component =
-                        zk::components::exponentiation<ArithmetizationType, 60, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
+                        zk::components::exponentiation<ArithmetizationType, 256, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                                                        W10, W11, W12, W13, W14>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     
