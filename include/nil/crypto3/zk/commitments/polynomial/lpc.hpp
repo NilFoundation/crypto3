@@ -456,24 +456,62 @@ namespace nil {
                                              LPC>::value,
                              bool>::type = true>
                 static bool verify_eval(
-                    const std::vector<typename LPC::field_type::value_type> &evaluation_points,
+                    const std::vector<typename LPC::field_type::value_type> &evaluation_point,
                     typename LPC::proof_type &proof,
                     typename LPC::basic_fri::params_type fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
-                    // TODO: Remove copy same evaluations point many times
+                    std::size_t leaf_size = proof.z.size();
+
                     typename select_container<LPC::const_size,
-                                              std::vector<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type tmp;
+                                              std::vector<std::pair<typename LPC::field_type::value_type,
+                                                                    typename LPC::field_type::value_type>>,
+                                              LPC::leaf_size>::type U_interpolation_points;
+
                     if constexpr (!LPC::const_size) {
-                        tmp.resize(std::max(LPC::leaf_size, evaluation_points.size()));
-                    }
-                    std::size_t leaf_size = tmp.size();
-                    for (auto i = 0; i < leaf_size; ++i) {
-                        tmp[i] = evaluation_points;
+                        U_interpolation_points.resize(leaf_size);
                     }
 
-                    return verify_eval<LPC>(tmp, proof, fri_params, transcript);
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U_interpolation_points[polynom_index].resize(evaluation_point.size());
+
+                        for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
+
+                            U_interpolation_points[polynom_index][point_index] =
+                                std::make_pair(evaluation_point[point_index], proof.z[polynom_index][point_index]);
+                        }
+                    }
+
+                    typename select_container<LPC::const_size,
+                                              math::polynomial<typename LPC::field_type::value_type>,
+                                              LPC::leaf_size>::type U,
+                        V;
+
+                    if constexpr (!LPC::const_size) {
+                        U.resize(leaf_size);
+                        V.resize(leaf_size);
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                        U[polynom_index] = math::lagrange_interpolation(U_interpolation_points[polynom_index]);
+
+                        V[polynom_index] = {1};
+
+                        for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
+                            V[polynom_index] =
+                                V[polynom_index] * (math::polynomial<typename LPC::field_type::value_type>(
+                                                       {-evaluation_point[point_index], 1}));
+                        }
+                    }
+
+                    for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
+                        if (!verify_eval<typename LPC::basic_fri>(
+                                proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
                 }
 
                 template<typename LPC,
