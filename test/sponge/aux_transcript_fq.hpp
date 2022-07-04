@@ -43,7 +43,8 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<size_t num_challenges,
+                template<size_t num_absorb,
+                         size_t num_challenges,
                          size_t num_challenges_fq,
                          bool digest,
                          typename ArithmetizationType,
@@ -52,6 +53,7 @@ namespace nil {
                 class aux_fq;
 
                 template<typename BlueprintFieldType,
+                         size_t num_absorb,
                          size_t num_challenges,
                          size_t num_challenges_fq,
                          bool digest,
@@ -73,6 +75,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class aux_fq<
+                    num_absorb,
                     num_challenges,
                     num_challenges_fq,
                     digest,
@@ -93,14 +96,16 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0fd8;
-                    constexpr static const std::size_t rows_amount = 100;
+                    constexpr static const std::size_t rows_amount = transcript_type::init_rows + num_absorb * transcript_type::absorb_rows + 
+                                                                    num_challenges * transcript_type::challenge_rows + 
+                                                                    num_challenges_fq * transcript_type::challenge_fq_rows +
+                                                                    static_cast<int>(digest) * transcript_type::digest_rows;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
                         std::vector<std::array<var, 2>> input_fr;
                         std::vector<std::array<var, 2>> input_g;
                         var zero;
-                        var one;
                     };
 
                     struct result_type {
@@ -116,7 +121,6 @@ namespace nil {
                         generate_assignments_constants(bp, assignment, params, start_row_index);
 
                         var zero = var(0, start_row_index, false, var::column_type::constant);
-                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
                         std::size_t row = start_row_index;
                         std::cout << "row: " << row << '\n';
@@ -147,7 +151,7 @@ namespace nil {
                         }
                         std::cout << "row: " << row << '\n';
                         if (digest) {
-                            sq = transcript.digest_circuit(bp, assignment, one, row);
+                            sq = transcript.digest_circuit(bp, assignment, row);
                             row += transcript_type::digest_rows;
                         }
                         std::cout << "row: " << row << '\n';
@@ -163,7 +167,6 @@ namespace nil {
                         std::size_t row = start_row_index;
 
                         var zero = var(0, start_row_index, false, var::column_type::constant);
-                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
                         transcript_type transcript;
                         transcript.init_assignment(assignment, zero, row);
@@ -186,7 +189,7 @@ namespace nil {
                             row += transcript_type::challenge_fq_rows;
                         }
                         if (digest) {
-                            sq = transcript.digest_assignment(assignment, one, row);
+                            sq = transcript.digest_assignment(assignment, row);
                             row += transcript_type::digest_rows;
                         }
                         return {sq};
@@ -210,8 +213,6 @@ namespace nil {
                                                   const std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         assignment.constant(0)[row] = 0;
-                        row++;
-                        assignment.constant(0)[row] = 1;
                     }
                 };
             }    // namespace components
