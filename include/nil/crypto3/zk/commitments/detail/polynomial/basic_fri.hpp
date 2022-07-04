@@ -122,18 +122,18 @@ namespace nil {
                             // bool operator!=(const round_proof_type &rhs) const {
                             //     return !(rhs == *this;
                             // }
-                            using colinear_value_t = typename select_container<(bool)leaf_size, typename FieldType::value_type, leaf_size>::type;
-
-                            typename select_container<(bool)leaf_size,
+                            using y_t = typename select_container<(bool)leaf_size,
                                                       std::array<typename FieldType::value_type, m>,
-                                                      leaf_size>::type y;
+                                                      leaf_size>::type;
+                            using p_t = std::array<merkle_proof_type, m>;
+                            using colinear_value_t = typename select_container<(bool)leaf_size, typename FieldType::value_type, leaf_size>::type;
+                            using colinear_path_t = merkle_proof_type;
 
-                            std::array<merkle_proof_type, m> p;
-
+                            y_t y;
+                            p_t p;
                             typename merkle_tree_type::value_type T_root;
                             colinear_value_t colinear_value;
-
-                            merkle_proof_type colinear_path;
+                            colinear_path_t colinear_path;
                         };
 
                         struct proof_type {
@@ -144,11 +144,13 @@ namespace nil {
                             bool operator!=(const proof_type &rhs) const {
                                 return !(rhs == *this);
                             }
-
-                            std::vector<round_proof_type> round_proofs;    // 0..r-2
-                            typename select_container<(bool)leaf_size,
+                            using round_proofs_t = std::vector<round_proof_type>;
+                            using final_polynomials_t = typename select_container<(bool)leaf_size,
                                                       math::polynomial<typename FieldType::value_type>,
-                                                      leaf_size>::type final_polynomials;
+                                                      leaf_size>::type;
+
+                            round_proofs_t round_proofs;    // 0..r-2
+                            final_polynomials_t final_polynomials;
                             commitment_type target_commitment;
                         };
                     };
@@ -347,7 +349,7 @@ namespace nil {
 
                     std::size_t r = fri_params.r;
 
-                    std::vector<typename FRI::round_proof_type> round_proofs;
+                    typename FRI::proof_type::round_proofs_t round_proofs;
                     std::unique_ptr<typename FRI::merkle_tree_type> p_tree =
                         std::make_unique<typename FRI::merkle_tree_type>(T);
                     typename FRI::merkle_tree_type T_next;
@@ -373,9 +375,7 @@ namespace nil {
                             return {};
                         }
 
-                        typename select_container<(bool)FRI::leaf_size,
-                                                  std::array<typename FRI::field_type::value_type, FRI::m>,
-                                                  FRI::leaf_size>::type y;
+                        typename FRI::round_proof_type::y_t y;
                         if constexpr (FRI::leaf_size == 0) {
                             y.resize(leaf_size);
                         }
@@ -393,7 +393,7 @@ namespace nil {
                             }
                         }
 
-                        std::array<typename FRI::merkle_proof_type, FRI::m> p;
+                        typename FRI::round_proof_type::p_t p;
 
                         for (std::size_t j = 0; j < FRI::m; j++) {
                             p[j] = typename FRI::merkle_proof_type(*p_tree, s_indices[j]);
@@ -434,7 +434,7 @@ namespace nil {
                         T_next = precommit<FRI>(f, fri_params.D[i + 1]);    // new merkle tree
                         transcript(commit<FRI>(T_next));
 
-                        typename FRI::merkle_proof_type colinear_path =
+                        typename FRI::round_proof_type::colinear_path_t colinear_path =
                             typename FRI::merkle_proof_type(T_next, x_index);
 
                         round_proofs.push_back(
@@ -443,9 +443,7 @@ namespace nil {
                         p_tree = std::make_unique<typename FRI::merkle_tree_type>(T_next);
                     }
 
-                    typename select_container<(bool)FRI::leaf_size,
-                                              math::polynomial<typename FRI::field_type::value_type>,
-                                              FRI::leaf_size>::type final_polynomials;
+                    typename FRI::proof_type::final_polynomials_t final_polynomials;
 
                     if constexpr (FRI::leaf_size == 0) {
                         final_polynomials.resize(f.size());
