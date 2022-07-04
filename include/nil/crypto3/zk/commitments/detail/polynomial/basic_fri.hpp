@@ -122,6 +122,8 @@ namespace nil {
                             // bool operator!=(const round_proof_type &rhs) const {
                             //     return !(rhs == *this;
                             // }
+                            using colinear_value_t = typename select_container<(bool)leaf_size, typename FieldType::value_type, leaf_size>::type;
+
                             typename select_container<(bool)leaf_size,
                                                       std::array<typename FieldType::value_type, m>,
                                                       leaf_size>::type y;
@@ -129,8 +131,7 @@ namespace nil {
                             std::array<merkle_proof_type, m> p;
 
                             typename merkle_tree_type::value_type T_root;
-                            typename select_container<(bool)leaf_size, typename FieldType::value_type, leaf_size>::type
-                                colinear_value;
+                            colinear_value_t colinear_value;
 
                             merkle_proof_type colinear_path;
                         };
@@ -398,9 +399,7 @@ namespace nil {
                             p[j] = typename FRI::merkle_proof_type(*p_tree, s_indices[j]);
                         }
 
-                        typename select_container<(bool)FRI::leaf_size,
-                                                  typename FRI::field_type::value_type,
-                                                  FRI::leaf_size>::type colinear_value;
+                        typename FRI::round_proof_type::colinear_value_t colinear_value;
 
                         if constexpr (FRI::leaf_size == 0) {
                             colinear_value.resize(leaf_size);
@@ -492,7 +491,8 @@ namespace nil {
                         std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                typename FRI::merkle_tree_hash_type,
                                                                                typename FRI::transcript_hash_type,
-                                                                               FRI::m, FRI::leaf_size>,
+                                                                               FRI::m,
+                                                                               FRI::leaf_size>,
                                         FRI>::value &&
                             !std::is_same_v<typename ContainerType::value_type, typename FRI::field_type::value_type>,
                         bool>::type = true>
@@ -605,23 +605,119 @@ namespace nil {
                     return true;
                 }
 
-                template<typename FRI, typename ContainerType,
+                template<typename FRI,
                     typename std::enable_if<
                         std::is_base_of<commitments::detail::basic_batched_fri<typename FRI::field_type,
                                                                                typename FRI::merkle_tree_hash_type,
                                                                                typename FRI::transcript_hash_type,
                                                                                FRI::m,
                                                                                FRI::leaf_size>,
-                                        FRI>::value &&
-                            !std::is_same_v<typename ContainerType::value_type, typename FRI::field_type::value_type>,
-                        bool>::type = true>
+                                        FRI>::value, bool>::type = true>
                 static bool verify_eval(typename FRI::proof_type &proof,
                                         typename FRI::params_type &fri_params,
-                                        const ContainerType U,
+                                        const math::polynomial<typename FRI::field_type::value_type> U,
                                         const math::polynomial<typename FRI::field_type::value_type> V,
                                         typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
-                    // TODO: Bad solution for container V - ContainerType(U.size(), V)
-                    return verify_eval<FRI>(proof, fri_params, U, ContainerType(U.size(), V), transcript);
+
+                    std::size_t leaf_size = FRI::leaf_size;
+                    if constexpr (FRI::leaf_size == 0) {
+                        leaf_size = proof.final_polynomials.size();
+                    }
+                        
+                    transcript(proof.target_commitment);
+
+                    std::size_t domain_size = fri_params.D[0]->size();
+                    std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
+                    typename FRI::field_type::value_type x = fri_params.D[0]->get_domain_element(x_index);
+
+                    std::size_t r = fri_params.r;
+
+                    for (std::size_t i = 0; i < r - 1; i++) {
+                        typename FRI::field_type::value_type alpha =
+                            transcript.template challenge<typename FRI::field_type>();
+
+                        typename FRI::field_type::value_type x_next = x * x;
+
+                        // m = 2, so:
+                        std::array<typename FRI::field_type::value_type, FRI::m> s;
+                        if constexpr (FRI::m == 2) {
+                            s[0] = x;
+                            s[1] = -x;
+                        } else {
+                            return false;
+                        }
+
+                        for (std::size_t j = 0; j < FRI::m; j++) {
+                            std::vector<std::uint8_t> leaf_data(FRI::field_element_type::length() * leaf_size);
+
+                            for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                                typename FRI::field_type::value_type leaf = proof.round_proofs[i].y[polynom_index][j];
+
+                                typename FRI::field_element_type leaf_val(leaf);
+                                auto write_iter = leaf_data.begin() + FRI::field_element_type::length() * polynom_index;
+                                leaf_val.write(write_iter, FRI::field_element_type::length());
+                            }
+
+                            if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
+                                return false;
+                            }
+                        }
+
+                        std::vector<std::uint8_t> leaf_data(FRI::field_element_type::length() * leaf_size);
+
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                            std::array<typename FRI::field_type::value_type, FRI::m> y;
+
+                            for (std::size_t j = 0; j < FRI::m; j++) {
+                                if (i == 0) {
+                                    y[j] =
+                                        (proof.round_proofs[i].y[polynom_index][j] - U.evaluate(s[j])) /
+                                        V.evaluate(s[j]);
+                                } else {
+                                    y[j] = proof.round_proofs[i].y[polynom_index][j];
+                                }
+                            }
+
+                            std::vector<
+                                std::pair<typename FRI::field_type::value_type, typename FRI::field_type::value_type>>
+                                interpolation_points {
+                                    std::make_pair(s[0], y[0]),
+                                    std::make_pair(s[1], y[1]),
+                                };
+
+                            math::polynomial<typename FRI::field_type::value_type> interpolant =
+                                math::lagrange_interpolation(interpolation_points);
+
+                            typename FRI::field_type::value_type leaf =
+                                proof.round_proofs[i].colinear_value[polynom_index];
+
+                            typename FRI::field_element_type leaf_val(leaf);
+                            auto write_iter = leaf_data.begin() + FRI::field_element_type::length() * polynom_index;
+                            leaf_val.write(write_iter, FRI::field_element_type::length());
+
+                            if (interpolant.evaluate(alpha) != proof.round_proofs[i].colinear_value[polynom_index]) {
+                                return false;
+                            }
+                        }
+
+                        transcript(proof.round_proofs[i].colinear_path.root());
+                        if (!proof.round_proofs[i].colinear_path.validate(leaf_data)) {
+                            return false;
+                        }
+                        x = x_next;
+                    }
+
+                    for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+
+                        if (proof.final_polynomials[polynom_index].degree() >
+                            std::pow(2, std::log2(fri_params.max_degree + 1) - r + 1) - 1) {
+                            return false;
+                        }
+                    }
+
+                    return true;
                 }
             }    // namespace algorithms
         }        // namespace zk

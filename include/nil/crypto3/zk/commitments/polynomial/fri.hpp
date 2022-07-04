@@ -113,22 +113,8 @@ namespace nil {
                     typename FRI::basic_fri::proof_type &proof,
                     typename FRI::basic_fri::params_type &fri_params,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
-                    // TODO: seems like it is no necessary to duplicate the same point of U and V
-                    if constexpr (FRI::leaf_size == 0) {
-                        std::size_t leaf_size = proof.final_polynomials.size();
-                        std::vector<math::polynomial<typename FRI::field_type::value_type>> U(leaf_size, {0});
-                        math::polynomial<typename FRI::field_type::value_type> V = {1};
-
-                        return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
-                    } else {
-                        std::array<math::polynomial<typename FRI::field_type::value_type>, FRI::leaf_size> U;
-                        std::array<math::polynomial<typename FRI::field_type::value_type>, FRI::leaf_size> V;
-                        for (auto i = 0; i < FRI::leaf_size; ++i) {
-                            U[i] = {0};
-                            V[i] = {1};
-                        }
-                        return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
-                    }
+                    
+                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, {0}, {1}, transcript);
                 }
             }    // namespace algorithms
         }        // namespace zk
