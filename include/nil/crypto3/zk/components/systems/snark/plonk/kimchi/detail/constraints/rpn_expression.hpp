@@ -384,11 +384,15 @@ namespace nil {
                         std::vector<var> stack;
                         std::vector<var> cache;
 
-                        var endo_factor(0, row, false, var::column_type::constant);
-                        var zero(0, row + 1, false, var::column_type::constant);
-                        var one(0, row + 2, false, var::column_type::constant);
+                        std::size_t constant_row = 0;
 
-                        auto mds = mds_vars(row + 3);
+                        var endo_factor(0, constant_row, false, var::column_type::constant);
+                        var zero(0, constant_row + 1, false, var::column_type::constant);
+                        var one(0, constant_row + 2, false, var::column_type::constant);
+                        constant_row += 3;
+
+                        auto mds = mds_vars(constant_row);
+                        constant_row += mds_size * mds_size;
 
 
                         for (typename params_type::token_value_type t : params.tokens) {
@@ -417,9 +421,9 @@ namespace nil {
                                 }
                                 case token_type::literal:
                                 {
-                                    var literal(W0, row, false, var::column_type::witness);
+                                    var literal(0, constant_row, false, var::column_type::constant);
                                     stack.emplace_back(literal);
-                                    row++;
+                                    constant_row++;
                                     break;
                                 }
                                 case token_type::cell:
@@ -435,8 +439,8 @@ namespace nil {
                                     break;
                                 case token_type::pow:
                                 {
-                                    var exponent(W0, row, false, var::column_type::witness);
-                                    row++;
+                                    var exponent(0, constant_row, false, var::column_type::constant);
+                                    constant_row++;
 
                                     var res = exponentiation_component::generate_circuit(bp,
                                         assignment, {stack.back(), exponent, zero, one}, row).output;
@@ -516,11 +520,15 @@ namespace nil {
                         std::vector<var> stack;
                         std::vector<var> cache;
 
-                        var endo_factor(0, row, false, var::column_type::constant);
-                        var zero(0, row + 1, false, var::column_type::constant);
-                        var one(0, row + 2, false, var::column_type::constant);
+                        std::size_t constant_row = 0;
 
-                        auto mds = mds_vars(row + 3);
+                        var endo_factor(0, constant_row, false, var::column_type::constant);
+                        var zero(0, constant_row + 1, false, var::column_type::constant);
+                        var one(0, constant_row + 2, false, var::column_type::constant);
+                        constant_row += 3;
+
+                        auto mds = mds_vars(constant_row);
+                        constant_row += mds_size * mds_size;
 
 
                         for (typename params_type::token_value_type t : params.tokens) {
@@ -549,10 +557,9 @@ namespace nil {
                                 }
                                 case token_type::literal:
                                 {
-                                    assignment.witness(W0)[row] = t.value.first; //TODO: it shoud be constant 
-                                    var literal(W0, row, false, var::column_type::witness);
+                                    var literal(0, constant_row, false, var::column_type::constant);
                                     stack.emplace_back(literal);
-                                    row++;
+                                    constant_row++;
                                     break;
                                 }
                                 case token_type::cell:
@@ -568,9 +575,8 @@ namespace nil {
                                     break;
                                 case token_type::pow:
                                 {
-                                    assignment.witness(W0)[row] = t.value.first;
-                                    var exponent(W0, row, false, var::column_type::witness);
-                                    row++;
+                                    var exponent(0, constant_row, false, var::column_type::constant);
+                                    constant_row++;
 
                                     var res = exponentiation_component::generate_assignments(
                                         assignment, {stack.back(), exponent, zero, one}, row).output;
@@ -674,6 +680,28 @@ namespace nil {
                             for (std::size_t j = 0; j < mds_size; j++) {
                                 assignment.constant(0)[row] = mds[i][j];
                                 row++;
+                            }
+                        }
+
+                        for (typename params_type::token_value_type t : params.tokens) {
+                            switch (t.type) {
+                                case token_type::literal:
+                                {
+                                    assignment.constant(W0)[row] = t.value.first;
+                                    row++;
+                                    break;
+                                }
+                                case token_type::pow:
+                                {
+                                    assignment.constant(W0)[row] = t.value.first;
+                                    row++;
+                                    break;
+                                }
+                                case token_type::unnormalized_lagrange_basis:
+                                    // TODO: lookups
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                     }
