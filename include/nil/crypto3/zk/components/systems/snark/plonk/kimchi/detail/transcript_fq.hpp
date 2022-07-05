@@ -125,8 +125,7 @@ namespace nil {
 
                     using pack = from_limbs<ArithmetizationType, W0, W1, W2>;
                     using unpack = to_limbs<ArithmetizationType, W0, W1, W2, W3, W4>;
-                    using compare = compare_with_const<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    // using compare = compare_with_const<ArithmetizationType, CurveType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16>;
+                    using compare = compare_with_const<ArithmetizationType, CurveType, W0, W1, W2>;
 
                     std::vector<var> last_squeezed;
 
@@ -186,8 +185,7 @@ namespace nil {
                         sponge_component::squeeze_rows + unpack::rows_amount 
                         + pack::rows_amount;
                     constexpr static const std::size_t challenge_fq_rows = sponge_component::squeeze_rows;
-                    constexpr static const std::size_t digest_rows = challenge_rows + compare::rows_amount
-                        + sub_component::rows_amount + mul_component::rows_amount;
+                    constexpr static const std::size_t digest_rows = challenge_rows + compare::rows_amount + mul_component::rows_amount;
 
                     void init_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                          var zero,
@@ -292,7 +290,6 @@ namespace nil {
 
                     var digest_assignment(
                             blueprint_assignment_table<ArithmetizationType> &assignment,
-                            const var &one,
                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
@@ -307,14 +304,11 @@ namespace nil {
                         }
                         var compare_result = compare::generate_assignments(assignment, packed, row).output;
                         row += compare::rows_amount;
-                        var bool_result = sub_component::generate_assignments(assignment, {one, compare_result}, row).output;
-                        row += sub_component::rows_amount;
-                        return mul_component::generate_assignments(assignment, {bool_result, packed}, row).output;
+                        return mul_component::generate_assignments(assignment, {compare_result, packed}, row).output;
                     }
 
                     var digest_circuit(blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            const var &one,
                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
@@ -329,9 +323,7 @@ namespace nil {
                         }
                         var compare_result = compare::generate_circuit(bp, assignment, packed, row).output;
                         row += compare::rows_amount;
-                        var bool_result = zk::components::generate_circuit<sub_component>(bp, assignment, {one, compare_result}, row).output;
-                        row += sub_component::rows_amount;
-                        return zk::components::generate_circuit<mul_component>(bp, assignment, {bool_result, packed}, row).output;
+                        return zk::components::generate_circuit<mul_component>(bp, assignment, {compare_result, packed}, row).output;
                     }
 
                 };
