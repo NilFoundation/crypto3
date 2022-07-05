@@ -131,14 +131,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite) {
         alpha, beta, gamma, joint_combiner,
         evals};
 
-    // s: Fp256 "(3BF91D9CBAB4826F2C2A0BFA421A66615BF403C45BB4096846C4326CC0DFF586)"
-    // s2: Fp256(BigInteger256([1, 2, 3, 4]))
-    typename BlueprintFieldType::value_type s = 0x3BF91D9CBAB4826F2C2A0BFA421A66615BF403C45BB4096846C4326CC0DFF586_cppui256;
-    typename BlueprintFieldType::integral_type s_integral = typename BlueprintFieldType::integral_type (s.data);
-    std::cout<<"s: "<<s.data<<std::endl;
-    std::cout<<"s_integral: "<<s_integral<<std::endl;
-    typename BlueprintFieldType::value_type s2 = 0;
-
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val + beta_val) == assignment.var_value(real_res.output));
     };

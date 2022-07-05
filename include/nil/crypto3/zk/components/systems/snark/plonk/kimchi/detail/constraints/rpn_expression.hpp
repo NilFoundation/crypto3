@@ -136,7 +136,7 @@ namespace nil {
                         return result;
                     }
 
-                    static var var_from_evals(blueprint_assignment_table<ArithmetizationType> &assignment,
+                    static var var_from_evals(
                                         const std::array<evaluations_type, KimchiParamsType::eval_points_amount> evaluations,
                                         const std::size_t var_column,
                                         const std::size_t var_row) {
@@ -202,8 +202,7 @@ namespace nil {
                     struct params_type {
                         struct token_value_type {
                             token_type type;
-                            typename BlueprintFieldType::value_type value;
-                            typename BlueprintFieldType::value_type value_second;
+                            std::pair<typename BlueprintFieldType::value_type, typename BlueprintFieldType::value_type> value;
                         };
 
                         std::vector<token_value_type> tokens;
@@ -256,18 +255,20 @@ namespace nil {
                                 row_pos += 5;
                                 std::size_t row_end_pos = token_str.find(" ", row_pos);
                                 std::string row_str = token_str.substr(row_pos, row_end_pos - row_pos);
-                                token.value = std::stoi(row_str);
+                                token.value.first = std::stoi(row_str);
 
                                 std::size_t col_pos = token_str.find("col");
                                 col_pos += 5;
                                 std::size_t col_end_pos = token_str.find(" ", col_pos);
                                 std::string col_str = token_str.substr(col_pos, col_end_pos - col_pos);
-                                token.value_second = std::stoi(col_str);
+                                token.value.second = std::stoi(col_str);
                             }
                             else if (token_str.find("Literal")) {
                                 token.type = token_type::literal;
-                                //std::size_t value_pos = token_str.find("value");
-                                // TODO: get multiprecision from string
+                                std::size_t value_start_pos = token_str.find("Literal") + 8;
+                                std::size_t value_end_pos = token_str.find(";", value_start_pos);
+                                std::string value_str = token_str.substr(value_start_pos, value_end_pos - value_start_pos);
+                                token.value.first = multiprecision::cpp_int("0x" + value_str);
                             }
                             else if (token_str.find("Cell")) {
                                 token.type = token_type::cell;
@@ -309,8 +310,8 @@ namespace nil {
                                     }
                                 }
 
-                                token.value = col;
-                                token.value_second = row;
+                                token.value.first = col;
+                                token.value.second = row;
                             }
                             else if (token_str.find("Dup")) {
                                 token.type = token_type::dup;
@@ -321,7 +322,7 @@ namespace nil {
                                 std::size_t exp_start_pos = token_str.find("Pow") + 4;
                                 std::size_t exp_end_pos = token_str.find(")", exp_start_pos);
                                 std::string exp_str = token_str.substr(exp_start_pos, exp_end_pos - exp_start_pos);
-                                token.value = std::stoi(exp_str);
+                                token.value.first = std::stoi(exp_str);
                             }
                             else if (token_str.find("Add")) {
                                 token.type = token_type::add;
@@ -347,7 +348,7 @@ namespace nil {
                                 std::size_t idx_start_pos = token_str.find("Load") + 5;
                                 std::size_t idx_end_pos = token_str.find(")", idx_start_pos);
                                 std::string idx_str = token_str.substr(idx_start_pos, idx_end_pos - idx_start_pos);
-                                token.value = std::stoi(idx_str);
+                                token.value.first = std::stoi(idx_str);
                             }
                             else {
                                 throw std::runtime_error("Unknown token type");
@@ -379,7 +380,131 @@ namespace nil {
                         generate_assignments_constants(assignment, params, start_row_index);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
-                        return result_type(start_row_index);
+
+                        std::vector<var> stack;
+                        std::vector<var> cache;
+
+                        var endo_factor(0, row, false, var::column_type::constant);
+                        var zero(0, row + 1, false, var::column_type::constant);
+                        var one(0, row + 2, false, var::column_type::constant);
+
+                        auto mds = mds_vars(row + 3);
+
+
+                        for (typename params_type::token_value_type t : params.tokens) {
+                            switch (t.type) {
+                                case token_type::alpha:
+                                    stack.emplace_back(params.alpha);
+                                    break;
+                                case token_type::beta:
+                                    stack.emplace_back(params.beta);
+                                    break;
+                                case token_type::gamma:
+                                    stack.emplace_back(params.gamma);
+                                    break;
+                                case token_type::joint_combiner:
+                                    stack.emplace_back(params.joint_combiner);
+                                    break;
+                                case token_type::endo_coefficient:
+                                    stack.emplace_back(endo_factor);
+                                    break;
+                                case token_type::mds:
+                                {
+                                    std::size_t mds_row = typename BlueprintFieldType::integral_type(t.value.first.data);
+                                    std::size_t mds_col = typename BlueprintFieldType::integral_type(t.value.second.data);
+                                    stack.emplace_back(mds[mds_row][mds_col]);
+                                    break;
+                                }
+                                case token_type::literal:
+                                {
+                                    var literal(W0, row, false, var::column_type::witness);
+                                    stack.emplace_back(literal);
+                                    row++;
+                                    break;
+                                }
+                                case token_type::cell:
+                                {
+                                    std::size_t cell_col = typename BlueprintFieldType::integral_type(t.value.first.data);
+                                    std::size_t cell_row = typename BlueprintFieldType::integral_type(t.value.second.data);
+                                    var cell_val = var_from_evals(params.evaluations, cell_col, cell_row);
+                                    stack.emplace_back(cell_val);
+                                    break;
+                                }
+                                case token_type::dup:
+                                    stack.emplace_back(stack.back());
+                                    break;
+                                case token_type::pow:
+                                {
+                                    var exponent(W0, row, false, var::column_type::witness);
+                                    row++;
+
+                                    var res = exponentiation_component::generate_circuit(bp,
+                                        assignment, {stack.back(), exponent, zero, one}, row).output;
+                                    row += exponentiation_component::rows_amount;
+
+                                    stack[stack.size() - 1] = res;
+                                    break;
+                                }
+                                case token_type::add:
+                                {
+                                    var x = stack.back();
+                                    stack.pop_back();
+                                    var y = stack.back();
+                                    stack.pop_back();
+                                    var res = zk::components::generate_circuit<add_component>(bp,
+                                        assignment, {x, y}, row).output;
+                                    row += add_component::rows_amount;
+                                    stack.push_back(res);
+                                    break;
+                                }
+                                case token_type::mul:
+                                {
+                                    var x = stack.back();
+                                    stack.pop_back();
+                                    var y = stack.back();
+                                    stack.pop_back();
+                                    var res = zk::components::generate_circuit<mul_component>(bp,
+                                        assignment, {x, y}, row).output;
+                                    row += mul_component::rows_amount;
+                                    stack.push_back(res);
+                                    break;
+                                }
+                                case token_type::sub:
+                                {
+                                    var x = stack.back();
+                                    stack.pop_back();
+                                    var y = stack.back();
+                                    stack.pop_back();
+                                    var res = zk::components::generate_circuit<sub_component>(bp,
+                                        assignment, {x, y}, row).output;
+                                    row += sub_component::rows_amount;
+                                    stack.push_back(res);
+                                    break;
+                                }
+                                case token_type::vanishes_on_last_4_rows:
+                                    // TODO: lookups
+                                    break;
+                                case token_type::unnormalized_lagrange_basis:
+                                    // TODO: lookups
+                                    break;
+                                case token_type::store:
+                                {
+                                    var x = stack.back();
+                                    cache.emplace_back(x);
+                                    break;
+                                }
+                                case token_type::load:
+                                {
+                                    std::size_t idx = typename BlueprintFieldType::integral_type(t.value.first.data);
+                                    stack.push_back(cache[idx]);
+                                    break;
+                                }
+                            }
+                        }
+
+                        result_type res;
+                        res.output = stack[0];
+                        return res;
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -417,14 +542,14 @@ namespace nil {
                                     break;
                                 case token_type::mds:
                                 {
-                                    std::size_t mds_row = typename BlueprintFieldType::integral_type(t.value.data);
-                                    std::size_t mds_col = typename BlueprintFieldType::integral_type(t.value_second.data);
+                                    std::size_t mds_row = typename BlueprintFieldType::integral_type(t.value.first.data);
+                                    std::size_t mds_col = typename BlueprintFieldType::integral_type(t.value.second.data);
                                     stack.emplace_back(mds[mds_row][mds_col]);
                                     break;
                                 }
                                 case token_type::literal:
                                 {
-                                    assignment.witness(W0)[row] = t.value;
+                                    assignment.witness(W0)[row] = t.value.first; //TODO: it shoud be constant 
                                     var literal(W0, row, false, var::column_type::witness);
                                     stack.emplace_back(literal);
                                     row++;
@@ -432,9 +557,10 @@ namespace nil {
                                 }
                                 case token_type::cell:
                                 {
-                                    std::size_t cell_col = typename BlueprintFieldType::integral_type(t.value.data);
-                                    std::size_t cell_row = typename BlueprintFieldType::integral_type(t.value_second.data);
-                                    var cell_val = var_from_evals(assignment, params.evaluations, cell_col, cell_row);
+                                    std::size_t cell_col = typename BlueprintFieldType::integral_type(t.value.first.data);
+                                    std::size_t cell_row = typename BlueprintFieldType::integral_type(t.value.second.data);
+                                    var cell_val = var_from_evals(params.evaluations, cell_col, cell_row);
+                                    stack.emplace_back(cell_val);
                                     break;
                                 }
                                 case token_type::dup:
@@ -442,7 +568,7 @@ namespace nil {
                                     break;
                                 case token_type::pow:
                                 {
-                                    assignment.witness(W0)[row] = t.value;
+                                    assignment.witness(W0)[row] = t.value.first;
                                     var exponent(W0, row, false, var::column_type::witness);
                                     row++;
 
@@ -503,7 +629,7 @@ namespace nil {
                                 }
                                 case token_type::load:
                                 {
-                                    std::size_t idx = typename BlueprintFieldType::integral_type(t.value.data);
+                                    std::size_t idx = typename BlueprintFieldType::integral_type(t.value.first.data);
                                     stack.push_back(cache[idx]);
                                     break;
                                 }
