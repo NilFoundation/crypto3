@@ -137,8 +137,12 @@ namespace nil {
                     typename FRI::basic_fri::proof_type &proof,
                     typename FRI::basic_fri::params_type &fri_params,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
-                    
-                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, {0}, {1}, transcript);
+
+                    std::array<math::polynomial<typename FRI::field_type::value_type>, 1> U;
+                    std::array<math::polynomial<typename FRI::field_type::value_type>, 1> V;
+                    U[0] = {0};
+                    V[0] = {1};
+                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
                 }
             }    // namespace algorithms
         }        // namespace zk
