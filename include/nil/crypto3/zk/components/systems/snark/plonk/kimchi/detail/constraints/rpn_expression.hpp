@@ -52,13 +52,14 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/expr.rs#L467
                 // Input: RPN expression E, variables values V
                 // Output: E(V) \in F_r
-                template<typename ArithmetizationType, typename KimchiParamsType,
+                template<typename ArithmetizationType, typename KimchiParamsType, std::size_t RowsAmount,
                     std::size_t... WireIndexes>
                 class rpn_expression;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
                          typename KimchiParamsType,
+                         std::size_t RowsAmount,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -77,6 +78,7 @@ namespace nil {
                 class rpn_expression<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     KimchiParamsType,
+                    RowsAmount,
                     W0,
                     W1,
                     W2,
@@ -176,7 +178,7 @@ namespace nil {
                     }
 
                 public:
-                    constexpr static const std::size_t rows_amount = 100;
+                    constexpr static const std::size_t rows_amount = RowsAmount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     enum token_type {
@@ -216,8 +218,8 @@ namespace nil {
                             evaluations;
                     };
 
-                    static std::vector<typename params_type::token_value_type> 
-                        rpn_from_string(const std::string &str) {
+                    constexpr static std::vector<typename params_type::token_value_type>
+                        rpn_from_string(const std::string_view &str) {
 
                         std::vector<std::string> tokens_str;
                         boost::split(tokens_str, str, boost::is_any_of(";"));
@@ -227,6 +229,7 @@ namespace nil {
 
                         std::vector<typename params_type::token_value_type> tokens;
                         for (std::size_t i = 0; i < tokens_str.size(); i++) {
+
                             std::string token_str = tokens_str[i];
                             if (token_str.empty()) {
                                 continue;
@@ -358,6 +361,44 @@ namespace nil {
                         }
 
                         return tokens;
+                    }
+
+                    constexpr static std::size_t rows_by_expr(
+                        const std::string_view &str) {
+                            auto tokens = rpn_from_string(str);
+                            std::size_t rows = 0;
+                            std::size_t constant_rows = 3 + mds_size * mds_size;
+
+                            for (std::size_t i = 0; i < tokens.size(); i++) {
+                                auto token = tokens[i];
+                                if (token.type == token_type::literal || token.type == token_type::pow) {
+                                    constant_rows++;
+                                }
+                                switch (token.type) {
+                                    case token_type::pow:
+                                        rows += exponentiation_component::rows_amount;
+                                        break;
+                                    case token_type::add:
+                                        rows += add_component::rows_amount;
+                                        break;
+                                    case token_type::mul:
+                                        rows += mul_component::rows_amount;
+                                        break;
+                                    case token_type::sub:
+                                        rows += sub_component::rows_amount;
+                                        break;
+                                    case token_type::vanishes_on_last_4_rows:
+                                        // TODO: lookups
+                                        break;
+                                    case token_type::unnormalized_lagrange_basis:
+                                        // TODO: lookups
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+
+                            return std::max(rows, constant_rows);
                     }
 
                     struct result_type {

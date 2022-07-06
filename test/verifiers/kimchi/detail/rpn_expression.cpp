@@ -89,8 +89,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite) {
         zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size, use_lookup, lookup_table_size,
                                            alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
 
+    constexpr std::string_view expression_str = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;";
+
+    //constexpr std::size_t rows_amount = tmp_component_type::rows_by_expr(expression_str);
     using component_type =
-        zk::components::rpn_expression<ArithmetizationType, kimchi_params, 0, 1, 2,
+        zk::components::rpn_expression<ArithmetizationType, kimchi_params, 100, 0, 1, 2,
                                              3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     typename BlueprintFieldType::value_type alpha_val =
@@ -117,8 +120,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite) {
 
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
-
-    std::string expression_str = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;";
 
     auto expression = component_type::rpn_from_string(expression_str);
 
