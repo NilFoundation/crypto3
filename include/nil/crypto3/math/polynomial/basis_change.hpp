@@ -90,7 +90,8 @@ namespace nil {
              * 12 and 14.
              */
             template<typename FieldType, typename Range>
-            void monomial_to_newton_basis(Range &a,
+            void
+                monomial_to_newton_basis(Range &a,
                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
                                          size_t n) {
 
@@ -215,9 +216,6 @@ namespace nil {
 
                 w = transpose_multiplication(n - 1, z, f);
 
-#ifdef MULTICORE
-#pragma omp parallel for
-#endif
                 for (std::size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];
                 }
@@ -260,9 +258,6 @@ namespace nil {
 
                 w = transpose_multiplication(n - 1, u, w);
 
-#ifdef MULTICORE
-#pragma omp parallel for
-#endif
                 for (std::size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];
                 }

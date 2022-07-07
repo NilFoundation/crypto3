@@ -346,29 +346,7 @@ namespace nil {
                  * polynomial C.
                  */
                 polynomial_view operator+=(const polynomial_view& other) {
-                    if (this->is_zero()) {
-                        this->assign(other.begin(), other.end());
-                        return *this;
-                    } else if (other.is_zero()) {
-                        return *this;
-                    } else {
-                        std::size_t a_size = std::distance(this->begin(), this->end());
-                        std::size_t b_size = std::distance(other.begin(), other.end());
-
-                        if (a_size > b_size) {
-                            this->resize(a_size);
-                            std::transform(other.begin(), other.end(), this->begin(), this->begin(),
-                                           std::plus<FieldValueType>());
-                            std::copy(this->begin() + b_size, this->end(), this->begin() + b_size);
-                        } else {
-                            this->resize(b_size);
-                            std::transform(this->begin(), this->end(), other.begin(), this->begin(),
-                                           std::plus<FieldValueType>());
-                            std::copy(other.begin() + a_size, other.end(), this->begin() + a_size);
-                        }
-
-                        this->condense();
-                    }
+                    addition(*this, *this, other);
                     return *this;
                 }
 
@@ -382,31 +360,7 @@ namespace nil {
                  * polynomial C.
                  */
                 polynomial_view operator-=(const polynomial_view& other) {
-                    if (this->is_zero()) {
-                        this->assign(other.begin(), other.end());
-                        this->neg();
-                        return *this;
-                    } else if (other.is_zero()) {
-                        return *this;
-                    } else {
-                        std::size_t a_size = std::distance(this->begin(), this->end());
-                        std::size_t b_size = std::distance(other.begin(), other.end());
-
-                        if (a_size > b_size) {
-                            this->resize(a_size);
-                            std::transform(this->begin(), this->begin() + b_size, other.begin(), this->begin(),
-                                           std::minus<FieldValueType>());
-                            std::copy(this->begin() + b_size, this->end(), this->begin() + b_size);
-                        } else {
-                            this->resize(b_size);
-                            std::transform(this->begin(), this->end(), other.begin(), this->begin(),
-                                           std::minus<FieldValueType>());
-                            std::transform(other.begin() + a_size, other.end(), this->begin() + a_size,
-                                           std::negate<FieldValueType>());
-                        }
-
-                        this->condense();
-                    }
+                    subtraction(*this, *this, other);
                     return *this;
                 }
 
@@ -415,30 +369,7 @@ namespace nil {
                  * polynomial C.
                  */
                 polynomial_view operator*=(polynomial_view other) {
-                    typedef typename value_type::field_type FieldType;
-
-                    BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
-                    BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
-
-                    const std::size_t n = detail::power_of_two(this->size() + other.size() - 1);
-                    value_type omega = unity_root<FieldType>(n);
-
-                    this->resize(n, value_type::zero());
-                    other.resize(n, value_type::zero());
-
-                    detail::basic_radix2_fft<FieldType>(it, omega);
-                    detail::basic_radix2_fft<FieldType>(other, omega);
-
-                    std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::multiplies<value_type>());
-
-                    detail::basic_radix2_fft<FieldType>(it, omega.inversed());
-
-                    const value_type sconst = value_type(n).inversed();
-                    std::transform(this->begin(),
-                                   this->end(),
-                                   this->begin(),
-                                   std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
-                    this->condense();
+                    multiplication(*this, *this, other);
                     return *this;
                 }
 
