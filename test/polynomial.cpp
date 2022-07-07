@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_SUITE(polynomial_division_test_suite)
 BOOST_AUTO_TEST_CASE(polynomial_division) {
 
     polynomial<typename FieldType::value_type> a = {5, 0, 0, 13, 0, 1};
-    polynomial<typename FieldType::value_type> b = {13, 0, 1};
+    polynomial<typename FieldType::value_type> b = {13, 2, 1};
 
     polynomial<typename FieldType::value_type> Q(1, FieldType::value_type::zero());
     polynomial<typename FieldType::value_type> R(1, FieldType::value_type::zero());
@@ -290,8 +290,71 @@ BOOST_AUTO_TEST_CASE(polynomial_division) {
     Q = a / b;
     R = a % b;
 
-    polynomial<typename FieldType::value_type> Q_ans = {0, 0, 0, 1};
-    polynomial<typename FieldType::value_type> R_ans = {5};
+    polynomial<typename FieldType::value_type> Q_ans = {18, 4, -2, 1};
+    polynomial<typename FieldType::value_type> R_ans = {-229, -88};
+
+    for (std::size_t i = 0; i < Q.size(); i++) {
+        BOOST_CHECK_EQUAL(Q_ans[i].data, Q[i].data);
+    }
+    for (std::size_t i = 0; i < R.size(); i++) {
+        BOOST_CHECK_EQUAL(R_ans[i].data, R[i].data);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_division_horner_binomial) {
+
+    polynomial<typename FieldType::value_type> a = {2, 0, 3, 2, 1};
+    polynomial<typename FieldType::value_type> b = {-2, 1};
+
+    polynomial<typename FieldType::value_type> Q(1, FieldType::value_type::zero());
+    polynomial<typename FieldType::value_type> R(1, FieldType::value_type::zero());
+
+    Q = a / b;
+    R = a % b;
+    polynomial<typename FieldType::value_type> Q_ans = {22, 11, 4, 1};
+    polynomial<typename FieldType::value_type> R_ans = {46};
+
+    for (std::size_t i = 0; i < Q.size(); i++) {
+        BOOST_CHECK_EQUAL(Q_ans[i].data, Q[i].data);
+    }
+    for (std::size_t i = 0; i < R.size(); i++) {
+        BOOST_CHECK_EQUAL(R_ans[i].data, R[i].data);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_division_horner_long_second) {
+
+    polynomial<typename FieldType::value_type> a = {2, 0, 3, 2, 1};
+    polynomial<typename FieldType::value_type> b = {-2, 0, 0, 1};
+
+    polynomial<typename FieldType::value_type> Q(1, FieldType::value_type::zero());
+    polynomial<typename FieldType::value_type> R(1, FieldType::value_type::zero());
+
+    Q = a / b;
+    R = a % b;
+    polynomial<typename FieldType::value_type> Q_ans = {2, 1};
+    polynomial<typename FieldType::value_type> R_ans = {6, 2, 3};
+
+    for (std::size_t i = 0; i < Q.size(); i++) {
+        BOOST_CHECK_EQUAL(Q_ans[i].data, Q[i].data);
+    }
+    for (std::size_t i = 0; i < R.size(); i++) {
+        BOOST_CHECK_EQUAL(R_ans[i].data, R[i].data);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_division_horner_long_equal) {
+
+    polynomial<typename FieldType::value_type> a = {2, 0, 3, 2, 2};
+    polynomial<typename FieldType::value_type> b = {-2, 0, 0, 0, 1};
+
+    polynomial<typename FieldType::value_type> Q(1, FieldType::value_type::zero());
+    polynomial<typename FieldType::value_type> R(1, FieldType::value_type::zero());
+
+    Q = a / b;
+    R = a % b;
+    polynomial<typename FieldType::value_type> Q_ans = {2};
+    polynomial<typename FieldType::value_type> R_ans = {6, 0, 3, 2};
 
     for (std::size_t i = 0; i < Q.size(); i++) {
         BOOST_CHECK_EQUAL(Q_ans[i].data, Q[i].data);

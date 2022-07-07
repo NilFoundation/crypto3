@@ -471,48 +471,9 @@ namespace nil {
                 polynomial_dfs operator/(const polynomial_dfs& other) const {
                     std::vector<FieldValueType> x = this->coefficients();
                     std::vector<FieldValueType> y = other.coefficients();
-
-                    std::size_t d = y.size() - 1;           /* Degree of B */
-                    FieldValueType c = y.back().inversed(); /* Inverse of Leading Coefficient of B */
-
-                    std::vector<FieldValueType> r(x);
-                    std::vector<FieldValueType> q(r.size(), FieldValueType::zero());
-
-                    std::size_t r_deg = r.size() - 1;
-                    std::size_t shift;
-
-                    while (r_deg >= d && (r.size() != 0)) {
-                        if (r_deg >= d) {
-                            shift = r_deg - d;
-                        } else {
-                            shift = 0;
-                        }
-
-                        FieldValueType lead_coeff = r.back() * c;
-
-                        q[shift] += lead_coeff;
-
-                        if (y.size() + shift + 1 > r.size()) {
-                            r.resize(y.size() + shift + 1);
-                        }
-                        auto glambda = [=](const FieldValueType& x, const FieldValueType& y) {
-                            return y - (x * lead_coeff);
-                        };
-                        std::transform(y.begin(), y.end(), r.begin() + shift, r.begin() + shift, glambda);
-
-                        size_t new_s = r.size();
-                        while (new_s > 0 && r[new_s - 1] == FieldValueType(0)) {
-                            --new_s;
-                        }
-                        r.resize(new_s);
-
-                        r_deg = r.size() - 1;
-                    }
-                    size_t new_s = q.size();
-                    while (new_s > 0 && q[new_s - 1] == FieldValueType(0)) {
-                        --new_s;
-                    }
-                    q.resize(new_s);
+                    std::vector<FieldValueType> r, q;
+                    division(q, r, x, y);
+                    std::size_t new_s = q.size();
 
                     typedef typename value_type::field_type FieldType;
                     size_t n = this->size();
@@ -530,47 +491,16 @@ namespace nil {
                 polynomial_dfs operator%(const polynomial_dfs& other) const {
                     std::vector<FieldValueType> x = this->coefficients();
                     std::vector<FieldValueType> y = other.coefficients();
-
-                    std::size_t d = y.size() - 1;           /* Degree of B */
-                    FieldValueType c = y.back().inversed(); /* Inverse of Leading Coefficient of B */
-
-                    std::vector<FieldValueType> r(x);
-
-                    std::size_t r_deg = r.size() - 1;
-                    std::size_t shift;
-
-                    while (r_deg >= d && (r.size() != 0)) {
-                        if (r_deg >= d) {
-                            shift = r_deg - d;
-                        } else {
-                            shift = 0;
-                        }
-
-                        FieldValueType lead_coeff = r.back() * c;
-
-                        if (y.size() + shift + 1 > r.size()) {
-                            r.resize(y.size() + shift + 1);
-                        }
-                        auto glambda = [=](const FieldValueType& x, const FieldValueType& y) {
-                            return y - (x * lead_coeff);
-                        };
-                        std::transform(y.begin(), y.end(), r.begin() + shift, r.begin() + shift, glambda);
-
-                        size_t new_s = r.size();
-                        while (new_s > 0 && r[new_s - 1] == FieldValueType(0)) {
-                            --new_s;
-                        }
-                        r.resize(new_s);
-
-                        r_deg = r.size() - 1;
-                    }
+                    std::vector<FieldValueType> r, q;
+                    division(q, r, x, y);
+                    std::size_t new_s = r.size();
 
                     typedef typename value_type::field_type FieldType;
                     size_t n = this->size();
                     value_type omega = unity_root<FieldType>(n);
                     r.resize(n);
                     detail::basic_radix2_fft<FieldType>(r, omega);
-                    return polynomial_dfs(r_deg, r);
+                    return polynomial_dfs(new_s - 1, r);
                 }
 
                 template<typename ContainerType>
