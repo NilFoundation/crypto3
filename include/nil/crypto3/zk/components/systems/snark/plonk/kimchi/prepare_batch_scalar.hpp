@@ -48,7 +48,6 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/generic_scalars.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_scalars.hpp>
 
-#include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 
 namespace nil {
@@ -105,9 +104,6 @@ namespace nil {
                     using index_terms_scalars_component = index_terms_scalars<ArithmetizationType, KimchiParamsType,
                                 W0, W1, W2, W3, W4, W5,
                                 W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using poseidon_component = zk::components::poseidon<ArithmetizationType, 
-                        BlueprintFieldType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
                     using proof_binding = typename zk::components::binding<ArithmetizationType,
                         BlueprintFieldType, KimchiParamsType>;
@@ -215,16 +211,12 @@ namespace nil {
                             ).output;
                         row += sub_component::rows_amount;
 
-                        auto mds = poseidon_component::mds_constants();
-
                         auto index_scalars = index_terms_scalars_component::generate_circuit(
                                 bp, assignment, {
-                                vanishing_eval, oracles_output.oracles.zeta,
-                                oracles_output.combined_evals,
                                 oracles_output.oracles.alpha,
                                 params.fq_output.beta, params.fq_output.gamma,
                                 params.fq_output.joint_combiner,
-                                mds}, row
+                                oracles_output.combined_evals}, row
                             ).output;
                         row += index_terms_scalars_component::rows_amount;
 
@@ -302,17 +294,12 @@ namespace nil {
                             ).output;
                         row += sub_component::rows_amount;
 
-                        // TODO: make endo_factor generic for different curves
-                        auto mds = poseidon_component::mds_constants();
-
                         auto index_scalars = index_terms_scalars_component::generate_assignments(
-                                assignment, {
-                                vanishing_eval, oracles_output.oracles.zeta,
-                                oracles_output.combined_evals,
+                                assignment, {   
                                 oracles_output.oracles.alpha,
                                 params.fq_output.beta, params.fq_output.gamma,
                                 params.fq_output.joint_combiner,
-                                mds}, row
+                                oracles_output.combined_evals}, row
                             ).output;
                             row += index_terms_scalars_component::rows_amount;
                         for(std::size_t i = 0; i < index_scalars.size(); i++) {

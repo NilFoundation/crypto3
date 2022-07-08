@@ -92,8 +92,8 @@ namespace nil {
                         _table_description.rows_amount = std::pow(2,
                             std::ceil(std::log2(_table_description.rows_amount)));
 
-                        if (_table_description.rows_amount < 4)
-                            _table_description.rows_amount = 4;
+                        if (_table_description.rows_amount < 8)
+                            _table_description.rows_amount = 8;
                     }
                     
                     for (std::size_t w_index = 0; w_index <

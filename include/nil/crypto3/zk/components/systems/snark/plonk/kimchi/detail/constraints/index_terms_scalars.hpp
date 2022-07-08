@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -94,39 +94,39 @@ namespace nil {
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
+                    using rpn_component = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 100, 
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using evaluations_type = typename zk::components::kimchi_proof_evaluations<
+                        BlueprintFieldType, KimchiParamsType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f27;
 
-                    constexpr static const std::size_t mds_size = 3;
-
-                    /*static var w1_scalar_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                            const params_type &params,
-                                                            std::size_t row) {
-                            
-                    }*/
+                    constexpr static const std::array<std::string_view, KimchiParamsType::index_term_size> terms = {
+                        "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;"
+                    };
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 100;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        var vanishing_polynomial_eval;
-                        var zeta; 
-                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
-                            KimchiParamsType::eval_points_amount> evals;
-
                         var alpha;
                         var beta;
                         var gamma;
                         var joint_combiner;
-                        std::array<std::array<typename BlueprintFieldType::value_type, mds_size>, mds_size> mds;
+
+                        std::array<evaluations_type, KimchiParamsType::eval_points_amount>
+                            evaluations;
                     };
 
                     struct result_type {
                         std::array<var, KimchiParamsType::index_term_size> output;
 
                         result_type(std::size_t start_row_index) {
-                            std::size_t row = start_row_index;
+                        }
+
+                        result_type() {
                         }
                     };
 
@@ -138,7 +138,21 @@ namespace nil {
                         std::size_t row = start_row_index;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
-                        return result_type(start_row_index);
+
+                        std::array<var, KimchiParamsType::index_term_size> output;
+
+                        for (std::size_t i = 0; i < KimchiParamsType::index_term_size; ++i) {
+                            auto tokens = rpn_component::rpn_from_string(terms[i]);
+                            output[i] = rpn_component::generate_circuit(bp, assignment,
+                                {tokens, params.alpha, params.beta, params.gamma, params.joint_combiner,
+                                params.evaluations}, row).output;
+                            row += rpn_component::rows_amount;
+                        }
+
+                        result_type res;
+                        res.output = output;
+
+                        return res;
                     }
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
@@ -147,7 +161,20 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        return result_type(start_row_index);
+                        std::array<var, KimchiParamsType::index_term_size> output;
+
+                        for (std::size_t i = 0; i < KimchiParamsType::index_term_size; ++i) {
+                            auto tokens = rpn_component::rpn_from_string(terms[i]);
+                            output[i] = rpn_component::generate_assignments(assignment,
+                                {tokens, params.alpha, params.beta, params.gamma, params.joint_combiner,
+                                params.evaluations}, row).output;
+                            row += rpn_component::rows_amount;
+                        }
+
+                        result_type res;
+                        res.output = output;
+
+                        return res;
                     }
 
                 private:
@@ -168,8 +195,6 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
-
-                        // typename BlueprintFieldType::value_type endo_coeff;
                     }
                 };
             }    // namespace components

@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prepare_batch_scalar_test_suite) {
     constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
-    constexpr static const std::size_t index_terms = 0;
+    constexpr static const std::size_t index_terms = 1;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
