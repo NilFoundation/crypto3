@@ -112,12 +112,15 @@ namespace nil {
                         std::size_t row = start_row_index;
                         sponge_type sponge;
                         sponge.init_circuit(bp, assignment, params.zero, row);
+                        row += sponge_type::init_rows;
                         for (std::size_t i = 0; i < params.input.size(); ++i) {
                             sponge.absorb_circuit(bp, assignment, params.input[i], row);
+                            row += sponge_type::absorb_rows;
                         }
                         var sq;
                         for (size_t i = 0; i < num_squeezes; ++i) {
                             sq = sponge.squeeze_circuit(bp, assignment, row);
+                            row += sponge_type::squeeze_rows;
                         }
                         return {sq};
                     }
@@ -130,13 +133,16 @@ namespace nil {
                         std::size_t row = start_row_index;
 
                         sponge_type sponge;
-                        sponge.init_assignment(assignment, row);
+                        sponge.init_assignment(assignment, params.zero, row);
+                        row += sponge_type::init_rows;
                         for (std::size_t i = 0; i < params.input.size(); ++i) {
                             sponge.absorb_assignment(assignment, params.input[i], row);
+                            row += sponge_type::absorb_rows;
                         }
                         var sq;
                         for (size_t i = 0; i < num_squeezes; ++i) {
                             sq = sponge.squeeze_assignment(assignment, row);
+                            row += sponge_type::squeeze_rows;
                         }
                         return {sq};
                     }
