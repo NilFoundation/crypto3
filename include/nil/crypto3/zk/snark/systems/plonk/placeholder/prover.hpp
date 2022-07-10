@@ -34,6 +34,7 @@
 
 #include <nil/crypto3/container/merkle/tree.hpp>
 
+#include <nil/crypto3/zk/detail/utility.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
@@ -251,6 +252,7 @@ namespace nil {
 #endif
 
                         /////TEST
+#ifdef ZK_PLACEHOLDER_DEBUG_ENABLED
                         for (std::size_t i = 0; i < f_parts; i++) {
                             for (std::size_t j = 0; j < table_description.rows_amount; j++) {
                                 if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
@@ -278,6 +280,8 @@ namespace nil {
                                 //}
                             }
                         }
+#endif
+
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         last = std::chrono::high_resolution_clock::now();
 #endif
