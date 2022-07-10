@@ -716,7 +716,7 @@ namespace nil {
                         constraint_out_2, constraint_out_3, constraint_out_4});
                     }
 
-                    static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> split_and_sparse(const std::vector<bool> &bits,
+                    static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> split_and_sparse(std::vector<bool> bits,
                                                                                  const std::vector<size_t> &sizes,
                                                                                  std::size_t base) {
                         std::size_t size = sizes.size() - 1;
@@ -724,11 +724,11 @@ namespace nil {
                                                                     std::vector<typename CurveType::base_field_type::integral_type>(size + 1)};
                         std::size_t k = 0;
                         for (int i = size; i > -1; i--) {
-                            res[0][i] = bits[k];
-                            res[1][i] = bits[k];
+                            res[0][i] = int(bits[k]);
+                            res[1][i] = int(bits[k]);
                             for (std::size_t j = 1; j < sizes[i]; j++) {
-                                res[0][i] = res[0][i] * 2 + bits[k + j];
-                                res[1][i] = res[1][i] * base + bits[k + j];
+                                res[0][i] = res[0][i] * 2 + int(bits[k + j]);
+                                res[1][i] = res[1][i] * base + int(bits[k + j]);
                             }
                             k = k + sizes[i];
                         }
