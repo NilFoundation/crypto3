@@ -105,7 +105,6 @@ namespace nil {
                     struct params_type {
                         std::vector<std::array<var, 2>> input_fr;
                         std::vector<std::array<var, 2>> input_g;
-                        var zero;
                     };
 
                     struct result_type {
@@ -119,42 +118,36 @@ namespace nil {
                         const std::size_t start_row_index){
 
                         generate_assignments_constants(bp, assignment, params, start_row_index);
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
 
-                        var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var zero(0, start_row_index, false, var::column_type::constant);
 
                         std::size_t row = start_row_index;
-                        std::cout << "row: " << row << '\n';
 
                         transcript_type transcript;
                         transcript.init_circuit(bp, assignment, zero, row);
                         row += transcript_type::init_rows;
-                        std::cout << "row: " << row << '\n';
                         for (std::size_t i = 0; i < params.input_fr.size(); ++i) {
                             transcript.absorb_fr_circuit(bp, assignment, params.input_fr[i], row);
                             row += transcript_type::absorb_rows;
                         }
-                        std::cout << "row: " << row << '\n';
                         for (std::size_t i = 0; i < params.input_g.size(); ++i) {
                             transcript.absorb_g_circuit(bp, assignment, params.input_g[i], row);
                             row += transcript_type::absorb_rows;
                         }
-                        std::cout << "row: " << row << '\n';
                         var sq;
                         for (size_t i = 0; i < num_challenges; ++i) {
                             sq = transcript.challenge_circuit(bp, assignment, row);
                             row += transcript_type::challenge_rows;
                         }
-                        std::cout << "row: " << row << '\n';
                         for (size_t i = 0; i < num_challenges_fq; ++i) {
                             sq = transcript.challenge_fq_circuit(bp, assignment, row);
                             row += transcript_type::challenge_fq_rows;
                         }
-                        std::cout << "row: " << row << '\n';
                         if (digest) {
                             sq = transcript.digest_circuit(bp, assignment, row);
                             row += transcript_type::digest_rows;
                         }
-                        std::cout << "row: " << row << '\n';
                         return {sq};
                     }
 

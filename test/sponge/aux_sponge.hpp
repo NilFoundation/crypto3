@@ -88,7 +88,7 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0fd2;
-                    constexpr static const std::size_t rows_amount = 100;
+                    constexpr static const std::size_t rows_amount = 200;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {

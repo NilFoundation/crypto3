@@ -140,7 +140,7 @@ namespace nil {
                         }
                         var sq = sponge.squeeze_assignment(assignment, row);
                         row += sponge_component::squeeze_rows;
-                        auto x = unpack::generate_assignments(assignment, {sq}, component_start_row).result;
+                        auto x = unpack::generate_assignments(assignment, {sq}, row).result;
                         row += unpack::rows_amount;
                         for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
                             last_squeezed.push_back(x[i]);
@@ -160,7 +160,7 @@ namespace nil {
                         }
                         var sq = sponge.squeeze_circuit(bp, assignment, row);
                         row += sponge_component::squeeze_rows;
-                        auto x = unpack::generate_circuit(bp, assignment, {sq}, component_start_row).result;
+                        auto x = unpack::generate_circuit(bp, assignment, {sq}, row).result;
                         row += unpack::rows_amount;
                         for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
                             last_squeezed.push_back(x[i]);
