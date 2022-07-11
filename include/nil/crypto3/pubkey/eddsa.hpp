@@ -30,7 +30,7 @@
 #include <array>
 #include <vector>
 
-#include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/curves/ed25519.hpp>
 
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -135,10 +135,10 @@ namespace nil {
 
             template<typename Coordinates, eddsa_type eddsa_variant, typename Params>
             struct eddsa<
-                typename algebra::curves::curve25519::g1_type<Coordinates, algebra::curves::forms::twisted_edwards>,
+                typename algebra::curves::ed25519::g1_type<Coordinates, algebra::curves::forms::twisted_edwards>,
                 eddsa_variant, Params> {
                 typedef
-                    typename algebra::curves::curve25519::g1_type<Coordinates, algebra::curves::forms::twisted_edwards>
+                    typename algebra::curves::ed25519::g1_type<Coordinates, algebra::curves::forms::twisted_edwards>
                         group_type;
                 typedef eddsa_policy<eddsa_variant, Params> policy_type;
             };

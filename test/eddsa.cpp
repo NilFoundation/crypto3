@@ -121,7 +121,7 @@ struct test_eddsa_params_void {
 template<pubkey::eddsa_type eddsa_variant,
          typename Params,
          typename InputRange,
-         typename Group = algebra::curves::curve25519::template g1_type<>>
+         typename Group = algebra::curves::ed25519::template g1_type<>>
 void check_eddsa(
     const InputRange &msg,
     const pubkey::private_key<pubkey::eddsa<Group, eddsa_variant, Params>> &private_key,
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_SUITE(eddsa_conformity_test_suite)
 
 BOOST_AUTO_TEST_CASE(eddsa_key_gen_test) {
 
-    using curve_type = algebra::curves::curve25519;
+    using curve_type = algebra::curves::ed25519;
     using group_type = typename curve_type::g1_type<>;
     using group_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using group_value_type = typename group_type::value_type;
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(eddsa_key_gen_test) {
 
 // https://datatracker.ietf.org/doc/html/rfc8032#section-7.1
 BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
-    using curve_type = algebra::curves::curve25519;
+    using curve_type = algebra::curves::ed25519;
     using group_type = typename curve_type::g1_type<>;
     using group_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using group_value_type = typename group_type::value_type;
@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE(eddsa_basic_test) {
 
 // https://datatracker.ietf.org/doc/html/rfc8032#section-7.2
 BOOST_AUTO_TEST_CASE(eddsa_ctx_test) {
-    using curve_type = algebra::curves::curve25519;
+    using curve_type = algebra::curves::ed25519;
     using group_type = typename curve_type::g1_type<>;
     using group_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using group_value_type = typename group_type::value_type;
@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE(eddsa_ctx_test) {
 
 // https://datatracker.ietf.org/doc/html/rfc8032#section-7.3
 BOOST_AUTO_TEST_CASE(eddsa_ph_test) {
-    using curve_type = algebra::curves::curve25519;
+    using curve_type = algebra::curves::ed25519;
     using group_type = typename curve_type::g1_type<>;
     using group_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using group_value_type = typename group_type::value_type;
