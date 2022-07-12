@@ -37,6 +37,8 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zk_w3.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
+
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
@@ -101,6 +103,8 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
+                    using div_component = zk::components::division<ArithmetizationType, W0, W1, W2, W3>;
+
 
                     using zkpm_eval_component = zk::components::zkpm_evaluate<ArithmetizationType, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
@@ -110,6 +114,12 @@ namespace nil {
 
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
                     using argument_type = typename verifier_index_type::argument_type;
+
+                    constexpr static const std::string_view constant_term_polish = {
+                        "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;"
+                    };
+                    using rpn_component = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 100, 
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     constexpr static const std::size_t selector_seed = 0x0f22;
                     constexpr static const std::size_t eval_points_amount = 2;
@@ -269,7 +279,28 @@ namespace nil {
                         ft_eval0 = sub_component::generate_assignments(
                             assignment, {ft_eval0, ft_eval0_sub}, row).output;
                         row += sub_component::rows_amount;
-                        
+
+                        // numerator calculation
+
+                        var domain_offset_for_zk = zk_w3_component::generate_assignments( // index.w()
+                            assignment, {params.verifier_index}, row).output;
+                        row += zk_w3_component::rows_amount;
+
+                        // zeta - index.w()
+                        var zeta_minus_w = sub_component::generate_assignments(
+                            assignment, {params.zeta, domain_offset_for_zk}, row).output;
+                        row += sub_component::rows_amount;
+
+                        // (zeta - ScalarField::<G>::one())
+                        var zeta_minus_one = sub_component::generate_assignments(
+                            assignment, {params.zeta, one}, row).output;
+                        row += sub_component::rows_amount;
+
+                        // (ScalarField::<G>::one() - evals[0].z)
+                        var one_minus_z = sub_component::generate_assignments(
+                            assignment, {one, params.combined_evals[0].z}, row).output;
+                        row += sub_component::rows_amount;
+
                         //     let numerator = ((zeta1m1 * alpha1 * (zeta - index.w()))
                         //         + (zeta1m1 * alpha2 * (zeta - ScalarField::<G>::one())))
                         //         * (ScalarField::<G>::one() - evals[0].z);
@@ -277,33 +308,55 @@ namespace nil {
                             assignment, {zeta1m1, alpha1}, row).output;
                         row += mul_component::rows_amount;
 
-                        var domain_offset_for_zk = zk_w3_component::generate_assignments( // index.w()
-                            assignment, {params.verifier_index}, row).output;
-                        row += zk_w3_component::rows_amount;
+                        numerator = mul_component::generate_assignments(
+                            assignment, {numerator, zeta_minus_w}, row).output;
+                        row += mul_component::rows_amount;
+
+                        var numerator_term = mul_component::generate_assignments(
+                            assignment, {zeta1m1, alpha2}, row).output;
+                        row += mul_component::rows_amount;
+                        numerator_term = mul_component::generate_assignments(
+                            assignment, {numerator_term, zeta_minus_one}, row).output;
+                        row += mul_component::rows_amount;
+
+                        numerator = add_component::generate_assignments(
+                            assignment, {numerator, numerator_term}, row).output;
+                        row += add_component::rows_amount;
+
+                        numerator = mul_component::generate_assignments(
+                            assignment, {numerator, one_minus_z}, row).output;
+                        row += mul_component::rows_amount;                        
+
                         //     let denominator = (zeta - index.w()) * (zeta - ScalarField::<G>::one());
                         //     let denominator = denominator.inverse().expect("negligible probability");
+                        var denominator = mul_component::generate_assignments(
+                            assignment, {zeta_minus_w, zeta_minus_one}, row).output;
+                        row += mul_component::rows_amount;
+
+                        denominator = div_component::generate_assignments(
+                            assignment, {one, denominator}, row).output;
+                        row += div_component::rows_amount;
 
                         //     ft_eval0 += numerator * denominator;
-                        //     let cs = Constants {
-                        //         alpha,
-                        //         beta,
-                        //         gamma,
-                        //         joint_combiner: joint_combiner.map(|j| j.1),
-                        //         endo_coefficient: index.endo,
-                        //         mds: index.fr_sponge_params.mds.clone(),
-                        //     };
+                        var numerator_denominator = mul_component::generate_assignments(
+                            assignment, {numerator, denominator}, row).output;
+                        row += mul_component::rows_amount;
+                        ft_eval0 = add_component::generate_assignments(
+                            assignment, {ft_eval0, numerator_denominator}, row).output;
+                        row += add_component::rows_amount;
 
-                        //     let pt = PolishToken::evaluate(
-                        //         &index.linearization.constant_term,
-                        //         index.domain,
-                        //         zeta,
-                        //         &evals,
-                        //         &cs,
-                        //     )
-                        //         .unwrap();
-                        //     ft_eval0 -= pt;
-                        //     ft_eval0
-                        // };
+                        // evaluate constant term expression
+                        auto tokens = rpn_component::rpn_from_string(constant_term_polish);
+                        var pt = rpn_component::generate_assignments(assignment,
+                            {tokens, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
+                            params.combined_evals}, row).output;
+                        row += rpn_component::rows_amount;
+                        
+                        ft_eval0 = sub_component::generate_assignments(
+                            assignment, {ft_eval0, pt}, row).output;
+                        row += sub_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
 
                         return result_type(start_row_index);
                     }
