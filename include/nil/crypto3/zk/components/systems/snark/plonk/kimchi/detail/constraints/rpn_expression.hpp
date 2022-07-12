@@ -484,7 +484,7 @@ namespace nil {
                                     constant_row++;
 
                                     var res = exponentiation_component::generate_circuit(bp,
-                                        assignment, {stack.back(), exponent, zero, one}, row).output;
+                                        assignment, {stack.back(), exponent}, row).output;
                                     row += exponentiation_component::rows_amount;
 
                                     stack[stack.size() - 1] = res;
@@ -620,7 +620,7 @@ namespace nil {
                                     constant_row++;
 
                                     var res = exponentiation_component::generate_assignments(
-                                        assignment, {stack.back(), exponent, zero, one}, row).output;
+                                        assignment, {stack.back(), exponent}, row).output;
                                     row += exponentiation_component::rows_amount;
 
                                     stack[stack.size() - 1] = res;

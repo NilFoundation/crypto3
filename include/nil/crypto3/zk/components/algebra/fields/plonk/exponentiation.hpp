@@ -95,8 +95,6 @@ namespace nil {
                     struct params_type {
                         var base;
                         var exponent;
-                        var zero;
-                        var one;
                     };
 
                     struct result_type {
@@ -128,6 +126,7 @@ namespace nil {
                                                    start_row_index + 1 + main_rows - 1);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
+                        generate_assignments_constants(assignment, params, start_row_index);
 
                         return result_type(params, start_row_index);
                     }
@@ -237,16 +236,30 @@ namespace nil {
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
 
+                        var zero(0, component_start_row, false, var::column_type::constant);
+                        var one(0, component_start_row + 1, false, var::column_type::constant);
+
                         for (std::size_t row = component_start_row + 1; row < component_start_row + rows_amount; row++) {
                             bp.add_copy_constraint({{W0, static_cast<int>(row), false}, params.base});
                         }
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, params.zero});
+                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, zero});
                         bp.add_copy_constraint({{intermediate_start + intermediate_results_per_row - 1,
                                                  static_cast<int>(component_start_row), false},
-                                                params.one});
+                                                one});
                         // check that the recalculated n is equal to the input challenge
                         bp.add_copy_constraint(
                            {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
+                    }
+
+                    static void generate_assignments_constants(
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  const std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
+                        assignment.constant(0)[row] = 0;
+                        row++;
+                        assignment.constant(0)[row] = 1;
+                        row++;
                     }
                 };
             }    // namespace components

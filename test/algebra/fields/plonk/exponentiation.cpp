@@ -69,16 +69,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation) {
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
     var base(0, 0, false, var::column_type::public_input);
     var exponent(0, 1, false, var::column_type::public_input);
-    var zero(0, 2, false, var::column_type::public_input);
-    var one(0, 3, false, var::column_type::public_input);
 
 
     typename BlueprintFieldType::value_type base_value = algebra::random_element<BlueprintFieldType>();
     typename BlueprintFieldType::value_type exponent_value = algebra::random_element<BlueprintFieldType>();
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = { 2, 3,0,1};
+    std::vector<typename BlueprintFieldType::value_type> public_input = { 2, 3};
 
-    typename component_type::params_type params = {base, exponent, zero,  one};
+    typename component_type::params_type params = {base, exponent};
 
     typename BlueprintFieldType::value_type expected_result = 8;
 

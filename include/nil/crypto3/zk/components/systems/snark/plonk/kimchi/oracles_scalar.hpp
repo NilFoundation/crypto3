@@ -306,7 +306,7 @@ namespace nil {
                         // zeta_pow_n = zeta**n
                         var zeta_pow_n = exponentiation_component::generate_circuit(
                                              bp, assignment,
-                                             {zeta, domain_size, zero, one}, row)
+                                             {zeta, domain_size}, row)
                                              .output;
                         row += exponentiation_component::rows_amount;
 
@@ -316,7 +316,7 @@ namespace nil {
 
                         var zeta_omega_pow_n = 
                             exponentiation_component::generate_circuit(bp, assignment, 
-                            {zeta_omega, domain_size, zero, one}, row).output;
+                            {zeta_omega, domain_size}, row).output;
                         row += exponentiation_component::rows_amount;
 
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers =
@@ -371,12 +371,12 @@ namespace nil {
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks;
                         powers_of_eval_points_for_chunks[0] = exponentiation_component::generate_circuit(
                                              bp, assignment,
-                                             {zeta, max_poly_size, zero, one}, row)
+                                             {zeta, max_poly_size}, row)
                                              .output;
                         row += exponentiation_component::rows_amount;
                         powers_of_eval_points_for_chunks[1] = exponentiation_component::generate_circuit(
                                              bp, assignment,
-                                             {zeta_omega, max_poly_size, zero, one}, row)
+                                             {zeta_omega, max_poly_size}, row)
                                              .output;
                         row += exponentiation_component::rows_amount;
 
@@ -495,7 +495,7 @@ namespace nil {
 
                         var n = domain_size;
                         var zeta_pow_n = exponentiation_component::generate_assignments(
-                            assignment, {zeta, n, zero, one}, row).output;
+                            assignment, {zeta, n}, row).output;
                         row += exponentiation_component::rows_amount;
 
                         var zeta_omega = mul_component::generate_assignments(assignment, {zeta, 
@@ -503,7 +503,7 @@ namespace nil {
                         row += mul_component::rows_amount;
 
                         var zeta_omega_pow_n = exponentiation_component::generate_assignments(
-                            assignment, {zeta_omega, n, zero, one}, row).output;
+                            assignment, {zeta_omega, n}, row).output;
                         row += exponentiation_component::rows_amount;
 
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers = alpha_powers_component::generate_assignments(
@@ -553,9 +553,9 @@ namespace nil {
 
                         std::array<var, eval_points_amount> powers_of_eval_points_for_chunks = {
                             exponentiation_component::generate_assignments(
-                                assignment, {zeta, max_poly_size, zero, one}, row).output,
+                                assignment, {zeta, max_poly_size}, row).output,
                             exponentiation_component::generate_assignments(
-                                assignment, {zeta_omega, max_poly_size, zero, one}, 
+                                assignment, {zeta_omega, max_poly_size}, 
                                 row + exponentiation_component::rows_amount).output
                         };
                         row += 2 * exponentiation_component::rows_amount;

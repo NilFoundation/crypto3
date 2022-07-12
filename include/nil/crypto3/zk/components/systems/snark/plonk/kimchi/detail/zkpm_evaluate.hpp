@@ -128,15 +128,13 @@ namespace nil {
 
                         generate_assignments_constants(bp, assignment, params, start_row_index);
 
-                        var zero = var(0, start_row_index, false, var::column_type::constant);
-                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
-                        var domain_size = var(0, start_row_index + 2, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index, false, var::column_type::constant);
                         
                         std::size_t row = start_row_index;
 
                         result_type result(row);
 
-                        var w1 = exp_component::generate_circuit(bp, assignment, {params.group_gen, domain_size, zero, one}, row).output;
+                        var w1 = exp_component::generate_circuit(bp, assignment, {params.group_gen, domain_size}, row).output;
                         row += exp_component::rows_amount;
                         var w2 = zk::components::generate_circuit<mul_component>(bp, assignment, {w1, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
@@ -162,15 +160,13 @@ namespace nil {
                                                             const params_type &params,
                                                             const std::size_t start_row_index) {
 
-                        var zero = var(0, start_row_index, false, var::column_type::constant);
-                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
-                        var domain_size = var(0, start_row_index + 2, false, var::column_type::constant);
+                        var domain_size = var(0, start_row_index, false, var::column_type::constant);
 
                         std::size_t row = start_row_index;
 
                         result_type result(row);
 
-                        var w1 = exp_component::generate_assignments(assignment, {params.group_gen, domain_size, zero, one}, row).output;
+                        var w1 = exp_component::generate_assignments(assignment, {params.group_gen, domain_size}, row).output;
                         row += exp_component::rows_amount;
                         var w2 = mul_component::generate_assignments(assignment, {w1, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
@@ -211,10 +207,6 @@ namespace nil {
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
-                        assignment.constant(0)[row] = 0;
-                        row++;
-                        assignment.constant(0)[row] = 1;
-                        row++;
                         assignment.constant(0)[row] = params.domain_size - zk_rows;
                     }
                 };
