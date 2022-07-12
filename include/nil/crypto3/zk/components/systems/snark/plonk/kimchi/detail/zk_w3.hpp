@@ -161,7 +161,7 @@ namespace nil {
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
-                        assignment.constant(0)[row] = params.verifier_idnex.domain_size - zk_rows;
+                        assignment.constant(0)[row] = params.verifier_index.domain_size - zk_rows;
                         row++;
                     }
                 };

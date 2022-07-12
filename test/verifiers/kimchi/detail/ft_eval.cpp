@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
     constexpr static std::size_t alpha_powers_n = 5;
-    constexpr static std::size_t public_input_size = 3;
+    constexpr static std::size_t public_input_size = 0;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
     constexpr static std::size_t witness_columns = 15;

@@ -124,8 +124,52 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0x0f22;
                     constexpr static const std::size_t eval_points_amount = 2;
 
+                    constexpr static std::size_t rows() {
+                        std::size_t row = 0;
+                        row += zkpm_eval_component::rows_amount;
+                        row += sub_component::rows_amount;
+
+                        row += add_component::rows_amount;
+                        row += 3 * mul_component::rows_amount;
+
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
+                            row += 2 * mul_component::rows_amount;
+                            row += 2 * add_component::rows_amount;
+                        }
+
+                        if (KimchiParamsType::public_input_size > 0) { // if public input isn't present, then public_eval is empty
+                            row += sub_component::rows_amount;
+                        }
+
+                        row += 2 * mul_component::rows_amount;
+
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
+                            row += 3 * mul_component::rows_amount;
+                            row += 2 * add_component::rows_amount;
+                        }
+                        row += sub_component::rows_amount;
+
+                        // numerator calculation
+                        row += zk_w3_component::rows_amount;
+                        row += 3 * sub_component::rows_amount;
+                        row += 5 * mul_component::rows_amount;
+                        row += add_component::rows_amount;
+
+                        // denominator
+                        row += mul_component::rows_amount;
+                        row += div_component::rows_amount;
+
+                        row += mul_component::rows_amount;
+                        row += add_component::rows_amount;
+
+                        row += rpn_component::rows_amount;
+                        row += sub_component::rows_amount;
+
+                        return row;
+                    }
+
                 public:
-                    constexpr static const std::size_t rows_amount = mul_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = rows();
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -157,10 +201,190 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        zk::components::generate_circuit<mul_component>(bp, assignment, 
-                            {params.zeta_pow_n, params.gamma}, row);
+                        var zero(0, start_row_index, false, var::column_type::constant);
+                        var one(0, start_row_index + 1, false, var::column_type::constant);
+
+                        // zkp = index.zkpm().evaluate(&zeta);
+                        var zkp = zkpm_eval_component::generate_circuit(bp, 
+                            assignment, {params.verifier_index.omega, 
+                            params.verifier_index.domain_size, params.zeta},
+                            row).output;
+                        row += zkpm_eval_component::rows_amount;
+
+                        // zeta1m1 = zeta1 - ScalarField::<G>::one();
+                        var zeta1m1 = zk::components::generate_circuit<sub_component>(bp, 
+                            assignment, {params.zeta, one}, row).output;
+                        row += sub_component::rows_amount;
+
+                        // get alpha0, alpha1, alpha2
+                        std::pair<std::size_t, std::size_t> alpha_idxs = 
+                            params.verifier_index.alpha_map[argument_type::Permutation];
+                        assert(alpha_idxs.second >= alpha_idxs.first + 3);
+                        var alpha0 = params.alpha_powers[alpha_idxs.first];
+                        var alpha1 = params.alpha_powers[alpha_idxs.first + 1];
+                        var alpha2 = params.alpha_powers[alpha_idxs.first + 2];
+
+                        // let init = (evals[0].w[PERMUTS - 1] + gamma) * evals[1].z * alpha0 * zkp;
+                        var init = zk::components::generate_circuit<add_component>(bp, 
+                            assignment, {
+                            params.combined_evals[0].w[KimchiParamsType::permut_size - 1], 
+                            params.gamma}, row).output;
+                        row += add_component::rows_amount;
+                        init  = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {init, params.combined_evals[0].z}, row).output;
+                        row += mul_component::rows_amount;
+                        init = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {init, alpha0}, row).output;
+                        row += mul_component::rows_amount;
+                        init = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {init, zkp}, row).output;
                         row += mul_component::rows_amount;
 
+                        //     let mut ft_eval0 = evals[0]
+                        //         .w
+                        //         .iter()
+                        //         .zip(evals[0].s.iter())
+                        //         .map(|(w, s)| (beta * s) + w + gamma)
+                        //         .fold(init, |x, y| x * y);
+                        var ft_eval0 = init;
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
+                            var w = params.combined_evals[0].w[i];
+                            var s = params.combined_evals[0].s[i];
+                            var beta_s = zk::components::generate_circuit<mul_component>(bp, 
+                                assignment, {params.beta, s}, row).output;
+                            row += mul_component::rows_amount;
+                            var w_beta_s = zk::components::generate_circuit<add_component>(bp, 
+                                assignment, {w, beta_s}, row).output;
+                            row += add_component::rows_amount;
+                            var w_beta_s_gamma = zk::components::generate_circuit<add_component>(bp, 
+                                assignment, {w_beta_s, params.gamma}, row).output;
+                            row += add_component::rows_amount;
+                            ft_eval0 = zk::components::generate_circuit<mul_component>(bp, 
+                                assignment, {ft_eval0, w_beta_s_gamma}, row).output;
+                            row += mul_component::rows_amount;
+                        }
+
+                        // ft_eval0 - p_eval[0]
+                        if (params.public_eval[0].has_value()) {
+                            var ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
+                                assignment, {ft_eval0, params.public_eval[0].value()}, row).output;
+                            row += sub_component::rows_amount;
+                        }
+
+                        //     ft_eval0 -= evals[0]
+                        //         .w
+                        //         .iter()
+                        //         .zip(index.shift.iter())
+                        //         .map(|(w, s)| gamma + (beta * zeta * s) + w)
+                        //         .fold(alpha0 * zkp * evals[0].z, |x, y| x * y);
+                        var ft_eval0_sub = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {alpha0, zkp}, row).output;
+                        row += mul_component::rows_amount;
+                        ft_eval0_sub = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {ft_eval0_sub, params.combined_evals[0].z}, row).output;
+                        row += mul_component::rows_amount;
+
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
+                            var w = params.combined_evals[0].w[i];
+                            var s = params.verifier_index.shift[i];
+                            var beta_s = zk::components::generate_circuit<mul_component>(bp, 
+                                assignment, {params.beta, s}, row).output;
+                            row += mul_component::rows_amount;
+                            var beta_zeta_s = zk::components::generate_circuit<mul_component>(bp, 
+                                assignment, {params.zeta, beta_s}, row).output;
+                            row += mul_component::rows_amount;
+                            var gamma_beta_zeta_s = zk::components::generate_circuit<add_component>(bp, 
+                                assignment, {params.gamma, beta_zeta_s}, row).output;
+                            row += add_component::rows_amount;
+                            var w_gamma_beta_zeta_s = zk::components::generate_circuit<add_component>(bp, 
+                                assignment, {w, gamma_beta_zeta_s}, row).output;
+                            row += add_component::rows_amount;
+
+                            ft_eval0_sub = zk::components::generate_circuit<mul_component>(bp, 
+                                assignment, {ft_eval0_sub, w_gamma_beta_zeta_s}, row).output;
+                            row += mul_component::rows_amount;
+                        }
+                        ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
+                            assignment, {ft_eval0, ft_eval0_sub}, row).output;
+                        row += sub_component::rows_amount;
+
+                        // numerator calculation
+
+                        var domain_offset_for_zk = zk_w3_component::generate_circuit(bp,  // index.w()
+                            assignment, {params.verifier_index}, row).output;
+                        row += zk_w3_component::rows_amount;
+
+                        // zeta - index.w()
+                        var zeta_minus_w = zk::components::generate_circuit<sub_component>(bp, 
+                            assignment, {params.zeta, domain_offset_for_zk}, row).output;
+                        row += sub_component::rows_amount;
+
+                        // (zeta - ScalarField::<G>::one())
+                        var zeta_minus_one = zk::components::generate_circuit<sub_component>(bp, 
+                            assignment, {params.zeta, one}, row).output;
+                        row += sub_component::rows_amount;
+
+                        // (ScalarField::<G>::one() - evals[0].z)
+                        var one_minus_z = zk::components::generate_circuit<sub_component>(bp, 
+                            assignment, {one, params.combined_evals[0].z}, row).output;
+                        row += sub_component::rows_amount;
+
+                        //     let numerator = ((zeta1m1 * alpha1 * (zeta - index.w()))
+                        //         + (zeta1m1 * alpha2 * (zeta - ScalarField::<G>::one())))
+                        //         * (ScalarField::<G>::one() - evals[0].z);
+                        var numerator = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {zeta1m1, alpha1}, row).output;
+                        row += mul_component::rows_amount;
+
+                        numerator = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {numerator, zeta_minus_w}, row).output;
+                        row += mul_component::rows_amount;
+
+                        var numerator_term = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {zeta1m1, alpha2}, row).output;
+                        row += mul_component::rows_amount;
+                        numerator_term = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {numerator_term, zeta_minus_one}, row).output;
+                        row += mul_component::rows_amount;
+
+                        numerator = zk::components::generate_circuit<add_component>(bp, 
+                            assignment, {numerator, numerator_term}, row).output;
+                        row += add_component::rows_amount;
+
+                        numerator = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {numerator, one_minus_z}, row).output;
+                        row += mul_component::rows_amount;                        
+
+                        //     let denominator = (zeta - index.w()) * (zeta - ScalarField::<G>::one());
+                        //     let denominator = denominator.inverse().expect("negligible probability");
+                        var denominator = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {zeta_minus_w, zeta_minus_one}, row).output;
+                        row += mul_component::rows_amount;
+
+                        denominator = zk::components::generate_circuit<div_component>(bp, 
+                            assignment, {one, denominator}, row).output;
+                        row += div_component::rows_amount;
+
+                        //     ft_eval0 += numerator * denominator;
+                        var numerator_denominator = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {numerator, denominator}, row).output;
+                        row += mul_component::rows_amount;
+                        ft_eval0 = zk::components::generate_circuit<add_component>(bp, 
+                            assignment, {ft_eval0, numerator_denominator}, row).output;
+                        row += add_component::rows_amount;
+
+                        // evaluate constant term expression
+                        auto tokens = rpn_component::rpn_from_string(constant_term_polish);
+                        var pt = rpn_component::generate_circuit(bp, assignment,
+                            {tokens, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
+                            params.combined_evals}, row).output;
+                        row += rpn_component::rows_amount;
+                        
+                        ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
+                            assignment, {ft_eval0, pt}, row).output;
+                        row += sub_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         generate_assignments_constants(assignment, params, start_row_index);
@@ -218,7 +442,7 @@ namespace nil {
                         //         .zip(evals[0].s.iter())
                         //         .map(|(w, s)| (beta * s) + w + gamma)
                         //         .fold(init, |x, y| x * y);
-                        var ft_eval0 = zero;
+                        var ft_eval0 = init;
                         for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
                             var w = params.combined_evals[0].w[i];
                             var s = params.combined_evals[0].s[i];
