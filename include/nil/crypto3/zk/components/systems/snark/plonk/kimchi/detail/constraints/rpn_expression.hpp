@@ -152,6 +152,10 @@ namespace nil {
                         /// witness_columns + 5: LookupTable
                         /// witness_columns + 6: LookupRuntimeTable
                         /// witness_columns + 7+: LookupSorted
+
+                        if (var_column < KimchiParamsType::witness_columns) {
+                            return evals.w[var_column];
+                        }
                         
                         switch(var_column) {
                             case KimchiParamsType::witness_columns + 1:
@@ -237,22 +241,22 @@ namespace nil {
 
                             typename params_type::token_value_type token;
 
-                            if (token_str.find("Alpha")) {
+                            if (token_str.find("Alpha") != std::string::npos) {
                                 token.type = token_type::alpha;
                             }
-                            else if (token_str.find("Beta")) {
+                            else if (token_str.find("Beta") != std::string::npos) {
                                 token.type = token_type::beta;
                             }
-                            else if (token_str.find("Gamma")) {
+                            else if (token_str.find("Gamma") != std::string::npos) {
                                 token.type = token_type::gamma;
                             }
-                            else if (token_str.find("JointCombiner")) {
+                            else if (token_str.find("JointCombiner") != std::string::npos) {
                                 token.type = token_type::joint_combiner;
                             }
-                            else if (token_str.find("EndoCoefficient")) {
+                            else if (token_str.find("EndoCoefficient") != std::string::npos) {
                                 token.type = token_type::endo_coefficient;
                             }
-                            else if (token_str.find("Mds")) {
+                            else if (token_str.find("Mds") != std::string::npos) {
                                 token.type = token_type::mds;
                                 std::size_t row_pos = token_str.find("row");
                                 row_pos += 5;
@@ -266,14 +270,14 @@ namespace nil {
                                 std::string col_str = token_str.substr(col_pos, col_end_pos - col_pos);
                                 token.value.second = std::stoi(col_str);
                             }
-                            else if (token_str.find("Literal")) {
+                            else if (token_str.find("Literal") != std::string::npos) {
                                 token.type = token_type::literal;
                                 std::size_t value_start_pos = token_str.find("Literal") + 8;
                                 std::size_t value_end_pos = token_str.find(";", value_start_pos);
                                 std::string value_str = token_str.substr(value_start_pos, value_end_pos - value_start_pos);
                                 token.value.first = multiprecision::cpp_int("0x" + value_str);
                             }
-                            else if (token_str.find("Cell")) {
+                            else if (token_str.find("Cell") != std::string::npos) {
                                 token.type = token_type::cell;
 
                                 std::size_t row_pos = token_str.find("row");
@@ -316,10 +320,10 @@ namespace nil {
                                 token.value.first = col;
                                 token.value.second = row;
                             }
-                            else if (token_str.find("Dup")) {
+                            else if (token_str.find("Dup") != std::string::npos) {
                                 token.type = token_type::dup;
                             }
-                            else if (token_str.find("Pow")) {
+                            else if (token_str.find("Pow") != std::string::npos) {
                                 token.type = token_type::pow;
 
                                 std::size_t exp_start_pos = token_str.find("Pow") + 4;
@@ -327,25 +331,25 @@ namespace nil {
                                 std::string exp_str = token_str.substr(exp_start_pos, exp_end_pos - exp_start_pos);
                                 token.value.first = std::stoi(exp_str);
                             }
-                            else if (token_str.find("Add")) {
+                            else if (token_str.find("Add") != std::string::npos) {
                                 token.type = token_type::add;
                             }
-                            else if (token_str.find("Mul")) {
+                            else if (token_str.find("Mul") != std::string::npos) {
                                 token.type = token_type::mul;
                             }
-                            else if (token_str.find("Sub")) {
+                            else if (token_str.find("Sub") != std::string::npos) {
                                 token.type = token_type::sub;
                             }
-                            else if (token_str.find("VanishesOnLast4Rows")) {
+                            else if (token_str.find("VanishesOnLast4Rows") != std::string::npos) {
                                 token.type = token_type::vanishes_on_last_4_rows;
                             }
-                            else if (token_str.find("UnnormalizedLagrangeBasis")) {
+                            else if (token_str.find("UnnormalizedLagrangeBasis") != std::string::npos) {
                                 token.type = token_type::unnormalized_lagrange_basis;
                             }
-                            else if (token_str.find("Store")) {
+                            else if (token_str.find("Store") != std::string::npos) {
                                 token.type = token_type::store;
                             }
-                            else if (token_str.find("Load")) {
+                            else if (token_str.find("Load") != std::string::npos) {
                                 token.type = token_type::load;
 
                                 std::size_t idx_start_pos = token_str.find("Load") + 5;
@@ -548,7 +552,7 @@ namespace nil {
                         }
 
                         result_type res;
-                        res.output = stack[0];
+                        res.output = stack[stack.size() - 1];
                         return res;
                     }
 
@@ -684,7 +688,7 @@ namespace nil {
                         }
 
                         result_type res;
-                        res.output = stack[0];
+                        res.output = stack[stack.size() - 1];
                         return res;
                     }
 
