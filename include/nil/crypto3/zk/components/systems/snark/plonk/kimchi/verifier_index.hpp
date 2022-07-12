@@ -43,8 +43,6 @@ namespace nil {
             namespace components {
                 typedef std::array<uint64_t, 2> kimchi_scalar_limbs;
 
-                struct constraint_description {};
-
                 template<typename BlueprintFieldType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
                     using var = snark::plonk_variable<BlueprintFieldType>;
@@ -59,16 +57,14 @@ namespace nil {
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;
-                    std::array<typename BlueprintFieldType::value_type, Permuts> shift;
+                    std::array<var, Permuts> shift;
 
                     var omega;
                     std::map<argument_type, std::pair<int, int>> alpha_map;
 
-                    std::array<constraint_description, constraints_amount> constraints;
-
                     kimchi_verifier_index_scalar() {
-                        alpha_map[argument_type::Permutation] = {0, 0};
-                        alpha_map[argument_type::Generic] = {1, 1};
+                        alpha_map[argument_type::Permutation] = {0, 3};
+                        alpha_map[argument_type::Generic] = {4, 4};
                     }
                 };
 

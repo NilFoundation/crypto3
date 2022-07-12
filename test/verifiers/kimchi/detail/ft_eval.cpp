@@ -135,9 +135,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
 
     zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
 
+    std::array<std::optional<var>, 2> public_eval = {std::nullopt, std::nullopt};
+
     typename component_type::params_type params = {verifier_index,    zeta_pow_n, alpha_powers,
                                                    proof.proof_evals, gamma,      beta,
-                                                   proof.proof_evals, zeta,       joint_combiner};
+                                                   proof.proof_evals, zeta,       joint_combiner,
+                                                   public_eval};
 
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
