@@ -104,6 +104,11 @@ namespace nil {
                             output = var(intermediate_start + intermediate_results_per_row - 1,
                                          component_start_row + rows_amount - 1, false);
                         }
+
+                        result_type(std::size_t component_start_row) {
+                            output = var(intermediate_start + intermediate_results_per_row - 1,
+                                         component_start_row + rows_amount - 1, false);
+                        }
                     };
 
                     static result_type
