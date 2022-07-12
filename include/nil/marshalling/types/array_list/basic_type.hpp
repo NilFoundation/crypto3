@@ -119,6 +119,9 @@ namespace nil {
                                * max_length_internal(elem_tag());
                     }
 
+                    constexpr std::size_t bit_length() const {
+                        return length() * 8;
+                    }
                     constexpr bool valid() const {
                         return valid_internal(elem_tag());
                     }
