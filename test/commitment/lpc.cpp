@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -141,7 +141,11 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
@@ -163,7 +167,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -211,7 +215,11 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
@@ -233,7 +241,7 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -280,7 +288,11 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -299,6 +311,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
     constexpr static const std::size_t leaf_size = 1;
+    constexpr static const bool is_const_size = true;
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
@@ -307,10 +320,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, is_const_size> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
-                                                               leaf_size, true>
+                                                               leaf_size, is_const_size>
         lpc_params_type;
     typedef zk::commitments::batched_list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -347,7 +360,11 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_skipping_layers_test) {
@@ -370,7 +387,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_skipping_layers_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
                                                                leaf_size, true>
@@ -415,7 +432,11 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_skipping_layers_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
@@ -438,7 +459,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
                                                                leaf_size, true>
@@ -479,7 +500,11 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
@@ -502,7 +527,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
                                                                leaf_size, true>
@@ -548,7 +573,11 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
@@ -571,7 +600,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -612,7 +641,11 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size_skipping_layers) {
@@ -635,7 +668,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size_skipping_layers) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -681,7 +714,11 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size_skipping_layers) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
@@ -704,7 +741,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -750,7 +787,11 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size_skipping_layers) {
@@ -773,7 +814,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size_skipping_layers) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -824,7 +865,10 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size_skipping_layers) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
-}
+    auto start = std::chrono::high_resolution_clock::now();
+    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
+    BOOST_CHECK(verify);}
 
 BOOST_AUTO_TEST_SUITE_END()

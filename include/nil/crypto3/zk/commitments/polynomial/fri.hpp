@@ -64,14 +64,16 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M,
-                         std::size_t BatchedSize>
+                         std::size_t BatchedSize,
+                         bool IsConstSize>
                 struct fri : public detail::
-                                 basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize> {
+                                 basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize, IsConstSize> {
 
                     using basic_fri =
-                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize>;
+                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize, IsConstSize>;
                     constexpr static const std::size_t m = basic_fri::m;
                     constexpr static const std::size_t leaf_size = basic_fri::leaf_size;
+                    constexpr static const bool is_const_size = IsConstSize;
 
                     using field_type = typename basic_fri::field_type;
                     using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
@@ -95,7 +97,8 @@ namespace nil {
                                                                                   typename FRI::merkle_tree_hash_type,
                                                                                   typename FRI::transcript_hash_type,
                                                                                   FRI::m,
-                                                                                  FRI::leaf_size>,
+                                                                                  FRI::leaf_size,
+                                                                                  FRI::is_const_size>,
                                                                  FRI>::value,
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
@@ -112,7 +115,8 @@ namespace nil {
                                                                                   typename FRI::merkle_tree_hash_type,
                                                                                   typename FRI::transcript_hash_type,
                                                                                   FRI::m,
-                                                                                  FRI::leaf_size>,
+                                                                                  FRI::leaf_size,
+                                                                                  FRI::is_const_size>,
                                                                  FRI>::value,
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
@@ -130,7 +134,8 @@ namespace nil {
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
                                                                                     FRI::m,
-                                                                                    FRI::leaf_size>,
+                                                                                    FRI::leaf_size,
+                                                                                    FRI::is_const_size>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(
