@@ -26,10 +26,6 @@ namespace nil {
                 template<class T>
                 struct make_signed : public std::make_signed<T> { };
 
-                template<>
-                struct make_unsigned<bool> {
-                    typedef bool type;
-                };
 
 #ifdef BOOST_HAS_INT128
 
