@@ -91,6 +91,10 @@ namespace nil {
                             return 0;
                         }
 
+                        constexpr std::size_t bit_length() {
+                            return multiprecision::msb(value_) + 1;
+                        }
+
                         // static constexpr std::size_t max_length() {
                         //     return length();
                         // }
@@ -123,9 +127,11 @@ namespace nil {
                     private:
                         template<typename TIter>
                         void read_no_status(TIter &iter, std::size_t size) {
+                            size = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        size : size * 8;
                             value_ =
                                 crypto3::marshalling::processing::read_data<T, typename base_impl_type::endian_type>(
-                                    iter, size * 8);
+                                    iter, size);
                         }
 
                     public:
