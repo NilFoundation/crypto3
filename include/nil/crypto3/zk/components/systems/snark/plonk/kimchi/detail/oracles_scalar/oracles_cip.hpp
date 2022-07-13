@@ -48,14 +48,13 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L386-L441
                 // Input:  
                 // Output: 
-                template<typename ArithmetizationType, typename KimchiCommitmentParamsType,
+                template<typename ArithmetizationType,
                     typename KimchiParamsType,
                     std::size_t... WireIndexes>
                 class oracles_cip;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         typename KimchiCommitmentParamsType,
                          typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
@@ -74,7 +73,6 @@ namespace nil {
                          std::size_t W14>
                 class oracles_cip<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    KimchiCommitmentParamsType,
                     KimchiParamsType,
                     W0,
                     W1,
@@ -115,7 +113,7 @@ namespace nil {
                         var ft_eval1;
                         std::array<
                             std::array<
-                            std::array<var, KimchiCommitmentParamsType::size_for_max_poly>, 
+                            std::array<var, KimchiParamsType::commitment_params_type::size_for_max_poly>, 
                             eval_points_amount>,
                             KimchiParamsType::prev_challenges_size> polys;
                         std::array<var, eval_points_amount> p_eval;

@@ -127,7 +127,7 @@ namespace nil {
                                                         KimchiParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
                                         
-                    using cip_component = zk::components::oracles_cip<ArithmetizationType, KimchiCommitmentParamsType,
+                    using cip_component = zk::components::oracles_cip<ArithmetizationType,
                                                         KimchiParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
                     
