@@ -120,8 +120,13 @@ namespace nil {
                     }
 
                     constexpr std::size_t bit_length() const {
-                        return length() * 8;
+                        return bit_length_internal(elem_tag());
                     }
+
+                    constexpr std::size_t max_bit_length() const {
+                        return max_length() * 8;
+                    }
+
                     constexpr bool valid() const {
                         return valid_internal(elem_tag());
                     }
@@ -155,10 +160,6 @@ namespace nil {
                     template<typename TIter>
                     status_type read(TIter &iter, std::size_t len) {
 
-                        if (len > max_length()){
-                            len = max_length();
-                        }
-
                         using IterType = typename std::decay<decltype(iter)>::type;
                         using IterCategory = typename std::iterator_traits<IterType>::iterator_category;
                         static const bool IsRandomAccessIter
@@ -168,6 +169,12 @@ namespace nil {
 
                         using tag = typename std::conditional<IsRandomAccessIter && IsRawData, raw_data_tag,
                                                               field_elem_tag>::type;
+
+                        auto length = std::is_same_v<typename std::iterator_traits<IterType>::value_type, bool> ? max_bit_length() : max_length();
+
+                        if (len > length){
+                            len = length;
+                        }
 
                         return read_internal(iter, len, tag());
                     }
@@ -284,6 +291,22 @@ namespace nil {
                                 return sum + e.length();
                             });
                     }
+                    
+                    constexpr std::size_t bit_length_internal(field_elem_tag) const {
+                        return bit_field_length(field_elem_tag());
+                    }
+
+                    constexpr std::size_t bit_field_length(field_elem_tag) const {
+                        return element_type().bit_length() * value_.size();
+                    }
+
+                    constexpr std::size_t bit_length_internal(integral_elem_tag) const {
+                        return length_internal(integral_elem_tag()) * 8;
+                    }
+
+                    std::size_t bit_field_length(var_length_tag) const {
+                        return field_length(var_length_tag()) * 8;
+                    }
 
                     static constexpr std::size_t max_length_internal(field_elem_tag) {
                         return element_type::max_length();
@@ -297,8 +320,9 @@ namespace nil {
                     static status_type read_field_element(element_type &elem, TIter &iter, std::size_t &len) {
                         status_type es = elem.read(iter, len);
                         if (es == status_type::success) {
-                            MARSHALLING_ASSERT(elem.length() <= len);
-                            len -= elem.length();
+                            std::size_t true_length = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? elem.bit_length() : elem.length();
+                            MARSHALLING_ASSERT(true_length <= len);
+                            len -= true_length;
                         }
                         return es;
                     }
@@ -350,7 +374,8 @@ namespace nil {
                     static status_type write_field_element(const element_type &elem, TIter &iter, std::size_t &len) {
                         status_type es = elem.write(iter, len);
                         if (es == status_type::success) {
-                            len -= elem.length();
+                            len -= (std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                            elem.bit_length() : elem.length());
                         }
                         return es;
                     }
