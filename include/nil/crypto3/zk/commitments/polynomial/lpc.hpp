@@ -332,7 +332,7 @@ namespace nil {
                                                                                              typename LPC::lpc_params>,
                                              LPC>::value,
                              bool>::type = true>
-                static typename LPC::proof_type proof_eval(
+                static typename LPC::proof_type proof_eval( //2 and 3 use it
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
@@ -429,7 +429,7 @@ namespace nil {
                                                                                              typename LPC::lpc_params>,
                                              LPC>::value,
                              bool>::type = true>
-                static typename LPC::proof_type proof_eval(
+                static typename LPC::proof_type proof_eval( // 1 uses it
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
@@ -481,21 +481,22 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, g, T, fri_params, transcript);
                 }
 
-                template<typename LPC,
+                template<typename LPC, typename ContainerType,
                          typename std::enable_if<
                              std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
                                                                                              typename LPC::lpc_params>,
-                                             LPC>::value,
+                                             LPC>::value &&
+                             std::is_same_v<typename ContainerType::value_type,
+                                                std::vector<typename LPC::field_type::value_type>>,
                              bool>::type = true>
                 static bool verify_eval(
-                    const typename select_container<LPC::is_const_size,
-                                                    std::vector<typename LPC::field_type::value_type>,
-                                                    LPC::leaf_size>::type &evaluation_points,
+                    const ContainerType &evaluation_points,
                     typename LPC::proof_type &proof,
                     typename LPC::basic_fri::params_type fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::size_t leaf_size = proof.z.size();
+                    std::size_t eval_size = evaluation_points.size();
 
                     typename select_container<LPC::is_const_size,
                                               std::vector<std::pair<typename LPC::field_type::value_type,
@@ -508,7 +509,7 @@ namespace nil {
 
                     for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                         auto evaluation_point = evaluation_points[0];
-                        if (polynom_index < evaluation_points.size()) {
+                        if (polynom_index < eval_size) {
                             evaluation_point = evaluation_points[polynom_index];
                         }
 
@@ -536,7 +537,7 @@ namespace nil {
 
                         V[polynom_index] = {1};
                         auto evaluation_point = evaluation_points[0];
-                        if (polynom_index < evaluation_points.size()) {
+                        if (polynom_index < eval_size) {
                             evaluation_point = evaluation_points[polynom_index];
                         }
 
@@ -568,18 +569,9 @@ namespace nil {
                     typename LPC::proof_type &proof,
                     typename LPC::basic_fri::params_type fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
-                    // TODO: Remove copy same evaluations point many times
-                    typename select_container<LPC::is_const_size,
-                                              std::vector<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type tmp;
-                    if constexpr (!LPC::is_const_size) {
-                        tmp.resize(std::max(LPC::leaf_size, evaluation_points.size()));
-                    }
-                    std::size_t leaf_size = tmp.size();
-                    for (auto i = 0; i < leaf_size; ++i) {
-                        tmp[i] = evaluation_points;
-                    }
-
+                    
+                    std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp;
+                    tmp[0] = evaluation_points;
                     return verify_eval<LPC>(tmp, proof, fri_params, transcript);
                 }
 
