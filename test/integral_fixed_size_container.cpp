@@ -128,17 +128,6 @@ void test_round_trip_fixed_size_container_fixed_precision_big_endian(
     std::vector<unit_type> test_cv = 
         nil::marshalling::pack<nil::marshalling::option::big_endian>(val_container, status);
 
-    // std::cout << std::hex << val_container.front() << ' ' << test_val.back() << '\n';
-    // for(auto a : cv){
-    //     std::cout << std::dec << a;
-    // }
-    // std::cout << '\n' << test_cv.size() << ' ' << cv.size() << '\n';
-
-    // for(auto a : test_cv){
-    //     std::cout << std::dec << a;
-    // }
-    // std::cout << '\n';
-
     BOOST_CHECK(std::equal(test_cv.begin(), test_cv.end(), cv.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 }
@@ -226,25 +215,25 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(integral_fixed_test_suite_bits)
 
 BOOST_AUTO_TEST_CASE(integral_fixed_checked_int1024_bits) {
-    test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::checked_int1024_t, 1, bool>();
+    test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::checked_int1024_t, 128, bool>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_fixed_cpp_uint512_bits) {
-    test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::checked_uint512_t, 1, bool>();
+    test_round_trip_fixed_size_container_fixed_precision<nil::crypto3::multiprecision::checked_uint512_t, 128, bool>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_fixed_cpp_int_backend_23_bits) {
     test_round_trip_fixed_size_container_fixed_precision<
         nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
             23, 23, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>,
-        1, bool>();
+        128, bool>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_fixed_cpp_int_backend_64_bits) {
     test_round_trip_fixed_size_container_fixed_precision<
         nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
             64, 64, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>,
-        1, bool>();
+        128, bool>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
