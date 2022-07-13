@@ -100,12 +100,19 @@ namespace nil {
 
                             // TODO: Better if we can construct params_type from any batch size to another
                             params_type(const typename basic_batched_fri<FieldType, MerkleTreeHashType,
-                                                                         TranscriptHashType, M, 1, IsConstSize>::params_type &obj) {
+                                                                         TranscriptHashType, M, 1, false>::params_type &obj) {
                                 r = obj.r;
                                 max_degree = obj.max_degree;
                                 D = obj.D;
                                 step_list = obj.step_list;
-                                // is_const_size = obj.is_const_size;
+                            }
+
+                            params_type(const typename basic_batched_fri<FieldType, MerkleTreeHashType,
+                                                                         TranscriptHashType, M, 1, true>::params_type &obj) {
+                                r = obj.r;
+                                max_degree = obj.max_degree;
+                                D = obj.D;
+                                step_list = obj.step_list;
                             }
 
                             params_type() {};
@@ -570,7 +577,7 @@ namespace nil {
                         }
 
                         typename FRI::round_proof_type::y_type y;
-                        if constexpr (FRI::leaf_size == 0) {
+                        if constexpr (!FRI::is_const_size) {
                             y.resize(leaf_size);
                         }
 
@@ -600,7 +607,7 @@ namespace nil {
                             get_folded_index<FRI>(x_index, domain_size, fri_params.step_list[i]), domain_size, *p_tree);
 
                         typename FRI::round_proof_type::colinear_value_type colinear_value;
-                        if constexpr (FRI::leaf_size == 0) {
+                        if constexpr (!FRI::is_const_size) {
                             colinear_value.resize(leaf_size);
                         }
 
@@ -662,7 +669,7 @@ namespace nil {
 
                     typename FRI::proof_type::final_polynomials_type final_polynomials;
 
-                    if constexpr (FRI::leaf_size == 0) {
+                    if constexpr (!FRI::is_const_size) {
                         final_polynomials.resize(f.size());
                     }
                     if constexpr (std::is_same_v<math::polynomial_dfs<typename FRI::field_type::value_type>,
@@ -763,7 +770,7 @@ namespace nil {
                     BOOST_ASSERT(U.size() == V.size());
 
                     std::size_t leaf_size;
-                    if constexpr (FRI::leaf_size == 0) {
+                    if constexpr (!FRI::is_const_size) {
                         leaf_size = proof.final_polynomials.size();
                     } else {
                         leaf_size = FRI::leaf_size;
@@ -790,7 +797,7 @@ namespace nil {
                     }
 
                     typename FRI::round_proof_type::y_type y_0;
-                    if constexpr (FRI::leaf_size == 0) {
+                    if constexpr (!FRI::is_const_size) {
                         y_0.resize(leaf_size);
                     }
                     if (U.size() == 1) {
@@ -853,7 +860,7 @@ namespace nil {
                         }
 
                         typename FRI::round_proof_type::y_type y;
-                        if constexpr (FRI::leaf_size == 0) {
+                        if constexpr (!FRI::is_const_size) {
                             y.resize(leaf_size);
                         }
                         if (basis_index == 0) {

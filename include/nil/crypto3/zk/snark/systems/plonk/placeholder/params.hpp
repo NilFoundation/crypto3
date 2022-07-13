@@ -60,10 +60,10 @@ namespace nil {
                         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
                     typedef typename commitments::fri<FieldType, MerkleTreeHashType,
-                        TranscriptHashType, M, 1, true>::params_type commitment_params_type;
+                        TranscriptHashType, M, 1>::params_type commitment_params_type;
                     
                     typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, 
-                            TranscriptHashType, Lambda, R, M, 1, true>
+                            TranscriptHashType, Lambda, R, M>
                             batched_commitment_params_type;
 
                     using runtime_size_commitment_scheme_type =

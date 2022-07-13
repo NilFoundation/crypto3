@@ -64,8 +64,8 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M,
-                         std::size_t BatchedSize,
-                         bool IsConstSize>
+                         std::size_t BatchedSize = 0,
+                         bool IsConstSize = (bool)BatchedSize>
                 struct fri : public detail::
                                  basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize, IsConstSize> {
 

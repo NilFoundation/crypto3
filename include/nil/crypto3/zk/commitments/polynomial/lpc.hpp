@@ -125,7 +125,7 @@ namespace nil {
                     };
                 };
 
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool ConstSize>
+                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
                 using batched_lpc = batched_list_polynomial_commitment<
                     FieldType,
                     commitments::list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
@@ -134,8 +134,8 @@ namespace nil {
                                                                    LPCParams::r,
                                                                    LPCParams::m,
                                                                    BatchSize,
-                                                                   ConstSize>>;
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool ConstSize>
+                                                                   IsConstSize>>;
+                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
                 using lpc = batched_list_polynomial_commitment<
                     FieldType,
                     list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
@@ -144,7 +144,7 @@ namespace nil {
                                                       LPCParams::r,
                                                       LPCParams::m,
                                                       BatchSize,
-                                                      ConstSize>>;
+                                                      IsConstSize>>;
 
                 template<typename FieldType, typename LPCParams>
                 using list_polynomial_commitment = batched_list_polynomial_commitment<FieldType, LPCParams>;
