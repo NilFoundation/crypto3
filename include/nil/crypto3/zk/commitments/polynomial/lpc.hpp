@@ -114,11 +114,12 @@ namespace nil {
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
-
-                        typename std::conditional<is_const_size,
+                        typedef
+                            typename std::conditional<is_const_size,
                                                   std::array<std::vector<typename FieldType::value_type>, leaf_size>,
-                                                  std::vector<std::vector<typename FieldType::value_type>>>::type z;
+                                                  std::vector<std::vector<typename FieldType::value_type>>>::type z_type;
 
+                        z_type z;
                         commitment_type T_root;
 
                         std::array<typename basic_fri::proof_type, lambda> fri_proof;
@@ -589,10 +590,7 @@ namespace nil {
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::size_t k = evaluation_points.size();
-                    typename std::conditional<
-                        LPC::is_const_size,
-                        std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size>,
-                        std::vector<std::vector<typename LPC::field_type::value_type>>>::type z;
+                    typename LPC::proof_type::z_type z;
                     // TODO: z[0] - not so good decision. Maybe using another proof_eval for this case?
                     z.resize(1);
                     z[0].resize(k);
