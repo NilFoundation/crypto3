@@ -163,104 +163,61 @@ namespace nil {
                         std::size_t row = start_row_index;
 
                         std::array<
-                            std::array<
-                            std::array<var, KimchiParamsType::commitment_params_type::size_for_max_poly>, 
-                            eval_points_amount>,
-                            cip_size> es;
-
-                        //TODO: SIZE FOR MAX POLY
-
-                        // #[allow(clippy::type_complexity)]
-                        //     let mut es: Vec<(Vec<Vec<ScalarField<G>>>, Option<usize>)> =
-                        //     polys.iter().map(|(_, e)| (e.clone(), None)).collect();
+                            std::array<var, cip_size>,
+                            eval_points_amount> es;
+                        
+                        // in the original code, cip transpose the evaluations of the same polynomial according to the evaluation point
+                        // we do it right here to use cip_component for general use-case
+                        // from [[f_full(zeta), f_diff(zeta)], [f_full(zeta_omega), f_diff(zeta_omega)]]
+                        // to [[f_full(zeta), f_full(zeta_omega)], [f_diff(zeta), f_diff(zeta_omega)]]
                         std::size_t es_idx = 0;
                         for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; ++i) {
-                            for (std::size_t j = 0; j < eval_points_amount; ++j) {
-                                for (std::size_t k = 0; k < KimchiParamsType::commitment_params_type::size_for_max_poly; ++k) {
-                                    es[i][j][k] = params.polys[i][j][k];
+                            for (std::size_t j = 0; j < KimchiParamsType::commitment_params_type::size_for_max_poly; ++j) {
+                                for (std::size_t k = 0; k < eval_points_amount; ++k) {
+                                    es[k][i] = params.polys[i][k][j];
                                 }
                             }
                         }
                         es_idx += KimchiParamsType::prev_challenges_size;
-                        // es.push((p_eval.clone(), None));
+
                         for (std::size_t i = 0; i < eval_points_amount; ++i) {
-                            es[es_idx][i][0] = params.p_eval[i];
+                            es[i][es_idx] = params.p_eval[i];
                             es_idx++;
                         }
-                        // es.push((vec![ft_eval0, ft_eval1], None));
-                        es[es_idx][0][0] = params.ft_eval0;
-                        es[es_idx][1][0] = params.ft_eval1;
+
+                        es[0][es_idx] = params.ft_eval0;
+                        es[1][es_idx] = params.ft_eval1;
                         es_idx++;
-                        // es.push((
-                        //     self.evals.iter().map(|e| e.z.clone()).collect::<Vec<_>>(),
-                        //     None,
-                        // ));
+
                         for (std::size_t i = 0; i < eval_points_amount; ++i) {
-                            es[es_idx][i][0] = params.evals[i].z;
+                            es[i][es_idx] = params.evals[i].z;
                             es_idx++;
                         }
-                        // es.push((
-                        //     self.evals
-                        //         .iter()
-                        //         .map(|e| e.generic_selector.clone())
-                        //         .collect::<Vec<_>>(),
-                        //     None,
-                        // ));
+
                         for (std::size_t i = 0; i < eval_points_amount; ++i) {
-                            es[es_idx][i][0] = params.evals[i].generic_selector;
+                            es[i][es_idx] = params.evals[i].generic_selector;
                             es_idx++;
                         }
-                        // es.push((
-                        //     self.evals
-                        //         .iter()
-                        //         .map(|e| e.poseidon_selector.clone())
-                        //         .collect::<Vec<_>>(),
-                        //     None,
-                        // ));
+
                         for (std::size_t i = 0; i < eval_points_amount; ++i) {
-                            es[es_idx][i][0] = params.evals[i].poseidon_selector;
+                            es[i][es_idx] = params.evals[i].poseidon_selector;
                             es_idx++;
                         }
-                        // es.extend(
-                        //     (0..COLUMNS)
-                        //         .map(|c| {
-                        //             (
-                        //                 self.evals
-                        //                     .iter()
-                        //                     .map(|e| e.w[c].clone())
-                        //                     .collect::<Vec<_>>(),
-                        //                 None,
-                        //             )
-                        //         })
-                        //         .collect::<Vec<_>>(),
-                        // );
+
                         for (std::size_t i = 0; i < eval_points_amount; ++i) {
                             for (std::size_t j = 0; j < KimchiParamsType::witness_columns; ++j) {
-                                es[es_idx][i][0] = params.evals[i].w[j];
-                                es_idx++;
-                            }
-                        }
-                        // es.extend(
-                        //     (0..PERMUTS - 1)
-                        //         .map(|c| {
-                        //             (
-                        //                 self.evals
-                        //                     .iter()
-                        //                     .map(|e| e.s[c].clone())
-                        //                     .collect::<Vec<_>>(),
-                        //                 None,
-                        //             )
-                        //         })
-                        //         .collect::<Vec<_>>(),
-                        // );
-                        for (std::size_t i = 0; i < eval_points_amount; ++i) {
-                            for (std::size_t j = 0; j < KimchiParamsType::permut_size - 1; ++j) {
-                                es[es_idx][i][0] = params.evals[i].s[j];
+                                es[i][es_idx] = params.evals[i].w[j];
                                 es_idx++;
                             }
                         }
 
-                        // combined_inner_product::<G>(&evaluation_points, &v, &u, &es, index.srs().g.len())
+                        for (std::size_t i = 0; i < eval_points_amount; ++i) {
+                            for (std::size_t j = 0; j < KimchiParamsType::permut_size - 1; ++j) {
+                                es[i][es_idx] = params.evals[i].s[j];
+                                es_idx++;
+                            }
+                        }
+
                         var res = cip_component::generate_assignments(assignment,
                             {es[0], es[1], params.v, params.u}, row).output;
                         row += cip_component::rows_amount;
