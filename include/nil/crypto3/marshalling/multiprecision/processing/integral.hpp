@@ -162,12 +162,11 @@ namespace nil {
                     std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
                     if (value > 0) {
-                        std::size_t end_index =
-                            chunks_count - ((nil::crypto3::multiprecision::msb(value) + 1) / chunk_bits +
+                        std::size_t begin_index = ((nil::crypto3::multiprecision::msb(value) + 1) / chunk_bits +
                                             (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits) ? 1 : 0));
 
-                        if (end_index < chunks_count) {
-                            std::fill(iter + end_index, iter + chunks_count, 0x00);
+                        if (begin_index < chunks_count) {
+                            std::fill(iter + begin_index, iter + chunks_count, 0x00);
                         }
 
                         export_bits(value, iter, chunk_bits, false);
