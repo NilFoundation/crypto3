@@ -113,7 +113,7 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xf2e;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = cip_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -145,23 +145,9 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                         const params_type &params,
-                                         const std::size_t start_row_index) {
-
-                        std::size_t row = start_row_index;
-
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
-                        return result_type(params, start_row_index);
-                    }
-
-                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                            const params_type &params,
-                                                            const std::size_t start_row_index) {
-
-                        std::size_t row = start_row_index;
-
+                    private:
+                    static std::array<std::array<var, cip_size>,
+                            eval_points_amount> prepare_cip_input(const params_type &params) {
                         std::array<
                             std::array<var, cip_size>,
                             eval_points_amount> es;
@@ -218,20 +204,48 @@ namespace nil {
                             }
                         }
 
+                        return es;
+                    }
+
+                    public:
+
+                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t start_row_index) {
+
+                        std::size_t row = start_row_index;
+
+                        auto es = prepare_cip_input(params);
+
+                        var res = cip_component::generate_circuit(bp, assignment,
+                            {es[0], es[1], params.v, params.u}, row).output;
+                        row += cip_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
+
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
+                        return result_type(params, start_row_index);
+                    }
+
+                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            const std::size_t start_row_index) {
+
+                        std::size_t row = start_row_index;
+
+                        auto es = prepare_cip_input(params);
+
                         var res = cip_component::generate_assignments(assignment,
                             {es[0], es[1], params.v, params.u}, row).output;
                         row += cip_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
 
                         return result_type(params, start_row_index);
                     }
 
                 private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               const std::size_t first_selector_index) {
-
-                    }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,

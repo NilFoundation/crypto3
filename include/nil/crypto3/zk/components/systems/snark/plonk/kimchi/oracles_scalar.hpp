@@ -425,7 +425,9 @@ namespace nil {
                         //cip
                         var cip = cip_component::generate_circuit(bp,
                             assignment,
-                            {ft_eval0,
+                            {v, 
+                            u,
+                            ft_eval0,
                             params.proof.ft_eval,
                             prev_challenges_evals,
                             public_eval,
@@ -603,7 +605,9 @@ namespace nil {
                         //cip
                         var cip = cip_component::generate_assignments(
                             assignment,
-                            {ft_eval0,
+                            {v, 
+                            u,
+                            ft_eval0,
                             params.proof.ft_eval,
                             prev_challenges_evals,
                             public_eval,
