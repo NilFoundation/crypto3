@@ -111,9 +111,6 @@ namespace nil {
                         nil::marshalling::status_type status;
                         std::array<bool, scalar_size> bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
 
-                        // for (std::size_t i = 0; i < scalar_size; i++) {
-                        //     bits[scalar_size - i - 1] = multiprecision::bit_test(integral_b, i);
-                        // }
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
 

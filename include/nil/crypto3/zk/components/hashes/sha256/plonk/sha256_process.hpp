@@ -162,10 +162,7 @@ namespace nil {
                                 std::vector<bool> input_state_sparse_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse, status);
                                 std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(), input_state_sparse.begin());
                             }
-                            // for (std::size_t i = 0; i < 32; i++) {
-                            //     input_state_sparse[32 - i - 1] =
-                            //         multiprecision::bit_test(integral_input_state_sparse, i);
-                            // }
+
                             std::vector<std::size_t> input_state_sparse_sizes = {32};
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> input_state_sparse_chunks =
                                 split_and_sparse(input_state_sparse, input_state_sparse_sizes, base4);
@@ -174,7 +171,6 @@ namespace nil {
                         }
                         for (std::size_t i = 4; i < 8; i++) {
                             assignment.witness(i)[row] = input_state[i];
-                            // std::vector<bool> input_state_sparse(32);
                             typename CurveType::base_field_type::integral_type integral_input_state_sparse =
                                 typename CurveType::base_field_type::integral_type(input_state[i].data);
                             std::vector<bool> input_state_sparse(32);
@@ -183,10 +179,7 @@ namespace nil {
                                 std::vector<bool> input_state_sparse_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse, status);
                                 std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(), input_state_sparse.begin());
                             }
-                            // for (std::size_t i = 0; i < 32; i++) {
-                            //     input_state_sparse[32 - i - 1] =
-                            //         multiprecision::bit_test(integral_input_state_sparse, i);
-                            // }
+
                             std::vector<std::size_t> input_state_sparse_sizes = {32};
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> input_state_sparse_chunks =
                                 split_and_sparse(input_state_sparse, input_state_sparse_sizes, base7);
@@ -209,9 +202,7 @@ namespace nil {
                                 std::vector<bool> a_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
                                 std::copy(a_all.end() - 32, a_all.end(), a.begin());
                             }
-                            // for (std::size_t j = 0; j < 32; j++) {
-                            //     a[32 - j - 1] = multiprecision::bit_test(integral_a, j);
-                            // }
+
                             std::vector<std::size_t> a_sizes = {3, 4, 11, 14};
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> a_chunks = split_and_sparse(a, a_sizes, base4);
                             assignment.witness(W1)[i] = a_chunks[0][0];
@@ -250,9 +241,6 @@ namespace nil {
                                 std::copy(b_all.end() - 32, b_all.end(), b.begin());
                             }
 
-                            // for (std::size_t j = 0; j < 32; j++) {
-                            //     b[32 - j - 1] = multiprecision::bit_test(integral_b, j);
-                            // }
                             std::vector<std::size_t> b_sizes = {10, 7, 2, 13};
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> b_chunks = split_and_sparse(b, b_sizes, base4);
                             assignment.witness(W0)[i + 4] = message_scheduling_words[(i - row) / 5 + 14];
@@ -304,9 +292,6 @@ namespace nil {
                                 std::copy(e_bits_all.end() - 32, e_bits_all.end(), e_bits.begin());
                             }
 
-                            // for (std::size_t j = 0; j < 32; j++) {
-                            //     e_bits[32 - j - 1] = multiprecision::bit_test(integral_e, j);
-                            // }
                             std::vector<std::size_t> e_sizes = {6, 5, 14, 7};
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> e_chunks = split_and_sparse(e_bits, e_sizes, base7);
                             assignment.witness(W2)[i] = e_chunks[0][0];
@@ -382,9 +367,7 @@ namespace nil {
                                 std::vector<bool> a_bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
                                 std::copy(a_bits_all.end() - 32, a_bits_all.end(), a_bits.begin());
                             }
-                            // for (std::size_t j = 0; j < 32; j++) {
-                            //     a_bits[32 - j - 1] = multiprecision::bit_test(integral_a, j);
-                            // }
+
                             std::vector<std::size_t> a_sizes = {2, 11, 9, 10};
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> a_chunks =
                                 split_and_sparse(a_bits, a_sizes, base4);
