@@ -53,7 +53,8 @@ namespace nil {
                 template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
                 struct modular_policy<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>> {
                     typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
-                    typedef modular_fixed_cpp_int_backend<MinBits,  cpp_integer_type::unsigned_magnitude, Checked> Backend_u;
+                    typedef modular_fixed_cpp_int_backend<MinBits, cpp_integer_type::unsigned_magnitude, Checked>
+                        Backend_u;
 
                     static_assert(MinBits, "number of bits should be defined");
                     static_assert(is_fixed_precision<Backend>::value, "fixed precision backend should be used");
@@ -66,7 +67,8 @@ namespace nil {
                     /// real limb_type depending on is_trivial_cpp_int property
                     /// such logic is necessary due to local_limb_type could be uint128
                     typedef typename std::conditional<is_trivial_cpp_int<Backend>::value,
-                                                      typename trivial_limb_type<MinBits>::type, limb_type>::type
+                                                      typename trivial_limb_type<MinBits>::type,
+                                                      limb_type>::type
                         internal_limb_type;
                     typedef typename std::conditional<
                         is_trivial_cpp_int<Backend>::value,
