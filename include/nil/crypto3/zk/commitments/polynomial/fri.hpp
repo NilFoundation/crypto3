@@ -64,14 +64,16 @@ namespace nil {
                          typename MerkleTreeHashType,
                          typename TranscriptHashType,
                          std::size_t M,
-                         std::size_t BatchedSize>
+                         std::size_t BatchedSize = 0,
+                         bool IsConstSize = (bool)BatchedSize>
                 struct fri : public detail::
-                                 basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize> {
+                                 basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize, IsConstSize> {
 
                     using basic_fri =
-                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize>;
+                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize, IsConstSize>;
                     constexpr static const std::size_t m = basic_fri::m;
                     constexpr static const std::size_t leaf_size = basic_fri::leaf_size;
+                    constexpr static const bool is_const_size = IsConstSize;
 
                     using field_type = typename basic_fri::field_type;
                     using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
@@ -95,7 +97,8 @@ namespace nil {
                                                                                   typename FRI::merkle_tree_hash_type,
                                                                                   typename FRI::transcript_hash_type,
                                                                                   FRI::m,
-                                                                                  FRI::leaf_size>,
+                                                                                  FRI::leaf_size,
+                                                                                  FRI::is_const_size>,
                                                                  FRI>::value,
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
@@ -112,7 +115,8 @@ namespace nil {
                                                                                   typename FRI::merkle_tree_hash_type,
                                                                                   typename FRI::transcript_hash_type,
                                                                                   FRI::m,
-                                                                                  FRI::leaf_size>,
+                                                                                  FRI::leaf_size,
+                                                                                  FRI::is_const_size>,
                                                                  FRI>::value,
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
@@ -130,29 +134,20 @@ namespace nil {
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
                                                                                     FRI::m,
-                                                                                    FRI::leaf_size>,
+                                                                                    FRI::leaf_size,
+                                                                                    FRI::is_const_size>,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(
                     typename FRI::basic_fri::proof_type &proof,
                     typename FRI::basic_fri::params_type &fri_params,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
-                    // TODO: seems like it is no necessary to duplicate the same point of U and V
-                    if constexpr (FRI::leaf_size == 0) {
-                        std::size_t leaf_size = proof.final_polynomials.size();
-                        std::vector<math::polynomial<typename FRI::field_type::value_type>> U(leaf_size, {0});
-                        math::polynomial<typename FRI::field_type::value_type> V = {1};
 
-                        return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
-                    } else {
-                        std::array<math::polynomial<typename FRI::field_type::value_type>, FRI::leaf_size> U;
-                        std::array<math::polynomial<typename FRI::field_type::value_type>, FRI::leaf_size> V;
-                        for (auto i = 0; i < FRI::leaf_size; ++i) {
-                            U[i] = {0};
-                            V[i] = {1};
-                        }
-                        return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
-                    }
+                    std::array<math::polynomial<typename FRI::field_type::value_type>, 1> U;
+                    std::array<math::polynomial<typename FRI::field_type::value_type>, 1> V;
+                    U[0] = {0};
+                    V[0] = {1};
+                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, U, V, transcript);
                 }
             }    // namespace algorithms
         }        // namespace zk
