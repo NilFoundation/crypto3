@@ -174,14 +174,15 @@ namespace nil {
                         std::size_t bits_per_row =
                             bits_per_crumb * crumbs_per_row;    // we suppose that ScalarSize % bits_per_row = 0
 
-                        std::vector<typename BlueprintFieldType::value_type> bits_msb(ScalarSize);
                         typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
                         typename BlueprintFieldType::integral_type integral_scalar =
                             typename BlueprintFieldType::integral_type(scalar.data);
-                        for (std::size_t i = 0; i < ScalarSize; i++) {
-                            bits_msb[ScalarSize - 1 - i] = multiprecision::bit_test(integral_scalar, i);
+                        std::array<bool, ScalarSize> bits_msb;
+                        {
+                            nil::marshalling::status_type status;
+                            std::array<bool, 255> bits_msb_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_scalar, status);
+                            std::copy(bits_msb_all.end() - ScalarSize, bits_msb_all.end(), bits_msb.begin());
                         }
-
                         typename BlueprintFieldType::value_type a = 2;
                         typename BlueprintFieldType::value_type b = 2;
                         typename BlueprintFieldType::value_type n = 0;
@@ -193,8 +194,8 @@ namespace nil {
 
                             for (std::size_t j = 0; j < crumbs_per_row; j++) {
                                 std::size_t crumb = chunk_start + j * bits_per_crumb;
-                                typename BlueprintFieldType::value_type b0 = bits_msb[crumb + 1];
-                                typename BlueprintFieldType::value_type b1 = bits_msb[crumb + 0];
+                                typename BlueprintFieldType::value_type b0 = static_cast<int>(bits_msb[crumb + 1]);
+                                typename BlueprintFieldType::value_type b1 = static_cast<int>(bits_msb[crumb + 0]);
 
                                 typename BlueprintFieldType::value_type crumb_value = b0 + b1.doubled();
                                 assignment.witness(W7 + j)[row] = crumb_value;
