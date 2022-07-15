@@ -93,6 +93,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test) {
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
     // component input
+    var v;
+    var u;
     var ft_eval0;
     var ft_eval1;
     std::array<
@@ -104,6 +106,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test) {
     std::array<zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>,
         eval_points_amount> evals;
 
+    public_input.push_back(algebra::random_element<BlueprintFieldType>());
+    v = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(algebra::random_element<BlueprintFieldType>());
+    u = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    
     public_input.push_back(algebra::random_element<BlueprintFieldType>());
     ft_eval0 = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
@@ -149,6 +157,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test) {
     
 
     typename component_type::params_type params = {
+        v,
+        u,
         ft_eval0,
         ft_eval1,
         polys,
