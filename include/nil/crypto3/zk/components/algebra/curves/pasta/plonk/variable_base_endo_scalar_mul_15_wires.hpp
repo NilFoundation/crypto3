@@ -171,12 +171,19 @@ namespace nil {
 
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type R;
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
-                        std::array<bool, 128> bits = {false};
                         typename CurveType::scalar_field_type::integral_type integral_b =
                             typename CurveType::scalar_field_type::integral_type(b.data);
-                        for (std::size_t i = 0; i < 128; i++) {
-                            bits[128 - i - 1] = multiprecision::bit_test(integral_b, i);
-                        }
+
+                        std::array<bool, 128> bits = {false};
+                        {
+                            nil::marshalling::status_type status;
+                            std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                            std::copy(bits_all.end() - 128, bits_all.end(), bits.begin());
+                        }                        
+                        // for (std::size_t i = 0; i < 128; i++) {
+                        //     bits[128 - i - 1] = multiprecision::bit_test(integral_b, i);
+                        // }
+                        
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
                         typename ArithmetizationType::field_type::value_type s1 = 0;
