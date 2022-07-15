@@ -180,9 +180,6 @@ namespace nil {
                             std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
                             std::copy(bits_all.end() - 128, bits_all.end(), bits.begin());
                         }                        
-                        // for (std::size_t i = 0; i < 128; i++) {
-                        //     bits[128 - i - 1] = multiprecision::bit_test(integral_b, i);
-                        // }
                         
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;

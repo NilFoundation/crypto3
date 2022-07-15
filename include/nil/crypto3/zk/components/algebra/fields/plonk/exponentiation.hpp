@@ -152,10 +152,6 @@ namespace nil {
                             std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
                             std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
                         }
-                        
-                        // for (std::size_t i = 0; i < padded_exponent_size; i++) {
-                        //     bits[padded_exponent_size - i - 1] = multiprecision::bit_test(integral_exp, i);
-                        // }
 
                         typename ArithmetizationType::field_type::value_type accumulated_n = 0;
                         typename BlueprintFieldType::value_type acc1 = 1;
