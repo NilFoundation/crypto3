@@ -172,9 +172,7 @@ namespace nil {
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
-                    typename select_container<LPC::is_const_size,
-                                              std::vector<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type z;
+                    typename LPC::proof_type::z_type z;
 
                     typename select_container<LPC::is_const_size,
                                               std::vector<std::pair<typename LPC::field_type::value_type,
@@ -344,9 +342,7 @@ namespace nil {
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::size_t leaf_size = g.size();
-                    typename select_container<LPC::is_const_size,
-                                              std::vector<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type z;
+                    typename LPC::proof_type::z_type z;
                     typename select_container<LPC::is_const_size,
                                               std::vector<std::pair<typename LPC::field_type::value_type,
                                                                     typename LPC::field_type::value_type>>,
