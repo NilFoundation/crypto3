@@ -115,7 +115,8 @@ namespace nil {
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
                     using mul_by_const_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
 
-                    using random_component = zk::components::random<ArithmetizationType, 
+                    using random_component = zk::components::random<ArithmetizationType,\
+                        KimchiParamsType, BatchSize,
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using endo_scalar_component =
@@ -259,10 +260,10 @@ namespace nil {
                         }
                         
                         var rand_base = random_component::generate_circuit(
-                            bp, assignment, {one}, row).output;
+                            bp, assignment, {params.batches}, row).output;
                         row += random_component::rows_amount;
                         var sg_rand_base = random_component::generate_circuit(
-                            bp, assignment, {one}, row).output;
+                            bp, assignment, {params.batches}, row).output;
                         row += random_component::rows_amount;
 
                         var rand_base_i = one;
@@ -435,7 +436,6 @@ namespace nil {
                         row += prepare_scalars_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);
-                        std::size_t msm_size = KimchiParamsType::final_msm_size(BatchSize);
                         assert(scalar_idx == KimchiParamsType::final_msm_size(BatchSize) - 1);
 
                         result_type res(start_row_index);
@@ -463,10 +463,10 @@ namespace nil {
                         }
 
                         var rand_base = random_component::generate_assignments(
-                            assignment, {one}, row).output;
+                            assignment, {params.batches}, row).output;
                         row += random_component::rows_amount;
                         var sg_rand_base = random_component::generate_assignments(
-                            assignment, {one}, row).output;
+                            assignment, {params.batches}, row).output;
                         row += random_component::rows_amount;
 
                         var rand_base_i = one;

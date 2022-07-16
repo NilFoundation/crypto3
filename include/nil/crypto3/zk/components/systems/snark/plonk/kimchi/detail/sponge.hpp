@@ -148,6 +148,12 @@ namespace nil {
                     constexpr static const std::size_t squeeze_rows = permute_rows;
                     constexpr static const std::size_t gates_amount = 0;
 
+                    constexpr static const std::size_t state_size = poseidon_component::state_size;
+
+                    std::array<var, state_size> _inner_state() {
+                        return state;
+                    }
+
                     void init_assignment(blueprint_assignment_table<ArithmetizationType>
                             &assignment,
                             var zero,

@@ -41,7 +41,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/limbs.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/sponge.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/evaluation_proof.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -146,6 +146,12 @@ namespace nil {
                         sponge_component::squeeze_rows + unpack::rows_amount 
                         + pack::rows_amount;
                     constexpr static const std::size_t absorb_evaluations_rows = 25 * absorb_rows;
+
+                    constexpr static const std::size_t state_size = sponge_component::state_size;
+
+                    std::array<var, sponge_component::state_size> state() {
+                        return sponge._inner_state();
+                    }
 
                     void init_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                          var zero,

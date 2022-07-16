@@ -234,7 +234,8 @@ namespace nil {
                             oracles_output.eval_points,
                             oracles_output.oracles.u,
                             oracles_output.oracles.v,
-                            params.proof.opening},
+                            params.proof.opening,
+                            oracles_output.transcript},
                             zeta_to_srs_len,
                             f_comm_scalars
                         };
@@ -316,7 +317,8 @@ namespace nil {
                             oracles_output.eval_points,
                             oracles_output.oracles.u,
                             oracles_output.oracles.v,
-                            params.proof.opening},
+                            params.proof.opening,
+                            oracles_output.transcript},
                             zeta_to_srs_len,
                             f_comm_scalars
                         };

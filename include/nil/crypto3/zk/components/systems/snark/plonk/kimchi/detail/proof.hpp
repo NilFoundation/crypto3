@@ -36,51 +36,16 @@
 
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/evaluation_proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-
-                template<typename FieldType, typename KimchiParamsType>
-                struct kimchi_lookup_evaluations {
-                    /// sorted lookup table polynomial
-                    // pub sorted: Vec<Field>,
-                    // /// lookup aggregation polynomial
-                    // pub aggreg: Field,
-                    // // TODO: May be possible to optimize this away?
-                    // /// lookup table polynomial
-                    // pub table: Field,
-
-                    // /// Optionally, a runtime table polynomial.
-                    // pub runtime: Option<Field>,
-                    kimchi_lookup_evaluations() {
-                    }
-                };
-
-                template<typename FieldType, typename KimchiParamsType>
-                struct kimchi_proof_evaluations {
-                    using var = snark::plonk_variable<FieldType>;
-                    // witness polynomials
-                    std::array<var, KimchiParamsType::witness_columns> w;
-                    // permutation polynomial
-                    var z;
-                    // permutation polynomials
-                    // (PERMUTS-1 evaluations because the last permutation is only used in commitment form)
-                    std::array<var, KimchiParamsType::permut_size - 1> s;
-                    // /// lookup-related evaluations
-                    kimchi_lookup_evaluations<FieldType, KimchiParamsType> lookup;
-                    // /// evaluation of the generic selector polynomial
-                    var generic_selector;
-                    // /// evaluation of the poseidon selector polynomial
-                    var poseidon_selector;
-
-                    kimchi_proof_evaluations() {
-                    }
-                };
 
                 template<typename BlueprintFieldType>
                 struct kimchi_opening_proof_scalar {
@@ -123,6 +88,12 @@ namespace nil {
 
                     kimchi_opening_proof_scalar<BlueprintFieldType> 
                         opening;
+
+                    using transcript_type = kimchi_transcript<ArithmetizationType, typename KimchiParamsType::curve_type,
+                                        KimchiParamsType,
+                                        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                        11, 12, 13, 14>;
+                    transcript_type transcript;
                 };
 
                 template<typename BlueprintFieldType,
