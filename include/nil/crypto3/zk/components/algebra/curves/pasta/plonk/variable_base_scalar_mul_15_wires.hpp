@@ -105,13 +105,12 @@ namespace nil {
                             P;
                         typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type Q;
 
-                        const std::size_t scalar_size = 255;
-                        std::array<bool, scalar_size> bits = {false};
                         typename CurveType::scalar_field_type::integral_type integral_b =
                             typename CurveType::scalar_field_type::integral_type(b.data);
-                        for (std::size_t i = 0; i < scalar_size; i++) {
-                            bits[scalar_size - i - 1] = multiprecision::bit_test(integral_b, i);
-                        }
+                        const std::size_t scalar_size = 255;
+                        nil::marshalling::status_type status;
+                        std::array<bool, scalar_size> bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
 

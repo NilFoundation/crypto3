@@ -143,11 +143,14 @@ namespace nil {
                         typename BlueprintFieldType::value_type base = assignment.var_value(params.base);
                         typename BlueprintFieldType::value_type exponent = assignment.var_value(params.exponent);
 
-                        std::array<bool, padded_exponent_size> bits;
                         typename BlueprintFieldType::integral_type integral_exp =
                             typename BlueprintFieldType::integral_type(exponent.data);
-                        for (std::size_t i = 0; i < padded_exponent_size; i++) {
-                            bits[padded_exponent_size - i - 1] = multiprecision::bit_test(integral_exp, i);
+
+                        std::array<bool, padded_exponent_size> bits = {false};
+                        {
+                            nil::marshalling::status_type status;
+                            std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
+                            std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
                         }
 
                         typename ArithmetizationType::field_type::value_type accumulated_n = 0;
