@@ -51,7 +51,8 @@ namespace nil {
                 /// @post The iterator is advanced.
                 template<typename T, typename TIter>
                 void write_big_endian(T value, TIter &iter) {
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
 
                     export_bits(value, iter, chunk_bits, true);
@@ -68,7 +69,8 @@ namespace nil {
                 /// @post The iterator is advanced.
                 template<std::size_t TSize, typename T, typename TIter>
                 void write_big_endian(T value, TIter &iter) {
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
                     std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
@@ -98,7 +100,8 @@ namespace nil {
                 template<typename T, typename TIter>
                 T read_big_endian(TIter &iter, std::size_t value_size) {
                     T serializedValue;
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
                     std::size_t chunks_count = (value_size / chunk_bits) + ((value_size % chunk_bits) ? 1 : 0);
 
@@ -119,7 +122,8 @@ namespace nil {
                 template<std::size_t TSize, typename T, typename TIter>
                 T read_big_endian(TIter &iter) {
                     T serializedValue;
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
                     std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
@@ -136,7 +140,8 @@ namespace nil {
                 /// @post The iterator is advanced.
                 template<typename T, typename TIter>
                 void write_little_endian(T value, TIter &iter) {
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
 
                     export_bits(value, iter, chunk_bits, false);
@@ -151,17 +156,17 @@ namespace nil {
                 /// @post The iterator is advanced.
                 template<std::size_t TSize, typename T, typename TIter>
                 void write_little_endian(T value, TIter &iter) {
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
                     std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
                     if (value > 0) {
-                        std::size_t end_index =
-                            chunks_count - ((nil::crypto3::multiprecision::msb(value) + 1) / chunk_bits +
+                        std::size_t begin_index = ((nil::crypto3::multiprecision::msb(value) + 1) / chunk_bits +
                                             (((nil::crypto3::multiprecision::msb(value) + 1) % chunk_bits) ? 1 : 0));
 
-                        if (end_index < chunks_count) {
-                            std::fill(iter + end_index, iter + chunks_count, 0x00);
+                        if (begin_index < chunks_count) {
+                            std::fill(iter + begin_index, iter + chunks_count, 0x00);
                         }
 
                         export_bits(value, iter, chunk_bits, false);
@@ -181,7 +186,8 @@ namespace nil {
                 template<typename T, typename TIter>
                 T read_little_endian(TIter &iter, std::size_t value_size) {
                     T serializedValue;
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
                     std::size_t chunks_count = (value_size / chunk_bits) + ((value_size % chunk_bits) ? 1 : 0);
 
@@ -200,7 +206,8 @@ namespace nil {
                 template<std::size_t TSize, typename T, typename TIter>
                 T read_little_endian(TIter &iter) {
                     T serializedValue;
-                    std::size_t units_bits = 8;
+                    std::size_t units_bits = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                                        1 : sizeof(typename std::iterator_traits<TIter>::value_type) * 8;
                     std::size_t chunk_bits = sizeof(typename std::iterator_traits<TIter>::value_type) * units_bits;
                     std::size_t chunks_count = (TSize / chunk_bits) + ((TSize % chunk_bits) ? 1 : 0);
 
