@@ -254,8 +254,10 @@ namespace nil {
                         /////TEST
                         for (std::size_t i = 0; i < f_parts; i++) {
                             for (std::size_t j = 0; j < table_description.rows_amount; j++) {
-                                assert((F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
-                                        j)) == FieldType::value_type::zero()));
+                                if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
+                                        j)) != FieldType::value_type::zero()) {
+                                    std::cout << "F[" << i << "] != 0 at j = " << j << std::endl;
+                                }
                             }
                         }
 
