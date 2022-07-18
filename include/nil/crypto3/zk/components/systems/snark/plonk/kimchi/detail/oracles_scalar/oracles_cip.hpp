@@ -124,7 +124,7 @@ namespace nil {
                         var ft_eval1;
                         std::array<
                             std::array<
-                            std::array<var, KimchiParamsType::commitment_params_type::size_for_max_poly>, 
+                            std::array<var, KimchiParamsType::commitment_params_type::split_poly_eval_size>, 
                             eval_points_amount>,
                             KimchiParamsType::prev_challenges_size> polys;
                         std::array<var, eval_points_amount> p_eval;
@@ -158,7 +158,7 @@ namespace nil {
                         // to [[f_full(zeta), f_full(zeta_omega)], [f_diff(zeta), f_diff(zeta_omega)]]
                         std::size_t es_idx = 0;
                         for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; ++i) {
-                            for (std::size_t j = 0; j < KimchiParamsType::commitment_params_type::size_for_max_poly; ++j) {
+                            for (std::size_t j = 0; j < KimchiParamsType::commitment_params_type::split_poly_eval_size; ++j) {
                                 for (std::size_t k = 0; k < eval_points_amount; ++k) {
                                     es[k][i] = params.polys[i][k][j];
                                 }

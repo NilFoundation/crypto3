@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test) {
     var ft_eval1;
     std::array<
         std::array<
-        std::array<var, commitment_params::size_for_max_poly>, 
+        std::array<var, commitment_params::split_poly_eval_size>, 
         eval_points_amount>,
         kimchi_params::prev_challenges_size> polys;
     std::array<var, eval_points_amount> p_eval;
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test) {
 
     for (std::size_t i = 0; i < kimchi_params::prev_challenges_size; i++) {
         for (std::size_t j = 0; j < eval_points_amount; j++) {
-            for (std::size_t k = 0; k < commitment_params::size_for_max_poly; k++) {
+            for (std::size_t k = 0; k < commitment_params::split_poly_eval_size; k++) {
                 public_input.push_back(algebra::random_element<BlueprintFieldType>());
                 polys[i][j][k] = var(0, public_input.size() - 1, false, var::column_type::public_input);
             }

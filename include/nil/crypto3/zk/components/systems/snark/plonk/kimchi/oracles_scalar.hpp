@@ -142,7 +142,7 @@ namespace nil {
 
                     constexpr static const std::size_t eval_points_amount = 2;
                     using prev_chal_output = 
-                            std::array<std::array<var, KimchiCommitmentParamsType::size_for_max_poly>, eval_points_amount>;
+                            std::array<std::array<var, KimchiCommitmentParamsType::split_poly_eval_size>, eval_points_amount>;
 
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
