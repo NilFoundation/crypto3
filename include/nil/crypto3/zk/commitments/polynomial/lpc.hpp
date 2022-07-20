@@ -49,7 +49,7 @@ namespace nil {
                          std::size_t R = 1,
                          std::size_t M = 2,
                          std::size_t BatchSize = 0,
-                         bool ConstSize = false>
+                         bool IsConstSize = false>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -58,10 +58,10 @@ namespace nil {
                     constexpr static const std::size_t r = R;
                     constexpr static const std::size_t m = M;
                     constexpr static const std::size_t leaf_size = BatchSize;
-                    constexpr static const bool const_size = ConstSize;
+                    constexpr static const bool is_const_size = IsConstSize;
                 };
                 /**
-                 * @brief Based on the FRI Commitment description from \[ResShift].
+                 * @brief Based on the FRI Commitment description from \[RedShift].
                  * @tparam d ...
                  * @tparam Rounds Denoted by r in \[Placeholder].
                  *
@@ -82,7 +82,8 @@ namespace nil {
                                                        typename LPCParams::merkle_hash_type,
                                                        typename LPCParams::transcript_hash_type,
                                                        LPCParams::m,
-                                                       LPCParams::leaf_size> {
+                                                       LPCParams::leaf_size,
+                                                       LPCParams::is_const_size> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
@@ -90,7 +91,7 @@ namespace nil {
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
                     constexpr static const std::size_t leaf_size = LPCParams::leaf_size;
-                    constexpr static const bool const_size = LPCParams::const_size;
+                    constexpr static const bool is_const_size = LPCParams::is_const_size;
 
                     typedef LPCParams lpc_params;
 
@@ -100,7 +101,8 @@ namespace nil {
                                                                 typename LPCParams::merkle_hash_type,
                                                                 typename LPCParams::transcript_hash_type,
                                                                 m,
-                                                                leaf_size>;
+                                                                leaf_size,
+                                                                is_const_size>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
@@ -112,18 +114,19 @@ namespace nil {
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
-
-                        typename std::conditional<const_size,
+                        typedef
+                            typename std::conditional<is_const_size,
                                                   std::array<std::vector<typename FieldType::value_type>, leaf_size>,
-                                                  std::vector<std::vector<typename FieldType::value_type>>>::type z;
+                                                  std::vector<std::vector<typename FieldType::value_type>>>::type z_type;
 
+                        z_type z;
                         commitment_type T_root;
 
                         std::array<typename basic_fri::proof_type, lambda> fri_proof;
                     };
                 };
 
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool ConstSize>
+                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
                 using batched_lpc = batched_list_polynomial_commitment<
                     FieldType,
                     commitments::list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
@@ -132,8 +135,8 @@ namespace nil {
                                                                    LPCParams::r,
                                                                    LPCParams::m,
                                                                    BatchSize,
-                                                                   ConstSize>>;
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool ConstSize>
+                                                                   IsConstSize>>;
+                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
                 using lpc = batched_list_polynomial_commitment<
                     FieldType,
                     list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
@@ -142,7 +145,7 @@ namespace nil {
                                                       LPCParams::r,
                                                       LPCParams::m,
                                                       BatchSize,
-                                                      ConstSize>>;
+                                                      IsConstSize>>;
 
                 template<typename FieldType, typename LPCParams>
                 using list_polynomial_commitment = batched_list_polynomial_commitment<FieldType, LPCParams>;
@@ -163,23 +166,21 @@ namespace nil {
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
                     typename LPC::precommitment_type &T,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
-                    typename select_container<LPC::const_size,
-                                              std::vector<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type z;
+                    typename LPC::proof_type::z_type z;
 
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               std::vector<std::pair<typename LPC::field_type::value_type,
                                                                     typename LPC::field_type::value_type>>,
                                               LPC::leaf_size>::type U_interpolation_points;
 
                     std::size_t leaf_size = g.size();
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         z.resize(leaf_size);
                         U_interpolation_points.resize(leaf_size);
                     }
@@ -204,10 +205,10 @@ namespace nil {
                         }
                     }
 
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               math::polynomial<typename LPC::field_type::value_type>,
                                               LPC::leaf_size>::type Q;
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         Q.resize(leaf_size);
                     }
 
@@ -257,16 +258,16 @@ namespace nil {
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
                     typename LPC::precommitment_type &T,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               math::polynomial<typename LPC::field_type::value_type>,
                                               LPC::leaf_size>::type g_normal;
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         g_normal.resize(g.size());
                     }
 
@@ -290,7 +291,7 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
@@ -313,7 +314,7 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
@@ -330,10 +331,10 @@ namespace nil {
                                                                                              typename LPC::lpc_params>,
                                              LPC>::value,
                              bool>::type = true>
-                static typename LPC::proof_type proof_eval(
+                static typename LPC::proof_type proof_eval( //2 and 3 use it
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     typename LPC::precommitment_type &T,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
 
@@ -341,17 +342,15 @@ namespace nil {
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::size_t leaf_size = g.size();
-                    typename select_container<LPC::const_size,
-                                              std::vector<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type z;
-                    typename select_container<LPC::const_size,
+                    typename LPC::proof_type::z_type z;
+                    typename select_container<LPC::is_const_size,
                                               std::vector<std::pair<typename LPC::field_type::value_type,
                                                                     typename LPC::field_type::value_type>>,
                                               LPC::leaf_size>::type U_interpolation_points;
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               math::polynomial<typename LPC::field_type::value_type>,
                                               LPC::leaf_size>::type g_normal;
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         z.resize(leaf_size);
                         U_interpolation_points.resize(leaf_size);
                         g_normal.resize(leaf_size);
@@ -385,10 +384,10 @@ namespace nil {
                             math::polynomial<typename LPC::field_type::value_type> {-evaluation_points[point_index], 1};
                     }
 
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               math::polynomial<typename LPC::field_type::value_type>,
                                               LPC::leaf_size>::type Q_normal;
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         Q_normal.resize(leaf_size);
                     }
                     for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
@@ -401,10 +400,10 @@ namespace nil {
 
                     std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
 
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               math::polynomial_dfs<typename LPC::field_type::value_type>,
                                               LPC::leaf_size>::type Q;
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         Q.resize(leaf_size);
                     }
 
@@ -427,10 +426,10 @@ namespace nil {
                                                                                              typename LPC::lpc_params>,
                                              LPC>::value,
                              bool>::type = true>
-                static typename LPC::proof_type proof_eval(
+                static typename LPC::proof_type proof_eval( // 1 uses it
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     typename LPC::precommitment_type &T,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
@@ -448,7 +447,7 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
 
@@ -468,7 +467,7 @@ namespace nil {
                              bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    const typename select_container<LPC::const_size,
+                    const typename select_container<LPC::is_const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
@@ -479,34 +478,35 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, g, T, fri_params, transcript);
                 }
 
-                template<typename LPC,
+                template<typename LPC, typename ContainerType,
                          typename std::enable_if<
                              std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
                                                                                              typename LPC::lpc_params>,
-                                             LPC>::value,
+                                             LPC>::value &&
+                             std::is_same_v<typename ContainerType::value_type,
+                                                std::vector<typename LPC::field_type::value_type>>,
                              bool>::type = true>
                 static bool verify_eval(
-                    const typename select_container<LPC::const_size,
-                                                    std::vector<typename LPC::field_type::value_type>,
-                                                    LPC::leaf_size>::type &evaluation_points,
+                    const ContainerType &evaluation_points,
                     typename LPC::proof_type &proof,
                     typename LPC::basic_fri::params_type fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::size_t leaf_size = proof.z.size();
+                    std::size_t eval_size = evaluation_points.size();
 
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               std::vector<std::pair<typename LPC::field_type::value_type,
                                                                     typename LPC::field_type::value_type>>,
                                               LPC::leaf_size>::type U_interpolation_points;
 
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         U_interpolation_points.resize(leaf_size);
                     }
 
                     for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                         auto evaluation_point = evaluation_points[0];
-                        if (polynom_index < evaluation_points.size()) {
+                        if (polynom_index < eval_size) {
                             evaluation_point = evaluation_points[polynom_index];
                         }
 
@@ -519,12 +519,12 @@ namespace nil {
                         }
                     }
 
-                    typename select_container<LPC::const_size,
+                    typename select_container<LPC::is_const_size,
                                               math::polynomial<typename LPC::field_type::value_type>,
                                               LPC::leaf_size>::type U,
                         V;
 
-                    if constexpr (!LPC::const_size) {
+                    if constexpr (!LPC::is_const_size) {
                         U.resize(leaf_size);
                         V.resize(leaf_size);
                     }
@@ -534,7 +534,7 @@ namespace nil {
 
                         V[polynom_index] = {1};
                         auto evaluation_point = evaluation_points[0];
-                        if (polynom_index < evaluation_points.size()) {
+                        if (polynom_index < eval_size) {
                             evaluation_point = evaluation_points[polynom_index];
                         }
 
@@ -566,19 +566,9 @@ namespace nil {
                     typename LPC::proof_type &proof,
                     typename LPC::basic_fri::params_type fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
-
-                    // TODO: Remove copy same evaluations point many times
-                    typename select_container<LPC::const_size,
-                                              std::vector<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type tmp;
-                    if constexpr (!LPC::const_size) {
-                        tmp.resize(std::max(LPC::leaf_size, evaluation_points.size()));
-                    }
-                    std::size_t leaf_size = tmp.size();
-                    for (auto i = 0; i < leaf_size; ++i) {
-                        tmp[i] = evaluation_points;
-                    }
-
+                    
+                    std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp;
+                    tmp[0] = evaluation_points;
                     return verify_eval<LPC>(tmp, proof, fri_params, transcript);
                 }
 
@@ -596,10 +586,7 @@ namespace nil {
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::size_t k = evaluation_points.size();
-                    typename std::conditional<
-                        LPC::const_size,
-                        std::array<std::vector<typename LPC::field_type::value_type>, LPC::leaf_size>,
-                        std::vector<std::vector<typename LPC::field_type::value_type>>>::type z;
+                    typename LPC::proof_type::z_type z;
                     // TODO: z[0] - not so good decision. Maybe using another proof_eval for this case?
                     z.resize(1);
                     z[0].resize(k);
