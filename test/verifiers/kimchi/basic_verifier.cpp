@@ -44,6 +44,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
@@ -132,9 +133,10 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     using kimchi_params =
         zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size, use_lookup, lookup_table_size,
                                            alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
+    using kimchi_constants = zk::components::kimchi_inner_constants<kimchi_params>;
 
     // COMMON DATA
-    constexpr static const std::size_t bases_size = kimchi_params::final_msm_size(batch_size);
+    constexpr static const std::size_t bases_size = kimchi_constants::final_msm_size(batch_size);
     std::array<ScalarFieldType::value_type, bases_size> batch_scalars;
     std::array<ScalarFieldType::value_type, batch_size> cips_shifted;
     std::array<ScalarFieldType::value_type, public_input_size> pi;

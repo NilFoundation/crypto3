@@ -55,7 +55,6 @@ namespace nil {
                     constexpr static bool use_lookup = UseLookup;
 
                     constexpr static std::size_t permutation_constraints = 3;
-                    constexpr static std::size_t ft_generic_size = 2 * 5;
 
                     constexpr static std::size_t eval_points_amount = 2;
                     constexpr static std::size_t scalar_challenge_size = 128;
@@ -75,18 +74,6 @@ namespace nil {
                         + witness_columns // w_comm
                         + permut_size - 1
                         + lookup_comm_size;
-
-                    constexpr static std::size_t final_msm_size(const std::size_t batch_size) {
-                        return 1 // H
-                            + CommitmentParamsType::srs_len   // G
-                            + (1 // opening.G
-                                + 1 // U
-                                + 2 * CommitmentParamsType::eval_rounds
-                                + evaluations_in_batch_size * (commitment_params_type::shifted_commitment_split + 1)
-                                + 1 // U
-                                + 1) // opening.delta 
-                            * batch_size;
-                    }
                 };
 
                 template <std::size_t EvalRounds,

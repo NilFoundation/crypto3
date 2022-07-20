@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,6 +48,7 @@ namespace nil {
                 struct binding {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using commitment_parms_type = typename KimchiParamsType::commitment_params_type;
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
                     template<typename VarType,
                         std::size_t BatchSize>
@@ -59,7 +61,7 @@ namespace nil {
                                 + verifier_index_type::constraints_amount;
                                 
                         public: 
-                        std::array<VarType, KimchiParamsType::final_msm_size(BatchSize)> scalars;
+                        std::array<VarType, kimchi_constants::final_msm_size(BatchSize)> scalars;
                         std::array<std::array<VarType, f_comm_msm_size>,
                             BatchSize> f_comm_scalars;
                         std::array<VarType, BatchSize> cip_shifted;

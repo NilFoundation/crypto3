@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fq.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -149,6 +150,8 @@ namespace nil {
                                             KimchiParamsType, KimchiCommitmentParamsType, BatchSize, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
+                    
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
                     constexpr static const std::size_t selector_seed = 0xff91;
 
@@ -189,7 +192,7 @@ namespace nil {
                             params.verifier_index.comm.sigma_comm[KimchiParamsType::permut_size - 1].shifted;
 
                         // take generic_size coeff_comm
-                        std::array<shifted_commitment_type, KimchiParamsType::ft_generic_size> generic_comm;
+                        std::array<shifted_commitment_type, kimchi_constants::ft_generic_size> generic_comm;
                         for (std::size_t i = 0; i < generic_comm.size(); i++) {
                             generic_comm[i] = params.verifier_index.comm.coefficient_comm[i];
                         }
@@ -253,12 +256,12 @@ namespace nil {
                             comm_idx);
 
                         // take generic_size coeff_comm
-                        std::array<shifted_commitment_type, KimchiParamsType::ft_generic_size> generic_comm;
+                        std::array<shifted_commitment_type, kimchi_constants::ft_generic_size> generic_comm;
                         for (std::size_t i = 0; i < generic_comm.size(); i++) {
                             generic_comm[i] = params.verifier_index.comm.coefficient_comm[i];
                         }
 
-                        parse_commitments<KimchiParamsType::ft_generic_size>(
+                        parse_commitments<kimchi_constants::ft_generic_size>(
                             unshifted_commitments,
                             generic_comm,
                             comm_idx

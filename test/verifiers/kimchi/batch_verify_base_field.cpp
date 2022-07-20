@@ -44,6 +44,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 #include "test_plonk_component.hpp"
 
@@ -96,8 +97,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
                                                              public_input_size,
                                                              index_terms,
                                                              prev_chal_size>;
+    using kimchi_constants = zk::components::kimchi_inner_constants<kimchi_params>;
 
-    constexpr static const std::size_t bases_size = kimchi_params::final_msm_size(batch_size);
+    constexpr static const std::size_t bases_size = kimchi_constants::final_msm_size(batch_size);
 
     using component_type = zk::components::batch_verify_base_field<ArithmetizationType,
                                                                    curve_type,

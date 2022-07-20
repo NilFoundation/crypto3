@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/combined_inner_product.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/random.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/batch_scalar/prepare_scalars.hpp>
@@ -132,8 +133,10 @@ namespace nil {
                         KimchiCommitmentParamsType::eval_rounds, W0, W1, W2, W3, W4, W5,
                         W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
+
                     constexpr static std::size_t scalars_len() {
-                        return KimchiParamsType::final_msm_size(BatchSize);
+                        return kimchi_constants::final_msm_size(BatchSize);
                     }
                     
                     using prepare_scalars_component =
@@ -253,10 +256,13 @@ namespace nil {
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
                         std::array<var, scalars_len()> scalars;
-                        std::size_t scalar_idx = KimchiCommitmentParamsType::srs_len;
+                        std::size_t scalar_idx = KimchiCommitmentParamsType::srs_len
+                            + kimchi_constants::srs_padding_size();
 
-                        for (std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i++) {
-                            scalars[i] = zero;
+                        for (std::size_t i = 0; 
+                            i < KimchiCommitmentParamsType::srs_len + kimchi_constants::srs_padding_size();
+                            i++) {
+                                scalars[i] = zero;
                         }
                         
                         var rand_base = random_component::generate_circuit(
@@ -436,7 +442,7 @@ namespace nil {
                         row += prepare_scalars_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);
-                        assert(scalar_idx == KimchiParamsType::final_msm_size(BatchSize) - 1);
+                        assert(scalar_idx == kimchi_constants::final_msm_size(BatchSize) - 1);
 
                         result_type res(start_row_index);
                         res.output = scalars;
@@ -456,10 +462,13 @@ namespace nil {
                         var one = var(0, start_row_index + 1, false, var::column_type::constant);
 
                         std::array<var, scalars_len()> scalars;
-                        std::size_t scalar_idx = KimchiCommitmentParamsType::srs_len;
+                        std::size_t scalar_idx = KimchiCommitmentParamsType::srs_len
+                            + kimchi_constants::srs_padding_size();
 
-                        for (std::size_t i = 0; i < KimchiCommitmentParamsType::srs_len; i++) {
-                            scalars[i] = zero;
+                        for (std::size_t i = 0; 
+                            i < KimchiCommitmentParamsType::srs_len + kimchi_constants::srs_padding_size();
+                            i++) {
+                                scalars[i] = zero;
                         }
 
                         var rand_base = random_component::generate_assignments(
@@ -636,7 +645,7 @@ namespace nil {
                         row += prepare_scalars_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);
-                        assert(scalar_idx == KimchiParamsType::final_msm_size(BatchSize) - 1);
+                        assert(scalar_idx == kimchi_constants::final_msm_size(BatchSize) - 1);
 
                         result_type res(start_row_index);
                         res.output = scalars;
