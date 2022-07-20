@@ -43,6 +43,18 @@ namespace nil {
                     using commitment_params_type = typename KimchiParamsType::commitment_params_type;
 
                     constexpr static std::size_t ft_generic_size = 2 * 5;
+                    constexpr static std::size_t permutation_constraints = 3;
+
+                    constexpr static std::size_t evaluations_in_batch_size = 
+                        KimchiParamsType::prev_challenges_size // recursion
+                        + 1 // p_comm
+                        + 1 // ft_comm
+                        + 1 // z_comm
+                        + 1 // generic_comm
+                        + 1 // psm_comm
+                        + KimchiParamsType::witness_columns // w_comm
+                        + KimchiParamsType::permut_size - 1
+                        + KimchiParamsType::lookup_comm_size;
 
                     constexpr static std::size_t srs_padding_size() {
                         std::size_t srs_two_power = 
@@ -60,7 +72,7 @@ namespace nil {
                             + (1 // opening.G
                                 + 1 // U
                                 + 2 * commitment_params_type::eval_rounds
-                                + KimchiParamsType::evaluations_in_batch_size
+                                + evaluations_in_batch_size
                                     * (commitment_params_type::shifted_commitment_split + 1)
                                 + 1 // U
                                 + 1) // opening.delta 

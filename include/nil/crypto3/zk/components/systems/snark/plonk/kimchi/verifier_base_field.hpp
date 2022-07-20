@@ -433,7 +433,7 @@ namespace nil {
                             shifted_commitment_type ft_comm = {{ft_comm_shifted.X, ft_comm_shifted.Y}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
 
                             std::array<shifted_commitment_type,
-                                KimchiParamsType::evaluations_in_batch_size> evaluations;
+                                kimchi_constants::evaluations_in_batch_size> evaluations;
                             std::size_t eval_idx = 0;
 
                             for (auto chal : params.proofs[i].comm.prev_challenges) {
@@ -463,7 +463,7 @@ namespace nil {
                             // evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
                             // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
 
-                            assert(eval_idx == KimchiParamsType::evaluations_in_batch_size);
+                            assert(eval_idx == kimchi_constants::evaluations_in_batch_size);
 
                             batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
                                 params.proofs[i].o};
@@ -625,7 +625,7 @@ namespace nil {
                             shifted_commitment_type ft_comm = {{ft_comm_shifted.X, ft_comm_shifted.Y}, {{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
 
                             std::array<shifted_commitment_type,
-                                KimchiParamsType::evaluations_in_batch_size> evaluations;
+                                kimchi_constants::evaluations_in_batch_size> evaluations;
                             std::size_t eval_idx = 0;
                             for (auto chal : params.proofs[i].comm.prev_challenges) {
                                 evaluations[eval_idx++] = chal;
@@ -652,7 +652,7 @@ namespace nil {
                             // evaluations[eval_idx++] = params.proofs[i].comm.table_comm;
                             // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime_comm;
 
-                            assert(eval_idx == KimchiParamsType::evaluations_in_batch_size);
+                            assert(eval_idx == kimchi_constants::evaluations_in_batch_size);
 
                             batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
                                 params.proofs[i].o};

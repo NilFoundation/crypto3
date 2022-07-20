@@ -41,6 +41,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -162,6 +163,8 @@ namespace nil {
                         zk::components::kimchi_opening_proof_base<BlueprintFieldType, 
                         KimchiCommitmentParamsType::eval_rounds>;
 
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
+
                     // using transcript_type = typename 
                     //     zk::components::kimchi_transcript_fq<ArithmetizationType, typename KimchiParamsType::curve_type,
                     //                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
@@ -169,7 +172,7 @@ namespace nil {
 
                     //typename proof_binding::fq_sponge_output fq_output;
                     std::array<shifted_commitment_type, 
-                        KimchiParamsType::evaluations_in_batch_size> comm;
+                        kimchi_constants::evaluations_in_batch_size> comm;
                     opening_proof_type opening_proof;
 
                     // transcript_type transcript;
