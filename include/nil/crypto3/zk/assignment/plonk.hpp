@@ -131,7 +131,7 @@ namespace nil {
                 std::size_t next_selector_index = 0;
 
                 std::size_t allocated_public_input_rows = 0;
-
+                std::size_t selector_index = 0;
             public:
 
                 blueprint_public_assignment_table(
@@ -184,7 +184,7 @@ namespace nil {
                 }
 
                 std::size_t add_selector(const std::vector<std::size_t> row_indices) {
-                    static std::size_t selector_index = 0;
+
                     std::size_t max_row_index = *std::max_element(row_indices.begin(), row_indices.end());
                     snark::plonk_column<BlueprintFieldType> selector_column(max_row_index + 1,
                                                                             BlueprintFieldType::value_type::zero());

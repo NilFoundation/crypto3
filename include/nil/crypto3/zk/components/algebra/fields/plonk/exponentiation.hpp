@@ -210,7 +210,7 @@ namespace nil {
 
                             for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result; bit_column++) {
                                 std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
-                                auto bit_check_constraint = bp.add_bit_check(var(column_idx, 0));
+                                snark::plonk_constraint<BlueprintFieldType> bit_check_constraint = bp.add_bit_check(var(column_idx, 0));
                                 constraints.push_back(bit_check_constraint);
 
                                 snark::plonk_constraint<BlueprintFieldType> bit_res = var(W0, 0) * var(column_idx, 0);
