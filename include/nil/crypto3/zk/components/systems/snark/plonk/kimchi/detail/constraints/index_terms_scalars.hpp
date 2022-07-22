@@ -105,7 +105,7 @@ namespace nil {
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 100;
+                    constexpr static const std::size_t rows_amount = index_terms_list::coefficient_0::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -140,11 +140,10 @@ namespace nil {
                         std::array<var, KimchiParamsType::index_term_size> output;
 
                         for (std::size_t i = 0; i < KimchiParamsType::index_term_size; ++i) {
-                            auto tokens = index_terms_list::index_term_0::rpn_from_string();
-                            output[i] = index_terms_list::index_term_0::generate_circuit(bp, assignment,
-                                {tokens, params.alpha, params.beta, params.gamma, params.joint_combiner,
+                            output[i] = index_terms_list::coefficient_0::generate_circuit(bp, assignment,
+                                {index_terms_list::coefficient_str[0], params.alpha, params.beta, params.gamma, params.joint_combiner,
                                 params.evaluations}, row).output;
-                            row += index_terms_list::index_term_0::rows_amount;
+                            row += index_terms_list::coefficient_0::rows_amount;
                         }
 
                         result_type res;
@@ -162,11 +161,10 @@ namespace nil {
                         std::array<var, KimchiParamsType::index_term_size> output;
 
                         for (std::size_t i = 0; i < KimchiParamsType::index_term_size; ++i) {
-                            auto tokens = index_terms_list::index_term_0::rpn_from_string();
-                            output[i] = index_terms_list::index_term_0::generate_assignments(assignment,
-                                {tokens, params.alpha, params.beta, params.gamma, params.joint_combiner,
+                            output[i] = index_terms_list::coefficient_0::generate_assignments(assignment,
+                                {index_terms_list::coefficient_str[0], params.alpha, params.beta, params.gamma, params.joint_combiner,
                                 params.evaluations}, row).output;
-                            row += index_terms_list::index_term_0::rows_amount;
+                            row += index_terms_list::coefficient_0::rows_amount;
                         }
 
                         result_type res;
