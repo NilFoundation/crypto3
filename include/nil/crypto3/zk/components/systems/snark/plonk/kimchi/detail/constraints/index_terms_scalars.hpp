@@ -33,6 +33,7 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_instances/ec_index_terms.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -94,17 +95,14 @@ namespace nil {
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
-                    using rpn_component = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 100, 
-                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using evaluations_type = typename zk::components::kimchi_proof_evaluations<
                         BlueprintFieldType, KimchiParamsType>;
 
                     constexpr static const std::size_t selector_seed = 0x0f27;
 
-                    constexpr static const std::array<std::string_view, KimchiParamsType::index_term_size> terms = {
-                        "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;"
-                    };
+                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType, KimchiParamsType, 
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:
                     constexpr static const std::size_t rows_amount = 100;
@@ -142,11 +140,11 @@ namespace nil {
                         std::array<var, KimchiParamsType::index_term_size> output;
 
                         for (std::size_t i = 0; i < KimchiParamsType::index_term_size; ++i) {
-                            auto tokens = rpn_component::rpn_from_string(terms[i]);
-                            output[i] = rpn_component::generate_circuit(bp, assignment,
+                            auto tokens = index_terms_list::index_term_0::rpn_from_string();
+                            output[i] = index_terms_list::index_term_0::generate_circuit(bp, assignment,
                                 {tokens, params.alpha, params.beta, params.gamma, params.joint_combiner,
                                 params.evaluations}, row).output;
-                            row += rpn_component::rows_amount;
+                            row += index_terms_list::index_term_0::rows_amount;
                         }
 
                         result_type res;
@@ -164,11 +162,11 @@ namespace nil {
                         std::array<var, KimchiParamsType::index_term_size> output;
 
                         for (std::size_t i = 0; i < KimchiParamsType::index_term_size; ++i) {
-                            auto tokens = rpn_component::rpn_from_string(terms[i]);
-                            output[i] = rpn_component::generate_assignments(assignment,
+                            auto tokens = index_terms_list::index_term_0::rpn_from_string();
+                            output[i] = index_terms_list::index_term_0::generate_assignments(assignment,
                                 {tokens, params.alpha, params.beta, params.gamma, params.joint_combiner,
                                 params.evaluations}, row).output;
-                            row += rpn_component::rows_amount;
+                            row += index_terms_list::index_term_0::rows_amount;
                         }
 
                         result_type res;
