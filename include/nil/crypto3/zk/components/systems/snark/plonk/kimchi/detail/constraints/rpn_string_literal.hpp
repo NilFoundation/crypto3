@@ -79,7 +79,7 @@ template<const std::size_t tokens_array_size, const std::size_t literal_string_s
          typename KimchiParamsType, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4,
          std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
          std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
-constexpr size_t rows(const char *expression) {
+constexpr size_t rpn_component_rows(const char *expression) {
     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
