@@ -75,17 +75,17 @@ constexpr std::size_t find_str(const char *expression, const char *str, std::siz
     return std::string::npos;
 }
 
-template<const std::size_t tokens_array_size, const std::size_t literal_string_size, typename ArithmetizationType,
-         typename KimchiParamsType, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4,
-         std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
-         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+template<const std::size_t tokens_array_size, typename ArithmetizationType,
+         typename KimchiParamsType>
 constexpr size_t rpn_component_rows(const char *expression) {
-    using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-    using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
-    using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
+    using mul_component = zk::components::multiplication<ArithmetizationType, 0, 1, 2>;
+    using add_component = zk::components::addition<ArithmetizationType, 0, 1, 2>;
+    using sub_component = zk::components::subtraction<ArithmetizationType, 0, 1, 2>;
 
-    using exponentiation_component = zk::components::exponentiation<ArithmetizationType, 64, W0, W1, W2, W3, W4, W5, W6,
-                                                                    W7, W8, W9, W10, W11, W12, W13, W14>;
+    using exponentiation_component = zk::components::exponentiation<ArithmetizationType, 64, 0, 1, 2, 3, 4, 5, 6,
+                                                                    7, 8, 9, 10, 11, 12, 13, 14>;
+
+    const std::size_t literal_string_size = str_len(expression);
 
     const size_t mds_size = 3;
     std::array<std::size_t, tokens_array_size> str_start = {};
