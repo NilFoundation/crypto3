@@ -121,13 +121,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    auto expression = component_type::rpn_from_string(s);
-
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {expression, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert(gamma_val == assignment.var_value(real_res.output));
@@ -206,13 +204,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_sub
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    auto expression = component_type::rpn_from_string(s);
-
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {expression, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val - beta_val) == assignment.var_value(real_res.output));
@@ -291,13 +287,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_add
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    auto expression = component_type::rpn_from_string(s);
-
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {expression, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val + beta_val) == assignment.var_value(real_res.output));
@@ -375,13 +369,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_mul
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    auto expression = component_type::rpn_from_string(s);
-
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {expression, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val * beta_val) == assignment.var_value(real_res.output));
@@ -460,13 +452,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_pow
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    auto expression = component_type::rpn_from_string(s);
-
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {expression, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val * gamma_val) == assignment.var_value(real_res.output));

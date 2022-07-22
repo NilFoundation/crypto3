@@ -149,10 +149,6 @@ namespace nil {
                         }
                     }
 
-                public:
-                    constexpr static const std::size_t rows_amount = NRows;
-                    constexpr static const std::size_t gates_amount = 0;
-
                     enum token_type {
                         alpha,
                         beta,
@@ -173,24 +169,13 @@ namespace nil {
                         load
                     };
 
-                    struct params_type {
-                        struct token_value_type {
-                            token_type type;
-                            std::pair<typename BlueprintFieldType::value_type, typename BlueprintFieldType::value_type>
-                                value;
-                        };
-
-                        std::vector<token_value_type> tokens;
-
-                        var alpha;
-                        var beta;
-                        var gamma;
-                        var joint_combiner;
-
-                        std::array<evaluations_type, KimchiParamsType::eval_points_amount> evaluations;
+                    struct token_value_type {
+                        token_type type;
+                        std::pair<typename BlueprintFieldType::value_type, typename BlueprintFieldType::value_type>
+                            value;
                     };
 
-                    static std::vector<typename params_type::token_value_type>
+                    static std::vector<token_value_type>
                         rpn_from_string(const std::string_view expression) {
 
                         std::vector<std::string> tokens_str;
@@ -199,7 +184,7 @@ namespace nil {
                             boost::trim(tokens_str[i]);
                         }
 
-                        std::vector<typename params_type::token_value_type> tokens;
+                        std::vector<token_value_type> tokens;
                         for (std::size_t i = 0; i < tokens_str.size(); i++) {
 
                             std::string token_str = tokens_str[i];
@@ -207,7 +192,7 @@ namespace nil {
                                 continue;
                             }
 
-                            typename params_type::token_value_type token;
+                            token_value_type token;
 
                             if (token_str.find("Alpha") != std::string::npos) {
                                 token.type = token_type::alpha;
@@ -320,44 +305,20 @@ namespace nil {
                         return tokens;
                     }
 
-                    //                    constexpr static std::size_t rows_by_expr(
-                    //                        const std::string_view &str) {
-                    //                        auto tokens = rpn_from_string(str);
-                    //                        std::size_t rows = 0;
-                    //                        std::size_t constant_rows = 3 + mds_size * mds_size;
-                    //
-                    //                        for (std::size_t i = 0; i < tokens.size(); i++) {
-                    //                            auto token = tokens[i];
-                    //                            if (token.type == token_type::literal || token.type ==
-                    //                            token_type::pow) {
-                    //                                constant_rows++;
-                    //                            }
-                    //                            switch (token.type) {
-                    //                                case token_type::pow:
-                    //                                    rows += exponentiation_component::rows_amount;
-                    //                                    break;
-                    //                                case token_type::add:
-                    //                                    rows += add_component::rows_amount;
-                    //                                    break;
-                    //                                case token_type::mul:
-                    //                                    rows += mul_component::rows_amount;
-                    //                                    break;
-                    //                                case token_type::sub:
-                    //                                    rows += sub_component::rows_amount;
-                    //                                    break;
-                    //                                case token_type::vanishes_on_last_4_rows:
-                    //                                    // TODO: lookups
-                    //                                    break;
-                    //                                case token_type::unnormalized_lagrange_basis:
-                    //                                    // TODO: lookups
-                    //                                    break;
-                    //                                default:
-                    //                                    break;
-                    //                            }
-                    //                        }
-                    //
-                    //                        return std::max(rows, constant_rows);
-                    //                    }
+                public:
+                    constexpr static const std::size_t rows_amount = NRows;
+                    constexpr static const std::size_t gates_amount = 0;
+
+                    struct params_type {
+                        std::string_view expression;
+
+                        var alpha;
+                        var beta;
+                        var gamma;
+                        var joint_combiner;
+
+                        std::array<evaluations_type, KimchiParamsType::eval_points_amount> evaluations;
+                    };
 
                     struct result_type {
                         var output;
@@ -379,7 +340,7 @@ namespace nil {
                         std::size_t row = start_row_index;
                         generate_assignments_constants(assignment, params, start_row_index);
 
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
+                        std::vector<token_value_type> tokens = rpn_from_string(params.expression);
 
                         std::vector<var> stack;
                         std::vector<var> cache;
@@ -394,7 +355,7 @@ namespace nil {
                         auto mds = mds_vars(constant_row);
                         constant_row += mds_size * mds_size;
 
-                        for (typename params_type::token_value_type t : params.tokens) {
+                        for (token_value_type t : tokens) {
                             switch (t.type) {
                                 case token_type::alpha:
                                     stack.emplace_back(params.alpha);
@@ -515,6 +476,8 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
+                        std::vector<token_value_type> tokens = rpn_from_string(params.expression);
+
                         std::vector<var> stack;
                         std::vector<var> cache;
 
@@ -528,7 +491,7 @@ namespace nil {
                         auto mds = mds_vars(constant_row);
                         constant_row += mds_size * mds_size;
 
-                        for (typename params_type::token_value_type t : params.tokens) {
+                        for (token_value_type t : tokens) {
                             switch (t.type) {
                                 case token_type::alpha:
                                     stack.emplace_back(params.alpha);
@@ -638,18 +601,6 @@ namespace nil {
                     }
 
                 private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               const std::size_t first_selector_index) {
-                    }
-
-                    static void
-                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
-                    }
 
                     static void generate_assignments_constants(
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
@@ -673,7 +624,9 @@ namespace nil {
                             }
                         }
 
-                        for (typename params_type::token_value_type t : params.tokens) {
+                        std::vector<token_value_type> tokens = rpn_from_string(params.expression);
+
+                        for (token_value_type t : tokens) {
                             switch (t.type) {
                                 case token_type::literal: {
                                     assignment.constant(W0)[row] = t.value.first;
