@@ -214,6 +214,13 @@ namespace nil {
                         set_complete_size(detail::merkle_tree_length(std::distance(il.begin(), il.end()), Arity));
                     }
 
+                    template<typename Iterator>
+                    merkle_tree_impl(std::size_t leaves, Iterator first, Iterator last) : _hashes(first, last) {
+                        set_row_count(detail::merkle_tree_row_count(leaves, Arity));
+                        set_leaves(leaves);
+                        set_complete_size(detail::merkle_tree_length(leaves, Arity));
+                    }
+
                     merkle_tree_impl(std::initializer_list<value_type> il, const allocator_type &a) : _hashes(il, a) {
                         set_row_count(detail::merkle_tree_row_count(std::distance(il.begin(), il.end()), Arity));
                         set_leaves(std::distance(il.begin(), il.end()));
