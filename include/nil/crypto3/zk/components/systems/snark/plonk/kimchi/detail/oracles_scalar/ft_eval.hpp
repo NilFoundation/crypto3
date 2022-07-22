@@ -37,7 +37,8 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zk_w3.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_instances/ec_index_terms.hpp>
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
@@ -115,11 +116,9 @@ namespace nil {
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
                     using argument_type = typename verifier_index_type::argument_type;
 
-                    constexpr static const std::string_view constant_term_polish = {
-                        "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;"
-                    };
-                    using rpn_component = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 100, 
+                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType, KimchiParamsType, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using constant_term = typename index_terms_list::constant_term;
 
                     constexpr static const std::size_t selector_seed = 0x0f22;
                     constexpr static const std::size_t eval_points_amount = 2;
@@ -162,7 +161,7 @@ namespace nil {
                         row += mul_component::rows_amount;
                         row += add_component::rows_amount;
 
-                        row += rpn_component::rows_amount;
+                        row += constant_term::rows_amount;
                         row += sub_component::rows_amount;
 
                         return row;
@@ -374,11 +373,11 @@ namespace nil {
                         row += add_component::rows_amount;
 
                         // evaluate constant term expression
-                        auto tokens = rpn_component::rpn_from_string(constant_term_polish);
-                        var pt = rpn_component::generate_circuit(bp, assignment,
+                        auto tokens = constant_term::rpn_from_string(constant_term_polish);
+                        var pt = constant_term::generate_circuit(bp, assignment,
                             {tokens, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
                             params.combined_evals}, row).output;
-                        row += rpn_component::rows_amount;
+                        row += constant_term::rows_amount;
                         
                         ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
                             assignment, {ft_eval0, pt}, row).output;
@@ -570,11 +569,11 @@ namespace nil {
                         row += add_component::rows_amount;
 
                         // evaluate constant term expression
-                        auto tokens = rpn_component::rpn_from_string(constant_term_polish);
-                        var pt = rpn_component::generate_assignments(assignment,
+                        auto tokens = constant_term::rpn_from_string(constant_term_polish);
+                        var pt = constant_term::generate_assignments(assignment,
                             {tokens, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
                             params.combined_evals}, row).output;
-                        row += rpn_component::rows_amount;
+                        row += constant_term::rows_amount;
                         
                         ft_eval0 = sub_component::generate_assignments(
                             assignment, {ft_eval0, pt}, row).output;
