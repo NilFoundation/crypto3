@@ -40,6 +40,9 @@ namespace nil {
                     static const bool ec_arithmetic_gates = IncludeEC;
                     static const bool chacha_gate = false;
                     static const bool generic_gate = true;
+
+                    static const std::size_t poseidon_gates_count = 15;
+                    static const std::size_t ec_arithmetic_gates_count = 4;
                 };
             }    // namespace components
         }        // namespace zk

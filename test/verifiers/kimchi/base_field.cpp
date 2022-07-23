@@ -84,7 +84,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 1;
-    constexpr static const std::size_t index_terms = 0;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
@@ -96,7 +95,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
                                                              lookup_table_size,
                                                              alpha_powers_n,
                                                              public_input_size,
-                                                             index_terms,
                                                              prev_chal_size>;
 
     using component_type = zk::components::base_field<ArithmetizationType,

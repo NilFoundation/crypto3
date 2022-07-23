@@ -139,7 +139,7 @@ namespace nil {
 
                     constexpr static const std::size_t f_comm_base_size = 1 // permuation-argument
                         + 5 // generic gate
-                        + KimchiParamsType::index_term_size;
+                        + KimchiParamsType::index_term_size();
 
                     commitments comm;
                     opening_proof_type o;

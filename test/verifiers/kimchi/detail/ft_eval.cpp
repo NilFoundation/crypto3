@@ -77,7 +77,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     constexpr static std::size_t perm_size = 7;
     constexpr static std::size_t lookup_table_size = 1;
     constexpr static bool use_lookup = false;
-    constexpr static const std::size_t index_terms = 0;
 
     constexpr static const std::size_t srs_len = 1;
     constexpr static const std::size_t prev_chal_size = 1;
@@ -91,7 +90,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
                                                              lookup_table_size,
                                                              alpha_powers_n,
                                                              public_input_size,
-                                                             index_terms,
                                                              prev_chal_size>;
 
     zk::components::kimchi_verifier_index_scalar<BlueprintFieldType> verifier_index;

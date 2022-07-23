@@ -125,7 +125,6 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     constexpr static std::size_t srs_len = 10;
     constexpr static std::size_t batch_size = 2;
 
-    constexpr static const std::size_t index_terms = 0;
     constexpr static const std::size_t prev_chal_size = 1;
 
     constexpr static const std::size_t domain_size = 128;
@@ -133,7 +132,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using kimchi_params =
         zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size, use_lookup, lookup_table_size,
-                                           alpha_powers_n, public_input_size, index_terms, prev_chal_size>;
+                                           alpha_powers_n, public_input_size, prev_chal_size>;
     using kimchi_constants = zk::components::kimchi_inner_constants<kimchi_params>;
 
     // COMMON DATA

@@ -465,6 +465,8 @@ namespace nil {
                             }
                         }
 
+                        assert(row == start_row_index + rows_amount);
+
                         result_type res;
                         res.output = stack[stack.size() - 1];
                         return res;
@@ -594,6 +596,8 @@ namespace nil {
                                 }
                             }
                         }
+
+                        assert(row == start_row_index + rows_amount);
 
                         result_type res;
                         res.output = stack[stack.size() - 1];

@@ -44,7 +44,7 @@ namespace nil {
                     std::size_t WitnessColumns, std::size_t PermutSize,
                     bool UseLookup, std::size_t LookupTableSize,
                     std::size_t AlphaPowersN, std::size_t PublicInputSize,
-                    std::size_t IndexTermSize, std::size_t PrevChalSize>
+                    std::size_t PrevChalSize>
                 struct kimchi_params_type {
                     using commitment_params_type = CommitmentParamsType;
                     using curve_type = CurveType;
@@ -63,7 +63,18 @@ namespace nil {
                     constexpr static std::size_t prev_challenges_size = PrevChalSize;
 
                     constexpr static std::size_t lookup_comm_size = 0;
-                    constexpr static std::size_t index_term_size = IndexTermSize;
+                    constexpr static std::size_t index_term_size() {
+                        std::size_t n = 0;
+                        
+                        if (circuit_params::poseidon_gate) {
+                            n += circuit_params::poseidon_gates_count;
+                        }
+                        if (circuit_params::ec_arithmetic_gates) {
+                            n += circuit_params::ec_arithmetic_gates_count;
+                        }
+
+                        return n;
+                    }
 
                 };
             }    // namespace components
