@@ -34,6 +34,8 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -46,6 +48,7 @@ namespace nil {
                 struct kimchi_params_type {
                     using commitment_params_type = CommitmentParamsType;
                     using curve_type = CurveType;
+                    using circuit_params = kimchi_circuit_description<true, true>; // TODO make configurable
 
                     constexpr static std::size_t alpha_powers_n = AlphaPowersN;
                     constexpr static std::size_t public_input_size = PublicInputSize;
@@ -61,17 +64,7 @@ namespace nil {
 
                     constexpr static std::size_t lookup_comm_size = 0;
                     constexpr static std::size_t index_term_size = IndexTermSize;
-                };
 
-                template <std::size_t EvalRounds,
-                    std::size_t MaxPolySize, std::size_t SrsLen>
-                struct kimchi_commitment_params_type {
-                    constexpr static std::size_t max_poly_size = MaxPolySize;
-                    constexpr static std::size_t eval_rounds = EvalRounds;
-                    constexpr static std::size_t split_poly_eval_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
-                    constexpr static std::size_t srs_len = SrsLen;
-
-                    constexpr static std::size_t shifted_commitment_split = 1; // todo
                 };
             }    // namespace components
         }        // namespace zk

@@ -37,7 +37,8 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/kimchi_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
