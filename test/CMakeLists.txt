@@ -27,6 +27,10 @@ macro(define_vdf_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
+    if(TOMMATH_FOUND)
+        target_compile_definitions(vdf_${name}_test PRIVATE CRYPTO3_VDF_BOOST_TOMMATH)
+    endif()
+
     set_target_properties(vdf_${name}_test PROPERTIES CXX_STANDARD 14)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)

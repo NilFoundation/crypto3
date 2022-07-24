@@ -81,6 +81,10 @@ elseif(CRYPTO3_VDF_BOOST)
         cm_find_package(Boost REQUIRED)
     endif()
 
+    if(Boost_FOUND)
+        cm_find_package(TomMath)
+    endif()
+
     cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
     cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 endif()

@@ -36,9 +36,11 @@
 
 #ifdef CRYPTO3_VDF_BOOST
 #include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/gmp.hpp>
-#include <nil/crypto3/multiprecision/tommath.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/gmp.hpp>
+#ifdef CRYPTO3_VDF_BOOST_TOMMATH
+#include <nil/crypto3/multiprecision/tommath.hpp>
+#endif
 #endif
 
 namespace std {
@@ -219,10 +221,12 @@ BOOST_DATA_TEST_CASE(chia_vdf_compute_cpp_int, boost::unit_test::data::make(vali
                             array_element.first.second);
 }
 
+#ifdef CRYPTO3_VDF_BOOST_TOMMATH
 BOOST_DATA_TEST_CASE(chia_vdf_compute_tommath_int, boost::unit_test::data::make(valid_data), array_element) {
     vdf::compute<vdf::chia>(vdf::discriminant_input<vdf::chia>(tommath_int(array_element.first.first)),
                             array_element.first.second);
 }
+#endif
 #endif
 
 BOOST_AUTO_TEST_SUITE_END()

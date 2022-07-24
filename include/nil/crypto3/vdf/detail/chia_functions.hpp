@@ -25,6 +25,8 @@
 #ifndef CRYPTO3_VDF_CHIA_FUNCTIONS_HPP
 #define CRYPTO3_VDF_CHIA_FUNCTIONS_HPP
 
+#include <boost/mpl/vector.hpp>
+
 #include <nil/crypto3/vdf/detail/chia_policy.hpp>
 
 namespace nil {
@@ -296,7 +298,6 @@ namespace nil {
                             aa1 = 1;
                             bb2 = 1;
                             bb1 = 0;
-
 
                             for (i = 0; rr1 != 0 && rr1 > bb; i++) {
                                 qq = rr2 / rr1;
@@ -854,22 +855,17 @@ namespace nil {
                      */
                     template<typename T>
                     inline static bool test_reduction(binary_quadratic_form<T> &f) {
-                        int a_b = mpz_cmpabs(f.a, f.b);
-                        int c_b = mpz_cmpabs(f.c, f.b);
-
-                        if (a_b < 0 || c_b < 0) {
+                        if (abs(f.a) < abs(f.b) || abs(f.c) < abs(f.b)) {
                             return false;
                         }
 
-                        int a_c = mpz_cmp(f.a, f.c);
-
-                        if (a_c > 0) {
-                            mpz_swap(f.a, f.c);
-                            mpz_neg(f.b, f.b);
+                        if (f.a > f.c) {
+                            std::swap(f.a, f.c);
+                            f.b = -f.b;
                         }
 
-                        if (a_c == 0 && mpz_sgn(f.b) < 0) {
-                            mpz_neg(f.b, f.b);
+                        if (f.a == f.c && f.b < 0) {
+                            f.b = -f.b;
                         }
 
                         return true;
@@ -948,9 +944,9 @@ namespace nil {
                                 w_ = x;
                                 x_ = -w + delta * x;
                                 // The condition (abs(v_) | abs(x_)) <= THRESH protects against overflow
-                            } while ((abs(v_) | abs(x_)) <= threshold && a > c && c > 0);
+                            } while ((::abs(v_) | ::abs(x_)) <= threshold && a > c && c > 0);
 
-                            if ((abs(v_) | abs(x_)) <= threshold) {
+                            if ((::abs(v_) | ::abs(x_)) <= threshold) {
                                 u = u_;
                                 v = v_;
                                 w = w_;
@@ -1021,7 +1017,7 @@ namespace nil {
                             uint64_t prev = mpz_getlimbn(op, size - 2);
                             ret += signed_shift(prev, -1 - lg2);
                         }
-                        if (mpz_sgn(op) < 0) {
+                        if (op < 0) {
                             return -((int64_t)ret);
                         }
                         return ret;
@@ -1029,32 +1025,36 @@ namespace nil {
 
                     template<typename T>
                     static void mpz_xgcd_partial(state_type<T> &state) {
-                        mp_limb_signed_t aa2, aa1, bb2, bb1, rr1, rr2, qq, bb, t1, t2, t3, i;
-                        mp_limb_signed_t bits, bits1, bits2;
+                        typedef typename state_type<T>::number_type number_type;
+                        typedef typename number_type::backend_type backend_type;
 
-                        mpz_set_si(state.y, 0);
-                        mpz_set_si(state.x, -1);
+                        typedef typename boost::mpl::front<typename backend_type::signed_types>::type limb_type;
 
-                        while (*state.bx->_mp_d != 0 && mpz_cmp(state.bx, state.L) > 0) {
+                        limb_type aa2, aa1, bb2, bb1, rr1, rr2, qq, bb, t1, t2, t3, i;
+                        limb_type bits, bits1, bits2;
+
+                        state.y = 0;
+                        state.x = -1;
+
+                        while (*state.bx->_mp_d != 0 && state.bx > state.L) {
                             bits2 = mpz_bits(state.by);
                             bits1 = mpz_bits(state.bx);
-                            bits = __GMP_MAX(bits2, bits1) - GMP_LIMB_BITS + 1;
+                            bits = __GMP_MAX(bits2, bits1) - sizeof(limb_type) * CHAR_BIT + 1;
                             if (bits < 0) {
                                 bits = 0;
                             }
 
-                            mpz_tdiv_q_2exp(state.r, state.by, bits);
-                            rr2 = mpz_get_ui(state.r);
-                            mpz_tdiv_q_2exp(state.r, state.bx, bits);
-                            rr1 = mpz_get_ui(state.r);
-                            mpz_tdiv_q_2exp(state.r, state.L, bits);
-                            bb = mpz_get_ui(state.r);
+                            state.r = state.by >> bits;
+                            rr2 = static_cast<limb_type>(state.r);
+                            state.r = state.bx >> bits;
+                            rr1 = static_cast<limb_type>(state.r);
+                            state.r = state.L >> bits;
+                            bb = static_cast<limb_type>(state.r);
 
                             aa2 = 0;
                             aa1 = 1;
                             bb2 = 1;
                             bb1 = 0;
-
 
                             for (i = 0; rr1 != 0 && rr1 > bb; i++) {
                                 qq = rr2 / rr1;
@@ -1083,54 +1083,54 @@ namespace nil {
 
                             if (i == 0) {
                                 mpz_fdiv_qr(state.ra, state.by, state.by, state.bx);
-                                mpz_swap(state.by, state.bx);
+                                std::swap(state.by, state.bx);
 
-                                mpz_submul(state.y, state.x, state.ra);
-                                mpz_swap(state.y, state.x);
+                                state.y -= state.x * state.ra;
+                                std::swap(state.y, state.x);
                             } else {
-                                mpz_mul_si(state.r, state.by, bb2);
+                                state.r = state.by * bb2;
                                 if (aa2 >= 0) {
-                                    mpz_addmul_ui(state.r, state.bx, aa2);
+                                    state.r += state.bx * aa2;
                                 } else {
-                                    mpz_submul_ui(state.r, state.bx, -aa2);
+                                    state.r -= state.bx * -aa2;
                                 }
-                                mpz_mul_si(state.bx, state.bx, aa1);
+                                state.bx *= aa1;
                                 if (bb1 >= 0) {
-                                    mpz_addmul_ui(state.bx, state.by, bb1);
+                                    state.bx += state.by * bb1;
                                 } else {
-                                    mpz_submul_ui(state.bx, state.by, -bb1);
+                                    state.bx -= state.by * -bb1;
                                 }
-                                mpz_set(state.by, state.r);
+                                state.by = state.r;
 
-                                mpz_mul_si(state.r, state.y, bb2);
+                                state.r = state.y * bb2;
                                 if (aa2 >= 0) {
-                                    mpz_addmul_ui(state.r, state.x, aa2);
+                                    state.r += state.x * aa2;
                                 } else {
-                                    mpz_submul_ui(state.r, state.x, -aa2);
+                                    state.r -= state.x * -aa2;
                                 }
-                                mpz_mul_si(state.x, state.x, aa1);
+                                state.x *= aa1;
                                 if (bb1 >= 0) {
-                                    mpz_addmul_ui(state.x, state.y, bb1);
+                                    state.x += state.y * bb1;
                                 } else {
-                                    mpz_submul_ui(state.x, state.y, -bb1);
+                                    state.x -= state.y * -bb1;
                                 }
-                                mpz_set(state.y, state.r);
+                                state.y = state.r;
 
-                                if (mpz_sgn(state.bx) < 0) {
-                                    mpz_neg(state.x, state.x);
-                                    mpz_neg(state.bx, state.bx);
+                                if (state.bx < 0) {
+                                    state.x = -state.x;
+                                    state.bx = -state.bx;
                                 }
-                                if (mpz_sgn(state.by) < 0) {
-                                    mpz_neg(state.y, state.y);
-                                    mpz_neg(state.by, state.by);
+                                if (state.by < 0) {
+                                    state.y = -state.y;
+                                    state.by = -state.by;
                                 }
                             }
                         }
 
-                        if (mpz_sgn(state.by) < 0) {
-                            mpz_neg(state.y, state.y);
-                            mpz_neg(state.x, state.x);
-                            mpz_neg(state.by, state.by);
+                        if (state.by < 0) {
+                            state.y = -state.y;
+                            state.x = -state.x;
+                            state.by = -state.by;
                         }
                     }
 
@@ -1150,7 +1150,7 @@ namespace nil {
                             state.dx = state.bx * state.Dy;
                             state.dx = state.dx - state.form.c;
 
-                            state.dx = statte.dx / state.By;
+                            state.dx = state.dx / state.By;
 
                             state.form.a = state.by * state.by;
                             state.form.c = state.bx * state.bx;
