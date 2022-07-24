@@ -34,7 +34,7 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/math/non_linear_combination.hpp>
 

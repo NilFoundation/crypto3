@@ -36,7 +36,7 @@
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
-#include <nil/crypto3/zk/snark/relations/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
 
 namespace nil {
     namespace crypto3 {
