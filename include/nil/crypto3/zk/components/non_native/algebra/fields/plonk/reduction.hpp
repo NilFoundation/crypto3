@@ -258,7 +258,17 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
+
                         std::size_t row = component_start_row;
+
+                        bp.add_copy_constraint({var(W0, row + 3, false), params.k[0]});
+                        bp.add_copy_constraint({var(W1, row + 3, false), params.k[1]});
+                        bp.add_copy_constraint({var(W2, row + 3, false), params.k[2]});
+                        bp.add_copy_constraint({var(W3, row + 3, false), params.k[3]});
+                        bp.add_copy_constraint({var(W4, row + 3, false), params.k[4]});
+                        bp.add_copy_constraint({var(W5, row + 3, false), params.k[5]});
+                        bp.add_copy_constraint({var(W6, row + 3, false), params.k[6]});
+                        bp.add_copy_constraint({var(W7, row + 3, false), params.k[7]});
                     }
                 };
 
