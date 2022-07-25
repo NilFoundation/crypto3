@@ -1,6 +1,0 @@
-[submodule "libs/crypto/hash"]
-	path = libs/crypto/hash
-	url = git@github.com:nilfoundation/hash.git
-[submodule "cmake/modules"]
-	path = cmake/modules
-	url = git@github.com:BoostCMake/cmake_modules.git
