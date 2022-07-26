@@ -68,27 +68,18 @@ namespace nil {
                     auto integral_b = a.data;
                     for (size_t i = 0; i < size; ++i) {
                         bits[i] = multiprecision::bit_test(integral_b, i);
-                        // std::cout << bits[i];
                     }
-                    // std::cout << "size is " << bits.size() << '\n';
-
-                    // std::cout << '\n';
-
                     return bits;
                 }
 
                 template <typename value_type, typename InputIterator>
                 value_type from_bits(InputIterator first, InputIterator last) {
                     value_type value;
-                    // std::cout << "distance is " << last - first << '\n';
                     for(auto iter = last - 1; iter >= first; --iter){
-                        // std::cout << *iter << ' ';
                         if((*iter) == true){
-                            // std::cout << "index is " << iter - first << ' ';
                             multiprecision::bit_set(value, iter - first);
                         }
                     }
-                    // std::cout << '\n';
                     return value;
                 }
                 template <typename CurveType>
@@ -98,7 +89,6 @@ namespace nil {
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     using policy_type = nil::crypto3::hashes::detail::base_poseidon_policy<base_field_type, 2, 1, 7, 55, 0, true>;
 
-                    // typedef  sponge_type;
                     typedef std::uint64_t limb_type;
 
                     typename nil::crypto3::hashes::detail::poseidon_sponge_construction<policy_type> sponge;
@@ -111,7 +101,6 @@ namespace nil {
                     typedef typename BaseSponge<CurveType>::group_type group_type;
                     typedef typename BaseSponge<CurveType>::base_field_type base_field_type;
                     typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
-                    // typedef typename BaseSponge::sponge_type sponge_type;
                     typedef typename BaseSponge<CurveType>::limb_type limb_type;
 
                     typename base_field_type::value_type squeeze(std::size_t num_limbs){
@@ -141,7 +130,6 @@ namespace nil {
                     typedef typename BaseSponge<CurveType>::group_type group_type;
                     typedef typename BaseSponge<CurveType>::base_field_type base_field_type;
                     typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
-                    // typedef typename BaseSponge::sponge_type sponge_type;
                     typedef typename BaseSponge<CurveType>::limb_type limb_type;
 
                     std::vector<limb_type> squeeze_limbs(std::size_t num_limbs){
@@ -153,14 +141,12 @@ namespace nil {
                         }
                         else{
                             auto sq = this->sponge.squeeze();
-                            // std::cout << sq.data << '\n';
                             nil::marshalling::status_type status;
 
                             std::vector<limb_type> x = unpack<typename base_field_type::value_type, typename base_field_type::integral_type>(sq);
 
                             for(int i = 0; i < HIGH_ENTROPY_LIMBS; ++i){
                                 this->last_squeezed.push_back(x[i]);
-                                // std::cout << i << ": " << x[i] << '\n';
                             }
 
                             return squeeze_limbs(num_limbs);
@@ -195,7 +181,6 @@ namespace nil {
                             if(scalar_field_type::modulus < base_field_type::modulus){
                                 typename base_field_type::value_type casted_to_base_value = typename base_field_type::value_type(typename base_field_type::integral_type(f.data));
                                 this->sponge.absorb(casted_to_base_value);
-                                // std::cout << "here: " << casted_to_base_value.data << '\n';
                             } else{
                                 std::vector<bool> bits = to_bits(f);
                                 typename base_field_type::integral_type low_bit = bits[0] ? 
