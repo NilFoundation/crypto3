@@ -45,10 +45,12 @@ namespace nil {
                 size_t next_pow2(size_t n) {
                     return std::pow(2, std::ceil(std::log(n)));
                 }
+
                 // find power of 2 of a number which is power of 2
                 size_t log2_pow2(size_t n) {
                     return next_pow2(n);
                 }
+
                 // Row_Count calculation given the number of _leaves in the tree and the branches.
                 size_t merkle_tree_row_count(size_t leafs, size_t branches) {
                     // Optimization
@@ -70,6 +72,24 @@ namespace nil {
                         while (cur != 0) {
                             cur /= branches;
                             len += cur;
+                        }
+                    }
+                    return len;
+                }
+
+                // This method returns the number of '_leaves' given a merkle tree
+                // length of 'len', where _leaves must be a power of 2, respecting the
+                // number of branches.
+                size_t merkle_tree_leaves(size_t tree_s, size_t branches) {
+                    // Optimization
+                    size_t len = tree_s;
+                    if (branches == 2) {
+                        len = (tree_s + 1) >> 1;
+                    } else {
+                        size_t cur = 1;
+                        while (cur < len) {
+                            len -= cur;
+                            cur *= branches;
                         }
                     }
                     return len;
@@ -121,26 +141,6 @@ namespace nil {
                     return 2 + ((branches - 1) * (row_count - 1));
                 }
 
-                // This method returns the number of '_leaves' given a merkle tree
-                // length of 'len', where _leaves must be a power of 2, respecting the
-                // number of branches.
-                size_t merkle_tree_leaves(size_t len, size_t branches) {
-                    size_t leafs = 0;
-                    // Optimization:
-                    if (branches == 2) {
-                        leafs = (len >> 1) + 1;
-                    } else {
-                        size_t leafs = 1;
-                        size_t cur = len;
-                        size_t shift = log2_pow2(branches);
-                        while (cur != 1) {
-                            leafs <<= shift;    // _leaves *= branches
-                            cur -= leafs;
-                        }
-                    };
-
-                    return leafs;
-                }
                 // Merkle Tree.
                 //
                 // All _leaves and nodes are stored in a BGL graph structure.
@@ -192,49 +192,48 @@ namespace nil {
                     ~merkle_tree_impl() = default;
 
                     merkle_tree_impl(size_t n) :
-                        _size(detail::merkle_tree_length(n, Arity)), _leaves(n),
-                        _rc(detail::merkle_tree_row_count(n, Arity)) {
-                        BOOST_ASSERT_MSG(std::log(n) / std::log(Arity) == (std::size_t)(std::log(n) / std::log(Arity)),
+                            _size(detail::merkle_tree_length(n, Arity)), _leaves(n),
+                            _rc(detail::merkle_tree_row_count(n, Arity)) {
+                        BOOST_ASSERT_MSG(std::log(n) / std::log(Arity) == (std::size_t) (std::log(n) / std::log(Arity)),
                                          "Wrong leaves number");
                     }
 
                     merkle_tree_impl(const merkle_tree_impl &x) :
-                        _hashes(x._hashes), _size(x._size), _leaves(x._leaves), _rc(x._rc) {
+                            _hashes(x._hashes), _size(x._size), _leaves(x._leaves), _rc(x._rc) {
                     }
 
-                    merkle_tree_impl(const merkle_tree_impl &x, const allocator_type &a) : _hashes(x.hashes(), a) {
-                        set_row_count(detail::merkle_tree_row_count(std::distance(x.begin(), x.end()), Arity));
-                        set_leaves(std::distance(x.begin(), x.end()));
-                        set_complete_size(detail::merkle_tree_length(std::distance(x.begin(), x.end()), Arity));
+                    merkle_tree_impl(const merkle_tree_impl &x, const allocator_type &a) : _hashes(x.hashes(), a),
+                                                                                           _size(x._size),
+                                                                                           _leaves(x._leaves),
+                                                                                           _rc(x._rc) {}
+
+                    merkle_tree_impl(const std::initializer_list<value_type> &il) : _hashes(il) {
+                        set_leaves(detail::merkle_tree_leaves(std::distance(il.begin(), il.end()), Arity));
+                        set_row_count(detail::merkle_tree_row_count(_leaves, Arity));
+                        set_complete_size(detail::merkle_tree_length(_leaves, Arity));
                     }
 
-                    merkle_tree_impl(std::initializer_list<value_type> il) : _hashes(il) {
-                        set_row_count(detail::merkle_tree_row_count(std::distance(il.begin(), il.end()), Arity));
-                        set_leaves(std::distance(il.begin(), il.end()));
-                        set_complete_size(detail::merkle_tree_length(std::distance(il.begin(), il.end()), Arity));
+                    template<typename Iterator, typename std::enable_if<std::is_same<typename Iterator::value_type, value_type>::value, bool>::type = true>
+                    merkle_tree_impl(Iterator first, Iterator last) : _hashes(first, last) {
+                        set_leaves(detail::merkle_tree_leaves(std::distance(first, last), Arity));
+                        set_row_count(detail::merkle_tree_row_count(_leaves, Arity));
+                        set_complete_size(detail::merkle_tree_length(_leaves, Arity));
                     }
 
-                    template<typename Iterator>
-                    merkle_tree_impl(std::size_t leaves, Iterator first, Iterator last) : _hashes(first, last) {
-                        set_row_count(detail::merkle_tree_row_count(leaves, Arity));
-                        set_leaves(leaves);
-                        set_complete_size(detail::merkle_tree_length(leaves, Arity));
-                    }
-
-                    merkle_tree_impl(std::initializer_list<value_type> il, const allocator_type &a) : _hashes(il, a) {
-                        set_row_count(detail::merkle_tree_row_count(std::distance(il.begin(), il.end()), Arity));
-                        set_leaves(std::distance(il.begin(), il.end()));
-                        set_complete_size(detail::merkle_tree_length(std::distance(il.begin(), il.end()), Arity));
+                    merkle_tree_impl(const std::initializer_list<value_type> &il, const allocator_type &a) : _hashes(il, a) {
+                        set_leaves(detail::merkle_tree_leaves(std::distance(il.begin(), il.end()), Arity));
+                        set_row_count(detail::merkle_tree_row_count(_leaves, Arity));
+                        set_complete_size(detail::merkle_tree_length(_leaves, Arity));
                     }
 
                     merkle_tree_impl(merkle_tree_impl &&x)
-                        BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
-                        _hashes(x._hashes),
-                        _size(x._size), _leaves(x._leaves), _rc(x._rc) {
+                    BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value):
+                            _hashes(x._hashes),
+                            _size(x._size), _leaves(x._leaves), _rc(x._rc) {
                     }
 
                     merkle_tree_impl(merkle_tree_impl &&x, const allocator_type &a) :
-                        _hashes(x.hashes(), a), _size(x._size), _leaves(x._leaves), _rc(x._rc) {
+                            _hashes(x.hashes(), a), _size(x._size), _leaves(x._leaves), _rc(x._rc) {
                     }
 
                     merkle_tree_impl &operator=(const merkle_tree_impl &x) {
@@ -253,6 +252,7 @@ namespace nil {
                     bool operator==(const merkle_tree_impl &rhs) const {
                         return _hashes == rhs.val;
                     }
+
                     bool operator!=(const merkle_tree_impl &rhs) const {
                         return !(rhs == *this);
                     }
@@ -268,9 +268,11 @@ namespace nil {
                     const_iterator begin() const BOOST_NOEXCEPT {
                         return _hashes.begin();
                     }
+
                     iterator end() BOOST_NOEXCEPT {
                         return _hashes.end();
                     }
+
                     const_iterator end() const BOOST_NOEXCEPT {
                         return _hashes.end();
                     }
@@ -318,15 +320,19 @@ namespace nil {
                     size_type capacity() const BOOST_NOEXCEPT {
                         return _hashes.capacity();
                     }
+
                     bool empty() const BOOST_NOEXCEPT {
                         return (_hashes.size() == 0);
                     }
+
                     size_type max_size() const BOOST_NOEXCEPT {
                         return _hashes.max_size();
                     }
+
                     void reserve(size_type _n) {
                         return _hashes.reserve(_n);
                     }
+
                     void shrink_to_fit() BOOST_NOEXCEPT {
                         return _hashes.shrink_to_fit();
                     }
@@ -334,12 +340,15 @@ namespace nil {
                     reference operator[](size_type _n) BOOST_NOEXCEPT {
                         return _hashes[_n];
                     }
+
                     const_reference operator[](size_type _n) const BOOST_NOEXCEPT {
                         return _hashes[_n];
                     }
+
                     reference at(size_type _n) {
                         return _hashes.at(_n);
                     }
+
                     const_reference at(size_type _n) const {
                         return _hashes.at(_n);
                     }
@@ -347,12 +356,15 @@ namespace nil {
                     reference front() BOOST_NOEXCEPT {
                         return _hashes.front();
                     }
+
                     const_reference front() const BOOST_NOEXCEPT {
                         return _hashes.front();
                     }
+
                     reference back() BOOST_NOEXCEPT {
                         return _hashes.back();
                     }
+
                     const_reference back() const BOOST_NOEXCEPT {
                         return _hashes.back();
                     }
@@ -374,6 +386,7 @@ namespace nil {
                         //    #error ERROR
                         _hashes.push_back(_x);
                     }
+
                     //
                     template<class... Args>
                     reference emplace_back(Args &&..._args) {
@@ -381,7 +394,7 @@ namespace nil {
                     }
 
                     template<class... Args>
-                    iterator emplace(const_iterator _position, Args&&... _args) {
+                    iterator emplace(const_iterator _position, Args &&... _args) {
                         return _hashes.template emplace(_position, _args...);
                     }
 
@@ -490,15 +503,15 @@ namespace nil {
 
             template<typename T, std::size_t Arity>
             using merkle_tree = typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
-                                                          detail::merkle_tree_impl<detail::merkle_tree_node<T>, Arity>,
-                                                          detail::merkle_tree_impl<T, Arity>>::type;
+                    detail::merkle_tree_impl<detail::merkle_tree_node<T>, Arity>,
+                    detail::merkle_tree_impl<T, Arity>>::type;
 
             template<typename T, std::size_t Arity, typename LeafIterator>
             merkle_tree<T, Arity> make_merkle_tree(LeafIterator first, LeafIterator last) {
                 return detail::make_merkle_tree<typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
-                                                                          detail::merkle_tree_node<T>,
-                                                                          T>::type,
-                                                Arity>(first, last);
+                        detail::merkle_tree_node<T>,
+                        T>::type,
+                        Arity>(first, last);
             }
 
         }    // namespace containers
