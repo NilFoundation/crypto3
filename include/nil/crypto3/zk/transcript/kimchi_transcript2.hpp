@@ -166,12 +166,14 @@ namespace nil {
 
                         for(auto &f : fs){
                             nil::marshalling::status_type status;
-                            std::vector<bool> bits = nil::marshalling::pack<nil::marshalling::option::little_endian>(f.data, status);
+                            // std::cout << "data: " << std::hex << f.data << '\n';
+                            // std::cout << std::is_integral<decltype(f)>::value << ' ' << std::is_integral<scalar_field_type::integral_type>::value << '\n';
+                            // std::array<bool, 255> bits = nil::marshalling::pack<nil::marshalling::option::little_endian>(f.data, status);
                             
                             if(scalar_field_type::modulus < base_field_type::modulus){
                                 typename base_field_type::value_type casted_to_base_value = typename base_field_type::value_type(typename base_field_type::integral_type(f.data));
                                 this->sponge.absorb(casted_to_base_value);
-                                std::cout << "here\n";
+                                std::cout << "here: " << casted_to_base_value.data << '\n';
                             } else{
                                 // typename base_field_type::integral_type low_bit = bits[0] ? 
                                 //         typename base_field_type::integral_type(1) : typename base_field_type::integral_type(0);
