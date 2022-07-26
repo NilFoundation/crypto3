@@ -72,6 +72,7 @@ set(TESTS_NAMES
     "systems/plonk/pickles/kimchi"
     "systems/plonk/pickles/oracles"
     "systems/plonk/pickles/to_field"
+    "systems/plonk/pickles/ArithmeticSponge"
     
     "systems/plonk/placeholder/placeholder"
 
@@ -91,6 +92,7 @@ set(TESTS_NAMES
 
     "transcript/transcript"
     "transcript/kimchi_transcript"
+    "transcript/kimchi_transcript2"
 
     "systems/plonk/plonk_constraint")
 

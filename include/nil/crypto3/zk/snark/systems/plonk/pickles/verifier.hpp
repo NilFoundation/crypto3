@@ -40,7 +40,7 @@ namespace nil {
             namespace snark {
                 template<typename CurveType, std::size_t WiresAmount>
                 batch_evaluation_proof<CurveType>
-                    to_batch(verifier_index<CurveType> index, commitments::kimchi_pedersen<CurveType> proof) {
+                to_batch(verifier_index<CurveType> index, commitments::kimchi_pedersen<CurveType> proof) {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using Fr = typename CurveType::scalar_field_type;
