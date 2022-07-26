@@ -1,27 +1,3 @@
-//---------------------------------------------------------------------------//
-// Copyright (c) 2022 Polina Chernyshova <pockvokhbtra@nil.foundation>
-//
-// MIT License
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//---------------------------------------------------------------------------//
-
 #ifndef CRYPTO3_ZK_SPONGE_HPP
 #define CRYPTO3_ZK_SPONGE_HPP
 
@@ -30,7 +6,10 @@
 #include <cstdint>
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/status_type.hpp>
+#include <nil/crypto3/multiprecision/number.hpp>
+
 using namespace nil::crypto3;
 
 namespace nil {
@@ -40,131 +19,196 @@ namespace nil {
                 const int CHALLENGE_LENGTH_IN_LIMBS = 2;
                 const int HIGH_ENTROPY_LIMBS = 2;
 
-                template<typename curve_type>
-                class sponge{
-                public:
-                    using group_type = typename curve_type::template g1_type<>;
-                    using scalar_field_type = typename curve_type::scalar_field_type;
-                    using base_field_type = typename curve_type::base_field_type;
-                    using policy_type = hashes::detail::base_poseidon_policy<base_field_type, 2, 1, 7, 55, 0, true>;
+                // template <typename FieldType>
+                // typename FieldType::integral_type pack(const std::vector<uint64_t>& limbs_lsb){
+                //     nil::marshalling::status_type status;
+                //     typename FieldType::integral_type res = nil::marshalling::pack<nil::marshalling::option::big_endian>(limbs_lsb, status);
+                //     return res;
+                // }
 
-                    typename hashes::detail::poseidon_sponge_construction<policy_type> pos_sponge;
-                    std::vector<std::uint64_t> last_squeezed;
+                // template <typename value_type, typename integral_type>
+                // std::vector<std::uint64_t> unpack(value_type& value){
+                //     nil::marshalling::status_type status;
+                //     integral_type scalar_value = integral_type(value.data);
+                //     std::vector<bool> limbs_lsb1 = nil::marshalling::pack<nil::marshalling::option::big_endian>(scalar_value, status);
+                //     std::vector<std::uint64_t> limbs_lsb;
+                //     return limbs_lsb;
+                // }
 
-                    sponge() : last_squeezed(), pos_sponge() {}
-
-                    void print_state() {
-                        std::cout << "STATE: ";
-                        for (auto i : this->pos_sponge.state) {
-                            std::cout << i.data << ' ';
-                        }
-                        std::cout << '\n';
+                template <typename value_type>
+                value_type pack(const std::vector<std::uint64_t>& limbs) {
+                    value_type res(0);
+                    value_type zero(0);
+                    auto x = zero.data;
+                    for (int i = 0; i < limbs.size(); ++i) {
+                        value_type smth(limbs[limbs.size() - 1 - i]);
+                        x = x << 64;
+                        x = x + smth.data;
                     }
+                    res = value_type(x);
+                    return res;
+                }
 
-                    typename scalar_field_type::value_type pack(const std::vector<std::uint64_t>& limbs) {
-                        typename scalar_field_type::value_type res(0);
-                        typename scalar_field_type::value_type zero(0);
-                        auto x = zero.data;
-                        for (int i = 0; i < limbs.size(); ++i) {
-                            typename scalar_field_type::value_type smth(limbs[limbs.size() - 1 - i]);
-                            x = x << 64;
-                            x = x + smth.data;
-                        }
-                        res.data = x;
-                        return res;
+                template <typename value_type, typename integral_type>
+                std::vector<std::uint64_t> unpack(value_type elem) {
+                    std::vector<std::uint64_t> res;
+                    auto data = elem.data;
+                    for (int i = 0; i < HIGH_ENTROPY_LIMBS; ++i) {
+                        auto delta = data - ((data >> 64) << 64);
+                        res.push_back(static_cast<std::uint64_t>(integral_type(delta)));
+                        data = data >> 64;
                     }
+                    return res;
+                }
 
-                    std::vector<std::uint64_t> unpack(typename base_field_type::value_type elem) {
-                        std::vector<std::uint64_t> res;
-                        auto data = elem.data;
-                        for (int i = 0; i < HIGH_ENTROPY_LIMBS; ++i) {
-                            auto delta = data - ((data >> 64) << 64);
-                            res.push_back(static_cast<std::uint64_t>(typename base_field_type::integral_type(delta)));
-                            data = data >> 64;
-                        }
-                        return res;
+                template <typename value_type>
+                std::vector<bool> to_bits(value_type a) {
+                    size_t size = 255;
+                    std::vector<bool> bits(size, false);
+                    auto integral_b = a.data;
+                    for (size_t i = 0; i < size; ++i) {
+                        bits[i] = multiprecision::bit_test(integral_b, i);
+                        // std::cout << bits[i];
                     }
+                    // std::cout << "size is " << bits.size() << '\n';
 
-                    std::vector<std::uint64_t> squeeze_limbs(int num_limbs) {
-                        if (this->last_squeezed.size() >= num_limbs) {
-                            auto copy_last_squeezed = this->last_squeezed;
-                            std::vector<std::uint64_t> limbs = {copy_last_squeezed.begin(), copy_last_squeezed.begin() + num_limbs};
-                            std::vector<std::uint64_t> remaining = {copy_last_squeezed.begin() + num_limbs, copy_last_squeezed.end()};
+                    // std::cout << '\n';
+
+                    return bits;
+                }
+
+                template <typename value_type, typename InputIterator>
+                value_type from_bits(InputIterator first, InputIterator last) {
+                    value_type value;
+                    // std::cout << "distance is " << last - first << '\n';
+                    for(auto iter = last - 1; iter >= first; --iter){
+                        // std::cout << *iter << ' ';
+                        if((*iter) == true){
+                            // std::cout << "index is " << iter - first << ' ';
+                            multiprecision::bit_set(value, iter - first);
+                        }
+                    }
+                    // std::cout << '\n';
+                    return value;
+                }
+                template <typename CurveType>
+                struct BaseSponge{
+                    typedef typename CurveType::template g1_type<> group_type;
+                    typedef typename CurveType::base_field_type base_field_type;
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+                    using policy_type = nil::crypto3::hashes::detail::base_poseidon_policy<base_field_type, 2, 1, 7, 55, 0, true>;
+
+                    // typedef  sponge_type;
+                    typedef std::uint64_t limb_type;
+
+                    typename nil::crypto3::hashes::detail::poseidon_sponge_construction<policy_type> sponge;
+                    std::vector<limb_type> last_squeezed;
+
+                };
+
+                template <typename CurveType>
+                struct DefaultFrSponge : public BaseSponge<CurveType> {
+                    typedef typename BaseSponge<CurveType>::group_type group_type;
+                    typedef typename BaseSponge<CurveType>::base_field_type base_field_type;
+                    typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
+                    // typedef typename BaseSponge::sponge_type sponge_type;
+                    typedef typename BaseSponge<CurveType>::limb_type limb_type;
+
+                    typename base_field_type::value_type squeeze(std::size_t num_limbs){
+                        if(this->last_squeezed.size() >= num_limbs){
+                            std::vector<limb_type> limbs(this->last_squeezed.begin(), this->last_squeezed.begin() + limbs);
+                            std::vector<limb_type> remaining(this->last_squeezed.begin() + limbs, this->last_squeezed.end());
+                            this->last_squeezed = remaining;
+                            
+                            return pack(limbs);
+                        }
+                        else{
+                            auto sq = this->sponge.squeeze();
+                            nil::marshalling::status_type status;
+                            std::vector<limb_type> x = unpack<base_field_type::value_type, base_field_type::integral_type>(sq);
+
+                            for(int i = 0; i < HIGH_ENTROPY_LIMBS; ++i){
+                                this->last_squeezed.push_back(x[i]);
+                            }
+
+                            return squeeze(num_limbs);
+                        }
+                    }
+                };
+
+                template <typename CurveType>
+                struct DefaultFqSponge : public BaseSponge<CurveType> {
+                    typedef typename BaseSponge<CurveType>::group_type group_type;
+                    typedef typename BaseSponge<CurveType>::base_field_type base_field_type;
+                    typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
+                    // typedef typename BaseSponge::sponge_type sponge_type;
+                    typedef typename BaseSponge<CurveType>::limb_type limb_type;
+
+                    std::vector<limb_type> squeeze_limbs(std::size_t num_limbs){
+                        if(this->last_squeezed.size() >= num_limbs){
+                            std::vector<limb_type> limbs(this->last_squeezed.begin(), this->last_squeezed.begin() + num_limbs);
+                            std::vector<limb_type> remaining(this->last_squeezed.begin() + num_limbs, this->last_squeezed.end());
                             this->last_squeezed = remaining;
                             return limbs;
                         }
-                        auto sq = this->pos_sponge.squeeze();
-                        auto x = unpack(sq);
-                        for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
-                            this->last_squeezed.push_back(x[i]);
+                        else{
+                            auto sq = this->sponge.squeeze();
+                            // std::cout << sq.data << '\n';
+                            nil::marshalling::status_type status;
+
+                            std::vector<limb_type> x = unpack<typename base_field_type::value_type, typename base_field_type::integral_type>(sq);
+
+                            for(int i = 0; i < HIGH_ENTROPY_LIMBS; ++i){
+                                this->last_squeezed.push_back(x[i]);
+                                // std::cout << i << ": " << x[i] << '\n';
+                            }
+
+                            return squeeze_limbs(num_limbs);
                         }
-                        return this->squeeze_limbs(num_limbs);
                     }
 
-                    typename base_field_type::value_type squeeze_field() {
-                        this->last_squeezed = {};
-                        return this->pos_sponge.squeeze();
+                    typename base_field_type::value_type squeeze_field(){
+                        this->last_squeezed.clear();
+                        return this->sponge.squeeze();
                     }
 
-                    typename scalar_field_type::value_type squeeze(int num_limbs) {
-                        typename scalar_field_type::value_type res(0);
+                    typename scalar_field_type::value_type squeeze(std::size_t num_limbs){
                         auto limbs = this->squeeze_limbs(num_limbs);
-                        res = pack(limbs);
+                        nil::marshalling::status_type status;
+                        typename scalar_field_type::value_type res = pack<typename scalar_field_type::value_type>(limbs);
                         return res;
                     }
 
-                    void absorb_g(const std::vector<typename group_type::value_type>& gs) {
-                        this->last_squeezed = {};
-                        for (auto g : gs) {
-                            // for infinite groups need to check if inf - then absorb [zero, zero]
-                            this->pos_sponge.absorb({g.X});
-                            this->pos_sponge.absorb({g.Y});
+                    void absorb_g(std::vector<typename group_type::value_type>& gs){
+                        this->last_squeezed.clear();
+                        for(auto &g : gs){
+                            this->sponge.absorb(g.X);
+                            this->sponge.absorb(g.Y);
                         }
-                        return;
                     }
 
-                    int from_bits(const std::array<bool, 128>& bits) {
-                        int res = 1;
-                        // int a = 1;
-                        // for (auto bit : bits) {
-                        //     if (bit) {res += a;}
-                        //     a *= 2;
-                        // }
-                        return res;
+
+                    void absorb_fr(const std::vector<typename scalar_field_type::value_type>& fs){
+                        this->last_squeezed.clear();
+
+                        for(auto &f : fs){
+                            if(scalar_field_type::modulus < base_field_type::modulus){
+                                typename base_field_type::value_type casted_to_base_value = typename base_field_type::value_type(typename base_field_type::integral_type(f.data));
+                                this->sponge.absorb(casted_to_base_value);
+                                // std::cout << "here: " << casted_to_base_value.data << '\n';
+                            } else{
+                                std::vector<bool> bits = to_bits(f);
+                                typename base_field_type::integral_type low_bit = bits[0] ? 
+                                        typename base_field_type::integral_type(1) : typename base_field_type::integral_type(0);
+                                typename base_field_type::integral_type high_bits = from_bits<typename base_field_type::integral_type>(bits.begin() + 1, bits.end());    
+                                typename base_field_type::value_type high_bits_field = typename base_field_type::value_type(high_bits);
+                                typename base_field_type::value_type low_bit_field = typename base_field_type::value_type(low_bit);
+                                this->sponge.absorb(high_bits_field);
+                                this->sponge.absorb(low_bit_field);
+                            }
+                        }
                     }
-
-                    std::array<bool, 128> to_bits(int a) {
-                        std::array<bool, 128> bits = {false};
-                        // auto integral_b = typename scalar_field_type::integral_type(a);
-                        // for (std::size_t i = 0; i < 128; i++) {
-                        //     bits[128 - i - 1] = multiprecision::bit_test(integral_b, i);
-                        // }
-                        return bits;
-                    }
-
-                    void absorb_fr(const std::vector<typename scalar_field_type::value_type>& xs) {
-                        // this->last_squeezed = {};
-                        // for (auto x : xs) {
-                        //     auto bits = to_bits(x.data);
-
-                        //     if (scalar_field_type::modulus < base_field_type::modulus) {
-                        //         this->pos_sponge.absorb();
-                        //     } else {
-                        //         typename base_field_type::value_type low_bit = (bits[0] ?
-                        //                                         typename base_field_type::value_type::one() :
-                        //                                         typename base_field_type::value_type::zero());
-                        //         typename base_field_type::value_type high_bits = base_field_type::value_type(
-                        //                                         from_bits(newVec(bits.begin() + 1, bits.end())));
-                                
-                        //         this->pos_sponge.absorb(std::vector<typename base_field_type::value_type>(high_bits));
-                        //         this->pos_sponge.absorb(std::vector<typename base_field_type::value_type>(low_bit));
-                        //     }
-                        // }
-                        return;
-                    }
-
-                    // static typename scalar_field_type::value_type digest() {}
-
+                  public:
                     typename scalar_field_type::value_type challenge() {
                         return this->squeeze(CHALLENGE_LENGTH_IN_LIMBS);
                     }
@@ -173,9 +217,9 @@ namespace nil {
                         return this->squeeze_field();
                     }
                 };
-            }    // namespace transcript
-        }        // namespace zk
-    }            // namespace crypto3
-}    // namespace nil
+            }
+        }
+    }
+}
 
-#endif    // CRYPTO3_ZK_SPONGE_HPP
+#endif

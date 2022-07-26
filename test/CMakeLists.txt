@@ -91,7 +91,6 @@ set(TESTS_NAMES
 
     "transcript/transcript"
     "transcript/kimchi_transcript"
-    "transcript/kimchi_transcript2"
 
     "systems/plonk/plonk_constraint")
 

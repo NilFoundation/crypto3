@@ -37,6 +37,7 @@
 #include <nil/crypto3/algebra/fields/pallas/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/fields/vesta/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
@@ -44,21 +45,23 @@
 
 #include <nil/crypto3/hash/poseidon.hpp>
 
+#include <nil/marshalling/algorithms/pack.hpp>
+#include <nil/marshalling/status_type.hpp>
 #include <nil/crypto3/zk/transcript/kimchi_transcript.hpp>
 
 using namespace nil::crypto3;
+using curve_type = algebra::curves::vesta;
+using group_type = typename curve_type::template g1_type<>;
+using scalar_field_type = typename curve_type::scalar_field_type;
+using base_field_type = typename curve_type::base_field_type;
+
+using sponge_type = zk::transcript::DefaultFqSponge<curve_type>;
 
 BOOST_AUTO_TEST_SUITE(zk_sponge_test_suite)
 
 BOOST_AUTO_TEST_CASE(zk_sponge_test_0) {
-    using curve_type = algebra::curves::vesta;
-    using group_type = typename curve_type::template g1_type<>;
-    using scalar_field_type = typename curve_type::scalar_field_type;
-    using base_field_type = typename curve_type::base_field_type;
-
-    using sponge_type = typename zk::transcript::sponge<curve_type>;
     sponge_type spng;
-
+//     sponge_type2 spng2;
     group_type::value_type g[15];
 
     g[0] = group_type::value_type(0x1CF10D1482EB88632AEFED15C16082007B38DDC528626195CF6B040E2C7D5914_cppui256,
@@ -93,7 +96,8 @@ BOOST_AUTO_TEST_CASE(zk_sponge_test_0) {
             0x178AC19F836752BAF356D9E9C3C35470F27A52C16B7572EEF2C61A43B4D0499B_cppui256, 0x1_cppui256);
 
     for (int i = 0; i < 15; ++i) {
-        spng.absorb_g({g[i]});
+        std::vector<group_type::value_type> input({g[i]});
+        spng.absorb_g(input);
     }
 
     auto check1 = spng.challenge();
@@ -103,12 +107,6 @@ BOOST_AUTO_TEST_CASE(zk_sponge_test_0) {
 
 
 BOOST_AUTO_TEST_CASE(zk_sponge_test_1) {
-    using curve_type = algebra::curves::vesta;
-    using group_type = typename curve_type::template g1_type<>;
-    using scalar_field_type = typename curve_type::scalar_field_type;
-    using base_field_type = typename curve_type::base_field_type;
-
-    using sponge_type = typename zk::transcript::sponge<curve_type>;
     sponge_type spng;
 
     group_type::value_type g[15];
@@ -144,7 +142,8 @@ BOOST_AUTO_TEST_CASE(zk_sponge_test_1) {
             0x2A14FA11389648694F68426BDA965E8380C1B155B277467B0C96C5EC73CE17EB_cppui256, 0x1_cppui256);
     
     for (int i = 0; i < 15; ++i) {
-        spng.absorb_g({g[i]});
+        std::vector<group_type::value_type> input({g[i]});
+        spng.absorb_g(input);
     }
 
     typename scalar_field_type::value_type chal1(0x000000000000000000000000000000006586A4AF99E47C9EA8C7AD23A9E42247_cppui256);
@@ -153,12 +152,6 @@ BOOST_AUTO_TEST_CASE(zk_sponge_test_1) {
 
 
 BOOST_AUTO_TEST_CASE(zk_sponge_test_2) {
-    using curve_type = algebra::curves::vesta;
-    using group_type = typename curve_type::template g1_type<>;
-    using scalar_field_type = typename curve_type::scalar_field_type;
-    using base_field_type = typename curve_type::base_field_type;
-
-    using sponge_type = typename zk::transcript::sponge<curve_type>;
     sponge_type spng;
 
     group_type::value_type g[23];
@@ -210,7 +203,8 @@ BOOST_AUTO_TEST_CASE(zk_sponge_test_2) {
             0x22083FE3C84501B1C06B8BF9EDC10783523E080B10B41106555D3994B42DE333_cppui256, 0x1_cppui256);
     
     for (int i = 0; i < 15; ++i) {
-        spng.absorb_g({g[i]});
+        std::vector<group_type::value_type> input({g[i]});
+        spng.absorb_g(input);
     }
 
     typename scalar_field_type::value_type chal1(0x000000000000000000000000000000005D6E02ED382BBF4A9FF5C2C13A1F0E3D_cppui256);
@@ -218,15 +212,90 @@ BOOST_AUTO_TEST_CASE(zk_sponge_test_2) {
     typename scalar_field_type::value_type chal2(0x0000000000000000000000000000000058C638E4FE632BB34E9D712D10953688_cppui256);
     BOOST_CHECK(spng.challenge() == chal2);
 
-    spng.absorb_g({g[15]});
+    std::vector<group_type::value_type> input({g[15]});
+    spng.absorb_g(input);
+
     typename scalar_field_type::value_type chal3(0x0000000000000000000000000000000072D58D72518968134276BCBD15848A54_cppui256);
     BOOST_CHECK(spng.challenge() == chal3);
 
     for (int i = 16; i < 23; ++i) {
-        spng.absorb_g({g[i]});
+        std::vector<group_type::value_type> input({g[i]});
+        spng.absorb_g(input);
     }
     typename scalar_field_type::value_type chal4(0x00000000000000000000000000000000126C2E2D31FBDDB543E4FE174987EDBC_cppui256);
     BOOST_CHECK(spng.challenge() == chal4);
+}
+
+BOOST_AUTO_TEST_CASE(zk_sponge_test_for_absorb_fr) {
+    sponge_type spng;
+//     sponge_type2 spng2;
+    scalar_field_type::value_type g[30] = {
+    0x1CF10D1482EB88632AEFED15C16082007B38DDC528626195CF6B040E2C7D5914_cppui256,
+    0x15A406A92FA16DB6E24D125C8EC5365D76DD8BB188106C0063BA9EC51E0FB8E7_cppui256, 
+    0x3B38AC47170B2DB158AE7C02E939B2877139040D240171F6A6BB01183902566E_cppui256,
+    0x05AAC7FD92471BBFF23D5E4F9AD0B64783467A4809940FEBB7BD6C91A9E9E1C0_cppui256, 
+    0x281BD2B891CF0795B1439B3AB149ED2A535B8E08C4430112D7D4BF53F3789BEF_cppui256,
+    0x10B2FA452CAC5D11CC8040D5DD504222A2621FC378EFD7D08A01BAB3A3DE28DF_cppui256, 
+    0x0158FEA0E6586A75F36FB621E9C9FC7A38970812F0F1753D3BB716655E3B9D79_cppui256,
+    0x2A9688F370DCC43130D38AB7AD2B3FF2A925791F587B55AD138B1F067E874C59_cppui256, 
+    0x0CA7898337AB528838EAD23D7CBCD4861F1E5E2E5D3B1BD3B733A832C7931547_cppui256,
+    0x351C82EC1D20E977ABFC632BBA2330AF61270A00BC2D32B6F2E1DA93AA0D51F1_cppui256, 
+    0x00DCE7DC20642A850002731F9B3820327CF5856B1D8C3B0EE6BD7BC03BC85FFD_cppui256,
+    0x3B1BCBA06B0D33F08123EDD6DF725CC1F8CD2213EA867FF4020C2D18619BB2DB_cppui256, 
+    0x0F7C2FF92D8F0776629F87BBF25702CEAA45B1893617F7C9AC10AACB080B6E10_cppui256,
+    0x16E7207D6596C7FAFF46FB335E14DC57E08E150AB7F692607F3B8DCC9E6CDA93_cppui256, 
+    0x2CD748E8C8806196ABE34DF032864491CADCF205AF70CB9152507BD16B912BEC_cppui256,
+    0x2219EC3C1873373A6717E7BFA24827AD89BF949B0F240D7B9D8981C2006E400F_cppui256, 
+    0x027E878BD478FC5DE36CA783CB60297C5F75CB638C71615A04714C52E9B15E8E_cppui256,
+    0x2CCE580022C7D44E72BA8E7E608C3733A3F3EDC0304566097C07D6CCA172A1B4_cppui256, 
+    0x0DC7C8FE3A9007F09283D29C5BE99AACEB9DA6996CD691BBAC5D075BDD6DA223_cppui256,
+    0x1FA4B95451090B8A36D503BFDBF086D4462745626B4BA4490AF42A7A6B5FD449_cppui256, 
+    0x20254A64C61A3C1882EC3E9FCA0ABAE814B0EB0477C3396E562C1006054347F3_cppui256,
+    0x23CDCBDE9DCBD33AD86BF48181B1616FC76D24A18711A3953D184E772D936418_cppui256, 
+    0x00DB22BCFC9A1D1A10A53716A7E7D4022DBF101B8767B68E78837CB8263BE097_cppui256,
+    0x3E283D2F0D90CAC87B3FCD95E7A8933FB2B2B43EF07FA577CA566527481AB6C9_cppui256, 
+    0x0D24814B6FE1C8C42FC05834B95212E473B76C8B9588D1272BFAE8FA0E2B9384_cppui256,
+    0x11C75275709440AC01B74C4E64E2606F7826294F868F6B0265008E758C148369_cppui256, 
+    0x007997CB753B919B586243FCAF6E5886676F180C2220BAC055AE9739CA4A1B4B_cppui256,
+    0x166859AE2ECE3520D33C2D146F6DBCFC819779C288E9D81C3F7369DF5642EF31_cppui256, 
+    0x04E774B3DE1A78D6C9408D7B10D9E4614FC8AE4DFE4BFE6762278EE72BB9E25D_cppui256,
+    0x178AC19F836752BAF356D9E9C3C35470F27A52C16B7572EEF2C61A43B4D0499B_cppui256};
+
+    for (int i = 0; i < 30; ++i) {
+        std::vector<scalar_field_type::value_type> input({g[i]});
+        spng.absorb_fr(input);
+    }
+
+    auto check1 = spng.challenge();
+    scalar_field_type::value_type chal1 = 0x0000000000000000000000000000000006906F18EE1C02C944C3186D54A8D03E_cppui256;
+    BOOST_CHECK(check1 == chal1);
+
+//     nil::marshalling::status_type status;
+//     scalar_field_type::integral_type val(chal1.data);
+//     std::array<bool, 2500> res = nil::marshalling::pack<nil::marshalling::option::big_endian>(val, status);
+}
+
+
+BOOST_AUTO_TEST_CASE(zk_sponge_test_for_absorb_fr_2){
+        using namespace nil::crypto3;
+        using curve_type = algebra::curves::pallas;
+        using group_type = typename curve_type::template g1_type<>;
+        using scalar_field_type = typename curve_type::scalar_field_type;
+        using base_field_type = typename curve_type::base_field_type;
+
+        using sponge_type = zk::transcript::DefaultFqSponge<curve_type>;
+
+        std::vector<scalar_field_type::value_type> input_values = {0x3AA52C0B2BC507CEC6CEEDBFD2C02B9C74CFA1043847011BA789D6F871201A52_cppui256};
+        sponge_type spng;
+        spng.absorb_fr(input_values);
+        base_field_type::value_type real_value = spng.challenge_fq();
+        
+        std::vector<base_field_type::value_type> real_inputs = {0x1D52960595E283E7636776DFE96015CE3A67D0821C23808DD3C4EB7C38900D29_cppui256, 0x0_cppui256};
+        sponge_type spng_real;
+        spng_real.sponge.absorb(real_inputs);
+        base_field_type::value_type expected_value = spng_real.challenge_fq();
+
+        BOOST_CHECK(real_value == expected_value);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
