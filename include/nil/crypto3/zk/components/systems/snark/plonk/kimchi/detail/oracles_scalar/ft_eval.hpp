@@ -118,7 +118,7 @@ namespace nil {
 
                     using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType, KimchiParamsType, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    using constant_term = typename index_terms_list::constant_term;
+                    using constant_term_component = typename index_terms_list::constant_term;
 
                     constexpr static const std::size_t selector_seed = 0x0f22;
                     constexpr static const std::size_t eval_points_amount = 2;
@@ -161,7 +161,7 @@ namespace nil {
                         row += mul_component::rows_amount;
                         row += add_component::rows_amount;
 
-                        row += constant_term::rows_amount;
+                        row += constant_term_component::rows_amount;
                         row += sub_component::rows_amount;
 
                         return row;
@@ -373,11 +373,10 @@ namespace nil {
                         row += add_component::rows_amount;
 
                         // evaluate constant term expression
-                        auto tokens = constant_term::rpn_from_string(constant_term_polish);
-                        var pt = constant_term::generate_circuit(bp, assignment,
-                            {tokens, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
+                        var pt = constant_term_component::generate_circuit(bp, assignment,
+                            {index_terms_list::constant_term_str, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
                             params.combined_evals}, row).output;
-                        row += constant_term::rows_amount;
+                        row += constant_term_component::rows_amount;
                         
                         ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
                             assignment, {ft_eval0, pt}, row).output;
@@ -569,11 +568,10 @@ namespace nil {
                         row += add_component::rows_amount;
 
                         // evaluate constant term expression
-                        auto tokens = constant_term::rpn_from_string(constant_term_polish);
-                        var pt = constant_term::generate_assignments(assignment,
-                            {tokens, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
+                        var pt = constant_term_component::generate_assignments(assignment,
+                            {index_terms_list::constant_term_str, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
                             params.combined_evals}, row).output;
-                        row += constant_term::rows_amount;
+                        row += constant_term_component::rows_amount;
                         
                         ft_eval0 = sub_component::generate_assignments(
                             assignment, {ft_eval0, pt}, row).output;
