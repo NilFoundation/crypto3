@@ -331,7 +331,7 @@ namespace nil {
                                                                                              typename LPC::lpc_params>,
                                              LPC>::value,
                              bool>::type = true>
-                static typename LPC::proof_type proof_eval( //2 and 3 use it
+                static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
@@ -356,8 +356,6 @@ namespace nil {
                         g_normal.resize(leaf_size);
                     }
 
-                    //                    std::array<math::polynomial<typename LPC::field_type::value_type>,
-                    //                    LPC::leaf_size> g_normal;
                     for (int polynom_index = 0; polynom_index < g_normal.size(); ++polynom_index) {
                         g_normal[polynom_index] =
                             math::polynomial<typename LPC::field_type::value_type>(g[polynom_index].coefficients());
@@ -426,7 +424,7 @@ namespace nil {
                                                                                              typename LPC::lpc_params>,
                                              LPC>::value,
                              bool>::type = true>
-                static typename LPC::proof_type proof_eval( // 1 uses it
+                static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
@@ -521,8 +519,7 @@ namespace nil {
 
                     typename select_container<LPC::is_const_size,
                                               math::polynomial<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type U,
-                        V;
+                                              LPC::leaf_size>::type U, V;
 
                     if constexpr (!LPC::is_const_size) {
                         U.resize(leaf_size);
