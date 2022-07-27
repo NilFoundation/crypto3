@@ -10,8 +10,6 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
-using namespace nil::crypto3;
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
