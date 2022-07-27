@@ -12,6 +12,7 @@
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_mds_matrix.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_constants_operator.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -21,8 +22,9 @@ namespace nil {
                 struct poseidon_sponge_construction {
 
                     private:
-                        typedef detail::poseidon_functions<poseidon_policy> poseidon_functions;
-
+                        // typedef detail::field_type field_type
+                        typedef poseidon_functions<poseidon_policy> poseidon_functions_permutation;
+                        // typedef poseidon_policy<
                         std::size_t state_count = 0;
                         bool state_absorbed = true;
 
@@ -39,33 +41,37 @@ namespace nil {
                         this->state_count = 0;
                     }
 
-                    void absorb(std::vector<typename poseidon_policy::element_type> input) {
-                        for (std::size_t i = 0; i < input.size(); i++) {
-                            if (this->state_absorbed) {
-                                if (this->state_count == poseidon_policy::rate) {
-                                    poseidon_functions::permute(this->state);
+                    void absorb(std::vector<typename poseidon_policy::element_type>& inputs) {
+                        for (auto &input : inputs) {
+                            absorb(input);
+                        }
+                    }
 
-                                    this->state[0] += input[i];
+                    void absorb(typename poseidon_policy::element_type &input){
+                        if (this->state_absorbed) {
+                            if (this->state_count == poseidon_policy::rate) {
+                                poseidon_functions_permutation::permute(this->state);
 
-                                    this->state_count = 1;
-                                } else {
-                                    this->state[this->state_count] += input[i];
+                                this->state[0] += input;
 
-                                    this->state_count++;
-                                }
-                            } else {
-                                this->state[0] += input[i];
-
-                                this->state_absorbed = true;
                                 this->state_count = 1;
+                            } else {
+                                this->state[this->state_count] += input;
+
+                                this->state_count++;
                             }
+                        } else {
+                            this->state[0] += input;
+
+                            this->state_absorbed = true;
+                            this->state_count = 1;
                         }
                     }
 
                     typename poseidon_policy::element_type squeeze() {
                         if (!this->state_absorbed) { // state = squeezed
                             if (this->state_count == poseidon_policy::rate) {
-                                poseidon_functions::permute(this->state);
+                                poseidon_functions_permutation::permute(this->state);
                                 this->state_count = 1;
 
                                 return this->state[0];
@@ -73,7 +79,7 @@ namespace nil {
                                 return this->state[this->state_count++];
                             }
                         } else {
-                            poseidon_functions::permute(this->state);
+                            poseidon_functions_permutation::permute(this->state);
 
                             this->state_absorbed = false;
                             this->state_count = 1;
@@ -83,9 +89,7 @@ namespace nil {
                     }
 
                     void reset() {
-                        for (std::size_t i = 0; i < poseidon_policy::state_words; i++) {
-                            state[i] = 0;
-                        }
+                        state.clear();
 
                         this->state_absorbed = true;
                         this->state_count = 0;
