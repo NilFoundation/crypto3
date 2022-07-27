@@ -422,7 +422,8 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_skipping_layers_test) {
 
     // TODO: take a point outside of the basic domain
     std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = {
-        {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
+            {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
+             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
