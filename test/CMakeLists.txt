@@ -72,6 +72,7 @@ set(TESTS_NAMES
     "systems/plonk/pickles/kimchi"
     "systems/plonk/pickles/oracles"
     "systems/plonk/pickles/to_field"
+    "systems/plonk/pickles/to_group"
     
     "systems/plonk/placeholder/placeholder"
 
