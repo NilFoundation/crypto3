@@ -41,6 +41,7 @@
 #include <cstdio>
 #include <limits>
 #include <type_traits>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::containers;
@@ -78,6 +79,11 @@ template<typename Hash, size_t Arity, typename Element>
 void testing_validate_template(std::vector<Element> data) {
     std::array<uint8_t, 7> data_not_in_tree = {'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65'};
     merkle_tree<Hash, Arity> tree = make_merkle_tree<Hash, Arity>(data.begin(), data.end());
+    merkle_tree<Hash, Arity> tree2(tree.begin(), tree.end());
+//    for (auto i = 0; i < tree.size(); ++i) {
+//        std::cout << tree[i] << std::endl;
+//    }
+//    tree.emplace_back(nil::crypto3::hash<typename Hash::hash_type>(data_not_in_tree[0]));
     merkle_proof<Hash, Arity> proof(tree, 0);
     bool good_validate = proof.validate(data[0]);
     bool wrong_leaf_validate = proof.validate(data[1]);
@@ -94,6 +100,25 @@ void testing_hash_template(std::vector<Element> data, std::string result) {
 }
 
 BOOST_AUTO_TEST_SUITE(containers_merkltree_test)
+
+BOOST_AUTO_TEST_CASE(merkletree_construct_test_1) {
+    std::vector<std::array<char, 1>> v = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}};
+    merkle_tree<hashes::sha2<256>, 2> tree_res = make_merkle_tree<hashes::sha2<256>, 2>(v.begin(), v.end());
+    merkle_tree<hashes::sha2<256>, 2> tree(tree_res.begin(), tree_res.end());
+    BOOST_CHECK_EQUAL(tree.size(), 15);
+    BOOST_CHECK_EQUAL(tree.leaves(), 8);
+    BOOST_CHECK_EQUAL(tree.row_count(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(merkletree_construct_test_2) {
+    std::vector<std::array<char, 1>> v = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}, {'8'}};
+    merkle_tree<hashes::sha2<256>, 3> tree_res = make_merkle_tree<hashes::sha2<256>, 3>(v.begin(), v.end());
+    merkle_tree<hashes::sha2<256>, 3> tree(tree_res.begin(), tree_res.end());
+    BOOST_CHECK_EQUAL(tree.size(), 13);
+    BOOST_CHECK_EQUAL(tree.leaves(), 9);
+    BOOST_CHECK_EQUAL(tree.row_count(), 3);
+}
+
 
 BOOST_AUTO_TEST_CASE(merkletree_validate_test_1) {
     std::vector<std::array<char, 1>> v = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}};
