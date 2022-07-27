@@ -3,6 +3,7 @@
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 // Copyright (c) 2022 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
 //
 // MIT License
 //
@@ -141,11 +142,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
@@ -215,11 +212,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
@@ -288,11 +281,7 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -360,11 +349,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_skipping_layers_test) {
@@ -422,7 +407,8 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_skipping_layers_test) {
 
     // TODO: take a point outside of the basic domain
     std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = {
-        {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
+            {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
+             {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
 
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
@@ -432,11 +418,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_skipping_layers_test) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
@@ -500,11 +482,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_2) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
@@ -573,11 +551,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_2) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
@@ -641,11 +615,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size_skipping_layers) {
@@ -714,11 +684,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_basic_test_runtime_size_skipping_layers) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
@@ -787,11 +753,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
 }
 
 BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size_skipping_layers) {
@@ -865,10 +827,7 @@ BOOST_AUTO_TEST_CASE(batched_lpc_dfs_basic_test_runtime_size_skipping_layers) {
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto verify = zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    // std::cout << "verify: " << duration.count() << "ms" << std::endl;
-    BOOST_CHECK(verify);}
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier));
+}
 
 BOOST_AUTO_TEST_SUITE_END()
