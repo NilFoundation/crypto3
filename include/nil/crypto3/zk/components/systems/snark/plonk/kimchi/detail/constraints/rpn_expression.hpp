@@ -345,7 +345,7 @@ namespace nil {
                         std::vector<var> stack;
                         std::vector<var> cache;
 
-                        std::size_t constant_row = 0;
+                        std::size_t constant_row = start_row_index;
 
                         var endo_factor(0, constant_row, false, var::column_type::constant);
                         var zero(0, constant_row + 1, false, var::column_type::constant);
@@ -483,7 +483,7 @@ namespace nil {
                         std::vector<var> stack;
                         std::vector<var> cache;
 
-                        std::size_t constant_row = 0;
+                        std::size_t constant_row = start_row_index;
 
                         var endo_factor(0, constant_row, false, var::column_type::constant);
                         var zero(0, constant_row + 1, false, var::column_type::constant);
