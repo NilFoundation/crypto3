@@ -202,6 +202,17 @@ namespace nil {
                                                           const params_type &params,
                                                           std::size_t component_start_row) {
                         std::size_t row = component_start_row;
+
+                        bp.add_copy_constraint({var(W0, row + 1, false), params.T.x[0]});
+                        bp.add_copy_constraint({var(W1, row + 1, false), params.T.x[1]});
+                        bp.add_copy_constraint({var(W2, row + 1, false), params.T.x[2]});
+                        bp.add_copy_constraint({var(W3, row + 1, false), params.T.x[3]});
+                        bp.add_copy_constraint({var(W4, row + 1, false), params.k});
+                        bp.add_copy_constraint({var(W0, row, false), params.T.y[0]});
+                        bp.add_copy_constraint({var(W1, row, false), params.T.y[1]});
+                        bp.add_copy_constraint({var(W2, row, false), params.T.y[2]});
+                        bp.add_copy_constraint({var(W3, row, false), params.T.y[3]});
+                        bp.add_copy_constraint({var(W4, row, false), params.k});
                     }
                 };
 

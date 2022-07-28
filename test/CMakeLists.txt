@@ -61,6 +61,8 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/fixed_base_mul"
     "non_native/plonk/variable_base_multiplication"
     "non_native/plonk/non_native_demo"
+    "non_native/plonk/reduction"
+    "non_native/plonk/ed25519"
     )
 
 set(BLUEPRINT_TESTS_FILES

@@ -30,8 +30,12 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/variable_base_multiplication_edwards25519.hpp>
-#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/bool_scalar_multiplication.hpp>
-#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/bit_decomposition.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/fixed_base_multiplication_edwards25519.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/complete_addition_edwards25519.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/reduction.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/scalar_non_native_range.hpp>
+#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,7 +49,7 @@ namespace nil {
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
-                          typename Ed25519Type,
+                         typename Ed25519Type,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -57,7 +61,7 @@ namespace nil {
                          std::size_t W8>
                 class eddsa25519<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
-                                                        Ed25519Type,
+                                                       Ed25519Type,
                                                        W0,
                                                        W1,
                                                        W2,
@@ -71,20 +75,31 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    using mult_per_bit_component = variable_base_multiplication_per_bit<ArithmetizationType, CurveType, Ed25519Type,
+                    using variable_base_mult_component = variable_base_multiplication<ArithmetizationType, CurveType, Ed25519Type,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using fixed_base_mult_component = fixed_base_multiplication<ArithmetizationType, CurveType, Ed25519Type,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using addition_component = complete_addition<ArithmetizationType, CurveType, Ed25519Type,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
-                    using bool_scalar_multiplication_component = bool_scalar_multiplication<ArithmetizationType, CurveType, Ed25519Type,
+                    using reduction_component = reduction<ArithmetizationType, CurveType,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
-                    using bit_decomposition_component = bit_decomposition<ArithmetizationType, CurveType, Ed25519Type,
+                    using non_native_range_component = non_native_range<ArithmetizationType, CurveType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using scalar_non_native_range_component = scalar_non_native_range<ArithmetizationType, CurveType, Ed25519Type,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using sha512_component = sha512<ArithmetizationType, CurveType,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     constexpr static const std::size_t selector_seed = 0xfcc2;
 
                 public:
-                    constexpr static const std::size_t rows_amount = bit_decomposition_component::rows_amount +
-                        252 * mult_per_bit_component::rows_amount + bool_scalar_multiplication_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 5 * non_native_range_component::rows_amount
+                                                                    + variable_base_mult_component::rows_amount
+                                                                    + fixed_base_mult_component::rows_amount
+                                                                    + addition_component::rows_amount
+                                                                    + reduction_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -96,12 +111,13 @@ namespace nil {
                         struct signature{
                             var_ec_point R;
                             var s;
-                        }
+                        };
                         signature e;
                         var_ec_point public_key;
-                        var k;
                         var M;
                     };
+
+                    //TODO: check if points R and public_key lie on the curve
 
                     struct result_type {
                         result_type(std::size_t component_start_row) {
@@ -112,46 +128,108 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        std::array<var, 4> T_x = params.T.x;
-                        std::array<var, 4> T_y = params.T.y;
-                        auto bits = bit_decomposition_component::generate_assignments(assignment,
-                         typename bit_decomposition_component::params_type({params.k}), row);
-                        row+=bit_decomposition_component::rows_amount;
-                        auto bool_mul_res = bool_scalar_multiplication_component::generate_assignments(assignment, typename bool_scalar_multiplication_component::params_type({{T_x, T_y},
-                         bits.output[0]}), row);
-                        row+=bool_scalar_multiplication_component::rows_amount;
-                        auto res_per_bit = mult_per_bit_component::generate_assignments(assignment, typename mult_per_bit_component::params_type({{T_x, T_y},
-                        {bool_mul_res.output.x, bool_mul_res.output.y}, bits.output[1]}), row);
-                        row+=mult_per_bit_component::rows_amount;
-                        for (std::size_t i = 2; i < 253; i++){
-                            res_per_bit = mult_per_bit_component::generate_assignments(assignment, typename mult_per_bit_component::params_type({{T_x, T_y},
-                            {res_per_bit.output.x, res_per_bit.output.y}, bits.output[i]}), row);
-                            row+=mult_per_bit_component::rows_amount;
+
+                        var s = params.e.s;
+                        auto R = params.e.R;
+                        auto pk = params.public_key;
+                        var M = params.M;
+
+                        /* here we check if s lies in range */
+                        non_native_range_component::generate_assignments(assignment, {s}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_assignments(assignment, {R.x}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_assignments(assignment, {R.y}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_assignments(assignment, {pk.x}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_assignments(assignment, {pk.y}, row);
+                        row += non_native_range_component::rows_amount;
+                        
+                        /* here we get k = SHA(R||A||M) */
+                        /* 66*15 + 34 = 1024 bits */
+                        // auto padded = ...;
+                        // row += ...;
+                        // auto k_vec = sha512_component::generate_assignments(assignment, {padded}, row).output;
+                        // row += sha512_component::rows_amount;
+                        std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
+                            0x66666666, 0x11111111, 0x22222222, 0x55555555,
+                            0x33333333, 0x99999999, 0x11111111, 0x77777777};
+                        for (int i = 0; i < 8; i++) {
+                            assignment.constant(0)[component_start_row + i] = constants[i];
                         }
-                        return {res_per_bit.output.x, res_per_bit.output.y};
+                        std::array<var, 8> k_vec = {var(0, component_start_row, false, var::column_type::constant),
+                                                    var(0, component_start_row + 1, false, var::column_type::constant),
+                                                    var(0, component_start_row + 2, false, var::column_type::constant),
+                                                    var(0, component_start_row + 3, false, var::column_type::constant),
+                                                    var(0, component_start_row + 4, false, var::column_type::constant),
+                                                    var(0, component_start_row + 5, false, var::column_type::constant),
+                                                    var(0, component_start_row + 6, false, var::column_type::constant),
+                                                    var(0, component_start_row + 7, false, var::column_type::constant)};
+                        var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
+                        row += reduction_component::rows_amount;
+
+                        /* here we check sB == R + kA */
+                        auto S = fixed_base_mult_component::generate_assignments(assignment, {s}, row).output;
+                        row += fixed_base_mult_component::rows_amount;
+                        auto A = variable_base_mult_component::generate_assignments(assignment, {{pk.x, pk.y}, k}, row).output;
+                        row += variable_base_mult_component::rows_amount;
+                        typename addition_component::params_type add_params = {{A.x, A.y}, {R.x, R.y}};
+                        auto res = addition_component::generate_assignments(assignment, add_params, row).output;
+                        row += addition_component::rows_amount;
+
+                        return result_type(component_start_row);
                     }
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t start_row_index){
+                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                        const params_type &params,
+                                                        const std::size_t start_row_index){
                         std::size_t row = start_row_index;
-                        std::array<var, 4> T_x = params.T.x;
-                        std::array<var, 4> T_y = params.T.y;
-                        auto bits = bit_decomposition_component::generate_circuit(bp, assignment,
-                         typename bit_decomposition_component::params_type({params.k}), row);
-                        row+=bit_decomposition_component::rows_amount;
-                        auto bool_mul_res = bool_scalar_multiplication_component::generate_circuit(bp, assignment, typename bool_scalar_multiplication_component::params_type({{T_x, T_y}, bits.output[0]}), row);
-                        row+=bool_scalar_multiplication_component::rows_amount;
-                        auto res_per_bit = mult_per_bit_component::generate_circuit(bp, assignment, typename mult_per_bit_component::params_type({{T_x, T_y},
-                        {bool_mul_res.output.x, bool_mul_res.output.y}, bits.output[1]}), row);
-                        row+=mult_per_bit_component::rows_amount;
-                        for (std::size_t i = 2; i < 253; i++){
-                            res_per_bit = mult_per_bit_component::generate_circuit(bp, assignment, typename mult_per_bit_component::params_type({{T_x, T_y},
-                            {res_per_bit.output.x, res_per_bit.output.y}, bits.output[i]}), row);
-                            row+=mult_per_bit_component::rows_amount;
-                        }
-                        return {res_per_bit.output.x, res_per_bit.output.y};
+
+                        var s = params.e.s;
+                        auto R = params.e.R;
+                        auto pk = params.public_key;
+                        var M = params.M;
+
+                        /* here we check if s lies in range */
+                        non_native_range_component::generate_circuit(bp, assignment, {s}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_circuit(bp, assignment, {R.x}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_circuit(bp, assignment, {R.y}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_circuit(bp, assignment, {pk.x}, row);
+                        row += non_native_range_component::rows_amount;
+                        non_native_range_component::generate_circuit(bp, assignment, {pk.y}, row);
+                        row += non_native_range_component::rows_amount;
+                        
+                        /* here we get k = SHA(R||A||M) */
+                        // auto padded = ...;
+                        // row += ...;
+                        // auto k_vec = sha512_component::generate_circuit(bp, assignment, {padded}, row).output;
+                        // row += sha512_component::rows_amount;
+                        std::array<var, 8> k_vec = {var(0, start_row_index, false, var::column_type::constant),
+                                                    var(0, start_row_index + 1, false, var::column_type::constant),
+                                                    var(0, start_row_index + 2, false, var::column_type::constant),
+                                                    var(0, start_row_index + 3, false, var::column_type::constant),
+                                                    var(0, start_row_index + 4, false, var::column_type::constant),
+                                                    var(0, start_row_index + 5, false, var::column_type::constant),
+                                                    var(0, start_row_index + 6, false, var::column_type::constant),
+                                                    var(0, start_row_index + 7, false, var::column_type::constant)};
+                        var k = reduction_component::generate_circuit(bp, assignment, {k_vec}, row).output;
+                        row += reduction_component::rows_amount;
+
+                        /* here we check sB == R + kA */
+                        auto S = fixed_base_mult_component::generate_circuit(bp, assignment, {s}, row).output;
+                        row += fixed_base_mult_component::rows_amount;
+                        auto A = variable_base_mult_component::generate_circuit(bp, assignment, {{pk.x, pk.y}, k}, row).output;
+                        row += variable_base_mult_component::rows_amount;
+                        typename addition_component::params_type add_params = {{A.x, A.y}, {R.x, R.y}};
+                        auto res = addition_component::generate_circuit(bp, assignment, add_params, row).output;
+                        row += addition_component::rows_amount;
+
+                        return result_type(start_row_index);
                     }
 
                 private:
@@ -169,6 +247,18 @@ namespace nil {
                                                           const params_type &params,
                                                           std::size_t component_start_row) {
                         std::size_t row = component_start_row;
+                        row += 5 * non_native_range_component::rows_amount + reduction_component::rows_amount;
+                        auto S = (typename fixed_base_mult_component::result_type(row)).output;
+                        row += fixed_base_mult_component::rows_amount + variable_base_mult_component::rows_amount;
+                        auto res = (typename addition_component::result_type(row)).output;
+                        bp.add_copy_constraint({{S.x[0]}, {res.x[0]}});
+                        bp.add_copy_constraint({{S.x[1]}, {res.x[1]}});
+                        bp.add_copy_constraint({{S.x[2]}, {res.x[2]}});
+                        bp.add_copy_constraint({{S.x[3]}, {res.x[3]}});
+                        bp.add_copy_constraint({{S.y[0]}, {res.y[0]}});
+                        bp.add_copy_constraint({{S.y[1]}, {res.y[1]}});
+                        bp.add_copy_constraint({{S.y[2]}, {res.y[2]}});
+                        bp.add_copy_constraint({{S.y[3]}, {res.y[3]}});
                     }
                 };
 

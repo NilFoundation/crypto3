@@ -2,6 +2,7 @@
 // Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
+// Copyright (c) 2022 Polina Chernyshova <pockvokhbtra@nil.foundation>
 //
 // MIT License
 //
@@ -109,7 +110,7 @@ namespace nil {
 
                         result_type(const std::size_t &component_start_row) {
                         output = {var(W0, component_start_row + 2, false), 
-                            var(W1, component_start_row +2, false), var(W2, component_start_row + 2, false), 
+                            var(W1, component_start_row + 2, false), var(W2, component_start_row + 2, false), 
                             var(W3, component_start_row + 2, false)};
                         }
                     };
@@ -267,9 +268,7 @@ namespace nil {
                         (var(W0, +1) + var(W1, +1) * (base << 66) + var(W2, +1)*(base<< 132) + var(W3, +1) * (base << 198)) ));
 
                         bp.add_gate(first_selector_index,
-                                    {constraint_1, constraint_2, constraint_3, constraint_4
-
-                                    });
+                                    {constraint_1, constraint_2, constraint_3, constraint_4});
                     }
 
                     static void generate_copy_constraints(
@@ -278,31 +277,16 @@ namespace nil {
                         const params_type &params,
                         std::size_t component_start_row) {
 
-                        std::size_t j = component_start_row;
+                        std::size_t row = component_start_row;
 
-                        /*bp.add_copy_constraint({var(W0, j + 8, false), var(W0, j + 4, false)});
-                        bp.add_copy_constraint({var(W1, j + 8, false), var(W0, j + 5, false)});
-                        bp.add_copy_constraint({var(W2, j + 8, false), var(W1, j + 5, false)});
-                        bp.add_copy_constraint({var(W6, j + 8, false), var(W0, j + 6, false)});
-                        bp.add_copy_constraint({var(W7, j + 8, false), var(W1, j + 4, false)});
-                        bp.add_copy_constraint({var(W6, j + 8, false), var(W0, j + 6, false)});
-                        bp.add_copy_constraint({var(W7, j + 8, false), var(W1, j + 4, false)});
-                        bp.add_copy_constraint({var(W8, j + 8, false), var(W2, j + 4, false)});
-                        bp.add_copy_constraint({var(W0, j + 9, false), var(W0, j + 3, false)});
-                        bp.add_copy_constraint({var(W1, j + 9, false), var(W1, j + 3, false)});
-                        bp.add_copy_constraint({var(W2, j + 9, false), var(W3, j + 4, false)});
-                        bp.add_copy_constraint({var(W3, j + 9, false), var(W1, j + 2, false)});
-                        bp.add_copy_constraint({var(W4, j + 9, false), var(W2, j + 2, false)});
-                        bp.add_copy_constraint({var(W5, j + 9, false), var(W3, j + 2, false)});
-                        bp.add_copy_constraint({var(W7, j + 9, false), var(W0, j + 11, false)});
-                        bp.add_copy_constraint({var(W8, j + 9, false), var(W4, j + 11, false)});
-                        bp.add_copy_constraint({var(W0, j + 10, false), var(W0, j + 0, false)});
-                        bp.add_copy_constraint({var(W1, j + 10, false), var(W0, j + 1, false)});
-                        bp.add_copy_constraint({var(W2, j + 10, false), var(W1, j + 1, false)});
-                        bp.add_copy_constraint({var(W3, j + 10, false), var(W0, j + 2, false)});
-                        bp.add_copy_constraint({var(W4, j + 10, false), var(W1, j + 0, false)});
-                        bp.add_copy_constraint({var(W5, j + 10, false), var(W2, j + 0, false)});
-                        bp.add_copy_constraint({var(W6, j + 10, false), var(W3, j + 0, false)});*/
+                        bp.add_copy_constraint({var(W0, row + 1, false), params.A[0]});
+                        bp.add_copy_constraint({var(W1, row + 1, false), params.B[0]});
+                        bp.add_copy_constraint({var(W3, row + 1, false), params.A[1]});
+                        bp.add_copy_constraint({var(W4, row + 1, false), params.A[2]});
+                        bp.add_copy_constraint({var(W5, row + 1, false), params.A[3]});
+                        bp.add_copy_constraint({var(W6, row + 1, false), params.B[1]});
+                        bp.add_copy_constraint({var(W7, row + 1, false), params.B[2]});
+                        bp.add_copy_constraint({var(W8, row + 1, false), params.B[3]});
                     }
                 };
 
