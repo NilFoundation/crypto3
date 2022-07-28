@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdint>
 
+#include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/marshalling/status_type.hpp>

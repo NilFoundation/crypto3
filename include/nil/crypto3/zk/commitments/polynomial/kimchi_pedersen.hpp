@@ -33,8 +33,8 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
-
-using namespace nil::crypto3;
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/detail.hpp>
+#include <nil/crypto3/zk/transcript/kimchi_transcript.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,7 +47,8 @@ namespace nil {
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::base_field_type base_field_type;
                     typedef typename CurveType::template g1_type<algebra::curves::coordinates::affine> group_type;
-                    typedef typename algebra::policies::multiexp_method_BDLO12 multiexp_method;
+                    typedef algebra::policies::multiexp_method_BDLO12 multiexp_method;
+                    typedef zk::transcript::DefaultFqSponge<CurveType> base_sponge_type;
                     // using multiexp = algebra::multiexp_with_mixed_addition<multiexp_method>;
 
                     struct params_type {
@@ -101,19 +102,31 @@ namespace nil {
 
                     // fake structs
                     struct sponge_type {
+                      protected:
+                        typedef nil::crypto3::zk::snark::ScalarChallenge<scalar_field_type> scalarchal_type;
+                        base_sponge_type sponge;
+                      public:
                         void absorb(typename scalar_field_type::value_type a) {
                         }
                         void absorb_fr(typename scalar_field_type::value_type a) {
+                            sponge.absorb_fr(a);
                         }
                         void absorb_g(typename group_type::value_type a) {
+                            sponge.absorb_g(a);
                         }
 
                         typename scalar_field_type::value_type squeeze() {
-                            return typename scalar_field_type::value_type::one();
+                            return sponge.squeeze();
                         }
-                        typename group_type::value_type squeeze_prechallenge() {
-                            return typename group_type::value_type::zero();
+
+                        scalarchal_type squeeze_prechallenge() {
+                            return scalarchal_type(sponge.challenge());
                         }
+
+                        typename scalar_field_type::value_type squeeze_challenge(typename scalar_field_type::value_type& endo_r) {
+                            return squeeze_prechallenge().to_field(endo_r);
+                        }
+
                         typename scalar_field_type::value_type challenge_fq() {
                             return typename scalar_field_type::value_type::one();
                         }
@@ -324,8 +337,8 @@ namespace nil {
                             // fake funtions
                             sponge.absorb_g(l);
                             sponge.absorb_g(r);
-                            auto u_pre = sponge.squeeze_prechallenge();
-                            auto u = typename scalar_field_type::value_type::one();    // u_pre to field using endo_r
+                            // auto u_pre = sponge.squeeze_prechallenge();
+                            auto u = sponge.squeeze_challenge(params.endo_r);    // u_pre to field using endo_r
 
                             chals.push_back(u);
                             chal_invs.push_back(u.inverse());

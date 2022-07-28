@@ -32,6 +32,7 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <map>
+#include <array>
 
 namespace nil {
     namespace crypto3 {
@@ -144,6 +145,86 @@ namespace nil {
                     };
 
                     typename FieldType::value_type _val;
+                };
+
+                template <typename CurveType>
+                struct group_map{
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+                    typedef typename CurveType::base_field_type base_field_type;
+                    typedef typename CurveType::template g1_type<> group_type;
+                    typedef typename base_field_type::value_type value_type;
+                    constexpr static const typename base_field_type::integral_type a = CurveType::template g1_type<>::params_type::a;
+                    constexpr static const typename base_field_type::integral_type b = CurveType::template g1_type<>::params_type::b;
+
+                    value_type u;
+                    value_type fu;
+                    value_type sqrt_neg_three_u_squared_minus_u_over_2;
+                    value_type sqrt_neg_three_u_squared;
+                    value_type inv_three_u_squared;
+
+                    static value_type curve_eqn(value_type x){
+                        value_type res = x;
+                        res *= x;
+                        res += a;
+                        res *= x;
+                        res += b;
+                        return res;
+                    }
+
+                    group_map() {
+                        u = value_type(1);
+                        while(true){
+                            fu = curve_eqn(u);
+                            if(!fu.is_zero()){
+                                break;
+                            }
+                            else{
+                                ++u;
+                            }
+                        }
+                        
+                        value_type three_u_squared = value_type(3) * u.squared();
+                        inv_three_u_squared = three_u_squared.inversed();
+                        sqrt_neg_three_u_squared = (-three_u_squared).sqrt();
+                        sqrt_neg_three_u_squared_minus_u_over_2 = (sqrt_neg_three_u_squared - u) * (value_type(2)).inversed();
+                        std::cout << "sqrt_neg_three_u_squared_minus_u_over_2: " << std:: hex << sqrt_neg_three_u_squared_minus_u_over_2.data << '\n';
+                    }
+
+                    std::array<value_type, 3> potential_xs_helper(value_type& t2, value_type& alpha){
+                        value_type x1 = sqrt_neg_three_u_squared_minus_u_over_2 - t2.squared() * alpha * sqrt_neg_three_u_squared;
+                        value_type x2 = -u - x1;
+                        value_type t2_plus_fu = t2 + fu;
+                        value_type x3 = u - t2_plus_fu.squared() * alpha * t2_plus_fu * inv_three_u_squared;
+                        std::cout << std::hex << "x1.data " << x1.data << '\n'; 
+                        return std::array<value_type, 3>({x1, x2, x3});
+                    }
+
+                    std::array<value_type, 3> potential_xs(value_type& t){
+                        value_type t2 = t.squared();
+                        value_type alpha = ((t2 + fu) * t2).inversed();
+
+                        return potential_xs_helper(t2, alpha);
+                    }
+
+                    value_type get_y(value_type& x){
+                        return curve_eqn(x).sqrt();
+                    }
+
+                    typename group_type::value_type get_xy(value_type& t){
+                        std::array<value_type, 3> xvec = potential_xs(t);
+                        for(auto &x : xvec){
+                            value_type y = curve_eqn(x).sqrt();
+                            if(y.squared() == x.pow(3) + a * x + b){
+                                return typename group_type::value_type(x, y, 0x1_cppui256);
+                            }
+                        }
+                        return typename group_type::value_type(value_type(0), value_type(0), 0x1_cppui256);
+                    }
+
+                    typename group_type::value_type to_group(value_type t){
+                        std::cout << "to group begin " << std::hex << t.data << '\n';
+                        return get_xy(t);
+                    }
                 };
 
                 enum gate_type {
