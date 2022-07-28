@@ -374,8 +374,14 @@ namespace nil {
                     static status_type write_field_element(const element_type &elem, TIter &iter, std::size_t &len) {
                         status_type es = elem.write(iter, len);
                         if (es == status_type::success) {
-                            len -= (std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
-                                            elem.bit_length() : elem.length());
+                            std::size_t len_to_substract = 0;
+                            if constexpr(std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool>){
+                                len_to_substract = elem.bit_length();
+                            } else{
+                                len_to_substract = elem.length();
+                            }
+                            std::cout << len_to_substract << std::flush << '\n';
+                            len -= len_to_substract;
                         }
                         return es;
                     }
