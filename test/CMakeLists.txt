@@ -108,6 +108,7 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/combined_inner_product"
     "algebra/fields/plonk/element_powers"
     "algebra/fields/plonk/exponentiation"
+    "algebra/fields/plonk/sqrt"
     "detail/prepare_scalars"
     "detail/zkpm_evaluate"
     )
