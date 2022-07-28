@@ -99,11 +99,19 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    constexpr static bool scalar_larger() {
+                        using ScalarField = typename CurveType::scalar_field_type;
+                        using BaseField = typename CurveType::base_field_type;
+
+                        auto n1 = ScalarField::modulus;
+                        auto n2 = BaseField::modulus;
+                        return n1 > n2;
+                    }
+
+                    static const std::size_t fr_value_size = scalar_larger ? 2 : 1;
+
                     struct fr_value {
-                        var bit;
-                        var fq_value;
-                        fr_value(var first, var second) : bit(first), fq_value(second) {}
-                        fr_value(std::array<var, 2> vec) : bit(vec[0]), fq_value(vec[1]) {}
+                        std::array<var, fr_value_size> value;
                     };
 
                     struct group_value {
@@ -167,20 +175,12 @@ namespace nil {
                         }
                         return squeeze_limbs_circuit(bp, assignment, row);
                     }
-
-                    constexpr static bool scalar_larger() {
-                        using ScalarField = typename CurveType::scalar_field_type;
-                        using BaseField = typename CurveType::base_field_type;
-
-                        auto n1 = ScalarField::modulus;
-                        auto n2 = BaseField::modulus;
-                        return n1 > n2;
-                    }
                     
                 public:
                     constexpr static const std::size_t rows_amount = 0;
                     constexpr static const std::size_t init_rows = sponge_component::init_rows;
-                    constexpr static const std::size_t absorb_rows = 2 * sponge_component::absorb_rows;
+                    constexpr static const std::size_t absorb_group_rows = 2 * sponge_component::absorb_rows;
+                    constexpr static const std::size_t absorb_fr_rows = fr_value_size * sponge_component::absorb_rows;
                     constexpr static const std::size_t challenge_rows = 
                         sponge_component::squeeze_rows + unpack::rows_amount 
                         + pack::rows_amount;
@@ -230,12 +230,9 @@ namespace nil {
                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
-                        if (scalar_larger()) {
-                            sponge.absorb_assignment(assignment, absorbing_value.fq_value, row);
+                        for (std::size_t i = 0; i < fr_value_size; i++) {
+                            sponge.absorb_assignment(assignment, absorbing_value.value[i], row);
                             row += sponge_component::absorb_rows;
-                            sponge.absorb_assignment(assignment, absorbing_value.bit, row);
-                        } else {
-                            sponge.absorb_assignment(assignment, absorbing_value.fq_value, row);
                         }
                     }
 
@@ -245,12 +242,9 @@ namespace nil {
                                         std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
-                        if (scalar_larger()) {
-                            sponge.absorb_circuit(bp, assignment, absorbing_value.fq_value, row);
+                        for (std::size_t i = 0; i < fr_value_size; i++) {
+                            sponge.absorb_circuit(bp, assignment, absorbing_value.value[i], row);
                             row += sponge_component::absorb_rows;
-                            sponge.absorb_circuit(bp, assignment, absorbing_value.bit, row);
-                        } else {
-                            sponge.absorb_circuit(bp, assignment, absorbing_value.fq_value, row);
                         }
                     }
 

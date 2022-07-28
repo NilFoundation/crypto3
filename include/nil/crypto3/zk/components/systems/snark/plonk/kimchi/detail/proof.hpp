@@ -165,17 +165,17 @@ namespace nil {
 
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
-                    // using transcript_type = typename 
-                    //     zk::components::kimchi_transcript_fq<ArithmetizationType, typename KimchiParamsType::curve_type,
-                    //                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                    //                 11, 12, 13, 14>;
+                    using transcript_type = typename 
+                        zk::components::kimchi_transcript_fq<ArithmetizationType, typename KimchiParamsType::curve_type,
+                                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                    11, 12, 13, 14>;
 
                     //typename proof_binding::fq_sponge_output fq_output;
                     std::array<shifted_commitment_type, 
                         kimchi_constants::evaluations_in_batch_size> comm;
                     opening_proof_type opening_proof;
 
-                    // transcript_type transcript;
+                    transcript_type transcript;
                 };
             }    // namespace components
         }        // namespace zk

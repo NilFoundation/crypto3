@@ -110,7 +110,10 @@ namespace nil {
                     constexpr static const std::size_t final_msm_size = kimchi_constants::final_msm_size(BatchSize);
 
                     using msm_component = zk::components::element_g1_multi_scalar_mul< ArithmetizationType, CurveType, final_msm_size,
-                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> ;
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using to_group_component = zk::components::to_group<ArithmetizationType, 
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 
@@ -139,8 +142,9 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xff91;
 
                 public:
-                    constexpr static const std::size_t rows_amount = transcript_type::absorb_rows + 
-                        1 + msm_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = transcript_type::absorb_fr_rows 
+                        + transcript_type::challenge_rows 
+                        * 1 + msm_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -152,16 +156,16 @@ namespace nil {
 
                     struct result_type {
 
-                        result_type(std::size_t component_start_row) {
+                        result_type(std::size_t start_row_index) {
                         }
                     };
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
-                        var two_pow_255(0, component_start_row, false, var::column_type::constant);
-                        var zero(0, component_start_row + 1, false, var::column_type::constant);
+                                                            std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
+                        var two_pow_255(0, start_row_index, false, var::column_type::constant);
+                        var zero(0, start_row_index + 1, false, var::column_type::constant);
                         std::array<var_ec_point, final_msm_size> bases;
                         std::size_t bases_idx = 0;
 
@@ -177,9 +181,14 @@ namespace nil {
                         }
 
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            //transcript_type transcript = params.proofs[i].transcript;
-                            //transcript.absorb_fr_assignment(assignment, {params.fr_output.cip_shifted[i]}, row);
-                            row += transcript_type::absorb_rows;
+                            transcript_type transcript = params.proofs[i].transcript;
+                            transcript.absorb_fr_assignment(assignment, {{params.fr_output.cip_shifted[i]}}, row);
+                            row += transcript_type::absorb_fr_rows;
+                            var t = transcript.challenge_fq_assignment(assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            var_ec_point U = to_group_component::
+
                             //U = transcript.squeeze.to_group()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U_value =
                                  algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
@@ -210,9 +219,10 @@ namespace nil {
                         }
 
                         assert(bases_idx == final_msm_size);
+                        assert(row == start_row_index + rows_amount);
 
                         auto res = msm_component::generate_assignments(assignment, {params.fr_output.scalars, bases}, row);
-                        return result_type(component_start_row);
+                        return result_type(start_row_index);
                     }
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
@@ -241,8 +251,11 @@ namespace nil {
                         }
 
                         for (std::size_t i = 0; i < params.proofs.size(); i++) {
-                            //params.proofs[i].transcript.absorb_fr_circuit(bp, assignment, params.fr_output.cip_shifted[i], row);
-                            row += transcript_type::absorb_rows;
+                            transcript_type transcript = params.proofs[i].transcript;
+                            transcript.absorb_fr_circuit(bp, assignment, {{params.fr_output.cip_shifted[i]}}, row);
+                            row += transcript_type::absorb_fr_rows;
+                            var t = transcript.challenge_fq_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
                             //U = transcript.squeeze.to_group()
                             var_ec_point U = {var(0, row), var(1, row)};
                             
@@ -270,6 +283,7 @@ namespace nil {
                         }
 
                         assert(bases_idx == final_msm_size);
+                        assert(row == start_row_index + rows_amount);
 
                         auto res = msm_component::generate_circuit(bp, assignment, {params.fr_output.scalars, bases}, row);
                         return result_type(start_row_index);
@@ -297,8 +311,8 @@ namespace nil {
                         generate_assignments_constant(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
-                                                  std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
+                                                  std::size_t start_row_index) {
+                            std::size_t row = start_row_index;
                             typename BlueprintFieldType::integral_type tmp = 1;
                             assignment.constant(0)[row] = (tmp << 255);
                             row++;
