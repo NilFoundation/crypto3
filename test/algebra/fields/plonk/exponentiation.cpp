@@ -72,13 +72,61 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation) {
 
 
     typename BlueprintFieldType::value_type base_value = algebra::random_element<BlueprintFieldType>();
-    typename BlueprintFieldType::value_type exponent_value = algebra::random_element<BlueprintFieldType>();
+    typename BlueprintFieldType::value_type exponent_value = 654;
+    typename BlueprintFieldType::integral_type exponent_value_integral = typename BlueprintFieldType::integral_type(exponent_value.data);
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = { 2, 3};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {base_value, exponent_value};
 
     typename component_type::params_type params = {base, exponent};
 
-    typename BlueprintFieldType::value_type expected_result = 8;
+    typename BlueprintFieldType::value_type expected_result = power(base_value, exponent_value_integral);
+
+
+    auto result_check = [&expected_result](AssignmentType &assignment,
+        component_type::result_type &real_res) { 
+        assert(expected_result== assignment.var_value(real_res.output));
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "exponentiation_component: " << duration.count() << "ms" << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_2) {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    using curve_type = algebra::curves::pallas;
+    using BlueprintFieldType = typename curve_type::base_field_type;
+    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t n = 255;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 1;
+
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    using component_type = zk::components::exponentiation<ArithmetizationType, n, 0, 1, 2, 3,
+                                                                          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+    var base(0, 0, false, var::column_type::public_input);
+    var exponent(0, 1, false, var::column_type::public_input);
+
+
+    typename BlueprintFieldType::value_type base_value = algebra::random_element<BlueprintFieldType>();
+    typename BlueprintFieldType::value_type exponent_value = (BlueprintFieldType::value_type::modulus - 1) / 2;
+    typename BlueprintFieldType::integral_type exponent_value_integral = typename BlueprintFieldType::integral_type(exponent_value.data);
+
+    std::vector<typename BlueprintFieldType::value_type> public_input = {base_value, exponent_value};
+
+    typename component_type::params_type params = {base, exponent};
+
+    typename BlueprintFieldType::value_type expected_result = power(base_value, exponent_value_integral);
 
 
     auto result_check = [&expected_result](AssignmentType &assignment,
