@@ -61,7 +61,6 @@ BOOST_AUTO_TEST_SUITE(zk_sponge_test_suite)
 
 BOOST_AUTO_TEST_CASE(zk_sponge_test_0) {
     sponge_type spng;
-//     sponge_type2 spng2;
     group_type::value_type g[15];
 
     g[0] = group_type::value_type(0x1CF10D1482EB88632AEFED15C16082007B38DDC528626195CF6B040E2C7D5914_cppui256,

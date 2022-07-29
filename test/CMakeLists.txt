@@ -60,6 +60,7 @@ set(TESTS_NAMES
     "commitment/lpc_performance"
     "commitment/pedersen"
     "commitment/type_traits"
+    "commitment/kimchi_pedersen"
 
 
     "routing_algorithms/test_routing_algorithms"
