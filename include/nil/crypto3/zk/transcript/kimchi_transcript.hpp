@@ -2,13 +2,20 @@
 #define CRYPTO3_ZK_SPONGE_HPP
 
 #include <vector>
+#include <array>
 #include <iostream>
 #include <cstdint>
+#include <algorithm>
+
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/marshalling/status_type.hpp>
+
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/detail/mapping.hpp>
+
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
 namespace nil {
@@ -18,10 +25,16 @@ namespace nil {
                 const int CHALLENGE_LENGTH_IN_LIMBS = 2;
                 const int HIGH_ENTROPY_LIMBS = 2;
 
-                template <typename FieldType>
-                typename FieldType::integral_type pack(const std::vector<uint64_t>& limbs_lsb){
+                template <typename integral_type>
+                integral_type pack(std::vector<uint64_t> limbs_lsb){
                     nil::marshalling::status_type status;
-                    typename FieldType::integral_type res = nil::marshalling::pack<nil::marshalling::option::big_endian>(limbs_lsb, status);
+                    std::size_t byte_size = nil::crypto3::multiprecision::backends::max_precision<typename integral_type::backend_type>::value / CHAR_BIT;
+                    std::size_t size = byte_size / sizeof(uint64_t) + (byte_size % sizeof(uint64_t) ? 1 : 0);
+                    limbs_lsb.resize(size);
+                    std::reverse(limbs_lsb.begin(), limbs_lsb.end());
+
+                    integral_type res = nil::marshalling::pack<nil::marshalling::option::big_endian>(limbs_lsb, status);
+
                     return res;
                 }
 
@@ -29,58 +42,14 @@ namespace nil {
                 std::vector<std::uint64_t> unpack(value_type& value){
                     nil::marshalling::status_type status;
                     integral_type scalar_value = integral_type(value.data);
-                    std::vector<bool> limbs_lsb1 = nil::marshalling::pack<nil::marshalling::option::big_endian>(scalar_value, status);
-                    std::vector<std::uint64_t> limbs_lsb;
+                    std::vector<std::uint64_t> limbs_lsb = nil::marshalling::pack<nil::marshalling::option::big_endian>(scalar_value, status);
+
+                    std::reverse(limbs_lsb.begin(), limbs_lsb.end());
+                    limbs_lsb.resize(CHALLENGE_LENGTH_IN_LIMBS);
+
                     return limbs_lsb;
                 }
 
-                // template <typename value_type>
-                // value_type pack(const std::vector<std::uint64_t>& limbs) {
-                //     value_type res(0);
-                //     value_type zero(0);
-                //     auto x = zero.data;
-                //     for (int i = 0; i < limbs.size(); ++i) {
-                //         value_type smth(limbs[limbs.size() - 1 - i]);
-                //         x = x << 64;
-                //         x = x + smth.data;
-                //     }
-                //     res = value_type(x);
-                //     return res;
-                // }
-
-                // template <typename value_type, typename integral_type>
-                // std::vector<std::uint64_t> unpack(value_type elem) {
-                //     std::vector<std::uint64_t> res;
-                //     auto data = elem.data;
-                //     for (int i = 0; i < HIGH_ENTROPY_LIMBS; ++i) {
-                //         auto delta = data - ((data >> 64) << 64);
-                //         res.push_back(static_cast<std::uint64_t>(integral_type(delta)));
-                //         data = data >> 64;
-                //     }
-                //     return res;
-                // }
-
-                template <typename value_type>
-                std::vector<bool> to_bits(value_type a) {
-                    size_t size = 255;
-                    std::vector<bool> bits(size, false);
-                    auto integral_b = a.data;
-                    for (size_t i = 0; i < size; ++i) {
-                        bits[i] = multiprecision::bit_test(integral_b, i);
-                    }
-                    return bits;
-                }
-
-                template <typename value_type, typename InputIterator>
-                value_type from_bits(InputIterator first, InputIterator last) {
-                    value_type value;
-                    for(auto iter = last - 1; iter >= first; --iter){
-                        if((*iter) == true){
-                            multiprecision::bit_set(value, iter - first);
-                        }
-                    }
-                    return value;
-                }
                 template <typename CurveType>
                 struct BaseSponge{
                     typedef typename CurveType::template g1_type<> group_type;
@@ -108,7 +77,7 @@ namespace nil {
                             std::vector<limb_type> remaining(this->last_squeezed.begin() + limbs, this->last_squeezed.end());
                             this->last_squeezed = remaining;
                             
-                            return pack(limbs);
+                            return typename base_field_type::value_type(pack<typename base_field_type::integral_type>(limbs));
                         }
                         else{
                             auto sq = this->sponge.squeeze();
@@ -130,6 +99,7 @@ namespace nil {
                     typedef typename BaseSponge<CurveType>::base_field_type base_field_type;
                     typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
                     typedef typename BaseSponge<CurveType>::limb_type limb_type;
+                    typedef snark::ScalarChallenge<scalar_field_type> scalar_challenge_type;
 
                     std::vector<limb_type> squeeze_limbs(std::size_t num_limbs){
                         if(this->last_squeezed.size() >= num_limbs){
@@ -160,7 +130,8 @@ namespace nil {
                     typename scalar_field_type::value_type squeeze(std::size_t num_limbs){
                         auto limbs = this->squeeze_limbs(num_limbs);
                         nil::marshalling::status_type status;
-                        typename scalar_field_type::value_type res = pack<typename scalar_field_type::value_type>(limbs);
+                        auto first_value = pack<typename scalar_field_type::integral_type>(limbs);
+                        typename scalar_field_type::value_type res = typename scalar_field_type::value_type(pack<typename scalar_field_type::integral_type>(limbs));
                         return res;
                     }
 
@@ -172,7 +143,7 @@ namespace nil {
                     }
 
                     void absorb_g(typename group_type::value_type& g){
-                        if(this->last_squeezed.empty())
+                        if(!this->last_squeezed.empty())
                             this->last_squeezed.clear();
 
                         this->sponge.absorb(g.X);
@@ -187,12 +158,20 @@ namespace nil {
                             typename base_field_type::value_type casted_to_base_value = typename base_field_type::value_type(typename base_field_type::integral_type(f.data));
                             this->sponge.absorb(casted_to_base_value);
                         } else{
-                            std::vector<bool> bits = to_bits(f);
-                            typename base_field_type::integral_type low_bit = bits[0] ? 
+                            nil::marshalling::status_type status;
+                            typename scalar_field_type::integral_type scalar_f(f.data);
+                            std::vector<bool> bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(scalar_f, status);
+
+                            std::vector<bool> shifted_bits(bits.size(), false);
+                            std::copy(bits.begin(), bits.end() - 1, shifted_bits.begin() + 1);
+
+                            typename base_field_type::integral_type low_bit = bits.back() ? 
                                     typename base_field_type::integral_type(1) : typename base_field_type::integral_type(0);
-                            typename base_field_type::integral_type high_bits = from_bits<typename base_field_type::integral_type>(bits.begin() + 1, bits.end());    
+                            typename base_field_type::integral_type high_bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(shifted_bits, status);
+
                             typename base_field_type::value_type high_bits_field = typename base_field_type::value_type(high_bits);
                             typename base_field_type::value_type low_bit_field = typename base_field_type::value_type(low_bit);
+
                             this->sponge.absorb(high_bits_field);
                             this->sponge.absorb(low_bit_field);
                         }
@@ -211,6 +190,14 @@ namespace nil {
 
                     typename base_field_type::value_type challenge_fq() {
                         return this->squeeze_field();
+                    }
+
+                    scalar_challenge_type squeeze_prechallenge() {
+                        return scalar_challenge_type(challenge());
+                    }
+
+                    typename scalar_field_type::value_type squeeze_challenge(typename scalar_field_type::value_type& endo_r) {
+                        return squeeze_prechallenge().to_field(endo_r);
                     }
                 };
             }
