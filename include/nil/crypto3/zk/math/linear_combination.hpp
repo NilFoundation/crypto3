@@ -53,6 +53,9 @@ namespace nil {
                 typedef typename VariableType::value_type field_value_type;
 
             public:
+                typedef typename VariableType::field_type field_type;
+                typedef VariableType variable_type;
+
                 std::size_t index;
                 field_value_type coeff;
 
@@ -117,6 +120,7 @@ namespace nil {
                 constexpr static const bool RotationSupport = false;
 
             public:
+                typedef typename VariableType::field_type field_type;
                 std::vector<linear_term<VariableType>> terms;
 
                 linear_combination() {};
