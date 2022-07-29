@@ -405,7 +405,7 @@ namespace nil {
                         }
 
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
-                            eval_points_amount> p_evals = params.proof.proof_evals;
+                            eval_points_amount> evals = params.proof.proof_evals;
                         var ft_eval0 = ft_eval_component::generate_circuit(
                             bp,
                             assignment, 
@@ -415,7 +415,7 @@ namespace nil {
                             combined_evals,
                             gamma,
                             beta,
-                            p_evals,
+                            public_eval,
                             zeta,
                             joint_combiner},
                             row
@@ -586,7 +586,7 @@ namespace nil {
                         }
 
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
-                            eval_points_amount> p_evals = params.proof.proof_evals;
+                            eval_points_amount> evals = params.proof.proof_evals;
                         var ft_eval0 = ft_eval_component::generate_assignments(
                             assignment, 
                             {params.verifier_index,
@@ -595,7 +595,7 @@ namespace nil {
                             combined_evals,
                             gamma,
                             beta,
-                            p_evals,
+                            public_eval,
                             zeta,
                             joint_combiner},
                             row
