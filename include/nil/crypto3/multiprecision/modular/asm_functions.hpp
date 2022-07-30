@@ -125,9 +125,11 @@ namespace nil {
                 template<typename Limb1, typename Limb2, typename Limb3>
                 void sub_mod_asm(size_t n, Limb1 *x, const Limb2 *y, const Limb3 *mod) {
                     __asm__ volatile(
+                        "pushf                          \n\t"
                         "movq    $0, %%rbx              \n\t"
                         // Start circle sub from 0st limb
                     "1:                                 \n\t"
+                        "popf                           \n\t"
                         "movq (%[y], %%rbx, 8), %%rax   \n\t"
                         "sbbq %%rax, (%[x], %%rbx, 8)   \n\t"
                         "pushf                          \n\t"
@@ -138,8 +140,11 @@ namespace nil {
                         // If it's more than zero (no carry bit) just go to end
                         "jnc 4f                         \n\t"
                         // Else add mod to result
+                        "clc                            \n\t"
+                        "pushf                          \n\t"
                         "movq    $0, %%rbx              \n\t"
                     "2:                                 \n\t"
+                        "popf                           \n\t"
                         "movq (%[mod], %%rbx, 8), %%rax \n\t"
                         "adcq %%rax, (%[x], %%rbx, 8)   \n\t"
                         "pushf                          \n\t"

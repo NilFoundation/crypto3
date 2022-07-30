@@ -305,18 +305,19 @@ namespace nil {
                     using ui_type = typename std::tuple_element<
                         0, typename cpp_int_backend<MinBits, MaxBits, SignType, Checked>::unsigned_types>::type;
                     using default_ops::eval_lt;
-//#if BOOST_ARCH_X86_64
-//                    auto limbs_count = result.base_data().size();
-//                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) &&
-//                                                     !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked>>::value &&
-//                        result.base_data().size() == o.base_data().size() &&
-//                        result.base_data().size() == result.mod_data().get_mod().backend().size()) {
-//                        sub_mod_asm(limbs_count, result.base_data().limbs(), o.base_data().limbs(),
-//                                    result.mod_data().get_mod().backend().limbs());
-//                        result.base_data().resize(limbs_count, limbs_count);
-//                        result.base_data().normalize();
-//                    } else
-//#endif
+#if BOOST_ARCH_X86_64
+                    auto limbs_count = result.base_data().size();
+                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) &&
+                        !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked>>::value &&
+                        result.base_data().size() == o.base_data().size() &&
+                        result.base_data().size() == result.mod_data().get_mod().backend().size()) {
+
+                        sub_mod_asm(limbs_count, result.base_data().limbs(), o.base_data().limbs(),
+                                    result.mod_data().get_mod().backend().limbs());
+                        result.base_data().resize(limbs_count, limbs_count);
+                        result.base_data().normalize();
+                    } else
+#endif
                     {
                         eval_subtract(result.base_data(), o.base_data());
                         if (eval_lt(result.base_data(), ui_type(0u))) {
