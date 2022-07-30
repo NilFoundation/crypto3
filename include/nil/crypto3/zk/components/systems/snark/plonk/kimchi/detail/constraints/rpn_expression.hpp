@@ -348,9 +348,7 @@ namespace nil {
                         std::size_t constant_row = start_row_index;
 
                         var endo_factor(0, constant_row, false, var::column_type::constant);
-                        var zero(0, constant_row + 1, false, var::column_type::constant);
-                        var one(0, constant_row + 2, false, var::column_type::constant);
-                        constant_row += 3;
+                        constant_row += 1;
 
                         auto mds = mds_vars(constant_row);
                         constant_row += mds_size * mds_size;
@@ -399,6 +397,7 @@ namespace nil {
                                     stack.emplace_back(stack.back());
                                     break;
                                 case token_type::pow: {
+                                    constant_row += 2; 
                                     var exponent(0, constant_row, false, var::column_type::constant);
                                     constant_row++;
 
@@ -486,9 +485,7 @@ namespace nil {
                         std::size_t constant_row = start_row_index;
 
                         var endo_factor(0, constant_row, false, var::column_type::constant);
-                        var zero(0, constant_row + 1, false, var::column_type::constant);
-                        var one(0, constant_row + 2, false, var::column_type::constant);
-                        constant_row += 3;
+                        constant_row += 1;
 
                         auto mds = mds_vars(constant_row);
                         constant_row += mds_size * mds_size;
@@ -537,6 +534,7 @@ namespace nil {
                                     stack.emplace_back(stack.back());
                                     break;
                                 case token_type::pow: {
+                                    constant_row += 2;
                                     var exponent(0, constant_row, false, var::column_type::constant);
                                     constant_row++;
 
@@ -614,11 +612,6 @@ namespace nil {
                         assignment.constant(0)[row] = endo_scalar_component::endo_factor;
                         row++;
 
-                        assignment.constant(0)[row] = 0;
-                        row++;
-                        assignment.constant(0)[row] = 1;
-                        row++;
-
                         std::array<std::array<typename BlueprintFieldType::value_type, mds_size>, mds_size> mds =
                             poseidon_component::mds_constants();
                         for (std::size_t i = 0; i < mds_size; i++) {
@@ -638,6 +631,7 @@ namespace nil {
                                     break;
                                 }
                                 case token_type::pow: {
+                                    row += 2; // exponentiation component uses 2 constant rows
                                     assignment.constant(W0)[row] = t.value.first;
                                     row++;
                                     break;

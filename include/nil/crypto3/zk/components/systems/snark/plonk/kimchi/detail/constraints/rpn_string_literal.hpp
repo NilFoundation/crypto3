@@ -119,11 +119,12 @@ constexpr size_t rpn_component_rows(const char *expression) {
         str_start[i + 1] = pos + 1;
     }
     size_t rows = 0;
-    size_t constant_rows = 3 + mds_size * mds_size;
+    size_t constant_rows = 1 + mds_size * mds_size;
     for (i = 0; i < tokens_array_size; i++) {
         if (find_str(expression, literal_c, 7, str_start[i], str_end[i]) != std::string::npos) {
             constant_rows++;
         } else if (find_str(expression, pow_c, 3, str_start[i], str_end[i]) != std::string::npos) {
+            constant_rows += 2; // exponentiation component uses 2 constant rows
             rows += exponentiation_component::rows_amount;
             constant_rows++;
         } else if (find_str(expression, add_c, 3, str_start[i], str_end[i]) != std::string::npos) {
