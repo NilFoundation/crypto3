@@ -72,10 +72,6 @@ BOOST_DATA_TEST_CASE(base_opeartions, numbers_size * (boost::unit_test::data::ma
     std::string b_string = big_numbers_b.substr(0, num);
     std::string mod_string = exp;
 
-    std::cout << a_string << std::endl;
-    std::cout << b_string << std::endl;
-    std::cout << mod_string << std::endl;
-
     standart_number a_s(a_string), b_s(b_string), mod_s(mod_string), result_s(0);
 
     params_number mod(mod_s);

@@ -146,7 +146,7 @@ template <class E>
 void report_unexpected_exception(const E& e, int severity, const char* file, int line, const char* function)
 {
    report_where(file, line, function) << " Unexpected exception of type " << typeid(e).name() << std::endl;
-   BOOST_LIGHTWEIGHT_TEST_OSTREAM << "Errot message was: " << e.what() << std::endl;
+   BOOST_LIGHTWEIGHT_TEST_OSTREAM << "Error message was: " << e.what() << std::endl;
    BOOST_MP_REPORT_SEVERITY(severity);
 }
 
