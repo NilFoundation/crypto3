@@ -6,18 +6,23 @@
 #ifndef BOOST_MP_CPP_INT_HPP
 #define BOOST_MP_CPP_INT_HPP
 
+#ifndef TVM
 #include <iostream>
 #include <iomanip>
 #include <cstdint>
+
+#include <boost/array.hpp>
+
+#include <boost/predef/other/endian.h>
+#endif
+
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/detail/integer_ops.hpp>
 #include <nil/crypto3/multiprecision/detail/rebind.hpp>
 #include <boost/core/empty_value.hpp>
-#include <boost/array.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <nil/crypto3/multiprecision/rational_adaptor.hpp>
 #include <nil/crypto3/multiprecision/traits/is_byte_container.hpp>
-#include <boost/predef/other/endian.h>
 #include <boost/integer/static_min_max.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/checked.hpp>
 #include <nil/crypto3/multiprecision/detail/constexpr.hpp>
@@ -256,6 +261,11 @@ namespace nil {
                     //
                     static_assert(!std::is_void<Allocator>::value, "Allocator must not be void here");
 
+#ifdef TVM
+                    static_assert(std::is_void<Allocator>::value, "Arbitrary precision is not supported in TVM");
+#endif
+
+
                     using base_type = boost::empty_value<allocator_type>;
 
                 private:
@@ -324,6 +334,16 @@ namespace nil {
                     BOOST_MP_FORCEINLINE constexpr cpp_int_base(signed_limb_type i) noexcept :
                         m_data(i), m_limbs(1), m_sign(i < 0), m_internal(true), m_alias(false) {
                     }
+
+#ifdef TVM
+                    BOOST_MP_FORCEINLINE constexpr cpp_int_base(unsigned int i) noexcept :
+                        cpp_int_base(static_cast<limb_type>(i)) {
+                    }
+                    BOOST_MP_FORCEINLINE constexpr cpp_int_base(int i) noexcept :
+                        cpp_int_base(static_cast<signed_limb_type>(i)) {
+                    }
+#endif // TVM
+
 #if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
                     BOOST_MP_FORCEINLINE constexpr cpp_int_base(double_limb_type i) noexcept :
                         m_data(i), m_limbs(i > max_limb_value ? 2 : 1), m_sign(false), m_internal(true),
@@ -840,6 +860,7 @@ namespace nil {
                         constexpr data_type(limb_type i, limb_type j) : m_data {i, j} {
                         }
 #endif
+#ifndef TVM
                         constexpr data_type(double_limb_type i) : m_double_first_limb(i) {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                             if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb)) {
@@ -849,6 +870,8 @@ namespace nil {
                             }
 #endif
                         }
+#endif // TVM
+
                         template<limb_type... VALUES>
                         constexpr data_type(literals::detail::value_pack<VALUES...>) : m_data {VALUES...} {
                         }
@@ -869,6 +892,16 @@ namespace nil {
                         if (i < 0)
                             negate();
                     }
+
+#ifdef TVM
+                    BOOST_MP_FORCEINLINE constexpr cpp_int_base(unsigned int i) noexcept :
+                        cpp_int_base(static_cast<limb_type>(i)) {
+                    }
+                    BOOST_MP_FORCEINLINE constexpr cpp_int_base(int i) noexcept :
+                        cpp_int_base(static_cast<signed_limb_type>(i)) {
+                    }
+#endif // TVM
+
 #if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
                     BOOST_MP_FORCEINLINE constexpr cpp_int_base(double_limb_type i) noexcept :
                         m_wrapper(i), m_limbs(i > max_limb_value ? 2 : 1) {
@@ -1011,6 +1044,7 @@ namespace nil {
                 // because some platforms have native integer types longer than boost::long_long_type, "really
                 // boost::long_long_type" anyone??
                 //
+#ifndef TVM
                 template<unsigned N, bool s>
                 struct trivial_limb_type_imp {
                     using type = double_limb_type;
@@ -1024,6 +1058,12 @@ namespace nil {
                 template<unsigned N>
                 struct trivial_limb_type
                     : public trivial_limb_type_imp<N, N <= sizeof(boost::long_long_type) * CHAR_BIT> { };
+#else
+                template<unsigned N>
+                struct trivial_limb_type {
+                    using type = unsigned;
+                };
+#endif //TVM
                 //
                 // Backend for fixed precision signed-magnitude type which will fit entirely inside a
                 // "double_limb_type":
@@ -1522,6 +1562,10 @@ namespace nil {
                 struct is_allowed_cpp_int_base_conversion
                     : public std::conditional<std::is_same<Arg, limb_type>::value ||
                                                   std::is_same<Arg, signed_limb_type>::value
+#ifdef TVM
+                                                  || std::is_same<Arg, unsigned int>::value||
+                                                  std::is_same<Arg, int>::value
+#endif
 #if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
                                                   || std::is_same<Arg, double_limb_type>::value ||
                                                   std::is_same<Arg, signed_double_limb_type>::value
@@ -1556,8 +1600,15 @@ namespace nil {
                                                    Allocator,
                                                    is_trivial_cpp_int<self_type>::value>;
                     using trivial_tag = std::integral_constant<bool, is_trivial_cpp_int<self_type>::value>;
-
+#ifdef TVM
+                    static_assert(std::is_void<Allocator>::value, "Arbitrary precision integers are not supported in TVM");
+#endif
                 public:
+#ifdef TVM
+                    using signed_types = std::tuple<int, signed_limb_type, signed_double_limb_type>;
+                    using unsigned_types = std::tuple<unsigned, limb_type, double_limb_type>;
+#else
+
                     using signed_types = typename std::conditional<
                         is_trivial_cpp_int<self_type>::value,
                         std::tuple<signed char, short, int, long, boost::long_long_type, signed_double_limb_type>,
@@ -1570,6 +1621,7 @@ namespace nil {
                                                                                 boost::ulong_long_type,
                                                                                 double_limb_type>,
                                                                      std::tuple<limb_type, double_limb_type>>::type;
+#endif
                     using float_types = typename std::conditional<is_trivial_cpp_int<self_type>::value,
                                                                   std::tuple<float, double, long double>,
                                                                   std::tuple<long double>>::type;
@@ -1850,7 +1902,9 @@ namespace nil {
                     }
                     BOOST_MP_CXX14_CONSTEXPR void
                         do_assign_arithmetic(double_limb_type i, const std::integral_constant<bool, false>&) noexcept {
+#ifndef TVM
                         static_assert(sizeof(i) == 2 * sizeof(limb_type), "Failed integer size check");
+#endif // TVM
                         static_assert(base_type::internal_limb_count >= 2, "Failed internal limb count");
                         typename base_type::limb_pointer p = this->limbs();
 #ifdef __MSVC_RUNTIME_CHECKS
@@ -1866,7 +1920,9 @@ namespace nil {
                         signed_double_limb_type i,
                         const std::integral_constant<bool, false>&) noexcept(noexcept(std::declval<cpp_int_backend>()
                                                                                           .sign(true))) {
+#ifndef TVM
                         static_assert(sizeof(i) == 2 * sizeof(limb_type), "double limb type size check failed");
+#endif
                         static_assert(base_type::internal_limb_count >= 2, "Failed internal limb count check");
                         bool s = false;
                         if (i < 0)
@@ -1883,6 +1939,17 @@ namespace nil {
                         this->resize(p[1] ? 2 : 1, p[1] ? 2 : 1);
                         this->sign(s);
                     }
+
+#ifdef TVM
+                    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void
+                        do_assign_arithmetic(unsigned i, const std::integral_constant<bool, false>& tag) noexcept {
+                        do_assign_arithmetic(double_limb_type(i), tag);
+                    }
+                    BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void
+                        do_assign_arithmetic(int i, const std::integral_constant<bool, false>& tag) noexcept {
+                        do_assign_arithmetic(signed_double_limb_type(i), tag);
+                    }
+#endif
 
                     BOOST_MP_CXX14_CONSTEXPR void do_assign_arithmetic(long double a,
                                                                        const std::integral_constant<bool, false>&) {
@@ -1966,7 +2033,7 @@ namespace nil {
                         do_assign_arithmetic(val, trivial_tag());
                         return *this;
                     }
-
+#ifndef TVM
                 private:
                     void do_assign_string(const char* s, const std::integral_constant<bool, true>&) {
                         std::size_t n = s ? std::strlen(s) : 0;
@@ -2164,10 +2231,11 @@ namespace nil {
                         do_assign_string(s, trivial_tag());
                         return *this;
                     }
+#endif
                     BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR void swap(cpp_int_backend& o) noexcept {
                         this->do_swap(o);
                     }
-
+#ifndef TVM
                 private:
                     std::string do_get_trivial_string(std::ios_base::fmtflags f,
                                                       const std::integral_constant<bool, false>&) const {
@@ -2364,7 +2432,8 @@ namespace nil {
                     std::string str(std::streamsize /*digits*/, std::ios_base::fmtflags f) const {
                         return do_get_string(f, trivial_tag());
                     }
-
+#endif // TVM
+#ifndef TVM
                 private:
                     template<class Container>
                     void construct_from_container(const Container& c, const std::integral_constant<bool, false>&) {
@@ -2391,6 +2460,8 @@ namespace nil {
                             }
                         }
                     }
+#endif
+
                     template<class Container>
                     BOOST_MP_CXX14_CONSTEXPR void construct_from_container(const Container& c,
                                                                            const std::integral_constant<bool, true>&) {

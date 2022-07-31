@@ -10,6 +10,10 @@
 #include <boost/integer_traits.hpp>
 #include <boost/assert.hpp>
 
+#ifdef TVM
+#include <mask_int/mask_int.hpp>
+#endif
+
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
@@ -45,8 +49,28 @@ namespace nil {
                 };
 
             }    // namespace detail
+#ifdef TVM
+            using namespace mask_int;
+            using limb_type = mask_uint128;
+            using signed_limb_type = mask_int128;
+            using double_limb_type = mask_uint256;
+            using signed_double_limb_type = mask_int256;
 
-#if defined(BOOST_HAS_INT128)
+
+            constexpr const unsigned bits_per_limb = 128;
+            constexpr const limb_type limb_value_max = limb_type(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
+
+
+            constexpr const limb_type max_block_10 = limb_type(100000000000000000000000000000000000000);
+            constexpr const unsigned int digits_per_block_10 = 38;
+
+            inline unsigned int block_multiplier(unsigned count) {
+                constexpr const unsigned int values[digits_per_block_10] = {
+                    10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000, 1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 10000000000000000000, 100000000000000000000, 1000000000000000000000, 10000000000000000000000, 100000000000000000000000, 1000000000000000000000000, 10000000000000000000000000, 100000000000000000000000000, 1000000000000000000000000000, 10000000000000000000000000000, 100000000000000000000000000000, 1000000000000000000000000000000, 10000000000000000000000000000000, 100000000000000000000000000000000, 1000000000000000000000000000000000, 10000000000000000000000000000000000, 100000000000000000000000000000000000, 1000000000000000000000000000000000000, 10000000000000000000000000000000000000, 100000000000000000000000000000000000000};
+                BOOST_ASSERT(count < digits_per_block_10);
+                return values[count];
+            }
+#elif defined(BOOST_HAS_INT128)
 
             using limb_type = detail::largest_unsigned_type<64>::type;
             using signed_limb_type = detail::largest_signed_type<64>::type;
@@ -54,6 +78,9 @@ namespace nil {
             using signed_double_limb_type = boost::int128_type;
             constexpr const limb_type max_block_10 = 1000000000000000000uLL;
             constexpr const limb_type digits_per_block_10 = 18;
+
+            constexpr const unsigned bits_per_limb = 64;
+            constexpr const limb_type limb_value_max = ~static_cast<limb_type>(0u);
 
             inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count) {
                 constexpr const limb_type values[digits_per_block_10] = {10,
@@ -108,11 +135,14 @@ namespace nil {
         namespace multiprecision {
 
 #else
-
             using limb_type = detail::largest_unsigned_type<32>::type;
             using signed_limb_type = detail::largest_signed_type<32>::type;
             using double_limb_type = detail::largest_unsigned_type<64>::type;
             using signed_double_limb_type = detail::largest_signed_type<64>::type;
+
+            constexpr const unsigned bits_per_limb = 32;
+            constexpr const limb_type limb_value_max = ~static_cast<limb_type>(0u);
+
             constexpr const limb_type max_block_10 = 1000000000;
             constexpr const limb_type digits_per_block_10 = 9;
 
@@ -124,8 +154,6 @@ namespace nil {
             }
 
 #endif
-
-            constexpr const unsigned bits_per_limb = sizeof(limb_type) * CHAR_BIT;
 
             template<class T>
             inline BOOST_MP_CXX14_CONSTEXPR void minmax(const T& a, const T& b, T& aa, T& bb) {

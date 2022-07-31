@@ -273,7 +273,7 @@ namespace nil {
                         multiply_karatsuba(result, a, b, storage);
                     }
                 }
-
+#ifndef TVM
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3,
@@ -355,7 +355,7 @@ namespace nil {
                     typename variable_precision_type::scoped_shared_storage storage(t.allocator(), storage_size);
                     multiply_karatsuba(t, a_t, b_t, storage);
                 }
-
+#endif
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3,
@@ -430,10 +430,20 @@ namespace nil {
                     //
                     unsigned as = a.size();
                     unsigned bs = b.size();
+#ifdef TVM
+                    cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> ta(a);
+                    typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::const_limb_pointer
+                        pa = ta.limbs();
+
+                    cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> tb(b);
+                    typename cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>::const_limb_pointer
+                        pb = tb.limbs();
+#else
                     typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::const_limb_pointer
                         pa = a.limbs();
                     typename cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>::const_limb_pointer
                         pb = b.limbs();
+#endif
                     if (as == 1) {
                         bool s = b.sign() != a.sign();
                         if (bs == 1) {

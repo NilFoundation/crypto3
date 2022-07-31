@@ -357,7 +357,7 @@ namespace nil {
                         result.limbs()[i] = ~static_cast<limb_type>(0);
                     result.normalize();
                 }
-
+#ifndef TVM
                 template<class Int>
                 inline void left_shift_byte(Int& result, double_limb_type s) {
                     limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
@@ -386,6 +386,7 @@ namespace nil {
                         std::memset(pc, 0, bytes);
                     }
                 }
+#endif
 
                 template<class Int>
                 inline BOOST_MP_CXX14_CONSTEXPR void left_shift_limb(Int& result, double_limb_type s) {
@@ -528,6 +529,7 @@ namespace nil {
                     result.normalize();
                 }
 
+#ifndef TVM
                 template<class Int>
                 inline void right_shift_byte(Int& result, double_limb_type s) {
                     limb_type offset = static_cast<limb_type>(s / Int::limb_bits);
@@ -551,6 +553,7 @@ namespace nil {
                     }
                     result.resize(rs, rs);
                 }
+#endif
 
                 template<class Int>
                 inline BOOST_MP_CXX14_CONSTEXPR void right_shift_limb(Int& result, double_limb_type s) {
@@ -613,7 +616,7 @@ namespace nil {
                     if (!s)
                         return;
 
-#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT) && !defined(TVM)
                     constexpr const limb_type limb_shift_mask =
                         cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
                     constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
@@ -626,7 +629,7 @@ namespace nil {
                     else if (((s & byte_shift_mask) == 0) && !BOOST_MP_IS_CONST_EVALUATED(s))
 #endif
                         right_shift_byte(result, s);
-#elif BOOST_ENDIAN_LITTLE_BYTE
+#elif BOOST_ENDIAN_LITTLE_BYTE && !defined(TVM)
                     constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
@@ -666,7 +669,7 @@ namespace nil {
                     if (is_neg)
                         eval_increment(result);
 
-#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT)
+#if BOOST_ENDIAN_LITTLE_BYTE && defined(BOOST_MP_USE_LIMB_SHIFT) && !defined(TVM)
                     constexpr const limb_type limb_shift_mask =
                         cpp_int_backend<MinBits1, MaxBits1, signed_magnitude, Checked1, Allocator1>::limb_bits - 1;
                     constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
@@ -675,7 +678,7 @@ namespace nil {
                         right_shift_limb(result, s);
                     else if ((s & byte_shift_mask) == 0)
                         right_shift_byte(result, s);
-#elif BOOST_ENDIAN_LITTLE_BYTE
+#elif BOOST_ENDIAN_LITTLE_BYTE && !defined(TVM)
                     constexpr const limb_type byte_shift_mask = CHAR_BIT - 1;
 
                     if ((s & byte_shift_mask) == 0)

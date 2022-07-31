@@ -17,23 +17,26 @@ namespace nil {
                     // Note that this is not a complete header, it must be included as part of
                     // nil/crypto3/multiprecision/cpp_int.hpp.
                     //
-
+#ifndef TVM
                     inline void raise_overflow(std::string op) {
                         BOOST_THROW_EXCEPTION(std::overflow_error("overflow in " + op));
                     }
                     inline void raise_add_overflow() {
                         raise_overflow("addition");
                     }
+#endif
                     inline void raise_subtract_overflow() {
                         BOOST_THROW_EXCEPTION(
                             std::range_error("Subtraction resulted in a negative value, but the type is unsigned"));
                     }
+#ifndef TVM
                     inline void raise_mul_overflow() {
                         raise_overflow("multiplication");
                     }
                     inline void raise_div_overflow() {
                         raise_overflow("division");
                     }
+#endif
 
                     template<class A>
                     inline BOOST_MP_CXX14_CONSTEXPR A checked_add_imp(A a, A b,
