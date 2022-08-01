@@ -52,7 +52,7 @@ namespace nil {
 
                 template <typename CurveType>
                 struct BaseSponge{
-                    typedef typename CurveType::template g1_type<> group_type;
+                    typedef typename CurveType::template g1_type<algebra::curves::coordinates::affine> group_type;
                     typedef typename CurveType::base_field_type base_field_type;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     using policy_type = nil::crypto3::hashes::detail::base_poseidon_policy<base_field_type, 2, 1, 7, 55, 0, true>;
@@ -142,7 +142,7 @@ namespace nil {
                         }
                     }
 
-                    void absorb_g(typename group_type::value_type& g){
+                    void absorb_g(typename group_type::value_type g){
                         if(!this->last_squeezed.empty())
                             this->last_squeezed.clear();
 
@@ -150,7 +150,7 @@ namespace nil {
                         this->sponge.absorb(g.Y);
                     }
 
-                    void absorb_fr(typename scalar_field_type::value_type& f){
+                    void absorb_fr(typename scalar_field_type::value_type f){
                         if(this->last_squeezed.empty())
                             this->last_squeezed.clear();
 
@@ -196,7 +196,7 @@ namespace nil {
                         return scalar_challenge_type(challenge());
                     }
 
-                    typename scalar_field_type::value_type squeeze_challenge(typename scalar_field_type::value_type& endo_r) {
+                    typename scalar_field_type::value_type squeeze_challenge(typename scalar_field_type::value_type endo_r) {
                         return squeeze_prechallenge().to_field(endo_r);
                     }
                 };

@@ -11,7 +11,7 @@ namespace nil{
                 struct group_map{
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename CurveType::base_field_type base_field_type;
-                    typedef typename CurveType::template g1_type<> group_type;
+                    typedef typename CurveType::template g1_type<algebra::curves::coordinates::affine> group_type;
                     typedef typename base_field_type::value_type value_type;
                     constexpr static const typename base_field_type::integral_type a = CurveType::template g1_type<>::params_type::a;
                     constexpr static const typename base_field_type::integral_type b = CurveType::template g1_type<>::params_type::b;
@@ -73,10 +73,10 @@ namespace nil{
                         for(auto &x : xvec){
                             value_type y = curve_eqn(x).sqrt();
                             if(y.squared() == x.pow(3) + a * x + b){
-                                return typename group_type::value_type(x, y, 0x1_cppui256);
+                                return typename group_type::value_type(x, y);
                             }
                         }
-                        return typename group_type::value_type(value_type(0), value_type(0), 0x1_cppui256);
+                        return typename group_type::value_type();
                     }
 
                     typename group_type::value_type to_group(value_type t){
@@ -115,7 +115,9 @@ namespace nil{
                         }
 
                         return a * endo_coeff + b;
-                    };
+                    }
+
+                    ScalarChallenge(typename FieldType::value_type _val) : _val(_val) {}
 
                     typename FieldType::value_type _val;
                 };
