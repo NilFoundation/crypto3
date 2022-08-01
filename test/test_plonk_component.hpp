@@ -182,7 +182,7 @@ namespace nil {
 
             bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
               public_preprocessed_data, proof, bp, fri_params);
-            //profiling(assignments);
+            profiling(assignments);
             BOOST_CHECK(verifier_res);
         }
 

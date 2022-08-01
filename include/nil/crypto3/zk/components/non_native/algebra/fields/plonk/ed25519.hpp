@@ -35,6 +35,7 @@
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/reduction.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/scalar_non_native_range.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/ec_point_edwards25519.hpp>
 #include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
 
 namespace nil {
@@ -75,6 +76,9 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
+                    using check_ec_point_component = ec_point<ArithmetizationType, CurveType, Ed25519Type,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+
                     using variable_base_mult_component = variable_base_multiplication<ArithmetizationType, CurveType, Ed25519Type,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     using fixed_base_mult_component = fixed_base_multiplication<ArithmetizationType, CurveType, Ed25519Type,
@@ -95,7 +99,8 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xfcc2;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 5 * non_native_range_component::rows_amount
+                    constexpr static const std::size_t rows_amount = 4 * non_native_range_component::rows_amount
+                                                                    + scalar_non_native_range_component::rows_amount
                                                                     + variable_base_mult_component::rows_amount
                                                                     + fixed_base_mult_component::rows_amount
                                                                     + addition_component::rows_amount
@@ -135,16 +140,12 @@ namespace nil {
                         var M = params.M;
 
                         /* here we check if s lies in range */
-                        non_native_range_component::generate_assignments(assignment, {s}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_assignments(assignment, {R.x}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_assignments(assignment, {R.y}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_assignments(assignment, {pk.x}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_assignments(assignment, {pk.y}, row);
-                        row += non_native_range_component::rows_amount;
+                        scalar_non_native_range_component::generate_assignments(assignment, {s}, row);
+                        row += scalar_non_native_range_component::rows_amount;
+                        check_ec_point_component::generate_assignments(assignment, {{R.x, R.y}}, row);
+                        row += check_ec_point_component::rows_amount;
+                        check_ec_point_component::generate_assignments(assignment, {{pk.x, pk.y}}, row);
+                        row += check_ec_point_component::rows_amount;
                         
                         /* here we get k = SHA(R||A||M) */
                         /* 66*15 + 34 = 1024 bits */
@@ -193,16 +194,12 @@ namespace nil {
                         var M = params.M;
 
                         /* here we check if s lies in range */
-                        non_native_range_component::generate_circuit(bp, assignment, {s}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_circuit(bp, assignment, {R.x}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_circuit(bp, assignment, {R.y}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_circuit(bp, assignment, {pk.x}, row);
-                        row += non_native_range_component::rows_amount;
-                        non_native_range_component::generate_circuit(bp, assignment, {pk.y}, row);
-                        row += non_native_range_component::rows_amount;
+                        scalar_non_native_range_component::generate_circuit(bp, assignment, {s}, row);
+                        row += scalar_non_native_range_component::rows_amount;
+                        check_ec_point_component::generate_circuit(bp, assignment, {{R.x, R.y}}, row);
+                        row += check_ec_point_component::rows_amount;
+                        check_ec_point_component::generate_circuit(bp, assignment, {{pk.x, pk.y}}, row);
+                        row += check_ec_point_component::rows_amount;
                         
                         /* here we get k = SHA(R||A||M) */
                         // auto padded = ...;

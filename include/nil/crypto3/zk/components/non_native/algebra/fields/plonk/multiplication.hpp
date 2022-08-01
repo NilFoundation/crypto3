@@ -328,10 +328,10 @@ namespace nil {
                         // bp.add_copy_constraint({var(W1, row + 4, false), params.A[1]});
                         // bp.add_copy_constraint({var(W2, row + 4, false), params.A[2]});
                         // bp.add_copy_constraint({var(W3, row + 4, false), params.A[3]});
-                        // bp.add_copy_constraint({var(W4, row + 4, false), params.B[0]});
-                        // bp.add_copy_constraint({var(W5, row + 4, false), params.B[1]});
-                        // bp.add_copy_constraint({var(W6, row + 4, false), params.B[2]});
-                        // bp.add_copy_constraint({var(W7, row + 4, false), params.B[3]});
+                        bp.add_copy_constraint({var(W4, row + 4, false), params.B[0]});
+                        bp.add_copy_constraint({var(W5, row + 4, false), params.B[1]});
+                        bp.add_copy_constraint({var(W6, row + 4, false), params.B[2]});
+                        bp.add_copy_constraint({var(W7, row + 4, false), params.B[3]});
                     }
                 };
 

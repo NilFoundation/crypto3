@@ -63,6 +63,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/non_native_demo"
     "non_native/plonk/reduction"
     "non_native/plonk/ed25519"
+    "non_native/plonk/ec_point"
     )
 
 set(BLUEPRINT_TESTS_FILES

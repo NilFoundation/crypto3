@@ -89,7 +89,7 @@ namespace nil {
                 public:
                     constexpr static const std::size_t rows_amount =
                         2 * non_native_range_component::rows_amount + 8 * multiplication_component::rows_amount +
-                        3 * addition_component::rows_amount + subtraction_component::rows_amount;
+                        3 * addition_component::rows_amount + subtraction_component::rows_amount + 2;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -176,6 +176,7 @@ namespace nil {
                         assignment.witness(W2)[row] = x3[2];
                         assignment.witness(W3)[row] = x3[3];
                         std::array<var, 4>  P_x = {var(W0, row), var(W1, row), var(W2, row), var(W3, row)};
+                        row++;
 
                         typename non_native_range_component::params_type range_params_x3 = {P_x};
                         non_native_range_component::generate_assignments(assignment, range_params_x3, row);
@@ -186,6 +187,8 @@ namespace nil {
                         assignment.witness(W2)[row] = y3[2];
                         assignment.witness(W3)[row] = y3[3];
                         std::array<var, 4>  P_y = {var(W0, row), var(W1, row), var(W2, row), var(W3, row)};
+                        row++;
+
                         typename non_native_range_component::params_type range_params_y3 = {P_y};
                         non_native_range_component::generate_assignments(assignment, range_params_y3, row);
                         row+=non_native_range_component::rows_amount;
@@ -252,12 +255,15 @@ namespace nil {
                         }
                         std::size_t row = start_row_index;
                         std::array<var, 4>  P_x = {var(W0, row), var(W1, row), var(W2, row), var(W3, row)};
+                        row++;
 
                         typename non_native_range_component::params_type range_params_x3 = {P_x};
                         non_native_range_component::generate_circuit(bp, assignment, range_params_x3, row);
                         row+=non_native_range_component::rows_amount;
 
                         std::array<var, 4>  P_y = {var(W0, row), var(W1, row), var(W2, row), var(W3, row)};
+                        row++;
+
                         typename non_native_range_component::params_type range_params_y3 = {P_y};
                         non_native_range_component::generate_circuit(bp, assignment, range_params_y3, row);
                         row+=non_native_range_component::rows_amount;
@@ -288,8 +294,8 @@ namespace nil {
                         auto z2 = multiplication_component::generate_circuit(bp, assignment, typename multiplication_component::params_type({t0.output, t1.output}), row);
                         row+=multiplication_component::rows_amount;
 
-                        std::array<var, 4> d_var_array = {var(0, 4, false, var::column_type::constant), var(0, 5, false, var::column_type::constant),
-                        var(0, 6, false, var::column_type::constant), var(0, 7, false, var::column_type::constant)};
+                        std::array<var, 4> d_var_array = {var(0, row + 4, false, var::column_type::constant), var(0, row + 5, false, var::column_type::constant),
+                        var(0, row + 6, false, var::column_type::constant), var(0, row + 7, false, var::column_type::constant)};
 
                         auto k0 = multiplication_component::generate_circuit(bp, assignment, typename multiplication_component::params_type({d_var_array, z2.output}), row);
                         row+=multiplication_component::rows_amount;
@@ -327,6 +333,7 @@ namespace nil {
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
+                        row+=2;
                         row+=non_native_range_component::rows_amount;
                         row+=non_native_range_component::rows_amount;
                         row+=multiplication_component::rows_amount;
