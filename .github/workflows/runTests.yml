@@ -1,0 +1,47 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Run test
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on pull request events but only for the master branch
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  run_tests:
+    runs-on: [self-hosted]
+
+    env:
+      SUITE_REPO: "NilFoundation/crypto3"
+      LIB_PATH: "./libs/blueprint"
+
+    steps:
+      - name: Checkout suite
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.SUITE_REPO }}
+          submodules: recursive
+
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          path: ${{ env.LIB_PATH }}
+
+      - name: Cmake and build
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+
+      - name: Run tests
+        run: make tests
+
+
+
+
+
+
