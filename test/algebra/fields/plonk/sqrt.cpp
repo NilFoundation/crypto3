@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sqrt_qr_test) {
 
     auto result_check = [&expected_res](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        //assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == assignment.var_value(real_res.output));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sqrt_qnr_test) {
 
     auto result_check = [&expected_res](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        //assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == assignment.var_value(real_res.output));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sqrt_zero_test) {
 
     auto result_check = [&expected_res](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        //assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == assignment.var_value(real_res.output));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
