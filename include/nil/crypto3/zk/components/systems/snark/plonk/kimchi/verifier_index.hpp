@@ -75,22 +75,22 @@ namespace nil {
                     using FieldType = typename CurveType::base_field_type;
                     using commitment_params_type = typename KimchiParamsType::commitment_params_type;
 
-                    using shifted_commitment_type = typename 
-                        zk::components::kimchi_shifted_commitment_type<FieldType, 
+                    using commitment_type = typename 
+                        zk::components::kimchi_commitment_type<FieldType, 
                             commitment_params_type::shifted_commitment_split>;
 
                     using var = snark::plonk_variable<FieldType>;
                     using var_ec_point = typename zk::components::var_ec_point<FieldType>;
 
                     struct commitments {
-                        std::array<shifted_commitment_type,
+                        std::array<commitment_type,
                             KimchiParamsType::permut_size> sigma_comm;
-                        std::array<shifted_commitment_type,
+                        std::array<commitment_type,
                             KimchiParamsType::witness_columns> coefficient_comm;
-                        shifted_commitment_type generic_comm;
-                        shifted_commitment_type psm_comm;
-                        std::vector<shifted_commitment_type> selectors_comm;
-                        std::vector<shifted_commitment_type> lookup_selectors_comm;
+                        commitment_type generic_comm;
+                        commitment_type psm_comm;
+                        std::vector<commitment_type> selectors_comm;
+                        std::vector<commitment_type> lookup_selectors_comm;
                     };
 
                     var_ec_point H;

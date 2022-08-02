@@ -115,8 +115,8 @@ namespace nil {
                     using commitment_params_type = typename 
                         KimchiParamsType::commitment_params_type;
 
-                    using shifted_commitment_type = typename 
-                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                    using commitment_type = typename 
+                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             commitment_params_type::shifted_commitment_split>;
 
                     using opening_proof_type = typename 
@@ -124,15 +124,15 @@ namespace nil {
                         commitment_params_type::eval_rounds>;
 
                     struct commitments {
-                        std::array<shifted_commitment_type,
+                        std::array<commitment_type,
                             KimchiParamsType::witness_columns> witness_comm;
-                        shifted_commitment_type lookup_runtime_comm;
-                        shifted_commitment_type table_comm;
-                        std::vector<shifted_commitment_type> lookup_sorted_comm;
-                        shifted_commitment_type lookup_agg_comm;
-                        shifted_commitment_type z_comm;
-                        shifted_commitment_type t_comm;
-                        std::array<shifted_commitment_type, 
+                        commitment_type lookup_runtime_comm;
+                        commitment_type table_comm;
+                        std::vector<commitment_type> lookup_sorted_comm;
+                        commitment_type lookup_agg_comm;
+                        commitment_type z_comm;
+                        commitment_type t_comm;
+                        std::array<commitment_type, 
                             KimchiParamsType::prev_challenges_size>
                             prev_challenges; // to-do: get in the component from oracles
                     };
@@ -155,8 +155,8 @@ namespace nil {
                         BlueprintFieldType, KimchiParamsType>;
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    using shifted_commitment_type = typename 
-                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
+                    using commitment_type = typename 
+                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             KimchiCommitmentParamsType::shifted_commitment_split>;
 
                     using opening_proof_type = typename 
@@ -171,7 +171,7 @@ namespace nil {
                                     11, 12, 13, 14>;
 
                     //typename proof_binding::fq_sponge_output fq_output;
-                    std::array<shifted_commitment_type, 
+                    std::array<commitment_type, 
                         kimchi_constants::evaluations_in_batch_size> comm;
                     opening_proof_type opening_proof;
 

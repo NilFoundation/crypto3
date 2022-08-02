@@ -73,7 +73,7 @@ namespace nil {
                                 + 1 // U
                                 + 2 * commitment_params_type::eval_rounds
                                 + evaluations_in_batch_size
-                                    * (commitment_params_type::shifted_commitment_split + 1)
+                                    * commitment_params_type::shifted_commitment_split
                                 + 1 // U
                                 + 1) // opening.delta 
                             * batch_size;

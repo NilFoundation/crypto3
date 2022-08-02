@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 10;
+    constexpr std::size_t SelectorColumns = 25;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -118,8 +118,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
                                                       13,
                                                       14>;
 
-    using shifted_commitment_type =
-        typename zk::components::kimchi_shifted_commitment_type<BlueprintFieldType,
+    using commitment_type =
+        typename zk::components::kimchi_commitment_type<BlueprintFieldType,
                                                                 commitment_params::shifted_commitment_split>;
 
     using opening_proof_type =
@@ -158,32 +158,32 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         unshifted_var.push_back({var(0, i * 4 + 2, false, var::column_type::public_input),
                                  var(0, i * 4 + 3, false, var::column_type::public_input)});
     }
-    std::array<shifted_commitment_type, witness_columns> witness_comm;
+    std::array<commitment_type, witness_columns> witness_comm;
     for (std::size_t i = 0; i < witness_columns; i++) {
-        witness_comm[i] = {{shifted_var[0]}, {unshifted_var[0]}};
+        witness_comm[i] = {{unshifted_var[0]}};
     }
 
-    std::array<shifted_commitment_type, perm_size> sigma_comm;
+    std::array<commitment_type, perm_size> sigma_comm;
     for (std::size_t i = 0; i < perm_size; i++) {
-        witness_comm[i] = {{shifted_var[1]}, {unshifted_var[1]}};
+        witness_comm[i] = {{unshifted_var[1]}};
     }
-    std::array<shifted_commitment_type, kimchi_params::witness_columns> 
+    std::array<commitment_type, kimchi_params::witness_columns> 
         coefficient_comm;
     for (std::size_t i = 0; i < coefficient_comm.size(); i++) {
-        coefficient_comm[i] = {{shifted_var[2]}, {unshifted_var[2]}};
+        coefficient_comm[i] = {{unshifted_var[2]}};
     }
-    std::vector<shifted_commitment_type> oracles_poly_comm = {
-        {{shifted_var[3]}, {unshifted_var[3]}}};    // to-do: get in the component from oracles
-    shifted_commitment_type lookup_runtime_comm = {{shifted_var[4]}, {unshifted_var[4]}};
-    shifted_commitment_type table_comm = {{shifted_var[5]}, {unshifted_var[5]}};
-    std::vector<shifted_commitment_type> lookup_sorted_comm {{{shifted_var[6]}, {unshifted_var[6]}}};
-    std::vector<shifted_commitment_type> lookup_selectors_comm = {{{shifted_var[7]}, {unshifted_var[7]}}};
-    std::vector<shifted_commitment_type> selectors_comm = {{{shifted_var[8]}, {unshifted_var[8]}}};
-    shifted_commitment_type lookup_agg_comm = {{shifted_var[9]}, {unshifted_var[9]}};
-    shifted_commitment_type z_comm = {{shifted_var[10]}, {unshifted_var[10]}};
-    shifted_commitment_type t_comm = {{shifted_var[11]}, {unshifted_var[11]}};
-    shifted_commitment_type generic_comm = {{shifted_var[12]}, {unshifted_var[12]}};
-    shifted_commitment_type psm_comm = {{shifted_var[13]}, {unshifted_var[13]}};
+    std::vector<commitment_type> oracles_poly_comm = {
+        {{unshifted_var[3]}}};    // to-do: get in the component from oracles
+    commitment_type lookup_runtime_comm = {{unshifted_var[4]}};
+    commitment_type table_comm = {{unshifted_var[5]}};
+    std::vector<commitment_type> lookup_sorted_comm {{{unshifted_var[6]}}};
+    std::vector<commitment_type> lookup_selectors_comm = {{{unshifted_var[7]}}};
+    std::vector<commitment_type> selectors_comm = {{{unshifted_var[8]}}};
+    commitment_type lookup_agg_comm = {{unshifted_var[9]}};
+    commitment_type z_comm = {{unshifted_var[10]}};
+    commitment_type t_comm = {{unshifted_var[11]}};
+    commitment_type generic_comm = {{unshifted_var[12]}};
+    commitment_type psm_comm = {{unshifted_var[13]}};
 
     curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type L =
         algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();

@@ -33,6 +33,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/to_group.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
@@ -120,10 +121,6 @@ namespace nil {
                     using opening_proof_type = typename 
                         zk::components::kimchi_opening_proof_base<BlueprintFieldType, KimchiCommitmentParamsType::eval_rounds>;
 
-                    using shifted_commitment_type = typename 
-                        zk::components::kimchi_shifted_commitment_type<BlueprintFieldType, 
-                            KimchiCommitmentParamsType::shifted_commitment_split>;
-
                     using batch_proof_type = typename 
                         zk::components::batch_evaluation_proof_base<BlueprintFieldType, 
                             ArithmetizationType, KimchiParamsType,
@@ -144,7 +141,7 @@ namespace nil {
                 public:
                     constexpr static const std::size_t rows_amount = transcript_type::absorb_fr_rows 
                         + transcript_type::challenge_rows 
-                        * 1 + msm_component::rows_amount;
+                        + 1 + msm_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -187,7 +184,7 @@ namespace nil {
                             var t = transcript.challenge_fq_assignment(assignment, row);
                             row += transcript_type::challenge_rows;
 
-                            var_ec_point U = to_group_component::
+                            //var_ec_point U = to_group_component::
 
                             //U = transcript.squeeze.to_group()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U_value =
@@ -208,20 +205,21 @@ namespace nil {
                             std::size_t unshifted_size = 0;
 
                             for (std::size_t j = 0 ; j < params.proofs[i].comm.size(); j++) {
-                                unshifted_size = params.proofs[i].comm[j].unshifted.size();
+                                unshifted_size = params.proofs[i].comm[j].parts.size();
                                 for (std::size_t k =0; k< unshifted_size; k++){
-                                    bases[bases_idx++] = params.proofs[i].comm[j].unshifted[k];
+                                    bases[bases_idx++] = params.proofs[i].comm[j].parts[k];
                                 }
-                                bases[bases_idx++] = params.proofs[i].comm[j].shifted;
                             }
                             bases[bases_idx++] = U;
                             bases[bases_idx++] = params.proofs[i].opening_proof.delta;
                         }
 
                         assert(bases_idx == final_msm_size);
-                        assert(row == start_row_index + rows_amount);
 
                         auto res = msm_component::generate_assignments(assignment, {params.fr_output.scalars, bases}, row);
+                        row += msm_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
                         return result_type(start_row_index);
                     }
 
@@ -272,20 +270,22 @@ namespace nil {
                             std::size_t unshifted_size = 0;
 
                             for (std::size_t j = 0 ; j < params.proofs[i].comm.size(); j++) {
-                                unshifted_size = params.proofs[i].comm[j].unshifted.size();
+                                unshifted_size = params.proofs[i].comm[j].parts.size();
                                 for (std::size_t k =0; k < unshifted_size; k++){
-                                    bases[bases_idx++] = params.proofs[i].comm[j].unshifted[k];
+                                    bases[bases_idx++] = params.proofs[i].comm[j].parts[k];
                                 }
-                                bases[bases_idx++] = params.proofs[i].comm[j].shifted;
                             }
                             bases[bases_idx++] = U;
                             bases[bases_idx++] = params.proofs[i].opening_proof.delta;
                         }
 
                         assert(bases_idx == final_msm_size);
-                        assert(row == start_row_index + rows_amount);
 
                         auto res = msm_component::generate_circuit(bp, assignment, {params.fr_output.scalars, bases}, row);
+                        row += msm_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
+
                         return result_type(start_row_index);
                     }
 

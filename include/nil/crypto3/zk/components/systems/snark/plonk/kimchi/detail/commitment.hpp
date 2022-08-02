@@ -40,17 +40,10 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename BlueprintFieldType>
-                struct kimchi_commimtment_type {
-                            using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
-                            var_ec_point unshifted;
-                };
-
                 template<typename BlueprintFieldType, std::size_t SplitSize>
-                struct kimchi_shifted_commitment_type {
+                struct kimchi_commitment_type {
                             using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
-                            var_ec_point shifted;
-                            std::array<var_ec_point, SplitSize> unshifted;
+                            std::array<var_ec_point, SplitSize> parts;
                 };
             }    // namespace components
         }        // namespace zk

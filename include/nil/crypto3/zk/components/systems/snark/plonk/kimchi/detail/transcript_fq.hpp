@@ -42,7 +42,6 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/limbs.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/sponge.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/compare.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -121,8 +120,8 @@ namespace nil {
                         group_value(std::array<var, 2> vec) : X(vec[0]), Y(vec[1]) {}
                     };
 
-                    const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
-                    const std::size_t HIGH_ENTROPY_LIMBS = 2;
+                    static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
+                    static const std::size_t HIGH_ENTROPY_LIMBS = 2;
 
                     using sponge_component = kimchi_sponge<ArithmetizationType, CurveType,
                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;

@@ -129,59 +129,59 @@ namespace nil {
                             {params.y, exp}, row).output;
                         row += exp_component::rows_amount;
 
-                        // // x = sqrt(y) if y \in QR(q) or y = 0, -1 otherwise 
-                        // var x(W0, row);
-                        // var x_squared = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //     {x, x}, row).output;
-                        // row += mul_component::rows_amount;
+                        // x = sqrt(y) if y \in QR(q) or y = 0, -1 otherwise 
+                        var x(W0, row);
+                        var x_squared = zk::components::generate_circuit<mul_component>(bp, assignment,
+                            {x, x}, row).output;
+                        row += mul_component::rows_amount;
 
-                        // // qr_check * (1 + qr_check) * (y - x_squared) = 0 for y \in QR(q)
-                        // var one_plus_qr_check = zk::components::generate_circuit<add_component>(bp, assignment,
-                        //     {qr_check, one}, row).output;
-                        // row += add_component::rows_amount;
+                        // qr_check * (1 + qr_check) * (y - x_squared) = 0 for y \in QR(q)
+                        var one_plus_qr_check = zk::components::generate_circuit<add_component>(bp, assignment,
+                            {qr_check, one}, row).output;
+                        row += add_component::rows_amount;
 
-                        // var y_minus_x_squared = zk::components::generate_circuit<sub_component>(bp, assignment,
-                        //     {params.y, x_squared}, row).output;
-                        // row += sub_component::rows_amount;
+                        var y_minus_x_squared = zk::components::generate_circuit<sub_component>(bp, assignment,
+                            {params.y, x_squared}, row).output;
+                        row += sub_component::rows_amount;
 
-                        // var in_qr = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //     {qr_check, one_plus_qr_check}, row).output;
-                        // row += mul_component::rows_amount;
-                        // in_qr = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //     {in_qr, y_minus_x_squared}, row).output;
-                        // row += mul_component::rows_amount;
+                        var in_qr = zk::components::generate_circuit<mul_component>(bp, assignment,
+                            {qr_check, one_plus_qr_check}, row).output;
+                        row += mul_component::rows_amount;
+                        in_qr = zk::components::generate_circuit<mul_component>(bp, assignment,
+                            {in_qr, y_minus_x_squared}, row).output;
+                        row += mul_component::rows_amount;
 
-                        // // qr_check * (1 - qr_check) * (1 + x_squared) = 0 for y \in QNR(q)
-                        // var one_minus_qr_check = zk::components::generate_circuit<sub_component>(bp, assignment,
-                        //     {one, qr_check}, row).output;
-                        // row += sub_component::rows_amount;
-                        // var x_squared_plus_one = zk::components::generate_circuit<add_component>(bp, assignment,
-                        //     {x_squared, one}, row).output;
-                        // row += add_component::rows_amount;
+                        // qr_check * (1 - qr_check) * (1 + x_squared) = 0 for y \in QNR(q)
+                        var one_minus_qr_check = zk::components::generate_circuit<sub_component>(bp, assignment,
+                            {one, qr_check}, row).output;
+                        row += sub_component::rows_amount;
+                        var x_squared_plus_one = zk::components::generate_circuit<add_component>(bp, assignment,
+                            {x_squared, one}, row).output;
+                        row += add_component::rows_amount;
 
-                        // var in_qnr = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //     {qr_check, one_minus_qr_check}, row).output;
-                        // row += mul_component::rows_amount;
-                        // in_qnr = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //     {in_qnr, x_squared_plus_one}, row).output;
-                        // row += mul_component::rows_amount;
-                        // // (1 - qr_check) * (1 + qr_check) * x_squared = 0 for y = 0
+                        var in_qnr = zk::components::generate_circuit<mul_component>(bp, assignment,
+                            {qr_check, one_minus_qr_check}, row).output;
+                        row += mul_component::rows_amount;
+                        in_qnr = zk::components::generate_circuit<mul_component>(bp, assignment,
+                            {in_qnr, x_squared_plus_one}, row).output;
+                        row += mul_component::rows_amount;
+                        // (1 - qr_check) * (1 + qr_check) * x_squared = 0 for y = 0
 
-                        // var y_eq_zero = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //     {one_minus_qr_check, one_plus_qr_check}, row).output;
-                        // row += mul_component::rows_amount;
-                        // y_eq_zero = zk::components::generate_circuit<mul_component>(bp, assignment,
-                        //     {y_eq_zero, x_squared}, row).output;
-                        // row += mul_component::rows_amount;
+                        var y_eq_zero = zk::components::generate_circuit<mul_component>(bp, assignment,
+                            {one_minus_qr_check, one_plus_qr_check}, row).output;
+                        row += mul_component::rows_amount;
+                        y_eq_zero = zk::components::generate_circuit<mul_component>(bp, assignment,
+                            {y_eq_zero, x_squared}, row).output;
+                        row += mul_component::rows_amount;
 
-                        // var last_check = zk::components::generate_circuit<add_component>(bp, assignment,
-                        //     {in_qr, in_qnr}, row).output;
-                        // row += add_component::rows_amount;
-                        // last_check = zk::components::generate_circuit<add_component>(bp, assignment,
-                        //     {last_check, y_eq_zero}, row).output;
-                        // row += add_component::rows_amount;
+                        var last_check = zk::components::generate_circuit<add_component>(bp, assignment,
+                            {in_qr, in_qnr}, row).output;
+                        row += add_component::rows_amount;
+                        last_check = zk::components::generate_circuit<add_component>(bp, assignment,
+                            {last_check, y_eq_zero}, row).output;
+                        row += add_component::rows_amount;
 
-                        // assert(row == start_row_index + rows_amount);
+                        assert(row == start_row_index + rows_amount);
 
                         // copy-constarint for last_check and zero
 
@@ -245,29 +245,29 @@ namespace nil {
                             {x_squared, one}, row).output;
                         row += add_component::rows_amount;
 
-                        // var in_qnr = mul_component::generate_assignments(assignment,
-                        //     {qr_check, one_minus_qr_check}, row).output;
-                        // row += mul_component::rows_amount;
-                        // in_qnr = mul_component::generate_assignments(assignment,
-                        //     {in_qnr, x_squared_plus_one}, row).output;
-                        // row += mul_component::rows_amount;
-                        // // (1 - qr_check) * (1 + qr_check) * x_squared = 0 for y = 0
+                        var in_qnr = mul_component::generate_assignments(assignment,
+                            {qr_check, one_minus_qr_check}, row).output;
+                        row += mul_component::rows_amount;
+                        in_qnr = mul_component::generate_assignments(assignment,
+                            {in_qnr, x_squared_plus_one}, row).output;
+                        row += mul_component::rows_amount;
+                        // (1 - qr_check) * (1 + qr_check) * x_squared = 0 for y = 0
 
-                        // var y_eq_zero = mul_component::generate_assignments(assignment,
-                        //     {one_minus_qr_check, one_plus_qr_check}, row).output;
-                        // row += mul_component::rows_amount;
-                        // y_eq_zero = mul_component::generate_assignments(assignment,
-                        //     {y_eq_zero, x_squared}, row).output;
-                        // row += mul_component::rows_amount;
+                        var y_eq_zero = mul_component::generate_assignments(assignment,
+                            {one_minus_qr_check, one_plus_qr_check}, row).output;
+                        row += mul_component::rows_amount;
+                        y_eq_zero = mul_component::generate_assignments(assignment,
+                            {y_eq_zero, x_squared}, row).output;
+                        row += mul_component::rows_amount;
 
-                        // var last_check = add_component::generate_assignments(assignment,
-                        //     {in_qr, in_qnr}, row).output;
-                        // row += add_component::rows_amount;
-                        // last_check = add_component::generate_assignments(assignment,
-                        //     {last_check, y_eq_zero}, row).output;
-                        // row += add_component::rows_amount;
+                        var last_check = add_component::generate_assignments(assignment,
+                            {in_qr, in_qnr}, row).output;
+                        row += add_component::rows_amount;
+                        last_check = add_component::generate_assignments(assignment,
+                            {last_check, y_eq_zero}, row).output;
+                        row += add_component::rows_amount;
 
-                        // assert(row == start_row_index + rows_amount);
+                        assert(row == start_row_index + rows_amount);
 
                         // copy-constarint for last_check and zero
 
@@ -299,7 +299,7 @@ namespace nil {
                         var zero(0, start_row_index + 4, false, var::column_type::constant);
                         var last_check(W2, start_row_index + rows_amount - add_component::rows_amount,
                             false, var::column_type::witness);
-                        // bp.add_copy_constraint({zero, last_check});
+                        bp.add_copy_constraint({zero, last_check});
                     }
                 };
             }    // namespace components

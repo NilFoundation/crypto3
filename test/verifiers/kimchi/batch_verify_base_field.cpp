@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 10;
+    constexpr std::size_t SelectorColumns = 25;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -123,8 +123,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     using opening_proof_type =
         typename zk::components::kimchi_opening_proof_base<BlueprintFieldType, commitment_params::eval_rounds>;
-    using shifted_commitment_type =
-        typename zk::components::kimchi_shifted_commitment_type<BlueprintFieldType,
+    using commitment_type =
+        typename zk::components::kimchi_commitment_type<BlueprintFieldType,
                                                                 commitment_params::shifted_commitment_split>;
 
     // using transcript_type = kimchi_transcript_fq<ArithmetizationType, CurveType,
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
 
     var cip_var = var(0, 24 + bases_size, false, var::column_type::public_input);
 
-    shifted_commitment_type comm_var = {{shifted_var}, {unshifted_var}};
+    commitment_type comm_var = {{unshifted_var}};
 
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
     //transcript_type transcript;
