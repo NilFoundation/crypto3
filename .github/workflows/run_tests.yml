@@ -27,7 +27,7 @@ jobs:
         " # Tests to execute
 
     steps:
-      - name: Cleanup # move to scripts on runner
+      - name: Cleanup # TODO - move to scripts on runner
         run: |
           rm -rf ./* || true
           rm -rf ./.??* || true
