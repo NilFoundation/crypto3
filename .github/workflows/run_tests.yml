@@ -68,7 +68,7 @@ jobs:
       - name: Run tests
         working-directory: ./build
         run: |
-          cd build/libs/${{ env.LIB_NAME }}/test/
+          cd libs/${{ env.LIB_NAME }}/test
           for target in ${{ env.TARGETS }}
           do
             echo $target
