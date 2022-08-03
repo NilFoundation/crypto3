@@ -6,6 +6,8 @@
 #ifndef BOOST_MP_CPP_INT_IMPORT_EXPORT_HPP
 #define BOOST_MP_CPP_INT_IMPORT_EXPORT_HPP
 
+#include <nil/crypto3/multiprecision/traits/conditional_make_unsigned.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
@@ -98,8 +100,7 @@ namespace nil {
                                     ExpressionTemplates>::backend_type newval;
 
                     using value_type = typename std::iterator_traits<Iterator>::value_type;
-                    using unsigned_value_type =
-                        typename nil::crypto3::multiprecision::detail::make_unsigned<value_type>::type;
+                    using unsigned_value_type = typename nil::crypto3::multiprecision::detail::conditional_make_unsigned<value_type>::type;
                     using difference_type = typename std::iterator_traits<Iterator>::difference_type;
                     using size_type =
                         typename nil::crypto3::multiprecision::detail::make_unsigned<difference_type>::type;
