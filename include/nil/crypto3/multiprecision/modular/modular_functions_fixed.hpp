@@ -11,6 +11,7 @@
 #ifndef BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
 #define BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
 
+#include <nil/crypto3/multiprecision/detail/number_base.hpp>
 #include <nil/crypto3/multiprecision/modular/asm_functions.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_policy_fixed.hpp>
 
@@ -402,6 +403,7 @@ namespace nil {
 
                         Backend_doubled_padded_limbs accum(result);
                         Backend_doubled_padded_limbs prod;
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 #if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == m_mod.backend().size()
                             && !is_trivial_cpp_int<Backend1>::value && result.size() > 1) {
@@ -422,6 +424,7 @@ namespace nil {
                             result.resize(m_mod.backend().size(), m_mod.backend().size());
                             result.normalize();
                         } else
+#endif
 #endif
                         {
                             for (auto i = 0; i < m_mod.backend().size(); ++i) {
@@ -456,6 +459,7 @@ namespace nil {
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 #if BOOST_ARCH_X86_64
                         if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == y.size()
                             && result.size() == m_mod.backend().size() && !is_trivial_cpp_int<Backend1>::value) {
@@ -463,6 +467,7 @@ namespace nil {
                             result.resize(limbs_count, limbs_count);
                             result.normalize();
                         } else
+#endif
 #endif
                         {
                             using T = typename policy_type::Backend_padded_limbs_u;

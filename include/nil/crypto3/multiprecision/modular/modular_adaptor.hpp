@@ -16,6 +16,7 @@
 #include <boost/predef.h>
 
 #include <nil/crypto3/multiprecision/detail/digits.hpp>
+#include <nil/crypto3/multiprecision/detail/number_base.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
 #include <nil/crypto3/multiprecision/modular/modular_params.hpp>
@@ -305,6 +306,7 @@ namespace nil {
                     using ui_type = typename std::tuple_element<
                         0, typename cpp_int_backend<MinBits, MaxBits, SignType, Checked>::unsigned_types>::type;
                     using default_ops::eval_lt;
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
 #if BOOST_ARCH_X86_64
                     auto limbs_count = result.base_data().size();
                     if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) &&
@@ -317,6 +319,7 @@ namespace nil {
                         result.base_data().resize(limbs_count, limbs_count);
                         result.base_data().normalize();
                     } else
+#endif
 #endif
                     {
                         eval_subtract(result.base_data(), o.base_data());
