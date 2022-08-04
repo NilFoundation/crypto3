@@ -8,27 +8,14 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  SUITE_REPO: "NilFoundation/crypto3"
+  LIB_NAME: "blueprint"
+  CACHE_NAME: "checkout-job-cache"
+
 jobs:
-  run_tests:
+  checkout:
     runs-on: [self-hosted]
-
-    strategy:
-      matrix:
-        target: [
-            blueprint_hashes_plonk_sha256_process_test,
-            blueprint_hashes_plonk_sha512_process_test,
-            blueprint_non_native_plonk_non_native_demo_test,
-            blueprint_non_native_plonk_non_native_range_test,
-            blueprint_non_native_plonk_fixed_base_mul_test,
-            blueprint_non_native_plonk_complete_addition_test,
-            blueprint_non_native_plonk_var_base_mul_per_bit_test,
-            blueprint_non_native_plonk_variable_base_multiplication_test
-          ]  # Tests to execute
-
-    env:
-      SUITE_REPO: "NilFoundation/crypto3"
-      LIB_NAME: "blueprint"
-
     steps:
       - name: Cleanup # TODO - move to scripts on runner
         run: |
@@ -66,9 +53,56 @@ jobs:
           mkdir build
           cd build
           cmake ${{ env.CMAKE_ARGS }} ..
-          cmake --build . -t ${{ matrix.target }}
 
-      - name: Run tests
+      - name: Archive build results
+        run: |
+          touch ${{ env.CACHE_NAME }}.tar.gz
+          tar -czf ${{ env.CACHE_NAME }}.tar.gz --exclude=${{ env.CACHE_NAME }}.tar.gz .
+
+      - name: Cache archived job output
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.CACHE_NAME }}
+          path: ${{ env.CACHE_NAME }}.tar.gz
+          retention-days: 1
+
+
+  run_tests:
+    runs-on: [self-hosted]
+    needs: [checkout]
+    strategy:
+      matrix:
+        target: [
+            blueprint_hashes_plonk_sha256_process_test,
+            blueprint_hashes_plonk_sha512_process_test,
+            blueprint_non_native_plonk_non_native_demo_test,
+            blueprint_non_native_plonk_non_native_range_test,
+            blueprint_non_native_plonk_fixed_base_mul_test,
+            blueprint_non_native_plonk_complete_addition_test,
+            blueprint_non_native_plonk_var_base_mul_per_bit_test,
+            blueprint_non_native_plonk_variable_base_multiplication_test,
+          ]  # Tests to execute
+    steps:
+      - name: Cleanup # TODO - move to scripts on runner
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+
+      - name: Upload checkout job cache
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.CACHE_NAME }}
+
+      - name: Extract artifacts
+        run: |
+          tar -xf ${{ env.CACHE_NAME }}.tar.gz
+          rm ${{ env.CACHE_NAME }}.tar.gz
+
+      - name: Build
+        working-directory: ./build
+        run: cmake --build . -t ${{ matrix.target }}
+
+      - name: Run test
         working-directory: ./build
         run: |
           cd libs/${{ env.LIB_NAME }}/test
