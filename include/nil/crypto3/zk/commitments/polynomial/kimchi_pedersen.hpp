@@ -576,7 +576,7 @@ namespace nil {
                         // std::cout << "size " << scalars.size() << '\n';
 
                         auto res_point = algebra::multiexp_with_mixed_addition<multiexp_method>(
-                                    my_points.begin(), my_points.end(), my_scalars.begin(), my_scalars.end(), 1);
+                                    points.begin(), points.end(), scalars.begin(), scalars.end(), 1);
                         
                         std::cout << "res_point " << std::hex << res_point.X.data << ' ' << std::hex << res_point.Y.data << '\n';
                         return (algebra::multiexp_with_mixed_addition<multiexp_method>(
