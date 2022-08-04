@@ -14,7 +14,7 @@ namespace nil{
                         typename scalar_field_type::value_type two = typename scalar_field_type::value_type(2);
                         typename scalar_field_type::value_type two_pow = two.pow(scalar_field_type::modulus_bits);
                         if(scalar_field_type::modulus < base_field_type::modulus){
-                            return (x - two_pow) / two;
+                            return (x - (two_pow + scalar_field_type::value_type::one())) / two;
                         } else{
                             return x - two_pow;
                         }

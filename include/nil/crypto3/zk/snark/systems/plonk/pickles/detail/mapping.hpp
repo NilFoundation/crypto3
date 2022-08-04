@@ -64,10 +64,6 @@ namespace nil{
                         return potential_xs_helper(t2, alpha);
                     }
 
-                    value_type get_y(value_type& x){
-                        return curve_eqn(x).sqrt();
-                    }
-
                     typename group_type::value_type get_xy(value_type& t){
                         std::array<value_type, 3> xvec = potential_xs(t);
                         for(auto &x : xvec){
