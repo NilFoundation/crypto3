@@ -163,11 +163,6 @@ namespace nil {
                         row += mult_component::rows_amount;
                         auto right = add_component::generate_assignments(assignment, {one_var, t2}, row).output;
                         row += add_component::rows_amount;
-
-                        for (int i = 0; i < 4; ++i) {
-                            std::cout << assignment.var_value(left[i]).data << ' ' << assignment.var_value(right[i]).data << '\n';
-                        }
-
                         return result_type(component_start_row);
                     }
 
@@ -204,14 +199,12 @@ namespace nil {
                         auto t0 = mult_component::generate_circuit(bp, assignment, {x_2, a_var}, row).output;
                         row += mult_component::rows_amount;
                         auto left = add_component::generate_circuit(bp, assignment, {y_2, t0}, row).output;
-                        std::cout << row << '\n';
                         row += add_component::rows_amount;
                         auto t1 = mult_component::generate_circuit(bp, assignment, {y_2, x_2}, row).output;
                         row += mult_component::rows_amount;
                         auto t2 = mult_component::generate_circuit(bp, assignment, {d_var, t1}, row).output;
                         row += mult_component::rows_amount;
                         auto right = add_component::generate_circuit(bp, assignment, {one_var, t2}, row).output;
-                        std::cout << row << '\n';
                         row += add_component::rows_amount;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);

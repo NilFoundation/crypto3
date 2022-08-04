@@ -36,7 +36,7 @@
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/scalar_non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/ec_point_edwards25519.hpp>
-#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
+//#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -92,19 +92,19 @@ namespace nil {
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     using scalar_non_native_range_component = scalar_non_native_range<ArithmetizationType, CurveType, Ed25519Type,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
-                    using sha512_component = sha512<ArithmetizationType, CurveType,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    //using sha512_component = sha512<ArithmetizationType, CurveType,
+                    //W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     constexpr static const std::size_t selector_seed = 0xfcc2;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 4 * non_native_range_component::rows_amount
-                                                                    + scalar_non_native_range_component::rows_amount
+                    constexpr static const std::size_t rows_amount = scalar_non_native_range_component::rows_amount
                                                                     + variable_base_mult_component::rows_amount
                                                                     + fixed_base_mult_component::rows_amount
                                                                     + addition_component::rows_amount
-                                                                    + reduction_component::rows_amount;
+                                                                    + reduction_component::rows_amount
+                                                                    + 2 * check_ec_point_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
