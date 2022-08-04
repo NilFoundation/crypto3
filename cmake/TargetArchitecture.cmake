@@ -1,10 +1,3 @@
-#---------------------------------------------------------------------------#
-# Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
-#
-# Distributed under the Boost Software License, Version 1.0
-# See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt
-#---------------------------------------------------------------------------#
 
 # https://qt.gitorious.org/qt/qtbase/blobs/master/src/corelib/global/qprocessordetection.h
 # Currently handles arm (v5, v6, v7), x86 (32/64), ia64, and ppc (32/64)
@@ -108,6 +101,8 @@ function(target_architecture OUTPUT_ARCHITECTURE)
                 set(osx_arch_i386 TRUE)
             elseif("${osx_arch}" STREQUAL "x86_64")
                 set(osx_arch_x86_64 TRUE)
+            elseif("${osx_arch}" STREQUAL "arm64")
+                set(osx_arch_arm64 TRUE)
             elseif("${osx_arch}" STREQUAL "ppc64" AND ppc_support)
                 set(osx_arch_ppc64 TRUE)
             else()
@@ -130,6 +125,10 @@ function(target_architecture OUTPUT_ARCHITECTURE)
 
         if(osx_arch_ppc64)
             list(APPEND ARCH ppc64)
+        endif()
+
+        if(osx_arch_ppc64)
+            list(APPEND ARCH arm64)
         endif()
     else()
         file(WRITE "${CMAKE_BINARY_DIR}/arch.c" "${archdetect_c_code}")
