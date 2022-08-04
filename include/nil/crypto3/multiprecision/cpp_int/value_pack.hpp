@@ -13,7 +13,13 @@ namespace nil {
             namespace literals {
                 namespace detail {
 
-                    template<limb_type... VALUES>
+#ifndef TVM
+                    using limb_pack_type = limb_type;
+#else
+                    using limb_pack_type = unsigned int;
+#endif
+
+                    template<limb_pack_type... VALUES>
                     struct value_pack {
                         constexpr value_pack() {
                         }

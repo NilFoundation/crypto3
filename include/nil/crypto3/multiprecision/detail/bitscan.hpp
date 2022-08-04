@@ -8,7 +8,9 @@
 #ifndef BOOST_MP_DETAIL_BITSCAN_HPP
 #define BOOST_MP_DETAIL_BITSCAN_HPP
 
+#ifndef TVM
 #include <boost/predef/other/endian.h>
+#endif
 #include <cstdint>
 
 #if (defined(BOOST_MSVC) || (defined(__clang__) && defined(__c2__)) || (defined(BOOST_INTEL) && defined(_MSC_VER))) && \

@@ -7,7 +7,11 @@
 #define BOOST_MATH_BIG_NUM_DEF_OPS
 
 #include <boost/core/no_exceptions_support.hpp>    // BOOST_TRY
+#ifndef TVM
 #include <boost/math/policies/error_handling.hpp>
+#else
+#include <boost/utility/enable_if.hpp>
+#endif
 #include <nil/crypto3/multiprecision/detail/number_base.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/next.hpp>

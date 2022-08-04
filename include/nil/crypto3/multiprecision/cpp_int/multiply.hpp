@@ -32,16 +32,16 @@ namespace nil {
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                        const limb_type&
-                            val) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                   Checked1, Allocator1>>::value)) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                        const limb_type
+                            &val) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                    Checked1, Allocator1>>::value)) {
                     if (!val) {
                         result = static_cast<limb_type>(0);
                         return;
                     }
-                    if ((void*)&a != (void*)&result)
+                    if ((void *)&a != (void *)&result)
                         result.resize(a.size(), a.size());
                     double_limb_type carry = 0;
                     typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer p =
@@ -79,13 +79,13 @@ namespace nil {
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1>
                 inline BOOST_MP_CXX14_CONSTEXPR void
-                    resize_for_carry(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& /*result*/,
+                    resize_for_carry(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> & /*result*/,
                                      unsigned /*required*/) {
                 }
 
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, class Allocator1>
                 inline BOOST_MP_CXX14_CONSTEXPR void
-                    resize_for_carry(cpp_int_backend<MinBits1, MaxBits1, SignType1, checked, Allocator1>& result,
+                    resize_for_carry(cpp_int_backend<MinBits1, MaxBits1, SignType1, checked, Allocator1> &result,
                                      unsigned required) {
                     if (result.size() < required)
                         result.resize(required, required);
@@ -107,11 +107,11 @@ namespace nil {
                 //
                 template<unsigned MinBits, unsigned MaxBits, cpp_int_check_type Checked, class Allocator>
                 inline void
-                    multiply_karatsuba(cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator>& result,
-                                       const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator>& a,
-                                       const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator>& b,
+                    multiply_karatsuba(cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator> &result,
+                                       const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator> &a,
+                                       const cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator> &b,
                                        typename cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked,
-                                                                Allocator>::scoped_shared_storage& storage) {
+                                                                Allocator>::scoped_shared_storage &storage) {
                     using cpp_int_type = cpp_int_backend<MinBits, MaxBits, signed_magnitude, Checked, Allocator>;
 
                     unsigned as = a.size();
@@ -250,9 +250,9 @@ namespace nil {
                          class Allocator>
                 inline typename std::enable_if<
                     !is_fixed_precision<cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>>::value>::type
-                    setup_karatsuba(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& result,
-                                    const cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& a,
-                                    const cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>& b) {
+                    setup_karatsuba(cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> &result,
+                                    const cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> &a,
+                                    const cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator> &b) {
                     unsigned as = a.size();
                     unsigned bs = b.size();
                     unsigned s = as > bs ? as : bs;
@@ -283,9 +283,9 @@ namespace nil {
                     is_fixed_precision<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value ||
                     is_fixed_precision<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>>::value>::
                     type
-                    setup_karatsuba(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                                    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) {
+                    setup_karatsuba(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                                    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                                    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> &b) {
                     //
                     // Now comes the fixed precision case.
                     // In fact Karatsuba doesn't really work with fixed precision since the logic
@@ -335,9 +335,9 @@ namespace nil {
                     !is_fixed_precision<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value &&
                     !is_fixed_precision<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>>::value>::
                     type
-                    setup_karatsuba(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                                    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b) {
+                    setup_karatsuba(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                                    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                                    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> &b) {
                     //
                     // Variable precision, mixed arguments, just alias and forward:
                     //
@@ -361,11 +361,11 @@ namespace nil {
                          cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3,
                          cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_multiply_comba(
-                    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>&
-                        b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                                                             Allocator1>>::value)) {
+                    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                    const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>
+                        &b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
+                                                                              Allocator1>>::value)) {
                     //
                     // see PR #182
                     // Comba Multiplier - based on Paul Comba's
@@ -415,14 +415,14 @@ namespace nil {
                     !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                        const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>&
-                            b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>>::value &&
-                                         (karatsuba_cutoff * sizeof(limb_type) * CHAR_BIT > MaxBits1) &&
-                                         (karatsuba_cutoff * sizeof(limb_type) * CHAR_BIT > MaxBits2) &&
-                                         (karatsuba_cutoff * sizeof(limb_type) * CHAR_BIT > MaxBits3))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                        const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>
+                            &b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1>>::value &&
+                                          (karatsuba_cutoff * sizeof(limb_type) * CHAR_BIT > MaxBits1) &&
+                                          (karatsuba_cutoff * sizeof(limb_type) * CHAR_BIT > MaxBits2) &&
+                                          (karatsuba_cutoff * sizeof(limb_type) * CHAR_BIT > MaxBits3))) {
                     // Uses simple (O(n^2)) multiplication when the limbs are less
                     // otherwise switches to karatsuba algorithm based on experimental value (~40 limbs)
                     //
@@ -463,12 +463,12 @@ namespace nil {
                         return;
                     }
 
-                    if ((void*)&result == (void*)&a) {
+                    if ((void *)&result == (void *)&a) {
                         cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(a);
                         eval_multiply(result, t, b);
                         return;
                     }
-                    if ((void*)&result == (void*)&b) {
+                    if ((void *)&result == (void *)&b) {
                         cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> t(b);
                         eval_multiply(result, a, t);
                         return;
@@ -478,6 +478,7 @@ namespace nil {
                     constexpr const double_limb_type double_limb_max = ~static_cast<double_limb_type>(0u);
 
                     result.resize(as + bs, as + bs - 1);
+#ifndef TVM
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                     if (!BOOST_MP_IS_CONST_EVALUATED(as) && (as >= karatsuba_cutoff && bs >= karatsuba_cutoff))
 #else
@@ -491,6 +492,7 @@ namespace nil {
                         result.sign(a.sign() != b.sign());
                         return;
                     }
+#endif    // TVM
                     typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer pr =
                         result.limbs();
                     static_assert(double_limb_max - 2 * limb_max >= limb_max * limb_max,
@@ -576,17 +578,17 @@ namespace nil {
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>&
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &
                             a) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
                                                                                              SignType1, Checked1,
-                                                                                             Allocator1>&>(),
+                                                                                             Allocator1> &>(),
                                                                 std::declval<
                                                                     const cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                          Checked1, Allocator1>&>(),
-                                                                std::declval<const cpp_int_backend<MinBits2, MaxBits2,
-                                                                                                   SignType2, Checked2,
-                                                                                                   Allocator2>&>())))) {
+                                                                                          Checked1, Allocator1> &>(),
+                                                                std::declval<const cpp_int_backend<
+                                                                    MinBits2, MaxBits2, SignType2, Checked2, Allocator2>
+                                                                                 &>())))) {
                     eval_multiply(result, result, a);
                 }
 
@@ -595,18 +597,19 @@ namespace nil {
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const limb_type&
-                            val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
-                                                                                               SignType1, Checked1,
-                                                                                               Allocator1>&>(),
-                                                                  std::declval<const cpp_int_backend<
-                                                                      MinBits1, MaxBits1, SignType1, Checked1,
-                                                                      Allocator1>&>(),
-                                                                  std::declval<const limb_type&>())))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const limb_type
+                            &val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
+                                                                                                SignType1, Checked1,
+                                                                                                Allocator1> &>(),
+                                                                   std::declval<const cpp_int_backend<
+                                                                       MinBits1, MaxBits1, SignType1, Checked1,
+                                                                       Allocator1> &>(),
+                                                                   std::declval<const limb_type &>())))) {
                     eval_multiply(result, result, val);
                 }
 
+#ifndef TVM
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2>
@@ -615,23 +618,23 @@ namespace nil {
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                        const double_limb_type&
-                            val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
-                                                                                               SignType1, Checked1,
-                                                                                               Allocator1>&>(),
-                                                                  std::declval<const cpp_int_backend<
-                                                                      MinBits2, MaxBits2, SignType2, Checked2,
-                                                                      Allocator2>&>(),
-                                                                  std::declval<const limb_type&>()))) &&
-                                          (noexcept(eval_multiply(
-                                              std::declval<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                                                           Allocator1>&>(),
-                                              std::declval<const cpp_int_backend<MinBits2, MaxBits2, SignType2,
-                                                                                 Checked2, Allocator2>&>(),
-                                              std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>&>())))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                        const double_limb_type
+                            &val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
+                                                                                                SignType1, Checked1,
+                                                                                                Allocator1> &>(),
+                                                                   std::declval<const cpp_int_backend<
+                                                                       MinBits2, MaxBits2, SignType2, Checked2,
+                                                                       Allocator2> &>(),
+                                                                   std::declval<const limb_type &>()))) &&
+                                           (noexcept(eval_multiply(
+                                               std::declval<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
+                                                                            Allocator1> &>(),
+                                               std::declval<const cpp_int_backend<MinBits2, MaxBits2, SignType2,
+                                                                                  Checked2, Allocator2> &>(),
+                                               std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1> &>())))) {
                     if (val <= (std::numeric_limits<limb_type>::max)()) {
                         eval_multiply(result, a, static_cast<limb_type>(val));
                     } else {
@@ -650,17 +653,18 @@ namespace nil {
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const double_limb_type&
-                            val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
-                                                                                               SignType1, Checked1,
-                                                                                               Allocator1>&>(),
-                                                                  std::declval<const cpp_int_backend<
-                                                                      MinBits1, MaxBits1, SignType1, Checked1,
-                                                                      Allocator1>&>(),
-                                                                  std::declval<const double_limb_type&>())))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const double_limb_type
+                            &val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
+                                                                                                SignType1, Checked1,
+                                                                                                Allocator1> &>(),
+                                                                   std::declval<const cpp_int_backend<
+                                                                       MinBits1, MaxBits1, SignType1, Checked1,
+                                                                       Allocator1> &>(),
+                                                                   std::declval<const double_limb_type &>())))) {
                     eval_multiply(result, result, val);
                 }
+#endif // T
 
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
@@ -670,16 +674,16 @@ namespace nil {
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                        const signed_limb_type&
-                            val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
-                                                                                               SignType1, Checked1,
-                                                                                               Allocator1>&>(),
-                                                                  std::declval<const cpp_int_backend<
-                                                                      MinBits2, MaxBits2, SignType2, Checked2,
-                                                                      Allocator2>&>(),
-                                                                  std::declval<const limb_type&>())))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                        const signed_limb_type
+                            &val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
+                                                                                                SignType1, Checked1,
+                                                                                                Allocator1> &>(),
+                                                                   std::declval<const cpp_int_backend<
+                                                                       MinBits2, MaxBits2, SignType2, Checked2,
+                                                                       Allocator2> &>(),
+                                                                   std::declval<const limb_type &>())))) {
                     if (val > 0)
                         eval_multiply(result, a, static_cast<limb_type>(val));
                     else {
@@ -694,18 +698,19 @@ namespace nil {
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const signed_limb_type&
-                            val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
-                                                                                               SignType1, Checked1,
-                                                                                               Allocator1>&>(),
-                                                                  std::declval<const cpp_int_backend<
-                                                                      MinBits1, MaxBits1, SignType1, Checked1,
-                                                                      Allocator1>&>(),
-                                                                  std::declval<const limb_type&>())))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const signed_limb_type
+                            &val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
+                                                                                                SignType1, Checked1,
+                                                                                                Allocator1> &>(),
+                                                                   std::declval<const cpp_int_backend<
+                                                                       MinBits1, MaxBits1, SignType1, Checked1,
+                                                                       Allocator1> &>(),
+                                                                   std::declval<const limb_type &>())))) {
                     eval_multiply(result, result, val);
                 }
 
+#ifndef TVM
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2>
@@ -714,23 +719,23 @@ namespace nil {
                     !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                        const signed_double_limb_type&
-                            val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
-                                                                                               SignType1, Checked1,
-                                                                                               Allocator1>&>(),
-                                                                  std::declval<const cpp_int_backend<
-                                                                      MinBits2, MaxBits2, SignType2, Checked2,
-                                                                      Allocator2>&>(),
-                                                                  std::declval<const limb_type&>()))) &&
-                                          (noexcept(eval_multiply(
-                                              std::declval<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                                                           Allocator1>&>(),
-                                              std::declval<const cpp_int_backend<MinBits2, MaxBits2, SignType2,
-                                                                                 Checked2, Allocator2>&>(),
-                                              std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>&>())))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> &a,
+                        const signed_double_limb_type
+                            &val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
+                                                                                                SignType1, Checked1,
+                                                                                                Allocator1> &>(),
+                                                                   std::declval<const cpp_int_backend<
+                                                                       MinBits2, MaxBits2, SignType2, Checked2,
+                                                                       Allocator2> &>(),
+                                                                   std::declval<const limb_type &>()))) &&
+                                           (noexcept(eval_multiply(
+                                               std::declval<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
+                                                                            Allocator1> &>(),
+                                               std::declval<const cpp_int_backend<MinBits2, MaxBits2, SignType2,
+                                                                                  Checked2, Allocator2> &>(),
+                                               std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1> &>())))) {
                     if (val > 0) {
                         if (val <= (std::numeric_limits<limb_type>::max)()) {
                             eval_multiply(result, a, static_cast<limb_type>(val));
@@ -756,25 +761,25 @@ namespace nil {
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const signed_double_limb_type&
-                            val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
-                                                                                               SignType1, Checked1,
-                                                                                               Allocator1>&>(),
-                                                                  std::declval<const cpp_int_backend<
-                                                                      MinBits1, MaxBits1, SignType1, Checked1,
-                                                                      Allocator1>&>(),
-                                                                  std::declval<const limb_type&>()))) &&
-                                          (noexcept(eval_multiply(
-                                              std::declval<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
-                                                                           Allocator1>&>(),
-                                              std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>&>(),
-                                              std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>&>())))) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const signed_double_limb_type
+                            &val) noexcept((noexcept(eval_multiply(std::declval<cpp_int_backend<MinBits1, MaxBits1,
+                                                                                                SignType1, Checked1,
+                                                                                                Allocator1> &>(),
+                                                                   std::declval<const cpp_int_backend<
+                                                                       MinBits1, MaxBits1, SignType1, Checked1,
+                                                                       Allocator1> &>(),
+                                                                   std::declval<const limb_type &>()))) &&
+                                           (noexcept(eval_multiply(
+                                               std::declval<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1,
+                                                                            Allocator1> &>(),
+                                               std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1> &>(),
+                                               std::declval<const cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1> &>())))) {
                     eval_multiply(result, result, val);
                 }
-
+#endif //TVM
                 //
                 // Now over again for trivial cpp_int's:
                 //
@@ -787,10 +792,10 @@ namespace nil {
                      is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
-                            o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>>::value)) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>
+                            &o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1>>::value)) {
                     *result.limbs() = detail::checked_multiply(
                         *result.limbs(), *o.limbs(),
                         typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
@@ -805,10 +810,10 @@ namespace nil {
                     is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
-                            o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>>::value)) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>
+                            &o) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1>>::value)) {
                     *result.limbs() = detail::checked_multiply(
                         *result.limbs(), *o.limbs(),
                         typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
@@ -824,11 +829,11 @@ namespace nil {
                      is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value)>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
-                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
-                            b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>>::value)) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &a,
+                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>
+                            &b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1>>::value)) {
                     *result.limbs() = detail::checked_multiply(
                         *a.limbs(), *b.limbs(),
                         typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
@@ -843,11 +848,11 @@ namespace nil {
                     is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::
                     type
                     eval_multiply(
-                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& a,
-                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&
-                            b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
-                                                                                 Checked1, Allocator1>>::value)) {
+                        cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &a,
+                        const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>
+                            &b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1,
+                                                                                  Checked1, Allocator1>>::value)) {
                     *result.limbs() = detail::checked_multiply(
                         *a.limbs(), *b.limbs(),
                         typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::checked_type());
@@ -861,7 +866,7 @@ namespace nil {
                          class Allocator1>
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
-                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
                                   signed_double_limb_type a, signed_double_limb_type b) {
                     constexpr const signed_double_limb_type mask = ~static_cast<limb_type>(0);
                     constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
@@ -881,7 +886,7 @@ namespace nil {
                     double_limb_type z = b >> limb_bits;
 
                     result.resize(4, 4);
-                    limb_type* pr = result.limbs();
+                    limb_type *pr = result.limbs();
 
                     double_limb_type carry = w * y;
 #ifdef __MSVC_RUNTIME_CHECKS
@@ -911,7 +916,7 @@ namespace nil {
                          class Allocator1>
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<
                     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::value>::type
-                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
                                   double_limb_type a, double_limb_type b) {
                     constexpr const signed_double_limb_type mask = ~static_cast<limb_type>(0);
                     constexpr const unsigned limb_bits = sizeof(limb_type) * CHAR_BIT;
@@ -922,7 +927,7 @@ namespace nil {
                     double_limb_type z = b >> limb_bits;
 
                     result.resize(4, 4);
-                    limb_type* pr = result.limbs();
+                    limb_type *pr = result.limbs();
 
                     double_limb_type carry = w * y;
 #ifdef __MSVC_RUNTIME_CHECKS
@@ -964,9 +969,9 @@ namespace nil {
                     is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value &&
                     is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>>::value>::
                     type
-                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
-                                  cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const& a,
-                                  cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const& b) {
+                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result,
+                                  cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const &a,
+                                  cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> const &b) {
                     using canonical_type = typename nil::crypto3::multiprecision::detail::canonical<
                         typename cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>::local_limb_type,
                         cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>>::type;
@@ -981,7 +986,7 @@ namespace nil {
                     typename std::enable_if<nil::crypto3::multiprecision::detail::is_signed<SI>::value &&
                                             nil::crypto3::multiprecision::detail::is_integral<SI>::value &&
                                             (sizeof(SI) <= sizeof(signed_double_limb_type) / 2)>::type
-                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, SI a,
+                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result, SI a,
                                   SI b) {
                     result = static_cast<signed_double_limb_type>(a) * static_cast<signed_double_limb_type>(b);
                 }
@@ -991,7 +996,7 @@ namespace nil {
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR
                     typename std::enable_if<nil::crypto3::multiprecision::detail::is_unsigned<UI>::value &&
                                             (sizeof(UI) <= sizeof(signed_double_limb_type) / 2)>::type
-                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result, UI a,
+                    eval_multiply(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> &result, UI a,
                                   UI b) {
                     result = static_cast<double_limb_type>(a) * static_cast<double_limb_type>(b);
                 }
