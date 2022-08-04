@@ -385,7 +385,7 @@ namespace nil {
                             } else{
                                 true_length = elem.length();
                             }
-                            // std::cout << true_length << std::flush << '\n';
+
                             len -= true_length;
                         }
                         return es;
