@@ -217,6 +217,9 @@ namespace nil {
                          * y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)3/(x2-x1)3-y1
                          */
                         curve_element add(const curve_element &other) const {
+                            if(*this == - other){
+                                return curve_element();
+                            }
                             field_value_type Y2mY1 = other.Y - Y;
                             field_value_type X2mX1 = other.X - X;
 
