@@ -154,8 +154,8 @@ namespace nil {
                         // auto k_vec = sha512_component::generate_assignments(assignment, {padded}, row).output;
                         // row += sha512_component::rows_amount;
                         std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
-                            0x66666666, 0x11111111, 0x22222222, 0x55555555,
-                            0x33333333, 0x99999999, 0x11111111, 0x77777777};
+                            0, 0, 0, 0,
+                            0, 0, 0, 1};
                         for (int i = 0; i < 8; i++) {
                             assignment.constant(0)[component_start_row + i] = constants[i];
                         }
