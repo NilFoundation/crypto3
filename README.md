@@ -1,5 +1,7 @@
 # Circuit Definition Library (Blueprint) for =nil; Foundation's Cryptography Suite
 
+[![Run tests](https://github.com/NilFoundation/crypto3-blueprint/actions/workflows/run_tests.yml/badge.svg)](https://github.com/NilFoundation/crypto3-blueprint/actions/workflows/run_tests.yml)
+
 Circuit definition library for =nil; Foundation's cryptography suite.
 
 ## Building
