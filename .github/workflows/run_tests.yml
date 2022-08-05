@@ -15,7 +15,7 @@ env:
 
 jobs:
   checkout:
-    runs-on: [self-hosted]
+    runs-on: [self-hosted, tests-runner]
     steps:
       - name: Cleanup # TODO - move to scripts on runner
         run: |
