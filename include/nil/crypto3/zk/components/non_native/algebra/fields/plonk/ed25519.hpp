@@ -154,22 +154,21 @@ namespace nil {
                         // auto k_vec = sha512_component::generate_assignments(assignment, {padded}, row).output;
                         // row += sha512_component::rows_amount;
                         std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
-                            0, 0, 0, 0,
-                            0, 0, 0, 1};
+                            1, 1, 1, 1,
+                            1, 1, 1, 1};
                         for (int i = 0; i < 8; i++) {
-                            assignment.constant(0)[component_start_row + i] = constants[i];
+                            assignment.constant(0)[row + i] = constants[i];
                         }
-                        std::array<var, 8> k_vec = {var(0, component_start_row, false, var::column_type::constant),
-                                                    var(0, component_start_row + 1, false, var::column_type::constant),
-                                                    var(0, component_start_row + 2, false, var::column_type::constant),
-                                                    var(0, component_start_row + 3, false, var::column_type::constant),
-                                                    var(0, component_start_row + 4, false, var::column_type::constant),
-                                                    var(0, component_start_row + 5, false, var::column_type::constant),
-                                                    var(0, component_start_row + 6, false, var::column_type::constant),
-                                                    var(0, component_start_row + 7, false, var::column_type::constant)};
+                        std::array<var, 8> k_vec = {var(0, row, false, var::column_type::constant),
+                                                    var(0, row + 1, false, var::column_type::constant),
+                                                    var(0, row + 2, false, var::column_type::constant),
+                                                    var(0, row + 3, false, var::column_type::constant),
+                                                    var(0, row + 4, false, var::column_type::constant),
+                                                    var(0, row + 5, false, var::column_type::constant),
+                                                    var(0, row + 6, false, var::column_type::constant),
+                                                    var(0, row + 7, false, var::column_type::constant)};
                         var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
-
                         /* here we check sB == R + kA */
                         auto S = fixed_base_mult_component::generate_assignments(assignment, {s}, row).output;
                         row += fixed_base_mult_component::rows_amount;
@@ -206,14 +205,14 @@ namespace nil {
                         // row += ...;
                         // auto k_vec = sha512_component::generate_circuit(bp, assignment, {padded}, row).output;
                         // row += sha512_component::rows_amount;
-                        std::array<var, 8> k_vec = {var(0, start_row_index, false, var::column_type::constant),
-                                                    var(0, start_row_index + 1, false, var::column_type::constant),
-                                                    var(0, start_row_index + 2, false, var::column_type::constant),
-                                                    var(0, start_row_index + 3, false, var::column_type::constant),
-                                                    var(0, start_row_index + 4, false, var::column_type::constant),
-                                                    var(0, start_row_index + 5, false, var::column_type::constant),
-                                                    var(0, start_row_index + 6, false, var::column_type::constant),
-                                                    var(0, start_row_index + 7, false, var::column_type::constant)};
+                        std::array<var, 8> k_vec = {var(0, row, false, var::column_type::constant),
+                                                    var(0, row + 1, false, var::column_type::constant),
+                                                    var(0, row + 2, false, var::column_type::constant),
+                                                    var(0, row + 3, false, var::column_type::constant),
+                                                    var(0, row + 4, false, var::column_type::constant),
+                                                    var(0, row + 5, false, var::column_type::constant),
+                                                    var(0, row + 6, false, var::column_type::constant),
+                                                    var(0, row + 7, false, var::column_type::constant)};
                         var k = reduction_component::generate_circuit(bp, assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
 
