@@ -227,9 +227,9 @@ namespace nil {
                                                           const params_type &params,
                                                           std::size_t component_start_row) {
                         std::size_t row = component_start_row + 2 * non_native_range_component::rows_amount + 3 * mult_component::rows_amount;
-                        auto left = (typename add_component::result_type(25)).output;
+                        auto left = (typename add_component::result_type(component_start_row + 25)).output;
                         row += 2 * mult_component::rows_amount + add_component::rows_amount;
-                        auto right = (typename add_component::result_type(43)).output;
+                        auto right = (typename add_component::result_type(component_start_row + 43)).output;
                         
                         bp.add_copy_constraint({left[0], right[0]});
                         bp.add_copy_constraint({left[1], right[1]});

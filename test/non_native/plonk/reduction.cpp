@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(blueprint_variable_base_decomposition_edward25519) {
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t SelectorColumns = 2;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(blueprint_variable_base_decomposition_edward25519) {
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using component_type = zk::components::reduction<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {1,1,1,1,1,1,1,1};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {1,0,0,0,0,0,0,0};
     std::array<var, 8> input_state_var = {var(0, 0, false, var::column_type::public_input),
                                           var(0, 1, false, var::column_type::public_input),
                                           var(0, 2, false, var::column_type::public_input),
