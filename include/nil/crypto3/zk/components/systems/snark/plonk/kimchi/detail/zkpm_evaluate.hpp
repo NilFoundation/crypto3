@@ -103,7 +103,7 @@ namespace nil {
                     constexpr static const std::size_t zk_rows = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = exp_component::rows_amount 
+                    constexpr static const std::size_t rows_amount = 1 + exp_component::rows_amount 
                         + 4 * mul_component::rows_amount + 3 * sub_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -131,6 +131,7 @@ namespace nil {
                         var domain_size = var(0, start_row_index, false, var::column_type::constant);
                         
                         std::size_t row = start_row_index;
+                        row++; // skip row for constants in exp_component
 
                         result_type result(row);
 
@@ -163,6 +164,7 @@ namespace nil {
                         var domain_size = var(0, start_row_index, false, var::column_type::constant);
 
                         std::size_t row = start_row_index;
+                        row++; // skip row for constants in exp_component
 
                         result_type result(row);
 

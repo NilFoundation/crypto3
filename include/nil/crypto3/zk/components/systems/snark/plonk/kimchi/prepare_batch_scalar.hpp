@@ -111,6 +111,8 @@ namespace nil {
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
                         ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
+
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
                     using argument_type = typename verifier_index_type::argument_type;
 
@@ -138,9 +140,8 @@ namespace nil {
                     constexpr static const std::size_t rows_amount = rows();
                     constexpr static const std::size_t gates_amount = 0;
 
-                    constexpr static const std::size_t f_comm_msm_size = 1 
-                                + generic_scalars_component::output_size
-                                + verifier_index_type::constraints_amount;
+                    constexpr static const std::size_t f_comm_msm_size = 
+                        kimchi_constants::f_comm_msm_size;
 
                     struct params_type {
                         verifier_index_type &verifier_index;

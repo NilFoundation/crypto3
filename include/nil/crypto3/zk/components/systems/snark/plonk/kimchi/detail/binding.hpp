@@ -34,7 +34,6 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 namespace nil {
@@ -54,11 +53,8 @@ namespace nil {
                         std::size_t BatchSize>
                     struct fr_data {
                         private:
-                        using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
-
-                        constexpr static const std::size_t f_comm_msm_size = 1 
-                                + 10 // generic_scalars_component::output_size
-                                + verifier_index_type::constraints_amount;
+                        constexpr static const std::size_t f_comm_msm_size = 
+                            kimchi_constants::f_comm_msm_size;
                                 
                         public: 
                         std::array<VarType, kimchi_constants::final_msm_size(BatchSize)> scalars;
@@ -85,36 +81,6 @@ namespace nil {
                         var fq_digest;    // TODO overflow check
                         std::array<var, commitment_parms_type::eval_rounds> challenges;
                         var c;
-
-
-                        static fq_sponge_output
-                            allocate_fq_output(blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                typename BlueprintFieldType::value_type joint_combiner,
-                                typename BlueprintFieldType::value_type beta,
-                                typename BlueprintFieldType::value_type gamma,
-                                typename BlueprintFieldType::value_type alpha,
-                                typename BlueprintFieldType::value_type zeta,
-                                typename BlueprintFieldType::value_type fq_digest,
-                                std::array<typename BlueprintFieldType::value_type,
-                                    commitment_parms_type::eval_rounds> challenges,
-                                typename BlueprintFieldType::value_type c) {
-
-                            std::array<var, commitment_parms_type::eval_rounds> chals;
-                            for (std::size_t i = 0; i < commitment_parms_type::eval_rounds; i++) {
-                                chals[i] = assignment.allocate_public_input(challenges[i]);
-                            }
-
-                            return fq_sponge_output {
-                                assignment.allocate_public_input(joint_combiner),
-                                assignment.allocate_public_input(beta),
-                                assignment.allocate_public_input(gamma),
-                                assignment.allocate_public_input(alpha),
-                                assignment.allocate_public_input(zeta),
-                                assignment.allocate_public_input(fq_digest),
-                                chals,
-                                assignment.allocate_public_input(c)
-                            };
-                        }
                     };
                 };
             }    // namespace components

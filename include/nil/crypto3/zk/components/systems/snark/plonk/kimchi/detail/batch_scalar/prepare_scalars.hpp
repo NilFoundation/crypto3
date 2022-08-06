@@ -41,7 +41,7 @@ namespace nil {
             namespace components {
 
                 // shift scalars for scalar multiplication input
-                // f(X) = X -> X - 2^255 when the scalar field is larger than the base field and
+                // f(X) = X -> X - 2^255 when the scalar field is larger than the base field and // TODO: "larger scalar field is depricated case"
                 // f(X) = X -> (X - 2^255 - 1) / 2 otherwise
                 // Input: [x_0, ..., x_InputSize]
                 // Output: [f(x_0), ..., f(x_InputSize)]

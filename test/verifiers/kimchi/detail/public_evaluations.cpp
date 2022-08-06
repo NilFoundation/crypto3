@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_publuc_evaluations) {
 
     auto duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "lagrange_base_component: " << duration.count() << "ms" << std::endl;
+    std::cout << "public_evaluations_component: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
