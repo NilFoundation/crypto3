@@ -214,10 +214,13 @@ namespace nil {
 
                         auto index_scalars = index_terms_scalars_component::generate_circuit(
                                 bp, assignment, {
+                                oracles_output.oracles.zeta,
                                 oracles_output.oracles.alpha,
                                 params.fq_output.beta, params.fq_output.gamma,
                                 params.fq_output.joint_combiner,
-                                oracles_output.combined_evals}, row
+                                oracles_output.combined_evals,
+                                params.verifier_index.omega,
+                                params.verifier_index.domain_size}, row
                             ).output;
                         row += index_terms_scalars_component::rows_amount;
 
@@ -298,10 +301,13 @@ namespace nil {
 
                         auto index_scalars = index_terms_scalars_component::generate_assignments(
                                 assignment, {   
+                                oracles_output.oracles.zeta,
                                 oracles_output.oracles.alpha,
                                 params.fq_output.beta, params.fq_output.gamma,
                                 params.fq_output.joint_combiner,
-                                oracles_output.combined_evals}, row
+                                oracles_output.combined_evals,
+                                params.verifier_index.omega,
+                                params.verifier_index.domain_size}, row
                             ).output;
                             row += index_terms_scalars_component::rows_amount;
                         for(std::size_t i = 0; i < index_scalars.size(); i++) {

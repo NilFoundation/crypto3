@@ -231,7 +231,6 @@ namespace nil {
 
                         assert(row == start_row_index + rows_amount);
 
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
                     }
 

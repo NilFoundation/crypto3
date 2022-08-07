@@ -140,6 +140,8 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
+                        var eval_point; // zeta
+
                         var alpha;
                         var beta;
                         var gamma;
@@ -147,6 +149,9 @@ namespace nil {
 
                         std::array<evaluations_type, KimchiParamsType::eval_points_amount>
                             evaluations;
+
+                        var group_gen;
+                        std::size_t domain_size;
                     };
 
                     struct result_type {
@@ -174,81 +179,81 @@ namespace nil {
 
                         if (KimchiParamsType::circuit_params::poseidon_gate) {
                             output[output_idx++] = index_terms_list::coefficient_0::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[0], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_0::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_1::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[1], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_1::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_2::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[2], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_2::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_3::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[3], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_3::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_4::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[4], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_4::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_5::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[5], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_5::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_6::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[6], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_6::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_7::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[7], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_7::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_8::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[8], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_8::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_9::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[9], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_9::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_10::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[10], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_10::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_11::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[11], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_11::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_12::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[12], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_12::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_13::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[13], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_13::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_14::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[14], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_14::rows_amount;
                         }
 
                         if (KimchiParamsType::circuit_params::ec_arithmetic_gates) {
                             output[output_idx++] = index_terms_list::var_base_mul::generate_circuit(bp, assignment, {index_terms_list::var_base_mul_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::var_base_mul::rows_amount;
 
                             output[output_idx++] = index_terms_list::complete_add::generate_circuit(bp, assignment, {index_terms_list::complete_add_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::complete_add::rows_amount;
 
                             output[output_idx++] = index_terms_list::endo_mul::generate_circuit(bp, assignment, {index_terms_list::endo_mul_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::endo_mul::rows_amount;
 
                             output[output_idx++] = index_terms_list::endo_mul_scalar::generate_circuit(bp, assignment, {index_terms_list::endo_mul_scalar_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::endo_mul_scalar::rows_amount;
                         }
 
@@ -273,81 +278,81 @@ namespace nil {
 
                         if (KimchiParamsType::circuit_params::poseidon_gate) {
                             output[output_idx++] = index_terms_list::coefficient_0::generate_assignments(assignment, {index_terms_list::coefficient_str[0], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_0::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_1::generate_assignments(assignment, {index_terms_list::coefficient_str[1], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_1::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_2::generate_assignments(assignment, {index_terms_list::coefficient_str[2], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_2::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_3::generate_assignments(assignment, {index_terms_list::coefficient_str[3], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_3::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_4::generate_assignments(assignment, {index_terms_list::coefficient_str[4], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_4::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_5::generate_assignments(assignment, {index_terms_list::coefficient_str[5], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_5::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_6::generate_assignments(assignment, {index_terms_list::coefficient_str[6], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_6::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_7::generate_assignments(assignment, {index_terms_list::coefficient_str[7], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_7::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_8::generate_assignments(assignment, {index_terms_list::coefficient_str[8], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_8::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_9::generate_assignments(assignment, {index_terms_list::coefficient_str[9], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_9::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_10::generate_assignments(assignment, {index_terms_list::coefficient_str[10], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_10::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_11::generate_assignments(assignment, {index_terms_list::coefficient_str[11], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_11::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_12::generate_assignments(assignment, {index_terms_list::coefficient_str[12], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_12::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_13::generate_assignments(assignment, {index_terms_list::coefficient_str[13], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_13::rows_amount;
 
                             output[output_idx++] = index_terms_list::coefficient_14::generate_assignments(assignment, {index_terms_list::coefficient_str[14], 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::coefficient_14::rows_amount;
                         }
 
                         if (KimchiParamsType::circuit_params::ec_arithmetic_gates) {
                             output[output_idx++] = index_terms_list::var_base_mul::generate_assignments(assignment, {index_terms_list::var_base_mul_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::var_base_mul::rows_amount;
 
                             output[output_idx++] = index_terms_list::complete_add::generate_assignments(assignment, {index_terms_list::complete_add_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::complete_add::rows_amount;
 
                             output[output_idx++] = index_terms_list::endo_mul::generate_assignments(assignment, {index_terms_list::endo_mul_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::endo_mul::rows_amount;
 
                             output[output_idx++] = index_terms_list::endo_mul_scalar::generate_assignments(assignment, {index_terms_list::endo_mul_scalar_str, 
-                                params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations}, row).output;
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
                             row += index_terms_list::endo_mul_scalar::rows_amount;
                         }
 

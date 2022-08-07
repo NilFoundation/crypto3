@@ -42,6 +42,8 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/vanishes_on_last_4_rows.hpp>
+
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 
@@ -85,6 +87,10 @@ namespace nil {
                     using exponentiation_component =
                         zk::components::exponentiation<ArithmetizationType, 64, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                                                        W10, W11, W12, W13, W14>;
+
+                    using vanishes_on_last_4_rows_component = zk::components::vanishes_on_last_4_rows<
+                        ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                                                    11, 12, 13, 14>;
 
                     using evaluations_type =
                         typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>;
@@ -312,12 +318,17 @@ namespace nil {
                     struct params_type {
                         std::string_view expression;
 
+                        var eval_point; // zeta
+
                         var alpha;
                         var beta;
                         var gamma;
                         var joint_combiner;
 
                         std::array<evaluations_type, KimchiParamsType::eval_points_amount> evaluations;
+
+                        var group_gen;
+                        std::size_t domain_size;
                     };
 
                     struct result_type {
@@ -445,9 +456,14 @@ namespace nil {
                                     stack.push_back(res);
                                     break;
                                 }
-                                case token_type::vanishes_on_last_4_rows:
-                                    // TODO: lookups
+                                case token_type::vanishes_on_last_4_rows: {
+                                    constant_row += 2; // exponentiation component uses 2 constant rows
+                                    var res = vanishes_on_last_4_rows_component::generate_circuit(
+                                                  bp, assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
+                                    row += vanishes_on_last_4_rows_component::rows_amount;
+                                    stack.push_back(res);
                                     break;
+                                }
                                 case token_type::unnormalized_lagrange_basis:
                                     // TODO: lookups
                                     break;
@@ -576,9 +592,14 @@ namespace nil {
                                     stack.push_back(res);
                                     break;
                                 }
-                                case token_type::vanishes_on_last_4_rows:
-                                    // TODO: lookups
+                                case token_type::vanishes_on_last_4_rows: {
+                                    constant_row += 2; // exponentiation component uses 2 constant rows
+                                    var res = vanishes_on_last_4_rows_component::generate_assignments(
+                                                  assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
+                                    row += vanishes_on_last_4_rows_component::rows_amount;
+                                    stack.push_back(res);
                                     break;
+                                }
                                 case token_type::unnormalized_lagrange_basis:
                                     // TODO: lookups
                                     break;

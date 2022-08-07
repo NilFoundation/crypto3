@@ -134,7 +134,6 @@ namespace nil {
                             row += mul_component::rows_amount;                 
                         }
 
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
                         result_type res;
                         res.output = output;
                         return res;

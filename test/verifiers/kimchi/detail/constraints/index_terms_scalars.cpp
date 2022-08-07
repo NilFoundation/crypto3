@@ -103,6 +103,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_test_suite
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    std::size_t domain_size = 512;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
@@ -118,14 +121,20 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_test_suite
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<
                         BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals; 
     evals[0].w[3] = gamma;
 
     typename component_type::params_type params = { 
-        alpha, beta, gamma, joint_combiner,
-        evals};
+        zeta, alpha, beta, gamma, joint_combiner,
+        evals, omega, domain_size};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         //assert((gamma_val + beta_val) == assignment.var_value(real_res.output));
