@@ -70,7 +70,7 @@ jobs:
   run_tests:
     runs-on: [self-hosted]
     needs: [checkout]
-    continue-on-error: true
+    if: always()
     strategy:
       matrix:
         target: [
