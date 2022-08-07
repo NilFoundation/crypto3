@@ -70,8 +70,8 @@ jobs:
   run_tests:
     runs-on: [self-hosted]
     needs: [checkout]
-    if: always()
     strategy:
+      fail-fast: false
       matrix:
         target: [
             blueprint_hashes_plonk_sha256_process_test,
