@@ -10,7 +10,7 @@ jobs:
     name: Auto tag version
     runs-on: [ubuntu-latest]
     env:
-      VERSION_FILE_NAME: version.txt
+      VERSION_FILE_NAME: VERSION
     steps:
     - name: Checkout
       uses: actions/checkout@v3
