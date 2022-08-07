@@ -43,6 +43,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/vanishes_on_last_4_rows.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/unnormalized_lagrange_basis.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -95,6 +96,9 @@ namespace nil {
                                         ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                                     11, 12, 13, 14>;
 
+                    using unnormalized_lagrange_basis_component = zk::components::unnormalized_lagrange_basis<ArithmetizationType,
+                         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+
                     const std::size_t literal_string_size = str_len(expression);
 
                     const size_t mds_size = 3;
@@ -146,6 +150,11 @@ namespace nil {
                             constant_rows += 2; // exponentiation component uses 2 constant rows
                             constant_rows++; // vanishes_on_last_4_rows_component saves domain_size into constant
                             rows += vanishes_on_last_4_rows_component::rows_amount;
+                        }
+                        else if (find_str(expression, unnormalized_lagrange_basis_c, 3, str_start[i], str_end[i]) != std::string::npos) {
+                            constant_rows += 2; // exponentiation component uses 2 constant rows
+                            constant_rows += 3; // unnormalized_lagrange_basis_component uses 3 constant rows
+                            rows += unnormalized_lagrange_basis_component::rows_amount;
                         }
                     }
 
