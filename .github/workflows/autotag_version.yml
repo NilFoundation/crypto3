@@ -23,7 +23,7 @@ jobs:
     - name: Tag new version
       if: ${{ env.MATCHED_FILES }}
       run: |
-        version=$(cat ${{ env.VERSION_FILE_NAME }})
+        version=$(cat ${{ env.VERSION_FILE_NAME }} | tr -d '\r')
         git tag v$version
 
     - name: Push tags
