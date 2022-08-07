@@ -458,6 +458,7 @@ namespace nil {
                                 }
                                 case token_type::vanishes_on_last_4_rows: {
                                     constant_row += 2; // exponentiation component uses 2 constant rows
+                                    constant_rows++; // vanishes_on_last_4_rows_component saves domain_size into constant
                                     var res = vanishes_on_last_4_rows_component::generate_circuit(
                                                   bp, assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
                                     row += vanishes_on_last_4_rows_component::rows_amount;
@@ -594,6 +595,7 @@ namespace nil {
                                 }
                                 case token_type::vanishes_on_last_4_rows: {
                                     constant_row += 2; // exponentiation component uses 2 constant rows
+                                    constant_rows++; // vanishes_on_last_4_rows_component saves domain_size into constant
                                     var res = vanishes_on_last_4_rows_component::generate_assignments(
                                                   assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
                                     row += vanishes_on_last_4_rows_component::rows_amount;

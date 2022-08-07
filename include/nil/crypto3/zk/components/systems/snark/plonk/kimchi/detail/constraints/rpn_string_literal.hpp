@@ -144,6 +144,7 @@ namespace nil {
                             rows += sub_component::rows_amount;
                         } else if (find_str(expression, vanishes_on_last_4_rows_c, 3, str_start[i], str_end[i]) != std::string::npos) {
                             constant_rows += 2; // exponentiation component uses 2 constant rows
+                            constant_rows++; // vanishes_on_last_4_rows_component saves domain_size into constant
                             rows += vanishes_on_last_4_rows_component::rows_amount;
                         }
                     }
