@@ -143,20 +143,19 @@ namespace nil {
                             case KimchiParamsType::witness_columns + 3:
                                 return evals.generic_selector;
                             case KimchiParamsType::witness_columns + 4:
-                                // TODO: lookups
-                                return evals.z;
+                                return evals.lookup.aggreg;
                             case KimchiParamsType::witness_columns + 5:
-                                // TODO: lookups
-                                return evals.z;
+                                return evals.lookup.table;
                             case KimchiParamsType::witness_columns + 6:
-                                // TODO: lookups
-                                return evals.z;
-                            case KimchiParamsType::witness_columns + 7:
-                                // TODO: lookups
-                                return evals.z;
+                                return evals.lookup.runtime;
                             default:
-                                throw std::runtime_error("Unknown column type");
+                                break;
                         }
+
+                        assert(var_column <= KimchiParamsType::witness_columns + 
+                            6 + KimchiParamsType::circuit_params::lookup_columns);
+                        
+                        return evals.lookup.sorted[var_column - KimchiParamsType::witness_columns - 7];
                     }
 
                     enum token_type {
@@ -272,7 +271,7 @@ namespace nil {
                                         std::size_t col_end_pos = token_str.find(")", col_start_pos);
                                         std::string col_str =
                                             token_str.substr(col_start_pos, col_end_pos - col_start_pos);
-                                        col = KimchiParamsType::witness_columns + 6 + std::stoi(col_str);
+                                        col = KimchiParamsType::witness_columns + 7 + std::stoi(col_str);
                                     }
                                 }
 
@@ -682,9 +681,6 @@ namespace nil {
                                     row++;
                                     break;
                                 }
-                                case token_type::unnormalized_lagrange_basis:
-                                    // TODO: lookups
-                                    break;
                                 default:
                                     break;
                             }
