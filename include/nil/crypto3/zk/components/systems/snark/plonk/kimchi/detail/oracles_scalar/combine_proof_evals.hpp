@@ -99,11 +99,27 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0x0f23;
 
+                    constexpr static const std::size_t lookup_rows() {
+                        std::size_t rows = 0;
+                        if (KimchiParamsType::circuit_params::lookup_columns > 0) {
+                            rows += KimchiParamsType::circuit_params::lookup_columns * mul_component::rows_amount;
+
+                            rows += 2 * mul_component::rows_amount;
+
+                            if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                rows += mul_component::rows_amount;
+                            }
+                        }
+
+                        return rows;
+                    }
+
                 public:
                     constexpr static const std::size_t rows_amount = 
                         KimchiParamsType::witness_columns * mul_component::rows_amount // w
                         + mul_component::rows_amount // z
                         + (KimchiParamsType::permut_size - 1) * mul_component::rows_amount  // s
+                        + lookup_rows()
                         + mul_component::rows_amount // generic
                         + mul_component::rows_amount; // poseidon
                     constexpr static const std::size_t gates_amount = 0;
@@ -133,8 +149,22 @@ namespace nil {
                                 row += mul_component::rows_amount;
                             }
                             // lookup
-                            if (KimchiParamsType::use_lookup) {
-                                // TODO
+                            if (KimchiParamsType::circuit_params::lookup_columns > 0) {
+                                for (std::size_t i = 0; i < KimchiParamsType::circuit_params::lookup_columns; i++) {
+                                    output.lookup.sorted[i] = typename mul_component::result_type(row).output;
+                                    row += mul_component::rows_amount;
+                                }
+
+                                output.lookup.aggreg = typename mul_component::result_type(row).output;
+                                row += mul_component::rows_amount;
+
+                                output.lookup.table = typename mul_component::result_type(row).output;
+                                row += mul_component::rows_amount;
+
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    output.lookup.runtime = typename mul_component::result_type(row).output;
+                                    row += mul_component::rows_amount;
+                                }
                             }
                             // generic_selector
                             output.generic_selector = typename mul_component::result_type(row).output;
@@ -169,8 +199,26 @@ namespace nil {
                             row += mul_component::rows_amount;
                         }
                         // lookup
-                        if (KimchiParamsType::use_lookup) {
-                            // TODO
+                        if (KimchiParamsType::circuit_params::lookup_columns > 0) {
+                            for (std::size_t i = 0; i < KimchiParamsType::circuit_params::lookup_columns; i++) {
+                                zk::components::generate_circuit<mul_component>(bp,assignment,
+                                    {params.evals.lookup.sorted[i], params.x}, row);
+                                row += mul_component::rows_amount;
+                            }
+
+                            zk::components::generate_circuit<mul_component>(bp,assignment,
+                                    {params.evals.lookup.aggreg, params.x}, row);
+                            row += mul_component::rows_amount;
+
+                            zk::components::generate_circuit<mul_component>(bp,assignment,
+                                    {params.evals.lookup.table, params.x}, row);
+                            row += mul_component::rows_amount;
+
+                            if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                zk::components::generate_circuit<mul_component>(bp,assignment,
+                                        {params.evals.lookup.runtime, params.x}, row);
+                                row += mul_component::rows_amount;
+                            }
                         }
                         // generic_selector
                         zk::components::generate_circuit<mul_component>(bp, assignment,
@@ -180,6 +228,8 @@ namespace nil {
                         zk::components::generate_circuit<mul_component>(bp, assignment,
                                 {params.evals.poseidon_selector, params.x}, row);
                         row += mul_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
@@ -208,8 +258,26 @@ namespace nil {
                             row += mul_component::rows_amount;
                         }
                         // lookup
-                        if (KimchiParamsType::use_lookup) {
-                            // TODO
+                        if (KimchiParamsType::circuit_params::lookup_columns > 0) {
+                            for (std::size_t i = 0; i < KimchiParamsType::circuit_params::lookup_columns; i++) {
+                                mul_component::generate_assignments(assignment,
+                                    {params.evals.lookup.sorted[i], params.x}, row);
+                                row += mul_component::rows_amount;
+                            }
+
+                            mul_component::generate_assignments(assignment,
+                                    {params.evals.lookup.aggreg, params.x}, row);
+                            row += mul_component::rows_amount;
+
+                            mul_component::generate_assignments(assignment,
+                                    {params.evals.lookup.table, params.x}, row);
+                            row += mul_component::rows_amount;
+
+                            if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                mul_component::generate_assignments(assignment,
+                                        {params.evals.lookup.runtime, params.x}, row);
+                                row += mul_component::rows_amount;
+                            }
                         }
                         // generic_selector
                         mul_component::generate_assignments(assignment,
@@ -219,6 +287,8 @@ namespace nil {
                         mul_component::generate_assignments(assignment,
                                 {params.evals.poseidon_selector, params.x}, row);
                         row += mul_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
 
                         return result_type(start_row_index);
                     }

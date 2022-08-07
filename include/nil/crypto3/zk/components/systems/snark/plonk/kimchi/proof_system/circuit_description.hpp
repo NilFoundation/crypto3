@@ -43,6 +43,9 @@ namespace nil {
 
                     static const std::size_t poseidon_gates_count = 15;
                     static const std::size_t ec_arithmetic_gates_count = 4;
+
+                    static const std::size_t lookup_columns = 0;
+                    static const bool lookup_runtime = false;
                 };
             }    // namespace components
         }        // namespace zk
