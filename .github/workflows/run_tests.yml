@@ -37,7 +37,7 @@ jobs:
       - name: Cmake and build
         env:
           CMAKE_ARGS: "
-            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_BUILD_TYPE=Debug
             -DBUILD_SHARED_LIBS=FALSE
             -DBUILD_TESTS=TRUE
             -DBUILD_WITH_NUMA=FALSE
