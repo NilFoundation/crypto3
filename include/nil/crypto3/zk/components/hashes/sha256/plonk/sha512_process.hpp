@@ -870,6 +870,167 @@ namespace nil {
                                                           blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                           const params_type &params,
                                                           const std::size_t &start_row_index) {
+
+                                                            std::size_t row = start_row_index + 2;
+
+                                                            // вторая задача Алисы 
+                                                            // прописать копи констрейнты для связи input_words в params и в witness
+
+                                                            // ищем все присваивания витнессам значений message_scheduling_words
+                                                            //________________________________________
+                                                            //       |   W0      W5      W7      W8   |
+                                                            //_______|________________________________|
+                                                            // i + 0 | msw[1]                         |
+                                                            // i + 1 |                                |
+                                                            // i + 2 |                  msw[9] msw[0] |
+                                                            // i + 3 |                                |
+                                                            // i + 4 |                                |
+                                                            // i + 5 | msw[14]                        |
+
+
+                                                            // assignment.witness(W0)[i + 0] = message_scheduling_words[(i - row) / 6 + 1]
+                                                            for (std::size_t i = 1; i <= 15; ++i) {
+                                                                bp.add_copy_constraint({var(W0, row + (i - 1)*6 + 0, false), params.input_words[i]});
+                                                            }
+
+                                                            // assignment.witness(W7)[i+2] = message_scheduling_words[(i - row) / 6 + 9]
+                                                            for (std::size_t i = 9; i <= 15; ++i) {
+                                                                bp.add_copy_constraint({var(W7, row + (i - 9)*6 + 2, false), params.input_words[i]});
+                                                            }
+
+                                                            //  W8, [i + 2],  +0
+                                                            for (std::size_t i = 0; i <= 15; ++i) {
+                                                                bp.add_copy_constraint({var(W8, row + (i - 0)*6 + 2, false), params.input_words[i]});
+                                                            }
+
+                                                            // W0, [i + 5], +14
+                                                            for (std::size_t i = 14; i <= 15; ++i) {
+                                                               bp.add_copy_constraint({var(W0, row + (i - 14)*6 + 5, false), params.input_words[i]});
+                                                           }
+                                                            // конец второй задачи Алисы
+
+
+                                                            row = row + 384;
+                                                            // третья задача Алисы
+                                                            // копи констрейнты между a,b,c,d,e,f,g,h и витнессом
+                                                            // копи констрейнты между sparsed_values и витнессом
+
+                                                            // первое вхождение спарсед инпут стейт в основной цикл
+                                                            // i = 0, ... , 7
+                                                            // assignment.witness(i)[start_row_index + 1] = input_state_sparse_chunks[1][0];
+                                                            // sparse_values[i] = input_state_sparse_chunks[1][0];
+
+                                                            bp.add_copy_constraint({var(W6, row + 2, false), var(W5, start_row_index + 1)});
+                                                            bp.add_copy_constraint({var(W6, row + 3, false), var(W6, start_row_index + 1)});
+                                                            bp.add_copy_constraint({var(W6, row + 6, false), var(W1, start_row_index + 1)});
+                                                            bp.add_copy_constraint({var(W6, row + 5, false), var(W2, start_row_index + 1)});
+
+                                                            // спарснутые внутри цикла
+                                                            // _______  W5___|___W6___________________
+                                                            // i + 0 |   
+                                                            // i + 1 |       | 
+                                                            // i + 2 | s_v[4]| s_v[5]
+                                                            // i + 3 |       | s_v[6]
+                                                            // i + 4 |       | 
+                                                            // i + 5 |       | s_v[2]
+                                                            // i + 6 | s_v[0]| s_v[1]
+                                                            // i + 7 |       | 
+                                                            // i + 8 |       | 
+
+                                                            // следующая итерация с i = i + 9 
+                                                            // i + 0 |       |   
+                                                            // i + 1 |       | 
+                                                            // i + 2 |       | s_v[5] == s_v[4]
+                                                            // i + 3 |       | s_v[6] == s_v[5]
+                                                            // i + 4 |       | 
+                                                            // i + 5 |       | s_v[2] == s_v[1]
+                                                            // i + 6 |       | s_v[1] == s_v[0]
+                                                            // i + 7 | 
+                                                            // i + 8 |  
+
+                                                            for (std::size_t i = row; i < row + 720 - 9; i = i + 9){
+                                                                bp.add_copy_constraint ({var(W6, (i + 2) + 9, false), var(W5, (i + 2), false)});
+                                                                bp.add_copy_constraint ({var(W6, (i + 3) + 9, false), var(W6, (i + 2), false)});
+                                                                bp.add_copy_constraint ({var(W6, (i + 5) + 9, false), var(W6, (i + 6), false)});
+                                                                bp.add_copy_constraint ({var(W6, (i + 6) + 9, false), var(W5, (i + 6), false)});
+                                                            }
+                                                            // цикл отработает 79 раз, не выйдем за границы 
+
+                                                            // теперь то же самое для не-sparsed букв алфавита
+                                                            // a = input_state[0];
+                                                            // b = input_state[1];
+                                                            // c = input_state[2];
+                                                            // d = input_state[3];
+                                                            // e = input_state[4];
+                                                            // f = input_state[5];
+                                                            // g = input_state[6];
+                                                            // h = input_state[7];
+                                                            // связываем первое вхождение a, d, e, h с соответствующими инпут стейтами
+                                                            bp.add_copy_constraint({var(W0, row + 8, false), params.input_state[0]});
+                                                            bp.add_copy_constraint({var(W7, row + 3, false), params.input_state[3]});
+                                                            bp.add_copy_constraint({var(W0, row + 0, false), params.input_state[4]});
+                                                            bp.add_copy_constraint({var(W8, row + 3, false), params.input_state[7]});
+
+
+                                                            row = row + 720;
+
+
+/* 
+                                                            
+                                                            // __________W0___|___W7___|___W8___|__________
+                                                            // i + 0 |    e   |        |        |
+                                                            // i + 1 |        |        |        |
+                                                            // i + 2 |        |        |        |
+                                                            // i + 3 |        |    d   |    h   |
+                                                            // i + 4 |        |        |        |
+                                                            // i + 5 |        |        |        |
+                                                            // i + 6 |        |        |        |
+                                                            // i + 7 |        |        |        |
+                                                            // i + 8 |    a   |        |        |
+
+                                                            h = g;      записанное в витнесс значение не записыавется в аутпут стейт
+                                                            g = f;      
+                                                            f = e;
+                                                            e = e_new;  записанное в витнесс значение не записыавется в аутпут стейт
+                                                            d = c;      записанное в витнесс значение не записыавется в аутпут стейт
+                                                            c = b;
+                                                            b = a;
+                                                            a = a_new;  записанное в витнесс значение не записыавется в аутпут стейт
+
+                                                            // __________W0___|___W7___|___W8___|__________
+                                                            // i + 0 |   ХХХ  |        |        |
+                                                            // i + 1 |        |        |        |
+                                                            // i + 2 |        |        |        |
+                                                            // i + 3 |        |   XXX  |   ХХХ  |
+                                                            // i + 4 |        |        |        |
+                                                            // i + 5 |        |        |        |
+                                                            // i + 6 |        |        |        |
+                                                            // i + 7 |        |        |        |
+                                                            // i + 8 |   ХХХ  |        |        |
+                        
+                                                            std::array<typename CurveType::base_field_type::value_type, 8> output_state = {a, b, c, d, e, f, g, h};
+
+                                                            for(std::size_t i = 0; i < 4; i ++){
+                                                                assignment.witness(i + 4)[row] = output_state[i];
+                                                            }
+                                                            row = row + 2;
+                                                            for(std::size_t i = 0; i < 4; i ++){
+                                                                assignment.witness(i + 4)[row] = output_state[i + 4];
+                                                            }
+
+*/
+
+
+
+                                                            // первая задача Алисы, записать копи констрейнтс для связи между инпут_стейтс и в парамс и в витнессе:
+                                                            bp.add_copy_constraint({var(W0, row, false), params.input_state[0]});
+                                                            bp.add_copy_constraint({var(W1, row, false), params.input_state[1]});
+                                                            bp.add_copy_constraint({var(W2, row, false), params.input_state[2]});
+                                                            bp.add_copy_constraint({var(W3, row, false), params.input_state[3]});
+                                                            bp.add_copy_constraint({var(W0, row + 2, false), params.input_state[4]});
+                                                            bp.add_copy_constraint({var(W1, row + 2, false), params.input_state[5]});
+                                                            bp.add_copy_constraint({var(W2, row + 2, false), params.input_state[6]});
+                                                            bp.add_copy_constraint({var(W3, row + 2, false), params.input_state[7]});
                     }
                     static void
                         generate_assignments_constant(blueprint<ArithmetizationType> &bp,
