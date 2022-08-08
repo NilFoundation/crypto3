@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Dup;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
-    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_sub
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Sub;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
-    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_add
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
-    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_mul
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Mul;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
-    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -445,7 +445,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_pow
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Pow(2);\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
-    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -534,7 +534,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
 
     constexpr const char *s = "Cell(Variable { col: Witness(10), row: Curr });Cell(Variable { col: Witness(2), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Sub;Store;Mul;Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(7), row: Curr });Sub;Sub;Alpha;Pow(1);Cell(Variable { col: Witness(7), row: Curr });Load(0);Mul;Mul;Add;Alpha;Pow(2);Cell(Variable { col: Witness(7), row: Curr });Cell(Variable { col: Witness(8), row: Curr });Dup;Add;Cell(Variable { col: Witness(1), row: Curr });Mul;Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Mul;Store;Dup;Add;Sub;Load(1);Sub;Mul;Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(7), row: Curr });Sub;Load(0);Cell(Variable { col: Witness(8), row: Curr });Mul;Cell(Variable { col: Witness(3), row: Curr });Cell(Variable { col: Witness(1), row: Curr });Sub;Store;Sub;Mul;Add;Mul;Add;Alpha;Pow(3);Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(2), row: Curr });Add;Cell(Variable { col: Witness(4), row: Curr });Add;Cell(Variable { col: Witness(8), row: Curr });Cell(Variable { col: Witness(8), row: Curr });Mul;Sub;Mul;Add;Alpha;Pow(4);Cell(Variable { col: Witness(8), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(4), row: Curr });Sub;Mul;Cell(Variable { col: Witness(1), row: Curr });Sub;Cell(Variable { col: Witness(5), row: Curr });Sub;Mul;Add;Alpha;Pow(5);Load(2);Cell(Variable { col: Witness(7), row: Curr });Cell(Variable { col: Witness(6), row: Curr });Sub;Mul;Mul;Add;Alpha;Pow(6);Load(2);Cell(Variable { col: Witness(9), row: Curr });Mul;Cell(Variable { col: Witness(6), row: Curr });Sub;Mul;Add;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
-    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 

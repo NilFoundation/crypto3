@@ -101,35 +101,23 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0x0f27;
 
-                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType, KimchiParamsType, 
+                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType, 
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
 
                     constexpr static std::size_t rows() {
                         std::size_t n = 0;
                         if (KimchiParamsType::circuit_params::poseidon_gate) {
-                            n += index_terms_list::coefficient_0::rows_amount;
-                            n += index_terms_list::coefficient_1::rows_amount;
-                            n += index_terms_list::coefficient_2::rows_amount;
-                            n += index_terms_list::coefficient_3::rows_amount;
-                            n += index_terms_list::coefficient_4::rows_amount;
-                            n += index_terms_list::coefficient_5::rows_amount;
-                            n += index_terms_list::coefficient_6::rows_amount;
-                            n += index_terms_list::coefficient_7::rows_amount;
-                            n += index_terms_list::coefficient_8::rows_amount;
-                            n += index_terms_list::coefficient_9::rows_amount;
-                            n += index_terms_list::coefficient_10::rows_amount;
-                            n += index_terms_list::coefficient_11::rows_amount;
-                            n += index_terms_list::coefficient_12::rows_amount;
-                            n += index_terms_list::coefficient_13::rows_amount;
-                            n += index_terms_list::coefficient_14::rows_amount;
+                            for (std::size_t i = 0; i < index_terms_list::coefficient_rows.size(); i++) {
+                                n += index_terms_list::coefficient_rows[i];
+                            }
                         }
 
                         if (KimchiParamsType::circuit_params::ec_arithmetic_gates) {
-                            n += index_terms_list::var_base_mul::rows_amount;
-                            n += index_terms_list::complete_add::rows_amount;
-                            n += index_terms_list::endo_mul::rows_amount;
-                            n += index_terms_list::endo_mul_scalar::rows_amount;
+                            n += index_terms_list::var_base_mul_rows;
+                            n += index_terms_list::complete_add_rows;
+                            n += index_terms_list::endo_mul_rows;
+                            n += index_terms_list::endo_mul_scalar_rows;
                         }
 
                         return n;
@@ -171,90 +159,130 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
-
                         std::array<var, KimchiParamsType::index_term_size()> output;
 
                         std::size_t output_idx = 0;
 
                         if (KimchiParamsType::circuit_params::poseidon_gate) {
-                            output[output_idx++] = index_terms_list::coefficient_0::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[0], 
+                            using coefficient_component_0 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[0], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_0::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[0], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_0::rows_amount;
+                            row += coefficient_component_0::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_1::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[1], 
+                            using coefficient_component_1 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[1], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_1::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[1], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_1::rows_amount;
+                            row += coefficient_component_1::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_2::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[2], 
+                            using coefficient_component_2 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[2], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_2::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[2], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_2::rows_amount;
+                            row += coefficient_component_2::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_3::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[3], 
+                            using coefficient_component_3 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[3], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_3::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[3], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_3::rows_amount;
+                            row += coefficient_component_3::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_4::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[4], 
+                            using coefficient_component_4 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[4], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_4::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[4], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_4::rows_amount;
+                            row += coefficient_component_4::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_5::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[5], 
+                            using coefficient_component_5 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[5], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_5::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[5], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_5::rows_amount;
+                            row += coefficient_component_5::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_6::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[6], 
+                            using coefficient_component_6 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[6], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_6::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[6], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_6::rows_amount;
+                            row += coefficient_component_6::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_7::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[7], 
+                            using coefficient_component_7 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[7], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_7::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[7], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_7::rows_amount;
+                            row += coefficient_component_7::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_8::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[8], 
+                            using coefficient_component_8 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[8], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_8::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[8], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_8::rows_amount;
+                            row += coefficient_component_8::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_9::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[9], 
+                            using coefficient_component_9 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[9], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_9::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[9], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_9::rows_amount;
+                            row += coefficient_component_9::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_10::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[10], 
+                            using coefficient_component_10 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[10], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_10::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[10], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_10::rows_amount;
+                            row += coefficient_component_10::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_11::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[11], 
+                            using coefficient_component_11 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[11], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_11::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[11], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_11::rows_amount;
+                            row += coefficient_component_11::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_12::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[12], 
+                            using coefficient_component_12 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[12], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_12::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[12], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_12::rows_amount;
+                            row += coefficient_component_12::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_13::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[13], 
+                            using coefficient_component_13 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[13], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_13::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[13], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_13::rows_amount;
+                            row += coefficient_component_13::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_14::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[14], 
+                            using coefficient_component_14 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[14], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_14::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[14], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_14::rows_amount;
+                            row += coefficient_component_14::rows_amount;
                         }
 
                         if (KimchiParamsType::circuit_params::ec_arithmetic_gates) {
-                            output[output_idx++] = index_terms_list::var_base_mul::generate_circuit(bp, assignment, {index_terms_list::var_base_mul_str, 
-                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::var_base_mul::rows_amount;
+                            using var_base_mul = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::var_base_mul_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                                
+                            using complete_add = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::complete_add_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                            output[output_idx++] = index_terms_list::complete_add::generate_circuit(bp, assignment, {index_terms_list::complete_add_str, 
-                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::complete_add::rows_amount;
+                            using endo_mul = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::endo_mul_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                            output[output_idx++] = index_terms_list::endo_mul::generate_circuit(bp, assignment, {index_terms_list::endo_mul_str, 
-                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::endo_mul::rows_amount;
+                            using endo_mul_scalar = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::endo_mul_scalar_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                            output[output_idx++] = index_terms_list::endo_mul_scalar::generate_circuit(bp, assignment, {index_terms_list::endo_mul_scalar_str, 
+                            output[output_idx++] = var_base_mul::generate_circuit(bp, assignment, {index_terms_list::var_base_mul_str, 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::endo_mul_scalar::rows_amount;
+                            row += var_base_mul::rows_amount;
+
+                            output[output_idx++] = complete_add::generate_circuit(bp, assignment, {index_terms_list::complete_add_str, 
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
+                            row += complete_add::rows_amount;
+
+                            output[output_idx++] = endo_mul::generate_circuit(bp, assignment, {index_terms_list::endo_mul_str, 
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
+                            row += endo_mul::rows_amount;
+
+                            output[output_idx++] = endo_mul_scalar::generate_circuit(bp, assignment, {index_terms_list::endo_mul_scalar_str, 
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
+                            row += endo_mul_scalar::rows_amount;
                         }
 
                         assert(output_idx == KimchiParamsType::index_term_size());
@@ -277,83 +305,125 @@ namespace nil {
                         std::size_t output_idx = 0;
 
                         if (KimchiParamsType::circuit_params::poseidon_gate) {
-                            output[output_idx++] = index_terms_list::coefficient_0::generate_assignments(assignment, {index_terms_list::coefficient_str[0], 
+                            using coefficient_component_0 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[0], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_0::generate_assignments(assignment, {index_terms_list::coefficient_str[0], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_0::rows_amount;
+                            row += coefficient_component_0::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_1::generate_assignments(assignment, {index_terms_list::coefficient_str[1], 
+                            using coefficient_component_1 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[1], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_1::generate_assignments(assignment, {index_terms_list::coefficient_str[1], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_1::rows_amount;
+                            row += coefficient_component_1::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_2::generate_assignments(assignment, {index_terms_list::coefficient_str[2], 
+                            using coefficient_component_2 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[2], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_2::generate_assignments(assignment, {index_terms_list::coefficient_str[2], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_2::rows_amount;
+                            row += coefficient_component_2::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_3::generate_assignments(assignment, {index_terms_list::coefficient_str[3], 
+                            using coefficient_component_3 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[3], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_3::generate_assignments(assignment, {index_terms_list::coefficient_str[3], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_3::rows_amount;
+                            row += coefficient_component_3::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_4::generate_assignments(assignment, {index_terms_list::coefficient_str[4], 
+                            using coefficient_component_4 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[4], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_4::generate_assignments(assignment, {index_terms_list::coefficient_str[4], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_4::rows_amount;
+                            row += coefficient_component_4::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_5::generate_assignments(assignment, {index_terms_list::coefficient_str[5], 
+                            using coefficient_component_5 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[5], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_5::generate_assignments(assignment, {index_terms_list::coefficient_str[5], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_5::rows_amount;
+                            row += coefficient_component_5::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_6::generate_assignments(assignment, {index_terms_list::coefficient_str[6], 
+                            using coefficient_component_6 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[6], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_6::generate_assignments(assignment, {index_terms_list::coefficient_str[6], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_6::rows_amount;
+                            row += coefficient_component_6::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_7::generate_assignments(assignment, {index_terms_list::coefficient_str[7], 
+                            using coefficient_component_7 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[7], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_7::generate_assignments(assignment, {index_terms_list::coefficient_str[7], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_7::rows_amount;
+                            row += coefficient_component_7::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_8::generate_assignments(assignment, {index_terms_list::coefficient_str[8], 
+                            using coefficient_component_8 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[8], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_8::generate_assignments(assignment, {index_terms_list::coefficient_str[8], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_8::rows_amount;
+                            row += coefficient_component_8::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_9::generate_assignments(assignment, {index_terms_list::coefficient_str[9], 
+                            using coefficient_component_9 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[9], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_9::generate_assignments(assignment, {index_terms_list::coefficient_str[9], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_9::rows_amount;
+                            row += coefficient_component_9::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_10::generate_assignments(assignment, {index_terms_list::coefficient_str[10], 
+                            using coefficient_component_10 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[10], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_10::generate_assignments(assignment, {index_terms_list::coefficient_str[10], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_10::rows_amount;
+                            row += coefficient_component_10::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_11::generate_assignments(assignment, {index_terms_list::coefficient_str[11], 
+                            using coefficient_component_11 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[11], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_11::generate_assignments(assignment, {index_terms_list::coefficient_str[11], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_11::rows_amount;
+                            row += coefficient_component_11::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_12::generate_assignments(assignment, {index_terms_list::coefficient_str[12], 
+                            using coefficient_component_12 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[12], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_12::generate_assignments(assignment, {index_terms_list::coefficient_str[12], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_12::rows_amount;
+                            row += coefficient_component_12::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_13::generate_assignments(assignment, {index_terms_list::coefficient_str[13], 
+                            using coefficient_component_13 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[13], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_13::generate_assignments(assignment, {index_terms_list::coefficient_str[13], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_13::rows_amount;
+                            row += coefficient_component_13::rows_amount;
 
-                            output[output_idx++] = index_terms_list::coefficient_14::generate_assignments(assignment, {index_terms_list::coefficient_str[14], 
+                            using coefficient_component_14 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::coefficient_rows[14], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                            output[output_idx++] = coefficient_component_14::generate_assignments(assignment, {index_terms_list::coefficient_str[14], 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::coefficient_14::rows_amount;
+                            row += coefficient_component_14::rows_amount;
                         }
 
                         if (KimchiParamsType::circuit_params::ec_arithmetic_gates) {
-                            output[output_idx++] = index_terms_list::var_base_mul::generate_assignments(assignment, {index_terms_list::var_base_mul_str, 
-                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::var_base_mul::rows_amount;
+                            using var_base_mul = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::var_base_mul_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                                
+                            using complete_add = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::complete_add_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                            output[output_idx++] = index_terms_list::complete_add::generate_assignments(assignment, {index_terms_list::complete_add_str, 
-                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::complete_add::rows_amount;
+                            using endo_mul = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::endo_mul_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                            output[output_idx++] = index_terms_list::endo_mul::generate_assignments(assignment, {index_terms_list::endo_mul_str, 
-                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::endo_mul::rows_amount;
+                            using endo_mul_scalar = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
+                                index_terms_list::endo_mul_scalar_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                            output[output_idx++] = index_terms_list::endo_mul_scalar::generate_assignments(assignment, {index_terms_list::endo_mul_scalar_str, 
+                            output[output_idx++] = var_base_mul::generate_assignments(assignment, {index_terms_list::var_base_mul_str, 
                                 params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                            row += index_terms_list::endo_mul_scalar::rows_amount;
+                            row += var_base_mul::rows_amount;
+
+                            output[output_idx++] = complete_add::generate_assignments(assignment, {index_terms_list::complete_add_str, 
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
+                            row += complete_add::rows_amount;
+
+                            output[output_idx++] = endo_mul::generate_assignments(assignment, {index_terms_list::endo_mul_str, 
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
+                            row += endo_mul::rows_amount;
+
+                            output[output_idx++] = endo_mul_scalar::generate_assignments(assignment, {index_terms_list::endo_mul_scalar_str, 
+                                params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
+                            row += endo_mul_scalar::rows_amount;
                         }
 
                         assert(output_idx == KimchiParamsType::index_term_size());
@@ -363,26 +433,6 @@ namespace nil {
                         res.output = output;
 
                         return res;
-                    }
-
-                private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               const std::size_t first_selector_index) {
-
-                    }
-
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
-                    }
-
-                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
                     }
                 };
             }    // namespace components

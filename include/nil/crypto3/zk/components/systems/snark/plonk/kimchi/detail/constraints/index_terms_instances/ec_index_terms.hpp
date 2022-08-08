@@ -35,13 +35,12 @@ namespace nil {
 
                 // index terms for ec test
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/tests/ec.rs#L15
-                template<typename ArithmetizationType, typename KimchiParamsType,
+                template<typename ArithmetizationType,
                     std::size_t... WireIndexes>
                 class index_terms_scalars_list;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
-                         typename KimchiParamsType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -59,7 +58,6 @@ namespace nil {
                          std::size_t W14>
                 class index_terms_scalars_list<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    KimchiParamsType,
                     W0,
                     W1,
                     W2,
@@ -79,9 +77,9 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    static const std::size_t coefficients_amount = 15;
-
                     public: 
+
+                    static const std::size_t coefficients_amount = 15;
 
                     constexpr static const std::array<char*, coefficients_amount> coefficient_str = {
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;\0",
@@ -125,105 +123,50 @@ namespace nil {
                             count_delimiters(coefficient_str[14])
                     };
 
-                    constexpr static const std::array<std::size_t, coefficients_amount> 
-                        coefficient_rows = {
-                            rpn_component_rows<coefficient_array_size[0], ArithmetizationType, KimchiParamsType>(coefficient_str[0]),
-                            rpn_component_rows<coefficient_array_size[1], ArithmetizationType, KimchiParamsType>(coefficient_str[1]),
-                            rpn_component_rows<coefficient_array_size[2], ArithmetizationType, KimchiParamsType>(coefficient_str[2]),
-                            rpn_component_rows<coefficient_array_size[3], ArithmetizationType, KimchiParamsType>(coefficient_str[3]),
-                            rpn_component_rows<coefficient_array_size[4], ArithmetizationType, KimchiParamsType>(coefficient_str[4]),
-                            rpn_component_rows<coefficient_array_size[5], ArithmetizationType, KimchiParamsType>(coefficient_str[5]),
-                            rpn_component_rows<coefficient_array_size[6], ArithmetizationType, KimchiParamsType>(coefficient_str[6]),
-                            rpn_component_rows<coefficient_array_size[7], ArithmetizationType, KimchiParamsType>(coefficient_str[7]),
-                            rpn_component_rows<coefficient_array_size[8], ArithmetizationType, KimchiParamsType>(coefficient_str[8]),
-                            rpn_component_rows<coefficient_array_size[9], ArithmetizationType, KimchiParamsType>(coefficient_str[9]),
-                            rpn_component_rows<coefficient_array_size[10], ArithmetizationType, KimchiParamsType>(coefficient_str[10]),
-                            rpn_component_rows<coefficient_array_size[11], ArithmetizationType, KimchiParamsType>(coefficient_str[11]),
-                            rpn_component_rows<coefficient_array_size[12], ArithmetizationType, KimchiParamsType>(coefficient_str[12]),
-                            rpn_component_rows<coefficient_array_size[13], ArithmetizationType, KimchiParamsType>(coefficient_str[13]),
-                            rpn_component_rows<coefficient_array_size[14], ArithmetizationType, KimchiParamsType>(coefficient_str[14])
-                        };
-
                     constexpr static const std::size_t var_base_mul_array_size = count_delimiters(var_base_mul_str);
-                    constexpr static const std::size_t var_base_mul_rows = 
-                        rpn_component_rows<var_base_mul_array_size, ArithmetizationType, KimchiParamsType>(var_base_mul_str);
 
                     constexpr static const std::size_t endo_mul_array_size = count_delimiters(endo_mul_str);
-                    constexpr static const std::size_t endo_mul_rows = 
-                        rpn_component_rows<endo_mul_array_size, ArithmetizationType, KimchiParamsType>(endo_mul_str);
 
                     constexpr static const std::size_t complete_add_array_size = count_delimiters(complete_add_str);
-                    constexpr static const std::size_t complete_add_rows = 
-                        rpn_component_rows<complete_add_array_size, ArithmetizationType, KimchiParamsType>(complete_add_str);
 
                     constexpr static const std::size_t endo_mul_scalar_array_size = count_delimiters(endo_mul_scalar_str);
-                    constexpr static const std::size_t endo_mul_scalar_rows = 
-                        rpn_component_rows<endo_mul_scalar_array_size, ArithmetizationType, KimchiParamsType>(endo_mul_scalar_str);
 
                     constexpr static const std::size_t constatnt_term_array_size = count_delimiters(constant_term_str);
-                    constexpr static const std::size_t constatnt_term_rows = 
-                        rpn_component_rows<constatnt_term_array_size, ArithmetizationType, KimchiParamsType>(constant_term_str);
 
                 public:
-                    using coefficient_0 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[0], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    constexpr static const std::array<std::size_t, coefficients_amount> 
+                        coefficient_rows = {
+                            rpn_component_rows<coefficient_array_size[0], ArithmetizationType>(coefficient_str[0]),
+                            rpn_component_rows<coefficient_array_size[1], ArithmetizationType>(coefficient_str[1]),
+                            rpn_component_rows<coefficient_array_size[2], ArithmetizationType>(coefficient_str[2]),
+                            rpn_component_rows<coefficient_array_size[3], ArithmetizationType>(coefficient_str[3]),
+                            rpn_component_rows<coefficient_array_size[4], ArithmetizationType>(coefficient_str[4]),
+                            rpn_component_rows<coefficient_array_size[5], ArithmetizationType>(coefficient_str[5]),
+                            rpn_component_rows<coefficient_array_size[6], ArithmetizationType>(coefficient_str[6]),
+                            rpn_component_rows<coefficient_array_size[7], ArithmetizationType>(coefficient_str[7]),
+                            rpn_component_rows<coefficient_array_size[8], ArithmetizationType>(coefficient_str[8]),
+                            rpn_component_rows<coefficient_array_size[9], ArithmetizationType>(coefficient_str[9]),
+                            rpn_component_rows<coefficient_array_size[10], ArithmetizationType>(coefficient_str[10]),
+                            rpn_component_rows<coefficient_array_size[11], ArithmetizationType>(coefficient_str[11]),
+                            rpn_component_rows<coefficient_array_size[12], ArithmetizationType>(coefficient_str[12]),
+                            rpn_component_rows<coefficient_array_size[13], ArithmetizationType>(coefficient_str[13]),
+                            rpn_component_rows<coefficient_array_size[14], ArithmetizationType>(coefficient_str[14])
+                        };
 
-                    using coefficient_1 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType,
-                        coefficient_rows[1], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    
-                    using coefficient_2 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[2], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    constexpr static const std::size_t var_base_mul_rows = 
+                        rpn_component_rows<var_base_mul_array_size, ArithmetizationType>(var_base_mul_str);
 
-                    using coefficient_3 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType,
-                        coefficient_rows[3], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    constexpr static const std::size_t endo_mul_rows = 
+                        rpn_component_rows<endo_mul_array_size, ArithmetizationType>(endo_mul_str);
 
-                    using coefficient_4 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType,
-                        coefficient_rows[4], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    constexpr static const std::size_t complete_add_rows = 
+                        rpn_component_rows<complete_add_array_size, ArithmetizationType>(complete_add_str);
 
-                    using coefficient_5 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[5], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    
-                    using coefficient_6 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[6], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                    
-                    using coefficient_7 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[7], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    constexpr static const std::size_t endo_mul_scalar_rows = 
+                        rpn_component_rows<endo_mul_scalar_array_size, ArithmetizationType>(endo_mul_scalar_str);
 
-                    using coefficient_8 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[8], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using coefficient_9 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[9], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using coefficient_10 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[10], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using coefficient_11 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[11], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using coefficient_12 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[12], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using coefficient_13 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[13], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using coefficient_14 = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        coefficient_rows[14], W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using var_base_mul = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        var_base_mul_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                        
-                    using complete_add = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        complete_add_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using endo_mul = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        endo_mul_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using endo_mul_scalar = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        endo_mul_scalar_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using constant_term = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                        constatnt_term_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    constexpr static const std::size_t constatnt_term_rows = 
+                        rpn_component_rows<constatnt_term_array_size, ArithmetizationType>(constant_term_str);
                 };
             }    // namespace components
         }        // namespace zk

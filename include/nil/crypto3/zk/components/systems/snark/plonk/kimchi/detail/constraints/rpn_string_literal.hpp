@@ -82,8 +82,7 @@ namespace nil {
                     return std::string::npos;
                 }
 
-                template<const std::size_t tokens_array_size, typename ArithmetizationType,
-                        typename KimchiParamsType>
+                template<const std::size_t tokens_array_size, typename ArithmetizationType>
                 constexpr size_t rpn_component_rows(const char *expression) {
                     using mul_component = zk::components::multiplication<ArithmetizationType, 0, 1, 2>;
                     using add_component = zk::components::addition<ArithmetizationType, 0, 1, 2>;
