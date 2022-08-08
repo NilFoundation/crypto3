@@ -35,53 +35,32 @@ namespace nil {
 
                 // index terms for ec test
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/tests/ec.rs#L15
-                template<typename ArithmetizationType,
-                    std::size_t... WireIndexes>
+                template<typename ArithmetizationType>
                 class index_terms_scalars_list;
 
                 template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
+                         typename ArithmetizationParams>
                 class index_terms_scalars_list<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
                     public: 
 
-                    static const std::size_t coefficients_amount = 15;
+                    static const std::size_t lookup_columns = 0;
+                    static const bool lookup_runtime = false;
+                    static const bool poseidon_gate = true;
+                    static const bool ec_arithmetic_gates = true;
+                    static const bool generic_gate = false;
+                    static const bool chacha_gate = false;
 
-                    constexpr static const std::array<char*, coefficients_amount> coefficient_str = {
+                    static const std::size_t poseidon_gates_count = 15;
+                    static const std::size_t ec_arithmetic_gates_count = 4;
+
+                    static const std::size_t alpha_powers_n = 24;
+
+                    constexpr static const std::array<char*, poseidon_gates_count> coefficient_str = {
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;\0",
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(1);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(2);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
@@ -111,7 +90,7 @@ namespace nil {
                 
                 private:
 
-                    constexpr static const std::array<std::size_t, coefficients_amount> 
+                    constexpr static const std::array<std::size_t, poseidon_gates_count> 
                         coefficient_array_size = {
                             count_delimiters(coefficient_str[0]), count_delimiters(coefficient_str[1]),
                             count_delimiters(coefficient_str[2]), count_delimiters(coefficient_str[3]),
@@ -134,7 +113,7 @@ namespace nil {
                     constexpr static const std::size_t constatnt_term_array_size = count_delimiters(constant_term_str);
 
                 public:
-                    constexpr static const std::array<std::size_t, coefficients_amount> 
+                    constexpr static const std::array<std::size_t, poseidon_gates_count> 
                         coefficient_rows = {
                             rpn_component_rows<coefficient_array_size[0], ArithmetizationType>(coefficient_str[0]),
                             rpn_component_rows<coefficient_array_size[1], ArithmetizationType>(coefficient_str[1]),

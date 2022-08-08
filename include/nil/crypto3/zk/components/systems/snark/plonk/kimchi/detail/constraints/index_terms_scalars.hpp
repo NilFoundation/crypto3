@@ -101,8 +101,7 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0x0f27;
 
-                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType, 
-                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
 
 
                     constexpr static std::size_t rows() {

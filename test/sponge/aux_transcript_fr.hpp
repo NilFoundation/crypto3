@@ -39,6 +39,8 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_instances/ec_index_terms.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -82,13 +84,10 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                    constexpr static std::size_t alpha_powers_n = 5;
                     constexpr static std::size_t public_input_size = 3;
 
                     constexpr static std::size_t witness_columns = 15;
                     constexpr static std::size_t perm_size = 7;
-                    constexpr static std::size_t lookup_table_size = 1;
-                    constexpr static bool use_lookup = false;
 
                     constexpr static const std::size_t eval_rounds = 1;
                     constexpr static const std::size_t max_poly_size = 1;
@@ -97,9 +96,12 @@ namespace nil {
 
                     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
                             srs_len>;
-                    using kimchi_params = zk::components::kimchi_params_type<CurveType, commitment_params, witness_columns, perm_size,
-                        use_lookup, lookup_table_size,
-                        alpha_powers_n, public_input_size, prev_chal_size>;
+                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+
+                    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+                        witness_columns, perm_size>;
+                    using kimchi_params = zk::components::kimchi_params_type<CurveType, commitment_params, circuit_description,
+                        public_input_size, prev_chal_size>;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using transcript_type =

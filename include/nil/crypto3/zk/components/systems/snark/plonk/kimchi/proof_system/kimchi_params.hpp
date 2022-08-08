@@ -34,28 +34,25 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template<typename CurveType, typename CommitmentParamsType, 
-                    std::size_t WitnessColumns, std::size_t PermutSize,
-                    bool UseLookup, std::size_t LookupTableSize,
-                    std::size_t AlphaPowersN, std::size_t PublicInputSize,
+                template<typename CurveType, typename CommitmentParamsType,
+                    typename CircuitDescriptionType,
+                    std::size_t PublicInputSize,
                     std::size_t PrevChalSize>
                 struct kimchi_params_type {
                     using commitment_params_type = CommitmentParamsType;
                     using curve_type = CurveType;
-                    using circuit_params = kimchi_circuit_description<true, true>; // TODO make configurable
+                    using circuit_params = CircuitDescriptionType;
 
-                    constexpr static std::size_t alpha_powers_n = AlphaPowersN;
+                    constexpr static std::size_t alpha_powers_n = CircuitDescriptionType::alpha_powers_n;
                     constexpr static std::size_t public_input_size = PublicInputSize;
-                    constexpr static std::size_t witness_columns = WitnessColumns;
-                    constexpr static std::size_t permut_size = PermutSize;
-                    constexpr static std::size_t lookup_table_size = LookupTableSize;
-                    constexpr static bool use_lookup = UseLookup;
+                    constexpr static std::size_t witness_columns = CircuitDescriptionType::witness_columns;
+                    constexpr static std::size_t permut_size = CircuitDescriptionType::permut_size;
+
+                    constexpr static bool use_lookup = CircuitDescriptionType::lookup_columns > 0;
 
                     constexpr static std::size_t eval_points_amount = 2;
                     constexpr static std::size_t scalar_challenge_size = 128;

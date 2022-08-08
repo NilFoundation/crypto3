@@ -22,6 +22,9 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_CONSTRAINTS_RPN_STRING_LITERAL_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_CONSTRAINTS_RPN_STRING_LITERAL_HPP
+
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/vesta.hpp>
@@ -164,3 +167,5 @@ namespace nil {
         }   // namespace zk
     }     // namespace crypto3
 } // namespace nil
+
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_CONSTRAINTS_RPN_STRING_LITERAL_HPP

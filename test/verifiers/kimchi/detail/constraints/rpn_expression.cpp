@@ -49,6 +49,8 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_instances/ec_index_terms.hpp>
 #include "test_plonk_component.hpp"
 
 using namespace nil::crypto3;
@@ -70,23 +72,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size,
-                                                             use_lookup, lookup_table_size, alpha_powers_n,
-                                                             public_input_size, prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Dup;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
@@ -159,23 +160,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_sub
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size,
-                                                             use_lookup, lookup_table_size, alpha_powers_n,
-                                                             public_input_size, prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Sub;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
@@ -248,23 +248,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_add
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size,
-                                                             use_lookup, lookup_table_size, alpha_powers_n,
-                                                             public_input_size, prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
@@ -336,23 +335,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_mul
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size,
-                                                             use_lookup, lookup_table_size, alpha_powers_n,
-                                                             public_input_size, prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Mul;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
@@ -425,23 +423,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_pow
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size,
-                                                             use_lookup, lookup_table_size, alpha_powers_n,
-                                                             public_input_size, prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Pow(2);\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
@@ -514,23 +511,22 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size,
-                                                             use_lookup, lookup_table_size, alpha_powers_n,
-                                                             public_input_size, prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Cell(Variable { col: Witness(10), row: Curr });Cell(Variable { col: Witness(2), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Sub;Store;Mul;Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(7), row: Curr });Sub;Sub;Alpha;Pow(1);Cell(Variable { col: Witness(7), row: Curr });Load(0);Mul;Mul;Add;Alpha;Pow(2);Cell(Variable { col: Witness(7), row: Curr });Cell(Variable { col: Witness(8), row: Curr });Dup;Add;Cell(Variable { col: Witness(1), row: Curr });Mul;Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Mul;Store;Dup;Add;Sub;Load(1);Sub;Mul;Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(7), row: Curr });Sub;Load(0);Cell(Variable { col: Witness(8), row: Curr });Mul;Cell(Variable { col: Witness(3), row: Curr });Cell(Variable { col: Witness(1), row: Curr });Sub;Store;Sub;Mul;Add;Mul;Add;Alpha;Pow(3);Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(2), row: Curr });Add;Cell(Variable { col: Witness(4), row: Curr });Add;Cell(Variable { col: Witness(8), row: Curr });Cell(Variable { col: Witness(8), row: Curr });Mul;Sub;Mul;Add;Alpha;Pow(4);Cell(Variable { col: Witness(8), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(4), row: Curr });Sub;Mul;Cell(Variable { col: Witness(1), row: Curr });Sub;Cell(Variable { col: Witness(5), row: Curr });Sub;Mul;Add;Alpha;Pow(5);Load(2);Cell(Variable { col: Witness(7), row: Curr });Cell(Variable { col: Witness(6), row: Curr });Sub;Mul;Mul;Add;Alpha;Pow(6);Load(2);Cell(Variable { col: Witness(9), row: Curr });Mul;Cell(Variable { col: Witness(6), row: Curr });Sub;Mul;Add;\0";
     const std::size_t array_size = zk::components::count_delimiters(s);
