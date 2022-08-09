@@ -103,6 +103,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/detail/constraints/rpn_expression"
     "verifiers/kimchi/detail/constraints/vanishes_on_last_4_rows"
     "verifiers/kimchi/detail/constraints/unnormalized_lagrange_basis"
+    "verifiers/kimchi/detail/constraints/perm_scalars"
     "verifiers/kimchi/detail/oracles_cip"
     "sponge/sponge"
     "sponge/oracles"
