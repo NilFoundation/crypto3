@@ -27,6 +27,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_string_literal.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/alpha_argument_type.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,19 +47,39 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
+                    constexpr static const std::array<std::size_t, 2> argument_types = {
+                        argument_type::Permutation,
+                        argument_type::Generic,
+                    };
+
+                    constexpr static const std::array<std::pair<std::size_t, std::size_t>, 2> arguments_values = {
+                        std::make_pair(21, 3),
+                        std::make_pair(0, 21)
+                    };
+
                     public: 
 
-                    static const std::size_t lookup_columns = 0;
-                    static const bool lookup_runtime = false;
-                    static const bool poseidon_gate = true;
-                    static const bool ec_arithmetic_gates = true;
-                    static const bool generic_gate = false;
-                    static const bool chacha_gate = false;
+                    static std::pair<std::size_t, std::size_t> alpha_map(argument_type arg) {
+                        for (std::size_t i = 0; i < argument_types.size(); ++i) {
+                            if (arg == argument_types[i]) {
+                                return arguments_values[i];
+                            }
+                        }
+                        assert(false);
+                        return std::make_pair(0, 0);
+                    }
 
-                    static const std::size_t poseidon_gates_count = 15;
-                    static const std::size_t ec_arithmetic_gates_count = 4;
+                    constexpr static const std::size_t lookup_columns = 0;
+                    constexpr static const bool lookup_runtime = false;
+                    constexpr static const bool poseidon_gate = true;
+                    constexpr static const bool ec_arithmetic_gates = true;
+                    constexpr static const bool generic_gate = false;
+                    constexpr static const bool chacha_gate = false;
 
-                    static const std::size_t alpha_powers_n = 24;
+                    constexpr static const std::size_t poseidon_gates_count = 15;
+                    constexpr static const std::size_t ec_arithmetic_gates_count = 4;
+
+                    constexpr static const std::size_t alpha_powers_n = 24;
 
                     constexpr static const std::array<char*, poseidon_gates_count> coefficient_str = {
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;\0",

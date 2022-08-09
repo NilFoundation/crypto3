@@ -120,6 +120,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     var zero(0, 8, false, var::column_type::public_input);
 
     // TODO prepare real data
+    constexpr const std::size_t alpha_powers_n = index_terms_list::alpha_powers_n;
     std::array<var, alpha_powers_n> alpha_powers;
     for (std::size_t i = 0; i < alpha_powers_n; i++) {
         public_input.push_back(power(alpha_value, i));

@@ -48,23 +48,12 @@ namespace nil {
                 struct kimchi_verifier_index_scalar {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    enum argument_type {
-                        Permutation,
-                        Generic,
-                    };
-
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;
                     std::array<var, Permuts> shift;
 
                     var omega;
-                    std::map<argument_type, std::pair<int, int>> alpha_map;
-
-                    kimchi_verifier_index_scalar() {
-                        alpha_map[argument_type::Permutation] = {0, 3};
-                        alpha_map[argument_type::Generic] = {4, 4};
-                    }
                 };
 
                 template<typename CurveType,
