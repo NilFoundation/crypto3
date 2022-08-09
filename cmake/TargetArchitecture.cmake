@@ -127,7 +127,7 @@ function(target_architecture OUTPUT_ARCHITECTURE)
             list(APPEND ARCH ppc64)
         endif()
 
-        if(osx_arch_ppc64)
+        if(osx_arch_arm64)
             list(APPEND ARCH arm64)
         endif()
     else()
