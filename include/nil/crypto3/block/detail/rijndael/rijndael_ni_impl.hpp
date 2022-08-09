@@ -90,19 +90,21 @@ namespace nil {
                     return _mm_xor_si128(key, key_with_rcon);
                 }
 
-                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
+                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl>
                 class rijndael_ni_impl {
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128 && BlockBitsImpl == 128);
+                    typedef rijndael_policy<KeyBitsImpl, BlockBitsImpl> policy_type;
+
+                    BOOST_STATIC_ASSERT(policy_type::block_bits == 128 && BlockBitsImpl == 128);
                 };
 
-                template<typename PolicyType>
-                class rijndael_ni_impl<128, 128, PolicyType> {
-                    typedef PolicyType policy_type;
+                template<>
+                class rijndael_ni_impl<128, 128> {
+                    typedef rijndael_policy<128, 128> policy_type;
                     typedef typename policy_type::block_type block_type;
                     typedef typename policy_type::key_type key_type;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 128);
+                    BOOST_STATIC_ASSERT(policy_type::key_bits == 128);
 
                 public:
                     BOOST_ATTRIBUTE_TARGET("ssse3,aes")
@@ -237,15 +239,15 @@ namespace nil {
                     }
                 };
 
-                template<typename PolicyType>
-                class rijndael_ni_impl<192, 128, PolicyType> {
+                template<>
+                class rijndael_ni_impl<192, 128> {
                 protected:
-                    typedef PolicyType policy_type;
+                    typedef rijndael_policy<192, 128> policy_type;
                     typedef typename policy_type::block_type block_type;
                     typedef typename policy_type::key_type key_type;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 192);
+                    BOOST_STATIC_ASSERT(policy_type::key_bits == 192);
 
                 public:
                     BOOST_ATTRIBUTE_TARGET("ssse3,aes")
@@ -411,15 +413,15 @@ namespace nil {
                     }
                 };
 
-                template<typename PolicyType>
-                class rijndael_ni_impl<256, 128, PolicyType> {
+                template<>
+                class rijndael_ni_impl<256, 128> {
                 protected:
-                    typedef PolicyType policy_type;
+                    typedef rijndael_policy<256, 128> policy_type;
                     typedef typename policy_type::block_type block_type;
                     typedef typename policy_type::key_type key_type;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 256);
+                    BOOST_STATIC_ASSERT(policy_type::key_bits == 256);
 
                 public:
                     BOOST_ATTRIBUTE_TARGET("ssse3,aes")

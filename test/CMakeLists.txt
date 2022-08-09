@@ -34,6 +34,9 @@ macro(define_block_cipher_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+
+    string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/data/" "${name}" ".json")
+    target_compile_definitions(block_${name}_test PRIVATE TEST_DATA="${TEST_DATA}")
 endmacro()
 
 set(TESTS_NAMES

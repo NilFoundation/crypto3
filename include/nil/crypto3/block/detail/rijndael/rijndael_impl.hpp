@@ -37,9 +37,9 @@ namespace nil {
              * @cond DETAIL_IMPL
              */
             namespace detail {
-                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
+                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl>
                 class rijndael_impl {
-                    typedef PolicyType policy_type;
+                    typedef rijndael_policy<KeyBitsImpl, BlockBitsImpl> policy_type;
 
                     typedef typename policy_type::key_type key_type;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
@@ -51,8 +51,8 @@ namespace nil {
                     typedef typename policy_type::shift_offsets_type shift_offsets_type;
                     typedef typename policy_type::mm_type mm_type;
 
-                    BOOST_STATIC_ASSERT(KeyBitsImpl == PolicyType::key_bits);
-                    BOOST_STATIC_ASSERT(BlockBitsImpl == PolicyType::block_bits);
+                    BOOST_STATIC_ASSERT(KeyBitsImpl == policy_type::key_bits);
+                    BOOST_STATIC_ASSERT(BlockBitsImpl == policy_type::block_bits);
 
                     static inline key_schedule_word_type sub_word(const key_schedule_word_type &x,
                                                                   const constants_type &constants) {
@@ -101,7 +101,6 @@ namespace nil {
                     static inline block_type mix_columns(const StateType &state, const mm_type &mm) {
                         block_type tmp = {0};
 
-
                         for (std::size_t col = 0; col < policy_type::block_words; ++col) {
 
                             for (std::size_t row = 0; row < policy_type::word_bytes; ++row) {
@@ -121,7 +120,6 @@ namespace nil {
                     static inline void add_round_key(block_type &state, InputIterator first, InputIterator last) {
                         BOOST_ASSERT(std::distance(first, last) == policy_type::block_words &&
                                      state.size() == policy_type::block_bytes);
-
 
                         for (std::size_t i = 0; i < policy_type::block_words && first != last; ++i && ++first) {
 
@@ -150,7 +148,6 @@ namespace nil {
 
                         add_round_key(state, encryption_key.begin(), encryption_key.begin() + policy_type::block_words);
 
-
                         for (std::size_t round = 1; round < policy_type::rounds; ++round) {
                             apply_round(round, state, encryption_key, policy_type::constants,
                                         policy_type::shift_offsets, policy_type::mm);
@@ -170,7 +167,6 @@ namespace nil {
 
                         add_round_key(state, decryption_key.begin() + policy_type::rounds * policy_type::block_words,
                                       decryption_key.begin() + (policy_type::rounds + 1) * policy_type::block_words);
-
 
                         for (std::size_t round = policy_type::rounds - 1; round > 0; --round) {
                             apply_round(round, state, decryption_key, policy_type::inverted_constants,
@@ -193,7 +189,6 @@ namespace nil {
                             key.begin(), key.begin() + policy_type::key_words * policy_type::word_bytes,
                             encryption_key.begin());
 
-
                         for (std::size_t i = policy_type::key_words; i < policy_type::key_schedule_words; ++i) {
                             typename policy_type::key_schedule_word_type tmp = encryption_key[i - 1];
                             if (i % policy_type::key_words == 0) {
@@ -210,7 +205,6 @@ namespace nil {
                                                      stream_endian::big_octet_big_bit, policy_type::word_bits,
                                                      CHAR_BIT>(encryption_key.begin(), encryption_key.end(),
                                                                bekey.begin());
-
 
                         for (std::uint8_t round = 1; round < policy_type::rounds; ++round) {
                             move(mix_columns(boost::adaptors::slice(bekey, round * policy_type::block_bytes,

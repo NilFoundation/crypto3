@@ -132,12 +132,11 @@ if(CRYPTO3_BLOCK_AES)
         if(SSE2_FOUND)
             list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
                  include/nil/crypto3/block/detail/rijndael/rijndael_ni_impl.hpp)
-
         elseif(SSSE3_FOUND)
             list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
                  include/nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp)
         endif()
-    elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8")
+    elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "arm64")
         list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
              include/nil/crypto3/block/detail/rijndael/rijndael_armv8_impl.hpp)
         add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_ARMV8)
@@ -484,7 +483,7 @@ if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE
                                    "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_SSSE3")
         target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-maes;-mpclmul;-mssse3")
     endif()
-elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8")
+elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "arm64")
     target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                                "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_ARMV8")
 elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
