@@ -324,10 +324,10 @@ namespace nil {
 
                         std::size_t row = component_start_row;
 
-                        // bp.add_copy_constraint({var(W0, row + 4, false), params.A[0]});
-                        // bp.add_copy_constraint({var(W1, row + 4, false), params.A[1]});
-                        // bp.add_copy_constraint({var(W2, row + 4, false), params.A[2]});
-                        // bp.add_copy_constraint({var(W3, row + 4, false), params.A[3]});
+                         bp.add_copy_constraint({var(W0, row + 4, false), params.A[0]});
+                         bp.add_copy_constraint({var(W1, row + 4, false), params.A[1]});
+                         bp.add_copy_constraint({var(W2, row + 4, false), params.A[2]});
+                         bp.add_copy_constraint({var(W3, row + 4, false), params.A[3]});
                         bp.add_copy_constraint({var(W4, row + 4, false), params.B[0]});
                         bp.add_copy_constraint({var(W5, row + 4, false), params.B[1]});
                         bp.add_copy_constraint({var(W6, row + 4, false), params.B[2]});

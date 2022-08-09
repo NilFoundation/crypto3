@@ -73,24 +73,20 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = 4;
-                    constexpr static const std::size_t selector_seed = 0x0fFD;
+                    constexpr static const std::size_t selector_seed = 0xff34;
 
-                    constexpr static const std::size_t gates_amount = 3;
+                    constexpr static const std::size_t gates_amount = 2;
                     struct params_type {
                         std::array<var, 8> k;
                     };
 
                     struct result_type {
-                        var output = var(W4, 1, false);
+                        var output;
 
                         result_type(std::size_t component_start_row) {
                             var(W4, component_start_row + rows_amount - 3, false);
                         }
                     };
-
-                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
-                        return bp.allocate_rows(rows_amount);
-                    }
 
                     static result_type
                         generate_circuit(blueprint<ArithmetizationType> &bp,
@@ -107,7 +103,9 @@ namespace nil {
                             first_selector_index = selector_iterator->second;
                         }
 
-                        assignment.enable_selector(first_selector_index, start_row_index);
+                        assignment.enable_selector(first_selector_index, start_row_index + 1);
+                        assignment.enable_selector(first_selector_index + 1, start_row_index + 2);
+                        
                         generate_copy_constraints(bp, assignment, params, start_row_index);
 
                         return result_type(start_row_index);
@@ -201,56 +199,59 @@ namespace nil {
                         auto L = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui512;
 
                         auto constraint_1 = bp.add_constraint(
-                            var(W0, +3) * 0x01_cppui512 + var(W1, +3) * 0x10000000000000000_cppui512 +
-                            var(W2, +3) * 0x100000000000000000000000000000000_cppui512 +
-                            var(W3, +3) * 0x1000000000000000000000000000000000000000000000000_cppui512 +
-                            var(W4, +3) * 0xffffffffffffffffffffffffffffffec6ef5bf4737dcf70d6ec31748d98951d_cppui512 +
-                            var(W5, +3) * 0xffffffffffffffeb2106215d086329a93b8c838d39a5e065812631a5cf5d3ed_cppui512 +
-                            var(W6, +3) * 0x2106215d086329a7ed9ce5a30a2c131b64a7f435e4fdd9539822129a02a6271_cppui512 +
-                            var(W7, +3) * 0xed9ce5a30a2c131b399411b7c309a3de24babbe38d1d7a979daf520a00acb65_cppui512 -
-                            var(W4, 1) -
-                            (var(W0, +2) * 0x800000000000_cppui512 + var(W1, +2) * 0x8000000_cppui512 +
-                             var(W2, +2) * 0x80_cppui512 + var(W3, +2)) * L);
+                            var(W0, +1) * 0x01_cppui512 + var(W1, +1) * 0x10000000000000000_cppui512 +
+                            var(W2, +1) * 0x100000000000000000000000000000000_cppui512 +
+                            var(W3, +1) * 0x1000000000000000000000000000000000000000000000000_cppui512 +
+                            var(W4, +1) * 0xffffffffffffffffffffffffffffffec6ef5bf4737dcf70d6ec31748d98951d_cppui512 +
+                            var(W5, +1) * 0xffffffffffffffeb2106215d086329a93b8c838d39a5e065812631a5cf5d3ed_cppui512 +
+                            var(W6, +1) * 0x2106215d086329a7ed9ce5a30a2c131b64a7f435e4fdd9539822129a02a6271_cppui512 +
+                            var(W7, +1) * 0xed9ce5a30a2c131b399411b7c309a3de24babbe38d1d7a979daf520a00acb65_cppui512 -
+                            var(W4, -1) -
+                            (var(W0, 0) * 0x800000000000_cppui512 + var(W1, 0) * 0x8000000_cppui512 +
+                             var(W2, 0) * 0x80_cppui512 + var(W3, 0)) * L);
 
-                        auto s_r = var(W0, 0) + var(W1, 0) + var(W2, 0) + var(W3, 0) + var(W4, 0) + var(W5, 0) +
-                                   var(W6, 0) + var(W7, 0) + var(W8, 0) + var(W0, 1) + var(W1, 1) + var(W2, 1) +
-                                   var(W3, 1) - 12 * ((1 << (20)) - 1);
+                        auto s_r = var(W0, -1) + var(W1, -1) + var(W2, -1) + var(W3, -1) + var(W4, -1) + var(W5, -1) +
+                                   var(W6, -1) + var(W7, -1) + var(W8, -1) + var(W0, 0) + var(W1, 0) + var(W2, 0) +
+                                   var(W3, 0) - 12 * ((1 << (20)) - 1);
 
                         auto constraint_2 = bp.add_constraint(
-                            var(W4, +1) -
-                            (var(W3, +1) + var(W2, +1) * 0x2000_cppui255 + var(W1, +1) * 0x200000000_cppui255 +
-                             var(W0, +1) * 0x20000000000000_cppui255 + var(W8, +0) * 0x2000000000000000000_cppui255 +
-                             var(W7, +0) * 0x200000000000000000000000_cppui255 +
-                             var(W6, +0) * 0x20000000000000000000000000000_cppui255 +
-                             var(W5, +0) * 0x2000000000000000000000000000000000_cppui255 +
-                             var(W4, +0) * 0x200000000000000000000000000000000000000_cppui255 +
-                             var(W3, +0) * 0x20000000000000000000000000000000000000000000_cppui255 +
-                             var(W2, +0) * 0x2000000000000000000000000000000000000000000000000_cppui255 +
-                             var(W1, +0) * 0x200000000000000000000000000000000000000000000000000000_cppui255 +
-                             var(W0, +0) * 0x20000000000000000000000000000000000000000000000000000000000_cppui255));
+                            var(W4, 0) -
+                            (var(W3, 0) + var(W2, 0) * 0x2000_cppui255 + var(W1, 0) * 0x200000000_cppui255 +
+                             var(W0, 0) * 0x20000000000000_cppui255 + var(W8, -1) * 0x2000000000000000000_cppui255 +
+                             var(W7, -1) * 0x200000000000000000000000_cppui255 +
+                             var(W6, -1) * 0x20000000000000000000000000000_cppui255 +
+                             var(W5, -1) * 0x2000000000000000000000000000000000_cppui255 +
+                             var(W4, -1) * 0x200000000000000000000000000000000000000_cppui255 +
+                             var(W3, -1) * 0x20000000000000000000000000000000000000000000_cppui255 +
+                             var(W2, -1) * 0x2000000000000000000000000000000000000000000000000_cppui255 +
+                             var(W1, -1) * 0x200000000000000000000000000000000000000000000000000000_cppui255 +
+                             var(W0, -1) * 0x20000000000000000000000000000000000000000000000000000000000_cppui255));
 
-                        auto constraint_3 = bp.add_constraint((s_r) * ((s_r)*var(W5, +1) - 1));
+                        auto constraint_3 = bp.add_constraint((s_r) * ((s_r)*var(W5, 0) - 1)); 
 
                         auto constraint_4 =
-                            bp.add_constraint((s_r)*var(W5, +1) + (1 - (s_r)*var(W5, +1)) * var(W6, +1) - 1);
+                            bp.add_constraint((s_r)*var(W5, 0) + (1 - (s_r)*var(W5, 0)) * var(W6, 0) - 1);
 
                         auto constraint_5 = bp.add_constraint(
-                            var(W0, 3) + var(W1, 3) * 0x10000000000000000_cppui512 +
-                            (var(W0, +2) * 0x800000000000_cppui512 + var(W1, +2) * 0x8000000_cppui512 +
-                             var(W2, +2) * 0x80_cppui512 + var(W3, +2)) * (0x165812631a5cf5d3ed_cppui512) -
-                            (var(W3, +1) + var(W2, +1) * 0x2000_cppui512 + var(W1, +1) * 0x200000000_cppui512 +
-                             var(W0, +1) * 0x20000000000000_cppui512) -
-                            var(W8, 3));
+                            var(W0, +1) + var(W1, +1) * 0x10000000000000000_cppui512 +
+                            (var(W0, 0) * 0x800000000000_cppui512 + var(W1, 0) * 0x8000000_cppui512 +
+                             var(W2, 0) * 0x80_cppui512 + var(W3, 0)) * (0x165812631a5cf5d3ed_cppui512) -
+                            (var(W3, -1) + var(W2, -1) * 0x2000_cppui512 + var(W1, -1) * 0x200000000_cppui512 +
+                             var(W0, -1) * 0x20000000000000_cppui512) -
+                            var(W8, +1));
 
-                        auto constraint_6 = bp.add_constraint(var(W8, +3) - (var(W4, +2) * 0x20000000000_cppui255 +
-                                                                             var(W5, +2) * 0x200000_cppui255 +
-                                                                             var(W6, +2) * 2 + var(W7, +2)));
+                        auto constraint_6 = bp.add_constraint(var(W8, +1) - (var(W4, 0) * 0x20000000000_cppui255 +
+                                                                             var(W5, 0) * 0x200000_cppui255 +
+                                                                             var(W6, 0) * 2 + var(W7, 0)));
 
-                        auto constraint_7 = bp.add_constraint((var(W6, 1) - 1) * var(W6, +1));
+                        auto constraint_7 = bp.add_constraint((var(W6, 0) - 1) * var(W6, 0));
 
                         bp.add_gate(selector_index,
-                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                    {constraint_2, constraint_3, constraint_4,
                                      constraint_7});
+                        
+                        bp.add_gate(selector_index + 1,
+                                    {constraint_1, constraint_5, constraint_6});
                     }
 
                     static void
