@@ -50,9 +50,9 @@
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_detail_constraints_perm_scalars_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_perm_scalars_ec_input_test_suite) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_generic_input_test_suite) {
 
     using curve_type = algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::scalar_field_type;

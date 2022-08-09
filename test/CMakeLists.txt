@@ -106,6 +106,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/detail/constraints/perm_scalars"
     "verifiers/kimchi/detail/constraints/generic_scalars"
     "verifiers/kimchi/detail/oracles_cip"
+    "verifiers/kimchi/detail/zk_w3"
     "sponge/sponge"
     "sponge/oracles"
     "sponge/transcript_fr"
