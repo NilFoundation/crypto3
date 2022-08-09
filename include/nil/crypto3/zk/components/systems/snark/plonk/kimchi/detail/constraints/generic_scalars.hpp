@@ -186,7 +186,7 @@ namespace nil {
                             output[5 * i + 3] = zk::components::generate_circuit<mul_component>(
                                 bp, assignment, 
                                 {alpha_generic,
-                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                                 tmp}, row).output;
                             row += mul_component::rows_amount;
 
                             // constant
@@ -237,7 +237,7 @@ namespace nil {
                             output[5 * i + 3] = mul_component::generate_assignments(
                                 assignment, 
                                 {alpha_generic,
-                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                                 tmp}, row).output;
                             row += mul_component::rows_amount;
 
                             // constant
