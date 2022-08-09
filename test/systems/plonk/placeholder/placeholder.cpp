@@ -451,6 +451,10 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
 
     for (int i = 0; i < argument_size; i++) {
         BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
+        for (std::size_t j = 0; j < desc.rows_amount; j++) {
+            BOOST_CHECK(prover_res.F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
+                                        j)) == FieldType::value_type::zero());
+        }
     }
 }
 

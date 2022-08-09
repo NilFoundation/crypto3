@@ -29,7 +29,6 @@
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_PROVER_HPP
 
 #include <chrono>
-#include <cassert>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
