@@ -36,6 +36,7 @@
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/scalar_non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/ec_point_edwards25519.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/addition.hpp>
 //#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
 
 namespace nil {
@@ -92,6 +93,8 @@ namespace nil {
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     using scalar_non_native_range_component = scalar_non_native_range<ArithmetizationType, CurveType, Ed25519Type,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using non_addition_component = non_native_field_element_addition<ArithmetizationType, CurveType, Ed25519Type,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     //using sha512_component = sha512<ArithmetizationType, CurveType,
                     //W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     
@@ -99,12 +102,12 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xfcc2;
 
                 public:
-                    constexpr static const std::size_t rows_amount = scalar_non_native_range_component::rows_amount
+                    constexpr static const std::size_t rows_amount = /*262144;*/scalar_non_native_range_component::rows_amount
                                                                     + variable_base_mult_component::rows_amount
                                                                     + fixed_base_mult_component::rows_amount
                                                                     + addition_component::rows_amount
                                                                     + reduction_component::rows_amount
-                                                                    + 2 * check_ec_point_component::rows_amount;
+                                                                    + 2 * check_ec_point_component::rows_amount + 1;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -133,7 +136,11 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-
+                        //generate_lookup_table(assignment, params, component_start_row);
+                        /*std::size_t n = (1 << 18);
+                        for(std::size_t i = 0; i < n; i++) {
+                            assignment.constant(1)[i] = i;
+                        }*/
                         var s = params.e.s;
                         auto R = params.e.R;
                         auto pk = params.public_key;
@@ -157,19 +164,22 @@ namespace nil {
                             1, 1, 1, 1,
                             1, 1, 1, 1};
                         for (int i = 0; i < 8; i++) {
-                            assignment.constant(0)[row + i] = constants[i];
+                            assignment.witness(i)[row] = constants[i];
                         }
-                        std::array<var, 8> k_vec = {var(0, row, false, var::column_type::constant),
-                                                    var(0, row + 1, false, var::column_type::constant),
-                                                    var(0, row + 2, false, var::column_type::constant),
-                                                    var(0, row + 3, false, var::column_type::constant),
-                                                    var(0, row + 4, false, var::column_type::constant),
-                                                    var(0, row + 5, false, var::column_type::constant),
-                                                    var(0, row + 6, false, var::column_type::constant),
-                                                    var(0, row + 7, false, var::column_type::constant)};
+                        std::array<var, 8> k_vec = {var(0, row, false),
+                                                    var(1, row, false),
+                                                    var(2, row, false),
+                                                    var(3, row, false),
+                                                    var(4, row, false),
+                                                    var(5, row, false),
+                                                    var(6, row, false),
+                                                    var(7, row, false)};
+                        row++;
                         var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
+
                         /* here we check sB == R + kA */
+                        
                         auto S = fixed_base_mult_component::generate_assignments(assignment, {s}, row).output;
                         row += fixed_base_mult_component::rows_amount;
                         auto A = variable_base_mult_component::generate_assignments(assignment, {{pk.x, pk.y}, k}, row).output;
@@ -205,17 +215,17 @@ namespace nil {
                         // row += ...;
                         // auto k_vec = sha512_component::generate_circuit(bp, assignment, {padded}, row).output;
                         // row += sha512_component::rows_amount;
-                        std::array<var, 8> k_vec = {var(0, row, false, var::column_type::constant),
-                                                    var(0, row + 1, false, var::column_type::constant),
-                                                    var(0, row + 2, false, var::column_type::constant),
-                                                    var(0, row + 3, false, var::column_type::constant),
-                                                    var(0, row + 4, false, var::column_type::constant),
-                                                    var(0, row + 5, false, var::column_type::constant),
-                                                    var(0, row + 6, false, var::column_type::constant),
-                                                    var(0, row + 7, false, var::column_type::constant)};
-                        var k = reduction_component::generate_circuit(bp, assignment, {k_vec}, row).output;
+                        std::array<var, 8> k_vec = {var(0, row, false),
+                                                    var(1, row, false),
+                                                    var(2, row, false),
+                                                    var(3, row, false),
+                                                    var(4, row, false),
+                                                    var(5, row, false),
+                                                    var(6, row, false),
+                                                    var(7, row, false)};
+                        row++;
+                        var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
-
                         /* here we check sB == R + kA */
                         auto S = fixed_base_mult_component::generate_circuit(bp, assignment, {s}, row).output;
                         row += fixed_base_mult_component::rows_amount;
@@ -224,7 +234,7 @@ namespace nil {
                         typename addition_component::params_type add_params = {{A.x, A.y}, {R.x, R.y}};
                         auto res = addition_component::generate_circuit(bp, assignment, add_params, row).output;
                         row += addition_component::rows_amount;
-
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
                     }
 
@@ -243,7 +253,8 @@ namespace nil {
                                                           const params_type &params,
                                                           std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        row += 5 * non_native_range_component::rows_amount + reduction_component::rows_amount;
+                        row += scalar_non_native_range_component::rows_amount + 2 * check_ec_point_component::rows_amount
+                        + reduction_component::rows_amount;
                         auto S = (typename fixed_base_mult_component::result_type(row)).output;
                         row += fixed_base_mult_component::rows_amount + variable_base_mult_component::rows_amount;
                         auto res = (typename addition_component::result_type(row)).output;
@@ -253,8 +264,19 @@ namespace nil {
                         bp.add_copy_constraint({{S.x[3]}, {res.x[3]}});
                         bp.add_copy_constraint({{S.y[0]}, {res.y[0]}});
                         bp.add_copy_constraint({{S.y[1]}, {res.y[1]}});
-                        bp.add_copy_constraint({{S.y[2]}, {res.y[2]}});
+                        bp.add_copy_constraint({{S.y[2]}, {res.y[2]}}); 
                         bp.add_copy_constraint({{S.y[3]}, {res.y[3]}});
+                    }
+
+                    static void generate_lookup_table(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
+                    
+                        std::size_t row = component_start_row;
+                        std::size_t n = (1 << 16);
+                        for(std::size_t i = 0; i < 2; i++) {
+                            assignment.constant(1)[i] = 0;
+                        }
                     }
                 };
 

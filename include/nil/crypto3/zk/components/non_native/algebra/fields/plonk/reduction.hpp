@@ -32,6 +32,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/algebra/curves/ed25519.hpp>
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 namespace nil {
@@ -84,7 +85,7 @@ namespace nil {
                         var output;
 
                         result_type(std::size_t component_start_row) {
-                            var(W4, component_start_row + rows_amount - 3, false);
+                           output = var(W4, component_start_row + rows_amount - 3, false);
                         }
                     };
 
@@ -174,17 +175,26 @@ namespace nil {
                                assignment.witness(2)[row + 1] + assignment.witness(3)[row + 1];
                         s_r -= 12 * ((1 << (20)) - 1);
 
-                        assignment.witness(5)[row + 1] = 1 / s_r;
+                        assignment.witness(5)[row + 1] = s_r.inversed();
                         assignment.witness(6)[row + 1] = 1;
-
-                        auto v = (data[0] + data[1] * 0x10000000000000000_cppui512 +
-                                  q * (0x165812631a5cf5d3ed_cppui512) - (r & 0x1ffffffffffffffffff_cppui512));
+                        algebra::curves::ed25519::scalar_field_type::extended_integral_type one = 1;
+                        auto c = data[0] + data[1] * ((one << 64)) + data[3] * (((one << 192)%L) & ((one << 73) - 1))
+                         + data[4] * (((one << 256)%L) & ((one << 73) - 1))
+                         + data[5] * (((one << 320)%L) & ((one << 73) - 1)) +
+                          data[6] * (((one << 384)%L) & ((one << 73) - 1)) +
+                           data[7] * (((one << 448)%L) & ((one << 73) - 1)) 
+                                  + q * (0x165812631a5cf5d3ed_cppui512);
+                        auto d = (r) & ((1 << (13)) - 1) +
+                         ((r >> 13) &  ((1 << (20)) - 1))* (one << 13) + 
+                        ((r >> 33) &  ((1 << (20)) - 1)) * (one << 33) + 
+                        ((r >> 53) &  ((1 << (20)) - 1)) * (one << 53);
+                        auto v = (c - d) >> 69;
 
                         assignment.witness(8)[row + 3] = v;
-                        assignment.witness(4)[row + 2] = v >> 41;
-                        assignment.witness(5)[row + 2] = (v >> 21) &  ((1 << (20)) - 1);
-                        assignment.witness(6)[row + 2] = (v >> 1) &  ((1 << (20)) - 1);
-                        assignment.witness(7)[row + 2] = v & 1;
+                        assignment.witness(4)[row + 2] = v >> 56;
+                        assignment.witness(5)[row + 2] = (v >> 34) &  ((1 << (22)) - 1);
+                        assignment.witness(6)[row + 2] = (v >> 12) &  ((1 << (20)) - 1);
+                        assignment.witness(7)[row + 2] = v & 4095;
 
                         return result_type(start_row_index);
                     }
@@ -231,24 +241,29 @@ namespace nil {
 
                         auto constraint_4 =
                             bp.add_constraint((s_r)*var(W5, 0) + (1 - (s_r)*var(W5, 0)) * var(W6, 0) - 1);
-
+                        algebra::curves::ed25519::scalar_field_type::extended_integral_type one = 1;
+                        std::array<algebra::curves::ed25519::scalar_field_type::extended_integral_type, 5> m = 
+                        {((one << 192)%L), ((one << 256)%L), ((one << 320)%L), ((one << 384)%L), ((one << 448)%L)};
                         auto constraint_5 = bp.add_constraint(
-                            var(W0, +1) + var(W1, +1) * 0x10000000000000000_cppui512 +
+                            var(W0, +1) + var(W1, +1) * (one << 64) +
+                            var(W3, + 1) * ( m[0] & ((one << 73) - 1)) +
+                            var(W4, + 1) * ( m[1] & ((one << 73) - 1)) +
+                            var(W5, + 1) * ( m[2]& ((one << 73) - 1)) + 
+                            var(W6, + 1) * ( m[3]& ((one << 73) - 1)) +
+                            var(W7, + 1) * ( m[4]& ((one << 73) - 1)) +
                             (var(W0, 0) * 0x800000000000_cppui512 + var(W1, 0) * 0x8000000_cppui512 +
                              var(W2, 0) * 0x80_cppui512 + var(W3, 0)) * (0x165812631a5cf5d3ed_cppui512) -
-                            (var(W3, -1) + var(W2, -1) * 0x2000_cppui512 + var(W1, -1) * 0x200000000_cppui512 +
-                             var(W0, -1) * 0x20000000000000_cppui512) -
-                            var(W8, +1));
+                            (var(W3, -1) + var(W2, -1) * (one << 13) + var(W1, -1) * (one << 33) +
+                             var(W0, -1) * (one << 53)) -
+                            var(W8, +1) * (one << 69));
 
-                        auto constraint_6 = bp.add_constraint(var(W8, +1) - (var(W4, 0) * 0x20000000000_cppui255 +
-                                                                             var(W5, 0) * 0x200000_cppui255 +
-                                                                             var(W6, 0) * 2 + var(W7, 0)));
+                        auto constraint_6 = bp.add_constraint(var(W8, +1) - (var(W4, 0) * (one << 56) +
+                                                                             var(W5, 0) * (one << 34) +
+                                                                             var(W6, 0) * (one << 12) + var(W7, 0)));
 
-                        auto constraint_7 = bp.add_constraint((var(W6, 0) - 1) * var(W6, 0));
 
                         bp.add_gate(selector_index,
-                                    {constraint_2, constraint_3, constraint_4,
-                                     constraint_7});
+                                    {constraint_2, constraint_3, constraint_4});
                         
                         bp.add_gate(selector_index + 1,
                                     {constraint_1, constraint_5, constraint_6});
