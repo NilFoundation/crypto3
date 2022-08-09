@@ -184,8 +184,7 @@ namespace nil {
                                 key_type &left = x;
                                 key_type &right = y;
                                 if (_sizes[_aux[left]] < _sizes[_aux[right]]) {
-                                    left = y;
-                                    right = x;
+                                    std::swap(left, right);
                                 }
 
                                 _sizes[_aux[left]] = _sizes[_aux[left]] + _sizes[_aux[right]];
