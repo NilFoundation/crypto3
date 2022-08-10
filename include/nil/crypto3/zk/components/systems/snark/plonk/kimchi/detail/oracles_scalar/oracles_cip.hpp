@@ -66,13 +66,13 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static std::size_t poseidon_selector_size() {
-                        if (KimchiParamsType::circuit_params::poseidon_gates_count > 0) {
+                        if (KimchiParamsType::circuit_params::poseidon_gate == true) {
                             return 1;
                         }
                         return 0;
                     }
                     constexpr static std::size_t generic_selector_size() {
-                        if (KimchiParamsType::circuit_params::ec_arithmetic_gates_count > 0) {
+                        if (KimchiParamsType::circuit_params::ec_arithmetic_gates ==true) {
                             return 1;
                         }
                         return 0;
@@ -169,7 +169,20 @@ namespace nil {
                             es[i][es_idx] = params.evals[i].z;
                         }
                         es_idx++;
+                        if (KimchiParamsType::circuit_params::ec_arithmetic_gates == true) {
+                            for (std::size_t i = 0; i < eval_points_amount; ++i) {
+                                es[i][es_idx] = params.evals[i].generic_selector;
+                            }
+                            es_idx++;
+                        }
 
+                        if (KimchiParamsType::circuit_params::poseidon_gate == true) {
+                            for (std::size_t i = 0; i < eval_points_amount; ++i) {
+                                es[i][es_idx] = params.evals[i].poseidon_selector;
+                            }
+
+                            es_idx++;
+                        }
                         for (std::size_t i = 0; i < eval_points_amount; ++i) {
                             //                            std::size_t es_idx_tmp = es_idx;
                             for (std::size_t j = 0, es_idx_tmp = es_idx; j < KimchiParamsType::witness_columns;
@@ -185,23 +198,13 @@ namespace nil {
                             }
                             // es_idx++;
                         }
-
                         es_idx += KimchiParamsType::permut_size - 1;
-                        if (KimchiParamsType::circuit_params::poseidon_gates_count > 0) {
-                            for (std::size_t i = 0; i < eval_points_amount; ++i) {
-                                es[i][es_idx] = params.evals[i].poseidon_selector;
-                            }
 
-                            es_idx++;
-                        }
-                        if (KimchiParamsType::circuit_params::ec_arithmetic_gates_count > 0) {
-                            for (std::size_t i = 0; i < eval_points_amount; ++i) {
-                                es[i][es_idx] = params.evals[i].generic_selector;
-                            }
-                            es_idx++;
-                        }
+
                         assert(es_idx <= cip_size);
+
                         return es;
+
                     }
 
                 public:

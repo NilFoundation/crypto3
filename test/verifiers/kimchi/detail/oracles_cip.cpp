@@ -110,49 +110,21 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test2) 
 
     public_input.push_back(0x1A27603517D952BB0060BB01DE0DA94CFC587748DD85D4987C14883E3BA51BAB_cppui255);//algebra::random_element<BlueprintFieldType>());
     v = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    //public_input.push_back(0x2E0BB5E9179A691E51FB7336CB161A330268EE64C745078D6FD460E02A76729D_cppui255);
+
     public_input.push_back(0x0CD95BF326F609A8D27F9CD8CFA5C1A0662C588EEA1E5B84CD517DC5BA09C502_cppui255);//algebra::random_element<BlueprintFieldType>());
     u = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    //    fteval0
-    //        Fp256 "(064EEBAFAC40594BCEACD8091EBC8D085D3D3BEB2CA76A7E1D7935DC0CB73A66)"
-    //        fteval1
-    //            Fp256 "()"
+
     public_input.push_back(0x0C5FFA9CCCAB64B985EB4467CE3933E6F4BFF202AEA53ACD4E27C0C6BBE902B2_cppui255);
     ft_eval0 = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
     public_input.push_back(0x16FE1AE7F56997161DB512632BE7BFA337F47F422E0D01AF06DE298DD8C429D5_cppui255);
     ft_eval1 = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    //    for (std::size_t i = 0; i < kimchi_params::prev_challenges_size; i++) {
-    //        for (std::size_t j = 0; j < eval_points_amount; j++) {
-    //            for (std::size_t k = 0; k < commitment_params::split_poly_eval_size; k++) {
-    //    public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//0x2C27D4E04141972BE1147405F66D1EBAF82622DC3A0B97AF902988E38E76614F_cppui255);//algebra::random_element<BlueprintFieldType>());
-    //    polys[0][0][0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    //    public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//0x2034A41141E8DAFD88D5625DC695D10351CD8DACB545B4D260560DE31EF123EF_cppui255);//algebra::random_element<BlueprintFieldType>());
-    //    polys[0][1][0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    //            }
-    //        }
-    //    }
-    //    polys
-    //        Fp256 "(03B060BB64B9D6627C7336873BA524D7B752598E8B3390647BDF6B70B5BB93FF)"
-    //        Fp256 "(39B7CA68618353B26F521A651FE3F9DD365401BC8B68B07FC6D656EB010A541B)"
-    //        evals
-    //            Fp256 "(38C5D08C61572A0F233A3732575F3A07AD484107EC7366FEB0903FCC30253C1A)"
-    //        Fp256 "(2DEFB3CFB41140464BF709B147777123731468F528CF8F14C032CA136A477469)"
-    //    for (std::size_t i = 0; i < eval_points_amount; i++) {
-    //                )"
-    //Fp256 "(069DE7D0EBB1985B05DAB9E13348C12530D374BAD474C76C4AB9FAC8EB557332)"
     p_eval[1] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     //    }
     public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//x35557EBE9125C357A755F10D90F82A78DE0522FCBA6A3C2039F7F4F95B24F1BC_cppui255);//algebra::random_element<BlueprintFieldType>());
     p_eval[0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//0x175762EC87AE06A44B63D3F5626B76591A06D32BB6A2FCCA8A62A36C1D7A59E7_cppui255);//algebra::random_element<BlueprintFieldType>());
-
-    //    for (std::size_t i = 0; i < eval_points_amount; i++) {
-    //        for (std::size_t j = 0; j < kimchi_params::witness_columns; j++) {
-    //            public_input.push_back(algebra::random_element<BlueprintFieldType>());
-    //            evals[i].w[j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    //        }
 
     public_input.push_back(0x1480D3E4FD095CEC3688F88B105EE6F2365DCFAAA28CCB6B87DAB7E71E58010B_cppui255);//lgebra::random_element<BlueprintFieldType>());
     evals[0].z = var(0, public_input.size() - 1, false, var::column_type::public_input);
@@ -248,12 +220,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test2) 
     public_input.push_back(0x29126D228A13DAF18CD96C487BF794569FB5A8BBDF14DDEC6CE22DAAED7DF34F_cppui255);
     evals[1].w[14] = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    //        for (std::size_t j = 0; j < kimchi_params::permut_size - 1; j++) {
-    //            public_input.push_back(algebra::random_element<BlueprintFieldType>());
-    //            evals[i].s[j] = var(0, public_input.size() - 1, false, var::column_type::public_input);
-    //        }
-
-    // TODO: lookups
     public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//algebra::random_element<BlueprintFieldType>());
     evals[0].generic_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
@@ -280,12 +246,216 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test2) 
 
     auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
         assert(expected_result == assignment.var_value(real_res.output));
-        std::cout<<assignment.var_value(real_res.output).data<<std::endl;
+
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 }
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test) {
+
+    using curve_type = algebra::curves::vesta;
+    using BlueprintFieldType = typename curve_type::scalar_field_type;
+    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 30;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
+
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    constexpr static std::size_t alpha_powers_n = 5;
+    constexpr static std::size_t public_input_size = 0;
+    constexpr static std::size_t max_poly_size = 32;
+    constexpr static std::size_t eval_rounds = 5;
+
+    constexpr static std::size_t witness_columns = 15;
+    constexpr static std::size_t perm_size = 7;
+    constexpr static std::size_t lookup_table_size = 1;
+    constexpr static bool use_lookup = false;
+
+    constexpr static std::size_t srs_len = 10;
+    constexpr static const std::size_t prev_chal_size = 1;
+
+    constexpr static const std::size_t eval_points_amount = 2;
+
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
+    using kimchi_params =
+        zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size, use_lookup, lookup_table_size,
+                                           alpha_powers_n, public_input_size, prev_chal_size>;
+
+    using component_type =
+        zk::components::oracles_cip<ArithmetizationType, kimchi_params,0, 1, 2, 3, 4,
+                                    5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+
+    std::vector<typename BlueprintFieldType::value_type> public_input;
+
+    // component input
+    var v;
+    var u;
+    var ft_eval0;
+    var ft_eval1;
+    std::array<
+        std::array<
+            std::array<var, commitment_params::split_poly_eval_size>,
+            eval_points_amount>,
+        kimchi_params::prev_challenges_size> polys;
+    std::array<var,eval_points_amount> p_eval;
+    std::array<zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>,
+               eval_points_amount> evals;
+    typename BlueprintFieldType::value_type expected_result = 0x092931C57CBF91630B192C9BB166864F5D3F7E3D2C9217FDB382DB82564D4607_cppui255;
+
+    public_input.push_back(0x0416077232C8D4EFD0D1120ACC756A397EA8DCDCF792E5E0F9CDFF82BDF42D2D_cppui255);//algebra::random_element<BlueprintFieldType>());
+    v = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x2E0BB5E9179A691E51FB7336CB161A330268EE64C745078D6FD460E02A76729D_cppui255);//algebra::random_element<BlueprintFieldType>());
+    u = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x36B33A1266C7DCF380A308055D32978AE1F469723AAEB3EDBC512B18D6C095BD_cppui255);
+    ft_eval0 = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x30B81DB776FF4C13A0BF7BAB87E9768D7ADE52CD3D29549FB1E08798D6A3EF9E_cppui255);
+    ft_eval1 = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x2C27D4E04141972BE1147405F66D1EBAF82622DC3A0B97AF902988E38E76614F_cppui255);//algebra::random_element<BlueprintFieldType>());
+    polys[0][0][0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x2034A41141E8DAFD88D5625DC695D10351CD8DACB545B4D260560DE31EF123EF_cppui255);//algebra::random_element<BlueprintFieldType>());
+    polys[0][0][1] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//x35557EBE9125C357A755F10D90F82A78DE0522FCBA6A3C2039F7F4F95B24F1BC_cppui255);//algebra::random_element<BlueprintFieldType>());
+    p_eval[0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//0x175762EC87AE06A44B63D3F5626B76591A06D32BB6A2FCCA8A62A36C1D7A59E7_cppui255);//algebra::random_element<BlueprintFieldType>());
+    p_eval[1] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x3F8D8F25CB5A2D2533B3063716C83ADDBFF999C60BC5DEBC3A633EF82EBE108D_cppui255);//lgebra::random_element<BlueprintFieldType>());
+    evals[0].z = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x35557EBE9125C357A755F10D90F82A78DE0522FCBA6A3C2039F7F4F95B24F1BC_cppui255);
+    evals[0].s[0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x3BD62FADFBC967B2DDE2CD067A531BF158C20BBE1B42BB53BF7EE8EC3834555F_cppui255);
+    evals[0].s[1] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1D4D2D839270B2866A00334B3CD86E5B7A759B59329F1662039D6D2124FEE4D4_cppui255);
+    evals[0].s[2] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x2CA95F70D9D97BD9AB7F633B85556C1ABD1938D49ED2975FE62319951E69A022_cppui255);
+    evals[0].s[3] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x2601AC11905952B2EFD1BB4BE50AC2E86BBC421876C07312CFCC3AED17556926_cppui255);
+    evals[0].s[4] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x16303670383248B3C7D5786C8161EE001848D3D86D98F1069A3E0136E8AF322F_cppui255);
+    evals[0].s[5] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+
+    public_input.push_back(0x30AC247252D0ABAA93BDEEFBF27F4931E8F995D58AE78FC99910719A226ED51E_cppui255);
+    evals[0].w[0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x0E22763F6B830A605362663C49102E31FE20AE4A653038C3007B45CC85CBB96A_cppui255);
+    evals[0].w[1] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x2B98C80C843569161306DD7C9FA11332358E5FBB48C5DAD801134AEBE9289DB7_cppui255);
+    evals[0].w[2] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x090F19D99CE7C7CBD2AB54BCF631F8324AB57830230E83D1687E1F1E4C858203_cppui255);
+    evals[0].w[3] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x26856BA6B59A2681924FCBFD4CC2DD32822329A106A425E66916243DAFE26650_cppui255);
+    evals[0].w[4] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x03FBBD73CE4C853751F4433DA353C232974A4215E0ECCEDFD080F870133F4A9C_cppui255);
+    evals[0].w[5] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x21720F40E6FEE3ED1198BA7DF9E4A732CEB7F386C48270F4D118FD8F769C2EE9_cppui255);
+    evals[0].w[6] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x3EE8610DFFB142A2D13D31BE50758C330625A4F7A8181309D1B102AED9F91336_cppui255);
+    evals[0].w[7] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1C5EB2DB1863A15890E1A8FEA70671331B4CBD6C8260BC03391BD6E13D55F782_cppui255);
+    evals[0].w[8] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x39D504A83116000E5086203EFD97563352BA6EDD65F65E1839B3DC00A0B2DBCF_cppui255);
+    evals[0].w[9] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x174B567549C85EC4102A977F54283B3367E18752403F0711A11EB033040FC01B_cppui255);
+    evals[0].w[10] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x34C1A842627ABD79CFCF0EBFAAB920339F4F38C323D4A926A1B6B552676CA468_cppui255);
+    evals[0].w[11] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1237FA0F7B2D1C2F8F738600014A0533B4765137FE1D522009218984CAC988B4_cppui255);
+    evals[0].w[12] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x2FAE4BDC93DF7AE54F17FD4057DAEA33EBE402A8E1B2F43509B98EA42E266D01_cppui255);
+    evals[0].w[13] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x0D249DA9AC91D99B0EBC7480AE6BCF34010B1B1DBBFB9D2E712462D69183514D_cppui255);
+    evals[0].w[14] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x0D69C9B3BE918CB3DE88610F89D800916F23984B5BDFB8AE753C34C234BB1407_cppui255);//lgebra::random_element<BlueprintFieldType>());
+    evals[1].z = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x175762EC87AE06A44B63D3F5626B76591A06D32BB6A2FCCA8A62A36C1D7A59E7_cppui255);
+    evals[1].s[0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1F21634F6AEDCADE3D878584CC9EDBA4DA6A496DA05D824FB7E741305AAD2C45_cppui255);
+    evals[1].s[1] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1418CE39644E82C6411C9B3FD878FD781E3438B6B6B1106657AA48AE8F73F977_cppui255);
+    evals[1].s[2] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x13D3942A39464ACE1D4D56A687BBC392DCE24392E4CC6F34063C8B1BBC8E3D71_cppui255);
+    evals[1].s[3] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x31EFFF757DF39A98EB88BBBB86607EAE2AC1856A6F172BF969178B21975AFF4C_cppui255);
+    evals[1].s[4] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x0EBAE7C12211C4631FD3B3B04F112D99393CA706E09B4B98F2502A3720785BBC_cppui255);
+    evals[1].s[5] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+
+    public_input.push_back(0x0EC5173646D6F7F31A1774DFCC7FB5B0EA356EE2275EC698F7BEBE691BB84E06_cppui255);
+    evals[1].w[0] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x30D45140D88575398696BB4F1FA770B2337A0DDED0586F664DCFDE63334BF64D_cppui255);
+    evals[1].w[1] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x12E38B4B6A33F27FF31601BE72CF2BB35A7813DF70051F180AB3CD704ADF9E93_cppui255);
+    evals[1].w[2] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x34F2C555FBE26FC65F95482DC5F6E6B4A3BCB2DC18FEC7E560C4ED6A627346DA_cppui255);
+    evals[1].w[3] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1701FF608D90ED0CCC148E9D191EA1B5CABAB8DCB8AB77971DA8DC777A06EF20_cppui255);
+    evals[1].w[4] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x3911396B1F3F6A533893D50C6C465CB713FF57D961A5206473B9FC71919A9767_cppui255);
+    evals[1].w[5] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1B207375B0EDE799A5131B7BBF6E17B83AFD5DDA0151D016309DEB7EA92E3FAD_cppui255);
+    evals[1].w[6] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x3D2FAD80429C64E0119261EB1295D2B98441FCD6AA4B78E386AF0B78C0C1E7F4_cppui255);
+    evals[1].w[7] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x1F3EE78AD44AE2267E11A85A65BD8DBAAB4002D749F828954392FA85D855903A_cppui255);
+    evals[1].w[8] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x014E219565F95F6CEA90EEC9B8E548BBD23E08D7E9A4D8470076E992EFE93880_cppui255);
+    evals[1].w[9] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x235D5B9FF7A7DCB3571035390C0D03BD1B82A7D4929E81145688098D077CE0C7_cppui255);
+    evals[1].w[10] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x056C95AA895659F9C38F7BA85F34BEBE4280ADD5324B30C6136BF89A1F10890D_cppui255);
+    evals[1].w[11] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x277BCFB51B04D740300EC217B25C79BF8BC54CD1DB44D993697D189436A43154_cppui255);
+    evals[1].w[12] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x098B09BFACB354869C8E0887058434C0B2C352D27AF18945266107A14E37D99A_cppui255);
+    evals[1].w[13] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+    public_input.push_back(0x2B9A43CA3E61D1CD090D4EF658ABEFC1FC07F1CF23EB32127C72279B65CB81E1_cppui255);
+    evals[1].w[14] = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x28654BAD9D8CDFD846C0DB23E11CFE750DF683B9AC1F00BD1550778F27B28C70_cppui255);//algebra::random_element<BlueprintFieldType>());
+    evals[0].generic_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//algebra::random_element<BlueprintFieldType>());
+    evals[0].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x33018173752351E61F3CE0C02C14FCC1C936E2A9FC8713268ED5871BA404ECAF_cppui255);//algebra::random_element<BlueprintFieldType>());
+    evals[1].generic_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(0x0000000000000000000000000000000000000000000000000000000000000000_cppui255);//algebra::random_element<BlueprintFieldType>());
+    evals[1].poseidon_selector = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    typename component_type::params_type params = {
+        v,
+        u,
+        ft_eval0,
+        ft_eval1,
+        polys,
+        p_eval,
+        evals
+    };
+
+    auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
+        assert(expected_result == assignment.var_value(real_res.output));
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
+}
+
 //
 //BOOST_AUTO_TEST_CASE(blueprint_plonk_verifiers_kimchi_detail_oracles_cip_test) {
 //
