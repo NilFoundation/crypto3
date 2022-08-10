@@ -37,17 +37,9 @@ jobs:
       - name: Cmake and build
         env:
           CMAKE_ARGS: "
-            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_BUILD_TYPE=Debug
             -DBUILD_SHARED_LIBS=FALSE
             -DBUILD_TESTS=TRUE
-            -DBUILD_WITH_NUMA=FALSE
-            -DBUILD_WITH_CUDA=FALSE
-            -DBUILD_WITH_OPENCL=FALSE
-            -DBUILD_WITH_SANITIZE=FALSE
-            -DBUILD_WITH_DPDK=FALSE
-            -DCRYPTO3_HASH_POSEIDON=FALSE
-            -DBUILD_EXAMPLES=TRUE
-            -DZK_PLACEHOLDER_PROFILING=TRUE
             "
         run: |
           mkdir build
