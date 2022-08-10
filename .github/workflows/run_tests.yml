@@ -66,10 +66,10 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-            pubkey_bls_test
-            pubkey_ecdsa_test
-            pubkey_eddsa_test
-            pubkey_elgamal_verifiable_test
+            pubkey_bls_test,
+            pubkey_ecdsa_test,
+            pubkey_eddsa_test,
+            pubkey_elgamal_verifiable_test,
             pubkey_secret_sharing_test,
           ]  # Tests to execute
     steps:
