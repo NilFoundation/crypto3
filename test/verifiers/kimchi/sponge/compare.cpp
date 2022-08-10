@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_compare_with_constant_test
+#define BOOST_TEST_MODULE blueprint_plonk_kimchi_compare_with_constant_test
 
 #include <boost/test/unit_test.hpp>
 

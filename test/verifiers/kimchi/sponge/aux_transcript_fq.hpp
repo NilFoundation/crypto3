@@ -96,7 +96,7 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0fd8;
-                    constexpr static const std::size_t rows_amount = transcript_type::init_rows + num_absorb * transcript_type::absorb_rows + 
+                    constexpr static const std::size_t rows_amount = transcript_type::init_rows + num_absorb * transcript_type::absorb_group_rows + 
                                                                     num_challenges * transcript_type::challenge_rows + 
                                                                     num_challenges_fq * transcript_type::challenge_fq_rows +
                                                                     static_cast<int>(digest) * transcript_type::digest_rows;
@@ -128,12 +128,12 @@ namespace nil {
                         transcript.init_circuit(bp, assignment, zero, row);
                         row += transcript_type::init_rows;
                         for (std::size_t i = 0; i < params.input_fr.size(); ++i) {
-                            transcript.absorb_fr_circuit(bp, assignment, params.input_fr[i], row);
-                            row += transcript_type::absorb_rows;
+                            transcript.absorb_fr_circuit(bp, assignment, params.input_fr[i][0], row);
+                            row += transcript_type::absorb_fr_rows;
                         }
                         for (std::size_t i = 0; i < params.input_g.size(); ++i) {
                             transcript.absorb_g_circuit(bp, assignment, params.input_g[i], row);
-                            row += transcript_type::absorb_rows;
+                            row += transcript_type::absorb_group_rows;
                         }
                         var sq;
                         for (size_t i = 0; i < num_challenges; ++i) {
@@ -165,12 +165,12 @@ namespace nil {
                         transcript.init_assignment(assignment, zero, row);
                         row += transcript_type::init_rows;
                         for (std::size_t i = 0; i < params.input_fr.size(); ++i) {
-                            transcript.absorb_fr_assignment(assignment, params.input_fr[i], row);
-                            row += transcript_type::absorb_rows;
+                            transcript.absorb_fr_assignment(assignment, params.input_fr[i][0], row);
+                            row += transcript_type::absorb_fr_rows;
                         }
                         for (std::size_t i = 0; i < params.input_g.size(); ++i) {
                             transcript.absorb_g_assignment(assignment, params.input_g[i], row);
-                            row += transcript_type::absorb_rows;
+                            row += transcript_type::absorb_group_rows;
                         }
                         var sq;
                         for (size_t i = 0; i < num_challenges; ++i) {
