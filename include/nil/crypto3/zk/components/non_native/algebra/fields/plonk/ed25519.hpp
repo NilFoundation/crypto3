@@ -224,7 +224,7 @@ namespace nil {
                                                     var(6, row, false),
                                                     var(7, row, false)};
                         row++;
-                        var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
+                        var k = reduction_component::generate_circuit(bp, assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
                         /* here we check sB == R + kA */
                         auto S = fixed_base_mult_component::generate_circuit(bp, assignment, {s}, row).output;
