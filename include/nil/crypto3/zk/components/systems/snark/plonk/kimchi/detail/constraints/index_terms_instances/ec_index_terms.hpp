@@ -29,6 +29,9 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_string_literal.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/alpha_argument_type.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_term_type.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/column_type.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -167,6 +170,29 @@ namespace nil {
 
                     constexpr static const std::size_t constatnt_term_rows = 
                         rpn_component_rows<constatnt_term_array_size, ArithmetizationType>(constant_term_str);
+
+                    constexpr static const std::size_t size = 19;
+                    constexpr static const std::array<index_term_type, size> terms = {{
+                        {column_type::Coefficient, 0, coefficient_str[0], coefficient_rows[0]},
+                        {column_type::Coefficient, 1, coefficient_str[1], coefficient_rows[1]},
+                        {column_type::Coefficient, 2, coefficient_str[2], coefficient_rows[2]},
+                        {column_type::Coefficient, 3, coefficient_str[3], coefficient_rows[3]},
+                        {column_type::Coefficient, 4, coefficient_str[4], coefficient_rows[4]},
+                        {column_type::Coefficient, 5, coefficient_str[5], coefficient_rows[5]},
+                        {column_type::Coefficient, 6, coefficient_str[6], coefficient_rows[6]},
+                        {column_type::Coefficient, 7, coefficient_str[7], coefficient_rows[7]},
+                        {column_type::Coefficient, 8, coefficient_str[8], coefficient_rows[8]},
+                        {column_type::Coefficient, 9, coefficient_str[9], coefficient_rows[9]},
+                        {column_type::Coefficient, 10, coefficient_str[10], coefficient_rows[10]},
+                        {column_type::Coefficient, 11, coefficient_str[11], coefficient_rows[11]},
+                        {column_type::Coefficient, 12, coefficient_str[12], coefficient_rows[12]},
+                        {column_type::Coefficient, 13, coefficient_str[13], coefficient_rows[13]},
+                        {column_type::Coefficient, 14, coefficient_str[14], coefficient_rows[14]},
+                        {column_type::VarBaseMul, 0, var_base_mul_str, var_base_mul_rows},
+                        {column_type::EndoMul, 0, endo_mul_str, endo_mul_rows},
+                        {column_type::EndoMulScalar, 0, endo_mul_scalar_str, endo_mul_scalar_rows},
+                        {column_type::CompleteAdd, 0, complete_add_str, complete_add_rows},
+                    }};
                 };
             }    // namespace components
         }        // namespace zk
