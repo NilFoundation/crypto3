@@ -32,10 +32,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                // struct argument_type {
-                //     constexpr static std::size_t Permutation = 0;
-                //     constexpr static std::size_t Generic = 1;
-                // };
                 enum argument_type {
                     Permutation,
                     Generic
