@@ -31,48 +31,59 @@
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/alphas.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/detail.hpp>
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/constants.hpp>
+#include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
-#include <map>
+
+#include <array>
+#include <vector>
+#include <optional>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, std::size_t WiresAmount = 15, std::size_t Permuts = 7>
+                template<typename CurveType, std::size_t WiresAmount = kimchi_constant::COLUMNS, std::size_t Permuts = kimchi_constant::PERMUTES>
                 struct verifier_index {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using curve_type = CurveType;
-                    using scalar_field_value_type = typename CurveType::scalar_field_type::value_type;
-                    using base_field_value_type = typename CurveType::base_field_type::value_type;
+                    using scalar_field_type = typename CurveType::scalar_field_type;
+                    using base_field_type = typename CurveType::base_field_type;
 
-                    evaluation_domain<scalar_field_value_type> domain;
+                    basic_radix2_domain<scalar_field_type> domain;
                     size_t max_poly_size;
                     size_t max_quot_size;
-                    common_reference_string<CurveType> srs;
+                    commitment_scheme::params_type srs;
+
                     std::array<commitment_type, Permuts> sigma_comm;
                     std::array<commitment_type, WiresAmount> coefficients_comm;
                     commitment_type generic_comm;
+
                     commitment_type psm_comm;
+                    
                     commitment_type complete_add_comm;
                     commitment_type mul_comm;
                     commitment_type emul_comm;
                     commitment_type endomul_scalar_comm;
-                    std::array<commitment_type, 4> chacha_comm;
-                    std::array<scalar_field_value_type, Permuts> shifts;
 
+                    std::optional<std::array<commitment_type, 4>> chacha_comm;
+
+                    std::vector<commitment_type> range_check_comm;
+
+                    std::array<scalar_field_type::value_type, Permuts> shift;
                     // Polynomial in coefficients form
-                    nil::crypto3::math::polynomial<scalar_field_value_type> zkpm;
-                    scalar_field_value_type w;
-                    scalar_field_value_type endo;
-                    lookup_verifier_index<CurveType> lookup_index;
+                    math::polynomial<scalar_field_type::value_type> zkpm;
+                    scalar_field_type::value_type w;
+                    scalar_field_type::value_type endo;
+
+                    std::optional<lookup_verifier_index<CurveType>> lookup_index;
                     //                    linearization<std::vector<PolishToken<scalar_field_value_type>>>
                     //                    linearization;    // TODO:
                     //                    Linearization<Vec<PolishToken<scalar_field_value_type<G>>>>
                     Alphas<scalar_field_value_type> powers_of_alpha;
-                    arithmetic_sponge_params<scalar_field_value_type> fr_sponge_params;
-                    arithmetic_sponge_params<base_field_value_type> fq_sponge_params;
+                    // arithmetic_sponge_params<scalar_field_value_type> fr_sponge_params;
+                    // arithmetic_sponge_params<base_field_value_type> fq_sponge_params;  
                 };
             }    // namespace snark
         }        // namespace zk
