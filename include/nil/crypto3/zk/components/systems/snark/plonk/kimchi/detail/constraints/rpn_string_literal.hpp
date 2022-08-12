@@ -133,15 +133,13 @@ namespace nil {
                         str_end[i] = pos;
                         str_start[i + 1] = pos + 1;
                     }
-                    size_t rows = 0;
-                    size_t constant_rows = 1 + mds_size * mds_size;
+                    size_t rows = 1 + mds_size * mds_size;
                     for (i = 0; i < tokens_array_size; i++) {
                         if (find_str(expression, literal_c, 7, str_start[i], str_end[i]) != std::string::npos) {
-                            constant_rows++;
+                            rows++;
                         } else if (find_str(expression, pow_c, 3, str_start[i], str_end[i]) != std::string::npos) {
-                            constant_rows += 2; // exponentiation component uses 2 constant rows
+                            rows++;
                             rows += exponentiation_component::rows_amount;
-                            constant_rows++;
                         } else if (find_str(expression, add_c, 3, str_start[i], str_end[i]) != std::string::npos) {
                             rows += add_component::rows_amount;
                         } else if (find_str(expression, mul_c, 3, str_start[i], str_end[i]) != std::string::npos) {
@@ -149,19 +147,14 @@ namespace nil {
                         } else if (find_str(expression, sub_c, 3, str_start[i], str_end[i]) != std::string::npos) {
                             rows += sub_component::rows_amount;
                         } else if (find_str(expression, vanishes_on_last_4_rows_c, 3, str_start[i], str_end[i]) != std::string::npos) {
-                            constant_rows += 2; // exponentiation component uses 2 constant rows
-                            constant_rows++; // vanishes_on_last_4_rows_component saves domain_size into constant
                             rows += vanishes_on_last_4_rows_component::rows_amount;
                         }
                         else if (find_str(expression, unnormalized_lagrange_basis_c, 3, str_start[i], str_end[i]) != std::string::npos) {
-                            constant_rows += 2; // exponentiation component uses 2 constant rows
-                            constant_rows += 3; // unnormalized_lagrange_basis_component uses 3 constant rows
                             rows += unnormalized_lagrange_basis_component::rows_amount;
                         }
                     }
 
-                    size_t res = std::max(rows, constant_rows);
-                    return res;
+                    return rows;
                 }
             } // namespace components
         }   // namespace zk

@@ -366,13 +366,11 @@ namespace nil {
                         std::vector<var> stack;
                         std::vector<var> cache;
 
-                        std::size_t constant_row = start_row_index;
+                        var endo_factor(0, row, false, var::column_type::constant);
+                        row++;
 
-                        var endo_factor(0, constant_row, false, var::column_type::constant);
-                        constant_row += 1;
-
-                        auto mds = mds_vars(constant_row);
-                        constant_row += mds_size * mds_size;
+                        auto mds = mds_vars(row);
+                        row += mds_size * mds_size;
 
                         for (token_value_type t : tokens) {
                             switch (t.type) {
@@ -400,9 +398,9 @@ namespace nil {
                                     break;
                                 }
                                 case token_type::literal: {
-                                    var literal(0, constant_row, false, var::column_type::constant);
+                                    var literal(0, row, false, var::column_type::constant);
                                     stack.emplace_back(literal);
-                                    constant_row++;
+                                    row++;
                                     break;
                                 }
                                 case token_type::cell: {
@@ -418,15 +416,13 @@ namespace nil {
                                     stack.emplace_back(stack.back());
                                     break;
                                 case token_type::pow: {
-                                    constant_row += 2; 
-                                    var exponent(0, constant_row, false, var::column_type::constant);
-                                    constant_row++;
+                                    var exponent(0, row, false, var::column_type::constant);
+                                    row++;
 
                                     var res = zk::components::generate_circuit<exponentiation_component>(
                                                   bp, assignment, {stack.back(), exponent}, row)
                                                   .output;
                                     row += exponentiation_component::rows_amount;
-
                                     stack[stack.size() - 1] = res;
                                     break;
                                 }
@@ -460,15 +456,13 @@ namespace nil {
                                     var y = stack.back();
                                     stack.pop_back();
                                     var res =
-                                        zk::components::generate_circuit<sub_component>(bp, assignment, {x, y}, row)
+                                        zk::components::generate_circuit<sub_component>(bp, assignment, {y, x}, row)
                                             .output;
                                     row += sub_component::rows_amount;
                                     stack.push_back(res);
                                     break;
                                 }
                                 case token_type::vanishes_on_last_4_rows: {
-                                    constant_row += 2; // exponentiation component uses 2 constant rows
-                                    constant_row++; // vanishes_on_last_4_rows_component saves domain_size into constant
                                     var res = vanishes_on_last_4_rows_component::generate_circuit(
                                                   bp, assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
                                     row += vanishes_on_last_4_rows_component::rows_amount;
@@ -476,8 +470,6 @@ namespace nil {
                                     break;
                                 }
                                 case token_type::unnormalized_lagrange_basis: {
-                                    constant_row += 2; // exponentiation component uses 2 constant rows
-                                    constant_row += 3; // unnormalized_lagrange_basis uses 3 constant rows
                                     var res = unnormalized_lagrange_basis_component::generate_circuit(
                                                   bp, assignment, {params.group_gen, params.domain_size, params.eval_point, t.int_data}, row).output;
                                     row += unnormalized_lagrange_basis_component::rows_amount;
@@ -497,7 +489,7 @@ namespace nil {
                             }
                         }
 
-                        assert(std::max(row, constant_row) == start_row_index + rows_amount);
+                        assert(row == start_row_index + rows_amount);
 
                         result_type res;
                         res.output = stack[stack.size() - 1];
@@ -515,13 +507,11 @@ namespace nil {
                         std::vector<var> stack;
                         std::vector<var> cache;
 
-                        std::size_t constant_row = start_row_index;
+                        var endo_factor(0, row, false, var::column_type::constant);
+                        row += 1;
 
-                        var endo_factor(0, constant_row, false, var::column_type::constant);
-                        constant_row += 1;
-
-                        auto mds = mds_vars(constant_row);
-                        constant_row += mds_size * mds_size;
+                        auto mds = mds_vars(row);
+                        row += mds_size * mds_size;
 
                         for (token_value_type t : tokens) {
                             switch (t.type) {
@@ -549,9 +539,9 @@ namespace nil {
                                     break;
                                 }
                                 case token_type::literal: {
-                                    var literal(0, constant_row, false, var::column_type::constant);
+                                    var literal(0, row, false, var::column_type::constant);
                                     stack.emplace_back(literal);
-                                    constant_row++;
+                                    row++;
                                     break;
                                 }
                                 case token_type::cell: {
@@ -567,9 +557,8 @@ namespace nil {
                                     stack.emplace_back(stack.back());
                                     break;
                                 case token_type::pow: {
-                                    constant_row += 2;
-                                    var exponent(0, constant_row, false, var::column_type::constant);
-                                    constant_row++;
+                                    var exponent(0, row, false, var::column_type::constant);
+                                    row++; 
 
                                     var res = exponentiation_component::generate_assignments(
                                                   assignment, {stack.back(), exponent}, row)
@@ -604,14 +593,12 @@ namespace nil {
                                     stack.pop_back();
                                     var y = stack.back();
                                     stack.pop_back();
-                                    var res = sub_component::generate_assignments(assignment, {x, y}, row).output;
+                                    var res = sub_component::generate_assignments(assignment, {y, x}, row).output;
                                     row += sub_component::rows_amount;
                                     stack.push_back(res);
                                     break;
                                 }
                                 case token_type::vanishes_on_last_4_rows: {
-                                    constant_row += 2; // exponentiation component uses 2 constant rows
-                                    constant_row++; // vanishes_on_last_4_rows_component saves domain_size into constant
                                     var res = vanishes_on_last_4_rows_component::generate_assignments(
                                                   assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
                                     row += vanishes_on_last_4_rows_component::rows_amount;
@@ -619,8 +606,6 @@ namespace nil {
                                     break;
                                 }
                                 case token_type::unnormalized_lagrange_basis: {
-                                    constant_row += 2; // exponentiation component uses 2 constant rows
-                                    constant_row += 3; // unnormalized_lagrange_basis uses 3 constant rows
                                     var res = unnormalized_lagrange_basis_component::generate_assignments(
                                                   assignment, {params.group_gen, params.domain_size, params.eval_point, t.int_data}, row).output;
                                     row += unnormalized_lagrange_basis_component::rows_amount;
@@ -638,9 +623,11 @@ namespace nil {
                                     break;
                                 }
                             }
+                            //std::cout<<assignment.var_value(stack[stack.size() - 1]).data<<";";
                         }
+                        //std::cout<<std::endl;
 
-                        assert(std::max(row, constant_row) == start_row_index + rows_amount);
+                        assert(row == start_row_index + rows_amount);
 
                         result_type res;
                         res.output = stack[stack.size() - 1];
@@ -671,18 +658,36 @@ namespace nil {
                         for (token_value_type t : tokens) {
                             switch (t.type) {
                                 case token_type::literal: {
-                                    assignment.constant(W0)[row] = t.value.first;
+                                    assignment.constant(0)[row] = t.value.first;
                                     row++;
                                     break;
                                 }
                                 case token_type::pow: {
-                                    row += 2; // exponentiation component uses 2 constant rows
-                                    assignment.constant(W0)[row] = t.value.first;
+                                    assignment.constant(0)[row] = t.value.first;
                                     row++;
+                                    row += exponentiation_component::rows_amount;
                                     break;
                                 }
-                                default:
+                                case token_type::add: {
+                                    row += add_component::rows_amount;
                                     break;
+                                }
+                                case token_type::mul: {
+                                    row += mul_component::rows_amount;
+                                    break;
+                                }
+                                case token_type::sub: {
+                                    row += sub_component::rows_amount;
+                                    break;
+                                }
+                                case token_type::vanishes_on_last_4_rows: {
+                                    row += vanishes_on_last_4_rows_component::rows_amount;
+                                    break;
+                                }
+                                case token_type::unnormalized_lagrange_basis: {
+                                    row += unnormalized_lagrange_basis_component::rows_amount;
+                                    break;
+                                }
                             }
                         }
                     }
