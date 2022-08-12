@@ -182,6 +182,9 @@ namespace nil {
                             fq_sponge.absorb_g(commit.unshifted);
                         }
 
+                        if(index.lookup_index){
+                            
+                        }
                         //~ 4. TODO: lookup (joint combiner challenge)
                         ScalarChallenge<typename CurveType::scalar_field_type> s;
                         if (index.lookup_index.lookup_used == lookup_verifier_index::lookups_used::Single) {
