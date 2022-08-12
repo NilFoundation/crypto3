@@ -39,7 +39,7 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
 #include <nil/crypto3/hash/find_group_hash.hpp>
-#include <nil/crypto3/hash/algorithm/to_curve.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::multiprecision;
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(jubjub_sha256_default_params_manual_test) {
             "14821992026951101352906249207585330645531160601076441869339940926000353872705"),
         typename hash_type::group_value_type::field_type::integral_type(
             "52287259411977570791304693313354699485314647509298698724706688571292689216990"));
-    auto point = to_curve<hash_type>(input);
+    auto point = hash<hash_type>(input);
     BOOST_CHECK(expected == point);
 
     input = {1, 0, 0, 0};
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(jubjub_sha256_default_params_manual_test) {
             "1463691854240270278606818648002136194121833583821877204193209581327298182344"),
         typename hash_type::group_value_type::field_type::integral_type(
             "29819841443135548958808950484163239058878703816702478211299889017771131589670"));
-    point = to_curve<hash_type>(input);
+    point = hash<hash_type>(input);
     BOOST_CHECK(expected == point);
 
     input = {2, 0, 0, 0};
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(jubjub_sha256_default_params_manual_test) {
             "40291265060939609650944463710328312785099355084223308258183327547022417006973"),
         typename hash_type::group_value_type::field_type::integral_type(
             "52192102488968215278324791125420866252464543397675384723668566547038588479994"));
-    point = to_curve<hash_type>(input);
+    point = hash<hash_type>(input);
     BOOST_CHECK(expected == point);
 
     input = {3, 0, 0, 0};
@@ -135,11 +135,11 @@ BOOST_AUTO_TEST_CASE(jubjub_sha256_default_params_manual_test) {
             "9727827140824687394408632390964265750934762150332666686367551954377952599690"),
         typename hash_type::group_value_type::field_type::integral_type(
             "19724757542882122580209648860907766139392382704367414563715710526666657068129"));
-    point = to_curve<hash_type>(input);
+    point = hash<hash_type>(input);
     BOOST_CHECK(expected == point);
 
     std::uint32_t input_uint32 = 3;
-    point = to_curve<hash_type>({input_uint32,});
+    point = hash<hash_type>({input_uint32,});
     BOOST_CHECK(expected == point);
 }
 
