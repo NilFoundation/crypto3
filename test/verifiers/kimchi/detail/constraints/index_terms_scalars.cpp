@@ -31,6 +31,8 @@
 
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -58,8 +60,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_detail_index_terms_scalar_test_suit
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_test_suite) {
 
-    using curve_type = algebra::curves::vesta;
-    using BlueprintFieldType = typename curve_type::scalar_field_type;
+    using curve_type = algebra::curves::pallas;
+    using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
@@ -246,8 +248,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_test_suite
 
     auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
         for (std::size_t i = 0; i < expected_result.size(); ++i) {
-            std::cout<<"real_res["<<i<<"] = "<<assignment.var_value(real_res.output[i]).data<<std::endl;
-            std::cout<<"expected_result["<<i<<"] = "<<expected_result[i].data<<std::endl;
             assert(expected_result[i] == assignment.var_value(real_res.output[i]));
         }
     };

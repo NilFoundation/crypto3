@@ -623,9 +623,7 @@ namespace nil {
                                     break;
                                 }
                             }
-                            //std::cout<<assignment.var_value(stack[stack.size() - 1]).data<<";";
                         }
-                        //std::cout<<std::endl;
 
                         assert(row == start_row_index + rows_amount);
 
@@ -641,7 +639,7 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
-                        assignment.constant(0)[row] = endo_scalar_component::endo_factor;
+                        assignment.constant(0)[row] = endo_scalar_component::endo_q;
                         row++;
 
                         std::array<std::array<typename BlueprintFieldType::value_type, mds_size>, mds_size> mds =

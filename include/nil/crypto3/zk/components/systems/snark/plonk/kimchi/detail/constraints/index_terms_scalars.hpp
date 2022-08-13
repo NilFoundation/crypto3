@@ -124,23 +124,6 @@ namespace nil {
                         return n;
                     }
 
-                // static void calculate_index_terms(const std::size_t i, std::size_t &row, std::size_t &output_idx,
-                //     std::array<var, KimchiParamsType::index_term_size()> &output,
-                //     blueprint<ArithmetizationType> &bp,
-                //     blueprint_public_assignment_table<ArithmetizationType> &assignment) {
-                //     if (i == index_terms_list::size) {
-                //         return;
-                //     }
-
-                //     using component_type = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
-                //         index_terms_list::terms[i].rows_amount, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                //     output[output_idx++] = component_type::generate_circuit(bp, assignment, {index_terms_list::coefficient_str[i], 
-                //         params.eval_point, params.alpha, params.beta, params.gamma, params.joint_combiner, params.evaluations, params.group_gen, params.domain_size}, row).output;
-                //     row += component_type::rows_amount;
-
-                //     calculate_index_terms(i + 1, row, output_idx, output, bp, assignment);
-                // }
-
                 public:
                     constexpr static const std::size_t rows_amount = rows();
                     constexpr static const std::size_t gates_amount = 0;
@@ -185,7 +168,6 @@ namespace nil {
 
                         constexpr_for<0, end, 1>([&row, &output_idx, &output, &params,
                             &bp, &assignment](auto i){
-                            std::cout<<index_terms_list::terms[i].index<<std::endl;
                             using component_type = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
                                 index_terms_list::terms[i].rows_amount, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                             output[output_idx++] = component_type::generate_circuit(bp, assignment, {index_terms_list::terms[i].str_repr, 
