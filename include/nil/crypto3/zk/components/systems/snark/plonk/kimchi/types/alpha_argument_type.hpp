@@ -34,7 +34,9 @@ namespace nil {
             namespace components {
                 enum argument_type {
                     Permutation,
-                    Generic
+                    Generic,
+                    Zero,
+                    Lookup,
                 };
             }    // namespace components
         }        // namespace zk

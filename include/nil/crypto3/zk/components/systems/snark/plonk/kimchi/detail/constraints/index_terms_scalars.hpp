@@ -111,7 +111,7 @@ namespace nil {
 
                     constexpr static const std::size_t selector_seed = 0x0f27;
 
-                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+                    using index_terms_list = typename KimchiParamsType::circuit_params::index_terms_list;
 
 
                     constexpr static std::size_t rows() {

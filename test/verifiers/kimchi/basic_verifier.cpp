@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     using AssignmentTypeScalar = zk::blueprint_assignment_table<ArithmetizationTypeScalar>;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using index_terms_list = zk::components::index_terms_scalars_list<AssignmentTypeScalar>;
+    using index_terms_list = zk::components::index_terms_scalars_list_ec_test<AssignmentTypeScalar>;
     using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,

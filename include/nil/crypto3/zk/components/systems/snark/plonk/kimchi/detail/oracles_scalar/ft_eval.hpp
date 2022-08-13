@@ -116,7 +116,7 @@ namespace nil {
 
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
 
-                    using index_terms_list = zk::components::index_terms_scalars_list<ArithmetizationType>;
+                    using index_terms_list = KimchiParamsType::circuit_params::index_terms_list<ArithmetizationType>;
                     using constant_term_component = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
                                 index_terms_list::constatnt_term_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 

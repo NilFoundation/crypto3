@@ -141,6 +141,8 @@ namespace nil {
                     using verifier_index_type = kimchi_verifier_index_base<CurveType,
                         KimchiParamsType>;
 
+                    using index_terms_list = typename KimchiParamsType::circuit_params::index_terms_list;
+
                     using commitment_type = typename 
                         zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             KimchiCommitmentParamsType::shifted_commitment_split>;
@@ -222,6 +224,8 @@ namespace nil {
                             generic_comm,
                             comm_idx
                         );
+
+                        
 
                         // for term in terms:
                         // fill_shifted_commitments(params.proofs[i].comm.witness_comm,
