@@ -161,8 +161,8 @@ namespace nil {
                         // auto k_vec = sha512_component::generate_assignments(assignment, {padded}, row).output;
                         // row += sha512_component::rows_amount;
                         std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
-                            1, 1, 1, 1,
-                            1, 1, 1, 1};
+                            1, 0, 0, 0,
+                            0, 0, 0, 0};
                         for (int i = 0; i < 8; i++) {
                             assignment.witness(i)[row] = constants[i];
                         }
@@ -187,7 +187,6 @@ namespace nil {
                         typename addition_component::params_type add_params = {{A.x, A.y}, {R.x, R.y}};
                         auto res = addition_component::generate_assignments(assignment, add_params, row).output;
                         row += addition_component::rows_amount;
-
                         return result_type(component_start_row);
                     }
 
@@ -254,9 +253,9 @@ namespace nil {
                                                           std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         row += scalar_non_native_range_component::rows_amount + 2 * check_ec_point_component::rows_amount
-                        + reduction_component::rows_amount;
-                        auto S = (typename fixed_base_mult_component::result_type(row)).output;
-                        row += fixed_base_mult_component::rows_amount + variable_base_mult_component::rows_amount;
+                        + reduction_component::rows_amount + 1 + fixed_base_mult_component::rows_amount;
+                        auto S = (typename fixed_base_mult_component::result_type(row - 1 - addition_component::rows_amount)).output;
+                        row +=  variable_base_mult_component::rows_amount;
                         auto res = (typename addition_component::result_type(row)).output;
                         bp.add_copy_constraint({{S.x[0]}, {res.x[0]}});
                         bp.add_copy_constraint({{S.x[1]}, {res.x[1]}});
