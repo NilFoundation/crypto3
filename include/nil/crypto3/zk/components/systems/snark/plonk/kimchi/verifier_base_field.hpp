@@ -217,7 +217,7 @@ namespace nil {
 
                             row += transcript_type::challenge_rows;
 
-                            //get digest from transcript
+                            row += transcript_type::digest_rows;
 
                             // Oracles end
 
@@ -476,7 +476,8 @@ namespace nil {
                             var zeta = transcript.challenge_assignment(assignment, row);
                             row += transcript_type::challenge_rows;
 
-                            //get digest from transcript
+                            var digest = transcript.digest_assignment(assignment, row);
+                            row += transcript_type::digest_rows;
 
                             // Oracles end
 
@@ -688,7 +689,8 @@ namespace nil {
                             var zeta = transcript.challenge_circuit(bp, assignment, row);
                             row += transcript_type::challenge_rows;
 
-                            //get digest from transcript
+                            var digest = transcript.digest_circuit(bp, assignment, row);
+                            row += transcript_type::digest_rows;
 
                             // Oracles end
                             
