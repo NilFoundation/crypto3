@@ -218,11 +218,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
 
-    std::array<curve_type::base_field_type::value_type, proof_type::f_comm_base_size> scalars;
+    std::array<curve_type::base_field_type::value_type, kimchi_constants::f_comm_msm_size> scalars;
 
-    std::array<var, proof_type::f_comm_base_size> scalars_var;
+    std::array<var, kimchi_constants::f_comm_msm_size> scalars_var;
 
-    for (std::size_t i = 0; i < proof_type::f_comm_base_size; i++) {
+    for (std::size_t i = 0; i < kimchi_constants::f_comm_msm_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();
         public_input.push_back(scalars[i]);
         scalars_var[i] = var(0, 74 + i, false, var::column_type::public_input);

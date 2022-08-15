@@ -143,13 +143,9 @@ namespace nil {
                             prev_challenges; // to-do: get in the component from oracles
                     };
 
-                    constexpr static const std::size_t f_comm_base_size = 1 // permuation-argument
-                        + kimchi_constants::ft_generic_size // generic gate
-                        + KimchiParamsType::circuit_params::index_terms_list::size;
-
                     commitments_type comm;
                     opening_proof_type o;
-                    std::array<var, f_comm_base_size> scalars;
+                    std::array<var, kimchi_constants::f_comm_msm_size> scalars;
                 };
 
                 template<typename BlueprintFieldType,

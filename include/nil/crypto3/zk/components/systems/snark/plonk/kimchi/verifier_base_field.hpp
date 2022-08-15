@@ -111,7 +111,9 @@ namespace nil {
                     using const_mul_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
 
                     using proof_type = kimchi_proof_base<BlueprintFieldType, KimchiParamsType>;
-                    constexpr static const std::size_t f_comm_base_size = proof_type::f_comm_base_size;
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
+
+                    constexpr static const std::size_t f_comm_base_size = kimchi_constants::f_comm_msm_size;
 
                     using msm_component = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, CurveType, 
                         f_comm_base_size,
@@ -158,8 +160,6 @@ namespace nil {
                                             KimchiParamsType, KimchiCommitmentParamsType, BatchSize, W0, W1,
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
-                    
-                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
                     constexpr static const std::size_t selector_seed = 0xff91;
 
