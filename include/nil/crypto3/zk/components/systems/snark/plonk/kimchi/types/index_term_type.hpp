@@ -28,7 +28,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/column_type.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/column_type.hpp>
 
 namespace nil {
     namespace crypto3 {

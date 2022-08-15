@@ -31,7 +31,7 @@
 #include <nil/crypto3/zk/component.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/proof.hpp>
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 

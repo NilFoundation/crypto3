@@ -35,12 +35,12 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/column_type.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_term_type.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/column_type.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/index_term_type.hpp>
 
 namespace nil {
     namespace crypto3 {

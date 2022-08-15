@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/evaluation_proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>

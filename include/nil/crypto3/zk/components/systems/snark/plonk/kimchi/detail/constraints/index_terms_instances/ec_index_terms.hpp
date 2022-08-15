@@ -29,8 +29,8 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_string_literal.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/alpha_argument_type.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_term_type.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/column_type.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/index_term_type.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/column_type.hpp>
 
 namespace nil {
     namespace crypto3 {
