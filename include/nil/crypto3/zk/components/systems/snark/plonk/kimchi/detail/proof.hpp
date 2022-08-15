@@ -127,25 +127,27 @@ namespace nil {
                         zk::components::kimchi_opening_proof_base<BlueprintFieldType,
                         commitment_params_type::eval_rounds>;
 
-                    struct commitments {
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
+
+                    struct commitments_type {
                         std::array<witness_comm_type,
-                            KimchiParamsType::witness_columns> witness_comm;
-                        commitment_type lookup_runtime_comm;
-                        commitment_type table_comm;
-                        std::vector<commitment_type> lookup_sorted_comm;
-                        commitment_type lookup_agg_comm;
-                        commitment_type z_comm;
-                        commitment_type t_comm;
+                            KimchiParamsType::witness_columns> witness;
+                        commitment_type lookup_runtime;
+                        commitment_type table;
+                        std::vector<commitment_type> lookup_sorted;
+                        commitment_type lookup_agg;
+                        commitment_type z;
+                        commitment_type t;
                         std::array<commitment_type, 
                             KimchiParamsType::prev_challenges_size>
                             prev_challenges; // to-do: get in the component from oracles
                     };
 
                     constexpr static const std::size_t f_comm_base_size = 1 // permuation-argument
-                        + 5 // generic gate
-                        + KimchiParamsType::index_term_size();
+                        + kimchi_constants::ft_generic_size // generic gate
+                        + KimchiParamsType::circuit_params::index_terms_list::size;
 
-                    commitments comm;
+                    commitments_type comm;
                     opening_proof_type o;
                     std::array<var, f_comm_base_size> scalars;
                 };

@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     var cip_var = var(0, 74 + bases_size, false, var::column_type::public_input);
 
-    typename proof_type::commitments commitments = {
+    typename proof_type::commitments_type commitments = {
         {witness_comm}, lookup_runtime_comm,   table_comm, {lookup_sorted_comm}, lookup_agg_comm, z_comm,
         t_comm,         {oracles_poly_comm[0]}    // to-do: get in the component from oracles
     };
@@ -296,7 +296,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         H_var,
         {PI_G_var},
         {lagrange_bases_var},
-        {{sigma_comm}, {coefficient_comm}, generic_comm, psm_comm, {selectors_comm}, {lookup_selectors_comm}}};
+        {{sigma_comm}, {coefficient_comm}, generic_comm, psm_comm, {selectors_comm}, {lookup_selectors_comm},
+        psm_comm, // runtime_tables_selector 
+        psm_comm, // complete_add
+        psm_comm, // var_base_mmul
+        psm_comm, // endo_mul
+        psm_comm, // endo_mul_scalar
+        }};
 
     typename binding::fr_data<var, batch_size> fr_data = {
         batch_scalars_var, {cip_var}, {Pub_var}, zeta_to_srs_len_var, zeta_to_domain_size_minus_1_var};

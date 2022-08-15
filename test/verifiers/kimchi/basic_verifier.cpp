@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     var cip_var = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    typename proof_type::commitments commitments = {
+    typename proof_type::commitments_type commitments = {
         {witness_comm}, lookup_runtime_comm,   table_comm, {lookup_sorted_comm}, lookup_agg_comm, z_comm,
         t_comm,         {oracles_poly_comm[0]}    // to-do: get in the component from oracles
     };
