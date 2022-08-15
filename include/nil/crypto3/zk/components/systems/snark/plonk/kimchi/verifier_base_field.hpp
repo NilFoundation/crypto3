@@ -161,15 +161,96 @@ namespace nil {
                                                                                W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
                                                                                W12, W13, W14>;
 
+                    using transcript_type = kimchi_transcript_fq<ArithmetizationType, CurveType,
+                                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
+                                        W11, W12, W13, W14>;
+
                     constexpr static const std::size_t selector_seed = 0xff91;
 
+                    constexpr static const std::size_t rows() {
+                        std::size_t row = 0;
+
+                        row++;
+
+                        for(std::size_t i = 0; i < BatchSize; i++) {
+                            row = row + lagrange_msm_component::rows_amount;
+
+                            //Oracles
+                            row += transcript_type::init_rows;
+
+                            row += transcript_type::absorb_group_rows;
+
+                            row += KimchiParamsType::circuit_params::witness_columns 
+                                * KimchiParamsType::witness_commitment_size
+                                * transcript_type::absorb_group_rows;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    row += KimchiParamsType::lookup_runtime_commitment_size 
+                                        * transcript_type::absorb_group_rows;
+                                }
+
+                                if (KimchiParamsType::circuit_params::joint_lookup) {
+                                    row += transcript_type::challenge_rows;
+                                }
+
+                                row += KimchiParamsType::circuit_params::lookup_columns 
+                                * KimchiParamsType::lookup_sorted_commitment_size
+                                * transcript_type::absorb_group_rows;
+                            }
+
+                            row += transcript_type::challenge_rows;
+                            row += transcript_type::challenge_rows;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                row += KimchiParamsType::lookup_aggregated_commitment_size 
+                                    * transcript_type::absorb_group_rows;
+                            }
+
+                            row += KimchiParamsType::z_commitment_size 
+                                    * transcript_type::absorb_group_rows;
+
+                            row += transcript_type::challenge_rows;
+
+                            row += KimchiParamsType::t_commitment_size 
+                                    * transcript_type::absorb_group_rows;
+
+                            row += transcript_type::challenge_rows;
+
+                            //get digest from transcript
+
+                            // Oracles end
+
+                            // f_comm
+                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
+                                row+= msm_component::rows_amount;
+                            }
+                            row++;
+
+                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
+                                row+=scalar_mul_component::rows_amount;
+                                row+=add_component::rows_amount;
+                            }
+
+                            for(std::size_t j = 0; j < KimchiParamsType::t_commitment_size; j++) {
+                                row+=scalar_mul_component::rows_amount;
+                                row+=add_component::rows_amount;
+                            }
+                            row+=scalar_mul_component::rows_amount;
+                            row+=const_mul_component::rows_amount;
+
+                            row+=add_component::rows_amount;
+                        }
+
+                        row += batch_verify_component::rows_amount;
+
+                        row += map_fq_component::rows_amount;
+
+                        return row;
+                    }
+
                 public:
-                    constexpr static const std::size_t rows_amount = (1 + (2 + 2*KimchiCommitmentParamsType::shifted_commitment_split) * (scalar_mul_component::rows_amount + add_component::rows_amount) 
-                        + (KimchiCommitmentParamsType::shifted_commitment_split + 1) * msm_component::rows_amount + 
-                        lagrange_msm_component::rows_amount + 2 * const_mul_component::rows_amount 
-                        ) * BatchSize
-                        + batch_verify_component::rows_amount
-                        + map_fq_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = rows();
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -183,7 +264,7 @@ namespace nil {
 
                     struct result_type {
 
-                        result_type(std::size_t component_start_row) {
+                        result_type(std::size_t start_row_index) {
                         }
                     };
 
@@ -313,54 +394,91 @@ namespace nil {
 
                     static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                             const params_type &params,
-                                                            std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
+                                                            std::size_t start_row_index) {
+                        std::size_t row = start_row_index;
                         std::array<batch_proof_type, BatchSize> batch_proofs;
+                        var zero(0, row, false, var::column_type::constant);
+                        row++;
 
                         for(std::size_t i = 0; i < BatchSize; i++) {
 
+                            // p_comm is always the commitment of size 1
                             auto p_comm_unshifted = lagrange_msm_component::generate_assignments(assignment, 
-                                {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row);
+                                {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).sum;
                             row = row + lagrange_msm_component::rows_amount;
 
                             //Oracles
-                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[0], row);
-                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[1], row);
-                            /* for(std::size_t j = 0-; j < params.proofs[i].comm.witness.size(); j ++) {
-                                for(std::size_t k = 0; k < params.proofs[i].comm.witness[j].parts[k].size(); k++) {
-                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.witness[j].parts[k], row);
+                            transcript_type transcript;
+                            transcript.init_assignment(assignment, zero, row);
+                            row += transcript_type::init_rows;
+
+                            transcript.absorb_g_assignment(assignment, p_comm_unshifted, row);
+                            row += transcript_type::absorb_group_rows;
+                            
+                            for(std::size_t j = 0; j < params.proofs[i].comm.witness.size(); j++) {
+                                for(std::size_t k = 0; k < params.proofs[i].comm.witness[j].parts.size(); k++) {
+                                    transcript.absorb_g_assignment(assignment, params.proofs[i].comm.witness[j].parts[k], row);
+                                    row += transcript_type::absorb_group_rows;
                                 }
                             } 
-                            */
-                            //joint_combiner = transcript.squeeze().to_field() add to public input
-                            //for(std::size_t k = 0; k < params.proofs[i].comm.lookup_runtime[j].parts[k].size(); k++) {
-                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.lookup_runtime.parts[k], row);
-                            //}
-                            /* for(std::size_t j = 0-; j < n_wires; j ++) {
-                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_sorted.parts[k].size(); k++) {
-                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_sorted_comm[j].parts[k], row);
+
+                            var joint_combiner;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    for(std::size_t k = 0; k < params.proofs[i].comm.lookup_runtime.parts.size(); k++) {
+                                        transcript.absorb_g_assignment(assignment, params.proofs[i].comm.lookup_runtime.parts[k], row);
+                                        row += transcript_type::absorb_group_rows;
+                                    }
                                 }
-                            } 
-                            */
-                           //  auto beta, gamma = transcript.squeeze()
-                           /*
-                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_agg.parts[k].size(); k++) {
-                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_agg_comm[j].parts[k], row);
 
-                            } 
-                            */
-                            //for(std::size_t k = 0; k < params.proofs[i].comm.z.parts[k].size(); k++) {
-                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.z.parts[k], row);
-                            //}
-                            // auto alfa = transcript.squeeze(). to_field();
+                                if (KimchiParamsType::circuit_params::joint_lookup) {
+                                    joint_combiner = transcript.challenge_assignment(assignment, row);
+                                    row += transcript_type::challenge_rows;
+                                } else {
+                                    joint_combiner = zero;
+                                }
 
-                            //for(std::size_t k = 0; k < permuts; k++) {
-                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.t.parts[k], row);
-                            //}
+                                for (std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++) {
+                                    for(std::size_t k = 0; k < params.proofs[i].comm.lookup_sorted[j].parts.size(); k++) {
+                                        transcript.absorb_g_assignment(assignment, params.proofs[i].comm.lookup_sorted[j].parts[k], row);
+                                        row += transcript_type::absorb_group_rows;
+                                    }
+                                }
+                            }
 
-                            // auto zeta = transcript.squeeze(). to_field();
+                            var beta = transcript.challenge_assignment(assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            var gamma = transcript.challenge_assignment(assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_agg.parts.size(); k++) {
+                                    transcript.absorb_g_assignment(assignment, params.proofs[i].comm.lookup_agg.parts[k], row);
+                                    row += transcript_type::absorb_group_rows;
+                                }
+                            }
+
+                            for(std::size_t k = 0; k < params.proofs[i].comm.z.parts.size(); k++) {
+                                transcript.absorb_g_assignment(assignment, params.proofs[i].comm.z.parts[k], row);
+                                row += transcript_type::absorb_group_rows;
+                            }
+
+                            var alpha = transcript.challenge_assignment(assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            for(std::size_t k = 0; k < params.proofs[i].comm.t.parts.size(); k++) {
+                                transcript.absorb_g_assignment(assignment, params.proofs[i].comm.t.parts[k], row);
+                                row += transcript_type::absorb_group_rows;
+                            }
+
+                            var zeta = transcript.challenge_assignment(assignment, row);
+                            row += transcript_type::challenge_rows;
+
                             //get digest from transcript
 
+                            // Oracles end
 
                             // f_comm
                             std::array<std::vector<var_ec_point>, f_comm_base_size>
@@ -439,7 +557,7 @@ namespace nil {
                             }
 
                             //commitment_type p_comm = {none, p_comm_unshifted};
-                            commitment_type p_comm = {{{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
+                            commitment_type p_comm = {{{p_comm_unshifted.X, p_comm_unshifted.Y}}};
                             evaluations[eval_idx++] = p_comm;
                             evaluations[eval_idx++] = ft_comm;
                             evaluations[eval_idx++] = params.proofs[i].comm.z;
@@ -477,7 +595,9 @@ namespace nil {
                         map_fq_component::generate_assignments(assignment,
                             {params.fq_data, fq_data_recalculated}, row);
                         row += map_fq_component::rows_amount;
-                        return result_type(component_start_row);
+
+                        assert(row == start_row_index + rows_amount);
+                        return result_type(start_row_index);
                     }
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
@@ -485,56 +605,92 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index){
 
-                        auto selector_iterator = assignment.find_selector(selector_seed);
-                        std::size_t first_selector_index;
-                        if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
+                        generate_assignments_constant(assignment, params, start_row_index);
+                        
                         std::size_t row = start_row_index;
+                        var zero(0, row, false, var::column_type::constant);
+                        row++;
+
                         std::array<batch_proof_type, BatchSize> batch_proofs;
                         for(std::size_t i = 0; i < BatchSize; i++) {
                             auto p_comm_unshifted = lagrange_msm_component::generate_circuit(bp, assignment,
-                                 {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row);
+                                 {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).sum;
                             row = row + lagrange_msm_component::rows_amount;
-                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[0], row);
-                            //params.proofs[i].transcript.absorb_assignment(assignment, neg_res[1], row);
-                            /* for(std::size_t j = 0-; j < params.proofs[i].comm.witness.size(); j ++) {
-                                for(std::size_t k = 0; k < params.proofs[i].comm.witness[j].parts[k].size(); k++) {
-                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.witness[j].parts[k], row);
+
+                            std::size_t row_tmp = row;
+                            
+                            // Oracles
+                            transcript_type transcript;
+                            transcript.init_circuit(bp, assignment, zero, row);
+                            row += transcript_type::init_rows;
+
+                            transcript.absorb_g_circuit(bp, assignment, p_comm_unshifted, row);
+                            row += transcript_type::absorb_group_rows;
+                            
+                            for(std::size_t j = 0; j < params.proofs[i].comm.witness.size(); j++) {
+                                for(std::size_t k = 0; k < params.proofs[i].comm.witness[j].parts.size(); k++) {
+                                    transcript.absorb_g_circuit(bp, assignment, params.proofs[i].comm.witness[j].parts[k], row);
+                                    row += transcript_type::absorb_group_rows;
                                 }
                             } 
-                            */
-                            //joint_combiner = transcript.squeeze().to_field() add to public input
-                            //for(std::size_t k = 0; k < params.proofs[i].comm.lookup_runtime[j].parts[k].size(); k++) {
-                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.lookup_runtime.parts[k], row);
-                            //}
-                            /* for(std::size_t j = 0-; j < n_wires; j ++) {
-                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_sorted.parts[k].size(); k++) {
-                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_sorted_comm[j].parts[k], row);
+
+                            var joint_combiner;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    for(std::size_t k = 0; k < params.proofs[i].comm.lookup_runtime.parts.size(); k++) {
+                                        transcript.absorb_g_circuit(bp, assignment, params.proofs[i].comm.lookup_runtime.parts[k], row);
+                                        row += transcript_type::absorb_group_rows;
+                                    }
                                 }
-                            } 
-                            */
-                           //  auto beta, gamma = transcript.squeeze()
-                           /*
-                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_agg.parts[k].size(); k++) {
-                                    params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].lookup_agg_comm[j].parts[k], row);
 
-                            } 
-                            */
-                            //for(std::size_t k = 0; k < params.proofs[i].comm.z.parts[k].size(); k++) {
-                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.z.parts[k], row);
-                            //}
-                            // auto alfa = transcript.squeeze(). to_field();
+                                if (KimchiParamsType::circuit_params::joint_lookup) {
+                                    joint_combiner = transcript.challenge_circuit(bp, assignment, row);
+                                    row += transcript_type::challenge_rows;
+                                } else {
+                                    joint_combiner = zero;
+                                }
 
-                            //for(std::size_t k = 0; k < permuts; k++) {
-                            // params.proofs[i].transcript.absorb_assignment(assignment, params.proofs[i].comm.t.parts[k], row);
-                            //}
+                                for (std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++) {
+                                    for(std::size_t k = 0; k < params.proofs[i].comm.lookup_sorted[j].parts.size(); k++) {
+                                        transcript.absorb_g_circuit(bp, assignment, params.proofs[i].comm.lookup_sorted[j].parts[k], row);
+                                        row += transcript_type::absorb_group_rows;
+                                    }
+                                }
+                            }
 
-                            // auto zeta = transcript.squeeze(). to_field();
+                            var beta = transcript.challenge_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            var gamma = transcript.challenge_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                for(std::size_t k = 0; k < params.proofs[i].comm.lookup_agg.parts.size(); k++) {
+                                    transcript.absorb_g_circuit(bp, assignment, params.proofs[i].comm.lookup_agg.parts[k], row);
+                                    row += transcript_type::absorb_group_rows;
+                                }
+                            }
+
+                            for(std::size_t k = 0; k < params.proofs[i].comm.z.parts.size(); k++) {
+                                transcript.absorb_g_circuit(bp, assignment, params.proofs[i].comm.z.parts[k], row);
+                                row += transcript_type::absorb_group_rows;
+                            }
+
+                            var alpha = transcript.challenge_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            for(std::size_t k = 0; k < params.proofs[i].comm.t.parts.size(); k++) {
+                                transcript.absorb_g_circuit(bp, assignment, params.proofs[i].comm.t.parts[k], row);
+                                row += transcript_type::absorb_group_rows;
+                            }
+
+                            var zeta = transcript.challenge_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
+
                             //get digest from transcript
+
+                            // Oracles end
                             
                             std::array<std::vector<var_ec_point>, f_comm_base_size>
                                 unshifted_commitments = prepare_f_comm(params, i);
@@ -611,7 +767,7 @@ namespace nil {
                                 evaluations[eval_idx++] = chal;
                             }
                             //commitment_type p_comm = {none, p_comm_unshifted};
-                            commitment_type p_comm = {{{p_comm_unshifted.sum.X, p_comm_unshifted.sum.Y}}};
+                            commitment_type p_comm = {{{p_comm_unshifted.X, p_comm_unshifted.Y}}};
                             evaluations[eval_idx++] = p_comm;
                             evaluations[eval_idx++] = ft_comm;
                             evaluations[eval_idx++] = params.proofs[i].comm.z;
@@ -647,19 +803,13 @@ namespace nil {
                         map_fq_component::generate_circuit(bp, assignment,
                             {params.fq_data, fq_data_recalculated}, row);
                         row += map_fq_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
                         
                         return result_type(start_row_index);
                     }
 
                 private:
-
-                    static void generate_gates(
-                        blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                        const params_type &params,
-                        const std::size_t first_selector_index) {
-                        
-                    }
 
                     static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
@@ -667,6 +817,15 @@ namespace nil {
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
+                    }
+
+                    static void
+                        generate_assignments_constant(
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t start_row_index) {
+                            std::size_t row = start_row_index;
+                            assignment.constant(0)[row] = 0;
                     }
                 };
 

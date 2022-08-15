@@ -52,18 +52,24 @@ namespace nil {
                     constexpr static std::size_t witness_columns = CircuitDescriptionType::witness_columns;
                     constexpr static std::size_t permut_size = CircuitDescriptionType::permut_size;
 
-                    constexpr static bool use_lookup = CircuitDescriptionType::lookup_columns > 0;
+                    constexpr static bool use_lookup = CircuitDescriptionType::use_lookup;
 
                     constexpr static std::size_t eval_points_amount = 2;
                     constexpr static std::size_t scalar_challenge_size = 128;
 
                     constexpr static std::size_t prev_challenges_size = PrevChalSize;
 
-                    constexpr static std::size_t lookup_comm_size = 0;
+                    constexpr static std::size_t lookup_comm_size = 0; // TODO: 
                     constexpr static std::size_t index_term_size() {
                         return circuit_params::index_terms_list::size;
                     }
 
+                    constexpr static std::size_t witness_commitment_size = 1;
+                    constexpr static std::size_t z_commitment_size = 1;
+                    constexpr static std::size_t t_commitment_size = 1;
+                    constexpr static std::size_t lookup_runtime_commitment_size = 1;
+                    constexpr static std::size_t lookup_sorted_commitment_size = 1;
+                    constexpr static std::size_t lookup_aggregated_commitment_size = 1;
                 };
             }    // namespace components
         }        // namespace zk
