@@ -250,7 +250,7 @@ namespace nil {
                             assignment.witness(W6)[i + 2] = sigma0_chunks[0][4];
                             assignment.witness(W7)[i + 2] = message_scheduling_words[(i - row) / 6 + 9];
                             assignment.witness(W8)[i + 2] = message_scheduling_words[(i - row) / 6];
-                            
+
                             typename CurveType::base_field_type::integral_type integral_b =
                                 typename CurveType::base_field_type::integral_type(
                                     message_scheduling_words[(i - row) / 6 + 14].data);
@@ -310,7 +310,7 @@ namespace nil {
                                 typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
                             assignment.witness(W5)[i + 3] = message_scheduling_words[(i - row) / 6 + 16];
                             assignment.witness(W6)[i + 3] = (sum - message_scheduling_words[(i - row) / 6 + 16]) / 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data); 
                         }
                         row = row + 384;
                         for (std::size_t i = row; i < row + 720; i = i + 9) {
@@ -364,9 +364,9 @@ namespace nil {
                             assignment.witness(W4)[i + 2] = Sigma1_chunks[0][4];
                             typename CurveType::base_field_type::integral_type Sigma1 =
                                 Sigma1_chunks[0][0] + Sigma1_chunks[0][1] * (1 << (sigma_sizes[0])) +
-                                Sigma1_chunks[0][2] * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                                Sigma1_chunks[0][3] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
-                                Sigma1_chunks[0][4] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
+                                Sigma1_chunks[0][2] * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                                Sigma1_chunks[0][3] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
+                                Sigma1_chunks[0][4] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
 
 
                             sparse_values[4] = typename CurveType::base_field_type::integral_type((e_chunks[1][0] + 
@@ -460,9 +460,9 @@ namespace nil {
 
                             typename CurveType::base_field_type::integral_type Sigma0 =
                                 Sigma0_chunks[0][0] + Sigma0_chunks[0][1] * (1 << sigma_sizes[0]) +
-                                Sigma0_chunks[0][2] * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                                Sigma0_chunks[0][3] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
-                                Sigma0_chunks[0][4] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
+                                Sigma0_chunks[0][2] * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                                Sigma0_chunks[0][3] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
+                                Sigma0_chunks[0][4] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
 
                             sparse_values[0] = typename CurveType::base_field_type::integral_type((a_chunks[1][0] + a_chunks[1][1] * base4_value.pow(a_sizes[0]) +
                                                a_chunks[1][2] * base4_value.pow(a_sizes[0] + a_sizes[1]) +
@@ -695,9 +695,9 @@ namespace nil {
                         var(W1, +1) -
                         (var(W8, 0) + var(W0, +1) +
                         var(W0, -1) + var(W1, -1) * (1 << (sigma_sizes[0])) +
-                        var(W2, -1) * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                        var(W3, -1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
-                        var(W4, -1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) + 
+                        var(W2, -1) * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                        var(W3, -1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
+                        var(W4, -1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) + 
                         var(W2, 0) + var(W3, 0) * (1 << 16) +
                         var(W4, 0) * (one << 32) + var(W5, 0) * (one << 48) +
                         var(W0, 0, true, var::column_type::constant)));
@@ -713,9 +713,9 @@ namespace nil {
                             var(W7, 0) + m*var(W8, 0)-
                             (var(W1, -1) + 
                             var(W0, +1) + var(W1, +1) * (1 << sigma_sizes[0]) +
-                            var(W2, +1) * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                            var(W3, +1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
-                            var(W4, +1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) +
+                            var(W2, +1) * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                            var(W3, +1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
+                            var(W4, +1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) +
                              var(W2, 0) + var(W3, 0) * (1 << 16) +
                              var(W4, 0) * (one << 32) + var(W5, 0) * (one << 48)));
                         auto constraint_5 = bp.add_constraint((var(W8, 0) - 6) * (var(W8, 0) - 5) *
