@@ -39,8 +39,6 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zk_w3.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/alpha_argument_type.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_instances/ec_index_terms.hpp>
-
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {

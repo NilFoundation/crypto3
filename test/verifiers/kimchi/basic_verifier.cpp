@@ -52,7 +52,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_instances/ec_index_terms.hpp>
+#include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
