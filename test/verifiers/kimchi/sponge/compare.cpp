@@ -68,15 +68,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
     
     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
-    typename BlueprintFieldType::value_type value = nil::crypto3::algebra::random_element<BlueprintFieldType>();
+    typename BlueprintFieldType::value_type value = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000002_cppui255;
     std::vector<typename BlueprintFieldType::value_type> public_input = {value};
     typename BlueprintFieldType::value_type result = 0;
     if (value < 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255) {
         result = 1;
     }
+    std::cout<<result.data<<std::endl;
 
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
+            std::cout<<assignment.var_value(real_res.output).data<<std::endl;
         assert(result == assignment.var_value(real_res.output));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
