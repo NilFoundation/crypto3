@@ -122,7 +122,7 @@ namespace nil {
                         };
                         signature e;
                         var_ec_point public_key;
-                        var M;
+                        std::array<var, 4> M;
                     };
 
                     //TODO: check if points R and public_key lie on the curve
@@ -144,7 +144,7 @@ namespace nil {
                         var s = params.e.s;
                         auto R = params.e.R;
                         auto pk = params.public_key;
-                        var M = params.M;
+                        std::array<var, 4> M = params.M;
 
                         /* here we check if s lies in range */
                         scalar_non_native_range_component::generate_assignments(assignment, {s}, row);
@@ -199,7 +199,7 @@ namespace nil {
                         var s = params.e.s;
                         auto R = params.e.R;
                         auto pk = params.public_key;
-                        var M = params.M;
+                        std::array<var, 4> M = params.M;
 
                         /* here we check if s lies in range */
                         scalar_non_native_range_component::generate_circuit(bp, assignment, {s}, row);
