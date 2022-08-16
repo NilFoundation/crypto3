@@ -221,11 +221,9 @@ namespace nil {
 
                             // Oracles end
 
-                            // f_comm
                             for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
                                 row+= msm_component::rows_amount;
                             }
-                            row++;
 
                             for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
                                 row+=scalar_mul_component::rows_amount;
@@ -483,72 +481,77 @@ namespace nil {
 
                             // f_comm
                             std::array<std::vector<var_ec_point>, f_comm_base_size>
-                                unshifted_commitments = prepare_f_comm(params, i);
+                                f_comm_bases = prepare_f_comm(params, i);
 
-                            // TODO: U = zero()
-                            typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = 
-                                algebra::random_element<typename CurveType::template g1_type<algebra::curves::coordinates::affine>>();
-                            assignment.witness(W0)[row] = U.X;
-                            assignment.witness(W1)[row] = U.Y;
-                            std::size_t urow = row;
                             std::array<var_ec_point, 
-                                KimchiCommitmentParamsType::max_comm_size> shifted_commitment_type_unshifted; 
+                                KimchiCommitmentParamsType::max_comm_size> f_comm; 
                             for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
-                                std::array<var_ec_point, f_comm_base_size> part_unshifted_commitments;
-                                std::array<var, f_comm_base_size> part_scalars;
+                                std::array<var_ec_point, f_comm_base_size> bases;
+                                std::array<var, f_comm_base_size> scalars;
                                 for (std::size_t k = 0; k < f_comm_base_size; k++) {
-                                    if (j < unshifted_commitments[k].size()) {
-                                        part_unshifted_commitments[k] = unshifted_commitments[k][j];
-                                        part_scalars[k] = params.proofs[i].scalars[k];
+                                    if (j < f_comm_bases[k].size()) {
+                                        bases[k] = f_comm_bases[k][j];
+                                        scalars[k] = params.proofs[i].scalars[k];
+                                    } else {
+                                        bases[k] = {zero, zero};
+                                        scalars[k] = zero;
                                     }
                                 }
-                                auto res = msm_component::generate_assignments(assignment, {part_scalars, part_unshifted_commitments}, row);
-                                shifted_commitment_type_unshifted[j] = {res.sum.X, res.sum.Y};
-                                row+= msm_component::rows_amount;
+                                auto res = msm_component::generate_assignments(assignment, {scalars, bases}, row);
+                                f_comm[j] = {res.sum.X, res.sum.Y};
+                                row += msm_component::rows_amount;
                             }
-                            var_ec_point chunked_shifted_commitment_type_unshifted = {var(0, urow, false), var(1, urow, false)};
-                            row++;
 
-                            for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
+                            // chuncked_f_comm
+                            var_ec_point chuncked_f_comm = {zero, zero};
+
+                            for(std::size_t j = 0; j < f_comm.size(); j ++) {
                                 auto res0 = scalar_mul_component::generate_assignments(assignment, 
-                                    {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, 
+                                    {{chuncked_f_comm.X, chuncked_f_comm.Y}, 
                                     params.fr_data.zeta_to_srs_len[i]}, row);
-                                row+=scalar_mul_component::rows_amount;
-                                chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
+                                row += scalar_mul_component::rows_amount;
                                 auto res1 = add_component::generate_assignments(assignment,
-                                    {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y},
-                                    {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
-                                row+=add_component::rows_amount;
-                                chunked_shifted_commitment_type_unshifted = {res1.X, res1.Y};
+                                    {{res0.X, res0.Y}, {f_comm[j].X, f_comm[j].Y}}, row);
+                                row += add_component::rows_amount;
+                                chuncked_f_comm = {res1.X, res1.Y};
 
                             }
 
-                            var_ec_point chunked_t_comm_unshifted = {var(0, urow, false), var(1, urow, false)};;
+                            // chunked_t_comm
+                            var_ec_point chunked_t_comm = {zero, zero};;
                             for(std::size_t j = 0; j < params.proofs[i].comm.t.parts.size(); j++) {
                                 auto res0 = scalar_mul_component::generate_assignments(assignment, 
-                                    {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y}, 
+                                    {{chunked_t_comm.X, chunked_t_comm.Y}, 
                                     params.fr_data.zeta_to_srs_len[i]}, row);
-                                row+=scalar_mul_component::rows_amount;
-                                chunked_t_comm_unshifted = {res0.X, res0.Y};
-                                auto res1 = add_component::generate_assignments(assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
+                                row += scalar_mul_component::rows_amount;
+
+                                auto res1 = add_component::generate_assignments(assignment, {{res0.X, res0.Y},
                                  {params.proofs[i].comm.t.parts[j].X, params.proofs[i].comm.t.parts[j].Y}}, row);
-                                row+=add_component::rows_amount;
-                                chunked_t_comm_unshifted = {res1.X, res1.Y};
+                                row += add_component::rows_amount;
+                                chunked_t_comm = {res1.X, res1.Y};
                             }
-                            auto chunk_res_unshifted = scalar_mul_component::generate_assignments(assignment, 
-                            {{ chunked_t_comm_unshifted.X,  chunked_t_comm_unshifted.Y}, params.fr_data.zeta_to_domain_size_minus_1}, row);
-                            row+=scalar_mul_component::rows_amount;
+
+                            // ft_comm
+                            
+                            auto scaled_t_comm = scalar_mul_component::generate_assignments(assignment, 
+                            {{ chunked_t_comm.X,  chunked_t_comm.Y}, params.fr_data.zeta_to_domain_size_minus_1}, row);
+                            row += scalar_mul_component::rows_amount;
+
                             typename BlueprintFieldType::value_type minus_1 = -1;
-                            auto const_res_unshifted = const_mul_component::generate_assignments(assignment, 
-                            {chunk_res_unshifted.Y, minus_1}, row);
-                            row+=const_mul_component::rows_amount;
-                            chunked_t_comm_unshifted = {chunk_res_unshifted.X, const_res_unshifted.output};
+                            var const_res_unshifted = const_mul_component::generate_assignments(assignment, 
+                            {scaled_t_comm.Y, minus_1}, row).output;
+                            row += const_mul_component::rows_amount;
+                            
+                            var_ec_point neg_scaled_t_comm = {scaled_t_comm.X, const_res_unshifted};
 
-                            auto ft_comm_unshifted = add_component::generate_assignments(assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}}, row);
+                            auto ft_comm_part = add_component::generate_assignments(assignment, {{neg_scaled_t_comm.X, neg_scaled_t_comm.Y},
+                                 {chuncked_f_comm.X, chuncked_f_comm.Y}}, row);
                             row+=add_component::rows_amount;
-                            commitment_type ft_comm = {{{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
+                            commitment_type ft_comm = {{{ft_comm_part.X, ft_comm_part.Y}}};
 
+                            
+                            // evaluations
+                            
                             std::array<commitment_type,
                                 kimchi_constants::evaluations_in_batch_size> evaluations;
                             std::size_t eval_idx = 0;
@@ -695,72 +698,75 @@ namespace nil {
                             // Oracles end
                             
                             std::array<std::vector<var_ec_point>, f_comm_base_size>
-                                unshifted_commitments = prepare_f_comm(params, i);
-                                
-                            //to-do: U = zero()
-                            std::size_t urow = row;
-                            std::array<var_ec_point,
-                                KimchiCommitmentParamsType::max_comm_size> shifted_commitment_type_unshifted; 
+                                f_comm_bases = prepare_f_comm(params, i);
+
+                            std::array<var_ec_point, 
+                                KimchiCommitmentParamsType::max_comm_size> f_comm; 
                             for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
-                                std::array<var_ec_point, f_comm_base_size> part_unshifted_commitments;
-                                std::array<var, f_comm_base_size> part_scalars;
+                                std::array<var_ec_point, f_comm_base_size> bases;
+                                std::array<var, f_comm_base_size> scalars;
                                 for (std::size_t k = 0; k < f_comm_base_size; k++) {
-                                    if (j < unshifted_commitments[k].size()) {
-                                        part_unshifted_commitments[k] = unshifted_commitments[k][j];
-                                        part_scalars[k] = params.proofs[i].scalars[k];
+                                    if (j < f_comm_bases[k].size()) {
+                                        bases[k] = f_comm_bases[k][j];
+                                        scalars[k] = params.proofs[i].scalars[k];
+                                    } else {
+                                        bases[k] = {zero, zero};
+                                        scalars[k] = zero;
                                     }
                                 }
-                                auto res = msm_component::generate_circuit(bp, assignment, {part_scalars, part_unshifted_commitments}, row);
-                                shifted_commitment_type_unshifted[j] = {res.sum.X, res.sum.Y};
+                                auto res = msm_component::generate_circuit(bp, assignment, {scalars, bases}, row);
+                                f_comm[j] = {res.sum.X, res.sum.Y};
                                 row += msm_component::rows_amount;
                             }
-                            var_ec_point chunked_shifted_commitment_type_unshifted = {var(0, urow, false), var(1, urow, false)};
-                            row++;
 
-                            for(std::size_t j = 0; j < shifted_commitment_type_unshifted.size(); j ++) {
-                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment,
-                                    {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y},
+                            // chuncked_f_comm
+                            var_ec_point chuncked_f_comm = {zero, zero};
+
+                            for(std::size_t j = 0; j < f_comm.size(); j ++) {
+                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, 
+                                    {{chuncked_f_comm.X, chuncked_f_comm.Y}, 
                                     params.fr_data.zeta_to_srs_len[i]}, row);
-                                row+=scalar_mul_component::rows_amount;
-                                chunked_shifted_commitment_type_unshifted = {res0.X, res0.Y};
-                                zk::components::generate_circuit<add_component>(bp, assignment, 
-                                {{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
-                                typename add_component::result_type res1({{chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}, {shifted_commitment_type_unshifted[j].X, shifted_commitment_type_unshifted[j].Y}}, row);
-                                row+=add_component::rows_amount;
-                                chunked_shifted_commitment_type_unshifted = {res1.X, res1.Y};
+                                row += scalar_mul_component::rows_amount;
+                                auto res1 = zk::components::generate_circuit<add_component>(bp, assignment,
+                                    {{res0.X, res0.Y}, {f_comm[j].X, f_comm[j].Y}}, row);
+                                row += add_component::rows_amount;
+                                chuncked_f_comm = {res1.X, res1.Y};
 
                             }
 
-                            var_ec_point chunked_t_comm_unshifted = {var(0, urow, false), var(1, urow, false)};;
+                            // chunked_t_comm
+                            var_ec_point chunked_t_comm = {zero, zero};;
                             for(std::size_t j = 0; j < params.proofs[i].comm.t.parts.size(); j++) {
-                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment,
-                                    {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
+                                auto res0 = scalar_mul_component::generate_circuit(bp, assignment, 
+                                    {{chunked_t_comm.X, chunked_t_comm.Y}, 
                                     params.fr_data.zeta_to_srs_len[i]}, row);
-                                row+=scalar_mul_component::rows_amount;
-                                chunked_t_comm_unshifted = {res0.X, res0.Y};
-                                zk::components::generate_circuit<add_component>(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {params.proofs[i].comm.t.parts[j].X, params.proofs[i].comm.t.parts[j].Y}}, row);
-                                typename add_component::result_type res1({{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {params.proofs[i].comm.t.parts[j].X, params.proofs[i].comm.t.parts[j].Y}}, row);
-                                row+=add_component::rows_amount;
-                                chunked_t_comm_unshifted = {res1.X, res1.Y};
-                            }
-                            auto chunk_res_unshifted = scalar_mul_component::generate_circuit(bp, assignment, 
-                            {{ chunked_t_comm_unshifted.X,  chunked_t_comm_unshifted.Y}, params.fr_data.zeta_to_domain_size_minus_1}, row);
-                            row+=scalar_mul_component::rows_amount;
-                            typename BlueprintFieldType::value_type minus_1 = -1;
-                            zk::components::generate_circuit<const_mul_component>(bp, assignment, 
-                            {chunk_res_unshifted.Y, minus_1}, row);
-                            typename const_mul_component::result_type const_res_unshifted({chunk_res_unshifted.Y, minus_1}, row);
-                            row+=const_mul_component::rows_amount;
-                            chunked_t_comm_unshifted = {chunk_res_unshifted.X, const_res_unshifted.output};
+                                row += scalar_mul_component::rows_amount;
 
-                            zk::components::generate_circuit<add_component>(bp, assignment, {{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}}, row);
-                                typename add_component::result_type ft_comm_unshifted({{chunked_t_comm_unshifted.X, chunked_t_comm_unshifted.Y},
-                                 {chunked_shifted_commitment_type_unshifted.X, chunked_shifted_commitment_type_unshifted.Y}}, row);
+                                auto res1 = zk::components::generate_circuit<add_component>(bp, assignment, {{res0.X, res0.Y},
+                                 {params.proofs[i].comm.t.parts[j].X, params.proofs[i].comm.t.parts[j].Y}}, row);
+                                row += add_component::rows_amount;
+                                chunked_t_comm = {res1.X, res1.Y};
+                            }
+
+                            // ft_comm
+                            
+                            auto scaled_t_comm = scalar_mul_component::generate_circuit(bp, assignment, 
+                            {{ chunked_t_comm.X,  chunked_t_comm.Y}, params.fr_data.zeta_to_domain_size_minus_1}, row);
+                            row += scalar_mul_component::rows_amount;
+
+                            typename BlueprintFieldType::value_type minus_1 = -1;
+                            var const_res_unshifted = zk::components::generate_circuit<const_mul_component>(bp, assignment, 
+                            {scaled_t_comm.Y, minus_1}, row).output;
+                            row += const_mul_component::rows_amount;
+                            
+                            var_ec_point neg_scaled_t_comm = {scaled_t_comm.X, const_res_unshifted};
+
+                            auto ft_comm_part = zk::components::generate_circuit<add_component>(bp, assignment, {{neg_scaled_t_comm.X, neg_scaled_t_comm.Y},
+                                 {chuncked_f_comm.X, chuncked_f_comm.Y}}, row);
                             row+=add_component::rows_amount;
-                            commitment_type ft_comm = {{{ft_comm_unshifted.X, ft_comm_unshifted.Y}}};
+                            commitment_type ft_comm = {{{ft_comm_part.X, ft_comm_part.Y}}};
+
+                            // evaluations
 
                             std::array<commitment_type,
                                 kimchi_constants::evaluations_in_batch_size> evaluations;
