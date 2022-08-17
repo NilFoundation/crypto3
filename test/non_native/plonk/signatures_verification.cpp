@@ -85,12 +85,18 @@ BOOST_AUTO_TEST_CASE(blueprint_signatures_verification) {
     typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
     std::array<signature, k> Signatures;
     std::array<var_ec_point, k> Public_keys;
+    std::array<ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type, k> Signatures_point;
+    std::array<ed25519_type::scalar_field_type::value_type, k> Signatures_scalar;
+    std::array<ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type, k> Public_keys_values;
     for(std::size_t i = 0; i < k; i++) {
         ed25519_type::scalar_field_type::value_type r = algebra::random_element<ed25519_type::scalar_field_type>();
         ed25519_type::scalar_field_type::value_type c = algebra::random_element<ed25519_type::scalar_field_type>();
         ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type R = r*B;
+        Signatures_point[i] = R;
         ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type P = c*B;
+        Public_keys_values[i] = P;
         ed25519_type::scalar_field_type::value_type s = r + c;
+        Signatures_scalar[i] = s;
         ed25519_type::base_field_type::integral_type Rx = ed25519_type::base_field_type::integral_type(R.X.data);
         ed25519_type::base_field_type::integral_type Ry = ed25519_type::base_field_type::integral_type(R.Y.data);
         ed25519_type::base_field_type::integral_type Px = ed25519_type::base_field_type::integral_type(P.X.data);
