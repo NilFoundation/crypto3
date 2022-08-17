@@ -37,7 +37,6 @@
 
 #include <array>
 #include <vector>
-#include <optional>
 
 namespace nil {
     namespace crypto3 {
@@ -45,13 +44,13 @@ namespace nil {
             namespace snark {
                 template<typename CurveType, std::size_t WiresAmount = kimchi_constant::COLUMNS, std::size_t Permuts = kimchi_constant::PERMUTES>
                 struct verifier_index {
-                    typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
-                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
+                    typedef commitments::kimchi_pedersen<typename CurveType> commitment_scheme;
+                    typedef commitment_scheme::commitment_type commitment_type;
                     using curve_type = CurveType;
                     using scalar_field_type = typename CurveType::scalar_field_type;
                     using base_field_type = typename CurveType::base_field_type;
 
-                    basic_radix2_domain<scalar_field_type> domain;
+                    math::basic_radix2_domain<scalar_field_type> domain;
                     size_t max_poly_size;
                     size_t max_quot_size;
                     commitment_scheme::params_type srs;
@@ -67,8 +66,8 @@ namespace nil {
                     commitment_type emul_comm;
                     commitment_type endomul_scalar_comm;
 
-                    std::optional<std::array<commitment_type, 4>> chacha_comm;
-
+                    std::array<commitment_type chacha_comm;
+                    bool chacha_comm_is_used;
                     std::vector<commitment_type> range_check_comm;
 
                     std::array<scalar_field_type::value_type, Permuts> shift;
@@ -77,8 +76,9 @@ namespace nil {
                     scalar_field_type::value_type w;
                     scalar_field_type::value_type endo;
 
-                    std::optional<lookup_verifier_index<CurveType>> lookup_index;
-                    //                    linearization<std::vector<PolishToken<scalar_field_value_type>>>
+                    lookup_verifier_index<CurveType> lookup_index;
+                    bool lookup_index_is_used;
+                    Linearization<std::vector<PolishToken<scalar_field_type::value_type>>> linearization;
                     //                    linearization;    // TODO:
                     //                    Linearization<Vec<PolishToken<scalar_field_value_type<G>>>>
                     Alphas<scalar_field_value_type> powers_of_alpha;
