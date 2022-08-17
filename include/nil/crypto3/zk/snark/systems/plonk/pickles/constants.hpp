@@ -41,6 +41,7 @@ namespace nil {
                     constexpr static const std::size_t COLUMNS = 15;
                     constexpr static const std::size_t SPONGE_CAPACITY = 1;
                     constexpr static const std::size_t SPONGE_RATE = 2;
+                    constexpr static const std::size_t ZK_ROWS = 3;
                 };
             }    // namespace components
         }        // namespace zk
