@@ -53,6 +53,8 @@ namespace nil {
                     static const std::size_t poseidon_gates_count = index_terms_list::poseidon_gates_count;
                     static const std::size_t ec_arithmetic_gates_count = index_terms_list::ec_arithmetic_gates_count;
 
+                    static const bool use_lookup = index_terms_list::lookup_columns > 0;
+                    static const bool joint_lookup = index_terms_list::joint_lookup;
                     static const std::size_t lookup_columns = index_terms_list::lookup_columns;
                     static const bool lookup_runtime = index_terms_list::lookup_runtime;
                 };

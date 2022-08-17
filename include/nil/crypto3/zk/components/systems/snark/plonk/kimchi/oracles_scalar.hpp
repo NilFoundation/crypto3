@@ -147,6 +147,11 @@ namespace nil {
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
 
+                        if (KimchiParamsType::circuit_params::use_lookup &&
+                            KimchiParamsType::circuit_params::joint_lookup) {
+                            row += endo_scalar_component::rows_amount;
+                        }
+
                         // alpha
                         row += endo_scalar_component::rows_amount;
                         // zeta
@@ -285,7 +290,15 @@ namespace nil {
 
                         var beta = params.fq_output.beta;
                         var gamma = params.fq_output.gamma;
-                        var joint_combiner = params.fq_output.joint_combiner;
+                        
+                        
+                        var joint_combiner; 
+                        if (KimchiParamsType::circuit_params::use_lookup &&
+                            KimchiParamsType::circuit_params::joint_lookup) {
+                            joint_combiner = endo_scalar_component::generate_circuit(bp, assignment,
+                                {params.fq_output.joint_combiner}, row).output;
+                            row += endo_scalar_component::rows_amount;
+                        }
 
                         // alpha = phi(alpha_challenge)
                         var alpha = endo_scalar_component::generate_circuit(
@@ -474,7 +487,14 @@ namespace nil {
                         var fq_digest = params.fq_output.fq_digest;
                         var beta = params.fq_output.beta;
                         var gamma = params.fq_output.gamma;
-                        var joint_combiner = params.fq_output.joint_combiner;
+
+                        var joint_combiner; 
+                        if (KimchiParamsType::circuit_params::use_lookup &&
+                            KimchiParamsType::circuit_params::joint_lookup) {
+                            joint_combiner = endo_scalar_component::generate_assignments(assignment,
+                                {params.fq_output.joint_combiner}, row).output;
+                            row += endo_scalar_component::rows_amount;
+                        }
 
                         var alpha = endo_scalar_component::generate_assignments(assignment,
                             {params.fq_output.alpha}, row).output;
