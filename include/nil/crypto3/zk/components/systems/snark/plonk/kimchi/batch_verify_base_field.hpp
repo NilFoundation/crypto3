@@ -29,12 +29,12 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/to_group.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>

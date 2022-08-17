@@ -32,8 +32,8 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/proof.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
@@ -186,7 +186,7 @@ namespace nil {
                             output[5 * i + 3] = zk::components::generate_circuit<mul_component>(
                                 bp, assignment, 
                                 {alpha_generic,
-                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                                 tmp}, row).output;
                             row += mul_component::rows_amount;
 
                             // constant
@@ -237,7 +237,7 @@ namespace nil {
                             output[5 * i + 3] = mul_component::generate_assignments(
                                 assignment, 
                                 {alpha_generic,
-                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                                 tmp}, row).output;
                             row += mul_component::rows_amount;
 
                             // constant
