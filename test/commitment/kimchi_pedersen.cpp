@@ -43,7 +43,7 @@ struct Commitment {
     commitment_type chunked_commitment;
 
     /// an optional degree bound
-    unsigned int bound;
+    std::size_t bound;
 };
 
 /// An evaluated commitment (given a number of evaluation points)
@@ -167,7 +167,8 @@ BOOST_AUTO_TEST_CASE(kimchi_commitment_test_opening_proof){
     evals.emplace_back(std::get<0>(commitment), poly1_chunked_evals, -1);
     evals.emplace_back(std::get<0>(bounded_commitment), poly2_chunked_evals, poly2.degree() + 1);
     sponge_type new_fq_sponge;
-    batchproof_type batch = {new_fq_sponge, evals, elm, v, u, proof};
+    std::vector<batchproof_type> batch;
+    batch.emplace_back(new_fq_sponge, evals, elm, v, u, proof);
 
     BOOST_CHECK(kimchi_pedersen::verify_eval(params, g_map, batch));
 }
@@ -247,7 +248,7 @@ BOOST_AUTO_TEST_CASE(kimchi_commitment_test_case){
         batch.emplace_back(proof.verify_type());
     }
 
-    BOOST_CHECK(kimchi_pedersen::verify_eval(params, g_map, batch[0]));
+    BOOST_CHECK(kimchi_pedersen::verify_eval(params, g_map, batch));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
