@@ -41,11 +41,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/container/accumulation_vector.hpp>
-
-
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
-#include <nil/crypto3/marshalling/zk/types/accumulation_vector.hpp>
 
 namespace nil {
     namespace crypto3 {
