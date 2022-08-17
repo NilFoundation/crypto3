@@ -113,6 +113,10 @@ namespace nil{
                         return a * endo_coeff + b;
                     }
 
+                    typename FieldType::value_type value(){
+                        return _val;
+                    }
+
                     ScalarChallenge(typename FieldType::value_type _val) : _val(_val) {}
 
                     typename FieldType::value_type _val;
