@@ -47,9 +47,11 @@ namespace nil {
                 void basic_radix2_fft(Range &a, const typename FieldType::value_type &omega) {
                     typedef typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type
                         value_type;
-
+                    typedef typename FieldType::value_type field_value_type;
                     BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
-                    BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
+                    
+                    // It now supports curve elements too, should probably some other assertion about the field type and value type
+                    // BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
 
                     const std::size_t n = a.size(), logn = log2(n);
                     if (n != (1u << logn))
@@ -65,15 +67,15 @@ namespace nil {
                     std::size_t m = 1;    // invariant: m = 2^{s-1}
                     for (std::size_t s = 1; s <= logn; ++s) {
                         // w_m is 2^s-th root of unity now
-                        const value_type w_m = omega.pow(n / (2 * m));
+                        const field_value_type w_m = omega.pow(n / (2 * m));
 
                         asm volatile("/* pre-inner */");
                         for (std::size_t k = 0; k < n; k += 2 * m) {
-                            value_type w = value_type::one();
+                            field_value_type w = field_value_type::one();
                             for (std::size_t j = 0; j < m; ++j) {
-                                const value_type t = w * a[k + j + m];
+                                const value_type t = a[k + j + m] * w;
                                 a[k + j + m] = a[k + j] - t;
-                                a[k + j] += t;
+                                a[k + j] = a[k + j] + t;
                                 w *= w_m;
                             }
                         }
