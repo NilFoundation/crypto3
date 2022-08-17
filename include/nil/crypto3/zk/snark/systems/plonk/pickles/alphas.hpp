@@ -47,6 +47,7 @@ namespace nil {
                     /// If set to [Some], you can't register new constraints.
                     std::vector<FieldType> alphas;
 
+                    Alphas(uint32_t next_power) : next_power(next_power) {}
                     // Create alphas from 0 to next_power - 1
                     void instantiate(FieldType alpha) {
                         FieldType last_power = FieldType::one();
