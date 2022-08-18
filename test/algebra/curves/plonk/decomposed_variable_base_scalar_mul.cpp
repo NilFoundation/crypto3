@@ -51,68 +51,6 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-/*BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_5_wires_test_case) {
-
-	using curve_type = algebra::curves::bls12<381>;
-	using BlueprintFieldType = typename curve_type::base_field_type;
-	constexpr std::size_t WitnessColumns = 5;
-	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
-
-	zk::blueprint<ArithmetizationType> bp;
-
-	using component_type = zk::components::element_g1_variable_base_scalar_mul<ArithmetizationType, curve_type, 0, 1, 2, 3, 4>;
-
-	component_type scalar_mul_component(bp);
-
-	scalar_mul_component.generate_gates();
-
-	typename curve_type::scalar_field_type::value_type a = curve_type::scalar_field_type::value_type::one();
-	typename curve_type::template g1_type<>::value_type P = curve_type::template g1_type<>::value_type::one();
-
-	scalar_mul_component.generate_assignments(a, P);
-
-	auto cs = bp.get_constraint_system();
-
-	auto assignments = bp.full_variable_assignment();
-
-	typedef zk::snark::placeholder_preprocessor <typename curve_type::base_field_type, 5, 1> preprocess_type;
-
-    auto preprocessed_data = preprocess_type::process(cs, assignments);
-	typedef zk::snark::placeholder_prover <typename curve_type::base_field_type, 5, 5, 1, 5> prove_type;
-	auto proof = prove_type::process(preprocessed_data, cs, assignments);
-}
-
-BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_9_wires_test_case) {
-
-	using curve_type = algebra::curves::bls12<381>;
-	using BlueprintFieldType = typename curve_type::base_field_type;
-	constexpr std::size_t WitnessColumns = 9;
-	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
-
-	zk::blueprint<ArithmetizationType> bp;
-
-	using component_type = zk::components::element_g1_variable_base_scalar_mul<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
-
-	component_type scalar_mul_component = component_type(bp);
-
-	scalar_mul_component.generate_gates();
-
-	typename curve_type::scalar_field_type::value_type a = curve_type::scalar_field_type::value_type::one();
-	typename curve_type::template g1_type<>::value_type P = curve_type::template g1_type<>::value_type::one();
-
-	scalar_mul_component.generate_assignments(a, P);
-
-	auto cs = bp.get_constraint_system();
-
-	auto assignments = bp.full_variable_assignment();
-
-	typedef zk::snark::placeholder_preprocessor <typename curve_type::base_field_type, 9, 1> preprocess_type;
-
-    auto preprocessed_data = preprocess_type::process(cs, assignments);
-	typedef zk::snark::placeholder_prover <typename curve_type::base_field_type, 9, 5, 1, 5> prove_type;
-	auto proof = prove_type::process(preprocessed_data, cs, assignments);
-}*/
-
 BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposed_variable_base_scalar_mul) {
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -122,7 +60,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposed_variable_base_scalar_mul) {
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 3;
+    constexpr std::size_t SelectorColumns = 5;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -130,12 +68,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposed_variable_base_scalar_mul) {
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
-    using component_type = zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, curve_type,
+    using component_type = zk::components::curve_element_decomposed_variable_base_scalar_mul<ArithmetizationType, curve_type, 
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 	using var = zk::snark::plonk_variable<BlueprintFieldType>;
     typename BlueprintScalarType::value_type b_scalar = algebra::random_element<BlueprintScalarType>();
 
 	typename curve_type::scalar_field_type::value_type shift_base = 2;
+    typename curve_type::scalar_field_type::integral_type base = 1;
 	auto shift = shift_base.pow(255) + 1;
 	typename BlueprintScalarType::value_type x = (b_scalar - shift)/2;
 	typename BlueprintScalarType::integral_type integral_x = typename BlueprintScalarType::integral_type(x.data);
@@ -148,7 +87,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposed_variable_base_scalar_mul) {
     var T_X_var = {0, 0, false, var::column_type::public_input};
     var T_Y_var = {0, 1, false, var::column_type::public_input};
     typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var1, scalar_var2};
-	std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, x_scalar & (shift_base.pow(254) - 1), x_scalar >> 254};
+	std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, integral_x & ((base << 254) - 1), integral_x >> 254};
 	curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type expected;
 	if (b_scalar != 0) {
 	 	expected = b_scalar * T;
