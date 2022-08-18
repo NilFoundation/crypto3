@@ -34,6 +34,7 @@
 #include <boost/tti/tti.hpp>
 #include <boost/array.hpp>
 
+#ifndef GENERATE_HAS_MEMBER_TYPE
 #define GENERATE_HAS_MEMBER_TYPE(Type)                                                                                 \
     template<class T, typename Enable = void>                                                                          \
     class HasMemberType_##Type {                                                                                       \
@@ -63,7 +64,9 @@
                                                                                                                        \
     template<class T>                                                                                                  \
     struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> { };
+#endif //GENERATE_HAS_MEMBER_TYPE
 
+#ifndef GENERATE_HAS_MEMBER
 #define GENERATE_HAS_MEMBER(member)                                                                                  \
     template<class T, typename Enable = void>                                                                        \
     class HasMember_##member {                                                                                       \
@@ -93,7 +96,9 @@
                                                                                                                      \
     template<class T>                                                                                                \
     struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
+#endif //GENERATE_HAS_MEMBER
 
+#ifndef GENERATE_HAS_MEMBER_FUNCTION
 #define GENERATE_HAS_MEMBER_FUNCTION(Function, ...)                                  \
                                                                                      \
     template<typename T>                                                             \
@@ -115,7 +120,9 @@
                                                                                      \
         static bool const value = sizeof(f<Derived>(0)) == 2;                        \
     };
+#endif //GENERATE_HAS_MEMBER_FUNCTION
 
+#ifndef GENERATE_HAS_MEMBER_CONST_FUNCTION
 #define GENERATE_HAS_MEMBER_CONST_FUNCTION(Function, ...)                                  \
                                                                                            \
     template<typename T>                                                                   \
@@ -137,7 +144,9 @@
                                                                                            \
         static bool const value = sizeof(f<Derived>(0)) == 2;                              \
     };
+#endif //GENERATE_HAS_MEMBER_CONST_FUNCTION
 
+#ifndef GENERATE_HAS_MEMBER_RETURN_FUNCTION
 #define GENERATE_HAS_MEMBER_RETURN_FUNCTION(Function, ReturnType, ...)                       \
                                                                                              \
     template<typename T>                                                                     \
@@ -165,7 +174,9 @@
                                                                                              \
         static bool const value = sizeof(f<Derived>(0)) == 2;                                \
     };
+#endif //GENERATE_HAS_MEMBER_RETURN_FUNCTION
 
+#ifndef GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION
 #define GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(Function, ReturnType, ...)                 \
                                                                                              \
     template<typename T>                                                                     \
@@ -193,6 +204,7 @@
                                                                                              \
         static bool const value = sizeof(f<Derived>(0)) == 2;                                \
     };
+#endif //GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION
 
 namespace nil {
     namespace detail {
