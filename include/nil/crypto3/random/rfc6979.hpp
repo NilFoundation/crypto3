@@ -36,10 +36,9 @@
 #include <nil/crypto3/mac/hmac.hpp>
 #include <nil/crypto3/mac/algorithm/compute.hpp>
 
-#include <nil/crypto3/algebra/marshalling.hpp>
-#include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/types/integral.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/marshalling/algorithms/pack.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/algebra/type_traits.hpp>
@@ -75,9 +74,6 @@ namespace nil {
                     internal_accumulator_type;
 
                 typedef ::nil::crypto3::marshalling::types::
-                    field_element<::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, field_type>
-                        marshalling_field_element_be_type;
-                typedef ::nil::crypto3::marshalling::types::
                     integral<::nil::marshalling::field_type<::nil::marshalling::option::big_endian>, integral_type>
                         marshalling_integral_value_be_type;
                 typedef ::nil::crypto3::marshalling::types::
@@ -102,14 +98,6 @@ namespace nil {
 
                 explicit rfc6979(const result_type& x, const digest_type& h1) {
                     seed(x, h1);
-                }
-
-                static inline modulus_octets_container_type int2octets(const field_value_type& x) {
-                    marshalling_field_element_be_type marshalling_field_element_be(x);
-                    modulus_octets_container_type modulus_octet_container;
-                    auto it = modulus_octet_container.begin();
-                    marshalling_field_element_be.template write(it, modulus_octets);
-                    return modulus_octet_container;
                 }
 
                 // TODO: move to marshalling
@@ -183,7 +171,9 @@ namespace nil {
 
                 template<typename InputRange>
                 static inline modulus_octets_container_type bits2octets(const InputRange& range) {
-                    return int2octets(field_value_type(bits2int(range)));
+                    nil::marshalling::status_type status;
+                    return ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(
+                        field_value_type(bits2int(range)), status);
                 }
 
                 inline void seed(const result_type& x, const digest_type& h1) {
@@ -196,7 +186,11 @@ namespace nil {
 
                     // d.
                     internal_accumulator_type acc_d(Key);
-                    auto int2octets_x = int2octets(x);
+                    
+                    nil::marshalling::status_type status;
+                    modulus_octets_container_type int2octets_x =
+                        ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(x, status);
+
                     auto bits2octets_h1 = bits2octets(h1);
                     compute<hmac_policy>(V, acc_d);
                     compute<hmac_policy>(std::array<std::uint8_t, 1> {0}, acc_d);
