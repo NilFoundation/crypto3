@@ -667,7 +667,7 @@ struct conformity_pop_test_case {
 BOOST_AUTO_TEST_SUITE(bls_signature_public_interface_tests)
 
 BOOST_AUTO_TEST_CASE(bls_basic_mps) {
-    using curve_type = algebra::curves::bls12_381;
+    using curve_type = curves::bls12_381;
     using scheme_type = bls<bls_default_public_params<>, bls_mps_ro_version, bls_basic_scheme, curve_type>;
 
     using privkey_type = private_key<scheme_type>;
@@ -856,7 +856,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mps) {
 }
 
 BOOST_AUTO_TEST_CASE(bls_basic_mss) {
-    using curve_type = algebra::curves::bls12_381;
+    using curve_type = curves::bls12_381;
     using scheme_type = bls<bls_default_public_params<>, bls_mss_ro_version, bls_basic_scheme, curve_type>;
 
     using privkey_type = private_key<scheme_type>;
@@ -997,7 +997,7 @@ BOOST_AUTO_TEST_CASE(bls_basic_mss) {
 }
 
 BOOST_AUTO_TEST_CASE(bls_aug_mss) {
-    using curve_type = algebra::curves::bls12_381;
+    using curve_type = curves::bls12_381;
     using scheme_type = bls<bls_default_public_params<>, bls_mss_ro_version, bls_aug_scheme, curve_type>;
 
     using privkey_type = private_key<scheme_type>;
@@ -1065,7 +1065,7 @@ BOOST_AUTO_TEST_CASE(bls_aug_mss) {
 // }
 
 BOOST_AUTO_TEST_CASE(bls_pop_mss) {
-    using curve_type = algebra::curves::bls12_381;
+    using curve_type = curves::bls12_381;
     using scheme_type = bls<bls_pop_sign_default_public_params<>, bls_mss_ro_version, bls_pop_scheme, curve_type>;
     using scheme_pop_prove_type =
         bls<bls_pop_prove_default_public_params<>, bls_mss_ro_version, bls_pop_scheme, curve_type>;
