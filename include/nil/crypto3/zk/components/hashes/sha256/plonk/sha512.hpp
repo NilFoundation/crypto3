@@ -60,8 +60,10 @@ namespace nil {
  //                       decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                 public: 
+//                    constexpr static const std::size_t rows_RAM_and_input_words = 16;
+//
                     constexpr static const std::size_t rows_amount =
-                        3 + 2 + sha512_process_component::rows_amount * 2 + 2 + 1;
+                        2 + 3 + sha512_process_component::rows_amount * 2 + 2 + 1;
 
                     struct var_ec_point {
                         std::array<var, 4> x;    
@@ -136,22 +138,26 @@ namespace nil {
 
                         std::array<typename ArithmetizationType::field_type::integral_type, 16> input_words_values;
                         typename ArithmetizationType::field_type::integral_type integral_one = 1;
-                        input_words_values[0] = (RAM[0] >> 2) & ((0xffffffffffffffff));
-                        input_words_values[1] = ((RAM[0] << 62) + (RAM[1] >> 4)) & (0xffffffffffffffff);
-                        input_words_values[2] = ((RAM[1] << 60) + (RAM[2] >> 6)) & (0xffffffffffffffff);
-                        input_words_values[3] = ((RAM[2] << 58) + (RAM[3] << 1) + (RAM[4] >> 65)) & ((integral_one<<64) - 1);
-                        input_words_values[4] = ((RAM[4] >> 1)) & ((integral_one<<64) - 1);
-                        input_words_values[5] = ((RAM[4] << 63) + (RAM[5] >> 3)) & ((integral_one<<64) - 1);
-                        input_words_values[6] = ((RAM[5] << 61) + (RAM[6] >> 5)) & ((integral_one<<64) - 1);
-                        input_words_values[7] = ((RAM[6] << 59) + (RAM[7] << 2) + (RAM[8] >> 64)) & ((integral_one<<64) - 1);
-                        input_words_values[8] = ((RAM[8])) & ((integral_one<<64) - 1);
-                        input_words_values[9] = ((RAM[9] >> 2)) & ((integral_one<<64) - 1);
-                        input_words_values[10] = ((RAM[9] << 62) + (RAM[10] >> 4)) & ((integral_one<<64) - 1);
-                        input_words_values[11] = ((RAM[10] << 60) + (RAM[11] << 3) + (RAM[12] >> 63)) & ((integral_one<<64) - 1);
-                        input_words_values[12] = ((RAM[12] << 1) + (RAM[13] >> 65)) & ((integral_one<<64) - 1);
-                        input_words_values[13] = ((RAM[13] >> 1)) & ((integral_one<<64) - 1);
-                        input_words_values[14] = ((RAM[13] << 63) + (RAM[14] >> 3)) & ((integral_one<<64) - 1);
-                        input_words_values[15] = ((RAM[14] << 61) + (RAM[15] << 4) + (RAM[16] >> 62)) & ((integral_one<<64) - 1); // (RAM[16] >> 61) is correct only if RAM[16] is 66 bits long, not sure yet
+                        typename ArithmetizationType::field_type::integral_type mask = ((integral_one<<64) - 1);
+                        input_words_values[0] = (RAM[0]) & mask;
+                        input_words_values[1] = ((RAM[0] >> 64) + (RAM[1] << 2)) & mask;
+                        input_words_values[2] = ((RAM[1] >> 62) + (RAM[2] << 4)) & mask;
+                        input_words_values[3] = ((RAM[2] >> 60) + (RAM[3] << 6) + (RAM[4] << 63)) & mask;
+                        input_words_values[4] = ((RAM[4] >> 1)) & mask;
+                        input_words_values[5] = ((RAM[4] >> 65) + (RAM[5] << 1)) & mask;
+                        input_words_values[6] = ((RAM[5] >> 63) + (RAM[6] << 3)) & mask;
+                        input_words_values[7] = ((RAM[6] >> 61) + (RAM[7] << 5) + (RAM[8] << 62)) & mask;
+                        input_words_values[8] = ((RAM[8] >> 2)) & mask;
+                        input_words_values[9] = ((RAM[9])) & mask;
+                        input_words_values[10] = ((RAM[9] >> 64) + (RAM[10] << 2)) & mask;
+                        input_words_values[11] = ((RAM[10] >> 62) + (RAM[11] << 4) + (RAM[12] << 61)) & mask;
+                        input_words_values[12] = ((RAM[12] >> 3) + (RAM[13] << 63)) & mask;
+                        input_words_values[13] = ((RAM[13] >> 1)) & mask;
+                        input_words_values[14] = ((RAM[13] >> 65) + (RAM[14] << 1)) & mask;
+                        input_words_values[15] = ((RAM[14] >> 63) + (RAM[15] << 3) + (RAM[16] << 60)) & mask;
+
+                        
+                        
 
                         row = row + 3;
                         std::array<var, 16> input_words_vars;
@@ -184,10 +190,13 @@ namespace nil {
                         auto sha_output = sha512_process_component::generate_assignments(assignment, sha_params, row);
                         row += sha512_process_component::rows_amount;
 
-                        input_words_values[0] = ((RAM[16] << 3) + (RAM[17] >> 63)) & (0xffffffffffffffff);
-                        input_words_values[1] = ((RAM[17] << 1) + (RAM[18] >> 65)) & (0xffffffffffffffff);
-                        input_words_values[2] = ((RAM[18] << 63) + (RAM[19] << 5) + (1 << 4)) & (0xffffffffffffffff);
-                        for (std::size_t i = 3; i < 15; ++i) {
+                        input_words_values[0] = ((RAM[16] >> 4) + (RAM[17] << 62)) & mask;
+                        input_words_values[1] = ((RAM[17] >> 2)) & mask;
+                        input_words_values[2] = ((RAM[18])) & mask;
+                        input_words_values[3] = ((RAM[18] >> 64) + (RAM[19] << 2) + (integral_one << 60)) << 3;
+
+
+                        for (std::size_t i = 4; i < 15; ++i) {
                             input_words_values[i] = 0;
                         }
                         input_words_values[15] = 1024 + 252;
