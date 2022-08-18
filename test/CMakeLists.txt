@@ -80,6 +80,7 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/multi_scalar_multiplication"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
+    "hashes/plonk/sha512"
     "hashes/plonk/sha256_process"
     "hashes/plonk/sha512_process"
     "hashes/plonk/decomposition"
