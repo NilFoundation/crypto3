@@ -63,7 +63,7 @@ namespace nil {
 //                    constexpr static const std::size_t rows_RAM_and_input_words = 16;
 //
                     constexpr static const std::size_t rows_amount =
-                        2 + 3 + sha512_process_component::rows_amount * 2 + 2 + 1;
+                        2 + 3 + sha512_process_component::rows_amount * 2 + 2;
 
                     struct var_ec_point {
                         std::array<var, 4> x;    
@@ -107,6 +107,7 @@ namespace nil {
                         std::size_t row = component_start_row;
 
                         std::array<typename ArithmetizationType::field_type::integral_type, 20> RAM = {
+                            typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[0]).data),
                             typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[1]).data),
                             typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[2]).data),
                             typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[3]).data),
@@ -154,10 +155,7 @@ namespace nil {
                         input_words_values[12] = ((RAM[12] >> 3) + (RAM[13] << 63)) & mask;
                         input_words_values[13] = ((RAM[13] >> 1)) & mask;
                         input_words_values[14] = ((RAM[13] >> 65) + (RAM[14] << 1)) & mask;
-                        input_words_values[15] = ((RAM[14] >> 63) + (RAM[15] << 3) + (RAM[16] << 60)) & mask;
-
-                        
-                        
+                        input_words_values[15] = ((RAM[14] >> 63) + (RAM[15] << 3) + (RAM[16] << 60)) & mask;                    
 
                         row = row + 3;
                         std::array<var, 16> input_words_vars;
@@ -187,7 +185,7 @@ namespace nil {
                                                             var(0, component_start_row + 6, false, var::column_type::constant),
                                                             var(0, component_start_row + 7, false, var::column_type::constant)};
                         typename sha512_process_component::params_type sha_params = {constants_var, input_words_vars};
-                        auto sha_output = sha512_process_component::generate_assignments(assignment, sha_params, row);
+                        auto sha_output = sha512_process_component::generate_assignments(assignment, sha_params, row).output_state;
                         row += sha512_process_component::rows_amount;
 
                         input_words_values[0] = ((RAM[16] >> 4) + (RAM[17] << 62)) & mask;
@@ -209,7 +207,7 @@ namespace nil {
                         }
 
                         row = row + 2;
-                        sha_params = {sha_output.output_state, input_words_vars};
+                        sha_params = {sha_output, input_words_vars};
 
 
 
