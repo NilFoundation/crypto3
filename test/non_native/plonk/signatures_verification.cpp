@@ -96,11 +96,11 @@ typename ed25519_type::scalar_field_type::value_type sha512(typename ed25519_typ
     message_schedule_array[8] = (pkx >> 2) & mask;
     message_schedule_array[9] = (pkx >> 66) & mask;
     message_schedule_array[10] = (pkx >> 130) & mask;
-    message_schedule_array[11] = (pkx >> 194) & mask + (pky & 7) * (one << 61);
+    message_schedule_array[11] = ((pkx >> 194) & mask) + (pky & 7) * (one << 61);
     message_schedule_array[12] = (pky >> 3) & mask;
     message_schedule_array[13] = (pky >> 67) & mask;
     message_schedule_array[14] = (pky >> 131) & mask;
-    message_schedule_array[15] = (pky >> 195) & mask + (M[0] & 15) * (one << 60);
+    message_schedule_array[15] = ((pky >> 195) & mask) + (M[0] & 15) * (one << 60);
     for(std::size_t i = 16; i < 80; i ++){
         typename ed25519_type::base_field_type::integral_type s0 = ((message_schedule_array[i - 15] >> 1)|((message_schedule_array[i - 15] << (64 - 1)) 
         & typename ed25519_type::base_field_type::integral_type((typename ed25519_type::base_field_type::value_type(2).pow(64) - 1).data))) ^
@@ -170,7 +170,7 @@ typename ed25519_type::scalar_field_type::value_type sha512(typename ed25519_typ
     (h + typename ed25519_type::base_field_type::integral_type(public_input[7]))%
         typename ed25519_type::base_field_type::integral_type(typename ed25519_type::base_field_type::value_type(2).pow(64).data)};
     typename ed25519_type::base_field_type::integral_type bits_amount = 255*4+256;
-    message_schedule_array[0] = (M[0] >> 4) & mask + (M[1] & 3) * (one << 62);
+    message_schedule_array[0] = ((M[0] >> 4) & mask) + (M[1] & 3) * (one << 62);
     message_schedule_array[1] = (M[1] >> 2) & mask;
     message_schedule_array[2] =  M[2] & mask;
     message_schedule_array[3] = ((M[2] >> 64) + (M[3]) * (one << 2) + 1 * (one << 60)) << 3;
@@ -332,7 +332,8 @@ BOOST_AUTO_TEST_CASE(blueprint_signatures_verification) {
             var(0, i*17 + 15, false, var::column_type::public_input), var(0, i*17 + 16, false, var::column_type::public_input)};
         Public_keys[i] = {pk_x, pk_y};
     }
-    public_input.insert(public_input.end(), {M & mask, (M >> 66) & mask, (M >> 132) & mask, (M >> 198) & mask});
+    public_input.insert(public_input.end(), {ed25519_type::base_field_type::integral_type(M & mask), ed25519_type::base_field_type::integral_type((M >> 66) & mask)
+        , ed25519_type::base_field_type::integral_type((M >> 132) & mask), ed25519_type::base_field_type::integral_type((M >> 198) & mask)});
 
     std::array<var, 4> M_var = {var(0, k*17, false, var::column_type::public_input), var(0, k*17 + 1, false, var::column_type::public_input),
         var(0, k*17 + 2, false, var::column_type::public_input), var(0, k*17 + 3, false, var::column_type::public_input)};
