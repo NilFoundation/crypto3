@@ -93,6 +93,28 @@ std::vector<math::polynomial<typename FieldType::value_type>> generate(NumberTyp
     return res;
 }
 
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+    using dist_type = std::uniform_int_distribution<int>;
+    static std::random_device random_engine;
+
+    std::vector<std::size_t> step_list;
+    std::size_t steps_sum = 0;
+    while (steps_sum != r) {
+        if (r - steps_sum <= max_step) {
+            while (r - steps_sum != 1) {
+                step_list.emplace_back(r - steps_sum - 1);
+                steps_sum += step_list.back();
+            }
+            step_list.emplace_back(1);
+            steps_sum += step_list.back();
+        } else {
+            step_list.emplace_back(dist_type(1, max_step)(random_engine));
+            steps_sum += step_list.back();
+        }
+    }
+    return step_list;
+}
+
 BOOST_AUTO_TEST_SUITE(lpc_performance_test_suite)
 
 BOOST_AUTO_TEST_CASE(lpc_performance_test) {
@@ -112,7 +134,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m> lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
@@ -124,11 +146,10 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
 
     typename fri_type::params_type fri_params;
 
-    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
     fri_params.r = r;
     fri_params.D = D;
-    fri_params.q = q;
     fri_params.max_degree = d - 1;
+    fri_params.step_list = generate_random_step_list(r, 5);
 
     typedef boost::random::independent_bits_engine<boost::random::mt19937,
                                                    FieldType::modulus_bits,
@@ -146,11 +167,11 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     res.reserve(height);
 
     for (int i = 0; i < height; i++) {
-        math::polynomial<typename FieldType::value_type> poly;
+        math::polynomial<typename FieldType::value_type> poly(fri_params.max_degree + 1);
         for (int j = 0; j < fri_params.max_degree + 1; j++) {
-            poly.push_back(typename FieldType::value_type(polynomial_element_gen()));
+            poly[i] = typename FieldType::value_type(polynomial_element_gen());
         }
-        merkle_tree_type tree = lpc_type::precommit(poly, D[0]); // phase_1: Commit
+        merkle_tree_type tree = zk::algorithms::precommit<lpc_type>(poly, D[0], fri_params.step_list.front()); // phase_1: Commit
 
         // TODO: take a point outside of the basic domain
         std::vector<typename FieldType::value_type> evaluation_points = {
@@ -159,12 +180,12 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         std::array<std::uint8_t, 96> x_data {};
         zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-        auto proof = lpc_type::proof_eval(evaluation_points, tree, poly, fri_params, transcript); // phase_2: Prove
+        auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, poly, fri_params, transcript); // phase_2: Prove
 
         // verify
         zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
-        BOOST_CHECK(lpc_type::verify_eval(evaluation_points, proof, fri_params, transcript_verifier)); // phase_3: Verify
+        BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(evaluation_points, proof, fri_params, transcript_verifier)); // phase_3: Verify
     }
 }
 
