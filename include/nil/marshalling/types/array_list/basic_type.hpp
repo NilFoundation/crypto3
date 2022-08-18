@@ -320,7 +320,12 @@ namespace nil {
                     static status_type read_field_element(element_type &elem, TIter &iter, std::size_t &len) {
                         status_type es = elem.read(iter, len);
                         if (es == status_type::success) {
-                            std::size_t true_length = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? elem.bit_length() : elem.length();
+                            std::size_t true_length = 0;
+                            if constexpr(std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool>){
+                                true_length = elem.bit_length();
+                            } else{
+                                true_length = elem.length();
+                            }
                             MARSHALLING_ASSERT(true_length <= len);
                             len -= true_length;
                         }
@@ -374,8 +379,14 @@ namespace nil {
                     static status_type write_field_element(const element_type &elem, TIter &iter, std::size_t &len) {
                         status_type es = elem.write(iter, len);
                         if (es == status_type::success) {
-                            len -= (std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
-                                            elem.bit_length() : elem.length());
+                            std::size_t true_length = 0;
+                            if constexpr(std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool>){
+                                true_length = elem.bit_length();
+                            } else{
+                                true_length = elem.length();
+                            }
+
+                            len -= true_length;
                         }
                         return es;
                     }
