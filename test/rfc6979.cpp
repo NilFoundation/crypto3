@@ -148,8 +148,13 @@ BOOST_AUTO_TEST_CASE(k_generation_ansix9t163k1) {
     // int2octets
     std::vector<std::uint8_t> etalon_int2octets = {0x00, 0x9A, 0x4D, 0x67, 0x92, 0x29, 0x5A, 0x7F, 0x73, 0x0F, 0xC3,
                                                    0xF2, 0xB4, 0x9C, 0xBC, 0x0F, 0x62, 0xE8, 0x62, 0x27, 0x2F};
+    
+    nil::marshalling::status_type status;
+    std::vector<std::uint8_t> int2octets_x =
+        ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(x, status);
+
     BOOST_CHECK(
-        std::equal(etalon_int2octets.cbegin(), etalon_int2octets.cend(), generator_type::int2octets(x).cbegin()));
+        std::equal(etalon_int2octets.cbegin(), etalon_int2octets.cend(), int2octets_x.cbegin()));
 
     // bits2int
     std::vector<std::uint8_t> T1 = {0x93, 0x05, 0xA4, 0x6D, 0xE7, 0xFF, 0x8E, 0xB1, 0x07, 0x19, 0x4D,
