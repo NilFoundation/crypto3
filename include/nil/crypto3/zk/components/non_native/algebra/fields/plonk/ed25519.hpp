@@ -37,7 +37,7 @@
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/scalar_non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/ec_point_edwards25519.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/addition.hpp>
-//#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
+#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -95,8 +95,8 @@ namespace nil {
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     using non_addition_component = non_native_field_element_addition<ArithmetizationType, CurveType, Ed25519Type,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
-                    //using sha512_component = sha512<ArithmetizationType, CurveType,
-                    //W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using sha512_component = sha512<ArithmetizationType, CurveType,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     constexpr static const std::size_t selector_seed = 0xfcc2;
@@ -107,7 +107,7 @@ namespace nil {
                                                                     + fixed_base_mult_component::rows_amount
                                                                     + addition_component::rows_amount
                                                                     + reduction_component::rows_amount
-                                                                    + 2 * check_ec_point_component::rows_amount + 1;
+                                                                    + 2 * check_ec_point_component::rows_amount + sha512_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -155,26 +155,10 @@ namespace nil {
                         row += check_ec_point_component::rows_amount;
                         
                         /* here we get k = SHA(R||A||M) */
-                        /* 66*15 + 34 = 1024 bits */
-                        // auto padded = ...;
-                        // row += ...;
-                        // auto k_vec = sha512_component::generate_assignments(assignment, {padded}, row).output;
-                        // row += sha512_component::rows_amount;
-                        std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
-                            1, 0, 0, 0,
-                            0, 0, 0, 0};
-                        for (int i = 0; i < 8; i++) {
-                            assignment.witness(i)[row] = constants[i];
-                        }
-                        std::array<var, 8> k_vec = {var(0, row, false),
-                                                    var(1, row, false),
-                                                    var(2, row, false),
-                                                    var(3, row, false),
-                                                    var(4, row, false),
-                                                    var(5, row, false),
-                                                    var(6, row, false),
-                                                    var(7, row, false)};
-                        row++;
+                        auto k_vec = sha512_component::generate_assignments(assignment,  {{{R.x[0], R.x[1], R.x[2], R.x[3]}, 
+                        {R.y[0], R.y[1], R.y[2], R.y[3]}}, {{pk.x[0], pk.x[1], pk.x[2], pk.x[3]}, 
+                        {pk.y[0], pk.y[1], pk.y[2], pk.y[3]}}, M}, row).output_state;
+                        row += sha512_component::rows_amount;
                         var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
 
@@ -210,19 +194,10 @@ namespace nil {
                         row += check_ec_point_component::rows_amount;
                         
                         /* here we get k = SHA(R||A||M) */
-                        // auto padded = ...;
-                        // row += ...;
-                        // auto k_vec = sha512_component::generate_circuit(bp, assignment, {padded}, row).output;
-                        // row += sha512_component::rows_amount;
-                        std::array<var, 8> k_vec = {var(0, row, false),
-                                                    var(1, row, false),
-                                                    var(2, row, false),
-                                                    var(3, row, false),
-                                                    var(4, row, false),
-                                                    var(5, row, false),
-                                                    var(6, row, false),
-                                                    var(7, row, false)};
-                        row++;
+                        auto k_vec = sha512_component::generate_circuit(bp, assignment, {{{R.x[0], R.x[1], R.x[2], R.x[3]}, 
+                        {R.y[0], R.y[1], R.y[2], R.y[3]}}, {{pk.x[0], pk.x[1], pk.x[2], pk.x[3]}, 
+                        {pk.y[0], pk.y[1], pk.y[2], pk.y[3]}}, M}, row).output_state;
+                        row += sha512_component::rows_amount;
                         var k = reduction_component::generate_circuit(bp, assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
                         /* here we check sB == R + kA */
