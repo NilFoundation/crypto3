@@ -33,7 +33,6 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512_process.hpp>
-//#include <nil/crypto3/zk/components/hashes/sha256/plonk/decomposition.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -60,10 +59,10 @@ namespace nil {
  //                       decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                 public: 
-//                    constexpr static const std::size_t rows_RAM_and_input_words = 16;
-//
+                    constexpr static const std::size_t rows_amount_creating_input_words_component = 16;
+
                     constexpr static const std::size_t rows_amount =
-                        2 + 3 + sha512_process_component::rows_amount * 2 + 2 + 1;
+                        rows_amount_creating_input_words_component + sha512_process_component::rows_amount * 2 + 2;
 
                     struct var_ec_point {
                         std::array<var, 4> x;    
@@ -128,13 +127,7 @@ namespace nil {
                             typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.M[3]).data)
                             };
 
-                        for (std::size_t i = 0; i < 4; i++) {
-                            assignment.witness(i)[row] = RAM[i];
-                            assignment.witness(i+4)[row] = RAM[i+4];
-                            assignment.witness(i)[row+1] = RAM[i+8];
-                            assignment.witness(i+4)[row+1] = RAM[i+12];
-                            assignment.witness(i)[row+2] = RAM[i+16];
-                        } 
+
 
                         std::array<typename ArithmetizationType::field_type::integral_type, 16> input_words_values;
                         typename ArithmetizationType::field_type::integral_type integral_one = 1;
@@ -156,20 +149,293 @@ namespace nil {
                         input_words_values[14] = ((RAM[13] >> 65) + (RAM[14] << 1)) & mask;
                         input_words_values[15] = ((RAM[14] >> 63) + (RAM[15] << 3) + (RAM[16] << 60)) & mask;
 
-                        
-                        
+                        std::array<typename ArithmetizationType::field_type::integral_type, 4> range_chunks;
 
-                        row = row + 3;
+                        // 12|34567890123456789012.3456789012345678901234.5678901234567890123456
+                        // 1234|567890123456789012.3456789012345678901234.5678901234567890123456
+                        // 123456|7890123456789012.3456789012345678901234.5678901234567890123456
+                        // 1234567890123456789012.3456789012345678901234.5678901234567
+                        // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
+                        // 1234567890123456789012.3456789012345678901234.5678901234567890123|456
+                        // 1234567890123456789012.3456789012345678901234.56789012345678901|23456
+                        // 1234567890123456789012.3456789012345678901234.5678901234567
+                        // 12|34567890123456789012.3456789012345678901234.5678901234567890123456|
+                        // 1234567890123456789012.3456789012345678901234.56789012345678901234|56
+                        // 1234567890123456789012.3456789012345678901234.567890123456789012|3456
+                        // 1234567890123456789012.3456789012345678901234.5678901234567
+                        // 123|4567890123456789012.3456789012345678901234.5678901234567890123456
+                        // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
+                        // 1234567890123456789012.3456789012345678901234.5678901234567890123|456
+                        // 1234567890123456789012.3456789012345678901234.5678901234567
+                        // 1234|567890123456789012.3456789012345678901234.5678901234567890123456 
+                        // 12|34567890123456789012.3456789012345678901234.5678901234567890123456|
+                        // 1234567890123456789012.3456789012345678901234.56789012345678901234|56
+                        // 1234567890123456789012.3456789012345678901234.56789012345678               // 77 range_chunks
+
+                        typename ArithmetizationType::field_type::integral_type mask22 = ((integral_one<<22) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask21 = ((integral_one<<21) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask20 = ((integral_one<<20) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask19 = ((integral_one<<19) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask18 = ((integral_one<<18) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask17 = ((integral_one<<17) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask16 = ((integral_one<<16) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask15 = ((integral_one<<15) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask14 = ((integral_one<<14) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask13 = ((integral_one<<13) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask12 = ((integral_one<<12) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask11 = ((integral_one<<11) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask10 = ((integral_one<<10) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask9 = ((integral_one<<9) - 1);
+                        typename ArithmetizationType::field_type::integral_type mask8 = ((integral_one<<8) - 1);
+
+                        std::size_t  witn_iter = 0;
+                        // 12|34567890123456789012.3456789012345678901234.5678901234567890123456
+                        range_chunks[0] = RAM[0] & mask22;
+                        range_chunks[1] = (RAM[0] >> 22) & mask22;
+                        range_chunks[2] = (RAM[0] >> 44) & mask20;
+                        range_chunks[3] = (RAM[0] >> 64) & 0b11; 
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[0];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[1];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[2];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[3];
+                        witn_iter++;                                               
+
+                        // 1234|567890123456789012.3456789012345678901234.5678901234567890123456
+                        range_chunks[4] = (RAM[1]) & mask22;
+                        range_chunks[5] = (RAM[1] >> 22) & mask22;
+                        range_chunks[6] = (RAM[1] >> 44) & mask18;
+                        range_chunks[7] = (RAM[1] >> 62) & 15;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[4];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[5];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[6];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[7];
+                        witn_iter++;
+                        
+                        // 123456|7890123456789012.3456789012345678901234.5678901234567890123456
+                        range_chunks[8] = (RAM[2]) & mask22;
+                        range_chunks[9] = (RAM[2] >> 22) & mask22;
+                        range_chunks[10] = (RAM[2] >> 44) & mask16;
+                        range_chunks[11] = (RAM[2] >> 60) & 0b111111;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[8];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[9];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[10];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[11];
+                        witn_iter++;
+                       
+                        // 1234567890123.4567890123456789012345.6789012345678901234567
+                        range_chunks[12] = (RAM[3]) & mask22;
+                        range_chunks[13] = (RAM[3] >> 22) & mask22;
+                        range_chunks[14] = (RAM[3] >> 44) & mask13;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[12];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[13];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[14];
+                        witn_iter++;
+                         
+                        // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
+                        range_chunks[15] = (RAM[4]) & 1;
+                        range_chunks[16] = (RAM[4] >> 1) & mask21;
+                        range_chunks[17] = (RAM[4] >> 22) & mask22;
+                        range_chunks[18] = (RAM[4] >> 44) & mask21;
+                        range_chunks[19] = (RAM[4] >> 65) & 1;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[15];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[16];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[17];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[18];
+                        assignment.witness(W6)[row + witn_iter] = range_chunks[19];
+                        witn_iter++;
+                     
+                        // 1234567890123456789012.3456789012345678901234.5678901234567890123|456
+                        range_chunks[20] = (RAM[5]) & 7;
+                        range_chunks[21] = (RAM[5] >> 3) & mask19;
+                        range_chunks[22] = (RAM[5] >> 22) & mask22;
+                        range_chunks[23] = (RAM[5] >> 44) & mask22;
+                       
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[20];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[21];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[22];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[23];
+                        witn_iter++;
+
+                        // 1234567890123456789012.3456789012345678901234.56789012345678901|23456
+                        range_chunks[24] = (RAM[6]) & 0b11111;
+                        range_chunks[25] = (RAM[6] >> 5) & mask17;
+                        range_chunks[26] = (RAM[6] >> 22) & mask22;
+                        range_chunks[27] = (RAM[6] >> 44) & mask22;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[24];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[25];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[26];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[27];
+                        witn_iter++;
+
+                        // 1234567890123.4567890123456789012345.6789012345678901234567
+                        range_chunks[28] = (RAM[7]) & mask22;
+                        range_chunks[29] = (RAM[7] >> 22) & mask22;
+                        range_chunks[30] = (RAM[7] >> 44) & mask13;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[28];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[29];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[30];
+                        witn_iter++;
+
+                        // 12|34567890123456789012.3456789012345678901234.5678901234567890123456|
+                        range_chunks[31] = RAM[8] & mask22;
+                        range_chunks[32] = (RAM[8] >> 22) & mask22;
+                        range_chunks[33] = (RAM[8] >> 44) & mask20;
+                        range_chunks[34] = (RAM[8] >> 64) & 0b11; 
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[31];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[32];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[33];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[34];
+                        witn_iter++;
+
+                        // 1234567890123456789012.3456789012345678901234.56789012345678901234|56
+                        range_chunks[35] = (RAM[9]) & 3;
+                        range_chunks[36] = (RAM[9] >> 2) & mask20;
+                        range_chunks[37] = (RAM[9] >> 22) & mask22;
+                        range_chunks[38] = (RAM[9] >> 44) & mask22;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[35];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[36];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[37];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[38];
+                        witn_iter++;
+
+                        // 1234567890123456789012.3456789012345678901234.567890123456789012|3456
+                        range_chunks[39] = (RAM[10]) & 0b1111;
+                        range_chunks[40] = (RAM[10] >> 4) & mask18;
+                        range_chunks[41] = (RAM[10] >> 22) & mask22;
+                        range_chunks[42] = (RAM[10] >> 44) & mask22;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[39];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[40];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[41];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[42];
+                        witn_iter++;
+
+                        // 1234567890123.4567890123456789012345.6789012345678901234567
+                        range_chunks[43] = (RAM[11]) & mask22;
+                        range_chunks[44] = (RAM[11] >> 22) & mask22;
+                        range_chunks[45] = (RAM[11] >> 44) & mask13;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[43];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[44];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[45];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[46];
+                        witn_iter++;
+
+                        // 123|4567890123456789012.3456789012345678901234.5678901234567890123456
+                        range_chunks[46] = (RAM[12]) & mask22;
+                        range_chunks[47] = (RAM[12] >> 22) & mask22;
+                        range_chunks[48] = (RAM[12] >> 44) & mask19;
+                        range_chunks[49] = (RAM[12] >> 63) & 0b111;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[47];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[48];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[49];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[50];
+                        witn_iter++;
+
+                        // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
+                        range_chunks[50] = (RAM[13]) & 1;
+                        range_chunks[51] = (RAM[13] >> 1) & mask21;
+                        range_chunks[52] = (RAM[13] >> 22) & mask22;
+                        range_chunks[53] = (RAM[13] >> 44) & mask21;
+                        range_chunks[54] = (RAM[13] >> 65) & 1;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[51];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[52];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[53];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[54];
+                        witn_iter++;
+
+                        // 1234567890123456789012.3456789012345678901234.5678901234567890123|456
+                        range_chunks[55] = (RAM[14]) & 7;
+                        range_chunks[56] = (RAM[14] >> 3) & mask19;
+                        range_chunks[57] = (RAM[14] >> 22) & mask22;
+                        range_chunks[58] = (RAM[14] >> 44) & mask22;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[55];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[56];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[57];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[58];
+                        witn_iter++;
+
+                        // 1234567890123.4567890123456789012345.6789012345678901234567
+                        range_chunks[59] = (RAM[15]) & mask22;
+                        range_chunks[60] = (RAM[15] >> 22) & mask22;
+                        range_chunks[61] = (RAM[15] >> 44) & mask13;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[59];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[60];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[61];
+                        witn_iter++;
+
+                        // 1234|567890123456789012.3456789012345678901234.5678901234567890123456 
+                        range_chunks[62] = (RAM[16]) & mask22;
+                        range_chunks[63] = (RAM[16] >> 22) & mask22;
+                        range_chunks[64] = (RAM[16] >> 44) & mask18;
+                        range_chunks[65] = (RAM[16] >> 62) & 0b1111;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[62];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[63];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[64];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[65];
+                        witn_iter++;
+
+                        // 12|34567890123456789012.3456789012345678901234.5678901234567890123456|
+                        range_chunks[66] = (RAM[17]) & mask22;
+                        range_chunks[67] = (RAM[17] >> 22) & mask22;
+                        range_chunks[68] = (RAM[17] >> 44) & mask20;
+                        range_chunks[69] = (RAM[17] >> 64) & 0b11;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[66];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[67];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[68];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[69];
+                        witn_iter++;
+
+                        // 1234567890123456789012.3456789012345678901234.56789012345678901234|56
+                        range_chunks[70] = (RAM[18]) & 0b11;
+                        range_chunks[71] = (RAM[18] >> 2) & mask20;
+                        range_chunks[72] = (RAM[18] >> 22) & mask22;
+                        range_chunks[73] = (RAM[18] >> 44) & mask22;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[70];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[71];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[72];
+                        assignment.witness(W5)[row + witn_iter] = range_chunks[73];
+                        witn_iter++;
+
+                        // 12345678901234.5678901234567890123456.7890123456789012345678
+                        range_chunks[74] = (RAM[19]) & mask22;
+                        range_chunks[75] = (RAM[19] >> 22) & mask22;
+                        range_chunks[76] = (RAM[19] >> 44) & mask14;
+
+                        assignment.witness(W2)[row + witn_iter] = range_chunks[74];
+                        assignment.witness(W3)[row + witn_iter] = range_chunks[75];
+                        assignment.witness(W4)[row + witn_iter] = range_chunks[76];
+                        witn_iter++;
+ 
+
                         std::array<var, 16> input_words_vars;
 
-                        for (std::size_t i = 0; i < 8; i++) {
-                            assignment.witness(i)[row] = input_words_values[i];
-                            assignment.witness(i)[row+1] = input_words_values[i+8];
-                            input_words_vars[i] = var(i, row, false);
-                            input_words_vars[i+8] = var(i, row+1, false);
+                        for(std::size_t i = 0; i < rows_amount_creating_input_words_component; i++) {
+                            assignment.witness(W0)[row + i] = RAM[i];
+                            assignment.witness(W1)[row + i] = input_words_values[i];
+                            input_words_vars[i] = var(1, row+i, false);
                         }
 
-                        row = row + 2;
+                        
+
+
+                        row = row + rows_amount_creating_input_words_component;
 
                         std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
                             0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
@@ -246,6 +512,10 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                std::size_t component_start_row) {
                         std::size_t row = component_start_row;
+
+//                        auto constraint_1 = bp.add_constraint(
+//                           var(W0, +1) - (var(W1, +1) + var(W2, 1) * (one << 14) + var(W3, +1) * (one << 28) +
+//                                          var(W4, +1) * (one << 34) + var(W5, 1) * (one << 39) + var(W6, 1) * (one << 53)));
                         
                     }
 
