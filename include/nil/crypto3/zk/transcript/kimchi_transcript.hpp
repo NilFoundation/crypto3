@@ -14,6 +14,7 @@
 #include <nil/marshalling/status_type.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/detail/mapping.hpp>
+// #include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
 
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
@@ -21,9 +22,13 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
+            namespace snark{
+                template<typename value_type>
+                struct proof_evaluation_type;
+            }
             namespace transcript {
-                const int CHALLENGE_LENGTH_IN_LIMBS = 2;
-                const int HIGH_ENTROPY_LIMBS = 2;
+                constexpr static const int CHALLENGE_LENGTH_IN_LIMBS = 2;
+                constexpr static const int HIGH_ENTROPY_LIMBS = 2;
 
                 template <typename integral_type>
                 integral_type pack(std::vector<uint64_t> limbs_lsb){
@@ -55,7 +60,12 @@ namespace nil {
                     typedef typename CurveType::template g1_type<algebra::curves::coordinates::affine> group_type;
                     typedef typename CurveType::base_field_type base_field_type;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
-                    using policy_type = nil::crypto3::hashes::detail::base_poseidon_policy<base_field_type, 2, 1, 7, 55, 0, true>;
+                    typedef nil::crypto3::hashes::detail::base_poseidon_policy<base_field_type, 2, 1, 7, 55, 0, true> policy_type;
+                    
+                    constexpr static const int CHALLENGE_LENGTH_IN_LIMBS = 2;
+                    constexpr static const int HIGH_ENTROPY_LIMBS = 2;
+                    
+                    typedef snark::ScalarChallenge<scalar_field_type> scalar_challenge_type;
 
                     typedef std::uint64_t limb_type;
 
@@ -67,22 +77,30 @@ namespace nil {
                 template <typename CurveType>
                 struct DefaultFrSponge : public BaseSponge<CurveType> {
                     typedef typename BaseSponge<CurveType>::group_type group_type;
-                    typedef typename BaseSponge<CurveType>::base_field_type base_field_type;
                     typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
+                    // typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
                     typedef typename BaseSponge<CurveType>::limb_type limb_type;
+                    // typedef typename BaseSponge<CurveType>::scalar_challenge_type scalar_challenge_type;
+                    
+                    typedef nil::crypto3::hashes::detail::base_poseidon_policy<scalar_field_type, 2, 1, 7, 55, 0, true> policy_type;
+                    typename nil::crypto3::hashes::detail::poseidon_sponge_construction<policy_type> sponge;
+                    typedef snark::ScalarChallenge<scalar_field_type> scalar_challenge_type;
 
-                    typename base_field_type::value_type squeeze(std::size_t num_limbs){
+                    constexpr static const int CHALLENGE_LENGTH_IN_LIMBS = BaseSponge<CurveType>::CHALLENGE_LENGTH_IN_LIMBS;
+                    constexpr static const int HIGH_ENTROPY_LIMBS = BaseSponge<CurveType>::HIGH_ENTROPY_LIMBS;
+
+                    typename scalar_field_type::value_type squeeze(std::size_t num_limbs){
                         if(this->last_squeezed.size() >= num_limbs){
-                            std::vector<limb_type> limbs(this->last_squeezed.begin(), this->last_squeezed.begin() + limbs);
-                            std::vector<limb_type> remaining(this->last_squeezed.begin() + limbs, this->last_squeezed.end());
+                            std::vector<limb_type> limbs(this->last_squeezed.begin(), this->last_squeezed.begin() + num_limbs);
+                            std::vector<limb_type> remaining(this->last_squeezed.begin() + num_limbs, this->last_squeezed.end());
                             this->last_squeezed = remaining;
                             
-                            return typename base_field_type::value_type(pack<typename base_field_type::integral_type>(limbs));
+                            return typename scalar_field_type::value_type(pack<typename scalar_field_type::integral_type>(limbs));
                         }
                         else{
                             auto sq = this->sponge.squeeze();
                             nil::marshalling::status_type status;
-                            std::vector<limb_type> x = unpack<base_field_type::value_type, base_field_type::integral_type>(sq);
+                            std::vector<limb_type> x = unpack<typename scalar_field_type::value_type, typename scalar_field_type::integral_type>(sq);
 
                             for(int i = 0; i < HIGH_ENTROPY_LIMBS; ++i){
                                 this->last_squeezed.push_back(x[i]);
@@ -91,6 +109,52 @@ namespace nil {
                             return squeeze(num_limbs);
                         }
                     }
+
+                    void absorb(typename scalar_field_type::value_type x){
+                        this->last_squeezed.clear();
+                        this->sponge.absorb(x);
+                    }
+
+                    scalar_challenge_type challenge(){
+                        return scalar_challenge_type(squeeze(CHALLENGE_LENGTH_IN_LIMBS));
+                    }
+
+                    void absorb_evaluations(std::vector<typename scalar_field_type::value_type>& p,
+                                            snark::proof_evaluation_type<std::vector<typename scalar_field_type::value_type>>& e){
+                        this->last_squeezed.clear();
+                        this->sponge.absorb(p);
+
+                        std::vector<std::vector<typename scalar_field_type::value_type>> points = {
+                                                                                                    e.z,
+                                                                                                    e.generic_selector,
+                                                                                                    e.poseidon_selector
+                                                                                                 };
+                        this->sponge.absorb(e.z);
+                        this->sponge.absorb(e.generic_selector);
+                        this->sponge.absorb(e.poseidon_selector);
+                        
+                        for(auto &w_iter : e.w){
+                            this->sponge.absorb(w_iter);
+                        }
+
+                        for(auto &s_iter : e.s){
+                            this->sponge.absorb(s_iter);
+                        }
+
+                        if(e.lookup_is_used){
+                            for(auto &s : e.lookup.sorted){
+                                this->sponge.absorb(s);
+                            }
+
+                            this->sponge.absorb(e.lookup.aggreg);
+                            this->sponge.absorb(e.lookup.table);
+
+                            if(e.runtime_is_used){
+                                this->sponge.absorb(e.lookup.runtime_table);
+                            }
+                        }
+                    }
+
                 };
 
                 template <typename CurveType>
@@ -99,7 +163,10 @@ namespace nil {
                     typedef typename BaseSponge<CurveType>::base_field_type base_field_type;
                     typedef typename BaseSponge<CurveType>::scalar_field_type scalar_field_type;
                     typedef typename BaseSponge<CurveType>::limb_type limb_type;
-                    typedef snark::ScalarChallenge<scalar_field_type> scalar_challenge_type;
+                    typedef typename BaseSponge<CurveType>::scalar_challenge_type scalar_challenge_type;
+
+                    constexpr static const int CHALLENGE_LENGTH_IN_LIMBS = BaseSponge<CurveType>::CHALLENGE_LENGTH_IN_LIMBS;
+                    constexpr static const int HIGH_ENTROPY_LIMBS = BaseSponge<CurveType>::HIGH_ENTROPY_LIMBS;
 
                     std::vector<limb_type> squeeze_limbs(std::size_t num_limbs){
                         if(this->last_squeezed.size() >= num_limbs){
