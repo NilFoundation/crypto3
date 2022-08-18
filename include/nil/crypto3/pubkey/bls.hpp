@@ -290,11 +290,13 @@ namespace nil {
                 typedef detail::bls_basic_functions<policy_type> basic_functions;
             };
 
-            template<hashes::UniformityCount _uniformity_count = hashes::UniformityCount::uniform_count,
+            template<std::size_t _k = 128,
+                     hashes::UniformityCount _uniformity_count = hashes::UniformityCount::uniform_count,
                      hashes::ExpandMsgVariant _expand_msg_variant = hashes::ExpandMsgVariant::rfc_xmd>
             struct bls_default_public_params {
                 constexpr static hashes::UniformityCount uniformity_count = _uniformity_count;
                 constexpr static hashes::ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
+                constexpr static std::size_t k = _k;
 
                 // "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_NUL_"
                 typedef std::array<std::uint8_t, 43> dst_type;
@@ -304,11 +306,13 @@ namespace nil {
                                                  0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f, 0x4e, 0x55, 0x4c, 0x5f};
             };
 
-            template<hashes::UniformityCount _uniformity_count = hashes::UniformityCount::uniform_count,
+            template<std::size_t _k = 128,
+                     hashes::UniformityCount _uniformity_count = hashes::UniformityCount::uniform_count,
                      hashes::ExpandMsgVariant _expand_msg_variant = hashes::ExpandMsgVariant::rfc_xmd>
             struct bls_pop_prove_default_public_params {
                 constexpr static hashes::UniformityCount uniformity_count = _uniformity_count;
                 constexpr static hashes::ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
+                constexpr static std::size_t k = _k;
 
                 typedef std::vector<std::uint8_t> dst_type;
                 static inline dst_type dst = []() {
@@ -318,11 +322,13 @@ namespace nil {
                 }();
             };
 
-            template<hashes::UniformityCount _uniformity_count = hashes::UniformityCount::uniform_count,
+            template<std::size_t _k = 128,
+                     hashes::UniformityCount _uniformity_count = hashes::UniformityCount::uniform_count,
                      hashes::ExpandMsgVariant _expand_msg_variant = hashes::ExpandMsgVariant::rfc_xmd>
             struct bls_pop_sign_default_public_params {
                 constexpr static hashes::UniformityCount uniformity_count = _uniformity_count;
                 constexpr static hashes::ExpandMsgVariant expand_msg_variant = _expand_msg_variant;
+                constexpr static std::size_t k = _k;
 
                 typedef std::vector<std::uint8_t> dst_type;
                 static inline dst_type dst = []() {

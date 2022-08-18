@@ -38,9 +38,9 @@
 
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/hash/algorithm/to_curve.hpp>
-
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 #include <nil/crypto3/detail/type_traits.hpp>
 
@@ -96,21 +96,21 @@ namespace nil {
                     static inline void update(internal_accumulator_type &acc, const InputRange &range) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputRange>));
 
-                        to_curve<h2c_policy>(range, acc);
+                        hash<h2c_policy>(range, acc);
                     }
 
                     template<typename InputIterator>
                     static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
-                        to_curve<h2c_policy>(first, last, acc);
+                        hash<h2c_policy>(first, last, acc);
                     }
 
                     static inline signature_type sign(const internal_accumulator_type &acc,
                                                       const private_key_type &sk) {
                         BOOST_ASSERT(validate_private_key(sk));
 
-                        signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(acc);
+                        signature_type Q = nil::crypto3::accumulators::extract::hash<h2c_policy>(acc);
                         return sk * Q;
                     }
 
@@ -123,7 +123,7 @@ namespace nil {
                         if (!validate_public_key(pk)) {
                             return false;
                         }
-                        signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(acc);
+                        signature_type Q = nil::crypto3::accumulators::extract::hash<h2c_policy>(acc);
                         auto C1 = policy_type::pairing(Q, pk);
                         auto C2 = policy_type::pairing(sig, public_key_type::one());
                         return C1 == C2;
@@ -171,7 +171,7 @@ namespace nil {
                             if (!validate_public_key(*pk_n_iter)) {
                                 return false;
                             }
-                            signature_type Q = hashes::accumulators::extract::to_curve<h2c_policy>(*acc_n_iter++);
+                            signature_type Q = nil::crypto3::accumulators::extract::hash<h2c_policy>(*acc_n_iter++);
                             C1 = C1 * policy_type::pairing(Q, *pk_n_iter++);
                         }
                         return C1 == policy_type::pairing(sig, public_key_type::one());
@@ -196,7 +196,7 @@ namespace nil {
                         assert(validate_private_key(sk));
 
                         public_key_type pk = privkey_to_pubkey(sk);
-                        signature_type Q = to_curve<h2c_policy>(point_to_pubkey(pk));
+                        signature_type Q = hash<h2c_policy>(point_to_pubkey(pk));
                         return sk * Q;
                     }
 
@@ -207,7 +207,7 @@ namespace nil {
                         if (!validate_public_key(pk)) {
                             return false;
                         }
-                        signature_type Q = to_curve<h2c_policy>(point_to_pubkey(pk));
+                        signature_type Q = hash<h2c_policy>(point_to_pubkey(pk));
                         auto C1 = policy_type::pairing(Q, pk);
                         auto C2 = policy_type::pairing(pop, public_key_type::one());
                         return C1 == C2;
