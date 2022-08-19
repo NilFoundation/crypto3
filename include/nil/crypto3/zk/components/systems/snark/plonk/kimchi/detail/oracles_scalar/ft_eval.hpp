@@ -374,8 +374,9 @@ namespace nil {
 
                         // evaluate constant term expression
                         var pt = constant_term_component::generate_circuit(bp, assignment,
-                            {index_terms_list::constant_term_str, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
-                            params.combined_evals}, row).output;
+                            {index_terms_list::constant_term_str, params.zeta,
+                            params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
+                            params.combined_evals, params.verifier_index.omega, params.verifier_index.domain_size}, row).output;
                         row += constant_term_component::rows_amount;
                         
                         ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
@@ -569,8 +570,9 @@ namespace nil {
 
                         // evaluate constant term expression
                         var pt = constant_term_component::generate_assignments(assignment,
-                            {index_terms_list::constant_term_str, params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
-                            params.combined_evals}, row).output;
+                            {index_terms_list::constant_term_str, params.zeta,
+                            params.alpha_powers[1], params.beta, params.gamma, params.joint_combiner,
+                            params.combined_evals, params.verifier_index.omega, params.verifier_index.domain_size}, row).output;
                         row += constant_term_component::rows_amount;
                         
                         ft_eval0 = sub_component::generate_assignments(

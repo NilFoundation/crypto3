@@ -53,8 +53,6 @@ namespace nil {
                         Generic,
                     };
 
-                    constexpr static const std::size_t constraints_amount = 2;
-
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;

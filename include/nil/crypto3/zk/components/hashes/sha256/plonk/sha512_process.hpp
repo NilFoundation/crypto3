@@ -250,7 +250,7 @@ namespace nil {
                             assignment.witness(W6)[i + 2] = sigma0_chunks[0][4];
                             assignment.witness(W7)[i + 2] = message_scheduling_words[(i - row) / 6 + 9];
                             assignment.witness(W8)[i + 2] = message_scheduling_words[(i - row) / 6];
-                            
+
                             typename CurveType::base_field_type::integral_type integral_b =
                                 typename CurveType::base_field_type::integral_type(
                                     message_scheduling_words[(i - row) / 6 + 14].data);
@@ -310,7 +310,7 @@ namespace nil {
                                 typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
                             assignment.witness(W5)[i + 3] = message_scheduling_words[(i - row) / 6 + 16];
                             assignment.witness(W6)[i + 3] = (sum - message_scheduling_words[(i - row) / 6 + 16]) / 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data); 
                         }
                         row = row + 384;
                         for (std::size_t i = row; i < row + 720; i = i + 9) {
@@ -364,9 +364,9 @@ namespace nil {
                             assignment.witness(W4)[i + 2] = Sigma1_chunks[0][4];
                             typename CurveType::base_field_type::integral_type Sigma1 =
                                 Sigma1_chunks[0][0] + Sigma1_chunks[0][1] * (1 << (sigma_sizes[0])) +
-                                Sigma1_chunks[0][2] * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                                Sigma1_chunks[0][3] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
-                                Sigma1_chunks[0][4] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
+                                Sigma1_chunks[0][2] * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                                Sigma1_chunks[0][3] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
+                                Sigma1_chunks[0][4] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
 
 
                             sparse_values[4] = typename CurveType::base_field_type::integral_type((e_chunks[1][0] + 
@@ -460,9 +460,9 @@ namespace nil {
 
                             typename CurveType::base_field_type::integral_type Sigma0 =
                                 Sigma0_chunks[0][0] + Sigma0_chunks[0][1] * (1 << sigma_sizes[0]) +
-                                Sigma0_chunks[0][2] * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                                Sigma0_chunks[0][3] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
-                                Sigma0_chunks[0][4] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
+                                Sigma0_chunks[0][2] * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                                Sigma0_chunks[0][3] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
+                                Sigma0_chunks[0][4] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
 
                             sparse_values[0] = typename CurveType::base_field_type::integral_type((a_chunks[1][0] + a_chunks[1][1] * base4_value.pow(a_sizes[0]) +
                                                a_chunks[1][2] * base4_value.pow(a_sizes[0] + a_sizes[1]) +
@@ -695,9 +695,9 @@ namespace nil {
                         var(W1, +1) -
                         (var(W8, 0) + var(W0, +1) +
                         var(W0, -1) + var(W1, -1) * (1 << (sigma_sizes[0])) +
-                        var(W2, -1) * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                        var(W3, -1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
-                        var(W4, -1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) + 
+                        var(W2, -1) * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                        var(W3, -1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
+                        var(W4, -1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) + 
                         var(W2, 0) + var(W3, 0) * (1 << 16) +
                         var(W4, 0) * (one << 32) + var(W5, 0) * (one << 48) +
                         var(W0, 0, true, var::column_type::constant)));
@@ -713,9 +713,9 @@ namespace nil {
                             var(W7, 0) + m*var(W8, 0)-
                             (var(W1, -1) + 
                             var(W0, +1) + var(W1, +1) * (1 << sigma_sizes[0]) +
-                            var(W2, +1) * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
-                            var(W3, +1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
-                            var(W4, +1) * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) +
+                            var(W2, +1) * (one << (sigma_sizes[0] + sigma_sizes[1])) +
+                            var(W3, +1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
+                            var(W4, +1) * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3])) +
                              var(W2, 0) + var(W3, 0) * (1 << 16) +
                              var(W4, 0) * (one << 32) + var(W5, 0) * (one << 48)));
                         auto constraint_5 = bp.add_constraint((var(W8, 0) - 6) * (var(W8, 0) - 5) *
@@ -870,6 +870,51 @@ namespace nil {
                                                           blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                           const params_type &params,
                                                           const std::size_t &start_row_index) {
+
+                                                            std::size_t row = start_row_index + 2;
+ 
+                                                            for (std::size_t i = 1; i <= 15; ++i) {
+                                                                bp.add_copy_constraint({var(W0, row + (i - 1)*6 + 0, false), params.input_words[i]});
+                                                            }
+                                                            for (std::size_t i = 9; i <= 15; ++i) {
+                                                                bp.add_copy_constraint({var(W7, row + (i - 9)*6 + 2, false), params.input_words[i]});
+                                                            }
+                                                            for (std::size_t i = 0; i <= 15; ++i) {
+                                                                bp.add_copy_constraint({var(W8, row + (i - 0)*6 + 2, false), params.input_words[i]});
+                                                            }
+                                                            for (std::size_t i = 14; i <= 15; ++i) {
+                                                               bp.add_copy_constraint({var(W0, row + (i - 14)*6 + 5, false), params.input_words[i]});
+                                                            }
+
+                                                            row = row + 384;
+
+                                                            bp.add_copy_constraint({var(W6, row + 2, false), var(W5, start_row_index + 1)});
+                                                            bp.add_copy_constraint({var(W6, row + 3, false), var(W6, start_row_index + 1)});
+                                                            bp.add_copy_constraint({var(W6, row + 6, false), var(W1, start_row_index + 1)});
+                                                            bp.add_copy_constraint({var(W6, row + 5, false), var(W2, start_row_index + 1)});                                                             
+
+                                                            for (std::size_t i = row; i < row + 720 - 9; i = i + 9){
+                                                                bp.add_copy_constraint ({var(W6, (i + 2) + 9, false), var(W5, (i + 2), false)});
+                                                                bp.add_copy_constraint ({var(W6, (i + 3) + 9, false), var(W6, (i + 2), false)});
+                                                                bp.add_copy_constraint ({var(W6, (i + 5) + 9, false), var(W6, (i + 6), false)});
+                                                                bp.add_copy_constraint ({var(W6, (i + 6) + 9, false), var(W5, (i + 6), false)});
+                                                            }
+
+                                                            bp.add_copy_constraint({var(W0, row + 8, false), params.input_state[0]});
+                                                            bp.add_copy_constraint({var(W7, row + 3, false), params.input_state[3]});
+                                                            bp.add_copy_constraint({var(W0, row + 0, false), params.input_state[4]});
+                                                            bp.add_copy_constraint({var(W8, row + 3, false), params.input_state[7]});
+
+                                                            row = row + 720;
+
+                                                            bp.add_copy_constraint({var(W0, row, false), params.input_state[0]});
+                                                            bp.add_copy_constraint({var(W1, row, false), params.input_state[1]});
+                                                            bp.add_copy_constraint({var(W2, row, false), params.input_state[2]});
+                                                            bp.add_copy_constraint({var(W3, row, false), params.input_state[3]});
+                                                            bp.add_copy_constraint({var(W0, row + 2, false), params.input_state[4]});
+                                                            bp.add_copy_constraint({var(W1, row + 2, false), params.input_state[5]});
+                                                            bp.add_copy_constraint({var(W2, row + 2, false), params.input_state[6]});
+                                                            bp.add_copy_constraint({var(W3, row + 2, false), params.input_state[7]});
                     }
                     static void
                         generate_assignments_constant(blueprint<ArithmetizationType> &bp,

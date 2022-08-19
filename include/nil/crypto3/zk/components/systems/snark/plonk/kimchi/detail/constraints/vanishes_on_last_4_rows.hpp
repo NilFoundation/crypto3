@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_CONSTRAINTS_VANISHES_ON_LAST_4_ROWS_HPP
+#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_CONSTRAINTS_VANISHES_ON_LAST_4_ROWS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -42,16 +42,15 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
-                // zk-polynomial evaluation
-                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/polynomials/permutation.rs#L91
+                // (x - w^{n - 4}) (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
+                // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/polynomials/permutation.rs#L64
                 // Input: group generator (w),
                 //        domain size (n),
                 //        evaluation point (x)
-                // Output: (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
+                // Output: (x - w^{n - 4}) (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
                 template<typename ArithmetizationType, 
                     std::size_t... WireIndexes>
-                class zkpm_evaluate;
+                class vanishes_on_last_4_rows;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
@@ -70,7 +69,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class zkpm_evaluate<
+                class vanishes_on_last_4_rows<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     W0,
                     W1,
@@ -104,7 +103,7 @@ namespace nil {
 
                 public:
                     constexpr static const std::size_t rows_amount = 1 + exp_component::rows_amount 
-                        + 4 * mul_component::rows_amount + 3 * sub_component::rows_amount;
+                        + 6 * mul_component::rows_amount + 4 * sub_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -141,6 +140,8 @@ namespace nil {
                         row += mul_component::rows_amount;
                         var w3 = zk::components::generate_circuit<mul_component>(bp, assignment, {w2, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
+                        var w4 = zk::components::generate_circuit<mul_component>(bp, assignment, {w3, params.group_gen}, row).output;
+                        row += mul_component::rows_amount;
 
                         var a1 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w1}, row).output;
                         row += sub_component::rows_amount;
@@ -148,11 +149,17 @@ namespace nil {
                         row += sub_component::rows_amount;
                         var a3 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w3}, row).output;
                         row += sub_component::rows_amount;
+                        var a4 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w4}, row).output;
+                        row += sub_component::rows_amount;
 
                         var ans1 = zk::components::generate_circuit<mul_component>(bp, assignment, {a1, a2}, row).output;
                         row += mul_component::rows_amount;
-                        result.output = zk::components::generate_circuit<mul_component>(bp, assignment, {ans1, a3}, row).output;
+                        var ans2 = zk::components::generate_circuit<mul_component>(bp, assignment, {ans1, a3}, row).output;
                         row += mul_component::rows_amount;
+                        result.output = zk::components::generate_circuit<mul_component>(bp, assignment, {ans2, a4}, row).output;
+                        row += mul_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
 
                         return result;
                     }
@@ -174,6 +181,8 @@ namespace nil {
                         row += mul_component::rows_amount;
                         var w3 = mul_component::generate_assignments(assignment, {w2, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
+                        var w4 = mul_component::generate_assignments(assignment, {w3, params.group_gen}, row).output;
+                        row += mul_component::rows_amount;
 
                         var a1 = sub_component::generate_assignments(assignment, {params.x, w1}, row).output;
                         row += sub_component::rows_amount;
@@ -181,35 +190,28 @@ namespace nil {
                         row += sub_component::rows_amount;
                         var a3 = sub_component::generate_assignments(assignment, {params.x, w3}, row).output;
                         row += sub_component::rows_amount;
+                        var a4 = sub_component::generate_assignments(assignment, {params.x, w4}, row).output;
+                        row += sub_component::rows_amount;
 
                         var ans1 = mul_component::generate_assignments(assignment, {a1, a2}, row).output;
                         row += mul_component::rows_amount;
-                        result.output = mul_component::generate_assignments(assignment, {ans1, a3}, row).output;
+                        var ans2 = mul_component::generate_assignments(assignment, {ans1, a3}, row).output;
                         row += mul_component::rows_amount;
+                        result.output = mul_component::generate_assignments(assignment, {ans2, a4}, row).output;
+                        row += mul_component::rows_amount;
+
+                        assert(row == start_row_index + rows_amount);
 
                         return result;
                     }
 
                 private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               const std::size_t first_selector_index) {
-
-                    }
-
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
-                    }
-
                     static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
-                        assignment.constant(0)[row] = params.domain_size - zk_rows;
+                        assignment.constant(0)[row] = params.domain_size - zk_rows - 1;
                     }
                 };
             }    // namespace components
@@ -217,4 +219,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_ZKPM_EVALUATE_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_CONSTRAINTS_VANISHES_ON_LAST_4_ROWS_HPP

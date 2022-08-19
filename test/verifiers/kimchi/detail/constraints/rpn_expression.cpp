@@ -89,8 +89,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup
                                                              public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Dup;\0";
-    const std::size_t array_size = count_delimiters(s);
-    const std::size_t N = rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -104,6 +104,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    std::size_t domain_size = 512;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
@@ -119,11 +122,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert(gamma_val == assignment.var_value(real_res.output));
@@ -169,8 +178,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_sub
                                                              public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Sub;\0";
-    const std::size_t array_size = count_delimiters(s);
-    const std::size_t N = rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -184,6 +193,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_sub
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    std::size_t domain_size = 512;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
@@ -199,11 +211,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_sub
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val - beta_val) == assignment.var_value(real_res.output));
@@ -249,8 +267,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_add
                                                              public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Add;\0";
-    const std::size_t array_size = count_delimiters(s);
-    const std::size_t N = rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -264,6 +282,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_add
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    std::size_t domain_size = 512;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
@@ -279,11 +300,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_add
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val + beta_val) == assignment.var_value(real_res.output));
@@ -328,8 +355,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_mul
                                                              public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Mul;\0";
-    const std::size_t array_size = count_delimiters(s);
-    const std::size_t N = rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -343,6 +370,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_mul
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    std::size_t domain_size = 512;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
@@ -358,11 +388,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_mul
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val * beta_val) == assignment.var_value(real_res.output));
@@ -408,8 +444,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_pow
                                                              public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Alpha;Beta;Cell(Variable { col: Witness(3), row: Curr });Pow(2);\0";
-    const std::size_t array_size = count_delimiters(s);
-    const std::size_t N = rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -423,6 +459,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_pow
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    std::size_t domain_size = 512;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
@@ -438,11 +477,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_pow
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         assert((gamma_val * gamma_val) == assignment.var_value(real_res.output));
@@ -488,8 +533,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
                                                              public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Cell(Variable { col: Witness(10), row: Curr });Cell(Variable { col: Witness(2), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Sub;Store;Mul;Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(7), row: Curr });Sub;Sub;Alpha;Pow(1);Cell(Variable { col: Witness(7), row: Curr });Load(0);Mul;Mul;Add;Alpha;Pow(2);Cell(Variable { col: Witness(7), row: Curr });Cell(Variable { col: Witness(8), row: Curr });Dup;Add;Cell(Variable { col: Witness(1), row: Curr });Mul;Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Mul;Store;Dup;Add;Sub;Load(1);Sub;Mul;Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(7), row: Curr });Sub;Load(0);Cell(Variable { col: Witness(8), row: Curr });Mul;Cell(Variable { col: Witness(3), row: Curr });Cell(Variable { col: Witness(1), row: Curr });Sub;Store;Sub;Mul;Add;Mul;Add;Alpha;Pow(3);Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(2), row: Curr });Add;Cell(Variable { col: Witness(4), row: Curr });Add;Cell(Variable { col: Witness(8), row: Curr });Cell(Variable { col: Witness(8), row: Curr });Mul;Sub;Mul;Add;Alpha;Pow(4);Cell(Variable { col: Witness(8), row: Curr });Cell(Variable { col: Witness(0), row: Curr });Cell(Variable { col: Witness(4), row: Curr });Sub;Mul;Cell(Variable { col: Witness(1), row: Curr });Sub;Cell(Variable { col: Witness(5), row: Curr });Sub;Mul;Add;Alpha;Pow(5);Load(2);Cell(Variable { col: Witness(7), row: Curr });Cell(Variable { col: Witness(6), row: Curr });Sub;Mul;Mul;Add;Alpha;Pow(6);Load(2);Cell(Variable { col: Witness(9), row: Curr });Mul;Cell(Variable { col: Witness(6), row: Curr });Sub;Mul;Add;\0";
-    const std::size_t array_size = count_delimiters(s);
-    const std::size_t N = rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType, kimchi_params>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
                                                           8, 9, 10, 11, 12, 13, 14>;
 
@@ -503,6 +548,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
         0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
     typename BlueprintFieldType::value_type zeta_val =
         0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    std::size_t domain_size = 512;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 
@@ -518,11 +566,17 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
     public_input.push_back(joint_combiner_val);
     var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
     std::array<evaluations_type, 2> evals;
     evals[0].w[3] = gamma;
 
-    typename component_type::params_type params = {s, alpha, beta, gamma, joint_combiner, evals};
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
 
     auto result_check = [&gamma_val, &beta_val](AssignmentType &assignment, component_type::result_type &real_res) {
         

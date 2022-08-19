@@ -46,7 +46,10 @@ namespace nil {
                     constexpr static std::size_t split_poly_eval_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
                     constexpr static std::size_t srs_len = SrsLen;
 
-                    constexpr static std::size_t shifted_commitment_split = 1; // TODO
+                    // TODO we can set commitments size values from template but for now it looks like we can just fix it
+                    constexpr static std::size_t shifted_commitment_split = 1;
+                    constexpr static std::size_t max_comm_size = 1;
+                    constexpr static std::size_t w_comm_size = 1;
                 };
             }    // namespace components
         }        // namespace zk

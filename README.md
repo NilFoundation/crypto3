@@ -2,6 +2,8 @@
 
 Circuit definition library for =nil; Foundation's cryptography suite.
 
+[![Run tests](https://github.com/NilFoundation/crypto3-blueprint/actions/workflows/run_tests.yml/badge.svg)](https://github.com/NilFoundation/crypto3-blueprint/actions/workflows/run_tests.yml)
+
 ## Building
 
 This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git).

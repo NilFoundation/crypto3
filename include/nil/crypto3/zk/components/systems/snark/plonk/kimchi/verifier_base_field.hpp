@@ -145,6 +145,10 @@ namespace nil {
                         zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             KimchiCommitmentParamsType::shifted_commitment_split>;
 
+                    using w_comm_type = typename 
+                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
+                            KimchiCommitmentParamsType::w_comm_size>;
+
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
                                             KimchiParamsType, KimchiCommitmentParamsType, BatchSize, W0, W1,
@@ -183,23 +187,23 @@ namespace nil {
 
                     template<std::size_t CommSize>
                     static void parse_commitments(
-                        std::array<std::array<var_ec_point, KimchiCommitmentParamsType::shifted_commitment_split>, 
+                        std::array<std::vector<var_ec_point>, 
                             f_comm_base_size> &unshifted_commitments,
                         const std::array<commitment_type, CommSize> comms,
                         std::size_t &comm_idx) {
                         
                         for(std::size_t j = 0; j < CommSize; j ++) {
                             for(std::size_t k = 0; k < comms[j].parts.size(); k++) {
-                                unshifted_commitments[comm_idx][k] = comms[j].parts[k];
+                                unshifted_commitments[comm_idx].push_back(comms[j].parts[k]);
                             }
                             comm_idx++;
                         } 
                     }
 
-                    static std::array<std::array<var_ec_point, KimchiCommitmentParamsType::shifted_commitment_split>, 
-                        f_comm_base_size> prepare_f_comm_unshifted(const params_type &params) {
+                    static std::array<std::vector<var_ec_point>, 
+                        f_comm_base_size> prepare_f_comm(const params_type &params) {
 
-                        std::array<std::array<var_ec_point, KimchiCommitmentParamsType::shifted_commitment_split>, 
+                        std::array<std::vector<var_ec_point>, 
                             f_comm_base_size> unshifted_commitments;
                         std::size_t comm_idx = 0;
 
@@ -300,10 +304,9 @@ namespace nil {
                             //get digest from transcript
 
 
-                            // ft_comm
-                            std::array<std::array<var_ec_point, 
-                                KimchiCommitmentParamsType::shifted_commitment_split>, f_comm_base_size>
-                                unshifted_commitments = prepare_f_comm_unshifted(params);
+                            // f_comm
+                            std::array<std::vector<var_ec_point>, f_comm_base_size>
+                                unshifted_commitments = prepare_f_comm(params);
 
                             //to-do: U = zero()
                             typename CurveType::template g1_type<algebra::curves::coordinates::affine>::value_type U = 
@@ -312,13 +315,15 @@ namespace nil {
                             assignment.witness(W1)[row] = U.Y;
                             std::size_t urow = row;
                             std::array<var_ec_point, 
-                                KimchiCommitmentParamsType::shifted_commitment_split> shifted_commitment_type_unshifted; 
-                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::shifted_commitment_split; j ++) {
+                                KimchiCommitmentParamsType::max_comm_size> shifted_commitment_type_unshifted; 
+                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
                                 std::array<var_ec_point, f_comm_base_size> part_unshifted_commitments;
                                 std::array<var, f_comm_base_size> part_scalars;
                                 for (std::size_t k = 0; k < f_comm_base_size; k++) {
-                                    part_unshifted_commitments[k] = unshifted_commitments[j][k];
-                                    part_scalars[k] = params.proofs[i].scalars[k];
+                                    if (j < unshifted_commitments[k].size()) {
+                                        part_unshifted_commitments[k] = unshifted_commitments[k][j];
+                                        part_scalars[k] = params.proofs[i].scalars[k];
+                                    }
                                 }
                                 auto res = msm_component::generate_assignments(assignment, {part_scalars, part_unshifted_commitments}, row);
                                 shifted_commitment_type_unshifted[j] = {res.sum.X, res.sum.Y};
@@ -473,24 +478,25 @@ namespace nil {
                             // auto zeta = transcript.squeeze(). to_field();
                             //get digest from transcript
                             
-                            std::array<std::array<var_ec_point, 
-                                KimchiCommitmentParamsType::shifted_commitment_split>, f_comm_base_size>
-                                unshifted_commitments = prepare_f_comm_unshifted(params);
+                            std::array<std::vector<var_ec_point>, f_comm_base_size>
+                                unshifted_commitments = prepare_f_comm(params);
                                 
                             //to-do: U = zero()
                             std::size_t urow = row;
                             std::array<var_ec_point,
-                                KimchiCommitmentParamsType::shifted_commitment_split> shifted_commitment_type_unshifted; 
-                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::shifted_commitment_split; j ++) {
+                                KimchiCommitmentParamsType::max_comm_size> shifted_commitment_type_unshifted; 
+                            for(std::size_t j = 0; j < KimchiCommitmentParamsType::max_comm_size; j ++) {
                                 std::array<var_ec_point, f_comm_base_size> part_unshifted_commitments;
                                 std::array<var, f_comm_base_size> part_scalars;
                                 for (std::size_t k = 0; k < f_comm_base_size; k++) {
-                                    part_unshifted_commitments[k] = unshifted_commitments[j][k];
-                                    part_scalars[k] = params.proofs[i].scalars[k];
+                                    if (j < unshifted_commitments[k].size()) {
+                                        part_unshifted_commitments[k] = unshifted_commitments[k][j];
+                                        part_scalars[k] = params.proofs[i].scalars[k];
+                                    }
                                 }
                                 auto res = msm_component::generate_circuit(bp, assignment, {part_scalars, part_unshifted_commitments}, row);
                                 shifted_commitment_type_unshifted[j] = {res.sum.X, res.sum.Y};
-                                row+= msm_component::rows_amount;
+                                row += msm_component::rows_amount;
                             }
                             var_ec_point chunked_shifted_commitment_type_unshifted = {var(0, urow, false), var(1, urow, false)};
                             row++;
@@ -611,4 +617,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_BASE_FIELD_HPP

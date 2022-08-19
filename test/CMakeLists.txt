@@ -63,6 +63,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/non_native_demo"
     "non_native/plonk/reduction"
     "non_native/plonk/ed25519"
+    "non_native/plonk/signatures_verification"
     "non_native/plonk/ec_point"
     )
 
@@ -79,6 +80,7 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/multi_scalar_multiplication"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
+    "hashes/plonk/sha512"
     "hashes/plonk/sha256_process"
     "hashes/plonk/sha512_process"
     "hashes/plonk/decomposition"
@@ -99,8 +101,10 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/detail/prev_chal_evals"
     "verifiers/kimchi/detail/ft_eval"
     "verifiers/kimchi/detail/combine_proof_evals"
-    "verifiers/kimchi/detail/index_terms_scalars"
-    "verifiers/kimchi/detail/rpn_expression"
+    "verifiers/kimchi/detail//constraints/index_terms_scalars"
+    "verifiers/kimchi/detail/constraints/rpn_expression"
+    "verifiers/kimchi/detail/constraints/vanishes_on_last_4_rows"
+    "verifiers/kimchi/detail/constraints/unnormalized_lagrange_basis"
     "verifiers/kimchi/detail/oracles_cip"
     "sponge/sponge"
     "sponge/oracles"
