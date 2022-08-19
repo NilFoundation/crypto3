@@ -153,31 +153,35 @@ namespace nil {
                         assignment.witness(0)[row + 2] = (q >> 47) &  ((1 << (20)) - 1);
                         assignment.witness(4)[row + 1] = r;
 
-                        assignment.witness(3)[row + 1] = (r) & ((1 << (13)) - 1);
-                        assignment.witness(2)[row + 1] = (r >> 13) &  ((1 << (20)) - 1);
-                        assignment.witness(1)[row + 1] = (r >> 33) &  ((1 << (20)) - 1);
-                        assignment.witness(0)[row + 1] = (r >> 53) &  ((1 << (20)) - 1);
-                        assignment.witness(8)[row] = (r >> 73) & ((1 << (20)) - 1);
-                        assignment.witness(7)[row] = (r >> 93) &  ((1 << (20)) - 1);
-                        assignment.witness(6)[row] = (r >> 113) &  ((1 << (20)) - 1);
-                        assignment.witness(5)[row] = (r >> 133) &  ((1 << (20)) - 1);
-                        assignment.witness(4)[row] = (r >> 153) &  ((1 << (20)) - 1);
-                        assignment.witness(3)[row] = (r >> 173) &  ((1 << (20)) - 1);
-                        assignment.witness(2)[row] = (r >> 193) &  ((1 << (20)) - 1);
-                        assignment.witness(1)[row] = (r >> 213) &  ((1 << (20)) - 1);
-                        assignment.witness(0)[row] = (r >> 233);
+                        assignment.witness(3)[row + 1] = typename ArithmetizationType::field_type::value_type((r) & ((1 << (13)) - 1));
+                        assignment.witness(2)[row + 1] = typename ArithmetizationType::field_type::value_type((r >> 13) &  ((1 << (20)) - 1));
+                        assignment.witness(1)[row + 1] = typename ArithmetizationType::field_type::value_type((r >> 33) &  ((1 << (20)) - 1));
+                        assignment.witness(0)[row + 1] = typename ArithmetizationType::field_type::value_type((r >> 53) &  ((1 << (20)) - 1));
+                        assignment.witness(8)[row] = typename ArithmetizationType::field_type::value_type((r >> 73) & ((1 << (20)) - 1));
+                        assignment.witness(7)[row] = typename ArithmetizationType::field_type::value_type((r >> 93) &  ((1 << (20)) - 1));
+                        assignment.witness(6)[row] = typename ArithmetizationType::field_type::value_type((r >> 113) &  ((1 << (20)) - 1));
+                        assignment.witness(5)[row] = typename ArithmetizationType::field_type::value_type((r >> 133) &  ((1 << (20)) - 1));
+                        assignment.witness(4)[row] = typename ArithmetizationType::field_type::value_type((r >> 153) &  ((1 << (20)) - 1));
+                        assignment.witness(3)[row] = typename ArithmetizationType::field_type::value_type((r >> 173) &  ((1 << (20)) - 1));
+                        assignment.witness(2)[row] = typename ArithmetizationType::field_type::value_type((r >> 193) &  ((1 << (20)) - 1));
+                        assignment.witness(1)[row] = typename ArithmetizationType::field_type::value_type((r >> 213) &  ((1 << (20)) - 1));
+                        assignment.witness(0)[row] = typename ArithmetizationType::field_type::value_type((r >> 233));
 
-                        auto s_r = assignment.witness(0)[row];
+                        typename ArithmetizationType::field_type::value_type s_r = assignment.witness(0)[row];
                         for (size_t i = 1; i < 9; i++) {
                             s_r += assignment.witness(i)[row];
                         }
                         s_r += assignment.witness(0)[row + 1] + assignment.witness(1)[row + 1] +
-                               assignment.witness(2)[row + 1] + assignment.witness(3)[row + 1];
+                               assignment.witness(2)[row + 1];
                         s_r -= 12 * ((1 << (20)) - 1);
-
+                         algebra::curves::ed25519::scalar_field_type::extended_integral_type one = 1;
                         assignment.witness(5)[row + 1] = s_r.inversed();
-                        assignment.witness(6)[row + 1] = 1;
-                        algebra::curves::ed25519::scalar_field_type::extended_integral_type one = 1;
+                        
+                        //if ((r) & ((1 << (13)) - 1) (L - (one << 252))) { \\TO-DO
+                            assignment.witness(6)[row + 1] = 1;
+                        //} else {
+                        //}
+                       
                         auto c = data[0] + data[1] * ((one << 64)) + data[3] * (((one << 192)%L) & ((one << 73) - 1))
                          + data[4] * (((one << 256)%L) & ((one << 73) - 1))
                          + data[5] * (((one << 320)%L) & ((one << 73) - 1)) +
@@ -193,7 +197,7 @@ namespace nil {
                         assignment.witness(8)[row + 3] = v;
                         assignment.witness(4)[row + 2] = v >> 56;
                         assignment.witness(5)[row + 2] = (v >> 34) &  ((1 << (22)) - 1);
-                        assignment.witness(6)[row + 2] = (v >> 12) &  ((1 << (20)) - 1);
+                        assignment.witness(6)[row + 2] = (v >> 12) &  ((1 << (22)) - 1);
                         assignment.witness(7)[row + 2] = v & 4095;
 
                         return result_type(start_row_index);
@@ -221,8 +225,7 @@ namespace nil {
                              var(W2, 0) * 0x80_cppui512 + var(W3, 0)) * L);
 
                         auto s_r = var(W0, -1) + var(W1, -1) + var(W2, -1) + var(W3, -1) + var(W4, -1) + var(W5, -1) +
-                                   var(W6, -1) + var(W7, -1) + var(W8, -1) + var(W0, 0) + var(W1, 0) + var(W2, 0) +
-                                   var(W3, 0) - 12 * ((1 << (20)) - 1);
+                                   var(W6, -1) + var(W7, -1) + var(W8, -1) + var(W0, 0) + var(W1, 0) + var(W2, 0) - 12 * ((1 << (20)) - 1);
 
                         auto constraint_2 = bp.add_constraint(
                             var(W4, 0) -

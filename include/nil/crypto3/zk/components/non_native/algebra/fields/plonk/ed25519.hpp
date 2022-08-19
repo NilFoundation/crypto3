@@ -161,7 +161,6 @@ namespace nil {
                         row += sha512_component::rows_amount;
                         var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
-
                         /* here we check sB == R + kA */
                         
                         auto S = fixed_base_mult_component::generate_assignments(assignment, {s}, row).output;
@@ -228,7 +227,7 @@ namespace nil {
                                                           std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         row += scalar_non_native_range_component::rows_amount + 2 * check_ec_point_component::rows_amount
-                        + reduction_component::rows_amount + 1 + fixed_base_mult_component::rows_amount;
+                        + reduction_component::rows_amount + sha512_component::rows_amount + fixed_base_mult_component::rows_amount;
                         auto S = (typename fixed_base_mult_component::result_type(row - 1 - addition_component::rows_amount)).output;
                         row +=  variable_base_mult_component::rows_amount;
                         auto res = (typename addition_component::result_type(row)).output;
