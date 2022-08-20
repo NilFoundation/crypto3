@@ -130,7 +130,7 @@ namespace nil {
                             input[13] += input[12] < i;    // carry?
                         }
                     };
-                }
+                };
             }    // namespace detail
         }        // namespace stream
     }            // namespace crypto3

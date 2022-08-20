@@ -27,9 +27,11 @@
 
 #include <boost/predef/architecture.h>
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
 #include <nil/crypto3/stream/detail/chacha/chacha_avx2_impl.hpp>
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
 #include <nil/crypto3/stream/detail/chacha/chacha_sse2_impl.hpp>
 #else
 #include <nil/crypto3/stream/detail/chacha/chacha_impl.hpp>
@@ -43,9 +45,11 @@ namespace nil {
                 struct chacha_functions : public chacha_policy<Round, IVSize, KeyBits> {
                     typedef chacha_policy<Round, IVSize, KeyBits> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
                     typedef detail::chacha_avx2_impl<Round, IVSize, KeyBits> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
                     typedef detail::chacha_sse2_impl<Round, IVSize, KeyBits> impl_type;
 #else
                     typedef detail::chacha_impl<Round, IVSize, KeyBits> impl_type;
@@ -74,7 +78,6 @@ namespace nil {
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
 
-
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -88,9 +91,11 @@ namespace nil {
                 struct chacha_functions<Round, IVSize, 128> : public chacha_policy<Round, IVSize, 128> {
                     typedef chacha_policy<Round, IVSize, 128> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
                     typedef detail::chacha_avx2_impl<Round, IVSize, 128> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
                     typedef detail::chacha_sse2_impl<Round, IVSize, 128> impl_type;
 #else
                     typedef detail::chacha_impl<Round, IVSize, 128> impl_type;
@@ -119,7 +124,6 @@ namespace nil {
                         schedule[2] = policy_type::tau()[2];
                         schedule[3] = policy_type::tau()[3];
 
-
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -133,9 +137,11 @@ namespace nil {
                 struct chacha_functions<Round, 64, 128> : public chacha_policy<Round, 64, 128> {
                     typedef chacha_policy<Round, 64, 128> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
                     typedef detail::chacha_avx2_impl<Round, 64, 128> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
                     typedef detail::chacha_sse2_impl<Round, 64, 128> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 64, 128> impl_type;
@@ -173,7 +179,6 @@ namespace nil {
                         schedule[2] = policy_type::tau()[2];
                         schedule[3] = policy_type::tau()[3];
 
-
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -187,9 +192,11 @@ namespace nil {
                 struct chacha_functions<Round, 96, 128> : public chacha_policy<Round, 96, 128> {
                     typedef chacha_policy<Round, 96, 128> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
                     typedef detail::chacha_avx2_impl<Round, 96, 128> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
                     typedef detail::chacha_sse2_impl<Round, 96, 128> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 96, 128> impl_type;
@@ -227,7 +234,6 @@ namespace nil {
                         schedule[2] = policy_type::tau()[2];
                         schedule[3] = policy_type::tau()[3];
 
-
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -242,9 +248,11 @@ namespace nil {
 
                     typedef chacha_policy<Round, IVSize, 256> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
                     typedef detail::chacha_avx2_impl<Round, IVSize, 256> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
                     typedef detail::chacha_sse2_impl<Round, IVSize, 256> impl_type;
 #else
                     typedef detail::chacha_impl<Round, IVSize, 256> impl_type;
@@ -273,7 +281,6 @@ namespace nil {
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
 
-
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -286,9 +293,11 @@ namespace nil {
 
                     typedef chacha_policy<Round, 64, 256> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
                     typedef detail::chacha_avx2_impl<Round, 64, 256> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
                     typedef detail::chacha_sse2_impl<Round, 64, 256> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 64, 256> impl_type;
@@ -327,7 +336,6 @@ namespace nil {
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
 
-
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr + 0], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
@@ -340,9 +348,11 @@ namespace nil {
 
                     typedef chacha_policy<Round, 96, 256> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION)
                     typedef detail::chacha_avx2_impl<Round, 96, 256> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || \
+    ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION)
                     typedef detail::chacha_sse2_impl<Round, 96, 256> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 96, 256> impl_type;
@@ -379,7 +389,6 @@ namespace nil {
                         schedule[1] = policy_type::sigma()[1];
                         schedule[2] = policy_type::sigma()[2];
                         schedule[3] = policy_type::sigma()[3];
-
 
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
                             schedule[itr + 4] = boost::endian::native_to_little(
