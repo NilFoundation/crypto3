@@ -42,11 +42,12 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/oracles_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/proof.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/perm_scalars.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/generic_scalars.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/index_terms_scalars.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/alpha_argument_type.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 
@@ -111,10 +112,11 @@ namespace nil {
                     using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
                         ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
+                    using index_terms_list = typename KimchiParamsType::circuit_params::index_terms_list;
+
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
-                    using argument_type = typename verifier_index_type::argument_type;
 
                     constexpr static const std::size_t selector_seed = 0x0f24;
 
@@ -186,7 +188,7 @@ namespace nil {
                         row += zkpm_evaluate_component::rows_amount;
 
                         std::pair<std::size_t, std::size_t> alpha_idxs = 
-                            params.verifier_index.alpha_map[argument_type::Permutation];
+                            index_terms_list::alpha_map(argument_type::Permutation);
                         f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_circuit(bp,
                             assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
                             alpha_idxs.first,
@@ -196,7 +198,7 @@ namespace nil {
                         row += perm_scalars_component::rows_amount;
 
                         alpha_idxs = 
-                            params.verifier_index.alpha_map[argument_type::Generic];
+                            index_terms_list::alpha_map(argument_type::Generic);
                         std::array<var, generic_scalars_component::output_size> generic_scalars = 
                             generic_scalars_component::generate_circuit(bp,
                                 assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
@@ -273,7 +275,7 @@ namespace nil {
                         row += zkpm_evaluate_component::rows_amount;
 
                         std::pair<std::size_t, std::size_t> alpha_idxs = 
-                            params.verifier_index.alpha_map[argument_type::Permutation];
+                            index_terms_list::alpha_map(argument_type::Permutation);
                         f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_assignments(
                             assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
                             alpha_idxs.first,
@@ -283,7 +285,7 @@ namespace nil {
                         row += perm_scalars_component::rows_amount;
 
                         alpha_idxs = 
-                            params.verifier_index.alpha_map[argument_type::Generic];
+                            index_terms_list::alpha_map(argument_type::Generic);
                         std::array<var, generic_scalars_component::output_size> generic_scalars = 
                             generic_scalars_component::generate_assignments(
                                 assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,

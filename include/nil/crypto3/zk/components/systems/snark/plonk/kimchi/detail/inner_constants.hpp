@@ -40,8 +40,6 @@ namespace nil {
             namespace components {
                 template<typename KimchiParamsType>
                 struct kimchi_inner_constants {
-                    private:
-                    constexpr static const std::size_t constraints_amount = 2;
 
                     public:
                     using commitment_params_type = typename KimchiParamsType::commitment_params_type;
@@ -84,8 +82,8 @@ namespace nil {
                     }
 
                     constexpr static std::size_t f_comm_msm_size = 1 
-                                + 10 // generic_scalars_component::output_size
-                                + constraints_amount;
+                                + ft_generic_size
+                                + KimchiParamsType::circuit_params::index_terms_list::size;
                 };
             }    // namespace components
         }        // namespace zk

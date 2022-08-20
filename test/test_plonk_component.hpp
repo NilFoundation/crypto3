@@ -125,8 +125,7 @@ namespace nil {
             typename component_type::result_type component_result =
                 component_type::generate_assignments(assignment_bp, params, start_row);
             
-            auto rc = std::bind(result_check, assignment_bp, component_result);
-            rc(assignment_bp, component_result);
+            result_check(assignment_bp, component_result);
 
             assignment_bp.padding();
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;

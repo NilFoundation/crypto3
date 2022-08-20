@@ -63,13 +63,15 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
-                    using exp_component = zk::components::exponentiation<ArithmetizationType, 255,
+                    using exp_component = zk::components::exponentiation<ArithmetizationType, 256,
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     constexpr static const std::size_t selector_seed = 0x0ffa;
 
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
+
+                        row += 3;
 
                         row += exp_component::rows_amount;
 
@@ -109,7 +111,7 @@ namespace nil {
                         var output;
 
                         result_type(std::size_t component_start_row) {
-                            output = var(W0, component_start_row + exp_component::rows_amount);
+                            output = var(W0, component_start_row + 3 + exp_component::rows_amount);
                         }
                     };
 
@@ -119,9 +121,11 @@ namespace nil {
                                          const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
-                        var exp(0, start_row_index + 3, false, var::column_type::constant);
-                        var zero(0, start_row_index + 4, false, var::column_type::constant);
-                        var one(0, start_row_index + 5, false, var::column_type::constant);
+                        var exp(0, start_row_index, false, var::column_type::constant);
+                        var zero(0, start_row_index + 1, false, var::column_type::constant);
+                        var one(0, start_row_index + 2, false, var::column_type::constant);
+
+                        row += 3;
 
                         // check if y \in QR(q)
                         // qr_check = 1 if y \in QR(q), -1 if y \in QNR(q), 0 if y = 0
@@ -155,15 +159,15 @@ namespace nil {
                         var one_minus_qr_check = zk::components::generate_circuit<sub_component>(bp, assignment,
                             {one, qr_check}, row).output;
                         row += sub_component::rows_amount;
-                        var x_squared_plus_one = zk::components::generate_circuit<add_component>(bp, assignment,
-                            {x_squared, one}, row).output;
+                        var x_plus_one = zk::components::generate_circuit<add_component>(bp, assignment,
+                            {x, one}, row).output;
                         row += add_component::rows_amount;
 
                         var in_qnr = zk::components::generate_circuit<mul_component>(bp, assignment,
                             {qr_check, one_minus_qr_check}, row).output;
                         row += mul_component::rows_amount;
                         in_qnr = zk::components::generate_circuit<mul_component>(bp, assignment,
-                            {in_qnr, x_squared_plus_one}, row).output;
+                            {in_qnr, x_plus_one}, row).output;
                         row += mul_component::rows_amount;
                         // (1 - qr_check) * (1 + qr_check) * x_squared = 0 for y = 0
 
@@ -196,9 +200,11 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        var exp(0, start_row_index + 3, false, var::column_type::constant);
-                        var zero(0, start_row_index + 4, false, var::column_type::constant);
-                        var one(0, start_row_index + 5, false, var::column_type::constant);
+                        var exp(0, start_row_index, false, var::column_type::constant);
+                        var zero(0, start_row_index + 1, false, var::column_type::constant);
+                        var one(0, start_row_index + 2, false, var::column_type::constant);
+
+                        row += 3;
 
                         // check if y \in QR(q)
                         // qr_check = 1 if y \in QR(q), -1 if y \in QNR(q), 0 if y = 0
@@ -206,12 +212,15 @@ namespace nil {
                             {params.y, exp}, row).output;
                         row += exp_component::rows_amount;
                         // x = sqrt(y) if y \in QR(q) or y = 0, -1 otherwise 
-                        typename BlueprintFieldType::integral_type qr_check_value = typename BlueprintFieldType::integral_type(assignment.var_value(qr_check).data);
-                        if (qr_check_value == 0 || qr_check_value == 1){
-                            typename BlueprintFieldType::value_type x_val = assignment.var_value(params.y).sqrt();
-                            assignment.witness(0)[row] = x_val;
-                        } else {
+                        typename BlueprintFieldType::value_type qr_check_value = assignment.var_value(qr_check).data;
+                        if (qr_check_value == BlueprintFieldType::value_type::zero() || 
+                            qr_check_value == BlueprintFieldType::value_type::one()){
+                                typename BlueprintFieldType::value_type x_val = assignment.var_value(params.y).sqrt();
+                                assignment.witness(0)[row] = x_val;
+                        } else if (qr_check_value == -BlueprintFieldType::value_type::one()) {
                             assignment.witness(0)[row] = -1;
+                        } else {
+                            assert(false);
                         }
                         var x(0, row, false);
                         var x_squared = mul_component::generate_assignments(assignment,
@@ -279,7 +288,7 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
-                        std::size_t row = start_row_index + 3; // leave empty cells for exp_component
+                        std::size_t row = start_row_index; // leave empty cells for exp_component
                         assignment.constant(0)[row] = 
                             (BlueprintFieldType::value_type::modulus - 1) / 2;
                         row++;
@@ -295,10 +304,10 @@ namespace nil {
                                                   const std::size_t start_row_index) {
 
                         // last_check == zero
-                        var zero(0, start_row_index + 4, false, var::column_type::constant);
+                        var zero(0, start_row_index + 1, false, var::column_type::constant);
                         var last_check(W2, start_row_index + rows_amount - 1,
                             false, var::column_type::witness);
-                        bp.add_copy_constraint({zero, last_check});
+                        //bp.add_copy_constraint({zero, last_check});
                     }
                 };
             }    // namespace components

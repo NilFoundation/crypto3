@@ -36,6 +36,7 @@
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/scalar_non_native_range.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/ec_point_edwards25519.hpp>
+#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/addition.hpp>
 #include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
 
 namespace nil {
@@ -92,6 +93,8 @@ namespace nil {
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     using scalar_non_native_range_component = scalar_non_native_range<ArithmetizationType, CurveType, Ed25519Type,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    using non_addition_component = non_native_field_element_addition<ArithmetizationType, CurveType, Ed25519Type,
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     using sha512_component = sha512<ArithmetizationType, CurveType,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                     
@@ -99,12 +102,12 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xfcc2;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 4 * non_native_range_component::rows_amount
-                                                                    + scalar_non_native_range_component::rows_amount
+                    constexpr static const std::size_t rows_amount = /*262144;*/scalar_non_native_range_component::rows_amount
                                                                     + variable_base_mult_component::rows_amount
                                                                     + fixed_base_mult_component::rows_amount
                                                                     + addition_component::rows_amount
-                                                                    + reduction_component::rows_amount;
+                                                                    + reduction_component::rows_amount
+                                                                    + 2 * check_ec_point_component::rows_amount + sha512_component::rows_amount;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -119,7 +122,7 @@ namespace nil {
                         };
                         signature e;
                         var_ec_point public_key;
-                        var M;
+                        std::array<var, 4> M;
                     };
 
                     //TODO: check if points R and public_key lie on the curve
@@ -133,11 +136,15 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-
+                        //generate_lookup_table(assignment, params, component_start_row);
+                        /*std::size_t n = (1 << 18);
+                        for(std::size_t i = 0; i < n; i++) {
+                            assignment.constant(1)[i] = i;
+                        }*/
                         var s = params.e.s;
                         auto R = params.e.R;
                         auto pk = params.public_key;
-                        var M = params.M;
+                        std::array<var, 4> M = params.M;
 
                         /* here we check if s lies in range */
                         scalar_non_native_range_component::generate_assignments(assignment, {s}, row);
@@ -148,29 +155,14 @@ namespace nil {
                         row += check_ec_point_component::rows_amount;
                         
                         /* here we get k = SHA(R||A||M) */
-                        /* 66*15 + 34 = 1024 bits */
-                        // auto padded = ...;
-                        // row += ...;
-                        // auto k_vec = sha512_component::generate_assignments(assignment, {padded}, row).output;
-                        // row += sha512_component::rows_amount;
-                        std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
-                            0x66666666, 0x11111111, 0x22222222, 0x55555555,
-                            0x33333333, 0x99999999, 0x11111111, 0x77777777};
-                        for (int i = 0; i < 8; i++) {
-                            assignment.constant(0)[component_start_row + i] = constants[i];
-                        }
-                        std::array<var, 8> k_vec = {var(0, component_start_row, false, var::column_type::constant),
-                                                    var(0, component_start_row + 1, false, var::column_type::constant),
-                                                    var(0, component_start_row + 2, false, var::column_type::constant),
-                                                    var(0, component_start_row + 3, false, var::column_type::constant),
-                                                    var(0, component_start_row + 4, false, var::column_type::constant),
-                                                    var(0, component_start_row + 5, false, var::column_type::constant),
-                                                    var(0, component_start_row + 6, false, var::column_type::constant),
-                                                    var(0, component_start_row + 7, false, var::column_type::constant)};
+                        auto k_vec = sha512_component::generate_assignments(assignment,  {{{R.x[0], R.x[1], R.x[2], R.x[3]}, 
+                        {R.y[0], R.y[1], R.y[2], R.y[3]}}, {{pk.x[0], pk.x[1], pk.x[2], pk.x[3]}, 
+                        {pk.y[0], pk.y[1], pk.y[2], pk.y[3]}}, M}, row).output_state;
+                        row += sha512_component::rows_amount;
                         var k = reduction_component::generate_assignments(assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
-
                         /* here we check sB == R + kA */
+                        
                         auto S = fixed_base_mult_component::generate_assignments(assignment, {s}, row).output;
                         row += fixed_base_mult_component::rows_amount;
                         auto A = variable_base_mult_component::generate_assignments(assignment, {{pk.x, pk.y}, k}, row).output;
@@ -178,7 +170,6 @@ namespace nil {
                         typename addition_component::params_type add_params = {{A.x, A.y}, {R.x, R.y}};
                         auto res = addition_component::generate_assignments(assignment, add_params, row).output;
                         row += addition_component::rows_amount;
-
                         return result_type(component_start_row);
                     }
 
@@ -191,7 +182,7 @@ namespace nil {
                         var s = params.e.s;
                         auto R = params.e.R;
                         auto pk = params.public_key;
-                        var M = params.M;
+                        std::array<var, 4> M = params.M;
 
                         /* here we check if s lies in range */
                         scalar_non_native_range_component::generate_circuit(bp, assignment, {s}, row);
@@ -202,21 +193,12 @@ namespace nil {
                         row += check_ec_point_component::rows_amount;
                         
                         /* here we get k = SHA(R||A||M) */
-                        // auto padded = ...;
-                        // row += ...;
-                        // auto k_vec = sha512_component::generate_circuit(bp, assignment, {padded}, row).output;
-                        // row += sha512_component::rows_amount;
-                        std::array<var, 8> k_vec = {var(0, start_row_index, false, var::column_type::constant),
-                                                    var(0, start_row_index + 1, false, var::column_type::constant),
-                                                    var(0, start_row_index + 2, false, var::column_type::constant),
-                                                    var(0, start_row_index + 3, false, var::column_type::constant),
-                                                    var(0, start_row_index + 4, false, var::column_type::constant),
-                                                    var(0, start_row_index + 5, false, var::column_type::constant),
-                                                    var(0, start_row_index + 6, false, var::column_type::constant),
-                                                    var(0, start_row_index + 7, false, var::column_type::constant)};
+                        auto k_vec = sha512_component::generate_circuit(bp, assignment, {{{R.x[0], R.x[1], R.x[2], R.x[3]}, 
+                        {R.y[0], R.y[1], R.y[2], R.y[3]}}, {{pk.x[0], pk.x[1], pk.x[2], pk.x[3]}, 
+                        {pk.y[0], pk.y[1], pk.y[2], pk.y[3]}}, M}, row).output_state;
+                        row += sha512_component::rows_amount;
                         var k = reduction_component::generate_circuit(bp, assignment, {k_vec}, row).output;
                         row += reduction_component::rows_amount;
-
                         /* here we check sB == R + kA */
                         auto S = fixed_base_mult_component::generate_circuit(bp, assignment, {s}, row).output;
                         row += fixed_base_mult_component::rows_amount;
@@ -225,7 +207,7 @@ namespace nil {
                         typename addition_component::params_type add_params = {{A.x, A.y}, {R.x, R.y}};
                         auto res = addition_component::generate_circuit(bp, assignment, add_params, row).output;
                         row += addition_component::rows_amount;
-
+                        generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(start_row_index);
                     }
 
@@ -244,9 +226,10 @@ namespace nil {
                                                           const params_type &params,
                                                           std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        row += 5 * non_native_range_component::rows_amount + reduction_component::rows_amount;
-                        auto S = (typename fixed_base_mult_component::result_type(row)).output;
-                        row += fixed_base_mult_component::rows_amount + variable_base_mult_component::rows_amount;
+                        row += scalar_non_native_range_component::rows_amount + 2 * check_ec_point_component::rows_amount
+                        + reduction_component::rows_amount + sha512_component::rows_amount + fixed_base_mult_component::rows_amount;
+                        auto S = (typename fixed_base_mult_component::result_type(row - 1 - addition_component::rows_amount)).output;
+                        row +=  variable_base_mult_component::rows_amount;
                         auto res = (typename addition_component::result_type(row)).output;
                         bp.add_copy_constraint({{S.x[0]}, {res.x[0]}});
                         bp.add_copy_constraint({{S.x[1]}, {res.x[1]}});
@@ -254,8 +237,19 @@ namespace nil {
                         bp.add_copy_constraint({{S.x[3]}, {res.x[3]}});
                         bp.add_copy_constraint({{S.y[0]}, {res.y[0]}});
                         bp.add_copy_constraint({{S.y[1]}, {res.y[1]}});
-                        bp.add_copy_constraint({{S.y[2]}, {res.y[2]}});
+                        bp.add_copy_constraint({{S.y[2]}, {res.y[2]}}); 
                         bp.add_copy_constraint({{S.y[3]}, {res.y[3]}});
+                    }
+
+                    static void generate_lookup_table(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                            const params_type &params,
+                                                            std::size_t component_start_row) {
+                    
+                        std::size_t row = component_start_row;
+                        std::size_t n = (1 << 16);
+                        for(std::size_t i = 0; i < 2; i++) {
+                            assignment.constant(1)[i] = 0;
+                        }
                     }
                 };
 
