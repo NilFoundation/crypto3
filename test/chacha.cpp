@@ -32,11 +32,20 @@
 
 #include <nil/crypto3/random/chacha.hpp>
 
-static const std::unordered_map<std::tuple<std::string, std::string>, std::string> = {
+namespace std {
+    template<>
+    struct hash<std::tuple<std::string, std::string>> {
+        std::size_t operator()(const std::tuple<std::string, std::string> &v) const {
+            return std::hash<std::string>()(std::get<0>(v)) ^ std::hash<std::string>()(std::get<1>(v));
+        }
+    };
+}    // namespace std
+
+static const std::unordered_map<std::tuple<std::string, std::string>, std::string> values = {
     {{"0000000000000000000000000000000000000000000000000000000000000000",
-     "0000000000000000000000000000000000000000000000000000000000000000"},
-    "a84e2a6af98d0a2601ffd05c994de713fa8da43b6f04b3c48c28b0b1b6c9c813726b1d536da5b8b359176c646a7156db35420d5ccd1cea945b246f25edf43b38"}};
+      "0000000000000000000000000000000000000000000000000000000000000000"},
+     "a84e2a6af98d0a2601ffd05c994de713fa8da43b6f04b3c48c28b0b1b6c9c813726b1d536da5b8b359176c646a7156db35420d5ccd1cea945"
+     "b246f25edf43b38"}};
 
 BOOST_AUTO_TEST_CASE(test_special_seed) {
-
 }

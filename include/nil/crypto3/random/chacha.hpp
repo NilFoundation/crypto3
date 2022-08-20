@@ -152,7 +152,7 @@ namespace nil {
             protected:
                 template<typename InputIterator>
                 void update(InputIterator first, InputIterator last) {
-                    mac_key = encrypt<StreamCipher>({0}, mac::compute<mac_type>(first, last, mac_key), acc);
+                    mac_key = encrypt<StreamCipher>({0}, compute<mac_type>(first, last, mac_key), acc);
                 }
 
                 std::size_t cnt;
