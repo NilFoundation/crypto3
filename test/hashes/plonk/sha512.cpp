@@ -93,8 +93,8 @@ ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type
     Tx & mask, (Tx >> 66) & mask, (Tx >> 132) & mask, (Tx >> 198) & (mask >> 9),
     Ty & mask, (Ty >> 66) & mask, (Ty >> 132) & mask, (Ty >> 198) & (mask >> 9),
     Rx & mask, (Rx >> 66) & mask, (Rx >> 132) & mask, (Rx >> 198) & (mask >> 9),
-    Ry & mask, (Ry >> 66) & mask, (Ry >> 132) & mask, (Ry >> 198) & (mask >> 8), 
-    1, 1, 1, 1};
+    Ry & mask, (Ry >> 66) & mask, (Ry >> 132) & mask, (Ry >> 198) & (mask >> 9), 
+    mask, mask, mask, (mask >> 8)};
     std::array<var, 4> e_R_x = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
     std::array<var, 4> e_R_y = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),

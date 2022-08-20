@@ -114,7 +114,7 @@ namespace nil {
                         assignment.enable_selector(first_selector_index + 2, j + 7);
                         assignment.enable_selector(first_selector_index + 3, j + 10);
                         assignment.enable_selector(first_selector_index + 4, j + 13);
-
+/*
                         std::array<var, 16> input_words_vars_1;
 
                         for(std::size_t k = 0; k < 4; k++) {
@@ -152,7 +152,7 @@ namespace nil {
                         sha_params = {sha_output, input_words_vars_2};
                         sha512_process_component::generate_circuit(bp, assignment, sha_params, j);
 
-
+*/
 
                         generate_copy_constraints(bp, assignment, params, start_row_index); 
                         return result_type(start_row_index);
@@ -534,7 +534,7 @@ namespace nil {
                         //           W2,1                    W3,1                  W3,0      W3, -1
                         // |1234567890123456789012.3456789012345678901234.56789012345678901234|56
                         range_chunks[66] = (RAM[17]) & 0b11;
-                        range_chunks[67] = (RAM[17] >> 4) & mask18;
+                        range_chunks[67] = (RAM[17] >> 4) & mask20;
                         range_chunks[68] = (RAM[17] >> 22) & mask22;
                         range_chunks[69] = (RAM[17] >> 44) & mask22;
 
