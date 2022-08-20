@@ -44,7 +44,7 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename ProcessingMode>
-            using stream_accumulator = boost::accumulators::accumulator_set<
+            using accumulator_set = boost::accumulators::accumulator_set<
                 digest<ProcessingMode::input_stream_bits>,
                 boost::accumulators::features<accumulators::tag::stream<ProcessingMode>>>;
         }    // namespace stream

@@ -53,7 +53,7 @@ namespace nil {
                             OutputIterator out) {
 
             typedef typename StreamCipher::stream_encrypter_type EncryptionMode;
-            typedef typename stream::stream_accumulator<EncryptionMode> CipherAccumulator;
+            typedef typename stream::accumulator_set<EncryptionMode> CipherAccumulator;
 
             typedef stream::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef stream::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
@@ -76,13 +76,13 @@ namespace nil {
          *
          * @return
          */
-        template<typename StreamCipher, typename InputIterator,
-                 typename OutputAccumulator =
-                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<
+            typename StreamCipher, typename InputIterator,
+            typename OutputAccumulator = typename stream::accumulator_set<typename StreamCipher::stream_encrypter_type>>
         OutputAccumulator &seek(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef typename StreamCipher::stream_encrypter_type EncryptionMode;
-            typedef typename stream::stream_accumulator<EncryptionMode> CipherAccumulator;
+            typedef typename stream::accumulator_set<EncryptionMode> CipherAccumulator;
 
             typedef stream::detail::ref_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef stream::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
@@ -104,13 +104,13 @@ namespace nil {
          *
          * @return
          */
-        template<typename StreamCipher, typename SinglePassRange,
-                 typename OutputAccumulator =
-                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<
+            typename StreamCipher, typename SinglePassRange,
+            typename OutputAccumulator = typename stream::accumulator_set<typename StreamCipher::stream_encrypter_type>>
         OutputAccumulator &seek(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef typename StreamCipher::stream_encrypter_type EncryptionMode;
-            typedef typename stream::stream_accumulator<EncryptionMode> CipherAccumulator;
+            typedef typename stream::accumulator_set<EncryptionMode> CipherAccumulator;
 
             typedef stream::detail::ref_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef stream::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
@@ -134,9 +134,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename StreamCipher, typename InputIterator, typename KeyIterator,
-                 typename CipherAccumulator =
-                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<
+            typename StreamCipher, typename InputIterator, typename KeyIterator,
+            typename CipherAccumulator = typename stream::accumulator_set<typename StreamCipher::stream_encrypter_type>>
         stream::detail::range_cipher_impl<stream::detail::value_cipher_impl<CipherAccumulator>>
             seek(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
             typedef stream::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
@@ -165,7 +165,7 @@ namespace nil {
         OutputIterator seek(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
             typedef typename StreamCipher::stream_encrypter_type EncryptionMode;
-            typedef typename stream::stream_accumulator<EncryptionMode> CipherAccumulator;
+            typedef typename stream::accumulator_set<EncryptionMode> CipherAccumulator;
 
             typedef stream::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef stream::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
@@ -188,9 +188,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename StreamCipher, typename SinglePassRange, typename KeyRange,
-                 typename CipherAccumulator =
-                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<
+            typename StreamCipher, typename SinglePassRange, typename KeyRange,
+            typename CipherAccumulator = typename stream::accumulator_set<typename StreamCipher::stream_encrypter_type>>
         stream::detail::range_cipher_impl<stream::detail::value_cipher_impl<CipherAccumulator>>
             seek(const SinglePassRange &r, const KeyRange &key) {
 
