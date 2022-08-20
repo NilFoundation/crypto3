@@ -26,19 +26,21 @@
 #ifndef CRYPTO3_HASH_TYPE_TRAITS_HPP
 #define CRYPTO3_HASH_TYPE_TRAITS_HPP
 
+#include <boost/config.hpp>
+
 #ifdef __has_include
 #if __has_include(<version>)
 #include <version>
 #ifdef __cpp_lib_is_constant_evaluated
 #include <type_traits>
-#define BOOST_MP_HAS_IS_CONSTANT_EVALUATED
+#define CRYPTO3_HAS_IS_CONSTANT_EVALUATED
 #endif
 #endif
 #endif
 
 #ifdef __has_builtin
-#if __has_builtin(__builtin_is_constant_evaluated) && !defined(CRYPTO3_NO_CXX14_CONSTEXPR) && \
-    !defined(CRYPTO3_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
+#if __has_builtin(__builtin_is_constant_evaluated) && !defined(BOOST_NO_CXX14_CONSTEXPR) && \
+    !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
 #define CRYPTO3_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
 #endif
@@ -51,7 +53,7 @@
 //
 // As does GCC-9:
 //
-#if defined(BOOST_GCC) && !defined(CRYPTO3_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9) && \
+#if defined(BOOST_GCC) && !defined(BOOST_NO_CXX14_CONSTEXPR) && (__GNUC__ >= 9) && \
     !defined(CRYPTO3_HAS_BUILTIN_IS_CONSTANT_EVALUATED)
 #define CRYPTO3_HAS_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
@@ -115,31 +117,33 @@ namespace nil {
             struct h2c;
 
             template<typename Hash>
-            struct is_find_group_hash : std::bool_constant<false> { };
+            struct is_find_group_hash : std::integral_constant<bool, false> { };
 
             template<typename Params, typename Hash, typename Group>
-            struct is_find_group_hash<find_group_hash<Params, Hash, Group>> : std::bool_constant<true> { };
+            struct is_find_group_hash<find_group_hash<Params, Hash, Group>> : std::integral_constant<bool, true> { };
 
             template<typename Hash>
-            struct is_pedersen : std::bool_constant<false> { };
+            struct is_pedersen : std::integral_constant<bool, false> { };
 
             template<typename Params, typename BasePointGeneratorHash, typename Group>
-            struct is_pedersen<pedersen_to_point<Params, BasePointGeneratorHash, Group>> : std::bool_constant<true> { };
+            struct is_pedersen<pedersen_to_point<Params, BasePointGeneratorHash, Group>>
+                : std::integral_constant<bool, true> { };
 
             template<typename Params, typename BasePointGeneratorHash, typename Group>
-            struct is_pedersen<pedersen<Params, BasePointGeneratorHash, Group>> : std::bool_constant<true> { };
+            struct is_pedersen<pedersen<Params, BasePointGeneratorHash, Group>> : std::integral_constant<bool, true> {
+            };
 
             template<typename Hash>
-            struct is_h2f : std::bool_constant<false> { };
+            struct is_h2f : std::integral_constant<bool, false> { };
 
             template<typename Field, typename Hash, typename Params>
-            struct is_h2f<h2f<Field, Hash, Params>> : std::bool_constant<true> { };
+            struct is_h2f<h2f<Field, Hash, Params>> : std::integral_constant<bool, true> { };
 
             template<typename Hash>
-            struct is_h2c : std::bool_constant<false> { };
+            struct is_h2c : std::integral_constant<bool, false> { };
 
             template<typename Group, typename Hash, typename Params>
-            struct is_h2c<h2c<Group, Hash, Params>> : std::bool_constant<true> { };
+            struct is_h2c<h2c<Group, Hash, Params>> : std::integral_constant<bool, true> { };
 
         }    // namespace hashes
     }        // namespace crypto3
