@@ -44,7 +44,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, proving_mode Mode = proving_mode::basic>
+                template<typename CurveType, proving_mode Mode = proving_mode::basic, reductions::domain_mode DomainMode = reductions::domain_mode::minimal>
                 class r1cs_gg_ppzksnark_prover;
 
                 /**
@@ -55,8 +55,8 @@ namespace nil {
                  *               ``there exists Y such that CS(X,Y)=0''.
                  * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
                  */
-                template<typename CurveType>
-                class r1cs_gg_ppzksnark_prover<CurveType, proving_mode::basic> {
+                template<typename CurveType, reductions::domain_mode DomainMode>
+                class r1cs_gg_ppzksnark_prover<CurveType, proving_mode::basic, DomainMode> {
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
 
                     typedef typename CurveType::scalar_field_type scalar_field_type;
@@ -77,7 +77,7 @@ namespace nil {
                         BOOST_ASSERT(proving_key.constraint_system.is_satisfied(primary_input, auxiliary_input));
 
                         const qap_witness<scalar_field_type> qap_wit =
-                            reductions::r1cs_to_qap<scalar_field_type>::witness_map(
+                            reductions::r1cs_to_qap<scalar_field_type, DomainMode>::witness_map(
                                 proving_key.constraint_system, primary_input, auxiliary_input,
                                 scalar_field_type::value_type::zero(), scalar_field_type::value_type::zero(),
                                 scalar_field_type::value_type::zero());

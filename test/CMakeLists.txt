@@ -17,6 +17,11 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::math
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
 
+                       marshalling::core
+                       marshalling::crypto3_multiprecision
+                       marshalling::crypto3_algebra
+                       marshalling::crypto3_zk
+
                        ${Boost_LIBRARIES})
 
 option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
@@ -88,6 +93,9 @@ set(TESTS_NAMES
     "systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
     "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
+
+    "systems/ppzksnark/r1cs_gg_ppzksnark/powers_of_tau/powers_of_tau"
+    "systems/ppzksnark/r1cs_gg_ppzksnark/mpc_generator/mpc_generator"
 
     "transcript/transcript"
     "transcript/kimchi_transcript"
