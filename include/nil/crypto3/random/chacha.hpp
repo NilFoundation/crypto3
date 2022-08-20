@@ -157,7 +157,7 @@ namespace nil {
 
                 std::size_t cnt;
                 key_type mac_key;
-                accumulator_set<StreamCipher> acc;
+                stream::accumulator_set<StreamCipher> acc;
             };
         }    // namespace random
     }        // namespace crypto3
