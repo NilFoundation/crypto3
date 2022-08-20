@@ -173,7 +173,7 @@ typename ed25519_type::scalar_field_type::value_type sha512(typename ed25519_typ
     message_schedule_array[0] = ((M[0] >> 4) & mask) + (M[1] & 3) * (one << 62);
     message_schedule_array[1] = (M[1] >> 2) & mask;
     message_schedule_array[2] =  M[2] & mask;
-    message_schedule_array[3] = ((M[2] >> 64) + (M[3]) * (one << 2) + 1 * (one << 60)) << 3;
+    message_schedule_array[3] = (M[2] >> 64) + (M[3]) * (one << 2) + 1 * (one << 60);
     message_schedule_array[4] = 0;
     message_schedule_array[5] = 0;
     message_schedule_array[6] = 0;
