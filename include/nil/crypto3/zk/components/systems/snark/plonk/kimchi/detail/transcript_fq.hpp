@@ -98,6 +98,8 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    using group_value = typename zk::components::var_ec_point<BlueprintFieldType>;
+
                     constexpr static bool scalar_larger() {
                         using ScalarField = typename CurveType::scalar_field_type;
                         using BaseField = typename CurveType::base_field_type;
@@ -111,13 +113,6 @@ namespace nil {
 
                     struct fr_value {
                         std::array<var, fr_value_size> value;
-                    };
-
-                    struct group_value {
-                        var X;
-                        var Y;
-                        group_value(var first, var second) : X(first), Y(second) {}
-                        group_value(std::array<var, 2> vec) : X(vec[0]), Y(vec[1]) {}
                     };
 
                     static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;

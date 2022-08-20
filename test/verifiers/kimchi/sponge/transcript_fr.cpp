@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <../test/sponge/aux_transcript_fr.hpp>
+#include <../test/verifiers/kimchi/sponge/aux_transcript_fr.hpp>
 
 #include "test_plonk_component.hpp"
 
@@ -73,12 +73,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
     var zero(0, 0, false, var::column_type::public_input);
     typename component_type::params_type params = {input, zero};
     std::vector<typename BlueprintFieldType::value_type> public_input = {0};
-    typename BlueprintFieldType::value_type result = 0x1D1836F8D9DCCA4F5DB995D7E6BA0FC6B83ADB1FABE3BC4BCD7A4F4C41BC8F94_cppui256;
+    typename BlueprintFieldType::value_type result = 0x00000000000000000000000000000000C873AF205DFABB8A304600F3E09EEBA8_cppui256;
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        // std::cout << "real_res: " << assignment.var_value(real_res.squeezed).data << '\n';
-        // std::cout << "expected: " << result.data << '\n';
-        // assert(result == assignment.var_value(real_res.squeezed));
+        assert(result == assignment.var_value(real_res.squeezed));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 

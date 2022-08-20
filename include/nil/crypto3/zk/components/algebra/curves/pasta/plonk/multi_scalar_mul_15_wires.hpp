@@ -83,11 +83,6 @@ namespace nil {
                     };
 
                     struct result_type {
-                        struct var_ec_point {
-                            var X;
-                            var Y;
-                        };
-
                         var_ec_point sum;
 
                         result_type(const params_type &params, std::size_t start_row_index) {

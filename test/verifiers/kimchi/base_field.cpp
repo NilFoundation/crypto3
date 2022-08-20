@@ -46,8 +46,10 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
 
 #include "test_plonk_component.hpp"
+#include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_base_field_test_suite)
@@ -74,28 +76,21 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     // constexpr static const std::size_t padding = (1 << n_2) - n;
 
     constexpr static std::size_t public_input_size = 1;
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 1;
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params = zk::components::kimchi_params_type<curve_type,
-                                                             commitment_params,
-                                                             witness_columns,
-                                                             perm_size,
-                                                             use_lookup,
-                                                             lookup_table_size,
-                                                             alpha_powers_n,
-                                                             public_input_size,
-                                                             prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
 
     using component_type = zk::components::base_field<ArithmetizationType,
                                                       curve_type,
@@ -223,11 +218,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
 
-    std::array<curve_type::base_field_type::value_type, proof_type::f_comm_base_size> scalars;
+    std::array<curve_type::base_field_type::value_type, kimchi_constants::f_comm_msm_size> scalars;
 
-    std::array<var, proof_type::f_comm_base_size> scalars_var;
+    std::array<var, kimchi_constants::f_comm_msm_size> scalars_var;
 
-    for (std::size_t i = 0; i < proof_type::f_comm_base_size; i++) {
+    for (std::size_t i = 0; i < kimchi_constants::f_comm_msm_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();
         public_input.push_back(scalars[i]);
         scalars_var[i] = var(0, 74 + i, false, var::column_type::public_input);
@@ -290,7 +285,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     var cip_var = var(0, 74 + bases_size, false, var::column_type::public_input);
 
-    typename proof_type::commitments commitments = {
+    typename proof_type::commitments_type commitments = {
         {witness_comm}, lookup_runtime_comm,   table_comm, {lookup_sorted_comm}, lookup_agg_comm, z_comm,
         t_comm,         {oracles_poly_comm[0]}    // to-do: get in the component from oracles
     };
@@ -301,7 +296,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         H_var,
         {PI_G_var},
         {lagrange_bases_var},
-        {{sigma_comm}, {coefficient_comm}, generic_comm, psm_comm, {selectors_comm}, {lookup_selectors_comm}}};
+        {{sigma_comm}, {coefficient_comm}, generic_comm, psm_comm, {selectors_comm}, {lookup_selectors_comm},
+        psm_comm, // runtime_tables_selector 
+        psm_comm, // complete_add
+        psm_comm, // var_base_mmul
+        psm_comm, // endo_mul
+        psm_comm, // endo_mul_scalar
+        }};
 
     typename binding::fr_data<var, batch_size> fr_data = {
         batch_scalars_var, {cip_var}, {Pub_var}, zeta_to_srs_len_var, zeta_to_domain_size_minus_1_var};

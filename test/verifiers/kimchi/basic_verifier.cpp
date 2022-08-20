@@ -43,13 +43,16 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verify_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+#include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 
 #include "test_plonk_component.hpp"
 #include "proof_data.hpp"
@@ -112,15 +115,12 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     using var_scalar = zk::snark::plonk_variable<ScalarFieldType>;
 
-    constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;
     constexpr static std::size_t eval_rounds = 5;
 
     constexpr static std::size_t witness_columns = 15;
     constexpr static std::size_t perm_size = 7;
-    constexpr static std::size_t lookup_table_size = 1;
-    constexpr static bool use_lookup = false;
 
     constexpr static std::size_t srs_len = 10;
     constexpr static std::size_t batch_size = 2;
@@ -129,10 +129,23 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     constexpr static const std::size_t domain_size = 128;
 
+    constexpr std::size_t WitnessColumnsScalar = 15;
+    constexpr std::size_t PublicInputColumnsScalar = 1;
+    constexpr std::size_t ConstantColumnsScalar = 1;
+    constexpr std::size_t SelectorColumnsScalar = 30;
+
+    using ArithmetizationParamsScalar =
+        zk::snark::plonk_arithmetization_params<WitnessColumnsScalar, PublicInputColumnsScalar, ConstantColumnsScalar,
+                                                SelectorColumnsScalar>;
+    using ArithmetizationTypeScalar = zk::snark::plonk_constraint_system<ScalarFieldType, ArithmetizationParamsScalar>;
+    using AssignmentTypeScalar = zk::blueprint_assignment_table<ArithmetizationTypeScalar>;
+
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using kimchi_params =
-        zk::components::kimchi_params_type<curve_type, commitment_params, witness_columns, perm_size, use_lookup, lookup_table_size,
-                                           alpha_powers_n, public_input_size, prev_chal_size>;
+    using index_terms_list = zk::components::index_terms_scalars_list_ec_test<AssignmentTypeScalar>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+        witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+        public_input_size, prev_chal_size>;
     using kimchi_constants = zk::components::kimchi_inner_constants<kimchi_params>;
 
     // COMMON DATA
@@ -154,16 +167,6 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     }
 
     // SCALAR FIELD
-    constexpr std::size_t WitnessColumnsScalar = 15;
-    constexpr std::size_t PublicInputColumnsScalar = 1;
-    constexpr std::size_t ConstantColumnsScalar = 1;
-    constexpr std::size_t SelectorColumnsScalar = 30;
-
-    using ArithmetizationParamsScalar =
-        zk::snark::plonk_arithmetization_params<WitnessColumnsScalar, PublicInputColumnsScalar, ConstantColumnsScalar,
-                                                SelectorColumnsScalar>;
-    using ArithmetizationTypeScalar = zk::snark::plonk_constraint_system<ScalarFieldType, ArithmetizationParamsScalar>;
-    using AssignmentTypeScalar = zk::blueprint_assignment_table<ArithmetizationTypeScalar>;
 
     using fq_output_type_scalar =
         typename zk::components::binding<ArithmetizationTypeScalar, ScalarFieldType, kimchi_params>::fq_sponge_output;
@@ -368,11 +371,11 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     opening_proof_type o_var = {{L_var}, {R_var}, delta_var, G_var};
 
-    std::array<curve_type::base_field_type::value_type, proof_type::f_comm_base_size> scalars;
+    std::array<curve_type::base_field_type::value_type, kimchi_constants::f_comm_msm_size> scalars;
 
-    std::array<var, proof_type::f_comm_base_size> scalars_var;
+    std::array<var, kimchi_constants::f_comm_msm_size> scalars_var;
 
-    for (std::size_t i = 0; i < proof_type::f_comm_base_size; i++) {
+    for (std::size_t i = 0; i < kimchi_constants::f_comm_msm_size; i++) {
         scalars[i] = algebra::random_element<curve_type::base_field_type>();
         public_input.push_back(scalars[i]);
         scalars_var[i] = var(0, 74 + i, false, var::column_type::public_input);
@@ -434,7 +437,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     var cip_var = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    typename proof_type::commitments commitments = {
+    typename proof_type::commitments_type commitments = {
         {witness_comm}, lookup_runtime_comm,   table_comm, {lookup_sorted_comm}, lookup_agg_comm, z_comm,
         t_comm,         {oracles_poly_comm[0]}    // to-do: get in the component from oracles
     };
