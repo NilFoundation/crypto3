@@ -151,38 +151,45 @@ namespace nil {
             /**
              * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores
              * result in polynomial C.
+             * FieldRange is a range of field elements
+             * AlgebraicRange is a range of either field elements or curve elements
              */
-            template<typename Range>
-            void multiplication(Range &c, const Range &a, const Range &b) {
+            template<typename AlgebraicRange, typename FieldRange>
+            void multiplication(AlgebraicRange &c, const AlgebraicRange &a, const FieldRange &b) {
 
                 typedef
-                    typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+                    typename std::iterator_traits<decltype(std::begin(std::declval<AlgebraicRange>()))>::value_type algebraic_value_type;
+                typedef
+                    typename std::iterator_traits<decltype(std::begin(std::declval<FieldRange>()))>::value_type field_value_type;
 
-                typedef typename value_type::field_type FieldType;
+                typedef typename field_value_type::field_type FieldType;
                 BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
-                BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, value_type>::value);
+                BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, field_value_type>::value);
 
                 const std::size_t n = detail::power_of_two(a.size() + b.size() - 1);
-                value_type omega = unity_root<FieldType>(n);
+                field_value_type omega = unity_root<FieldType>(n);
 
-                Range u(a);
-                Range v(b);
-                u.resize(n, value_type::zero());
-                v.resize(n, value_type::zero());
-                c.resize(n, value_type::zero());
+                AlgebraicRange u(a);
+                FieldRange v(b);
+                u.resize(n, algebraic_value_type::zero());
+                v.resize(n, field_value_type::zero());
+                c.resize(n, algebraic_value_type::zero());
 
                 detail::basic_radix2_fft<FieldType>(u, omega);
                 detail::basic_radix2_fft<FieldType>(v, omega);
 
-                std::transform(u.begin(), u.end(), v.begin(), c.begin(), std::multiplies<value_type>());
+                for(std::size_t i = 0; i < n; ++i) {
+                    c[i] = u[i] * v[i];
+                }
 
                 detail::basic_radix2_fft<FieldType>(c, omega.inversed());
 
-                const value_type sconst = value_type(n).inversed();
-                std::transform(c.begin(),
-                               c.end(),
-                               c.begin(),
-                               std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
+                const field_value_type sconst = field_value_type(n).inversed();
+                
+                for(std::size_t i = 0; i < n; ++i) {
+                    c[i] = c[i] * sconst;
+                }
+                
                 condense(c);
             }
 
@@ -191,22 +198,22 @@ namespace nil {
              * Below we make use of the transposed multiplication definition from
              * [Bostan, Lecerf, & Schost, 2003. Tellegen's Principle in Practice, on page 39].
              */
-            template<typename Range>
-            Range transpose_multiplication(const std::size_t &n, const Range &a, const Range &c) {
+            template<typename AlgebraicRange, typename FieldRange>
+            AlgebraicRange transpose_multiplication(const std::size_t &n, const AlgebraicRange &a, const FieldRange &c) {
 
                 typedef
-                    typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
+                    typename std::iterator_traits<decltype(std::begin(std::declval<AlgebraicRange>()))>::value_type value_type;
 
                 const std::size_t m = a.size();
                 // if (c.size() - 1 > m + n)
                 // throw InvalidSizeException("expected c.size() - 1 <= m + n");
 
-                Range r(a);
+                AlgebraicRange r(a);
                 reverse(r, m);
                 multiplication(r, r, c);
 
                 /* Determine Middle Product */
-                Range result;
+                AlgebraicRange result;
                 for (std::size_t i = m - 1; i < n + m; i++) {
                     result.emplace_back(r[i]);
                 }

@@ -30,10 +30,12 @@
 #include <memory>
 #include <vector>
 #include <cstdint>
+#include <algorithm>
 
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
 
 #include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
@@ -58,6 +60,20 @@
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::math;
+
+template<typename EvaluationDomainType>
+std::size_t find_m() {
+    for(std::size_t m = 4; m < 100; ++m) {
+        try{
+            EvaluationDomainType d(m);
+            return m;
+        } catch(std::invalid_argument &e) {
+            // continute;
+        }
+    }
+    BOOST_FAIL(std::string("Could not find m below 100 for ") + typeid(EvaluationDomainType).name());
+    return 4;
+}
 
 /**
  * Note: Templatized type referenced with FieldType (instead of canonical FieldType)
@@ -194,6 +210,78 @@ void test_compute_z() {
     BOOST_CHECK_EQUAL(Z.data, a.data);
 }
 
+template<typename FieldType, typename GroupType, typename EvaluationDomainType, typename GroupEvaluationDomainType>
+void test_fft_curve_elements() {
+    typedef typename GroupType::value_type value_type;
+    typedef typename FieldType::value_type field_value_type;
+
+    std::size_t m = find_m<EvaluationDomainType>();
+    
+    // Make sure the results are reproducible.
+    std::srand(0);
+    std::vector<field_value_type> f(m);
+    std::generate(f.begin(), f.end(), std::rand);
+    std::vector<value_type> g(m);
+    for(std::size_t i = 0; i < m; ++i) {
+        g[i] = value_type::one() * f[i];
+    }
+ 
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
+
+    domain.reset(new EvaluationDomainType(m));
+
+    std::shared_ptr<evaluation_domain<FieldType, value_type>> curve_element_domain;
+
+    curve_element_domain.reset(new GroupEvaluationDomainType(m));
+
+    domain->fft(f);
+    curve_element_domain->fft(g);
+
+    BOOST_CHECK_EQUAL(f.size(), g.size());
+    
+    for(std::size_t i = 0; i < f.size(); ++i) {
+        BOOST_CHECK(f[i] * value_type::one() == g[i]);
+    }
+
+    std::cout << "type name " << typeid(EvaluationDomainType).name() << std::endl;
+}
+
+template<typename FieldType, typename GroupType, typename EvaluationDomainType, typename GroupEvaluationDomainType>
+void test_inverse_fft_curve_elements() {
+    typedef typename GroupType::value_type value_type;
+    typedef typename FieldType::value_type field_value_type;
+
+    std::size_t m = find_m<EvaluationDomainType>();
+
+    // Make sure the results are reproducible.
+    std::srand(0);
+    std::vector<field_value_type> f(m);
+    std::generate(f.begin(), f.end(), std::rand);
+    std::vector<value_type> g(m);
+    for(std::size_t i = 0; i < m; ++i) {
+        g[i] = value_type::one() * f[i];
+    }
+ 
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
+
+    domain.reset(new EvaluationDomainType(m));
+
+    std::shared_ptr<evaluation_domain<FieldType, value_type>> curve_element_domain;
+
+    curve_element_domain.reset(new GroupEvaluationDomainType(m));
+
+    domain->inverse_fft(f);
+    curve_element_domain->inverse_fft(g);
+
+    BOOST_CHECK_EQUAL(f.size(), g.size());
+    
+    for(std::size_t i = 0; i < f.size(); ++i) {
+        BOOST_CHECK(f[i] * value_type::one() == g[i]);
+    }
+
+    std::cout << "type name " << typeid(EvaluationDomainType).name() << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE(fft_evaluation_domain_test_suite)
 
 BOOST_AUTO_TEST_CASE(fft) {
@@ -219,6 +307,64 @@ BOOST_AUTO_TEST_CASE(lagrange_coefficients) {
 BOOST_AUTO_TEST_CASE(compute_z) {
     test_compute_z<fields::bls12<381>>();
     test_compute_z<fields::mnt4<298>>();
+}
+
+BOOST_AUTO_TEST_CASE(curve_elements_fft) {
+    typedef curves::bls12<381>::scalar_field_type field_type;
+    typedef curves::bls12<381>::g1_type<> group_type;
+    using group_value_type = group_type::value_type;
+    
+    test_fft_curve_elements<field_type,
+                            group_type,
+                            basic_radix2_domain<field_type>,
+                            basic_radix2_domain<field_type, group_value_type>>();
+    // not applicable for any m < 100 for this field 
+    // test_fft_curve_elements<field_type,
+    //                         group_type,
+    //                         extended_radix2_domain<field_type>,
+    //                         extended_radix2_domain<field_type, group_value_type>>();
+    test_fft_curve_elements<field_type,
+                            group_type,
+                            step_radix2_domain<field_type>,
+                            step_radix2_domain<field_type, group_value_type>>();
+    test_fft_curve_elements<field_type,
+                            group_type,
+                            geometric_sequence_domain<field_type>,
+                            geometric_sequence_domain<field_type, group_value_type>>();
+    // not applicable  for this field
+    // test_fft_curve_elements<field_type,
+    //                         group_type,
+    //                         arithmetic_sequence_domain<field_type>,
+    //                         arithmetic_sequence_domain<field_type, group_value_type>>();
+}
+
+BOOST_AUTO_TEST_CASE(curve_elements_inverse_fft) {
+    typedef curves::bls12<381>::scalar_field_type field_type;
+    typedef curves::bls12<381>::g1_type<> group_type;
+    using group_value_type = group_type::value_type;
+    
+    test_inverse_fft_curve_elements<field_type,
+                            group_type,
+                            basic_radix2_domain<field_type>,
+                            basic_radix2_domain<field_type, group_value_type>>();
+    // not applicable for any m < 100 for this field
+    // test_inverse_fft_curve_elements<field_type,
+    //                         group_type,
+    //                         extended_radix2_domain<field_type>,
+    //                         extended_radix2_domain<field_type, group_value_type>>();
+    test_inverse_fft_curve_elements<field_type,
+                            group_type,
+                            step_radix2_domain<field_type>,
+                            step_radix2_domain<field_type, group_value_type>>();
+    test_inverse_fft_curve_elements<field_type,
+                            group_type,
+                            geometric_sequence_domain<field_type>,
+                            geometric_sequence_domain<field_type, group_value_type>>();
+    // not applicable for this field
+    // test_inverse_fft_curve_elements<field_type,
+    //                         group_type,
+    //                         arithmetic_sequence_domain<field_type>,
+    //                         arithmetic_sequence_domain<field_type, group_value_type>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
