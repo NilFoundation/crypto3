@@ -61,7 +61,12 @@ namespace nil {
         namespace zk {
             namespace snark {
                 namespace reductions {
-                    template<typename FieldType>
+                    enum class domain_mode {
+                        minimal,
+                        basic_only
+                    };
+
+                    template<typename FieldType, domain_mode OnlyBasicDomain = domain_mode::minimal>
                     struct r1cs_to_qap {
                         typedef FieldType field_type;
 
@@ -79,7 +84,8 @@ namespace nil {
                          */
                         static qap_instance<FieldType> instance_map(const r1cs_constraint_system<FieldType> &cs) {
 
-                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain = OnlyBasicDomain == domain_mode::basic_only ?
+                                math::make_evaluation_domain<FieldType>(math::detail::power_of_two(cs.num_constraints() + cs.num_inputs() + 1)) :
                                 math::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                             std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis(
@@ -138,7 +144,8 @@ namespace nil {
                         static qap_instance_evaluation<FieldType>
                             instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                          const typename FieldType::value_type &t) {
-                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain = OnlyBasicDomain == domain_mode::basic_only ?
+                                math::make_evaluation_domain<FieldType>(math::detail::power_of_two(cs.num_constraints() + cs.num_inputs() + 1)) :
                                 math::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                             std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
@@ -226,7 +233,8 @@ namespace nil {
                             /* sanity check */
                             assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain = OnlyBasicDomain == domain_mode::basic_only ?
+                                math::make_evaluation_domain<FieldType>(math::detail::power_of_two(cs.num_constraints() + cs.num_inputs() + 1)) :
                                 math::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                             r1cs_variable_assignment<FieldType> full_variable_assignment = primary_input;

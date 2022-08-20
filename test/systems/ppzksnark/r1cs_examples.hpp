@@ -90,7 +90,7 @@ namespace nil {
                     full_variable_assignment.push_back(b);
 
                     for (std::size_t i = 0; i < num_constraints - 1; ++i) {
-                        linear_combination<FieldType> A, B, C;
+                        linear_combination<math::linear_variable<FieldType>> A, B, C;
 
                         if (i % 2) {
                             // a * b = c
@@ -116,7 +116,7 @@ namespace nil {
                         cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
                     }
 
-                    linear_combination<FieldType> A, B, C;
+                    linear_combination<math::linear_variable<FieldType>> A, B, C;
                     typename FieldType::value_type fin = FieldType::value_type::zero();
                     for (std::size_t i = 1; i < cs.num_variables(); ++i) {
                         A.add_term(i, 1);
@@ -176,7 +176,7 @@ namespace nil {
                            res = u + v - 2 * u * v
                            2 * u * v = u + v - res
                         */
-                        linear_combination<FieldType> A, B, C;
+                        linear_combination<math::linear_variable<FieldType>> A, B, C;
                         A.add_term(u + 1, 2);
                         B.add_term(v + 1, 1);
                         if (u == v) {

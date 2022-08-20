@@ -46,7 +46,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, proving_mode Mode = proving_mode::basic, typename = void>
+                template<typename CurveType, proving_mode Mode = proving_mode::basic, reductions::domain_mode DomainMode = reductions::domain_mode::minimal, typename = void>
                 class r1cs_gg_ppzksnark_generator;
 
                 /**
@@ -55,8 +55,8 @@ namespace nil {
                  * Given a R1CS constraint system CS, this algorithm produces proving and verification keys for
                  * CS.
                  */
-                template<typename CurveType>
-                class r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic> {
+                template<typename CurveType, reductions::domain_mode DomainMode>
+                class r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic, DomainMode> {
 
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
 
@@ -105,7 +105,7 @@ namespace nil {
 
                         /* A quadratic arithmetic program evaluated at t. */
                         qap_instance_evaluation<scalar_field_type> qap =
-                            reductions::r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(r1cs_copy, t);
+                            reductions::r1cs_to_qap<scalar_field_type, DomainMode>::instance_map_with_evaluation(r1cs_copy, t);
 
                         std::size_t non_zero_At = 0;
                         std::size_t non_zero_Bt = 0;
@@ -170,6 +170,155 @@ namespace nil {
                             algebra::get_window_table<g1_type>(g1_scalar_size, g1_window_size, g1_generator);
 
                         const typename g2_type::value_type G2_gen = algebra::random_element<g2_type>();
+
+                        const std::size_t g2_scalar_count = non_zero_Bt;
+                        const std::size_t g2_scalar_size = scalar_field_type::value_bits;
+                        std::size_t g2_window_size = algebra::get_exp_window_size<g2_type>(g2_scalar_count);
+
+                        algebra::window_table<g2_type> g2_table =
+                            algebra::get_window_table<g2_type>(g2_scalar_size, g2_window_size, G2_gen);
+
+                        typename g1_type::value_type alpha_g1 = alpha * g1_generator;
+                        typename g1_type::value_type beta_g1 = beta * g1_generator;
+                        typename g2_type::value_type beta_g2 = beta * G2_gen;
+                        typename g1_type::value_type delta_g1 = delta * g1_generator;
+                        typename g2_type::value_type delta_g2 = delta * G2_gen;
+
+                        typename std::vector<typename g1_type::value_type> A_query =
+                            algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, g1_window_size, g1_table,
+                                                                           At);
+#ifdef USE_MIXED_ADDITION
+                        algebra::batch_to_special<g1_type>(A_query);
+#endif
+
+                        commitments::knowledge_commitment_vector<g2_type, g1_type> B_query =
+                            commitments::kc_batch_exp<g2_type, g1_type, scalar_field_type>(
+                                scalar_field_type::value_bits, g2_window_size, g1_window_size, g2_table, g1_table,
+                                scalar_field_type::value_type::one(), scalar_field_type::value_type::one(), Bt, chunks);
+
+                        // NOTE: if USE_MIXED_ADDITION is defined,
+                        // kc_batch_exp will convert its output to special form internally
+
+                        typename std::vector<typename g1_type::value_type> H_query =
+                            algebra::batch_exp_with_coeff<g1_type, scalar_field_type>(
+                                g1_scalar_size, g1_window_size, g1_table, qap.Zt * delta_inverse, Ht);
+#ifdef USE_MIXED_ADDITION
+                        algebra::batch_to_special<g1_type>(H_query);
+#endif
+
+                        typename std::vector<typename g1_type::value_type> L_query =
+                            algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, g1_window_size, g1_table,
+                                                                           Lt);
+
+#ifdef USE_MIXED_ADDITION
+                        algebra::batch_to_special<g1_type>(L_query);
+#endif
+
+                        typename gt_type::value_type alpha_g1_beta_g2 = pair_reduced<CurveType>(alpha_g1, beta_g2);
+                        typename g2_type::value_type gamma_g2 = gamma * G2_gen;
+
+                        typename g1_type::value_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
+
+                        typename std::vector<typename g1_type::value_type> gamma_ABC_g1_values =
+                            algebra::batch_exp<g1_type, scalar_field_type>(g1_scalar_size, g1_window_size, g1_table,
+                                                                           gamma_ABC);
+
+                        typename g1_type::value_type gamma_g1 = gamma * g1_generator;
+
+                        container::accumulation_vector<g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
+                                                                               std::move(gamma_ABC_g1_values));
+
+                        return std::make_tuple(std::move(alpha_g1), std::move(beta_g1), std::move(beta_g2),
+                                               std::move(delta_g1), std::move(delta_g2), std::move(gamma_g2),
+                                               std::move(A_query), std::move(B_query), std::move(H_query),
+                                               std::move(L_query), std::move(r1cs_copy), std::move(alpha_g1_beta_g2),
+                                               std::move(gamma_ABC_g1), std::move(gamma_g1));
+                    }
+
+                    // Generate *unsafe* CRS for specific toxic waste 
+                    // For testing purposes only
+                    static inline auto deterministic_basic_process(const constraint_system_type &constraint_system,
+                                                                    const typename scalar_field_type::value_type &t,
+                                                                    const typename scalar_field_type::value_type &alpha,
+                                                                    const typename scalar_field_type::value_type &beta,
+                                                                    const typename scalar_field_type::value_type &gamma,
+                                                                    const typename scalar_field_type::value_type &delta,
+                                                                    const typename g1_type::value_type &g1_generator,
+                                                                    const typename g2_type::value_type &g2_generator
+                                                                    ) {
+
+                        /* Make the B_query "lighter" if possible */
+                        constraint_system_type r1cs_copy(constraint_system);
+                        r1cs_copy.swap_AB_if_beneficial();
+
+                        /* Generate secret randomness */
+                        const typename scalar_field_type::value_type gamma_inverse = gamma.inversed();
+                        const typename scalar_field_type::value_type delta_inverse = delta.inversed();
+
+                        /* A quadratic arithmetic program evaluated at t. */
+                        qap_instance_evaluation<scalar_field_type> qap =
+                            reductions::r1cs_to_qap<scalar_field_type, DomainMode>::instance_map_with_evaluation(r1cs_copy, t);
+
+                        std::size_t non_zero_At = 0;
+                        std::size_t non_zero_Bt = 0;
+                        for (std::size_t i = 0; i < qap.num_variables + 1; ++i) {
+                            if (!qap.At[i].is_zero()) {
+                                ++non_zero_At;
+                            }
+                            if (!qap.Bt[i].is_zero()) {
+                                ++non_zero_Bt;
+                            }
+                        }
+
+                        /* qap.{At,Bt,Ct,Ht} are now in unspecified state, but we do not use them later */
+                        std::vector<typename scalar_field_type::value_type> At = std::move(qap.At);
+                        std::vector<typename scalar_field_type::value_type> Bt = std::move(qap.Bt);
+                        std::vector<typename scalar_field_type::value_type> Ct = std::move(qap.Ct);
+                        std::vector<typename scalar_field_type::value_type> Ht = std::move(qap.Ht);
+
+                        /* The gamma inverse product component: (beta*A_i(t) + alpha*B_i(t) + C_i(t)) * gamma^{-1}.
+                         */
+                        std::vector<typename scalar_field_type::value_type> gamma_ABC;
+                        gamma_ABC.reserve(qap.num_inputs);
+
+                        const typename scalar_field_type::value_type gamma_ABC_0 =
+                            (beta * At[0] + alpha * Bt[0] + Ct[0]) * gamma_inverse;
+                        for (std::size_t i = 1; i < qap.num_inputs + 1; ++i) {
+                            gamma_ABC.emplace_back((beta * At[i] + alpha * Bt[i] + Ct[i]) * gamma_inverse);
+                        }
+
+                        /* The delta inverse product component: (beta*A_i(t) + alpha*B_i(t) + C_i(t)) * delta^{-1}.
+                         */
+                        std::vector<typename scalar_field_type::value_type> Lt;
+                        Lt.reserve(qap.num_variables - qap.num_inputs);
+
+                        const std::size_t Lt_offset = qap.num_inputs + 1;
+                        for (std::size_t i = 0; i < qap.num_variables - qap.num_inputs; ++i) {
+                            Lt.emplace_back((beta * At[Lt_offset + i] + alpha * Bt[Lt_offset + i] + Ct[Lt_offset + i]) *
+                                            delta_inverse);
+                        }
+
+                        /**
+                         * Note that H for Groth's proof system is degree d-2, but the QAP
+                         * reduction returns coefficients for degree d polynomial H (in
+                         * style of PGHR-type proof systems)
+                         */
+                        Ht.resize(Ht.size() - 2);
+
+#ifdef MULTICORE
+                        const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env
+                                                                             // var or call omp_set_num_threads()
+#else
+                        const std::size_t chunks = 1;
+#endif
+
+                        const std::size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables;
+                        const std::size_t g1_scalar_size = scalar_field_type::value_bits;
+                        const std::size_t g1_window_size = algebra::get_exp_window_size<g1_type>(g1_scalar_count);
+
+                        algebra::window_table<g1_type> g1_table =
+                            algebra::get_window_table<g1_type>(g1_scalar_size, g1_window_size, g1_generator);
+                        const typename g2_type::value_type G2_gen = g2_generator;
 
                         const std::size_t g2_scalar_count = non_zero_Bt;
                         const std::size_t g2_scalar_size = scalar_field_type::value_bits;
