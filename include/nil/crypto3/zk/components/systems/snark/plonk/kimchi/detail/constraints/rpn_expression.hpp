@@ -639,7 +639,10 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
-                        assignment.constant(0)[row] = endo_scalar_component::endo_q;
+                        typename KimchiParamsType::curve_type::base_field_type::integral_type endo_integral_base = 
+                            typename KimchiParamsType::curve_type::base_field_type::integral_type(endo_scalar_component::endo_q.data);
+                        typename BlueprintFieldType::integral_type endo_integral = endo_integral_base;
+                        assignment.constant(0)[row] = typename BlueprintFieldType::value_type(endo_integral);
                         row++;
 
                         std::array<std::array<typename BlueprintFieldType::value_type, mds_size>, mds_size> mds =

@@ -28,6 +28,8 @@
 
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -72,7 +74,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     
-    std::vector<std::array<var, 2>> input_fr;
+    std::vector<var> input_fr;
     std::vector<std::array<var, 2>> input_g = {{var(0, 0, false, var::column_type::public_input),
             var(0, 1, false, var::column_type::public_input)}, 
             {var(0, 2, false, var::column_type::public_input),
@@ -137,8 +139,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
     typename BlueprintFieldType::value_type result = 0x0000000000000000000000000000000006906F18EE1C02C944C3186D54A8D03E_cppui256;
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        std::cout << "real_res: " << assignment.var_value(real_res.squeezed).data << '\n';
-        std::cout << "expected: " << result.data << '\n';
         assert(result == assignment.var_value(real_res.squeezed));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
@@ -173,16 +173,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_1) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     
-    std::vector<std::array<var, 2>> input_fr;
+    std::vector<var> input_fr;
     std::vector<std::array<var, 2>> input_g;
     typename component_type::params_type params = {input_fr, input_g};
     std::vector<typename BlueprintFieldType::value_type> public_input;
-    typename BlueprintFieldType::value_type result = 0xAFEB6EEE7D0BD8B45C33CA8DDFC9DFE9_cppui256;
+    typename BlueprintFieldType::value_type result = 0x3A3374A061464EC0AAC7E0FF04346926C579D542F9D205A670CE4C18C004E5C1_cppui256;
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        std::cout << "real_res: " << assignment.var_value(real_res.squeezed).data << '\n';
-        std::cout << "expected: " << result.data << '\n';
-        // assert(result == assignment.var_value(real_res.squeezed));
+        assert(result == assignment.var_value(real_res.squeezed));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 
@@ -205,8 +203,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_2) {
                 ArithmetizationParams>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-    constexpr size_t num_absorb = 2; 
-    constexpr size_t num_challenges = 1;        //works
+    constexpr size_t num_absorb = 0; 
+    constexpr size_t num_challenges = 3;        //works
     constexpr size_t num_challenges_fq = 0;     //works
     constexpr bool digest = false;               //works
     using component_type = zk::components::aux_fq<num_absorb, num_challenges, num_challenges_fq, digest, ArithmetizationType, curve_type,
@@ -216,18 +214,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_2) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     
-    std::vector<std::array<var, 2>> input_fr = {{var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)}};
-    std::vector<std::array<var, 2>> input_g = {{var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
+    std::vector<var> input_fr;
+    std::vector<std::array<var, 2>> input_g;
     typename component_type::params_type params = {input_fr, input_g};
     std::vector<typename BlueprintFieldType::value_type> public_input = 
-        {0, 1, 0x163D7168231DC2F1193A09CC265E59BB166F796B00B6F5D3C0F9A2C2FFEC68FE_cppui256, 
-            0x163D7168231DC2F1193A09CC265E59BB166F796B00B6F5D3C0F9A2C2FFEC6800_cppui256};
-    typename BlueprintFieldType::value_type result = 0x163D7168231DC2F1193A09CC265E59BB166F796B00B6F5D3C0F9A2C2FFEC68FE_cppui256;
+        {};
+    typename BlueprintFieldType::value_type result = 0x00000000000000000000000000000000AFEB6EEE7D0BD8B45C33CA8DDFC9DFE9_cppui256;
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        std::cout << "real_res: " << assignment.var_value(real_res.squeezed).data << '\n';
-        std::cout << "expected: " << result.data << '\n';
-        // assert(result == assignment.var_value(real_res.squeezed));
+        assert(result == assignment.var_value(real_res.squeezed));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 
@@ -250,8 +245,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_3) {
                 ArithmetizationParams>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 
-    constexpr size_t num_absorb = 2; 
-    constexpr size_t num_challenges = 2;        //works
+    constexpr size_t num_absorb = 1; 
+    constexpr size_t num_challenges = 1;        //works
     constexpr size_t num_challenges_fq = 0;     //works
     constexpr bool digest = false;              //works
     using component_type = zk::components::aux_fq<num_absorb, num_challenges, num_challenges_fq, digest, ArithmetizationType, curve_type,
@@ -260,37 +255,21 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_3) {
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
-
-    typename BlueprintFieldType::value_type random_scalar = algebra::random_element<BlueprintFieldType>();
-    curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type 
-        random_point = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
 	
     
     std::vector<typename BlueprintFieldType::value_type> public_input;
-    typename BlueprintFieldType::value_type result = 0xAFEB6EEE7D0BD8B45C33CA8DDFC9DFE9_cppui256;
-
-    std::vector<std::array<var, 2>> input_fr;
+    typename BlueprintFieldType::value_type result = 0x000000000000000000000000000000003972C78FB41D347300A463E54826F2AB_cppui256;
+    std::vector<var> input_fr;
     std::vector<std::array<var, 2>> input_g;
 
-    public_input.push_back(random_scalar);
-    public_input.push_back(random_point.X);
-    public_input.push_back(random_point.Y);
-    public_input.push_back(0);
-    var scalar_var(0, 0, false, var::column_type::public_input);
-    var point_x_var(0, 1, false, var::column_type::public_input);
-    var point_y_var(0, 2, false, var::column_type::public_input);
-    var bit_var(0, 3, false, var::column_type::public_input);
-
-    input_fr = {{bit_var, scalar_var}};
-    input_g = {{point_x_var, point_y_var}};
+    public_input.push_back(1);
+    input_fr.push_back(var(0, 0, false, var::column_type::public_input));
 
     typename component_type::params_type params = {input_fr, input_g};
 
     auto result_check = [&result](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        std::cout << "real_res: " << assignment.var_value(real_res.squeezed).data << '\n';
-        std::cout << "expected: " << result.data << '\n';
-        //assert(result == assignment.var_value(real_res.squeezed));
+        assert(result == assignment.var_value(real_res.squeezed));
     };
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
 

@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2022 Ekaterina Chukavina <kate@nil.foundation>
 //
 // MIT License
 //
@@ -236,7 +237,6 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
-
                         auto es = prepare_cip_input(params);
 
                         var res =
