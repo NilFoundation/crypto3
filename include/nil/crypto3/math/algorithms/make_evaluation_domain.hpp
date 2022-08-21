@@ -47,58 +47,58 @@ namespace nil {
              The function get_evaluation_domain is chosen from different supported domains,
              depending on MinSize.
             */
-            template<typename FieldType>
-            std::shared_ptr<evaluation_domain<FieldType>> make_evaluation_domain(std::size_t m) {
-                typedef std::shared_ptr<evaluation_domain<FieldType>> result_type;
+            template<typename FieldType, typename ValueType = typename FieldType::value_type>
+            std::shared_ptr<evaluation_domain<FieldType, ValueType>> make_evaluation_domain(std::size_t m) {
+                typedef std::shared_ptr<evaluation_domain<FieldType, ValueType>> result_type;
 
                 const std::size_t big = 1ul << (std::size_t(std::ceil(std::log2(m))) - 1);
                 const std::size_t rounded_small = (1ul << std::size_t(std::ceil(std::log2(m - big))));
 
                 if (detail::is_basic_radix2_domain<FieldType>(m)) {
                     result_type result;
-                    result.reset(new basic_radix2_domain<FieldType>(m));
+                    result.reset(new basic_radix2_domain<FieldType, ValueType>(m));
                     return result;
                 }
 
                 if (detail::is_extended_radix2_domain<FieldType>(m)) {
                     result_type result;
-                    result.reset(new extended_radix2_domain<FieldType>(m));
+                    result.reset(new extended_radix2_domain<FieldType, ValueType>(m));
                     return result;
                 }
 
                 if (detail::is_step_radix2_domain<FieldType>(m)) {
                     result_type result;
-                    result.reset(new step_radix2_domain<FieldType>(m));
+                    result.reset(new step_radix2_domain<FieldType, ValueType>(m));
                     return result;
                 }
 
                 if (detail::is_basic_radix2_domain<FieldType>(big + rounded_small)) {
                     result_type result;
-                    result.reset(new basic_radix2_domain<FieldType>(big + rounded_small));
+                    result.reset(new basic_radix2_domain<FieldType, ValueType>(big + rounded_small));
                     return result;
                 }
 
                 if (detail::is_extended_radix2_domain<FieldType>(big + rounded_small)) {
                     result_type result;
-                    result.reset(new extended_radix2_domain<FieldType>(big + rounded_small));
+                    result.reset(new extended_radix2_domain<FieldType, ValueType>(big + rounded_small));
                     return result;
                 }
 
                 if (detail::is_step_radix2_domain<FieldType>(big + rounded_small)) {
                     result_type result;
-                    result.reset(new step_radix2_domain<FieldType>(big + rounded_small));
+                    result.reset(new step_radix2_domain<FieldType, ValueType>(big + rounded_small));
                     return result;
                 }
 
                 if (detail::is_geometric_sequence_domain<FieldType>(m)) {
                     result_type result;
-                    result.reset(new geometric_sequence_domain<FieldType>(m));
+                    result.reset(new geometric_sequence_domain<FieldType, ValueType>(m));
                     return result;
                 }
 
                 if (detail::is_arithmetic_sequence_domain<FieldType>(m)) {
                     result_type result;
-                    result.reset(new arithmetic_sequence_domain<FieldType>(m));
+                    result.reset(new arithmetic_sequence_domain<FieldType, ValueType>(m));
                     return result;
                 }
 

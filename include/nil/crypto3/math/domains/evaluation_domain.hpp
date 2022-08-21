@@ -37,20 +37,21 @@ namespace nil {
             /**
              * An evaluation domain.
              */
-            template<typename FieldType>
+            template<typename FieldType, typename ValueType = typename FieldType::value_type>
             class evaluation_domain {
 
-                typedef typename FieldType::value_type value_type;
+                typedef typename FieldType::value_type field_value_type;
+                typedef ValueType value_type;
 
             public:
                 typedef FieldType field_type;
 
-                value_type root;
-                value_type root_inverse;
-                value_type domain;
-                value_type domain_inverse;
-                value_type generator;
-                value_type generator_inverse;
+                field_value_type root;
+                field_value_type root_inverse;
+                field_value_type domain;
+                field_value_type domain_inverse;
+                field_value_type generator;
+                field_value_type generator_inverse;
 
                 std::size_t m;
                 std::size_t log2_size;
@@ -70,7 +71,7 @@ namespace nil {
                 /**
                  * Get the idx-th element in S.
                  */
-                virtual value_type get_domain_element(const std::size_t idx) = 0;
+                virtual field_value_type get_domain_element(const std::size_t idx) = 0;
 
                 /**
                  * Compute the FFT, over the domain S, of the vector a.
@@ -91,22 +92,22 @@ namespace nil {
                  * The output is a vector (b_{0},...,b_{m-1})
                  * where b_{i} is the evaluation of L_{i,S}(z) at z = t.
                  */
-                virtual std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) = 0;
+                virtual std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) = 0;
 
                 /**
                  * Evaluate the vanishing polynomial of S at the field element t.
                  */
-                virtual value_type compute_vanishing_polynomial(const value_type &t) = 0;
+                virtual field_value_type compute_vanishing_polynomial(const field_value_type &t) = 0;
 
                 /**
                  * Add the coefficients of the vanishing polynomial of S to the coefficients of the polynomial H.
                  */
-                virtual void add_poly_z(const value_type &coeff, std::vector<value_type> &H) = 0;
+                virtual void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) = 0;
 
                 /**
                  * Multiply by the evaluation, on a coset of S, of the inverse of the vanishing polynomial of S.
                  */
-                virtual void divide_by_z_on_coset(std::vector<value_type> &P) = 0;
+                virtual void divide_by_z_on_coset(std::vector<field_value_type> &P) = 0;
 
                 bool operator==(const evaluation_domain &rhs) const {
                     return root == rhs.root && root_inverse == rhs.root_inverse && domain == rhs.domain &&

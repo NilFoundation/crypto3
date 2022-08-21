@@ -40,23 +40,24 @@ namespace nil {
 
             using namespace nil::crypto3::algebra;
 
-            template<typename FieldType>
+            template<typename FieldType, typename ValueType>
             class evaluation_domain;
 
-            template<typename FieldType>
-            class basic_radix2_domain : public evaluation_domain<FieldType> {
-                typedef typename FieldType::value_type value_type;
+            template<typename FieldType, typename ValueType = typename FieldType::value_type>
+            class basic_radix2_domain : public evaluation_domain<FieldType, ValueType> {
+                typedef typename FieldType::value_type field_value_type;
+                typedef ValueType value_type;
 
             public:
                 typedef FieldType field_type;
 
-                value_type omega;
+                field_value_type omega;
 
-                basic_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
+                basic_radix2_domain(const std::size_t m) : evaluation_domain<FieldType, ValueType>(m) {
                     if (m <= 1)
                         throw std::invalid_argument("basic_radix2(): expected m > 1");
 
-                    if (!std::is_same<value_type, std::complex<double>>::value) {
+                    if (!std::is_same<field_value_type, std::complex<double>>::value) {
                         const std::size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         if (logm > (fields::arithmetic_params<FieldType>::s))
                             throw std::invalid_argument(
@@ -69,7 +70,7 @@ namespace nil {
                 void fft(std::vector<value_type> &a) {
                     if (a.size() != this->m) {
                         if (a.size() < this->m) {
-                            a.resize(this->m, value_type(0));
+                            a.resize(this->m, value_type::zero());
                         } else {
                             throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
                         }
@@ -81,7 +82,7 @@ namespace nil {
                 void inverse_fft(std::vector<value_type> &a) {
                     if (a.size() != this->m) {
                         if (a.size() < this->m) {
-                            a.resize(this->m, value_type(0));
+                            a.resize(this->m, value_type::zero());
                         } else {
                             throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
                         }
@@ -89,25 +90,25 @@ namespace nil {
 
                     detail::basic_radix2_fft<FieldType>(a, omega.inversed());
 
-                    const value_type sconst = value_type(a.size()).inversed();
+                    const field_value_type sconst = field_value_type(a.size()).inversed();
                     for (std::size_t i = 0; i < a.size(); ++i) {
-                        a[i] *= sconst;
+                        a[i] = a[i] * sconst;
                     }
                 }
 
-                std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
+                std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) {
                     return detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(this->m, t);
                 }
 
-                value_type get_domain_element(const std::size_t idx) {
+                field_value_type get_domain_element(const std::size_t idx) {
                     return omega.pow(idx);
                 }
 
-                value_type compute_vanishing_polynomial(const value_type &t) {
-                    return (t.pow(this->m)) - value_type::one();
+                field_value_type compute_vanishing_polynomial(const field_value_type &t) {
+                    return (t.pow(this->m)) - field_value_type::one();
                 }
 
-                void add_poly_z(const value_type &coeff, std::vector<value_type> &H) {
+                void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("basic_radix2: expected H.size() == this->m+1");
 
@@ -115,9 +116,9 @@ namespace nil {
                     H[0] -= coeff;
                 }
 
-                void divide_by_z_on_coset(std::vector<value_type> &P) {
-                    const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
-                    const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
+                void divide_by_z_on_coset(std::vector<field_value_type> &P) {
+                    const field_value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
+                    const field_value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
                     for (std::size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }

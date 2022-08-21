@@ -95,25 +95,25 @@ namespace nil {
                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
                                          size_t n) {
 
-                typedef typename FieldType::value_type value_type;
-                static_assert(std::is_same<typename Range::value_type, value_type>::value);
+                typedef typename Range::value_type value_type;
+                typedef typename FieldType::value_type field_value_type;
 
                 std::size_t m = log2(n);
                 // if (T.size() != m + 1u)
                 // throw DomainSizeException("expected T.size() == m + 1");
 
                 /* MonomialToNewton */
-                std::vector<value_type> I(T[m][0]);
+                std::vector<field_value_type> I(T[m][0]);
                 reverse(I, n);
 
-                std::vector<value_type> mod(n + 1, value_type::zero());
-                mod[n] = value_type::one();
+                std::vector<field_value_type> mod(n + 1, field_value_type::zero());
+                mod[n] = field_value_type::one();
 
                 extended_euclidean(mod, I, mod, mod, I);
 
                 I.resize(n);
 
-                std::vector<value_type> Q(transpose_multiplication(n - 1, I, a));
+                std::vector<value_type> Q(transpose_multiplication(n - 1, a, I));
                 reverse(Q, n);
 
                 /* TNewtonToMonomial */
@@ -130,7 +130,7 @@ namespace nil {
 
                     /* NB: unsigned reverse iteration */
                     for (std::size_t j = (1u << (m - i - 1)) - 1; j < (1u << (m - i - 1)); j--) {
-                        c[2 * j + 1] = transpose_multiplication((1u << i) - 1, T[i][row_length - 2 * j], c[j]);
+                        c[2 * j + 1] = transpose_multiplication((1u << i) - 1, c[j], T[i][row_length - 2 * j]);
                         c[2 * j] = c[j];
                         c[2 * j].resize(c_vec);
                     }
@@ -156,8 +156,8 @@ namespace nil {
                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
                                          size_t n) {
 
-                typedef typename FieldType::value_type value_type;
-                static_assert(std::is_same<typename Range::value_type, value_type>::value);
+                typedef typename Range::value_type value_type;
+                typedef typename FieldType::value_type field_vale_type;
 
                 std::size_t m = log2(n);
                 // if (T.size() != m + 1u)
@@ -172,7 +172,7 @@ namespace nil {
                 std::vector<value_type> temp(1, value_type::zero());
                 for (std::size_t i = 0; i < m; i++) {
                     for (std::size_t j = 0; j < (1u << (m - i - 1)); j++) {
-                        multiplication(temp, T[i][2 * j], f[2 * j + 1]);
+                        multiplication(temp, f[2 * j + 1], T[i][2 * j]);
                         addition(f[j], f[2 * j], temp);
                     }
                 }
@@ -191,19 +191,20 @@ namespace nil {
                                                     const Range3 &geometric_triangular_sequence,
                                                     const std::size_t &n) {
 
-                typedef typename FieldType::value_type value_type;
+                typedef typename FieldType::value_type field_value_type;
+                typedef typename Range1::value_type value_type;
 
-                std::vector<value_type> u(n, value_type::zero());
+                std::vector<field_value_type> u(n, field_value_type::zero());
                 std::vector<value_type> w(n, value_type::zero());
-                std::vector<value_type> z(n, value_type::zero());
+                std::vector<field_value_type> z(n, field_value_type::zero());
                 std::vector<value_type> f(n, value_type::zero());
-                u[0] = value_type::one();
+                u[0] = field_value_type::one();
                 w[0] = a[0];
-                z[0] = value_type::one();
+                z[0] = field_value_type::one();
                 f[0] = a[0];
 
                 for (std::size_t i = 1; i < n; i++) {
-                    u[i] = u[i - 1] * geometric_sequence[i] * (value_type::one() - geometric_sequence[i]).inversed();
+                    u[i] = u[i - 1] * geometric_sequence[i] * (field_value_type::one() - geometric_sequence[i]).inversed();
                     w[i] = a[i] * (u[i].inversed());
                     z[i] = u[i] * geometric_triangular_sequence[i].inversed();
                     f[i] = w[i] * geometric_triangular_sequence[i];
@@ -214,7 +215,7 @@ namespace nil {
                     }
                 }
 
-                w = transpose_multiplication(n - 1, z, f);
+                w = transpose_multiplication(n - 1, f, z);
 
                 for (std::size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];
@@ -232,23 +233,24 @@ namespace nil {
                                                     const Range3 &geometric_triangular_sequence,
                                                     std::size_t n) {
 
-                typedef typename FieldType::value_type value_type;
+                typedef typename Range1::value_type value_type;
+                typedef typename FieldType::value_type field_value_type;
 
                 std::vector<value_type> v(n, value_type::zero());
-                std::vector<value_type> u(n, value_type::zero());
+                std::vector<field_value_type> u(n, field_value_type::zero());
                 std::vector<value_type> w(n, value_type::zero());
-                std::vector<value_type> z(n, value_type::zero());
+                std::vector<field_value_type> z(n, field_value_type::zero());
                 v[0] = a[0];
-                u[0] = value_type::one();
+                u[0] = field_value_type::one();
                 w[0] = a[0];
-                z[0] = value_type::one();
+                z[0] = field_value_type::one();
 
                 for (std::size_t i = 1; i < n; i++) {
                     v[i] = a[i] * geometric_triangular_sequence[i];
                     if (i % 2 == 1)
                         v[i] = -v[i];
 
-                    u[i] = u[i - 1] * geometric_sequence[i] * (value_type::one() - geometric_sequence[i]).inversed();
+                    u[i] = u[i - 1] * geometric_sequence[i] * (field_value_type::one() - geometric_sequence[i]).inversed();
                     w[i] = v[i] * u[i].inversed();
 
                     z[i] = u[i] * geometric_triangular_sequence[i].inversed();
@@ -256,7 +258,7 @@ namespace nil {
                         z[i] = -z[i];
                 }
 
-                w = transpose_multiplication(n - 1, u, w);
+                w = transpose_multiplication(n - 1, w, u);
 
                 for (std::size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];

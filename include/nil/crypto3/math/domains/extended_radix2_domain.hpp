@@ -38,25 +38,26 @@ namespace nil {
 
             using namespace nil::crypto3::algebra;
 
-            template<typename FieldType>
+            template<typename FieldType, typename ValueType>
             class evaluation_domain;
 
-            template<typename FieldType>
-            class extended_radix2_domain : public evaluation_domain<FieldType> {
-                typedef typename FieldType::value_type value_type;
+            template<typename FieldType, typename ValueType = typename FieldType::value_type>
+            class extended_radix2_domain : public evaluation_domain<FieldType, ValueType> {
+                typedef typename FieldType::value_type field_value_type;
+                typedef ValueType value_type;
 
             public:
                 typedef FieldType field_type;
 
                 std::size_t small_m;
-                value_type omega;
-                value_type shift;
+                field_value_type omega;
+                field_value_type shift;
 
-                extended_radix2_domain(const std::size_t m) : evaluation_domain<FieldType>(m) {
+                extended_radix2_domain(const std::size_t m) : evaluation_domain<FieldType, ValueType>(m) {
                     if (m <= 1)
                         throw std::invalid_argument("extended_radix2(): expected m > 1");
 
-                    if (!std::is_same<value_type, std::complex<double>>::value) {
+                    if (!std::is_same<field_value_type, std::complex<double>>::value) {
                         const std::size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         if (logm != (fields::arithmetic_params<FieldType>::s + 1))
                             throw std::invalid_argument(
@@ -73,7 +74,7 @@ namespace nil {
                 void fft(std::vector<value_type> &a) {
                     if (a.size() != this->m) {
                         if (a.size() < this->m) {
-                            a.resize(this->m, value_type(0));
+                            a.resize(this->m, value_type::zero());
                         } else {
                             throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
                         }
@@ -82,9 +83,9 @@ namespace nil {
                     std::vector<value_type> a0(small_m, value_type::zero());
                     std::vector<value_type> a1(small_m, value_type::zero());
 
-                    const value_type shift_to_small_m = shift.pow(small_m);
+                    const field_value_type shift_to_small_m = shift.pow(small_m);
 
-                    value_type shift_i = value_type::one();
+                    field_value_type shift_i = field_value_type::one();
                     for (std::size_t i = 0; i < small_m; ++i) {
                         a0[i] = a[i] + a[small_m + i];
                         a1[i] = shift_i * (a[i] + shift_to_small_m * a[small_m + i]);
@@ -104,7 +105,7 @@ namespace nil {
                 void inverse_fft(std::vector<value_type> &a) {
                     if (a.size() != this->m) {
                         if (a.size() < this->m) {
-                            a.resize(this->m, value_type(0));
+                            a.resize(this->m, value_type::zero());
                         } else {
                             throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
                         }
@@ -114,15 +115,15 @@ namespace nil {
                     std::vector<value_type> a0(a.begin(), a.begin() + small_m);
                     std::vector<value_type> a1(a.begin() + small_m, a.end());
 
-                    const value_type omega_inverse = omega.inversed();
+                    const field_value_type omega_inverse = omega.inversed();
                     detail::basic_radix2_fft<FieldType>(a0, omega_inverse);
                     detail::basic_radix2_fft<FieldType>(a1, omega_inverse);
 
-                    const value_type shift_to_small_m = shift.pow(small_m);
-                    const value_type sconst = (value_type(small_m) * (value_type::one() - shift_to_small_m)).inversed();
+                    const field_value_type shift_to_small_m = shift.pow(small_m);
+                    const field_value_type sconst = (field_value_type(small_m) * (field_value_type::one() - shift_to_small_m)).inversed();
 
-                    const value_type shift_inverse = shift.inversed();
-                    value_type shift_inverse_i = value_type::one();
+                    const field_value_type shift_inverse = shift.inversed();
+                    field_value_type shift_inverse_i = field_value_type::one();
 
                     for (std::size_t i = 0; i < small_m; ++i) {
                         a[i] = sconst * (-shift_to_small_m * a0[i] + shift_inverse_i * a1[i]);
@@ -132,20 +133,20 @@ namespace nil {
                     }
                 }
 
-                std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
-                    const std::vector<value_type> T0 =
+                std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) {
+                    const std::vector<field_value_type> T0 =
                         detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m, t);
-                    const std::vector<value_type> T1 =
+                    const std::vector<field_value_type> T1 =
                         detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(small_m,
                                                                                           t * shift.inversed());
 
-                    std::vector<value_type> result(this->m, value_type::zero());
+                    std::vector<field_value_type> result(this->m, field_value_type::zero());
 
-                    const value_type t_to_small_m = t.pow(small_m);
-                    const value_type shift_to_small_m = shift.pow(small_m);
-                    const value_type one_over_denom = (shift_to_small_m - value_type::one()).inversed();
-                    const value_type T0_coeff = (t_to_small_m - shift_to_small_m) * (-one_over_denom);
-                    const value_type T1_coeff = (t_to_small_m - value_type::one()) * one_over_denom;
+                    const field_value_type t_to_small_m = t.pow(small_m);
+                    const field_value_type shift_to_small_m = shift.pow(small_m);
+                    const field_value_type one_over_denom = (shift_to_small_m - field_value_type::one()).inversed();
+                    const field_value_type T0_coeff = (t_to_small_m - shift_to_small_m) * (-one_over_denom);
+                    const field_value_type T1_coeff = (t_to_small_m - field_value_type::one()) * one_over_denom;
                     for (std::size_t i = 0; i < small_m; ++i) {
                         result[i] = T0[i] * T0_coeff;
                         result[i + small_m] = T1[i] * T1_coeff;
@@ -154,7 +155,7 @@ namespace nil {
                     return result;
                 }
 
-                value_type get_domain_element(const std::size_t idx) {
+                field_value_type get_domain_element(const std::size_t idx) {
                     if (idx < small_m) {
                         return omega.pow(idx);
                     } else {
@@ -162,34 +163,34 @@ namespace nil {
                     }
                 }
 
-                value_type compute_vanishing_polynomial(const value_type &t) {
-                    return (t.pow(small_m) - value_type::one()) * (t.pow(small_m) - shift.pow(small_m));
+                field_value_type compute_vanishing_polynomial(const field_value_type &t) {
+                    return (t.pow(small_m) - field_value_type::one()) * (t.pow(small_m) - shift.pow(small_m));
                 }
 
-                void add_poly_z(const value_type &coeff, std::vector<value_type> &H) {
+                void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) {
                     // if (H.size() != this->m + 1)
                     //    throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
 
-                    const value_type shift_to_small_m = shift.pow(small_m);
+                    const field_value_type shift_to_small_m = shift.pow(small_m);
 
                     H[this->m] += coeff;
-                    H[small_m] -= coeff * (shift_to_small_m + value_type::one());
+                    H[small_m] -= coeff * (shift_to_small_m + field_value_type::one());
                     H[0] += coeff * shift_to_small_m;
                 }
 
-                void divide_by_z_on_coset(std::vector<value_type> &P) {
-                    const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
+                void divide_by_z_on_coset(std::vector<field_value_type> &P) {
+                    const field_value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                    const value_type coset_to_small_m = coset.pow(small_m);
-                    const value_type shift_to_small_m = shift.pow(small_m);
+                    const field_value_type coset_to_small_m = coset.pow(small_m);
+                    const field_value_type shift_to_small_m = shift.pow(small_m);
 
-                    const value_type Z0 =
-                        (coset_to_small_m - value_type::one()) * (coset_to_small_m - shift_to_small_m);
-                    const value_type Z1 = (coset_to_small_m * shift_to_small_m - value_type::one()) *
+                    const field_value_type Z0 =
+                        (coset_to_small_m - field_value_type::one()) * (coset_to_small_m - shift_to_small_m);
+                    const field_value_type Z1 = (coset_to_small_m * shift_to_small_m - field_value_type::one()) *
                                           (coset_to_small_m * shift_to_small_m - shift_to_small_m);
 
-                    const value_type Z0_inverse = Z0.inversed();
-                    const value_type Z1_inverse = Z1.inversed();
+                    const field_value_type Z0_inverse = Z0.inversed();
+                    const field_value_type Z1_inverse = Z1.inversed();
 
                     for (std::size_t i = 0; i < small_m; ++i) {
                         P[i] *= Z0_inverse;
