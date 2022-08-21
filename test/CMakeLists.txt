@@ -74,8 +74,6 @@ set(RUNTIME_TESTS_NAMES
     "hash_to_curve"
     "wnaf"
     "multiexp"
-    #    "groups"
-    #    "bilinearity"
     )
 
 set(COMPILE_TIME_TESTS_NAMES
