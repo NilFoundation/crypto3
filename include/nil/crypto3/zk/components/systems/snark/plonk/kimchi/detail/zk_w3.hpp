@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_index.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>

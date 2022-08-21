@@ -126,7 +126,8 @@ namespace nil {
                     constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 2;
 
-                    constexpr static const typename BlueprintFieldType::value_type endo_factor = endo_params::endo_r;
+                    constexpr static const typename BlueprintFieldType::value_type endo_r = endo_params::endo_r;
+                    constexpr static const typename CurveType::base_field_type::value_type endo_q = endo_params::endo_q;
 
                     struct params_type {
                         var scalar;
@@ -221,7 +222,7 @@ namespace nil {
                             assignment.witness(W5)[row] = b;
                             row++;
                         }
-                        auto res = a * endo_factor + b;
+                        auto res = a * endo_r + b;
                         assignment.witness(W6)[row - 1] = res;
                         return result_type(params, start_row_index);
                     }
@@ -275,7 +276,7 @@ namespace nil {
                                           (1 << 10) * var(W9, 0) + (1 << 8) * var(W10, 0) + (1 << 6) * var(W11, 0) +
                                           (1 << 4) * var(W12, 0) + (1 << 2) * var(W13, 0) + var(W14, 0)));
 
-                        auto constraint_12 = bp.add_constraint(var(W6, 0) - (endo_factor * var(W4, 0) + var(W5, 0)));
+                        auto constraint_12 = bp.add_constraint(var(W6, 0) - (endo_r * var(W4, 0) + var(W5, 0)));
 
                         bp.add_gate(selector_index_2, {constraint_12});
 

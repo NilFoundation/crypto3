@@ -173,7 +173,7 @@ typename ed25519_type::scalar_field_type::value_type sha512(typename ed25519_typ
     message_schedule_array[0] = ((M[0] >> 4) & mask) + (M[1] & 3) * (one << 62);
     message_schedule_array[1] = (M[1] >> 2) & mask;
     message_schedule_array[2] =  M[2] & mask;
-    message_schedule_array[3] = ((M[2] >> 64) + (M[3]) * (one << 2) + 1 * (one << 60)) << 3;
+    message_schedule_array[3] = (M[2] >> 64) + (M[3]) * (one << 2) + 1 * (one << 60);
     message_schedule_array[4] = 0;
     message_schedule_array[5] = 0;
     message_schedule_array[6] = 0;
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(blueprint_signatures_verification) {
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 21;
+    constexpr std::size_t SelectorColumns = 26;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;

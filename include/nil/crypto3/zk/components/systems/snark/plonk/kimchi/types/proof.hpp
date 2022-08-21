@@ -38,7 +38,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/evaluation_proof.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
@@ -127,27 +127,25 @@ namespace nil {
                         zk::components::kimchi_opening_proof_base<BlueprintFieldType,
                         commitment_params_type::eval_rounds>;
 
-                    struct commitments {
+                    using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
+
+                    struct commitments_type {
                         std::array<witness_comm_type,
-                            KimchiParamsType::witness_columns> witness_comm;
-                        commitment_type lookup_runtime_comm;
-                        commitment_type table_comm;
-                        std::vector<commitment_type> lookup_sorted_comm;
-                        commitment_type lookup_agg_comm;
-                        commitment_type z_comm;
-                        commitment_type t_comm;
+                            KimchiParamsType::witness_columns> witness;
+                        commitment_type lookup_runtime;
+                        commitment_type table;
+                        std::vector<commitment_type> lookup_sorted;
+                        commitment_type lookup_agg;
+                        commitment_type z;
+                        commitment_type t;
                         std::array<commitment_type, 
                             KimchiParamsType::prev_challenges_size>
                             prev_challenges; // to-do: get in the component from oracles
                     };
 
-                    constexpr static const std::size_t f_comm_base_size = 1 // permuation-argument
-                        + 5 // generic gate
-                        + KimchiParamsType::index_term_size();
-
-                    commitments comm;
+                    commitments_type comm;
                     opening_proof_type o;
-                    std::array<var, f_comm_base_size> scalars;
+                    std::array<var, kimchi_constants::f_comm_msm_size> scalars;
                 };
 
                 template<typename BlueprintFieldType,

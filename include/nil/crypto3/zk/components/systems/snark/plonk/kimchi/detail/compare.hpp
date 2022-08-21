@@ -173,7 +173,7 @@ namespace nil {
                         row++;
                         var result_check_sum = zk::components::generate_circuit<add_component>(bp, assignment, {inv_check_c1, inv_check_b1}, row).output;
                         row++;
-                        var result_check = zk::components::generate_circuit<add_component>(bp, assignment, {result_check_sum, result_check_mul}, row).output;
+                        var result_check = zk::components::generate_circuit<sub_component>(bp, assignment, {result_check_sum, result_check_mul}, row).output;
                         return result_type(row);
                     }
 
@@ -237,7 +237,12 @@ namespace nil {
 
                         var delta_b_var = sub_component::generate_assignments(assignment, {b_var, b1_var}, row).output;
                         row++;
-                        typename BlueprintFieldType::value_type b1_inv = assignment.var_value(delta_b_var).inversed();
+                        typename BlueprintFieldType::value_type b1_inv;
+                        if (assignment.var_value(delta_b_var) != 0) {
+                            b1_inv = assignment.var_value(delta_b_var).inversed();
+                        } else {
+                            b1_inv = 0;
+                        }
                         assignment.witness(W1)[row] = b1_inv;
                         var b1_inv_var = var(W1, row, false);
                         var inv_check_b1 = mul_component::generate_assignments(assignment, {delta_b_var, b1_inv_var}, row).output;
@@ -250,7 +255,12 @@ namespace nil {
                         
                         var delta_c_var = sub_component::generate_assignments(assignment, {c_var, c1_var}, row).output;
                         row++;
-                        typename BlueprintFieldType::value_type c1_inv = assignment.var_value(delta_c_var).inversed();
+                        typename BlueprintFieldType::value_type c1_inv;
+                        if (assignment.var_value(delta_c_var) != 0) {
+                            c1_inv = assignment.var_value(delta_c_var).inversed();
+                        } else {
+                            c1_inv = 0;
+                        }
                         assignment.witness(W1)[row] = c1_inv;
                         var c1_inv_var = var(W1, row, false);
                         var inv_check_c1 = mul_component::generate_assignments(assignment, {delta_c_var, c1_inv_var}, row).output;
@@ -264,7 +274,7 @@ namespace nil {
                         row++;
                         var result_check_sum = add_component::generate_assignments(assignment, {inv_check_c1, inv_check_b1}, row).output;
                         row++;
-                        var result_check = add_component::generate_assignments(assignment, {result_check_sum, result_check_mul}, row).output;
+                        var result_check = sub_component::generate_assignments(assignment, {result_check_sum, result_check_mul}, row).output;
                         return result_type(row); 
                     }
 

@@ -36,27 +36,25 @@
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+#include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
 
-                template<size_t num_absorb,
-                         size_t num_challenges,
-                         size_t num_challenges_fq,
-                         bool digest,
+                template<size_t num_squeezes,
                          typename ArithmetizationType,
                          typename CurveType,
                          std::size_t... WireIndexes>
-                class aux_fq;
+                class aux_fr;
 
                 template<typename BlueprintFieldType,
-                         size_t num_absorb,
-                         size_t num_challenges,
-                         size_t num_challenges_fq,
-                         bool digest,
+                         size_t num_squeezes,
                          typename ArithmetizationParams,
                          typename CurveType,
                          std::size_t W0,
@@ -74,11 +72,8 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class aux_fq<
-                    num_absorb,
-                    num_challenges,
-                    num_challenges_fq,
-                    digest,
+                class aux_fr<
+                    num_squeezes,
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     CurveType,
                     W0, W1, W2, W3,
@@ -89,27 +84,46 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
+                    constexpr static std::size_t public_input_size = 3;
+
+                    constexpr static std::size_t witness_columns = 15;
+                    constexpr static std::size_t perm_size = 7;
+
+                    constexpr static const std::size_t eval_rounds = 1;
+                    constexpr static const std::size_t max_poly_size = 1;
+                    constexpr static const std::size_t srs_len = 1;
+                    constexpr static const std::size_t prev_chal_size = 1; 
+
+                    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
+                            srs_len>;
+                    using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
+
+                    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+                        witness_columns, perm_size>;
+                    using kimchi_params = zk::components::kimchi_params_type<CurveType, commitment_params, circuit_description,
+                        public_input_size, prev_chal_size>;
+
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using transcript_type =
-                        zk::components::kimchi_transcript_fq<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, 
+                        zk::components::kimchi_transcript<ArithmetizationType, CurveType, kimchi_params, W0, W1, W2, W3, W4, W5, W6, 
                                                                             W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:
-                    constexpr static const std::size_t selector_seed = 0x0fd8;
-                    constexpr static const std::size_t rows_amount = transcript_type::init_rows + num_absorb * transcript_type::absorb_rows + 
-                                                                    num_challenges * transcript_type::challenge_rows + 
-                                                                    num_challenges_fq * transcript_type::challenge_fq_rows +
-                                                                    static_cast<int>(digest) * transcript_type::digest_rows;
+                    constexpr static const std::size_t selector_seed = 0x0fd7;
+                    constexpr static const std::size_t rows_amount = 100;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::vector<std::array<var, 2>> input_fr;
-                        std::vector<std::array<var, 2>> input_g;
+                        std::vector<var> input;
+                        var zero;
                     };
 
                     struct result_type {
                         var squeezed = var(0, 0, false);
                         result_type(var &input) : squeezed(input) {}
+                        // result_type(const params_type &params, const std::size_t &start_row_index) {
+                        //     squeezed = var(W6, start_row_index + rows_amount - 1, false, var::column_type::witness);
+                        // }
                     };
 
                     static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
@@ -117,36 +131,19 @@ namespace nil {
                         const params_type &params,
                         const std::size_t start_row_index){
 
-                        generate_assignments_constants(bp, assignment, params, start_row_index);
-                        generate_copy_constraints(bp, assignment, params, start_row_index);
-
-                        var zero(0, start_row_index, false, var::column_type::constant);
-
                         std::size_t row = start_row_index;
 
                         transcript_type transcript;
-                        transcript.init_circuit(bp, assignment, zero, row);
+                        transcript.init_circuit(bp, assignment, params.zero, row);
                         row += transcript_type::init_rows;
-                        for (std::size_t i = 0; i < params.input_fr.size(); ++i) {
-                            transcript.absorb_fr_circuit(bp, assignment, params.input_fr[i], row);
-                            row += transcript_type::absorb_rows;
-                        }
-                        for (std::size_t i = 0; i < params.input_g.size(); ++i) {
-                            transcript.absorb_g_circuit(bp, assignment, params.input_g[i], row);
+                        for (std::size_t i = 0; i < params.input.size(); ++i) {
+                            transcript.absorb_circuit(bp, assignment, params.input[i], row);
                             row += transcript_type::absorb_rows;
                         }
                         var sq;
-                        for (size_t i = 0; i < num_challenges; ++i) {
+                        for (size_t i = 0; i < num_squeezes; ++i) {
                             sq = transcript.challenge_circuit(bp, assignment, row);
                             row += transcript_type::challenge_rows;
-                        }
-                        for (size_t i = 0; i < num_challenges_fq; ++i) {
-                            sq = transcript.challenge_fq_circuit(bp, assignment, row);
-                            row += transcript_type::challenge_fq_rows;
-                        }
-                        if (digest) {
-                            sq = transcript.digest_circuit(bp, assignment, row);
-                            row += transcript_type::digest_rows;
                         }
                         return {sq};
                     }
@@ -156,34 +153,19 @@ namespace nil {
                                 &assignment,
                             const params_type &params,
                             const std::size_t start_row_index){
-
                         std::size_t row = start_row_index;
 
-                        var zero = var(0, start_row_index, false, var::column_type::constant);
-
                         transcript_type transcript;
-                        transcript.init_assignment(assignment, zero, row);
+                        transcript.init_assignment(assignment, params.zero, row);
                         row += transcript_type::init_rows;
-                        for (std::size_t i = 0; i < params.input_fr.size(); ++i) {
-                            transcript.absorb_fr_assignment(assignment, params.input_fr[i], row);
-                            row += transcript_type::absorb_rows;
-                        }
-                        for (std::size_t i = 0; i < params.input_g.size(); ++i) {
-                            transcript.absorb_g_assignment(assignment, params.input_g[i], row);
+                        for (std::size_t i = 0; i < params.input.size(); ++i) {
+                            transcript.absorb_assignment(assignment, params.input[i], row);
                             row += transcript_type::absorb_rows;
                         }
                         var sq;
-                        for (size_t i = 0; i < num_challenges; ++i) {
+                        for (size_t i = 0; i < num_squeezes; ++i) {
                             sq = transcript.challenge_assignment(assignment, row);
                             row += transcript_type::challenge_rows;
-                        }
-                        for (size_t i = 0; i < num_challenges_fq; ++i) {
-                            sq = transcript.challenge_fq_assignment(assignment, row);
-                            row += transcript_type::challenge_fq_rows;
-                        }
-                        if (digest) {
-                            sq = transcript.digest_assignment(assignment, row);
-                            row += transcript_type::digest_rows;
                         }
                         return {sq};
                     }
@@ -198,15 +180,9 @@ namespace nil {
                             blueprint<ArithmetizationType> &bp,
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
-                            const std::size_t start_row_index) {}
-
-                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
-                        assignment.constant(0)[row] = 0;
-                    }
+                            const std::size_t start_row_index) {
+                                
+                            }
                 };
             }    // namespace components
         }        // namespace zk

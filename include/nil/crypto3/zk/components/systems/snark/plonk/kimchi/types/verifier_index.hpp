@@ -36,7 +36,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/commitment.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,23 +48,12 @@ namespace nil {
                 struct kimchi_verifier_index_scalar {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    enum argument_type {
-                        Permutation,
-                        Generic,
-                    };
-
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;
                     std::size_t domain_size;
                     std::array<var, Permuts> shift;
 
                     var omega;
-                    std::map<argument_type, std::pair<int, int>> alpha_map;
-
-                    kimchi_verifier_index_scalar() {
-                        alpha_map[argument_type::Permutation] = {0, 3};
-                        alpha_map[argument_type::Generic] = {4, 4};
-                    }
                 };
 
                 template<typename CurveType,
@@ -80,21 +69,31 @@ namespace nil {
                     using var = snark::plonk_variable<FieldType>;
                     using var_ec_point = typename zk::components::var_ec_point<FieldType>;
 
-                    struct commitments {
+                    static constexpr const std::size_t chacha_size = 4;
+                    static constexpr const std::size_t range_check_size = 2;
+
+                    struct commitments_type {
                         std::array<commitment_type,
-                            KimchiParamsType::permut_size> sigma_comm;
+                            KimchiParamsType::permut_size> sigma;
                         std::array<commitment_type,
-                            KimchiParamsType::witness_columns> coefficient_comm;
-                        commitment_type generic_comm;
-                        commitment_type psm_comm;
-                        std::vector<commitment_type> selectors_comm;
-                        std::vector<commitment_type> lookup_selectors_comm;
+                            KimchiParamsType::witness_columns> coefficient;
+                        commitment_type generic;
+                        commitment_type psm;
+                        std::vector<commitment_type> selectors;
+                        std::vector<commitment_type> lookup_selectors;
+                        commitment_type runtime_tables_selector;
+                        commitment_type complete_add;
+                        commitment_type var_base_mul;
+                        commitment_type endo_mul;
+                        commitment_type endo_mul_scalar;
+                        std::array<commitment_type, chacha_size> chacha;
+                        std::array<commitment_type, range_check_size> range_check;
                     };
 
                     var_ec_point H;
                     std::array<var_ec_point, commitment_params_type::srs_len> G;
                     std::array<var_ec_point, KimchiParamsType::public_input_size> lagrange_bases;
-                    commitments comm;
+                    commitments_type comm;
                 };
             }    // namespace components
         }        // namespace zk
