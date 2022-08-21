@@ -103,7 +103,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::vector<std::array<var, 2>> input_fr;
+                        std::vector<var> input_fr;
                         std::vector<std::array<var, 2>> input_g;
                     };
 
@@ -128,11 +128,11 @@ namespace nil {
                         transcript.init_circuit(bp, assignment, zero, row);
                         row += transcript_type::init_rows;
                         for (std::size_t i = 0; i < params.input_fr.size(); ++i) {
-                            transcript.absorb_fr_circuit(bp, assignment, params.input_fr[i][0], row);
+                            transcript.absorb_fr_circuit(bp, assignment, {params.input_fr[i]}, row);
                             row += transcript_type::absorb_fr_rows;
                         }
                         for (std::size_t i = 0; i < params.input_g.size(); ++i) {
-                            transcript.absorb_g_circuit(bp, assignment, params.input_g[i], row);
+                            transcript.absorb_g_circuit(bp, assignment, {params.input_g[i][0], params.input_g[i][1]}, row);
                             row += transcript_type::absorb_group_rows;
                         }
                         var sq;
@@ -165,11 +165,11 @@ namespace nil {
                         transcript.init_assignment(assignment, zero, row);
                         row += transcript_type::init_rows;
                         for (std::size_t i = 0; i < params.input_fr.size(); ++i) {
-                            transcript.absorb_fr_assignment(assignment, params.input_fr[i][0], row);
+                            transcript.absorb_fr_assignment(assignment, {params.input_fr[i]}, row);
                             row += transcript_type::absorb_fr_rows;
                         }
                         for (std::size_t i = 0; i < params.input_g.size(); ++i) {
-                            transcript.absorb_g_assignment(assignment, params.input_g[i], row);
+                            transcript.absorb_g_assignment(assignment, {params.input_g[i][0], params.input_g[i][1]}, row);
                             row += transcript_type::absorb_group_rows;
                         }
                         var sq;

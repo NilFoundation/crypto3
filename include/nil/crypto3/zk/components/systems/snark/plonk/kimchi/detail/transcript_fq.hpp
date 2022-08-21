@@ -44,6 +44,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/compare.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
@@ -106,10 +107,10 @@ namespace nil {
 
                         auto n1 = ScalarField::modulus;
                         auto n2 = BaseField::modulus;
-                        return n1 > n2;
+                        return (n1 > n2);
                     }
 
-                    static const std::size_t fr_value_size = scalar_larger ? 2 : 1;
+                    static const std::size_t fr_value_size = scalar_larger() ? 2 : 1;
 
                     struct fr_value {
                         std::array<var, fr_value_size> value;
@@ -179,7 +180,8 @@ namespace nil {
                         sponge_component::squeeze_rows + unpack::rows_amount 
                         + pack::rows_amount;
                     constexpr static const std::size_t challenge_fq_rows = sponge_component::squeeze_rows;
-                    constexpr static const std::size_t digest_rows = challenge_rows + compare::rows_amount + mul_component::rows_amount;
+                    constexpr static const std::size_t digest_rows = sponge_component::squeeze_rows
+                        + compare::rows_amount + mul_component::rows_amount;
 
                     void init_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                          var zero,
@@ -283,16 +285,12 @@ namespace nil {
                         last_squeezed = {};
                         var sq = sponge.squeeze_assignment(assignment, row);
                         row += sponge_component::squeeze_rows;
-                        auto x = unpack::generate_assignments(assignment, {sq}, row).result;
-                        row += unpack::rows_amount;
-                        var packed = pack::generate_assignments(assignment, {x[0], x[1]}, row).result;
-                        row += pack::rows_amount;
                         if (scalar_larger()) {
-                            return packed;
+                            return sq;
                         }
-                        var compare_result = compare::generate_assignments(assignment, packed, row).output;
+                        var compare_result = compare::generate_assignments(assignment, sq, row).output;
                         row += compare::rows_amount;
-                        return mul_component::generate_assignments(assignment, {compare_result, packed}, row).output;
+                        return mul_component::generate_assignments(assignment, {compare_result, sq}, row).output;
                     }
 
                     var digest_circuit(blueprint<ArithmetizationType> &bp,
@@ -302,16 +300,12 @@ namespace nil {
                         last_squeezed = {};
                         var sq = sponge.squeeze_circuit(bp, assignment, row);
                         row += sponge_component::squeeze_rows;
-                        auto x = unpack::generate_circuit(bp, assignment, {sq}, row).result;
-                        row += unpack::rows_amount;
-                        var packed = pack::generate_circuit(bp, assignment, {x[0], x[1]}, row).result;
-                        row += pack::rows_amount;
                         if (scalar_larger()) {
-                            return packed;
+                            return sq;
                         }
-                        var compare_result = compare::generate_circuit(bp, assignment, packed, row).output;
+                        var compare_result = compare::generate_circuit(bp, assignment, sq, row).output;
                         row += compare::rows_amount;
-                        return zk::components::generate_circuit<mul_component>(bp, assignment, {compare_result, packed}, row).output;
+                        return zk::components::generate_circuit<mul_component>(bp, assignment, {compare_result, sq}, row).output;
                     }
 
                 };
