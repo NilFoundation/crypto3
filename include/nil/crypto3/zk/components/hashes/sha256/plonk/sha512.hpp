@@ -114,7 +114,7 @@ namespace nil {
                         assignment.enable_selector(first_selector_index + 2, j + 7);
                         assignment.enable_selector(first_selector_index + 3, j + 10);
                         assignment.enable_selector(first_selector_index + 4, j + 13);
-
+/*
                         std::array<var, 16> input_words_vars_1;
 
                         for(std::size_t k = 0; k < 4; k++) {
@@ -152,7 +152,7 @@ namespace nil {
                         sha_params = {sha_output, input_words_vars_2};
                         sha512_process_component::generate_circuit(bp, assignment, sha_params, j);
 
-
+*/
 
                         generate_copy_constraints(bp, assignment, params, start_row_index); 
                         return result_type(start_row_index);
