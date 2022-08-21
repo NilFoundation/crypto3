@@ -533,11 +533,10 @@ namespace nil {
 
                         //           W2,1                    W3,1                  W3,0      W3, -1
                         // |1234567890123456789012.3456789012345678901234.56789012345678901234|56
-                        range_chunks[66] = (RAM[17]) & 0b11;
-                        range_chunks[67] = (RAM[17] >> 4) & mask18;
-                        range_chunks[68] = (RAM[17] >> 22) & mask22;
+                        range_chunks[66] = (RAM[17]) & 3;
+                        range_chunks[67] = (RAM[17] >> 2) & mask20;
+                        range_chunks[68] = (RAM[17] >> 22) & mask22; 
                         range_chunks[69] = (RAM[17] >> 44) & mask22;
-
                         assignment.witness(W2)[row_witness - 1] = RAM[17];
                         assignment.witness(W2)[row_witness - 0] = input_words_values[17];
                         assignment.witness(W3)[row_witness - 1] = range_chunks[66];
@@ -604,7 +603,7 @@ namespace nil {
                         input_words_vars_2[15] = var(0, component_start_row + 9, false, var::column_type::constant);
 
 
-                        row = row + rows_amount_creating_input_words_component;
+                        row = component_start_row + rows_amount_creating_input_words_component;
 
 
                         std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
@@ -640,7 +639,7 @@ namespace nil {
 
 
 
-/*                        std::array<typename ArithmetizationType::field_type::value_type, 16> input_words2 = {
+                       /*std::array<typename ArithmetizationType::field_type::value_type, 16> input_words2 = {
                             1 << 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 << 9};
                         for (int i = 0; i < 16; i++) {
                             assignment.constant(0)[component_start_row + 8 + i] = input_words2[i];
