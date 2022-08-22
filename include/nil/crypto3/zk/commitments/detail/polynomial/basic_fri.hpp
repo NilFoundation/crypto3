@@ -784,11 +784,12 @@ namespace nil {
                                         FRI>::value &&
                             !std::is_same_v<typename ContainerType::value_type, typename FRI::field_type::value_type>,
                         bool>::type = true>
-                static bool verify_eval(typename FRI::proof_type &proof,
-                                        typename FRI::params_type &fri_params,
-                                        const ContainerType U,
-                                        const ContainerType V,
-                                        typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
+                static bool verify_eval(typename FRI::proof_type        &proof,
+                                        typename FRI::params_type       &fri_params,
+                                        typename FRI::commitment_type   t_polynomials,
+                                        const ContainerType             U,
+                                        const ContainerType             V,
+                                        typename FRI::transcript_type   &transcript = typename FRI::transcript_type()) {
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
                     BOOST_ASSERT(U.size() == V.size());
 
@@ -880,6 +881,14 @@ namespace nil {
                             }
                             if (!proof.round_proofs[i].p.validate(leaf_data)) {
                                 return false;
+                            }
+                            
+                            
+                            // Check merkle roots.
+                            if(i == 0){
+                                if( t_polynomials != proof.round_proofs[i].p.root()) return false;
+                            } else {
+                                if( proof.round_proofs[i-1].colinear_path.root() != proof.round_proofs[i].T_root) return false;
                             }
                         }
 
