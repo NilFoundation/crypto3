@@ -44,14 +44,14 @@ namespace nil {
                      typename ArithmetizationParams>
             bool is_satisfied(blueprint<snark::plonk_constraint_system<BlueprintFieldType,
                                                            ArithmetizationParams>> bp,
-                              blueprint_assignment_table<snark::plonk_constraint_system<BlueprintFieldType,
-                                                        ArithmetizationParams>> assignments){
+                              snark::plonk_assignment_table<BlueprintFieldType,
+                                                        ArithmetizationParams> assignments){
 
-                const std::vector<plonk_gate<BlueprintFieldType, plonk_constraint<BlueprintFieldType>>> gates =
+                const std::vector<snark::plonk_gate<BlueprintFieldType, snark::plonk_constraint<BlueprintFieldType>>> gates =
                             bp.gates();
 
                 for (std::size_t i = 0; i < gates.size(); i++) {
-                    plonk_column<BlueprintFieldType> selector = polynomial_table.selector(gates[i].selector_index);
+                    snark::plonk_column<BlueprintFieldType> selector = assignments.selector(gates[i].selector_index);
 
                     for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
 
