@@ -318,20 +318,6 @@ namespace nil {
                         domain->inverse_fft(res);
                         return res;
                     }
-
-                    static std::size_t power_of_two(std::size_t n) {
-                        n--;
-                        n |= n >> 1;
-                        n |= n >> 2;
-                        n |= n >> 4;
-                        n |= n >> 8;
-                        n |= n >> 16;
-                        n++;
-
-                        return n;
-                    }
-
-
                 };
             }   // snarks
         }   // zk
