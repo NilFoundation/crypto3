@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
     acc2.transform(sk);
 
     BOOST_CHECK(scheme_type::verify_contribution(acc1, acc2, pk));
-    auto result = scheme_type::finalize(acc2);
+    auto result = scheme_type::finalize(acc2, tau_powers);
 
     auto g1_generator = g1_value_type::one();
     auto g2_generator = g2_value_type::one();
@@ -60,6 +60,27 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
         BOOST_CHECK_MESSAGE(result.beta_coeffs_g1[i] == g1_generator * (sk.beta * u[i]), std::string("i=") + std::to_string(i));
     }
 
+    auto result_16 = scheme_type::finalize(acc2, 16);
+    auto domain_16 = nil::crypto3::math::make_evaluation_domain<scalar_field_type>(16);
+    auto u_16 = domain_16->evaluate_all_lagrange_polynomials(sk.tau);
+
+    BOOST_CHECK_EQUAL(u_16.size(), 16);
+
+    BOOST_CHECK(result_16.alpha_g1 == g1_generator * sk.alpha);
+    BOOST_CHECK(result_16.beta_g1 == g1_generator * sk.beta);
+    BOOST_CHECK(result_16.beta_g2 == g2_generator * sk.beta);
+    
+    BOOST_CHECK_EQUAL(result_16.coeffs_g1.size(), 16);
+    BOOST_CHECK_EQUAL(result_16.coeffs_g2.size(), 16);
+    BOOST_CHECK_EQUAL(result_16.alpha_coeffs_g1.size(), 16);
+    BOOST_CHECK_EQUAL(result_16.beta_coeffs_g1.size(), 16);
+
+    for(std::size_t i = 0; i < domain_16->m; ++i) {
+        BOOST_CHECK_MESSAGE(result_16.coeffs_g1[i] == g1_generator * u_16[i], std::string("i=") + std::to_string(i));
+        BOOST_CHECK_MESSAGE(result_16.coeffs_g2[i] == g2_generator * u_16[i], std::string("i=") + std::to_string(i));
+        BOOST_CHECK_MESSAGE(result_16.alpha_coeffs_g1[i] == g1_generator *(sk.alpha * u_16[i]), std::string("i=") + std::to_string(i));
+        BOOST_CHECK_MESSAGE(result_16.beta_coeffs_g1[i] == g1_generator * (sk.beta * u_16[i]), std::string("i=") + std::to_string(i));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(powers_of_tau_basic_test) {
@@ -75,7 +96,7 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_basic_test) {
     auto beacon_pubkey = scheme_type::apply_randomness_beacon(acc3, beacon);
     BOOST_CHECK(scheme_type::verify_contribution(acc2, acc3, beacon_pubkey));
     BOOST_CHECK(scheme_type::verify_beacon_contribution(acc2, acc3, beacon));
-    auto result = scheme_type::finalize(acc3);
+    auto result = scheme_type::finalize(acc3, 32);
 }
 
 BOOST_AUTO_TEST_CASE(keypair_generation_basic_test) {
