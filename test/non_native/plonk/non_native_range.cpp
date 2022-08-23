@@ -66,23 +66,24 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::non_native_range<ArithmetizationType, curve_type, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8>;
+    using component_type = zk::components::non_native_range<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    std::array<var, 4> input_var = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> input_var = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {input_var};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {455245345345345, 523553453454343, 68753453534534689, 54355345344544};
-    
-    auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-    };
+    std::vector<typename BlueprintFieldType::value_type> public_input = {455245345345345, 523553453454343,
+                                                                         68753453534534689, 54355345344544};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
+
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 

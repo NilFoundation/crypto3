@@ -69,35 +69,45 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::non_native_field_element_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8>;
+    using component_type = zk::components::non_native_field_element_multiplication<ArithmetizationType,
+                                                                                   curve_type,
+                                                                                   ed25519_type,
+                                                                                   0,
+                                                                                   1,
+                                                                                   2,
+                                                                                   3,
+                                                                                   4,
+                                                                                   5,
+                                                                                   6,
+                                                                                   7,
+                                                                                   8>;
 
-    std::array<var, 4> input_var_a = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> input_var_a = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
-    std::array<var, 4> input_var_b = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+    std::array<var, 4> input_var_b = {
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0xc801afd_cppui255,
-    0xc801afd_cppui255,
-    0xc801afd_cppui255,
-    0xc801afd_cppui255,
-    0xc801afd_cppui255,
-    0xc801afd_cppui255,
-    0xc801afd_cppui255,
-    0xc801afd_cppui255};
-    //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {
+        0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255,
+        0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255};
+    // std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
 
-    auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) { 
-           std::cout << "multiplication ress : " << assignment.var_value(real_res.output[0]).data << " " << assignment.var_value(real_res.output[1]).data << " "<<
-        assignment.var_value(real_res.output[2]).data << " "<< assignment.var_value(real_res.output[3]).data << " "<< std::endl; 
+    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {
+        std::cout << "multiplication ress : " << assignment.var_value(real_res.output[0]).data << " "
+                  << assignment.var_value(real_res.output[1]).data << " "
+                  << assignment.var_value(real_res.output[2]).data << " "
+                  << assignment.var_value(real_res.output[3]).data << " " << std::endl;
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 

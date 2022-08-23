@@ -68,8 +68,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8>;
+    using component_type = zk::components::
+        fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     var var_b = var(0, 0, false, var::column_type::public_input);
 
@@ -77,28 +77,33 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
 
     typename component_type::params_type params = {{var_b}};
 
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type B = ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type P = b*B;
+    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type B =
+        ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
+    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type P = b * B;
     ed25519_type::base_field_type::integral_type Px = ed25519_type::base_field_type::integral_type(P.X.data);
     ed25519_type::base_field_type::integral_type Py = ed25519_type::base_field_type::integral_type(P.Y.data);
     typename ed25519_type::base_field_type::integral_type base = 1;
     typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {typename curve_type::base_field_type::integral_type(b.data)};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {
+        typename curve_type::base_field_type::integral_type(b.data)};
 
-    auto result_check = [Px, Py](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-            typename ed25519_type::base_field_type::integral_type base = 1;
-            typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
-            for (std::size_t i = 0; i < 4; i++) {
-                assert(typename BlueprintFieldType::value_type((Px >>66*i) & mask) == assignment.var_value(real_res.output.x[i])); 
-                assert(typename BlueprintFieldType::value_type((Py >>66*i) & mask) == assignment.var_value(real_res.output.y[i]));
-            } 
+    auto result_check = [Px, Py](AssignmentType &assignment, component_type::result_type &real_res) {
+        typename ed25519_type::base_field_type::integral_type base = 1;
+        typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
+        for (std::size_t i = 0; i < 4; i++) {
+            assert(typename BlueprintFieldType::value_type((Px >> 66 * i) & mask) ==
+                   assignment.var_value(real_res.output.x[i]));
+            assert(typename BlueprintFieldType::value_type((Py >> 66 * i) & mask) ==
+                   assignment.var_value(real_res.output.y[i]));
+        }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
