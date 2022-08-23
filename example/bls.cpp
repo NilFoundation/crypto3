@@ -29,9 +29,7 @@
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
 #include <nil/crypto3/pubkey/algorithm/aggregate.hpp>
-
 #include <nil/crypto3/pubkey/bls.hpp>
-#include <nil/crypto3/pubkey/detail/bls/serialization.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -49,48 +47,14 @@ using namespace nil::crypto3::multiprecision;
 
 using curve_type = curves::bls12_381;
 using hash_type = sha2<256>;
-using bls_variant = bls_mps_ro_version<curve_type, hash_type>;
-using scheme_type = bls<bls_variant, bls_basic_scheme>;
+using curve_type = curves::bls12_381;
+using scheme_type = bls<bls_default_public_params<>, bls_mss_ro_version, bls_basic_scheme, curve_type>;
 
 using privkey_type = private_key<scheme_type>;
 using pubkey_type = public_key<scheme_type>;
 using _privkey_type = typename privkey_type::private_key_type;
 using _pubkey_type = typename pubkey_type::public_key_type;
 using signature_type = typename pubkey_type::signature_type;
-using modulus_type = typename _privkey_type::modulus_type;
-
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
-    os << e.data << std::endl;
-}
-
-template<typename FpCurveGroupElement>
-void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
-    os << std::hex << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )" << std::endl;
-}
-
-template<typename Fp2CurveGroupElement>
-void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
-    os << std::hex << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
-       << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
-}
-
-template<typename group_value_type>
-struct print_curve_element;
-
-template<>
-struct print_curve_element<typename curves::bls12<381>::g1_type::value_type> {
-    void operator()(std::ostream &os, typename curves::bls12<381>::g1_type::value_type const &e) {
-        print_fp_curve_group_element(os, e);
-    }
-};
-
-template<>
-struct print_curve_element<typename curves::bls12<381>::g2_type::value_type> {
-    void operator()(std::ostream &os, typename curves::bls12<381>::g2_type::value_type const &e) {
-        print_fp2_curve_group_element(os, e);
-    }
-};
 
 int main() {
     std::string msg_str = "hello world";
@@ -100,9 +64,6 @@ int main() {
     signature_type sig = sign(msg, sk);
     pubkey_type &pubkey = sk;
     assert(verify(msg, sig, pubkey));
-
-    print_field_element(std::cout, sk.privkey());
-    print_curve_element(std::cout, pubkey.pubkey());
 
     return 0;
 }
