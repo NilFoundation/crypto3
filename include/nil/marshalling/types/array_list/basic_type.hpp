@@ -170,7 +170,7 @@ namespace nil {
                         using tag = typename std::conditional<IsRandomAccessIter && IsRawData, raw_data_tag,
                                                               field_elem_tag>::type;
 
-                        auto length = std::is_same_v<typename std::iterator_traits<IterType>::value_type, bool> ? max_bit_length() : max_length();
+                        auto length = std::is_same<typename std::iterator_traits<IterType>::value_type, bool>::value ? max_bit_length() : max_length();
 
                         if (len > length){
                             len = length;
@@ -321,7 +321,7 @@ namespace nil {
                         status_type es = elem.read(iter, len);
                         if (es == status_type::success) {
                             std::size_t true_length = 0;
-                            if constexpr(std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool>){
+                            if constexpr(std::is_same<typename std::iterator_traits<TIter>::value_type, bool>::value){
                                 true_length = elem.bit_length();
                             } else{
                                 true_length = elem.length();
@@ -380,7 +380,7 @@ namespace nil {
                         status_type es = elem.write(iter, len);
                         if (es == status_type::success) {
                             std::size_t true_length = 0;
-                            if constexpr(std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool>){
+                            if constexpr(std::is_same<typename std::iterator_traits<TIter>::value_type, bool>::value){
                                 true_length = elem.bit_length();
                             } else{
                                 true_length = elem.length();
