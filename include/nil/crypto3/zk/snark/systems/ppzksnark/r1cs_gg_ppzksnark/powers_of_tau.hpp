@@ -138,24 +138,25 @@ namespace nil {
                                                             transcript);
                     }
 
-                    static powers_of_tau_result<curve_type> finalize(const accumulator_type &acc) {
+                    static powers_of_tau_result<curve_type> finalize(const accumulator_type &acc, std::size_t m) {
                         auto alpha_g1 = acc.alpha_tau_powers_g1[0];
                         auto beta_g1 = acc.beta_tau_powers_g1[0];
                         auto beta_g2 = acc.beta_g2; 
                         
-                        std::vector<g1_value_type> coeffs_g1 = helpers_type::evaluate_lagrange_polynomials(acc.tau_powers_g1, policy_type::tau_powers_length);
+                        BOOST_ASSERT(m <= Tau_Powers_Length);
+                        BOOST_ASSERT(m == math::detail::power_of_two(m));
                         
-                        std::vector<g2_value_type> coeffs_g2 = helpers_type::evaluate_lagrange_polynomials(acc.tau_powers_g2, policy_type::tau_powers_length);
+                        std::vector<g1_value_type> coeffs_g1 = helpers_type::evaluate_lagrange_polynomials(acc.tau_powers_g1, m);
                         
-                        std::vector<g1_value_type> alpha_coeffs_g1 = helpers_type::evaluate_lagrange_polynomials(acc.alpha_tau_powers_g1, policy_type::tau_powers_length);
+                        std::vector<g2_value_type> coeffs_g2 = helpers_type::evaluate_lagrange_polynomials(acc.tau_powers_g2, m);
                         
-                        std::vector<g1_value_type> beta_coeffs_g1 = helpers_type::evaluate_lagrange_polynomials(acc.beta_tau_powers_g1, policy_type::tau_powers_length);
+                        std::vector<g1_value_type> alpha_coeffs_g1 = helpers_type::evaluate_lagrange_polynomials(acc.alpha_tau_powers_g1, m);
+                        
+                        std::vector<g1_value_type> beta_coeffs_g1 = helpers_type::evaluate_lagrange_polynomials(acc.beta_tau_powers_g1, m);
                         
                         std::vector<g1_value_type> h;
-                        std::size_t degree = Tau_Powers_Length;
-                        BOOST_ASSERT(degree == math::detail::power_of_two(degree));
-                        for(std::size_t i=0; i < degree-1; ++i) {
-                            h.emplace_back(acc.tau_powers_g1[i + degree] - acc.tau_powers_g1[i]);
+                        for(std::size_t i=0; i < m-1; ++i) {
+                            h.emplace_back(acc.tau_powers_g1[i + m] - acc.tau_powers_g1[i]);
                         }
                         return powers_of_tau_result<curve_type> {
                             alpha_g1,

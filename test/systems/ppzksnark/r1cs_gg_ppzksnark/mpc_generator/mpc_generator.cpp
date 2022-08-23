@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(mpc_generator_compare_keypairs_without_delta_contribution_t
     auto transcript = helpers_type::compute_transcript(acc);
     auto [pk,sk] = helpers_type::generate_keypair(transcript);
     acc.transform(sk);
-    auto result = powers_of_tau_scheme_type::finalize(acc);
+    auto result = powers_of_tau_scheme_type::finalize(acc, 32);
 
     auto r1cs_example = generate_r1cs_example_with_field_input<curve_type::scalar_field_type>(20,3);
 
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(mpc_generator_proof_verification_without_delta_contribution
 
     auto acc = powers_of_tau_scheme_type::initial_accumulator();
     powers_of_tau_scheme_type::contribute_randomness(acc);
-    auto result = powers_of_tau_scheme_type::finalize(acc);
+    auto result = powers_of_tau_scheme_type::finalize(acc, 32);
 
     auto r1cs_example = generate_r1cs_example_with_field_input<curve_type::scalar_field_type>(20,5);
     
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(mpc_generator_proof_verification_with_delta_contribution_te
 
     auto acc = powers_of_tau_scheme_type::initial_accumulator();
     powers_of_tau_scheme_type::contribute_randomness(acc);
-    auto result = powers_of_tau_scheme_type::finalize(acc);
+    auto result = powers_of_tau_scheme_type::finalize(acc, 32);
 
     auto r1cs_example = generate_r1cs_example_with_field_input<curve_type::scalar_field_type>(20,5);
     
