@@ -140,7 +140,7 @@ namespace boost {
 }    // namespace boost
 
 template<typename T>
-void test_UniformRandomBitGenerator() {
+void test_uniform_random_bit_generator() {
     using generator_type = random::algebraic_random_device<T>;
     using printer_type = boost::test_tools::tt_detail::print_log_value<typename generator_type::result_type>;
     generator_type g;
@@ -159,7 +159,7 @@ void test_UniformRandomBitGenerator() {
 
 // TODO: add custom Generator
 template<typename T>
-void test_RandomNumberEngine() {
+void test_random_number_engine() {
     std::srand(std::time(nullptr));
     constexpr std::size_t n = 5;
     using generator_type = random::algebraic_engine<T>;
@@ -237,22 +237,22 @@ BOOST_AUTO_TEST_CASE(mnt4_test) {
     using curve_type = algebra::curves::mnt4<298>;
     using scalar_field_type = typename curve_type::scalar_field_type;
 
-    test_UniformRandomBitGenerator<scalar_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type<>::field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type<>::field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type<>>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type<>>();
+    test_uniform_random_bit_generator<scalar_field_type>();
+    test_uniform_random_bit_generator<typename curve_type::g1_type<>::field_type>();
+    test_uniform_random_bit_generator<typename curve_type::g2_type<>::field_type>();
+    test_uniform_random_bit_generator<typename curve_type::g1_type<>>();
+    test_uniform_random_bit_generator<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_CASE(bls12_381_test) {
     using curve_type = algebra::curves::bls12<381>;
     using scalar_field_type = typename curve_type::scalar_field_type;
 
-    test_UniformRandomBitGenerator<scalar_field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type<>::field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type<>::field_type>();
-    test_UniformRandomBitGenerator<typename curve_type::g1_type<>>();
-    test_UniformRandomBitGenerator<typename curve_type::g2_type<>>();
+    test_uniform_random_bit_generator<scalar_field_type>();
+    test_uniform_random_bit_generator<typename curve_type::g1_type<>::field_type>();
+    test_uniform_random_bit_generator<typename curve_type::g2_type<>::field_type>();
+    test_uniform_random_bit_generator<typename curve_type::g1_type<>>();
+    test_uniform_random_bit_generator<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -263,22 +263,22 @@ BOOST_AUTO_TEST_CASE(mnt4_test) {
     using curve_type = algebra::curves::mnt4<298>;
     using scalar_field_type = typename curve_type::scalar_field_type;
 
-    test_RandomNumberEngine<scalar_field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type<>::field_type>();
-    test_RandomNumberEngine<typename curve_type::g2_type<>::field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type<>>();
-    test_RandomNumberEngine<typename curve_type::g2_type<>>();
+    test_random_number_engine<scalar_field_type>();
+    test_random_number_engine<typename curve_type::g1_type<>::field_type>();
+    test_random_number_engine<typename curve_type::g2_type<>::field_type>();
+    test_random_number_engine<typename curve_type::g1_type<>>();
+    test_random_number_engine<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_CASE(bls12_381_test) {
     using curve_type = algebra::curves::bls12<381>;
     using scalar_field_type = typename curve_type::scalar_field_type;
 
-    test_RandomNumberEngine<scalar_field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type<>::field_type>();
-    test_RandomNumberEngine<typename curve_type::g2_type<>::field_type>();
-    test_RandomNumberEngine<typename curve_type::g1_type<>>();
-    test_RandomNumberEngine<typename curve_type::g2_type<>>();
+    test_random_number_engine<scalar_field_type>();
+    test_random_number_engine<typename curve_type::g1_type<>::field_type>();
+    test_random_number_engine<typename curve_type::g2_type<>::field_type>();
+    test_random_number_engine<typename curve_type::g1_type<>>();
+    test_random_number_engine<typename curve_type::g2_type<>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
