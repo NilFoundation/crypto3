@@ -11,7 +11,7 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
-#include <nil/crypto3/marshalling/zk/types/powers_of_tau/accumulator.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/powers_of_tau/accumulator.hpp>
 
 namespace nil {
     namespace crypto3 {

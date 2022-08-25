@@ -66,6 +66,7 @@ set(TESTS_NAMES
     "commitment/pedersen"
     "commitment/proof_of_knowledge"
     "commitment/powers_of_tau"
+    "commitment/r1cs_gg_ppzksnark_mpc"
     "commitment/type_traits"
 
 
@@ -95,8 +96,6 @@ set(TESTS_NAMES
     "systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
     "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
-
-    "systems/ppzksnark/r1cs_gg_ppzksnark/mpc_generator/mpc_generator"
 
     "transcript/transcript"
     "transcript/kimchi_transcript"

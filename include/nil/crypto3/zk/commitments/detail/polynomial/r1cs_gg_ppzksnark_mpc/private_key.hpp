@@ -22,26 +22,26 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_MPC_GENERATOR_PUBLIC_KEY_HPP
-#define CRYPTO3_R1CS_MPC_GENERATOR_PUBLIC_KEY_HPP
-
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/proof_of_knowledge.hpp>
+#ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PRIVATE_KEY_HPP
+#define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PRIVATE_KEY_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename CurveType>
-                struct r1cs_gg_ppzksnark_mpc_generator_public_key {
-                    typedef CurveType curve_type;
-                    typedef proof_of_knowledge<CurveType> pok_type;
+            namespace commitments {
+                namespace detail {
+                    template<typename CurveType>
+                    // Contains the secret 𝛿 that the participant of the ceremony must destroy.
+                    struct r1cs_gg_ppzksnark_mpc_private_key {
+                        typedef CurveType curve_type;
+                        using field_value_type = typename CurveType::scalar_field_type::value_type;
 
-                    typename curve_type::g1_type<>::value_type delta_after;
-                    pok_type delta_pok;
-                };
-            }   // snarks
+                        field_value_type delta;
+                    };
+                } // detail
+            }   // commitments
         }   // zk
     }   // crypto3
 }   // nil
 
-#endif  // CRYPTO3_R1CS_MPC_GENERATOR_PUBLIC_KEY_HPP
+#endif  // CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PRIVATE_KEY_HPP
