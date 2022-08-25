@@ -61,7 +61,41 @@ namespace nil {
                     constexpr static const std::size_t value_bits = node_type::value_bits;
                     typedef typename node_type::value_type value_type;
 
+                    struct path_element_type {
+                        path_element_type(value_type x, size_t pos) : _hash(x), _position(pos) {
+                        }
+                        path_element_type() {
+                        }
+
+                        bool operator==(const path_element_type &rhs) const {
+                            return _hash == rhs._hash && _position == rhs._position;
+                        }
+                        bool operator!=(const path_element_type &rhs) const {
+                            return !(rhs == *this);
+                        }
+
+                        const value_type &hash() const {
+                            return _hash;
+                        }
+
+                        std::size_t position() const {
+                            return _position;
+                        }
+
+                        value_type _hash;
+                        std::size_t _position;
+
+                        template<typename, typename>
+                        friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
+                    };
+
+                    typedef std::array<path_element_type, Arity - 1> layer_type;
+                    typedef std::vector<layer_type> path_type;
+
                     merkle_proof_impl() : _li(0) {};
+
+                    merkle_proof_impl(std::size_t li, value_type root, path_type path) : _li(li), _root(root),
+                                                                                         _path(path){};
 
                     merkle_proof_impl(const merkle_tree<hash_type, arity> &tree, const std::size_t leaf_idx) {
                         _root = tree.root();
@@ -118,37 +152,6 @@ namespace nil {
                     bool operator!=(const merkle_proof_impl &rhs) const {
                         return !(rhs == *this);
                     }
-
-                    struct path_element_type {
-                        path_element_type(value_type x, size_t pos) : _hash(x), _position(pos) {
-                        }
-                        path_element_type() {
-                        }
-
-                        bool operator==(const path_element_type &rhs) const {
-                            return _hash == rhs._hash && _position == rhs._position;
-                        }
-                        bool operator!=(const path_element_type &rhs) const {
-                            return !(rhs == *this);
-                        }
-
-                        const value_type &hash() const {
-                            return _hash;
-                        }
-
-                        std::size_t position() const {
-                            return _position;
-                        }
-
-                        value_type _hash;
-                        std::size_t _position;
-
-                        template<typename, typename>
-                        friend class nil::crypto3::marshalling::types::merkle_proof_marshalling;
-                    };
-
-                    typedef std::array<path_element_type, Arity - 1> layer_type;
-                    typedef std::vector<layer_type> path_type;
 
                     const value_type &root() const {
                         return _root;
