@@ -409,7 +409,7 @@ namespace nil {
 
                             // p_comm is always the commitment of size 1
                             auto p_comm_unshifted = lagrange_msm_component::generate_assignments(assignment, 
-                                {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).sum;
+                                {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).output;
                             row = row + lagrange_msm_component::rows_amount;
 
                             //Oracles
@@ -505,7 +505,7 @@ namespace nil {
                                     }
                                 }
                                 auto res = msm_component::generate_assignments(assignment, {scalars, bases}, row);
-                                f_comm[j] = {res.sum.X, res.sum.Y};
+                                f_comm[j] = {res.output.X, res.output.Y};
                                 row += msm_component::rows_amount;
                             }
 
@@ -633,7 +633,7 @@ namespace nil {
                         std::array<batch_proof_type, BatchSize> batch_proofs;
                         for(std::size_t i = 0; i < BatchSize; i++) {
                             auto p_comm_unshifted = lagrange_msm_component::generate_circuit(bp, assignment,
-                                 {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).sum;
+                                 {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).output;
                             row = row + lagrange_msm_component::rows_amount;
 
                             std::size_t row_tmp = row;
@@ -730,7 +730,7 @@ namespace nil {
                                     }
                                 }
                                 auto res = msm_component::generate_circuit(bp, assignment, {scalars, bases}, row);
-                                f_comm[j] = {res.sum.X, res.sum.Y};
+                                f_comm[j] = {res.output.X, res.output.Y};
                                 row += msm_component::rows_amount;
                             }
 
