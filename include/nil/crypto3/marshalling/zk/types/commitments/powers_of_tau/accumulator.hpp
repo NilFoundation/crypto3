@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MARSHALLING_MPC_PARAMS_HPP
-#define CRYPTO3_MARSHALLING_MPC_PARAMS_HPP
+#ifndef CRYPTO3_MARSHALLING_POWERS_OF_TAO_ACCUMULATOR_HPP
+#define CRYPTO3_MARSHALLING_POWERS_OF_TAO_ACCUMULATOR_HPP
 
 #include <ratio>
 #include <limits>
@@ -41,43 +41,85 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/mpc_generator/mpc_params.hpp>
-#include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/fast_proving_key.hpp>
-#include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/verification_key.hpp>
+#include <nil/crypto3/container/accumulation_vector.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/powers_of_tau/accumulator.hpp>
+
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/fast_curve_element.hpp>
+#include <nil/crypto3/marshalling/zk/types/accumulation_vector.hpp>
+#include <nil/crypto3/marshalling/zk/types/sparse_vector.hpp>
+#include <nil/crypto3/marshalling/zk/types/r1cs_gg_ppzksnark/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
                 template<typename TTypeBase,
-                         typename MPCParams,
+                         typename Accumulator,
                          typename = typename std::enable_if<
-                             std::is_same<MPCParams,
-                                          zk::snark::r1cs_gg_ppzksnark_mpc_params<
-                                              typename MPCParams::curve_type>>::value,
+                             std::is_same<Accumulator,
+                                          zk::commitments::detail::powers_of_tau_accumulator<
+                                              typename Accumulator::curve_type,
+                                              Accumulator::tau_powers_length>>::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_mpc_params = nil::marshalling::types::bundle<
+                using powers_of_tau_accumulator = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-                        r1cs_gg_ppzksnark_fast_proving_key<TTypeBase, typename MPCParams::proving_scheme_type::keypair_type::first_type>,
-                        r1cs_gg_ppzksnark_verification_key<TTypeBase, typename MPCParams::proving_scheme_type::keypair_type::second_type>
+                        // tau_powers_g1
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g1_type<>>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // tau_powers_g2
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g2_type<>>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // alpha_tau_powers_g1
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g1_type<>>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // beta_tau_powers_g1
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g1_type<>>,
+                            nil::marshalling::option::sequence_size_field_prefix<
+                                nil::marshalling::types::integral<TTypeBase, std::size_t>>>,
+                        // beta_g2
+                        fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g2_type<>>
                     >>;
 
-                template<typename MPCParams, typename Endianness>
-                r1cs_gg_ppzksnark_mpc_params<nil::marshalling::field_type<Endianness>, MPCParams>
-                    fill_r1cs_gg_ppzksnark_mpc_params(const MPCParams &mpc_params) {
+                template<typename Accumulator, typename Endianness>
+                powers_of_tau_accumulator<nil::marshalling::field_type<Endianness>, Accumulator>
+                    fill_powers_of_tau_accumulator(const Accumulator &accumulator) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using curve_g1_element_type =
+                        fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g1_type<>>;
+                    using curve_g2_element_type =
+                        fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g2_type<>>;
 
-                    return r1cs_gg_ppzksnark_mpc_params<TTypeBase, MPCParams>(std::make_tuple(
+                    return powers_of_tau_accumulator<TTypeBase, Accumulator>(std::make_tuple(
                         std::move(
-                            fill_r1cs_gg_ppzksnark_fast_proving_key<typename MPCParams::proving_scheme_type::keypair_type::first_type, Endianness>(
-                                mpc_params.keypair.first)),
+                            fill_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
+                                accumulator.tau_powers_g1)),
                         std::move(
-                            fill_r1cs_gg_ppzksnark_verification_key<typename MPCParams::proving_scheme_type::keypair_type::second_type, Endianness>(
-                                mpc_params.keypair.second))
-                        ));
+                            fill_fast_curve_element_vector<typename Accumulator::curve_type::template g2_type<>, Endianness>(
+                                accumulator.tau_powers_g2)),
+                        std::move(
+                            fill_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
+                                accumulator.alpha_tau_powers_g1)),
+                        std::move(
+                            fill_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
+                                accumulator.beta_tau_powers_g1)),
+                        std::move(
+                            fill_fast_curve_element<typename Accumulator::curve_type::template g2_type<>, Endianness>(
+                                accumulator.beta_g2))));
                 }
 
                 // template<typename Accumulator, typename Endianness>
@@ -122,4 +164,4 @@ namespace nil {
         }        // namespace marshalling
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_MARSHALLING_MPC_PARAMS_HPP
+#endif    // CRYPTO3_MARSHALLING_POWERS_OF_TAO_ACCUMULATOR_HPP
