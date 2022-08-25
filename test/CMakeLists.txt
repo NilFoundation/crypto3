@@ -17,6 +17,11 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::math
                        ${CMAKE_WORKSPACE_NAME}::multiprecision
 
+                       marshalling::core
+                       marshalling::crypto3_multiprecision
+                       marshalling::crypto3_algebra
+                       marshalling::crypto3_zk
+
                        ${Boost_LIBRARIES})
 
 option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
@@ -59,6 +64,9 @@ set(TESTS_NAMES
     "commitment/fold_polynomial"
     "commitment/lpc_performance"
     "commitment/pedersen"
+    "commitment/proof_of_knowledge"
+    "commitment/powers_of_tau"
+    "commitment/r1cs_gg_ppzksnark_mpc"
     "commitment/type_traits"
 
 
