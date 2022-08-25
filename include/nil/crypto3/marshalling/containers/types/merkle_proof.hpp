@@ -286,7 +286,7 @@ namespace nil {
                     node_value_marshalling_type filled_root =
                         fill_merkle_node_value<MerkleProof, Endianness>(mp.root());
                     proof_path_marshalling_type filled_proof_path =
-                        fill_merkle_proof_path<MerkleProof, Endianness>(mp._path);
+                        fill_merkle_proof_path<MerkleProof, Endianness>(mp.path());
                     return merkle_proof<TTypeBase, MerkleProof>(
                         std::make_tuple(uint64_t_marshalling_type(mp.leaf_index()), filled_root, filled_proof_path));
                 }
@@ -295,12 +295,11 @@ namespace nil {
                 MerkleProof make_merkle_proof(
                     const merkle_proof<nil::marshalling::field_type<Endianness>, MerkleProof> &filled_merkle_proof) {
 
-                    MerkleProof mp;
-                    mp._li = std::get<0>(filled_merkle_proof.value()).value();
-                    mp._root =
-                        make_merkle_node_value<MerkleProof, Endianness>(std::get<1>(filled_merkle_proof.value()));
-                    mp._path =
-                        make_merkle_proof_path<MerkleProof, Endianness>(std::get<2>(filled_merkle_proof.value()));
+                    MerkleProof mp(
+                        std::get<0>(filled_merkle_proof.value()).value(), // mp._li
+                        make_merkle_node_value<MerkleProof, Endianness>(std::get<1>(filled_merkle_proof.value())), // mp._root
+                        make_merkle_proof_path<MerkleProof, Endianness>(std::get<2>(filled_merkle_proof.value())) // mp._path
+                    );
                     return mp;
                 }
             }    // namespace types

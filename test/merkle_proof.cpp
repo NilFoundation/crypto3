@@ -104,7 +104,7 @@ void test_merkle_proof(std::size_t tree_depth) {
 
     std::size_t leafs_number = std::pow(Arity, tree_depth);
     auto data = generate_random_data<std::uint8_t, LeafSize>(leafs_number);
-    merkle_tree_type tree(data.begin(), data.end());
+    merkle_tree_type tree = nil::crypto3::containers::make_merkle_tree<Hash, Arity>(data.begin(), data.end());
     std::size_t proof_idx = std::rand() % leafs_number;
     merkle_proof_type proof(tree, proof_idx);
 
