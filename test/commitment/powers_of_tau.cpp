@@ -8,11 +8,10 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/bls12.hpp>
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/powers_of_tau.hpp>
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/powers_of_tau/helpers.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/powers_of_tau.hpp>
 
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk::commitments;
 
 BOOST_AUTO_TEST_SUITE(powers_of_tau_test_suite)
 
@@ -26,16 +25,15 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
     constexpr const unsigned tau_powers = 1 << 5;
 
     using scheme_type = powers_of_tau<curve_type, tau_powers>;
-    using helpers_type = powers_of_tau_helpers<curve_type, tau_powers>;
     
-    auto acc1 = scheme_type::initial_accumulator();
+    auto acc1 = scheme_type::accumulator_type();
     auto acc2 = acc1;
-    auto transcript = helpers_type::compute_transcript(acc1);
-    auto [pk, sk] = helpers_type::generate_keypair(transcript);
+    auto sk = scheme_type::generate_private_key();
+    auto pk = scheme_type::proof_eval(sk, acc1);
     acc2.transform(sk);
 
-    BOOST_CHECK(scheme_type::verify_contribution(acc1, acc2, pk));
-    auto result = scheme_type::finalize(acc2, tau_powers);
+    BOOST_CHECK(scheme_type::verify_eval(pk, acc1, acc2));
+    auto result = scheme_type::result_type::from_accumulator(acc2, tau_powers);
 
     auto g1_generator = g1_value_type::one();
     auto g2_generator = g2_value_type::one();
@@ -60,7 +58,7 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
         BOOST_CHECK_MESSAGE(result.beta_coeffs_g1[i] == g1_generator * (sk.beta * u[i]), std::string("i=") + std::to_string(i));
     }
 
-    auto result_16 = scheme_type::finalize(acc2, 16);
+    auto result_16 = scheme_type::result_type::from_accumulator(acc2, 16);
     auto domain_16 = nil::crypto3::math::make_evaluation_domain<scalar_field_type>(16);
     auto u_16 = domain_16->evaluate_all_lagrange_polynomials(sk.tau);
 
@@ -86,64 +84,49 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
 BOOST_AUTO_TEST_CASE(powers_of_tau_basic_test) {
     using curve_type = curves::bls12<381>;
     using scheme_type = powers_of_tau<curve_type, 32>;
-    auto acc1 = scheme_type::initial_accumulator();
+    auto acc1 = scheme_type::accumulator_type();
     auto acc2 = acc1;
-    auto pubkey = scheme_type::contribute_randomness(acc2);
+    auto sk = scheme_type::generate_private_key();
+    auto pubkey = scheme_type::proof_eval(sk, acc2);
+    acc2.transform(sk);
+
     BOOST_CHECK(acc1.tau_powers_g1[0] == acc2.tau_powers_g1[0]);
-    BOOST_CHECK(scheme_type::verify_contribution(acc1, acc2, pubkey));
+    BOOST_CHECK(scheme_type::verify_eval(pubkey, acc1, acc2));
     auto acc3 = acc2;
     std::vector<std::uint8_t> beacon {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-    auto beacon_pubkey = scheme_type::apply_randomness_beacon(acc3, beacon);
-    BOOST_CHECK(scheme_type::verify_contribution(acc2, acc3, beacon_pubkey));
-    BOOST_CHECK(scheme_type::verify_beacon_contribution(acc2, acc3, beacon));
-    auto result = scheme_type::finalize(acc3, 32);
+    auto rng = scheme_type::rng_from_beacon(beacon);
+    auto beacon_sk = scheme_type::generate_private_key(rng);
+    auto beacon_pubkey = scheme_type::proof_eval(beacon_sk, acc2, rng);
+    acc3.transform(beacon_sk);
+    BOOST_CHECK(scheme_type::verify_eval(beacon_pubkey, acc2, acc3));
+    
+    // Check reproducibility
+    auto rng_reproduced = scheme_type::rng_from_beacon(beacon);
+    auto beacon_sk_reproduced = scheme_type::generate_private_key(rng_reproduced);
+    BOOST_CHECK(beacon_sk.tau == beacon_sk_reproduced.tau);
+    BOOST_CHECK(beacon_sk.alpha == beacon_sk_reproduced.alpha);
+    BOOST_CHECK(beacon_sk.beta == beacon_sk_reproduced.beta);
+    auto beacon_pubkey_reproduced = scheme_type::proof_eval(beacon_sk_reproduced, acc2, rng_reproduced);
+    BOOST_CHECK(scheme_type::verify_eval(beacon_pubkey_reproduced, acc2, acc3));
+
+    auto result = scheme_type::result_type::from_accumulator(acc3, 32);
 }
 
 BOOST_AUTO_TEST_CASE(keypair_generation_basic_test) {
     using curve_type = curves::bls12<381>;
-    using helpers_type = powers_of_tau_helpers<curve_type, 32>;
-    std::vector<std::uint8_t> transcript(64, 1);
-    auto keypair = helpers_type::generate_keypair(transcript);
-    auto pubkey = keypair.first;
-    auto tau_gs2 = helpers_type::compute_g2_s(pubkey.tau_pok.g1_s, pubkey.tau_pok.g1_s_x, transcript, 0);
-    BOOST_CHECK(helpers_type::verify_pok(pubkey.tau_pok, tau_gs2));
-    auto alpha_gs2 = helpers_type::compute_g2_s(pubkey.alpha_pok.g1_s, pubkey.alpha_pok.g1_s_x, transcript, 1);
-    BOOST_CHECK(helpers_type::verify_pok(pubkey.alpha_pok, alpha_gs2));
-    auto beta_gs2 = helpers_type::compute_g2_s(pubkey.beta_pok.g1_s, pubkey.beta_pok.g1_s_x, transcript, 2);
-    BOOST_CHECK(helpers_type::verify_pok(pubkey.beta_pok, beta_gs2));
-}
+    using scheme_type = powers_of_tau<curve_type, 32>;
+    auto sk = scheme_type::generate_private_key();
+    auto acc = scheme_type::accumulator_type();
 
-BOOST_AUTO_TEST_CASE(pok_basic_test) {
-    using curve_type = curves::bls12<381>;
-    using scalar_field_type = curve_type::scalar_field_type;
-    using helpers_type = powers_of_tau_helpers<curve_type, 32>;
-    std::vector<std::uint8_t> transcript(64, 1);
-    scalar_field_type::value_type tau =
-        random_element<scalar_field_type>();
+    std::vector<std::uint8_t> transcript = scheme_type::compute_transcript(acc);
     
-    auto tau_pok = helpers_type::construct_pok(tau, transcript, 0);
-
-    auto tau_gs2 = helpers_type::compute_g2_s(tau_pok.g1_s, tau_pok.g1_s_x, transcript, 0);
-    BOOST_CHECK(helpers_type::verify_pok(tau_pok, tau_gs2));
-}
-
-BOOST_AUTO_TEST_CASE(is_same_ratio_basic_test) {
-    using curve_type = curves::bls12<381>;
-    using scalar_field_type = curve_type::scalar_field_type;
-    using g1_type = curve_type::g1_type<>;
-    using g1_value_type = g1_type::value_type;
-    using g2_type = curve_type::g2_type<>;
-    using g2_value_type = g2_type::value_type;
-    using helpers_type = powers_of_tau_helpers<curve_type, 32>;
-
-    scalar_field_type::value_type s =
-        random_element<scalar_field_type>();
-    
-    g1_value_type g1 = g1_value_type::one();
-    g1_value_type g1_s = s * g1;
-    g2_value_type g2 = g2_value_type::one();
-    g2_value_type g2_s = s * g2;
-    BOOST_CHECK(helpers_type::is_same_ratio(std::make_pair(g1, g1_s), std::make_pair(g2, g2_s)));
+    auto pubkey = scheme_type::proof_eval(sk, acc);
+    auto tau_gs2 = scheme_type::proof_of_knowledge_scheme_type::compute_g2_s(pubkey.tau_pok.g1_s, pubkey.tau_pok.g1_s_x, transcript, 0);
+    BOOST_CHECK(scheme_type::proof_of_knowledge_scheme_type::verify_eval(pubkey.tau_pok, tau_gs2));
+    auto alpha_gs2 = scheme_type::proof_of_knowledge_scheme_type::compute_g2_s(pubkey.alpha_pok.g1_s, pubkey.alpha_pok.g1_s_x, transcript, 1);
+    BOOST_CHECK(scheme_type::proof_of_knowledge_scheme_type::verify_eval(pubkey.alpha_pok, alpha_gs2));
+    auto beta_gs2 = scheme_type::proof_of_knowledge_scheme_type::compute_g2_s(pubkey.beta_pok.g1_s, pubkey.beta_pok.g1_s_x, transcript, 2);
+    BOOST_CHECK(scheme_type::proof_of_knowledge_scheme_type::verify_eval(pubkey.beta_pok, beta_gs2));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

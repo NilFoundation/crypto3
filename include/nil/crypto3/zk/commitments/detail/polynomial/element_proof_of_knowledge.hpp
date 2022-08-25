@@ -22,26 +22,34 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_POWERS_OF_TAU_PRIVATE_KEY_HPP
-#define CRYPTO3_R1CS_POWERS_OF_TAU_PRIVATE_KEY_HPP
+#ifndef CRYPTO3_ZK_PROOF_OF_KNOWLEDGE_ELEMENT_HPP
+#define CRYPTO3_ZK_PROOF_OF_KNOWLEDGE_ELEMENT_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
+            namespace commitments {
+                namespace detail {
                 template<typename CurveType>
-                // Contains the secrets τ, α and β that the participant of the ceremony must destroy.
-                struct powers_of_tau_private_key {
-                    typedef CurveType curve_type;
-                    using field_value_type = typename CurveType::scalar_field_type::value_type;
+                    struct element_pok {
+                        typedef CurveType curve_type;
+                        using g1_value_type = typename CurveType::template g1_type<>::value_type;
+                        using g2_value_type = typename CurveType::template g2_type<>::value_type;
+                        
+                        g1_value_type g1_s;
+                        g1_value_type g1_s_x;
+                        g2_value_type g2_s_x;
 
-                    field_value_type tau;
-                    field_value_type alpha;
-                    field_value_type beta;                    
-                };
-            }   // snarks
+                        element_pok(const g1_value_type &g1_s,
+                                    const g1_value_type &g1_s_x,
+                                    const g2_value_type &g2_s_x) :
+                            g1_s(g1_s), g1_s_x(g1_s_x), g2_s_x(g2_s_x) {
+                        }
+                    };
+                } // detail
+            }   // commitments
         }   // zk
     }   // crypto3
 }   // nil
 
-#endif  // CRYPTO3_R1CS_POWERS_OF_TAU_PRIVATE_KEY_HPP
+#endif  // CRYPTO3_ZK_PROOF_OF_KNOWLEDGE_ELEMENT_HPP

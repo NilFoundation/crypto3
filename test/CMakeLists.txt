@@ -64,6 +64,8 @@ set(TESTS_NAMES
     "commitment/fold_polynomial"
     "commitment/lpc_performance"
     "commitment/pedersen"
+    "commitment/proof_of_knowledge"
+    "commitment/powers_of_tau"
     "commitment/type_traits"
 
 
@@ -94,7 +96,6 @@ set(TESTS_NAMES
     "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
 
-    "systems/ppzksnark/r1cs_gg_ppzksnark/powers_of_tau/powers_of_tau"
     "systems/ppzksnark/r1cs_gg_ppzksnark/mpc_generator/mpc_generator"
 
     "transcript/transcript"
