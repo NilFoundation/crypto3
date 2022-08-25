@@ -22,37 +22,29 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_POWERS_OF_TAU_RESULT_HPP
-#define CRYPTO3_R1CS_POWERS_OF_TAU_RESULT_HPP
+#ifndef CRYPTO3_ZK_POWERS_OF_TAU_PUBLIC_KEY_HPP
+#define CRYPTO3_ZK_POWERS_OF_TAU_PUBLIC_KEY_HPP
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/powers_of_tau/detail/basic_policy.hpp>
-#include<vector>
+#include <nil/crypto3/zk/commitments/detail/polynomial/element_proof_of_knowledge.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename CurveType>
-                struct powers_of_tau_result {
-                    typedef CurveType curve_type;
-                    using g1_type = typename CurveType::template g1_type<>;
-                    using g2_type = typename CurveType::template g2_type<>;
-                    using g1_value_type = typename g1_type::value_type;
-                    using g2_value_type = typename g2_type::value_type;
-                    using field_value_type = typename curve_type::scalar_field_type::value_type; 
+            namespace commitments {
+                namespace detail {
+                    template<typename CurveType>
+                    struct powers_of_tau_public_key {
+                        typedef CurveType curve_type;
+                        typedef commitments::detail::element_pok<CurveType> pok_type;
 
-                    g1_value_type alpha_g1;
-                    g1_value_type beta_g1;
-                    g2_value_type beta_g2;
-                    std::vector<g1_value_type> coeffs_g1;
-                    std::vector<g2_value_type> coeffs_g2;
-                    std::vector<g1_value_type> alpha_coeffs_g1;
-                    std::vector<g1_value_type> beta_coeffs_g1;
-                    std::vector<g1_value_type> h;
-                };
-            }   // snarks
+                        pok_type tau_pok;
+                        pok_type alpha_pok;
+                        pok_type beta_pok;
+                    };
+                } // detail
+            }   // commitments
         }   // zk
     }   // crypto3
 }   // nil
 
-#endif  // CRYPTO3_R1CS_POWERS_OF_TAU_ACCUMULATOR_HPP
+#endif  // CRYPTO3_ZK_POWERS_OF_TAU_PUBLIC_KEY_HPP

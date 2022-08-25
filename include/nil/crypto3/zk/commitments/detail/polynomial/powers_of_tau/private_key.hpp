@@ -22,26 +22,28 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_POWERS_OF_TAU_PROOF_OF_KNOWLEDGE_HPP
-#define CRYPTO3_R1CS_POWERS_OF_TAU_PROOF_OF_KNOWLEDGE_HPP
+#ifndef CRYPTO3_ZK_POWERS_OF_TAU_PRIVATE_KEY_HPP
+#define CRYPTO3_ZK_POWERS_OF_TAU_PRIVATE_KEY_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename CurveType>
-                struct proof_of_knowledge {
-                    typedef CurveType curve_type;
-                    using g1_value_type = typename CurveType::template g1_type<>::value_type;
-                    using g2_value_type = typename CurveType::template g2_type<>::value_type;
-                    
-                    g1_value_type g1_s;
-                    g1_value_type g1_s_x;
-                    g2_value_type g2_s_x;
-                };
-            }   // snarks
+            namespace commitments {
+                namespace detail {
+                    template<typename CurveType>
+                    // Contains the secrets τ, α and β that the participant of the ceremony must destroy.
+                    struct powers_of_tau_private_key {
+                        typedef CurveType curve_type;
+                        using field_value_type = typename CurveType::scalar_field_type::value_type;
+
+                        field_value_type tau;
+                        field_value_type alpha;
+                        field_value_type beta;                    
+                    };
+                } // detail
+            }   // commitments
         }   // zk
     }   // crypto3
 }   // nil
 
-#endif  // CRYPTO3_R1CS_POWERS_OF_TAU_PROOF_OF_KNOWLEDGE_HPP
+#endif  // CRYPTO3_ZK_POWERS_OF_TAU_PRIVATE_KEY_HPP
