@@ -51,7 +51,7 @@ namespace nil {
                 // Fiat-Shamir transfotmation (scalar field part)
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L81
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, std::size_t... WireIndexes>
-                class kimchi_transcript;
+                class kimchi_transcript_fr;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
@@ -72,7 +72,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class kimchi_transcript<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class kimchi_transcript_fr<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                         CurveType,
                                         KimchiParamsType,
                                         W0,

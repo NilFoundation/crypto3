@@ -90,7 +90,7 @@ namespace nil {
                     kimchi_opening_proof_scalar<BlueprintFieldType> 
                         opening;
 
-                    using transcript_type = kimchi_transcript<ArithmetizationType, typename KimchiParamsType::curve_type,
+                    using transcript_type = kimchi_transcript_fr<ArithmetizationType, typename KimchiParamsType::curve_type,
                                         KimchiParamsType,
                                         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                         11, 12, 13, 14>;

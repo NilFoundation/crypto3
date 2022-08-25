@@ -131,7 +131,7 @@ namespace nil {
                                                         KimchiParamsType, W0, W1, W2, W3,
                                                         W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
                     
-                    using transcript_type = kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
+                    using transcript_type = kimchi_transcript_fr<ArithmetizationType, CurveType, KimchiParamsType,
                                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
                                         W11, W12, W13, W14>;
 
