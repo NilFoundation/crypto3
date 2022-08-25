@@ -22,30 +22,28 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_MPC_GENERATOR_MPC_PARAMS_HPP
-#define CRYPTO3_R1CS_MPC_GENERATOR_MPC_PARAMS_HPP
+#ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PUBLIC_KEY_HPP
+#define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PUBLIC_KEY_HPP
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/mpc_generator/public_key.hpp>
-#include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
-#include<vector>
-#include <nil/crypto3/container/accumulation_vector.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/element_proof_of_knowledge.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace snark {
-                template<typename CurveType>
-                struct r1cs_gg_ppzksnark_mpc_params {
-                    typedef CurveType curve_type;
-                    typedef r1cs_gg_ppzksnark<curve_type> proving_scheme_type;
+            namespace commitments {
+                namespace detail {
+                    template<typename CurveType>
+                    struct r1cs_gg_ppzksnark_mpc_public_key {
+                        typedef CurveType curve_type;
+                        typedef commitments::detail::element_pok<CurveType> pok_type;
 
-                    typename proving_scheme_type::keypair_type keypair;
-                };
-            }   // snarks
+                        typename curve_type::g1_type<>::value_type delta_after;
+                        pok_type delta_pok;
+                    };
+                } // detail
+            }   // commitments
         }   // zk
     }   // crypto3
 }   // nil
 
-#endif  // CRYPTO3_R1CS_MPC_GENERATOR_MPC_PARAMS_HPP
+#endif  // CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PUBLIC_KEY_HPP

@@ -10,13 +10,16 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/powers_of_tau.hpp>
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/mpc_generator.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/powers_of_tau.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/r1cs_gg_ppzksnark_mpc.hpp>
 
-#include "../../r1cs_examples.hpp"
+#include "../systems/ppzksnark/r1cs_examples.hpp"
+
 
 using namespace nil::crypto3::algebra;
+using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::zk::commitments;
 
 BOOST_AUTO_TEST_SUITE(mpc_generator_test_suite)
 
@@ -29,17 +32,17 @@ BOOST_AUTO_TEST_CASE(mpc_generator_compare_keypairs_without_delta_contribution_t
     using g1_value_type = curve_type::g1_type<>::value_type;
     using g2_value_type = curve_type::g2_type<>::value_type;
     using powers_of_tau_scheme_type = powers_of_tau<curve_type, 32>;
-    using helpers_type = powers_of_tau_helpers<curve_type, 32>;
     using proving_scheme_type = r1cs_gg_ppzksnark<curve_type>;
     using proving_scheme_generator_type = r1cs_gg_ppzksnark_generator<curve_type, proving_mode::basic, reductions::domain_mode::basic_only>;
     using proving_scheme_prover_type = r1cs_gg_ppzksnark_prover<curve_type, proving_mode::basic, reductions::domain_mode::basic_only>;
 
-    using mpc_generator_type = r1cs_gg_ppzksnark_mpc_generator<curve_type>;
-    auto acc = powers_of_tau_scheme_type::initial_accumulator();
-    auto transcript = helpers_type::compute_transcript(acc);
-    auto [pk,sk] = helpers_type::generate_keypair(transcript);
+    using crs_mpc_type = r1cs_gg_ppzksnark_mpc<curve_type>;
+    
+    auto acc = powers_of_tau_scheme_type::accumulator_type();
+    auto sk = powers_of_tau_scheme_type::generate_private_key();
+    auto pk = powers_of_tau_scheme_type::proof_eval(sk, acc);
     acc.transform(sk);
-    auto result = powers_of_tau_scheme_type::finalize(acc, 32);
+    auto result = powers_of_tau_scheme_type::result_type::from_accumulator(acc, 32);
 
     auto r1cs_example = generate_r1cs_example_with_field_input<curve_type::scalar_field_type>(20,3);
 
@@ -47,8 +50,7 @@ BOOST_AUTO_TEST_CASE(mpc_generator_compare_keypairs_without_delta_contribution_t
     BOOST_CHECK_LE(r1cs_example.constraint_system.num_constraints() + r1cs_example.constraint_system.num_inputs() + 1, 32);
     BOOST_CHECK_GT(r1cs_example.constraint_system.num_constraints() + r1cs_example.constraint_system.num_inputs() + 1, 16);
     
-    auto mpc_params = mpc_generator_type::init_mpc_keypair(r1cs_example.constraint_system, result);
-    auto mpc_kp = mpc_params.keypair;
+    auto mpc_kp = commitments::detail::make_r1cs_gg_ppzksnark_keypair_from_powers_of_tau(r1cs_example.constraint_system, result);
     auto g1_generator = g1_value_type::one();
     auto g2_generator = g2_value_type::one();
     
@@ -112,19 +114,17 @@ BOOST_AUTO_TEST_CASE(mpc_generator_proof_verification_without_delta_contribution
     using powers_of_tau_scheme_type = powers_of_tau<curve_type, 32>;
     using proving_scheme_type = r1cs_gg_ppzksnark<curve_type>;
     using proving_scheme_prover_type = r1cs_gg_ppzksnark_prover<curve_type, proving_mode::basic, reductions::domain_mode::basic_only>;
-    using mpc_generator_type = r1cs_gg_ppzksnark_mpc_generator<curve_type>;
+    using crs_mpc_type = r1cs_gg_ppzksnark_mpc<curve_type>;
 
-    auto acc = powers_of_tau_scheme_type::initial_accumulator();
-    powers_of_tau_scheme_type::contribute_randomness(acc);
-    auto result = powers_of_tau_scheme_type::finalize(acc, 32);
+    auto acc = powers_of_tau_scheme_type::accumulator_type();
+    auto sk = powers_of_tau_scheme_type::generate_private_key();
+    auto pk = powers_of_tau_scheme_type::proof_eval(sk, acc);
+    acc.transform(sk);
+    auto result = powers_of_tau_scheme_type::result_type::from_accumulator(acc, 32);
 
     auto r1cs_example = generate_r1cs_example_with_field_input<curve_type::scalar_field_type>(20,5);
     
-    auto r1cs_copy = r1cs_example.constraint_system;
-    r1cs_copy.swap_AB_if_beneficial();
-
-    auto mpc_params = mpc_generator_type::init_mpc_keypair(r1cs_example.constraint_system, result);
-    auto mpc_kp = mpc_params.keypair;
+    auto mpc_kp = commitments::detail::make_r1cs_gg_ppzksnark_keypair_from_powers_of_tau(r1cs_example.constraint_system, result);
 
     auto proof = proving_scheme_prover_type::process(mpc_kp.first, r1cs_example.primary_input, r1cs_example.auxiliary_input);
     auto verification_result = proving_scheme_type::verify(mpc_kp.second, r1cs_example.primary_input, proof);
@@ -138,25 +138,30 @@ BOOST_AUTO_TEST_CASE(mpc_generator_proof_verification_with_delta_contribution_te
     using powers_of_tau_scheme_type = powers_of_tau<curve_type, 32>;
     using proving_scheme_type = r1cs_gg_ppzksnark<curve_type>;
     using proving_scheme_prover_type = r1cs_gg_ppzksnark_prover<curve_type, proving_mode::basic, reductions::domain_mode::basic_only>;
-    using mpc_generator_type = r1cs_gg_ppzksnark_mpc_generator<curve_type>;
-    using public_key_type = r1cs_gg_ppzksnark_mpc_generator_public_key<curve_type>;
+    using crs_mpc_type = r1cs_gg_ppzksnark_mpc<curve_type>;
+    using public_key_type = crs_mpc_type::public_key_type;
 
-    auto acc = powers_of_tau_scheme_type::initial_accumulator();
-    powers_of_tau_scheme_type::contribute_randomness(acc);
-    auto result = powers_of_tau_scheme_type::finalize(acc, 32);
+    auto acc = powers_of_tau_scheme_type::accumulator_type();
+    auto pot_sk = powers_of_tau_scheme_type::generate_private_key();
+    auto pot_pk = powers_of_tau_scheme_type::proof_eval(pot_sk, acc);
+    acc.transform(pot_sk);
+    auto result = powers_of_tau_scheme_type::result_type::from_accumulator(acc, 32);
 
     auto r1cs_example = generate_r1cs_example_with_field_input<curve_type::scalar_field_type>(20,5);
     
-    auto r1cs_copy = r1cs_example.constraint_system;
-    r1cs_copy.swap_AB_if_beneficial();
-
-    auto mpc_params = mpc_generator_type::init_mpc_keypair(r1cs_example.constraint_system, result);
+    auto mpc_kp = commitments::detail::make_r1cs_gg_ppzksnark_keypair_from_powers_of_tau(r1cs_example.constraint_system, result);
+ 
     std::vector<public_key_type> pks;
-    pks.emplace_back(mpc_generator_type::contribute_first_randomness(mpc_params));
-    BOOST_CHECK(mpc_generator_type::verify(mpc_params, pks, r1cs_example.constraint_system, result));
-    pks.emplace_back(mpc_generator_type::contribute_randomness(mpc_params, pks[0]));
-    BOOST_CHECK(mpc_generator_type::verify(mpc_params, pks, r1cs_example.constraint_system, result));
-    auto mpc_kp = mpc_params.keypair;
+
+    auto mpc_sk1 = crs_mpc_type::generate_private_key();
+    pks.emplace_back(crs_mpc_type::proof_eval(mpc_sk1, boost::none, mpc_kp));
+    commitments::detail::transform_keypair(mpc_kp, mpc_sk1);
+    BOOST_CHECK(crs_mpc_type::verify_eval(mpc_kp, pks, r1cs_example.constraint_system, result));
+
+    auto mpc_sk2 = crs_mpc_type::generate_private_key();
+    pks.emplace_back(crs_mpc_type::proof_eval(mpc_sk2, pks[0], mpc_kp));
+    commitments::detail::transform_keypair(mpc_kp, mpc_sk2);
+    BOOST_CHECK(crs_mpc_type::verify_eval(mpc_kp, pks, r1cs_example.constraint_system, result));
 
     auto proof = proving_scheme_prover_type::process(mpc_kp.first, r1cs_example.primary_input, r1cs_example.auxiliary_input);
     auto verification_result = proving_scheme_type::verify(mpc_kp.second, r1cs_example.primary_input, proof);
