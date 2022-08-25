@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/table_commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/column_type.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/index_term_type.hpp>
 
@@ -109,6 +110,8 @@ namespace nil {
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using const_mul_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
+                    using table_comm_component = zk::components::table_commitment<ArithmetizationType, 
+                        KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using proof_type = kimchi_proof_base<BlueprintFieldType, KimchiParamsType>;
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
@@ -238,6 +241,10 @@ namespace nil {
                             row+=const_mul_component::rows_amount;
 
                             row+=add_component::rows_amount;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                row += table_comm_component::rows_amount;
+                            }
                         }
 
                         row += batch_verify_component::rows_amount;
@@ -575,18 +582,26 @@ namespace nil {
                                 evaluations[eval_idx++] = params.verifier_index.comm.sigma[j];
                             }
 
-                            //to-do lookups
-                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
-                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
-                            // }
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.table;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
+                                }
+
+                                evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
+
+                                evaluations[eval_idx++] = table_comm_component::generate_assignments(assignment, 
+                                    {params.verifier_index.comm.lookup_table, joint_combiner, params.proofs[i].comm.lookup_runtime}, row).output;
+                                row += table_comm_component::rows_amount;
+
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                                }
+                            }
 
                             assert(eval_idx == kimchi_constants::evaluations_in_batch_size);
 
-                            batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
-                                params.proofs[i].o};
+                            batch_proof_type p = {{evaluations},
+                                params.proofs[i].o, transcript};
                         
                             batch_proofs[i] = p;
                         }
@@ -789,17 +804,26 @@ namespace nil {
                                 evaluations[eval_idx++] = params.verifier_index.comm.sigma[j];
                             }
 
-                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
-                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
-                            // }
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.table;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
+                                }
+
+                                evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
+
+                                evaluations[eval_idx++] = table_comm_component::generate_circuit(bp, assignment, 
+                                    {params.verifier_index.comm.lookup_table, joint_combiner, params.proofs[i].comm.lookup_runtime}, row).output;
+                                row += table_comm_component::rows_amount;
+
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                                }
+                            }
 
                             assert(eval_idx == kimchi_constants::evaluations_in_batch_size);
 
-                            batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
-                                params.proofs[i].o};
+                            batch_proof_type p = {{evaluations},
+                                params.proofs[i].o, transcript};
                             
                             batch_proofs[i] = p;
                         }

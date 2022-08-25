@@ -298,6 +298,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         {lagrange_bases_var},
         {{sigma_comm}, {coefficient_comm}, generic_comm, psm_comm, {selectors_comm}, {lookup_selectors_comm},
         psm_comm, // runtime_tables_selector 
+        {psm_comm}, // table
         psm_comm, // complete_add
         psm_comm, // var_base_mmul
         psm_comm, // endo_mul
