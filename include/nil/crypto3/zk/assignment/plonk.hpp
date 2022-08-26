@@ -26,6 +26,10 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_ASSIGNMENT_PLONK_HPP
 #define CRYPTO3_ZK_BLUEPRINT_ASSIGNMENT_PLONK_HPP
 
+#include <stdexcept>
+#include <boost/assert.hpp>
+
+#include <nil/crypto3/zk/assert.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
@@ -61,10 +65,11 @@ namespace nil {
                         ArithmetizationParams> &table_description) :
                     snark::plonk_private_assignment_table<BlueprintFieldType,
                         ArithmetizationParams>(), _table_description(table_description) {
+
                 }
 
                 snark::plonk_column<BlueprintFieldType> &witness(std::size_t witness_index) {
-                    assert(witness_index < ArithmetizationParams::WitnessColumns);
+                    BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
                     this->witness_columns[witness_index].resize(_table_description.rows_amount);
                     return this->witness_columns[witness_index];
                 }
@@ -143,7 +148,7 @@ namespace nil {
                 }
 
                 snark::plonk_column<BlueprintFieldType> &selector(std::size_t selector_index) {
-                    assert(selector_index < this->selector_columns.size());
+                    BLUEPRINT_ASSERT(selector_index < this->selector_columns.size());
                     this->selector_columns[selector_index].resize(_table_description.rows_amount);
                     return this->selector_columns[selector_index];
                 }
@@ -238,13 +243,13 @@ namespace nil {
                 // }
 
                 snark::plonk_column<BlueprintFieldType> &public_input(std::size_t public_input_index) {
-                    assert(public_input_index < this->public_input_columns.size());
+                    BLUEPRINT_ASSERT(public_input_index < this->public_input_columns.size());
                     this->public_input_columns[public_input_index].resize(_table_description.rows_amount);
                     return this->public_input_columns[public_input_index];
                 }
 
                 snark::plonk_column<BlueprintFieldType> &constant(std::size_t constant_index) {
-                    assert(constant_index < this->constant_columns.size());
+                    BLUEPRINT_ASSERT(constant_index < this->constant_columns.size());
                     this->constant_columns[constant_index].resize(_table_description.rows_amount);
                     return this->constant_columns[constant_index];
                 }

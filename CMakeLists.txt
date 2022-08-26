@@ -18,8 +18,8 @@ if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"
     cm_workspace(crypto3)
 endif()
 
-option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
-option(ZK_PLACEHOLDER_DEBUG_ENABLED "Build with placeholder testing inside" FALSE)
+option(ZK_PLACEHOLDER_PROFILING "Build with placeholder profiling" FALSE)
+option(ZK_PLACEHOLDER_DEBUG "Build with placeholder testing inside" FALSE)
 
 if(ZK_PLACEHOLDER_PROFILING)
     add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)
@@ -27,6 +27,13 @@ endif()
 
 if(ZK_PLACEHOLDER_DEBUG)
     add_definitions(-DZK_PLACEHOLDER_DEBUG_ENABLED)
+endif()
+
+option(BLUEPRINT_DEBUG "Build with blueprint debug profiling" FALSE)
+
+if(BLUEPRINT_DEBUG)
+    message(STATUS "BLUEPRINT DEBUG enabled")
+    add_definitions(-DBLUEPRINT_DEBUG_ENABLED)
 endif()
 
 macro(cm_find_package NAME)
