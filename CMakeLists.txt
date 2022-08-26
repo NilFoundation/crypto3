@@ -8,22 +8,33 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
-cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
+cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0076 NEW)
 
-if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+list(APPEND CMAKE_MODULE_PATH
+        "${CMAKE_CURRENT_LIST_DIR}/cmake"
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
+
+
+include(CMDeploy)
+include(CMSetupVersion)
+include(CMConfig)
+
+if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
 endif()
 
+
+cm_find_package(CM)
 cm_project(threshold WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
     cm_find_package(Boost)
 endif()
-
-cm_find_package(CM)
-include(CMDeploy)
-include(CMSetupVersion)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_pubkey)
 
