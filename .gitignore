@@ -447,3 +447,5 @@ TSWLatexianTemp*
 *.glstex
 
 # End of https://www.gitignore.io/api/c,tex,c++,cmake,jetbrains+all
+
+build/*
