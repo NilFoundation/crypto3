@@ -441,3 +441,5 @@ TSWLatexianTemp*
 ### TeX Patch ###
 # glossaries
 *.glstex
+
+build/*
