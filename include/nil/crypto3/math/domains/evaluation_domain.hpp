@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <nil/crypto3/multiprecision/integer.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -110,6 +111,11 @@ namespace nil {
                  * Evaluate the vanishing polynomial of S at the field element t.
                  */
                 virtual field_value_type compute_vanishing_polynomial(const field_value_type &t) = 0;
+
+                /**
+                 * Build the vanishing polynomial of S.
+                 */
+                virtual polynomial<field_value_type> get_vanishing_polynomial() = 0;
 
                 /**
                  * Add the coefficients of the vanishing polynomial of S to the coefficients of the polynomial H.

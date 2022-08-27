@@ -287,6 +287,16 @@ namespace nil {
                     }
                     return Z;
                 }
+                polynomial<field_value_type> get_vanishing_polynomial() {
+                    if (!precomputation_sentinel)
+                        do_precomputation();
+
+                    polynomial<field_value_type> z({field_value_type::one()});
+                    for (std::size_t i = 0; i < this->m; i++) {
+                        z = z * polynomial<field_value_type>({-arithmetic_sequence[i], field_value_type::one()});
+                    }
+                    return z;
+                }
                 void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("arithmetic: expected H.size() == this->m+1");

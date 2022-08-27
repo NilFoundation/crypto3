@@ -31,6 +31,7 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -207,6 +208,15 @@ namespace nil {
 
                 field_value_type compute_vanishing_polynomial(const field_value_type &t) {
                     return (t.pow(small_m) - field_value_type::one()) * (t.pow(small_m) - shift.pow(small_m));
+                }
+
+                polynomial<field_value_type> get_vanishing_polynomial() {
+                    polynomial<field_value_type> z(2*small_m + 1, field_value_type::zero());
+                    field_value_type shift_to_small_m = shift.pow(small_m);
+                    z[2*small_m] = field_value_type::one();
+                    z[small_m] = - (shift_to_small_m + field_value_type::one());
+                    z[0] = shift_to_small_m;
+                    return z;
                 }
 
                 void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) {
