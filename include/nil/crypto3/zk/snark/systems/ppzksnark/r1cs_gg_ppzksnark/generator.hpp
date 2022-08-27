@@ -46,7 +46,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CurveType, proving_mode Mode = proving_mode::basic, reductions::domain_mode DomainMode = reductions::domain_mode::minimal, typename = void>
+                template<typename CurveType, proving_mode Mode = proving_mode::basic, typename = void>
                 class r1cs_gg_ppzksnark_generator;
 
                 /**
@@ -55,8 +55,8 @@ namespace nil {
                  * Given a R1CS constraint system CS, this algorithm produces proving and verification keys for
                  * CS.
                  */
-                template<typename CurveType, reductions::domain_mode DomainMode>
-                class r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic, DomainMode> {
+                template<typename CurveType>
+                class r1cs_gg_ppzksnark_generator<CurveType, proving_mode::basic> {
 
                     typedef detail::r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> policy_type;
 
@@ -105,7 +105,7 @@ namespace nil {
 
                         /* A quadratic arithmetic program evaluated at t. */
                         qap_instance_evaluation<scalar_field_type> qap =
-                            reductions::r1cs_to_qap<scalar_field_type, DomainMode>::instance_map_with_evaluation(r1cs_copy, t);
+                            reductions::r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(r1cs_copy, t);
 
                         std::size_t non_zero_At = 0;
                         std::size_t non_zero_Bt = 0;
@@ -257,7 +257,7 @@ namespace nil {
 
                         /* A quadratic arithmetic program evaluated at t. */
                         qap_instance_evaluation<scalar_field_type> qap =
-                            reductions::r1cs_to_qap<scalar_field_type, DomainMode>::instance_map_with_evaluation(r1cs_copy, t);
+                            reductions::r1cs_to_qap<scalar_field_type>::instance_map_with_evaluation(r1cs_copy, t);
 
                         std::size_t non_zero_At = 0;
                         std::size_t non_zero_Bt = 0;
