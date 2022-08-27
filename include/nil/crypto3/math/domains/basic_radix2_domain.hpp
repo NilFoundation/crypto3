@@ -100,6 +100,16 @@ namespace nil {
                     return detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(this->m, t);
                 }
 
+                std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
+                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) {
+                    if (std::distance(t_powers_begin, t_powers_end) < this->m) {
+                        throw std::invalid_argument("basic_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
+                    }
+                    std::vector<value_type> tmp(t_powers_begin, t_powers_begin + this->m);
+                    this->inverse_fft(tmp);
+                    return tmp;
+                }
+
                 field_value_type get_domain_element(const std::size_t idx) {
                     return omega.pow(idx);
                 }

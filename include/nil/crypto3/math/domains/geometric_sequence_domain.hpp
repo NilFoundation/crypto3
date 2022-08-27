@@ -31,6 +31,7 @@
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
 #include <nil/crypto3/math/polynomial/basis_change.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -217,6 +218,87 @@ namespace nil {
 
                     return l;
                 }
+
+                std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
+                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) {                    
+                    if(std::distance(t_powers_begin, t_powers_end) < this->m) {
+                        throw std::invalid_argument("geometric_sequence_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
+                    }
+                    
+                    /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
+                    /* Evaluate for x = t */
+                    /* Return coeffs for each l_j(x) = (l / l_i[j]) * w[j] */
+
+                    /* for all i: w[i] = (1 / r) * w[i-1] * (1 - a[i]^m-i+1) / (1 - a[i]^-i) */
+
+                    if (!precomputation_sentinel) {
+                        do_precomputation();
+                    }
+
+                    /**
+                     * If t equals one of the geometric progression values,
+                     * then output 1 at the right place, and 0 elsewhere.
+                     */
+                    for (std::size_t i = 0; i < this->m; ++i) {
+                        if (geometric_sequence[i] * t_powers_begin[0] == t_powers_begin[1])    // i.e., t equals a[i]
+                        {
+                            std::vector<value_type> res(this->m, value_type::zero());
+                            res[i] = t_powers_begin[0];
+                            return res;
+                        }
+                    }
+
+                    /**
+                     * Otherwise, if t does not equal any of the geometric progression values,
+                     * then compute each Lagrange coefficient.
+                     */
+                    std::vector<polynomial<field_value_type>> l(this->m);
+
+                    l[0] = polynomial<field_value_type>({-geometric_sequence[0], field_value_type::one()});
+
+                    std::vector<field_value_type> g(this->m);
+                    g[0] = field_value_type::zero();
+
+                    polynomial<field_value_type> l_vanish = l[0];
+                    field_value_type g_vanish = field_value_type::one();
+                    for (std::size_t i = 1; i < this->m; i++) {
+                        l[i] = polynomial<field_value_type>({-geometric_sequence[i], field_value_type::one()});
+                        g[i] = field_value_type::one() - geometric_sequence[i];
+
+                        l_vanish = l_vanish * l[i];
+                        g_vanish *= g[i];
+                    }
+
+                    field_value_type r = geometric_sequence[this->m - 1].inversed();
+                    field_value_type r_i = r;
+
+                    std::vector<field_value_type> g_i(this->m);
+                    g_i[0] = g_vanish.inversed();
+
+                    for (std::size_t i = 0; i < this->m; i++) {
+                        l[i] = l_vanish / l[i];
+                    }
+
+                    std::vector<value_type> result(this->m, value_type::zero());
+                    
+                    for(std::size_t j = 0; j < l[0].size(); ++j) {
+                        result[0] = result[0] + t_powers_begin[j] * l[0][j];
+                    }
+                    result[0] = result[0] * g_i[0];
+                    for (std::size_t i = 1; i < this->m; i++) {
+                        g_i[i] = g_i[i - 1] * g[this->m - i] * -g[i].inversed() * geometric_sequence[i];
+                        
+                        for(std::size_t j = 0; j < l[i].size(); ++j) {
+                            result[i] = result[i] + t_powers_begin[j] * l[i][j];
+                        }
+                        
+                        result[i] = result[i] * (r_i * g_i[i]);
+                        r_i *= r;
+                    }
+
+                    return result;
+                }
+
                 field_value_type get_domain_element(const std::size_t idx) {
                     if (!precomputation_sentinel)
                         do_precomputation();
