@@ -36,7 +36,7 @@ namespace nil {
                         typename proving_scheme_type::constraint_system_type r1cs_copy(constraint_system);
                         r1cs_copy.swap_AB_if_beneficial();
 
-                        qap_instance<scalar_field_type> qap = reductions::r1cs_to_qap<scalar_field_type, reductions::domain_mode::basic_only>::instance_map(r1cs_copy);
+                        qap_instance<scalar_field_type> qap = reductions::r1cs_to_qap<scalar_field_type>::instance_map(r1cs_copy);
 
                         BOOST_ASSERT_MSG(powers_of_tau_result.coeffs_g1.size() == qap.domain->m, "powers_of_tau_result size does not match the constraint system");
                         BOOST_ASSERT_MSG(powers_of_tau_result.coeffs_g2.size() == qap.domain->m, "powers_of_tau_result size does not match the constraint system");

@@ -81,19 +81,29 @@ namespace nil {
                             auto beta_g2 = acc.beta_g2; 
                             
                             BOOST_ASSERT(m <= TauPowersLength);
-                            BOOST_ASSERT(m == math::detail::power_of_two(m));
                             
-                            std::vector<g1_value_type> coeffs_g1 = evaluate_lagrange_polynomials(acc.tau_powers_g1, m);
+                            auto domain_g1 = math::make_evaluation_domain<scalar_field_type, g1_value_type>(m);
+                            auto domain_g2 = math::make_evaluation_domain<scalar_field_type, g2_value_type>(m);
+
+                            std::vector<g1_value_type> coeffs_g1 = domain_g1->evaluate_all_lagrange_polynomials(acc.tau_powers_g1.begin(), acc.tau_powers_g1.end());
                             
-                            std::vector<g2_value_type> coeffs_g2 = evaluate_lagrange_polynomials(acc.tau_powers_g2, m);
+                            std::vector<g2_value_type> coeffs_g2 = domain_g2->evaluate_all_lagrange_polynomials(acc.tau_powers_g2.begin(), acc.tau_powers_g2.end());
                             
-                            std::vector<g1_value_type> alpha_coeffs_g1 = evaluate_lagrange_polynomials(acc.alpha_tau_powers_g1, m);
+                            std::vector<g1_value_type> alpha_coeffs_g1 = domain_g1->evaluate_all_lagrange_polynomials(acc.alpha_tau_powers_g1.begin(), acc.alpha_tau_powers_g1.end());
                             
-                            std::vector<g1_value_type> beta_coeffs_g1 = evaluate_lagrange_polynomials(acc.beta_tau_powers_g1, m);
+                            std::vector<g1_value_type> beta_coeffs_g1 = domain_g1->evaluate_all_lagrange_polynomials(acc.beta_tau_powers_g1.begin(), acc.beta_tau_powers_g1.end());
                             
-                            std::vector<g1_value_type> h;
+                            std::vector<g1_value_type> h(m-1, g1_value_type::zero());
+
+                            math::polynomial<scalar_field_value_type> Z = domain_g1->get_vanishing_polynomial();
+
+                            // H[i] = t**i * Z(t)
                             for(std::size_t i=0; i < m-1; ++i) {
-                                h.emplace_back(acc.tau_powers_g1[i + m] - acc.tau_powers_g1[i]);
+                                for(std::size_t j=0; j < Z.size(); ++j) {
+                                    if(!Z[j].is_zero()) {
+                                        h[i] = h[i] + Z[j] * acc.tau_powers_g1[i+j];
+                                    }
+                                }
                             }
 
                             return powers_of_tau_result(
@@ -105,20 +115,6 @@ namespace nil {
                                 std::move(alpha_coeffs_g1),
                                 std::move(beta_coeffs_g1),
                                 std::move(h));
-                        } 
-
-                        template<typename GroupValueType>
-                        static std::vector<GroupValueType> evaluate_lagrange_polynomials(
-                                const std::vector<GroupValueType> &powers,
-                                std::size_t degree) {
-                            
-                            BOOST_ASSERT(degree <= powers.size());
-                            BOOST_ASSERT(degree == math::detail::power_of_two(degree));
-                            
-                            std::vector<GroupValueType> res(powers.begin(), powers.begin() + degree);
-                            auto domain = math::make_evaluation_domain<scalar_field_type, GroupValueType>(degree);
-                            domain->inverse_fft(res);
-                            return res;
                         }
                     };
                 } // detail
