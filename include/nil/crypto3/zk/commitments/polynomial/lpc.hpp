@@ -106,6 +106,7 @@ namespace nil {
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
+                    using field_type = FieldType;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
