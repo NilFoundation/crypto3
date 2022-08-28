@@ -48,17 +48,18 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
+                template <typename TTypeBase, typename FieldElementType>
+                using field_element_vector_type = nil::marshalling::types::array_list<
+                    TTypeBase,
+                    field_element<TTypeBase, FieldElementType>,
+                    nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                >;
+
                 /*
                  * math::polynomial marshalling
                  */
                 template<typename TTypeBase, typename FRIScheme>
-                using fri_math_polynomial =  nil::marshalling::types::array_list<
-                    TTypeBase,
-                    field_element<TTypeBase, typename FRIScheme::field_type::value_type>,
-                    nil::marshalling::option::sequence_size_field_prefix<
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>
-                    >
-                >;
+                using fri_math_polynomial =  field_element_vector_type<TTypeBase, typename FRIScheme::field_type::value_type>;
 
                 template<typename Endianness, typename FRIScheme>
                 fri_math_polynomial<nil::marshalling::field_type<Endianness>, FRIScheme>

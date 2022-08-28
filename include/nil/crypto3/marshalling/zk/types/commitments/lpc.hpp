@@ -44,26 +44,103 @@
 #include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/batched_lpc.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase, typename LPCScheme, typename = void>
-                struct lpc_proof;
+                template < typename TTypeBase, typename LPCScheme >                
+                    using lpc_proof = nil::marshalling::types::bundle<
+                    TTypeBase,
+                    std::tuple<
+                        // lpc::proof::T_root
+                        typename merkle_node_value<TTypeBase, typename LPCScheme::commitment_type>::type,
 
-                template<typename TTypeBase, typename LPCScheme, typename = void>
-                struct lpc_proof_evm;
+                        // lpc::proof::z it is std::array<std::vector<field_element>> or std::vector<std::vector<field_element>>
+                        // Vectors in array are not fixed size. So we need sequence_size_field_prefix option
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPCScheme::field_type::value_type>,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
+                        >,
 
-                template<typename TTypeBase, typename LPCScheme>
+                        // lpc::proof::fri_proofs array_elements are not fixed size. So we need sequence_size_field_prefix option
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            fri_proof<TTypeBase, typename LPCScheme::basic_fri>,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
+                        >
+                    >
+                >;
+
+                template<typename Endianness, typename LPCScheme>
+                lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme> 
+                fill_lpc_proof( const typename LPCScheme::proof_type &proof ){
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+                    auto filled_T_root = fill_merkle_node_value<typename LPCScheme::commitment_type, Endianness>(proof.T_root);
+                   
+                    nil::marshalling::types::array_list<
+                        TTypeBase,
+                        nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPCScheme::field_type::value_type>,
+                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
+                    > filled_z;
+                    for( size_t i = 0; i < proof.z.size(); i++){
+                        filled_z.value().push_back(
+                            fill_field_element_vector<typename LPCScheme::field_type::value_type, Endianness>(proof.z[i])
+                        );
+                    }
+
+                    nil::marshalling::types::array_list<
+                        TTypeBase,
+                        fri_proof<TTypeBase, typename LPCScheme::basic_fri>,
+                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
+                    > filled_fri_proofs;
+                    for( size_t i = 0; i < proof.fri_proof.size(); i++){
+                        filled_fri_proofs.value().push_back(
+                            fill_fri_proof<Endianness, typename LPCScheme::basic_fri>(proof.fri_proof[i])
+                        );
+                    }
+
+                    return lpc_proof<TTypeBase, LPCScheme>(std::tuple(
+                        filled_T_root,
+                        filled_z,
+                        filled_fri_proofs
+                    ));
+                }
+
+                template<typename Endianness, typename LPCScheme>
+                typename LPCScheme::proof_type 
+                make_lpc_proof(const lpc_proof<nil::marshalling::field_type<Endianness>, LPCScheme> &filled_proof){
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+                    typename LPCScheme::proof_type proof;
+                    proof.T_root = make_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(std::get<0>(filled_proof.value()));
+
+                    auto filled_z = std::get<1>(filled_proof.value());
+                    if constexpr(LPCScheme::is_const_size){
+                        for( size_t i = 0; i < filled_z.value().size(); i ++){
+                            proof.z[i] = make_field_element_vector<typename LPCScheme::field_type::value_type, Endianness>(filled_z.value()[i]);
+                        }
+                    } else {
+                        for( size_t i = 0; i < filled_z.value().size(); i ++){
+                            proof.z.push_back(make_field_element_vector<typename LPCScheme::field_type::value_type, Endianness>(filled_z.value()[i]));
+                        }
+                    }
+
+                    auto filled_fri_proofs = std::get<2>(filled_proof.value());
+                    for( size_t i = 0; i < filled_fri_proofs.value().size(); i ++){
+                        proof.fri_proof[i] = make_fri_proof<Endianness, typename LPCScheme::basic_fri>(filled_fri_proofs.value()[i]);
+                    }
+
+                    return proof;
+                }
+
+/*                template<typename TTypeBase, typename LPCScheme>
                 struct lpc_proof<
                     TTypeBase,
                     LPCScheme,
-                    typename std::enable_if<std::is_same<LPCScheme,
-                                                         nil::crypto3::zk::commitments::list_polynomial_commitment<
-                                                             typename LPCScheme::field_type,
-                                                             typename LPCScheme::lpc_params>>::value>::type> {
+ {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
@@ -505,7 +582,7 @@ namespace nil {
                     }
 
                     return proof;
-                }
+                }*/
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
