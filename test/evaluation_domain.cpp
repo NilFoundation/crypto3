@@ -329,6 +329,25 @@ void test_lagrange_coefficients_curve_elements(std::size_t m) {
     std::cout << "type name " << typeid(EvaluationDomainType).name() << std::endl;
 }
 
+template<typename FieldType, typename EvaluationDomainType>
+void test_get_vanishing_polynomial(std::size_t m) {
+    typedef typename FieldType::value_type field_value_type;
+
+    // Make sure the results are reproducible.
+    std::srand(0);
+    field_value_type t = std::rand();
+ 
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
+
+    domain.reset(new EvaluationDomainType(m));
+
+    field_value_type Zt = domain->compute_vanishing_polynomial(t);
+    polynomial<field_value_type> Z = domain->get_vanishing_polynomial();
+    BOOST_CHECK(Z.evaluate(t) == Zt);
+
+    std::cout << "type name " << typeid(EvaluationDomainType).name() << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE(fft_evaluation_domain_test_suite)
 
 BOOST_AUTO_TEST_CASE(fft) {
@@ -454,6 +473,22 @@ BOOST_AUTO_TEST_CASE(curve_elements_lagrange_coefficients) {
                             group_type,
                             arithmetic_sequence_domain<field_type>,
                             arithmetic_sequence_domain<field_type, group_value_type>>(4);
+}
+
+BOOST_AUTO_TEST_CASE(get_vanishing_polynomial) {
+    typedef curves::bls12<381>::scalar_field_type field_type;
+    
+    test_get_vanishing_polynomial<field_type,
+                            basic_radix2_domain<field_type>>(4);
+    // not applicable for any m < 100 for this field, testing with base field instead
+    test_get_vanishing_polynomial<fields::bls12<381>,
+                            extended_radix2_domain<fields::bls12<381>>>(4);
+    test_get_vanishing_polynomial<field_type,
+                            step_radix2_domain<field_type>>(4);
+    test_get_vanishing_polynomial<field_type,
+                            geometric_sequence_domain<field_type>>(4);
+    test_get_vanishing_polynomial<field_type,
+                            arithmetic_sequence_domain<field_type>>(4);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
