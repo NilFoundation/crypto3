@@ -58,6 +58,12 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
         BOOST_CHECK_MESSAGE(result.beta_coeffs_g1[i] == g1_generator * (sk.beta * u[i]), std::string("i=") + std::to_string(i));
     }
 
+    BOOST_CHECK_EQUAL(result.h.size(), domain->m-1);
+    auto Zt = domain->compute_vanishing_polynomial(sk.tau);
+    for(std::size_t i = 0; i<domain->m-1; ++i) {
+        BOOST_CHECK_MESSAGE(result.h[i] == g1_generator * (sk.tau.pow(i) * Zt), std::string("i=") + std::to_string(i));
+    }
+
     auto result_16 = scheme_type::result_type::from_accumulator(acc2, 16);
     auto domain_16 = nil::crypto3::math::make_evaluation_domain<scalar_field_type>(16);
     auto u_16 = domain_16->evaluate_all_lagrange_polynomials(sk.tau);
@@ -78,6 +84,40 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
         BOOST_CHECK_MESSAGE(result_16.coeffs_g2[i] == g2_generator * u_16[i], std::string("i=") + std::to_string(i));
         BOOST_CHECK_MESSAGE(result_16.alpha_coeffs_g1[i] == g1_generator *(sk.alpha * u_16[i]), std::string("i=") + std::to_string(i));
         BOOST_CHECK_MESSAGE(result_16.beta_coeffs_g1[i] == g1_generator * (sk.beta * u_16[i]), std::string("i=") + std::to_string(i));
+    }
+
+    BOOST_CHECK_EQUAL(result_16.h.size(), domain_16->m-1);
+    auto Zt_16 = domain_16->compute_vanishing_polynomial(sk.tau);
+    for(std::size_t i = 0; i<domain_16->m-1; ++i) {
+        BOOST_CHECK_MESSAGE(result_16.h[i] == g1_generator * (sk.tau.pow(i) * Zt_16), std::string("i=") + std::to_string(i));
+    }
+
+    auto result_24 = scheme_type::result_type::from_accumulator(acc2, 24);
+    auto domain_24 = nil::crypto3::math::make_evaluation_domain<scalar_field_type>(24);
+    auto u_24 = domain_24->evaluate_all_lagrange_polynomials(sk.tau);
+    
+    BOOST_CHECK_EQUAL(u_24.size(), 24);
+
+    BOOST_CHECK(result_24.alpha_g1 == g1_generator * sk.alpha);
+    BOOST_CHECK(result_24.beta_g1 == g1_generator * sk.beta);
+    BOOST_CHECK(result_24.beta_g2 == g2_generator * sk.beta);
+    
+    BOOST_CHECK_EQUAL(result_24.coeffs_g1.size(), 24);
+    BOOST_CHECK_EQUAL(result_24.coeffs_g2.size(), 24);
+    BOOST_CHECK_EQUAL(result_24.alpha_coeffs_g1.size(), 24);
+    BOOST_CHECK_EQUAL(result_24.beta_coeffs_g1.size(), 24);
+
+    for(std::size_t i = 0; i < domain_24->m; ++i) {
+        BOOST_CHECK_MESSAGE(result_24.coeffs_g1[i] == g1_generator * u_24[i], std::string("i=") + std::to_string(i));
+        BOOST_CHECK_MESSAGE(result_24.coeffs_g2[i] == g2_generator * u_24[i], std::string("i=") + std::to_string(i));
+        BOOST_CHECK_MESSAGE(result_24.alpha_coeffs_g1[i] == g1_generator *(sk.alpha * u_24[i]), std::string("i=") + std::to_string(i));
+        BOOST_CHECK_MESSAGE(result_24.beta_coeffs_g1[i] == g1_generator * (sk.beta * u_24[i]), std::string("i=") + std::to_string(i));
+    }
+
+    BOOST_CHECK_EQUAL(result_24.h.size(), domain_24->m-1);
+    auto Zt_24 = domain_24->compute_vanishing_polynomial(sk.tau);
+    for(std::size_t i = 0; i<domain_24->m-1; ++i) {
+        BOOST_CHECK_MESSAGE(result_24.h[i] == g1_generator * (sk.tau.pow(i) * Zt_24), std::string("i=") + std::to_string(i));
     }
 }
 
