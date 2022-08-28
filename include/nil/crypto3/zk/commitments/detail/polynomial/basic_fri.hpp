@@ -78,6 +78,13 @@ namespace nil {
                         typedef MerkleTreeHashType merkle_tree_hash_type;
                         typedef TranscriptHashType transcript_hash_type;
 
+                        typedef std::array<typename field_type::value_type, m>  polynomial_value_type;
+                        typedef std::vector<polynomial_value_type>              polynomial_values_type;
+                        typedef typename select_container<is_const_size,
+                            polynomial_values_type,
+                            leaf_size>::type                                    polynomials_values_type;
+                        typedef std::vector<polynomials_values_type>            rounds_polynomials_values_type;
+
                         typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
                         typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
 
@@ -133,19 +140,6 @@ namespace nil {
                                 return !(rhs == *this);
                             }
 
-                            typedef
-                                typename select_container<is_const_size,
-                                                          std::vector<std::array<typename FieldType::value_type, m>>,
-                                                          leaf_size>::type y_type;
-                            typedef
-                                typename select_container<is_const_size,
-                                                          std::vector<std::array<typename FieldType::value_type, m>>,
-                                                          leaf_size>::type colinear_value_type;
-
-                            typedef
-                                typename select_container<is_const_size,
-                                                          std::vector<std::array<typename FieldType::value_type, m>>,
-                                                          leaf_size>::type value_type;
 
 //                          y and colinear value are stored in proof_type::values;
 //                          for i-th round y = proof_type::values[i]; colinear_value = proof_type::values[i+1];
@@ -156,8 +150,6 @@ namespace nil {
                         };
 
                         struct proof_type {
-                            using value_type=typename round_proof_type::value_type;
-
                             bool operator==(const proof_type &rhs) const {
                                 return values == rhs.values && round_proofs == rhs.round_proofs && final_polynomials == rhs.final_polynomials &&
                                        target_commitment == rhs.target_commitment;
@@ -168,12 +160,12 @@ namespace nil {
                             }
 
                             /* Returns y for i-th round*/ 
-                            value_type &get_y(int i){
+                            polynomials_values_type &get_y(int i){
                                 return this->values[i];
                             }
 
                             /* Returns colinear_values for i-th round*/ 
-                            value_type &get_colinear_value(int i){
+                            polynomials_values_type &get_colinear_value(int i){
                                 return this->values[i+1];
                             }
 
@@ -185,7 +177,7 @@ namespace nil {
                             final_polynomials_type final_polynomials;
                             commitment_type target_commitment;
 
-                            std::vector<typename round_proof_type::value_type> values; // y-s and colinear_values for round_proof_type
+                            rounds_polynomials_values_type values; // y-s and colinear_values for round_proof_type
                         };
                     };
                 }    // namespace detail
@@ -582,7 +574,7 @@ namespace nil {
                     std::vector<std::array<typename FRI::field_type::value_type, FRI::m>> s;
                     std::vector<std::array<std::size_t, FRI::m>> s_indices;
 
-                    std::vector<typename FRI::round_proof_type::value_type> values;
+                    typename FRI::rounds_polynomials_values_type values;
 
                     for (std::size_t i = 0; i < fri_params.step_list.size() - 1; i++) {
                         domain_size = fri_params.D[basis_index]->size();
@@ -596,7 +588,7 @@ namespace nil {
                             return {};
                         }
 
-                        typename FRI::round_proof_type::y_type y;
+                        typename FRI::polynomials_values_type y;
                         if constexpr (!FRI::is_const_size) {
                             y.resize(leaf_size);
                         }
@@ -625,7 +617,7 @@ namespace nil {
                         auto p = make_proof_specialized<FRI>(
                             get_folded_index<FRI>(x_index, domain_size, fri_params.step_list[i]), domain_size, *p_tree);
 
-                        typename FRI::round_proof_type::colinear_value_type colinear_value;
+                        typename FRI::polynomials_values_type colinear_value;
                         if constexpr (!FRI::is_const_size) {
                             colinear_value.resize(leaf_size);
                         }
@@ -820,7 +812,7 @@ namespace nil {
                         return false;
                     }
 
-                    typename FRI::round_proof_type::y_type y_0;
+                    typename FRI::polynomials_values_type y_0;
                     if constexpr (!FRI::is_const_size) {
                         y_0.resize(leaf_size);
                     }
@@ -892,7 +884,7 @@ namespace nil {
                             }
                         }
 
-                        typename FRI::round_proof_type::y_type y;
+                        typename FRI::polynomials_values_type y;
                         if constexpr (!FRI::is_const_size) {
                             y.resize(leaf_size);
                         }
@@ -913,7 +905,7 @@ namespace nil {
                                 transcript.template challenge<typename FRI::field_type>();
 
                             for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                                typename FRI::round_proof_type::y_type::value_type y_poly_i_new(
+                                typename FRI::polynomial_values_type y_poly_i_new(
                                     y[polynom_index].size() / FRI::m);
                                 for (std::size_t y_i = 0; y_i < y_poly_i_new.size(); y_i++) {
                                     std::vector<std::pair<typename FRI::field_type::value_type,

@@ -170,7 +170,8 @@ namespace nil {
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                ) {
 
                     typename LPC::proof_type::z_type z;
 
@@ -337,9 +338,9 @@ namespace nil {
                     const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
-
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                ) {
 
                     std::size_t leaf_size = g.size();
                     typename LPC::proof_type::z_type z;
@@ -431,8 +432,8 @@ namespace nil {
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
-
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                ) {
                     std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp = {evaluation_points};
                     return proof_eval<LPC>(tmp, T, g, fri_params, transcript);
                 }
