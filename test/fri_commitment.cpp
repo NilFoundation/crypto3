@@ -194,19 +194,19 @@ template<typename Endianness, typename FRIScheme>
 void test_fri_proof_one_round_values(typename FRIScheme::proof_type &proof){
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    auto filled_v0 = nil::crypto3::marshalling::types::fill_fri_polynomials_values_type<nil::marshalling::option::big_endian, FRIScheme>(proof.values[0]);
-    auto _v0 = nil::crypto3::marshalling::types::make_fri_polynomials_values_type<nil::marshalling::option::big_endian, FRIScheme>(filled_v0);
+    auto filled_v0 = nil::crypto3::marshalling::types::fill_fri_polynomials_values<nil::marshalling::option::big_endian, FRIScheme>(proof.values[0]);
+    auto _v0 = nil::crypto3::marshalling::types::make_fri_polynomials_values<nil::marshalling::option::big_endian, FRIScheme>(filled_v0);
     BOOST_CHECK(proof.values[0] == _v0);
     std::vector<std::uint8_t> cv0;
     cv0.resize(filled_v0.length(), 0x00);
     auto write_iter0 = cv0.begin();
     nil::marshalling::status_type status0 = filled_v0.write(write_iter0, cv0.size());
 
-    nil::crypto3::marshalling::types::fri_polynomials_values_type<TTypeBase, FRIScheme> test_val_read0;
+    nil::crypto3::marshalling::types::fri_polynomials_values<TTypeBase, FRIScheme> test_val_read0;
     auto read_iter0 = cv0.begin();
     status0 = test_val_read0.read(read_iter0, cv0.size());
     auto constructed_val_read0 =
-        nil::crypto3::marshalling::types::make_fri_polynomials_values_type<Endianness, FRIScheme>(test_val_read0);
+        nil::crypto3::marshalling::types::make_fri_polynomials_values<Endianness, FRIScheme>(test_val_read0);
     BOOST_CHECK(proof.values[0] == constructed_val_read0);
 }
 
@@ -214,8 +214,8 @@ template<typename Endianness, typename FRIScheme>
 void test_fri_proof_values(typename FRIScheme::proof_type &proof){
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    auto filled_v = nil::crypto3::marshalling::types::fill_fri_rounds_polynomials_values_type<Endianness, FRIScheme>(proof.values);
-    auto _v = nil::crypto3::marshalling::types::make_fri_rounds_polynomials_values_type<Endianness, FRIScheme>(filled_v);
+    auto filled_v = nil::crypto3::marshalling::types::fill_fri_rounds_polynomials_values<Endianness, FRIScheme>(proof.values);
+    auto _v = nil::crypto3::marshalling::types::make_fri_rounds_polynomials_values<Endianness, FRIScheme>(filled_v);
     BOOST_CHECK(proof.values == _v);
 
     std::vector<std::uint8_t> cv;
@@ -223,11 +223,11 @@ void test_fri_proof_values(typename FRIScheme::proof_type &proof){
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_v.write(write_iter, cv.size());
 
-    nil::crypto3::marshalling::types::fri_rounds_polynomials_values_type<TTypeBase, FRIScheme> test_val_read;
+    nil::crypto3::marshalling::types::fri_rounds_polynomials_values<TTypeBase, FRIScheme> test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     auto constructed_val_read =
-        nil::crypto3::marshalling::types::make_fri_rounds_polynomials_values_type<Endianness, FRIScheme>(test_val_read);
+        nil::crypto3::marshalling::types::make_fri_rounds_polynomials_values<Endianness, FRIScheme>(test_val_read);
     BOOST_CHECK(proof.values == constructed_val_read);
 }
 
@@ -235,8 +235,8 @@ template<typename Endianness, typename FRIScheme>
 void test_fri_proof(typename FRIScheme::proof_type &proof){
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     
-    auto filled_proof = nil::crypto3::marshalling::types::fill_fri_proof_type<nil::marshalling::option::big_endian, FRIScheme>(proof);
-    auto _proof = nil::crypto3::marshalling::types::make_fri_proof_type<nil::marshalling::option::big_endian, FRIScheme>(filled_proof);
+    auto filled_proof = nil::crypto3::marshalling::types::fill_fri_proof<nil::marshalling::option::big_endian, FRIScheme>(proof);
+    auto _proof = nil::crypto3::marshalling::types::make_fri_proof<nil::marshalling::option::big_endian, FRIScheme>(filled_proof);
 
     BOOST_CHECK(proof == _proof);
 
@@ -245,15 +245,50 @@ void test_fri_proof(typename FRIScheme::proof_type &proof){
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
 
-    nil::crypto3::marshalling::types::fri_proof_type<TTypeBase, FRIScheme> test_val_read;
+    nil::crypto3::marshalling::types::fri_proof<TTypeBase, FRIScheme> test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     typename FRIScheme::proof_type constructed_val_read =
-        nil::crypto3::marshalling::types::make_fri_proof_type<Endianness, FRIScheme>(test_val_read);
+        nil::crypto3::marshalling::types::make_fri_proof<Endianness, FRIScheme>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
 }
 
 BOOST_AUTO_TEST_SUITE(fri_test_suite)
+BOOST_AUTO_TEST_CASE(marshalling_fri_some_polynomial_marshalling_test) {
+    std::srand(std::time(0));
+    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
+    using field_type = typename curve_type::scalar_field_type;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    using FRIScheme = typename nil::crypto3::zk::commitments::fri<field_type, hash_type, hash_type, 2, 0>::basic_fri;
+
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+    auto filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, FRIScheme>(f);
+
+    auto _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, FRIScheme>(filled_polynomial);
+    BOOST_CHECK(f == _f);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_fri_random_round_proof) {
+    std::srand(std::time(0));
+    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
+    using field_type = typename curve_type::scalar_field_type;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    using FRIScheme = typename nil::crypto3::zk::commitments::fri<field_type, hash_type, hash_type, 2, 0>::basic_fri;
+    using proof_marshalling_type = typename nil::crypto3::marshalling::types::fri_round_proof<
+        nil::marshalling::field_type<Endianness>, FRIScheme
+    >;
+
+    typename FRIScheme::round_proof_type proof = generate_random_fri_round_proof<FRIScheme>(5);
+    test_fri_round_proof<Endianness, FRIScheme>(proof);
+}
+
 BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test){
     // setup
     using curve_type = algebra::curves::pallas;
@@ -604,39 +639,473 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_fri_basic_runtime_size_test){
     test_fri_proof<Endianness, FRIScheme>(proof);
 }
 
-BOOST_AUTO_TEST_CASE(marshalling_fri_some_polynomial_marshalling_test) {
-    std::srand(std::time(0));
-    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
-    using field_type = typename curve_type::scalar_field_type;
-    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    using FRIScheme = typename nil::crypto3::zk::commitments::fri<field_type, hash_type, hash_type, 2, 0>::basic_fri;
+BOOST_AUTO_TEST_CASE(marshalling_batched_fri_basic_runtime_size_skipping_layers_test) {
+
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t d = 4096;
+
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
+    const std::size_t leaf_size = 10;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
+
+    static_assert(zk::is_commitment<FRIScheme>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+    typedef typename FRIScheme::proof_type proof_type;
+    typedef typename FRIScheme::params_type params_type;
+
+    params_type params;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    params.r = r;
+    params.D = D;
+    params.max_degree = d - 1;
+    params.step_list = generate_random_step_list(r, 4);
+
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+    // commit
+    nil::crypto3::random::algebraic_random_device<FieldType> rnd;
+    std::vector<math::polynomial<typename FieldType::value_type>> f(
+        leaf_size, math::polynomial<typename FieldType::value_type>(d));
+    for (auto &f_i : f) {
+        std::generate(std::begin(f_i), std::end(f_i), [&rnd]() { return rnd(); });
+        f_i.back() = FieldType::value_type::one();
+    }
+
+    // eval
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+    auto proof = zk::algorithms::proof_eval<FRIScheme>(f, params, transcript);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
-    auto filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, FRIScheme>(f);
-
-    auto _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, FRIScheme>(filled_polynomial);
-    BOOST_CHECK(f == _f);
+    test_fri_proof_one_round_values<Endianness, FRIScheme>(proof);
+    test_fri_proof_values<Endianness, FRIScheme>(proof);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[0]);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[1]);
+    test_fri_proof<Endianness, FRIScheme>(proof);
 }
 
-BOOST_AUTO_TEST_CASE(marshalling_fri_random_round_proof) {
-    std::srand(std::time(0));
-    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
-    using field_type = typename curve_type::scalar_field_type;
-    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+BOOST_AUTO_TEST_CASE(fri_dfs_basic_test) {
+
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t d = 16;
+
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 1, true> FRIScheme;
+
+    static_assert(zk::is_commitment<FRIScheme>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+    typedef typename FRIScheme::proof_type proof_type;
+    typedef typename FRIScheme::params_type params_type;
+
+    params_type params;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    params.r = r;
+    params.D = D;
+    params.max_degree = d - 1;
+    params.step_list = generate_random_step_list(r, 1);
+
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+    // commit
+    math::polynomial<typename FieldType::value_type> f_data = {1, 3, 4, 1, 5, 6, 7, 2, 8, 5, 6, 1, 2, 1, 1};
+    math::polynomial_dfs<typename FieldType::value_type> f;
+    f.from_coefficients(f_data);
+
+    // eval
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+    auto proof = zk::algorithms::proof_eval<FRIScheme>(f, params, transcript);
+    
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    test_fri_proof_one_round_values<Endianness, FRIScheme>(proof);
+    test_fri_proof_values<Endianness, FRIScheme>(proof);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[0]);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[1]);
+    test_fri_proof<Endianness, FRIScheme>(proof);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_fri_dfs_basic_skipping_layers_test) {
+
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t d = 1024;
+
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 1, true> FRIScheme;
+
+    static_assert(zk::is_commitment<FRIScheme>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+    typedef typename FRIScheme::proof_type proof_type;
+    typedef typename FRIScheme::params_type params_type;
+
+    params_type params;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    params.r = r;
+    params.D = D;
+    params.max_degree = d - 1;
+    params.step_list = generate_random_step_list(r, 4);
+
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+    // commit
+    nil::crypto3::random::algebraic_random_device<FieldType> rnd;
+    math::polynomial<typename FieldType::value_type> f_data(d);
+    std::generate(std::begin(f_data), std::end(f_data), [&rnd]() { return rnd(); });
+    f_data.back() = FieldType::value_type::one();
+    math::polynomial_dfs<typename FieldType::value_type> f;
+    f.from_coefficients(f_data);
+
+    // eval
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+    auto proof = zk::algorithms::proof_eval<FRIScheme>(f, params, transcript);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    using FRIScheme = typename nil::crypto3::zk::commitments::fri<field_type, hash_type, hash_type, 2, 0>::basic_fri;
-    using proof_marshalling_type = typename nil::crypto3::marshalling::types::fri_round_proof<
-        nil::marshalling::field_type<Endianness>, FRIScheme
-    >;
+    test_fri_proof_one_round_values<Endianness, FRIScheme>(proof);
+    test_fri_proof_values<Endianness, FRIScheme>(proof);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[0]);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[1]);
+    test_fri_proof<Endianness, FRIScheme>(proof);
+}
 
-    typename FRIScheme::round_proof_type proof = generate_random_fri_round_proof<FRIScheme>(5);
-    test_fri_round_proof<Endianness, FRIScheme>(proof);
+BOOST_AUTO_TEST_CASE(marshalling_fri_dfs_test_2) {
+
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t d = 16;
+
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 1, true> FRIScheme;
+
+    static_assert(zk::is_commitment<FRIScheme>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+    typedef typename FRIScheme::proof_type proof_type;
+    typedef typename FRIScheme::params_type params_type;
+
+    params_type params;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    params.r = r;
+    params.D = D;
+    params.max_degree = d - 1;
+    params.step_list = {2, 1, 1};
+
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+    // commit
+    math::polynomial<typename FieldType::value_type> f_data = {1, 3, 4, 1, 5, 6, 7, 2, 8, 5, 6, 7, 1, 2, 1, 1};
+    math::polynomial_dfs<typename FieldType::value_type> f;
+    f.from_coefficients(f_data);
+
+    // eval
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+    auto proof = zk::algorithms::proof_eval<FRIScheme>(f, params, transcript);
+
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    test_fri_proof_one_round_values<Endianness, FRIScheme>(proof);
+    test_fri_proof_values<Endianness, FRIScheme>(proof);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[0]);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[1]);
+    test_fri_proof<Endianness, FRIScheme>(proof);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_batched_fri_dfs_basic_test) {
+
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t d = 16;
+
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
+    constexpr static const std::size_t leaf_size = 2;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
+
+    static_assert(zk::is_commitment<FRIScheme>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+    typedef typename FRIScheme::proof_type proof_type;
+    typedef typename FRIScheme::params_type params_type;
+
+    params_type params;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    params.r = r;
+    params.D = D;
+    params.max_degree = d - 1;
+    params.step_list = {2, 1, 1};
+
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+    // commit
+    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f_data = {
+        {{1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}, {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 7, 7, 7, 1, 1}}};
+
+    std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size> f;
+    for (std::size_t polynom_index = 0; polynom_index < f.size(); polynom_index++) {
+        f[polynom_index].from_coefficients(f_data[polynom_index]);
+    }
+
+    // eval
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+    using ContainerType = std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size>;
+    static_assert(
+        !std::is_same<typename ContainerType::value_type, math::polynomial<typename FieldType::value_type>>::value);
+    static_assert(
+        std::is_same<typename ContainerType::value_type, math::polynomial_dfs<typename FieldType::value_type>>::value);
+    auto proof = zk::algorithms::proof_eval<FRIScheme>(f, params, transcript);
+
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    test_fri_proof_one_round_values<Endianness, FRIScheme>(proof);
+    test_fri_proof_values<Endianness, FRIScheme>(proof);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[0]);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[1]);
+    test_fri_proof<Endianness, FRIScheme>(proof);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_batched_fri_dfs_basic_skipping_layers_test) {
+
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t d = 2048;
+
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
+    constexpr static const std::size_t leaf_size = 10;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
+
+    static_assert(zk::is_commitment<FRIScheme>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+    typedef typename FRIScheme::proof_type proof_type;
+    typedef typename FRIScheme::params_type params_type;
+
+    params_type params;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    params.r = r;
+    params.D = D;
+    params.max_degree = d - 1;
+    params.step_list = generate_random_step_list(r, 4);
+
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+    // commit
+    nil::crypto3::random::algebraic_random_device<FieldType> rnd;
+    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f_data;
+    f_data.fill(math::polynomial<typename FieldType::value_type>(d));
+    for (auto &f_i : f_data) {
+        std::generate(std::begin(f_i), std::end(f_i), [&rnd]() { return rnd(); });
+        f_i.back() = FieldType::value_type::one();
+    }
+
+    std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size> f;
+    for (std::size_t polynom_index = 0; polynom_index < f.size(); polynom_index++) {
+        f[polynom_index].from_coefficients(f_data[polynom_index]);
+    }
+
+    // eval
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+    using ContainerType = std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size>;
+    static_assert(
+        !std::is_same<typename ContainerType::value_type, math::polynomial<typename FieldType::value_type>>::value);
+    static_assert(
+        std::is_same<typename ContainerType::value_type, math::polynomial_dfs<typename FieldType::value_type>>::value);
+    auto proof = zk::algorithms::proof_eval<FRIScheme>(f, params, transcript);
+
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    test_fri_proof_one_round_values<Endianness, FRIScheme>(proof);
+    test_fri_proof_values<Endianness, FRIScheme>(proof);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[0]);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[1]);
+    test_fri_proof<Endianness, FRIScheme>(proof);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_batched_fri_dfs_test_2) {
+
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    typedef hashes::sha2<256> merkle_hash_type;
+    typedef hashes::sha2<256> transcript_hash_type;
+
+    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+
+    constexpr static const std::size_t d = 16;
+
+    constexpr static const std::size_t r = boost::static_log2<d>::value;
+    constexpr static const std::size_t m = 2;
+    constexpr static const std::size_t leaf_size = 7;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
+
+    static_assert(zk::is_commitment<FRIScheme>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+    typedef typename FRIScheme::proof_type proof_type;
+    typedef typename FRIScheme::params_type params_type;
+
+    params_type params;
+
+    constexpr static const std::size_t d_extended = d;
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    params.r = r;
+    params.D = D;
+    params.max_degree = d - 1;
+    params.step_list = {2, 1, 1};
+
+    BOOST_CHECK(D[1]->m == D[0]->m / 2);
+    BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+    // commit
+    std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f_data = {
+        {{1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1},
+         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 7, 7, 7, 2, 1, 1},
+         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 7, 2, 1, 1},
+         {1, 3, 4, 1, 5, 7, 2, 8, 7, 7, 7, 7, 2, 1, 1},
+         {1, 3, 4, 1, 5, 8, 7, 2, 8, 7, 7, 7, 7, 2, 1, 1},
+         {1, 3, 4, 1, 5, 4, 7, 2, 8, 7, 7, 7, 7, 2, 1, 1},
+         {1, 3, 4, 1, 5, 7, 7, 2, 8, 7, 7, 7, 7, 2, 1, 1}}};
+
+    std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size> f;
+    for (std::size_t polynom_index = 0; polynom_index < f.size(); polynom_index++) {
+        f[polynom_index].from_coefficients(f_data[polynom_index]);
+    }
+
+    // eval
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+    using ContainerType = std::array<math::polynomial_dfs<typename FieldType::value_type>, leaf_size>;
+    static_assert(
+        !std::is_same<typename ContainerType::value_type, math::polynomial<typename FieldType::value_type>>::value);
+    static_assert(
+        std::is_same<typename ContainerType::value_type, math::polynomial_dfs<typename FieldType::value_type>>::value);
+    auto proof = zk::algorithms::proof_eval<FRIScheme>(f, params, transcript);
+
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    test_fri_proof_one_round_values<Endianness, FRIScheme>(proof);
+    test_fri_proof_values<Endianness, FRIScheme>(proof);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[0]);
+    test_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[1]);
+    test_fri_proof<Endianness, FRIScheme>(proof);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
