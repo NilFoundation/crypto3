@@ -95,6 +95,18 @@ namespace nil {
                 virtual std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) = 0;
 
                 /**
+                 * Evaluate all Lagrange polynomials.
+                 *
+                 * The inputs are:
+                 * - an integer m
+                 * - a vector (t**0,...,t**(m-1)) t_powers for some element t
+                 * The output is a vector (b_{0},...,b_{m-1})
+                 * where b_{i} is the evaluation of L_{i,S}(z) at z = t.
+                 */
+                virtual std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
+                                                                                  const typename std::vector<value_type>::const_iterator &t_powers_end) = 0;
+
+                /**
                  * Evaluate the vanishing polynomial of S at the field element t.
                  */
                 virtual field_value_type compute_vanishing_polynomial(const field_value_type &t) = 0;
