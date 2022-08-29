@@ -59,19 +59,19 @@ namespace nil {
                             }
                         }
 
-                        void generate_r1cs_constraints() {
+                        void generate_gates() {
                             if (tree_depth > 0) {
                                 for (std::size_t i = 0; i < tree_depth; ++i) {
                                     generate_boolean_r1cs_constraint<FieldType>(this->bp, address_bits[i]);
                                 }
-                                merkle_path->generate_r1cs_constraints();
+                                merkle_path->generate_gates();
                             }
                         }
-                        void generate_r1cs_witness(const set_membership_proof &proof) {
+                        void generate_assignments(const set_membership_proof &proof) {
                             if (tree_depth > 0) {
                                 address_bits.fill_with_bits_of_field_element(
                                     this->bp, typename FieldType::value_type(proof.address));
-                                merkle_path->generate_r1cs_witness(proof.address, proof.merkle_path);
+                                merkle_path->generate_assignments(proof.address, proof.merkle_path);
                             }
                         }
 
@@ -95,7 +95,7 @@ namespace nil {
                             const std::size_t max_entries = (1ul << (proof.merkle_path.size()));
                             set_membership_proof_variable<FieldType, Hash> proof_variable(bp, max_entries,
                                                                                           "proof_variable");
-                            proof_variable.generate_r1cs_witness(proof);
+                            proof_variable.generate_assignments(proof);
 
                             return bp.full_variable_assignment();
                         }

@@ -53,22 +53,22 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            left_digests[i].generate_r1cs_constraints();
-                            right_digests[i].generate_r1cs_constraints();
+                            left_digests[i].generate_gates();
+                            right_digests[i].generate_gates();
                         }
                     }
 
-                    void generate_r1cs_witness(const std::size_t address,
+                    void generate_assignments(const std::size_t address,
                                                const snark::merkle_authentication_path &path) {
                         assert(path.size() == tree_depth);
 
                         for (std::size_t i = 0; i < tree_depth; ++i) {
                             if (address & (1ul << (tree_depth - 1 - i))) {
-                                left_digests[i].generate_r1cs_witness(path[i]);
+                                left_digests[i].generate_assignments(path[i]);
                             } else {
-                                right_digests[i].generate_r1cs_witness(path[i]);
+                                right_digests[i].generate_assignments(path[i]);
                             }
                         }
                     }

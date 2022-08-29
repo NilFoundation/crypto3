@@ -64,7 +64,7 @@ namespace nil {
                         i = bp.allocate_row();
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         typename blueprint_type::variable_type x_1(
                             W0, blueprint_type::variable_type::rotation_type::current);
                         typename blueprint_type::variable_type y_1(
@@ -81,11 +81,11 @@ namespace nil {
                         bp.add_gate(i, y_1 * r_1 - 1);
                     }
 
-                    void generate_r1cs_witness(typename CurveType::value_type &P1) {
-                        generate_r1cs_witness(P1, P1.doubled());
+                    void generate_assignments(typename CurveType::value_type &P1) {
+                        generate_assignments(P1, P1.doubled());
                     }
 
-                    void generate_r1cs_witness(typename CurveType::value_type &P1, typename CurveType::value_type &P2) {
+                    void generate_assignments(typename CurveType::value_type &P1, typename CurveType::value_type &P2) {
                         bp.val(W0, i) = P1.X;
                         bp.val(W1, i) = P1.Y;
                         bp.val(W2, i) = P2.X;

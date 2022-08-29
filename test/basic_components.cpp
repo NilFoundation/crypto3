@@ -51,14 +51,14 @@ void test_disjunction_component(size_t n) {
     output.allocate(bp);
 
     components::disjunction<FieldType> d(bp, inputs, output);
-    d.generate_r1cs_constraints();
+    d.generate_gates();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
         for (std::size_t j = 0; j < n; ++j) {
             bp.val(inputs[j]) = typename FieldType::value_type((w & (1ul << j)) ? 1 : 0);
         }
 
-        d.generate_r1cs_witness();
+        d.generate_assignments();
 
         BOOST_CHECK(bp.val(output) == (w ? FieldType::value_type::one() : FieldType::value_type::zero()));
         BOOST_CHECK(bp.is_satisfied());
@@ -78,14 +78,14 @@ void test_conjunction_component(size_t n) {
     output.allocate(bp);
 
     components::conjunction<FieldType> c(bp, inputs, output);
-    c.generate_r1cs_constraints();
+    c.generate_gates();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
         for (std::size_t j = 0; j < n; ++j) {
             bp.val(inputs[j]) = (w & (1ul << j)) ? FieldType::value_type::one() : FieldType::value_type::zero();
         }
 
-        c.generate_r1cs_witness();
+        c.generate_assignments();
 
         BOOST_CHECK(bp.val(output) ==
                     (w == (1ul << n) - 1 ? FieldType::value_type::one() : FieldType::value_type::zero()));
@@ -107,14 +107,14 @@ void test_comparison_component(size_t n) {
     less_or_eq.allocate(bp);
 
     components::comparison<FieldType> cmp(bp, n, A, B, less, less_or_eq);
-    cmp.generate_r1cs_constraints();
+    cmp.generate_gates();
 
     for (std::size_t a = 0; a < 1ul << n; ++a) {
         for (std::size_t b = 0; b < 1ul << n; ++b) {
             bp.val(A) = typename FieldType::value_type(a);
             bp.val(B) = typename FieldType::value_type(b);
 
-            cmp.generate_r1cs_witness();
+            cmp.generate_assignments();
 
             BOOST_CHECK(bp.val(less) == (a < b ? FieldType::value_type::one() : FieldType::value_type::zero()));
             BOOST_CHECK(bp.val(less_or_eq) == (a <= b ? FieldType::value_type::one() : FieldType::value_type::zero()));
@@ -135,7 +135,7 @@ void test_inner_product_component(size_t n) {
     result.allocate(bp);
 
     components::inner_product<FieldType> g(bp, A, B, result);
-    g.generate_r1cs_constraints();
+    g.generate_gates();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {
         for (std::size_t j = 0; j < 1ul << n; ++j) {
@@ -146,7 +146,7 @@ void test_inner_product_component(size_t n) {
                 correct += ((i & (1ul << k)) && (j & (1ul << k)) ? 1 : 0);
             }
 
-            g.generate_r1cs_witness();
+            g.generate_assignments();
 
             BOOST_CHECK(bp.val(result) == typename FieldType::value_type(correct));
             BOOST_CHECK(bp.is_satisfied());
@@ -169,7 +169,7 @@ void test_loose_multiplexing_component(size_t n) {
     success_flag.allocate(bp);
 
     components::loose_multiplexing<FieldType> g(bp, arr, index, result, success_flag);
-    g.generate_r1cs_constraints();
+    g.generate_gates();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {
         bp.val(arr[i]) = typename FieldType::value_type((19 * i) % (1ul << n));
@@ -178,7 +178,7 @@ void test_loose_multiplexing_component(size_t n) {
     for (int idx = -1; idx <= (int)(1ul << n); ++idx) {
 
         bp.val(index) = typename FieldType::value_type(idx);
-        g.generate_r1cs_witness();
+        g.generate_assignments();
 
 
         if (0 <= idx && idx <= (int)(1ul << n) - 1) {

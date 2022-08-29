@@ -77,8 +77,8 @@ void test_curves_g1_fixed_base_mul_zcash_component(
     typename fixed_base_mul_zcash_component::twisted_edwards_element_component result(bp);
     fixed_base_mul_zcash_component fixed_base_mul_instance(bp, basepoints, in_bits, result);
 
-    fixed_base_mul_instance.generate_r1cs_witness();
-    fixed_base_mul_instance.generate_r1cs_constraints();
+    fixed_base_mul_instance.generate_assignments();
+    fixed_base_mul_instance.generate_gates();
 
     BOOST_CHECK(expected.X == bp.lc_val(result.X));
     BOOST_CHECK(expected.Y == bp.lc_val(result.Y));

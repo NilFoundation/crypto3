@@ -64,13 +64,13 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < digest_size; ++i) {
                             generate_boolean_r1cs_constraint<FieldType>(this->bp, bits[i]);
                         }
                     }
 
-                    void generate_r1cs_witness(const std::vector<bool> &contents) {
+                    void generate_assignments(const std::vector<bool> &contents) {
                         bits.fill_with_bits(this->bp, contents);
                     }
 
@@ -111,14 +111,14 @@ namespace nil {
                         bits.insert(bits.end(), right.bits.begin(), right.bits.end());
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < block_size; ++i) {
                             generate_boolean_r1cs_constraint<FieldType>(this->bp, bits[i]);
                         }
                     }
 
                     template<typename InputRange>
-                    void generate_r1cs_witness(const InputRange &contents) {
+                    void generate_assignments(const InputRange &contents) {
                         bits.fill_with_bits(this->bp, contents);
                     }
 
@@ -162,12 +162,12 @@ namespace nil {
                         assert(message_length_iter == 0);
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         generate_r1cs_equals_const_constraint<FieldType>(this->bp, one, FieldType::value_type::one());
                         generate_r1cs_equals_const_constraint<FieldType>(this->bp, zero, FieldType::value_type::zero());
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         this->bp.val(one) = 1;
                         this->bp.val(zero) = 0;
                     }

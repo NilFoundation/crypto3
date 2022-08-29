@@ -134,10 +134,10 @@ namespace nil {
                     mp_compliance_step_pcd_circuit_maker(
                         const r1cs_pcd_compliance_predicate<FieldType> &compliance_predicate,
                         const std::size_t max_number_of_predicates);
-                    void generate_r1cs_constraints();
+                    void generate_gates();
                     snark::r1cs_constraint_system<FieldType> get_circuit() const;
 
-                    void generate_r1cs_witness(
+                    void generate_assignments(
                         const set_commitment &commitment_to_translation_step_r1cs_vks,
                         const std::vector<r1cs_ppzksnark_verification_key<other_curve<CurveType>>>
                             &mp_translation_step_pcd_circuit_vks,
@@ -183,10 +183,10 @@ namespace nil {
 
                     mp_translation_step_pcd_circuit_maker(
                         const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &compliance_step_vk);
-                    void generate_r1cs_constraints();
+                    void generate_gates();
                     snark::r1cs_constraint_system<FieldType> get_circuit() const;
 
-                    void generate_r1cs_witness(const snark::r1cs_primary_input<typename CurveType::scalar_field_type>
+                    void generate_assignments(const snark::r1cs_primary_input<typename CurveType::scalar_field_type>
                                                    translation_step_input,
                                                const r1cs_ppzksnark_proof<other_curve<CurveType>> &prev_proof);
                     snark::r1cs_primary_input<FieldType> get_primary_input() const;
@@ -425,45 +425,45 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mp_compliance_step_pcd_circuit_maker<CurveType>::generate_r1cs_constraints() {
+                void mp_compliance_step_pcd_circuit_maker<CurveType>::generate_gates() {
                     const std::size_t digest_size = crh_with_bit_out_component<FieldType>::get_digest_len();
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
-                    unpack_outgoing_message->generate_r1cs_constraints(true);
+                    unpack_outgoing_message->generate_gates(true);
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        unpack_incoming_messages[i].generate_r1cs_constraints(true);
+                        unpack_incoming_messages[i].generate_gates(true);
                     }
 
                     for (std::size_t i = 0; i < translation_step_vks.size(); ++i) {
-                        translation_step_vks[i].generate_r1cs_constraints(true);
+                        translation_step_vks[i].generate_gates(true);
                     }
 
-                    hash_outgoing_message->generate_r1cs_constraints();
+                    hash_outgoing_message->generate_gates();
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        hash_incoming_messages[i].generate_r1cs_constraints();
+                        hash_incoming_messages[i].generate_gates();
                     }
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        unpack_commitment_and_incoming_message_digests[i].generate_r1cs_constraints(true);
+                        unpack_commitment_and_incoming_message_digests[i].generate_gates(true);
                     }
 
                     for (auto &membership_proof : membership_proofs) {
-                        membership_proof.generate_r1cs_constraints();
+                        membership_proof.generate_gates();
                     }
 
                     for (auto &membership_checker : membership_checkers) {
-                        membership_checker.generate_r1cs_constraints();
+                        membership_checker.generate_gates();
                     }
 
-                    compliance_predicate_as_component->generate_r1cs_constraints();
+                    compliance_predicate_as_component->generate_gates();
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        proof[i].generate_r1cs_constraints();
+                        proof[i].generate_gates();
                     }
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        verifier[i].generate_r1cs_constraints();
+                        verifier[i].generate_gates();
                     }
 
                     generate_r1cs_equals_const_constraint<FieldType>(bp, zero, FieldType::value_type::zero());
@@ -526,7 +526,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mp_compliance_step_pcd_circuit_maker<CurveType>::generate_r1cs_witness(
+                void mp_compliance_step_pcd_circuit_maker<CurveType>::generate_assignments(
                     const set_commitment &commitment_to_translation_step_r1cs_vks,
                     const std::vector<r1cs_ppzksnark_verification_key<other_curve<CurveType>>>
                         &mp_translation_step_pcd_circuit_vks,
@@ -539,21 +539,21 @@ namespace nil {
                     this->bp.clear_values();
                     this->bp.val(zero) = FieldType::value_type::zero();
 
-                    compliance_predicate_as_component->generate_r1cs_witness(
+                    compliance_predicate_as_component->generate_assignments(
                         compliance_predicate_primary_input.as_r1cs_primary_input(),
                         compliance_predicate_auxiliary_input.as_r1cs_auxiliary_input(
                             compliance_predicate.incoming_message_payload_lengths));
 
-                    unpack_outgoing_message->generate_r1cs_witness_from_packed();
+                    unpack_outgoing_message->generate_assignments_from_packed();
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        unpack_incoming_messages[i].generate_r1cs_witness_from_packed();
+                        unpack_incoming_messages[i].generate_assignments_from_packed();
                     }
 
                     for (std::size_t i = 0; i < translation_step_vks.size(); ++i) {
-                        translation_step_vks[i].generate_r1cs_witness(mp_translation_step_pcd_circuit_vks[i]);
+                        translation_step_vks[i].generate_assignments(mp_translation_step_pcd_circuit_vks[i]);
                     }
 
-                    commitment->generate_r1cs_witness(commitment_to_translation_step_r1cs_vks);
+                    commitment->generate_assignments(commitment_to_translation_step_r1cs_vks);
 
                     if (compliance_predicate.relies_on_same_type_inputs) {
                         /* all messages (except base case) must be of the same type */
@@ -575,8 +575,8 @@ namespace nil {
                         this->bp.val(membership_check_results[0]) =
                             (this->bp.val(common_type).is_zero() ? FieldType::value_type::zero() :
                                                                    FieldType::value_type::zero());
-                        membership_proofs[0].generate_r1cs_witness(vk_membership_proofs[nonzero_type_idx]);
-                        membership_checkers[0].generate_r1cs_witness();
+                        membership_proofs[0].generate_assignments(vk_membership_proofs[nonzero_type_idx]);
+                        membership_checkers[0].generate_assignments();
 
                         auto it = compliance_predicate.accepted_input_types.begin();
                         for (std::size_t i = 0; i < compliance_predicate.accepted_input_types.size(); ++i, ++it) {
@@ -590,20 +590,20 @@ namespace nil {
                             this->bp.val(membership_check_results[i]) =
                                 (this->bp.val(incoming_message_types[i]).is_zero() ? FieldType::value_type::zero() :
                                                                                      FieldType::value_type::zero());
-                            membership_proofs[i].generate_r1cs_witness(vk_membership_proofs[i]);
-                            membership_checkers[i].generate_r1cs_witness();
+                            membership_proofs[i].generate_assignments(vk_membership_proofs[i]);
+                            membership_checkers[i].generate_assignments();
                         }
                     }
 
-                    hash_outgoing_message->generate_r1cs_witness();
+                    hash_outgoing_message->generate_assignments();
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        hash_incoming_messages[i].generate_r1cs_witness();
-                        unpack_commitment_and_incoming_message_digests[i].generate_r1cs_witness_from_packed();
+                        hash_incoming_messages[i].generate_assignments();
+                        unpack_commitment_and_incoming_message_digests[i].generate_assignments_from_packed();
                     }
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        proof[i].generate_r1cs_witness(translation_step_proofs[i]);
-                        verifier[i].generate_r1cs_witness();
+                        proof[i].generate_assignments(translation_step_proofs[i]);
+                        verifier[i].generate_assignments();
                     }
                 }
 
@@ -665,12 +665,12 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mp_translation_step_pcd_circuit_maker<CurveType>::generate_r1cs_constraints() {
-                    unpack_mp_translation_step_pcd_circuit_input->generate_r1cs_constraints(true);
+                void mp_translation_step_pcd_circuit_maker<CurveType>::generate_gates() {
+                    unpack_mp_translation_step_pcd_circuit_input->generate_gates(true);
 
-                    proof->generate_r1cs_constraints();
+                    proof->generate_gates();
 
-                    online_verifier->generate_r1cs_constraints();
+                    online_verifier->generate_gates();
                 }
 
                 template<typename CurveType>
@@ -680,16 +680,16 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mp_translation_step_pcd_circuit_maker<CurveType>::generate_r1cs_witness(
+                void mp_translation_step_pcd_circuit_maker<CurveType>::generate_assignments(
                     const snark::r1cs_primary_input<typename CurveType::scalar_field_type>
                         translation_step_input,
                     const r1cs_ppzksnark_proof<other_curve<CurveType>> &prev_proof) {
                     this->bp.clear_values();
                     mp_translation_step_pcd_circuit_input.fill_with_field_elements(bp, translation_step_input);
-                    unpack_mp_translation_step_pcd_circuit_input->generate_r1cs_witness_from_packed();
+                    unpack_mp_translation_step_pcd_circuit_input->generate_assignments_from_packed();
 
-                    proof->generate_r1cs_witness(prev_proof);
-                    online_verifier->generate_r1cs_witness();
+                    proof->generate_assignments(prev_proof);
+                    online_verifier->generate_assignments();
                 }
 
                 template<typename CurveType>

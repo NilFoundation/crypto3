@@ -69,55 +69,44 @@ if(UNIX AND BUILD_WITH_PROCPS)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-    include/nil/crypto3/zk/components/algebra/curves/edwards/element_g1.hpp
-    include/nil/crypto3/zk/components/algebra/curves/weierstrass/element_g1.hpp
-    include/nil/crypto3/zk/components/algebra/curves/weierstrass/element_g2.hpp
-    include/nil/crypto3/zk/components/algebra/curves/scalar_mul.hpp
+    include/nil/crypto3/zk/components/algebra/curves/edwards/r1cs/element_g1.hpp
+    include/nil/crypto3/zk/components/algebra/curves/weierstrass/r1cs/element_g1.hpp
+    include/nil/crypto3/zk/components/algebra/curves/weierstrass/r1cs/element_g2.hpp
+    include/nil/crypto3/zk/components/algebra/curves/detail/r1cs/scalar_mul.hpp
 
-    include/nil/crypto3/zk/components/algebra/fields/exponentiation.hpp
-    include/nil/crypto3/zk/components/algebra/fields/element_fp2.hpp
-    include/nil/crypto3/zk/components/algebra/fields/element_fp3.hpp
-    include/nil/crypto3/zk/components/algebra/fields/element_fp4.hpp
-    include/nil/crypto3/zk/components/algebra/fields/element_fp6.hpp
+    include/nil/crypto3/zk/components/algebra/fields/r1cs/exponentiation.hpp
+    include/nil/crypto3/zk/components/algebra/fields/r1cs/element_fp2.hpp
+    include/nil/crypto3/zk/components/algebra/fields/r1cs/element_fp3.hpp
+    include/nil/crypto3/zk/components/algebra/fields/r1cs/element_fp4.hpp
+    include/nil/crypto3/zk/components/algebra/fields/r1cs/element_fp6.hpp
 
-    include/nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp
-    include/nil/crypto3/zk/components/hashes/sha256/sha256_aux.hpp
-    include/nil/crypto3/zk/components/hashes/sha256/sha256_components.hpp
-    include/nil/crypto3/zk/components/hashes/sha256/sha256_component.hpp
-    include/nil/crypto3/zk/components/hashes/crh_component.hpp
-    include/nil/crypto3/zk/components/hashes/digest_selector_component.hpp
-    include/nil/crypto3/zk/components/hashes/hash_io.hpp
+    include/nil/crypto3/zk/components/hashes/knapsack/r1cs/knapsack.hpp
+    include/nil/crypto3/zk/components/hashes/sha256/r1cs/sha256_aux.hpp
+    include/nil/crypto3/zk/components/hashes/sha256/r1cs/sha256_components.hpp
+    include/nil/crypto3/zk/components/hashes/sha256/r1cs/sha256_component.hpp
 
-    include/nil/crypto3/zk/components/merkle_tree/authentication_path.hpp
-    include/nil/crypto3/zk/components/merkle_tree/check_read.hpp
-    include/nil/crypto3/zk/components/merkle_tree/check_update.hpp
+    include/nil/crypto3/zk/components/merkle_tree/r1cs/authentication_path.hpp
+    include/nil/crypto3/zk/components/merkle_tree/r1cs/check_read.hpp
+    include/nil/crypto3/zk/components/merkle_tree/r1cs/check_update.hpp
 
-    include/nil/crypto3/zk/components/algebra/pairing/detail/mnt4.hpp
-    include/nil/crypto3/zk/components/algebra/pairing/detail/mnt6.hpp
-    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/pairing_checks.hpp
-    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/final_exponentiation.hpp
-    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/miller_loop.hpp
-    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/precomputation.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/detail/r1cs/mnt4.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/detail/r1cs/mnt6.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/r1cs/pairing_checks.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/r1cs/final_exponentiation.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/r1cs/miller_loop.hpp
+    include/nil/crypto3/zk/components/algebra/pairing/weierstrass/r1cs/precomputation.hpp
 
-    include/nil/crypto3/zk/components/routing/as_waksman_routing_component.hpp
-    include/nil/crypto3/zk/components/routing/benes_routing_component.hpp
-
-     include/nil/crypto3/zk/components/systems/set_commitment/set_commitment_component.hpp
-     include/nil/crypto3/zk/components/systems/set_commitment/set_membership_proof_variable.hpp
-
-     include/nil/crypto3/zk/components/systems/snark/r1cs_pp_zksnark/verifier.hpp
-    include/nil/crypto3/zk/components/packing.hpp
-    include/nil/crypto3/zk/components/comparison.hpp
-    include/nil/crypto3/zk/components/conjunction.hpp
-    include/nil/crypto3/zk/components/disjunction.hpp
-    include/nil/crypto3/zk/components/inner_product.hpp
-    include/nil/crypto3/zk/components/loose_multiplexing.hpp
+    include/nil/crypto3/zk/components/systems/snark/r1cs_pp_zksnark/verifier.hpp
+    include/nil/crypto3/zk/components/detail/r1cs/packing.hpp
+    include/nil/crypto3/zk/components/boolean/r1cs/comparison.hpp
+    include/nil/crypto3/zk/components/boolean/r1cs/conjunction.hpp
+    include/nil/crypto3/zk/components/boolean/r1cs/disjunction.hpp
+    include/nil/crypto3/zk/components/boolean/r1cs/inner_product.hpp
+    include/nil/crypto3/zk/components/detail/r1cs/loose_multiplexing.hpp
     include/nil/crypto3/zk/components/component_from_r1cs.hpp
     include/nil/crypto3/zk/component.hpp
     include/nil/crypto3/zk/blueprint/r1cs.hpp
-    include/nil/crypto3/zk/blueprint/plonk.hpp
-    
-    include/nil/crypto3/zk/merkle_tree.hpp)
+    include/nil/crypto3/zk/blueprint/plonk.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 

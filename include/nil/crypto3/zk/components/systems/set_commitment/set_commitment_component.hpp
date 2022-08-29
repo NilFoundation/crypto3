@@ -83,19 +83,19 @@ namespace nil {
                             }
                         }
 
-                        void generate_r1cs_constraints() {
-                            hash_element->generate_r1cs_constraints();
+                        void generate_gates() {
+                            hash_element->generate_gates();
 
                             if (tree_depth > 0) {
-                                check_membership->generate_r1cs_constraints();
+                                check_membership->generate_gates();
                             }
                         }
 
-                        void generate_r1cs_witness() {
-                            hash_element->generate_r1cs_witness();
+                        void generate_assignments() {
+                            hash_element->generate_assignments();
 
                             if (tree_depth > 0) {
-                                check_membership->generate_r1cs_witness();
+                                check_membership->generate_assignments();
                             }
                         }
 

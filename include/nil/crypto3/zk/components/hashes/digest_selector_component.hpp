@@ -55,7 +55,7 @@ namespace nil {
                         digest_size(digest_size), input(input), is_right(is_right), left(left), right(right) {
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < digest_size; ++i) {
                             /*
                               input = is_right * right + (1-is_right) * left
@@ -65,7 +65,7 @@ namespace nil {
                                 is_right, right.bits[i] - left.bits[i], input.bits[i] - left.bits[i]));
                         }
                     }
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         is_right.evaluate(this->bp);
 
                         assert(this->bp.lc_val(is_right) == FieldType::value_type::one() ||

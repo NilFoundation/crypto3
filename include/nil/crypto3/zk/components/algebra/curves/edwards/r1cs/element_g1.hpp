@@ -86,7 +86,7 @@ namespace nil {
                         all_vars.emplace_back(Y);
                     }
 
-                    void generate_r1cs_witness(
+                    void generate_assignments(
                         const typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type &el) {
                         typename CurveType::pairing::chained_curve_type::template g1_type<>::value_type el_normalized =
                             el.to_affine();
@@ -146,7 +146,7 @@ namespace nil {
                         lhs.allocate(this->bp);
                         rhs.allocate(this->bp);
                     }
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         // A check, that a*X*X + Y*Y = 1 + d*X*X*Y*Y
 
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<scalar_field_type>({P.X}, {P.X}, {XX}));
@@ -163,7 +163,7 @@ namespace nil {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<scalar_field_type>(
                             {lhs}, {scalar_field_type::value_type::one()}, {rhs}));
                     }
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         typename scalar_field_type::value_type x = this->bp.lc_val(this->P.X);
                         typename scalar_field_type::value_type y = this->bp.lc_val(this->P.Y);
                         typename scalar_field_type::value_type temp_a = this->bp.val(this->a);
@@ -235,7 +235,7 @@ namespace nil {
                         dX1X2Y1Y2.allocate(this->bp);
                         aX1X2.allocate(this->bp);
                     }
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         // A check, that
                         //  X3 = (X1*Y2 + Y1*X2) / (Fq.ONE + D*X1*X2*Y1*Y2)
                         //  y3 = (Y1*Y2 - A*X1*X2) / (Fq.ONE - D*X1*X2*Y1*Y2)
@@ -254,7 +254,7 @@ namespace nil {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<scalar_field_type>(
                             {P1pP2.X}, {scalar_field_type::value_type::one(), dX1X2Y1Y2}, {X1Y2, Y1X2}));
                     }
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
 
                         typename scalar_field_type::value_type x1 = this->bp.lc_val(this->P1.X);
                         typename scalar_field_type::value_type y1 = this->bp.lc_val(this->P1.Y);
@@ -278,7 +278,7 @@ namespace nil {
                             (y1 * y2 - temp_a * x1 * x2) *
                             ((scalar_field_type::value_type::one() - (temp_d * x1 * x2 * y1 * y2)).inversed());
 
-                        // el_is_well_formed->generate_r1cs_witness();
+                        // el_is_well_formed->generate_assignments();
                     }
                 };
 
@@ -330,7 +330,7 @@ namespace nil {
                         el_add.reset(new element_g1_add<CurveType>(this->bp, a, d, P1, P_toAdd, P1pP2));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         // if coef == 1 then x_ret[i] + x_base
                         // x_add[i] = coef[i] * x_base;
                         this->bp.add_r1cs_constraint(
@@ -371,9 +371,9 @@ namespace nil {
                                                                       {P_toAdd.Y}));
 
                         // do the addition of either y1 , y1 plus x2, y2 if canAdd == true else x1 , y1 + 0
-                        el_add->generate_r1cs_constraints();
+                        el_add->generate_gates();
                     }
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         this->bp.lc_val(P_toAdd.X) = this->bp.lc_val(this->P2.X) * this->bp.val(this->canAdd);
 
                         this->bp.val(this->Y_intermediate_toAdd1) =
@@ -395,7 +395,7 @@ namespace nil {
                             // this->bp.lc_val(this->Y_intermediate_toAdd2));
                         }
 
-                        el_add->generate_r1cs_witness();
+                        el_add->generate_assignments();
                     }
                 };
             }    // namespace components

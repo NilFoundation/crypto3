@@ -48,20 +48,20 @@ namespace nil {
                         hash2.reset(new Hash2(bp, oblock.block_size, oblock, output));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         generate_r1cs_equals_const_constraint<FieldType>(this->bp, zero, FieldType::value_type::zero());
                         generate_xor_constraints(0x36, padded_key, key_xor_ipad);
                         generate_xor_constraints(0x5c, padded_key, key_xor_opad);
-                        hash1->generate_r1cs_constraints();
-                        hash2->generate_r1cs_constraints();
+                        hash1->generate_gates();
+                        hash2->generate_gates();
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         this->bp.val(zero) = FieldType::value_type::zero();
                         generate_xor_witness(0x36, padded_key, key_xor_ipad);
                         generate_xor_witness(0x5c, padded_key, key_xor_opad);
-                        hash1->generate_r1cs_witness();
-                        hash2->generate_r1cs_witness();
+                        hash1->generate_assignments();
+                        hash2->generate_assignments();
                     }
 
                     static typename Hash2::hash_value_type get_hmac(const std::vector<bool> &key,

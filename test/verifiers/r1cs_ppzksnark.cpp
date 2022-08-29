@@ -100,8 +100,8 @@ void test_verifier() {
 
     r1cs_ppzksnark_verifier_component<ppT_B> verifier(bp, vk, primary_input_bits, elt_size, proof, result);
 
-    proof.generate_r1cs_constraints();
-    verifier.generate_r1cs_constraints();
+    proof.generate_gates();
+    verifier.generate_gates();
 
     std::vector<bool> input_as_bits;
     for (const FieldT_A &el : example.primary_input) {
@@ -111,16 +111,16 @@ void test_verifier() {
 
     primary_input_bits.fill_with_bits(bp, input_as_bits);
 
-    vk.generate_r1cs_witness(keypair.second);
-    proof.generate_r1cs_witness(pi);
-    verifier.generate_r1cs_witness();
+    vk.generate_assignments(keypair.second);
+    proof.generate_assignments(pi);
+    verifier.generate_assignments();
     bp.val(result) = FieldT_B::one();
 
     std::cout << "positive test:\n" << std::endl;
     BOOST_CHECK(bp.is_satisfied());
 
     bp.val(primary_input_bits[0]) = FieldT_B::one() - bp.val(primary_input_bits[0]);
-    verifier.generate_r1cs_witness();
+    verifier.generate_assignments();
     bp.val(result) = FieldT_B::one();
 
     std::cout << "negative test:" << std::endl;
@@ -163,8 +163,8 @@ void test_hardcoded_verifier() {
     r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(bp, hardcoded_vk, primary_input_bits, elt_size,
                                                                     proof, result);
 
-    proof.generate_r1cs_constraints();
-    online_verifier.generate_r1cs_constraints();
+    proof.generate_gates();
+    online_verifier.generate_gates();
 
     std::vector<bool> input_as_bits;
     for (const FieldT_A &el : example.primary_input) {
@@ -174,15 +174,15 @@ void test_hardcoded_verifier() {
 
     primary_input_bits.fill_with_bits(bp, input_as_bits);
 
-    proof.generate_r1cs_witness(pi);
-    online_verifier.generate_r1cs_witness();
+    proof.generate_assignments(pi);
+    online_verifier.generate_assignments();
     bp.val(result) = FieldT_B::one();
 
     printf("positive test:\n");
     BOOST_CHECK(bp.is_satisfied());
 
     bp.val(primary_input_bits[0]) = FieldT_B::one() - bp.val(primary_input_bits[0]);
-    online_verifier.generate_r1cs_witness();
+    online_verifier.generate_assignments();
     bp.val(result) = FieldT_B::one();
 
     printf("negative test:\n");
@@ -199,14 +199,14 @@ void test_mul() {
     VarT<FpExtT> y(bp);
     VarT<FpExtT> xy(bp);
     MulT<FpExtT> mul(bp, x, y, xy);
-    mul.generate_r1cs_constraints();
+    mul.generate_gates();
 
     for (size_t i = 0; i < 10; ++i) {
         const typename FpExtT::value_type x_val = algebra::random_element<FpExtT>();
         const typename FpExtT::value_type y_val = algebra::random_element<FpExtT>();
-        x.generate_r1cs_witness(x_val);
-        y.generate_r1cs_witness(y_val);
-        mul.generate_r1cs_witness();
+        x.generate_assignments(x_val);
+        y.generate_assignments(y_val);
+        mul.generate_assignments();
         const typename FpExtT::value_type res = xy.get_element();
         BOOST_CHECK(res == x_val * y_val);
         BOOST_CHECK(bp.is_satisfied());
@@ -222,12 +222,12 @@ void test_sqr() {
     VarT<FpExtT> x(bp);
     VarT<FpExtT> xsq(bp);
     SqrT<FpExtT> sqr(bp, x, xsq);
-    sqr.generate_r1cs_constraints();
+    sqr.generate_gates();
 
     for (size_t i = 0; i < 10; ++i) {
         const typename FpExtT::value_type x_val = algebra::random_element<FpExtT>();
-        x.generate_r1cs_witness(x_val);
-        sqr.generate_r1cs_witness();
+        x.generate_assignments(x_val);
+        sqr.generate_assignments();
         const typename FpExtT::value_type res = xsq.get_element();
         BOOST_CHECK(res == x_val.squared());
         BOOST_CHECK(bp.is_satisfied());
@@ -244,14 +244,14 @@ void test_cyclotomic_sqr() {
     VarT<FpExtT> x(bp);
     VarT<FpExtT> xsq(bp);
     CycloSqrT<FpExtT> sqr(bp, x, xsq);
-    sqr.generate_r1cs_constraints();
+    sqr.generate_gates();
 
     for (size_t i = 0; i < 10; ++i) {
         FpExtT::value_type x_val = algebra::random_element<FpExtT>();
         x_val = final_exponentiation<CurveType>(x_val);
 
-        x.generate_r1cs_witness(x_val);
-        sqr.generate_r1cs_witness();
+        x.generate_assignments(x_val);
+        sqr.generate_assignments();
         const typename FpExtT::value_type res = xsq.get_element();
         BOOST_CHECK(res == x_val.squared());
         BOOST_CHECK(bp.is_satisfied());
@@ -269,7 +269,7 @@ void test_Frobenius() {
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
         const typename FpExtT::value_type x_val = algebra::random_element<FpExtT>();
-        x.generate_r1cs_witness(x_val);
+        x.generate_assignments(x_val);
         x_frob.evaluate();
         const typename FpExtT::value_type res = x_frob.get_element();
         BOOST_CHECK(res == x_val.Frobenius_map(i));
@@ -304,17 +304,17 @@ void test_full_pair() {
     result_is_one.allocate(bp);
     final_exp_component<CurveType> finexp(bp, miller_result, result_is_one);
 
-    compute_prec_P.generate_r1cs_constraints();
-    compute_prec_Q.generate_r1cs_constraints();
-    miller.generate_r1cs_constraints();
-    finexp.generate_r1cs_constraints();
+    compute_prec_P.generate_gates();
+    compute_prec_Q.generate_gates();
+    miller.generate_gates();
+    finexp.generate_gates();
 
-    P.generate_r1cs_witness(P_val);
-    compute_prec_P.generate_r1cs_witness();
-    Q.generate_r1cs_witness(Q_val);
-    compute_prec_Q.generate_r1cs_witness();
-    miller.generate_r1cs_witness();
-    finexp.generate_r1cs_witness();
+    P.generate_assignments(P_val);
+    compute_prec_P.generate_assignments();
+    Q.generate_assignments(Q_val);
+    compute_prec_Q.generate_assignments();
+    miller.generate_assignments();
+    finexp.generate_assignments();
     BOOST_CHECK(bp.is_satisfied());
 
     typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_g1(P_val);
@@ -354,11 +354,11 @@ void test_full_precomputed_pair() {
     result_is_one.allocate(bp);
     final_exp_component<CurveType> finexp(bp, miller_result, result_is_one);
 
-    miller.generate_r1cs_constraints();
-    finexp.generate_r1cs_constraints();
+    miller.generate_gates();
+    finexp.generate_gates();
 
-    miller.generate_r1cs_witness();
-    finexp.generate_r1cs_witness();
+    miller.generate_assignments();
+    finexp.generate_assignments();
     BOOST_CHECK(bp.is_satisfied());
 
     typename pairing_policy::affine_ate_g1_precomp native_prec_P = pairing_policy::affine_ate_precompute_g1(P_val);

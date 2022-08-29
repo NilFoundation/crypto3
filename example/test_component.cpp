@@ -48,14 +48,14 @@ int main(){
     // Initialize component
 
     test_component<field_type> g(bp, out, x);
-    g.generate_r1cs_constraints();
+    g.generate_gates();
     
     // Add witness values
 
     bp.val(out) = 35;
     bp.val(x) = 3;
 
-    g.generate_r1cs_witness();
+    g.generate_assignments();
     
     assert(bp.is_satisfied());
 

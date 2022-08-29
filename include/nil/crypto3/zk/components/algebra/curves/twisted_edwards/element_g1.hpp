@@ -115,7 +115,7 @@ namespace nil {
                         init();
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         //  X3 = (X1*Y2 + Y1*X2) / (Fq.ONE + D*X1*X2*Y1*Y2)
                         //  y3 = (Y1*Y2 - A*X1*X2) / (Fq.ONE - D*X1*X2*Y1*Y2)
                         this->bp.add_r1cs_constraint(
@@ -142,7 +142,7 @@ namespace nil {
                                                                {this->X1Y2, this->Y1X2}));
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         const typename field_type::value_type &x1 = this->bp.lc_val(this->p1.X);
                         const typename field_type::value_type &y1 = this->bp.lc_val(this->p1.Y);
                         const typename field_type::value_type &x2 = this->bp.lc_val(this->p2.X);
@@ -220,7 +220,7 @@ namespace nil {
                         this->rhs = rhs_var;
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         // a*X*X + Y*Y = 1 + d*X*X*Y*Y
                         this->bp.add_r1cs_constraint(
                             snark::r1cs_constraint<field_type>({this->p.X}, {this->p.X}, {this->XX}));
@@ -242,7 +242,7 @@ namespace nil {
                             {this->lhs}, {field_type::value_type::one()}, {this->rhs}));
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         const typename field_type::value_type &x = this->bp.lc_val(this->p.X);
                         const typename field_type::value_type &y = this->bp.lc_val(this->p.Y);
 
@@ -300,12 +300,12 @@ namespace nil {
                         field_to_bits_converter(bp, in_p.X, in_result), result(field_to_bits_converter.result) {
                     }
 
-                    void generate_r1cs_constraints() {
-                        this->field_to_bits_converter.generate_r1cs_constraints();
+                    void generate_gates() {
+                        this->field_to_bits_converter.generate_gates();
                     }
 
-                    void generate_r1cs_witness() {
-                        this->field_to_bits_converter.generate_r1cs_witness();
+                    void generate_assignments() {
+                        this->field_to_bits_converter.generate_assignments();
                     }
                 };
 
@@ -364,7 +364,7 @@ namespace nil {
                         // el_add.reset(new element_g1_add<CurveType>(this->bp, a, d, p1, P_toAdd, p1pp2));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         // if coef == 1 then x_ret[i] + x_base
                         // x_add[i] = coef[i] * x_base;
                         this->bp.add_r1cs_constraint(
@@ -406,10 +406,10 @@ namespace nil {
 
                         // TODO: refactor
                         // do the addition of either y1 , y1 plus x2, y2 if canAdd == true else x1 , y1 + 0
-                        // el_add->generate_r1cs_constraints();
+                        // el_add->generate_gates();
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         this->bp.lc_val(this->p_to_add.X) = this->bp.lc_val(this->p2.X) * this->bp.val(this->can_add);
                         this->bp.lc_val(this->Y_intermediate_to_add1) =
                             this->bp.lc_val(this->p2.Y) * this->bp.val(this->can_add);
@@ -427,7 +427,7 @@ namespace nil {
                         }
 
                         // TODO: refactor
-                        // el_add->generate_r1cs_witness();
+                        // el_add->generate_assignments();
                     }
                 };
             }    // namespace components

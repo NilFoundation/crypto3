@@ -80,13 +80,13 @@ void test_disjunction_component(std::size_t w) {
     inputs.allocate(bp, n);
 
     components::disjunction<field_type> d(bp, inputs, output);
-    d.generate_r1cs_constraints();
+    d.generate_gates();
 
     for (std::size_t j = 0; j < n; ++j) {
         bp.val(inputs[j]) = typename field_type::value_type((w & (1ul << j)) ? 1 : 0);
     }
 
-    d.generate_r1cs_witness();
+    d.generate_assignments();
 
     BOOST_CHECK(bp.val(output) == (w ? field_type::value_type::one() : field_type::value_type::zero()));
     BOOST_CHECK(bp.is_satisfied());
@@ -114,13 +114,13 @@ void test_conjunction_component(std::size_t w) {
     inputs.allocate(bp, n);
 
     components::conjunction<field_type> c(bp, inputs, output);
-    c.generate_r1cs_constraints();
+    c.generate_gates();
 
     for (std::size_t j = 0; j < n; ++j) {
         bp.val(inputs[j]) = (w & (1ul << j)) ? field_type::value_type::one() : field_type::value_type::zero();
     }
 
-    c.generate_r1cs_witness();
+    c.generate_assignments();
 
     BOOST_CHECK(bp.val(output) ==
                 (w == (1ul << n) - 1 ? field_type::value_type::one() : field_type::value_type::zero()));
@@ -148,12 +148,12 @@ void test_comparison_component(std::size_t a, std::size_t b) {
         ((std::max(a, b) > (1ul << std::size_t(std::log2(std::max(a, b)))))? 1 : 0);
 
     components::comparison<field_type> cmp(bp, n, A, B, less, less_or_eq);
-    cmp.generate_r1cs_constraints();
+    cmp.generate_gates();
     
     bp.val(A) = typename field_type::value_type(a);
     bp.val(B) = typename field_type::value_type(b);
 
-    cmp.generate_r1cs_witness();
+    cmp.generate_assignments();
 
     BOOST_CHECK(bp.val(less) == (a < b ? field_type::value_type::one() : field_type::value_type::zero()));
     BOOST_CHECK(bp.val(less_or_eq) == (a <= b ? field_type::value_type::one() : field_type::value_type::zero()));

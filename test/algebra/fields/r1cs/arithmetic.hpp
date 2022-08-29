@@ -46,8 +46,8 @@ blueprint<typename FieldType::base_field_type> test_field_element_mul(typename F
     element_component result(bp);
 
     element_mul_component el_mul_instance(bp, A, B, result);
-    el_mul_instance.generate_r1cs_constraints();
-    el_mul_instance.generate_r1cs_witness();
+    el_mul_instance.generate_gates();
+    el_mul_instance.generate_assignments();
 
     const typename field_type::value_type res = result.get_element();
 
@@ -71,8 +71,8 @@ blueprint<typename FieldType::base_field_type> test_field_element_squared(typena
     element_component result(bp);
 
     element_squared_component el_squared_instance(bp, A, result);
-    el_squared_instance.generate_r1cs_constraints();
-    el_squared_instance.generate_r1cs_witness();
+    el_squared_instance.generate_gates();
+    el_squared_instance.generate_assignments();
 
     const typename field_type::value_type res = result.get_element();
 

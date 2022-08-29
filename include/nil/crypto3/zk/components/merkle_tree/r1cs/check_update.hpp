@@ -82,7 +82,7 @@ namespace nil {
 
                     /* Note that while it is necessary to generate R1CS constraints
                        for prev_path, it is not necessary to do so for next_path. See
-                       comment in the implementation of generate_r1cs_constraints() */
+                       comment in the implementation of generate_gates() */
 
                     merkle_proof_update(blueprint<FieldType> &bp,
                                         const std::size_t tree_depth,
@@ -139,19 +139,19 @@ namespace nil {
                             FieldType::value_bits - 1));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         /* ensure correct hash computations */
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            prev_hashers[i].generate_r1cs_constraints(
+                            prev_hashers[i].generate_gates(
                                 false);    // we check root outside and prev_left/prev_right above
-                            next_hashers[i].generate_r1cs_constraints(
+                            next_hashers[i].generate_gates(
                                 true);    // however we must check right side hashes
                         }
 
                         /* ensure consistency of internal_left/internal_right with internal_output */
                         for (std::size_t i = 0; i < tree_depth; ++i) {
-                            prev_propagators[i].generate_r1cs_constraints();
-                            next_propagators[i].generate_r1cs_constraints();
+                            prev_propagators[i].generate_gates();
+                            next_propagators[i].generate_gates();
                         }
 
                         /* ensure that prev auxiliary input and next auxiliary input match */
@@ -175,37 +175,37 @@ namespace nil {
                            This holds, because { next_path.left_inputs[i],
                            next_path.right_inputs[i] } is a pair { hash_output,
                            auxiliary_input }. The bitness for hash_output is enforced
-                           above by next_hashers[i].generate_r1cs_constraints.
+                           above by next_hashers[i].generate_gates.
 
                            Because auxiliary input is the same for prev_path and next_path
                            (enforced above), we have that auxiliary_input part is also
                            constrained to be boolean, because prev_path is *all*
                            constrained to be all boolean. */
 
-                        check_next_root->generate_r1cs_constraints(false, false);
+                        check_next_root->generate_gates(false, false);
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         /* do the hash computations bottom-up */
                         for (int i = tree_depth - 1; i >= 0; --i) {
                             /* ensure consistency of prev_path and next_path */
                             if (this->bp.val(address_bits[tree_depth - 1 - i]) == FieldType::value_type::zero()) {
-                                next_path.left_digests[i].generate_r1cs_witness(prev_path.left_digests[i].get_digest());
+                                next_path.left_digests[i].generate_assignments(prev_path.left_digests[i].get_digest());
                             } else {
-                                next_path.right_digests[i].generate_r1cs_witness(
+                                next_path.right_digests[i].generate_assignments(
                                     prev_path.right_digests[i].get_digest());
                             }
 
                             /* propagate previous input */
-                            prev_propagators[i].generate_r1cs_witness();
-                            next_propagators[i].generate_r1cs_witness();
+                            prev_propagators[i].generate_assignments();
+                            next_propagators[i].generate_assignments();
 
                             /* compute hash */
-                            prev_hashers[i].generate_r1cs_witness();
-                            next_hashers[i].generate_r1cs_witness();
+                            prev_hashers[i].generate_assignments();
+                            next_hashers[i].generate_assignments();
                         }
 
-                        check_next_root->generate_r1cs_witness();
+                        check_next_root->generate_assignments();
                     }
                 };
 

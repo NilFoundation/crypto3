@@ -106,37 +106,37 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < 16; ++i) {
-                            pack_W[i]->generate_r1cs_constraints(
+                            pack_W[i]->generate_gates(
                                 false);    // do not enforce bitness here; caller be aware.
                         }
 
                         for (std::size_t i = 16; i < block::detail::shacal2_policy<256>::rounds; ++i) {
-                            compute_sigma0[i]->generate_r1cs_constraints();
-                            compute_sigma1[i]->generate_r1cs_constraints();
+                            compute_sigma0[i]->generate_gates();
+                            compute_sigma1[i]->generate_gates();
 
                             this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
                                 1, sigma0[i] + sigma1[i] + packed_W[i - 16] + packed_W[i - 7], unreduced_W[i]));
 
-                            mod_reduce_W[i]->generate_r1cs_constraints();
+                            mod_reduce_W[i]->generate_gates();
                         }
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         for (std::size_t i = 0; i < 16; ++i) {
-                            pack_W[i]->generate_r1cs_witness_from_bits();
+                            pack_W[i]->generate_assignments_from_bits();
                         }
 
                         for (std::size_t i = 16; i < block::detail::shacal2_policy<256>::rounds; ++i) {
-                            compute_sigma0[i]->generate_r1cs_witness();
-                            compute_sigma1[i]->generate_r1cs_witness();
+                            compute_sigma0[i]->generate_assignments();
+                            compute_sigma1[i]->generate_assignments();
 
                             this->bp.val(unreduced_W[i]) = this->bp.val(sigma0[i]) + this->bp.val(sigma1[i]) +
                                                            this->bp.val(packed_W[i - 16]) +
                                                            this->bp.val(packed_W[i - 7]);
 
-                            mod_reduce_W[i]->generate_r1cs_witness();
+                            mod_reduce_W[i]->generate_assignments();
                         }
                     }
                 };
@@ -228,15 +228,15 @@ namespace nil {
                             bp, unreduced_new_e, hashes::sha2<256>::word_bits + 3, packed_new_e, new_e));
                     }
 
-                    void generate_r1cs_constraints() {
-                        compute_sigma0->generate_r1cs_constraints();
-                        compute_sigma1->generate_r1cs_constraints();
+                    void generate_gates() {
+                        compute_sigma0->generate_gates();
+                        compute_sigma1->generate_gates();
 
-                        compute_choice->generate_r1cs_constraints();
-                        compute_majority->generate_r1cs_constraints();
+                        compute_choice->generate_gates();
+                        compute_majority->generate_gates();
 
-                        pack_d->generate_r1cs_constraints(false);
-                        pack_h->generate_r1cs_constraints(false);
+                        pack_d->generate_gates(false);
+                        pack_h->generate_gates(false);
 
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
                             1, packed_h + sigma1 + choice + K + W + sigma0 + majority, unreduced_new_a));
@@ -244,18 +244,18 @@ namespace nil {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
                             1, packed_d + packed_h + sigma1 + choice + K + W, unreduced_new_e));
 
-                        mod_reduce_new_a->generate_r1cs_constraints();
-                        mod_reduce_new_e->generate_r1cs_constraints();
+                        mod_reduce_new_a->generate_gates();
+                        mod_reduce_new_e->generate_gates();
                     }
 
-                    void generate_r1cs_witness() {
-                        compute_sigma0->generate_r1cs_witness();
-                        compute_sigma1->generate_r1cs_witness();
+                    void generate_assignments() {
+                        compute_sigma0->generate_assignments();
+                        compute_sigma1->generate_assignments();
 
-                        compute_choice->generate_r1cs_witness();
-                        compute_majority->generate_r1cs_witness();
-                        pack_d->generate_r1cs_witness_from_bits();
-                        pack_h->generate_r1cs_witness_from_bits();
+                        compute_choice->generate_assignments();
+                        compute_majority->generate_assignments();
+                        pack_d->generate_assignments_from_bits();
+                        pack_h->generate_assignments_from_bits();
 
                         this->bp.val(unreduced_new_a) = this->bp.val(packed_h) + this->bp.val(sigma1) +
                                                         this->bp.val(choice) + typename FieldType::value_type(K) +
@@ -264,8 +264,8 @@ namespace nil {
                                                         this->bp.val(sigma1) + this->bp.val(choice) +
                                                         typename FieldType::value_type(K) + this->bp.val(W);
 
-                        mod_reduce_new_a->generate_r1cs_witness();
-                        mod_reduce_new_e->generate_r1cs_witness();
+                        mod_reduce_new_a->generate_assignments();
+                        mod_reduce_new_e->generate_assignments();
                     }
                 };
 

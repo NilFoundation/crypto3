@@ -58,9 +58,9 @@ blueprint<FieldType> test_knapsack_crh_with_bit_out_component_internal(std::size
         bp, components::knapsack_crh_with_bit_out_component<FieldType>::get_digest_len());
     components::knapsack_crh_with_bit_out_component<FieldType> H(bp, input_bits.size(), input_block, output_digest);
 
-    input_block.generate_r1cs_witness(input_bits);
-    H.generate_r1cs_constraints();
-    H.generate_r1cs_witness();
+    input_block.generate_assignments(input_bits);
+    H.generate_gates();
+    H.generate_assignments();
 
     BOOST_CHECK(output_digest.get_digest().size() == digest_bits.size());
     BOOST_CHECK(bp.is_satisfied());

@@ -61,7 +61,7 @@ namespace nil {
                     r1cs_pcd_message_variable(blueprint<FieldType> &bp);
                     void update_all_vars();
 
-                    void generate_r1cs_witness(const std::shared_ptr<r1cs_pcd_message<FieldType>> &message);
+                    void generate_assignments(const std::shared_ptr<r1cs_pcd_message<FieldType>> &message);
                     virtual std::shared_ptr<r1cs_pcd_message<FieldType>> get_message() const = 0;
 
                     virtual ~r1cs_pcd_message_variable() = default;
@@ -82,7 +82,7 @@ namespace nil {
                     r1cs_pcd_local_data_variable(blueprint<FieldType> &bp);
                     void update_all_vars();
 
-                    void generate_r1cs_witness(const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data);
+                    void generate_assignments(const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data);
 
                     virtual ~r1cs_pcd_local_data_variable() = default;
                 };
@@ -116,8 +116,8 @@ namespace nil {
                         const std::size_t max_arity,
                         const bool relies_on_same_type_inputs,
                         const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
-                    virtual void generate_r1cs_constraints() = 0;
-                    virtual void generate_r1cs_witness(
+                    virtual void generate_gates() = 0;
+                    virtual void generate_assignments(
                         const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
                         const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value);
 
@@ -154,7 +154,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void r1cs_pcd_message_variable<FieldType>::generate_r1cs_witness(
+                void r1cs_pcd_message_variable<FieldType>::generate_assignments(
                     const std::shared_ptr<r1cs_pcd_message<FieldType>> &message) {
                     all_vars.fill_with_field_elements(this->bp, message->as_r1cs_variable_assignment());
                 }
@@ -176,7 +176,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void r1cs_pcd_local_data_variable<FieldType>::generate_r1cs_witness(
+                void r1cs_pcd_local_data_variable<FieldType>::generate_assignments(
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data) {
                     all_vars.fill_with_field_elements(this->bp, local_data->as_r1cs_variable_assignment());
                 }
@@ -196,7 +196,7 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename BlueprintType>
-                void compliance_predicate_handler<FieldType, BlueprintType>::generate_r1cs_witness(
+                void compliance_predicate_handler<FieldType, BlueprintType>::generate_assignments(
                     const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value) {
                     bp.clear_values();
@@ -204,10 +204,10 @@ namespace nil {
                     bp.val(arity) = typename FieldType::value_type(incoming_message_values.size());
 
                     for (std::size_t i = 0; i < incoming_message_values.size(); ++i) {
-                        incoming_messages[i]->generate_r1cs_witness(incoming_message_values[i]);
+                        incoming_messages[i]->generate_assignments(incoming_message_values[i]);
                     }
 
-                    local_data->generate_r1cs_witness(local_data_value);
+                    local_data->generate_assignments(local_data_value);
                 }
 
                 template<typename FieldType, typename BlueprintType>

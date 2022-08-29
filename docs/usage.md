@@ -201,11 +201,11 @@ y.allocate(this->bp);
 sym_2.allocate(this->bp);
 ```
 
-### Function `generate_r1cs_constraints()`
+### Function `generate_gates()`
 
 This function adds the R1CS constraints corresponding to the circuits. These are the same constraints as we added manually earlier, just bundled up inside this function.
 
-### Function `generate_r1cs_witness()`
+### Function `generate_assignments()`
 
 This function assumes that we've already set the public value `out`, and the witness value `x`. It then computes the inferred witness values for the intermediate variables `sym_1`, `y`, `sym_2`. Thus the user of the component never needs to worry about the intermediate variables.
 
@@ -232,7 +232,7 @@ test_component<field_type> g(bp, out, x);
 Next generate the R1CS constraints by simply calling the corresponding function:
 
 ```
-g.generate_r1cs_constraints();
+g.generate_gates();
 ```
 
 Now we add the witness values. We add the value 35 for the public variable `out` and the value 3 for the witness variable `x`. The rest of the values will be computed inside the component:
@@ -240,7 +240,7 @@ Now we add the witness values. We add the value 35 for the public variable `out`
 ```
 bp.val(out) = 35;
 bp.val(x) = 3;
-g.generate_r1cs_witness();
+g.generate_assignments();
 ```
 
 That's it! Now we can run the Generator to generate proving and verification keys, create the proof and verify it as we did before.
@@ -290,15 +290,15 @@ primary input is allocated before the auxiliary input in the program.
 *Component* is a class for constructing a particular constraint system. The component's 
 constructor allocates intermediate variables, so the developer is responsible for 
 allocation only primary and auxiliary variables. Any Component has to implement 
-at least two methods: `generate_r1cs_constraints()` and `generate_r1cs_witness()`.
+at least two methods: `generate_gates()` and `generate_assignments()`.
 
-Now we initialize the simple component `inner_product`. The function `generate_r1cs_constraints()` 
+Now we initialize the simple component `inner_product`. The function `generate_gates()` 
 adds R1CS constraints to the blueprint corresponding to the circuit. 
 
 
 ```cpp
 inner_product<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
-compute_inner_product.generate_r1cs_constraints();
+compute_inner_product.generate_gates();
 ```
 
 Next, we set the random values to vectors. 
@@ -310,11 +310,11 @@ for (std::size_t i = 0; i < n; ++i) {
 }
 ```
 
-The function `generate_r1cs_witness()` computes intermediate witness value for the 
+The function `generate_assignments()` computes intermediate witness value for the 
 public values and the inner product for the `res`. 
 
 ```cpp
-compute_inner_product.generate_r1cs_witness();
+compute_inner_product.generate_assignments();
 ```
 
 ### SHA2-256 component 
@@ -330,7 +330,7 @@ field `field_type`.
 Firstly, we need to create a `blueprint` and allocate the variables `left`, `right` 
 and `output` at the blueprint. The allocation on the blueprint proceeds at the constructor 
 of digest_variable. Then we initialize the  component ` sha256_two_to_one_hash_component ` 
-and add constraints at the `generate_r1cs_constraints()` function.
+and add constraints at the `generate_gates()` function.
 
 ```cpp
 blueprint<field_type> bp;
@@ -341,7 +341,7 @@ digest_variable<field_type> output(bp, hashes::sha2<256>::digest_bits);
 
 sha256_two_to_one_hash_component<field_type> f(bp, left, right, output);
 
-f.generate_r1cs_constraints();
+f.generate_gates();
 ```
 
 After the generation of r1cs constraints, we need to transform data blocks into 
@@ -396,12 +396,12 @@ detail::pack_to<stream_endian::big_octet_big_bit, 32, 1>(
 After getting bit vectors, we can generate r1cs witnesses.
 
 ```cpp
-left.generate_r1cs_witness(left_bv);
+left.generate_assignments(left_bv);
 
-right.generate_r1cs_witness(right_bv);
+right.generate_assignments(right_bv);
 
-f.generate_r1cs_witness();
-output.generate_r1cs_witness(hash_bv);
+f.generate_assignments();
+output.generate_assignments(hash_bv);
 ```
 
 Now we have the `blueprint` with SHA2-256 component on it and can prove our knowledge 

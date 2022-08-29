@@ -59,7 +59,7 @@ namespace nil {
                     B.allocate(bp, new_num_constraints);
 
                     inner_product<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
-                    compute_inner_product.generate_r1cs_constraints();
+                    compute_inner_product.generate_gates();
 
                     /* fill in random example */
                     for (std::size_t i = 0; i < new_num_constraints; ++i) {
@@ -67,7 +67,7 @@ namespace nil {
                         bp.val(B[i]) = algebra::random_element<FieldType>();
                     }
 
-                    compute_inner_product.generate_r1cs_witness();
+                    compute_inner_product.generate_assignments();
                     return r1cs_example<FieldType>(
                         bp.get_constraint_system(), bp.primary_input(), bp.auxiliary_input());
                 }

@@ -204,12 +204,12 @@ namespace nil {
                     }
 
                     // TODO: ignored for now, enforce bitness checking constrains
-                    void generate_r1cs_constraints(bool ensure_output_bitness = false) {
-                        this->m_commitment.generate_r1cs_constraints();
+                    void generate_gates(bool ensure_output_bitness = false) {
+                        this->m_commitment.generate_gates();
                     }
 
-                    void generate_r1cs_witness() {
-                        this->m_commitment.generate_r1cs_witness();
+                    void generate_assignments() {
+                        this->m_commitment.generate_assignments();
                     }
                 };
 
@@ -360,16 +360,16 @@ namespace nil {
                     }
 
                     // TODO: ignored for now, enforce bitness checking constrains
-                    void generate_r1cs_constraints(bool ensure_output_bitness = false) {
-                        this->hasher.generate_r1cs_constraints(ensure_output_bitness);
-                        this->to_bits_converter.generate_r1cs_constraints();
-                        this->result.generate_r1cs_constraints();
+                    void generate_gates(bool ensure_output_bitness = false) {
+                        this->hasher.generate_gates(ensure_output_bitness);
+                        this->to_bits_converter.generate_gates();
+                        this->result.generate_gates();
                     }
 
-                    void generate_r1cs_witness() {
-                        this->hasher.generate_r1cs_witness();
+                    void generate_assignments() {
+                        this->hasher.generate_assignments();
                         // to_bits_converter generate witness also for result
-                        this->to_bits_converter.generate_r1cs_witness();
+                        this->to_bits_converter.generate_assignments();
                     }
 
                     static std::size_t get_digest_len() {
@@ -420,20 +420,20 @@ namespace nil {
                         hasher(bp, in_bits), random_point(bp), adder(bp, hasher.result, random_point, result) {
                     }
 
-                    void generate_r1cs_constraints(bool ensure_output_bitness = false) {
-                        hasher.generate_r1cs_constraints(ensure_output_bitness);
-                        adder.generate_r1cs_constraints();
+                    void generate_gates(bool ensure_output_bitness = false) {
+                        hasher.generate_gates(ensure_output_bitness);
+                        adder.generate_gates();
                     }
 
-                    void generate_r1cs_witness(const typename field_type::value_type &r) {
+                    void generate_assignments(const typename field_type::value_type &r) {
                         using group_hash_type = hashes::find_group_hash<HashParams, BasePointGeneratorHash,
                                                                         typename element_component::group_type>;
 
-                        hasher.generate_r1cs_witness();
-                        random_point.generate_r1cs_witness(r * hash<group_hash_type>(std::vector<std::uint8_t> {
+                        hasher.generate_assignments();
+                        random_point.generate_assignments(r * hash<group_hash_type>(std::vector<std::uint8_t> {
                                                                    'r',
                                                                }));
-                        adder.generate_r1cs_witness();
+                        adder.generate_assignments();
                     }
                 };
 
@@ -479,16 +479,16 @@ namespace nil {
                         result(result) {
                     }
 
-                    void generate_r1cs_constraints(bool ensure_output_bitness = false) {
-                        commiter.generate_r1cs_constraints(ensure_output_bitness);
-                        to_bits_converter.generate_r1cs_constraints();
+                    void generate_gates(bool ensure_output_bitness = false) {
+                        commiter.generate_gates(ensure_output_bitness);
+                        to_bits_converter.generate_gates();
                     }
 
-                    void generate_r1cs_witness(const typename field_type::value_type &r) {
-                        commiter.generate_r1cs_witness(r);
+                    void generate_assignments(const typename field_type::value_type &r) {
+                        commiter.generate_assignments(r);
                         // to_bits_converter generate witness also for result
-                        to_bits_converter.generate_r1cs_witness();
-                        result.generate_r1cs_constraints();
+                        to_bits_converter.generate_assignments();
+                        result.generate_gates();
                     }
                 };
             }    // namespace components

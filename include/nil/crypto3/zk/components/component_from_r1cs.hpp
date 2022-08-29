@@ -63,7 +63,7 @@ namespace nil {
                         assert(cs_var_idx - 1 == cs.num_variables());
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                             const snark::r1cs_constraint<FieldType> &constr = cs.constraints[i];
                             snark::r1cs_constraint<FieldType> translated_constr;
@@ -86,7 +86,7 @@ namespace nil {
                             this->bp.add_r1cs_constraint(translated_constr);
                         }
                     }
-                    void generate_r1cs_witness(const snark::r1cs_primary_input<FieldType> &primary_input,
+                    void generate_assignments(const snark::r1cs_primary_input<FieldType> &primary_input,
                                                const snark::r1cs_auxiliary_input<FieldType> &auxiliary_input) {
                         assert(cs.num_inputs() == primary_input.size());
                         assert(cs.num_variables() == primary_input.size() + auxiliary_input.size());

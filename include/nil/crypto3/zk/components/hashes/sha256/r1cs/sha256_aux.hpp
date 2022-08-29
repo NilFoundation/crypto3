@@ -67,14 +67,14 @@ namespace nil {
                         pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints() {
-                        unpack_bits->generate_r1cs_constraints(true);
-                        pack_result->generate_r1cs_constraints(false);
+                    void generate_gates() {
+                        unpack_bits->generate_gates(true);
+                        pack_result->generate_gates(false);
                     }
 
-                    void generate_r1cs_witness() {
-                        unpack_bits->generate_r1cs_witness_from_packed();
-                        pack_result->generate_r1cs_witness_from_bits();
+                    void generate_assignments() {
+                        unpack_bits->generate_assignments_from_packed();
+                        pack_result->generate_assignments_from_bits();
                     }
                 };
 
@@ -103,7 +103,7 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         /*
                           tmp = A + B - 2AB i.e. tmp = A xor B
                           out = tmp + C - 2tmp C i.e. out = tmp xor C
@@ -116,7 +116,7 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         if (assume_C_is_zero) {
                             this->bp.lc_val(out) =
                                 this->bp.lc_val(A) + this->bp.lc_val(B) -
@@ -166,20 +166,20 @@ namespace nil {
                         pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < 32; ++i) {
-                            compute_bits[i]->generate_r1cs_constraints();
+                            compute_bits[i]->generate_gates();
                         }
 
-                        pack_result->generate_r1cs_constraints(false);
+                        pack_result->generate_gates(false);
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         for (std::size_t i = 0; i < 32; ++i) {
-                            compute_bits[i]->generate_r1cs_witness();
+                            compute_bits[i]->generate_assignments();
                         }
 
-                        pack_result->generate_r1cs_witness_from_bits();
+                        pack_result->generate_assignments_from_bits();
                     }
                 };
 
@@ -215,20 +215,20 @@ namespace nil {
                         pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < 32; ++i) {
-                            compute_bits[i]->generate_r1cs_constraints();
+                            compute_bits[i]->generate_gates();
                         }
 
-                        pack_result->generate_r1cs_constraints(false);
+                        pack_result->generate_gates(false);
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         for (std::size_t i = 0; i < 32; ++i) {
-                            compute_bits[i]->generate_r1cs_witness();
+                            compute_bits[i]->generate_assignments();
                         }
 
-                        pack_result->generate_r1cs_witness_from_bits();
+                        pack_result->generate_assignments_from_bits();
                     }
                 };
 
@@ -257,7 +257,7 @@ namespace nil {
                         pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             /*
                               result = x * y + (1-x) * z
@@ -266,16 +266,16 @@ namespace nil {
                             this->bp.add_r1cs_constraint(
                                 snark::r1cs_constraint<FieldType>(X[i], Y[i] - Z[i], result_bits[i] - Z[i]));
                         }
-                        pack_result->generate_r1cs_constraints(false);
+                        pack_result->generate_gates(false);
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             this->bp.val(result_bits[i]) =
                                 this->bp.lc_val(X[i]) * this->bp.lc_val(Y[i]) +
                                 (FieldType::value_type::one() - this->bp.lc_val(X[i])) * this->bp.lc_val(Z[i]);
                         }
-                        pack_result->generate_r1cs_witness_from_bits();
+                        pack_result->generate_assignments_from_bits();
                     }
                 };
 
@@ -303,7 +303,7 @@ namespace nil {
                         pack_result.reset(new packing<FieldType>(bp, result_bits, result));
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         for (std::size_t i = 0; i < 32; ++i) {
                             /*
                               2*result + aux = x + y + z
@@ -315,10 +315,10 @@ namespace nil {
                                 snark::r1cs_constraint<FieldType>(X[i] + Y[i] + Z[i] - 2 * result_bits[i],
                                                                   1 - (X[i] + Y[i] + Z[i] - 2 * result_bits[i]), 0));
                         }
-                        pack_result->generate_r1cs_constraints(false);
+                        pack_result->generate_gates(false);
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
 
                         // temporary added until fixed-precision modular adaptor is ready:
                         typedef nil::crypto3::multiprecision::number<
@@ -333,7 +333,7 @@ namespace nil {
                             this->bp.val(result_bits[i]) = typename FieldType::value_type(integral_type(v / 2));
                         }
 
-                        pack_result->generate_r1cs_witness_from_bits();
+                        pack_result->generate_assignments_from_bits();
                     }
                 };
 

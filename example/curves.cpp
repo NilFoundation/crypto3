@@ -111,11 +111,11 @@ blueprint<typename CurveType::scalar_field_type> addition_example(
     components::element_g1_is_well_formed<main_curve_type> 
         el_is_well_formed(bp, a, d, P1);
 
-    el_add.generate_r1cs_constraints();
-    el_is_well_formed.generate_r1cs_constraints();
+    el_add.generate_gates();
+    el_is_well_formed.generate_gates();
 
-    el_add.generate_r1cs_witness();
-    el_is_well_formed.generate_r1cs_witness();
+    el_add.generate_assignments();
+    el_is_well_formed.generate_assignments();
 
     std::cout << "blueprint size: " << bp.num_variables() << std::endl;
 

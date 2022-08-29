@@ -47,7 +47,7 @@ blueprint<FieldType> sha2_two_to_one_bp() {
 
     components::sha256_two_to_one_hash_component<FieldType> f(bp, left, right, output);
 
-    f.generate_r1cs_constraints();
+    f.generate_gates();
     std::cout << "Number of constraints for sha256_two_to_one_hash_component: " << bp.num_constraints() << std::endl;
 
     std::array<std::uint32_t, 8> array_a_intermediate;
@@ -79,12 +79,12 @@ blueprint<FieldType> sha2_two_to_one_bp() {
 
     detail::pack_to<stream_endian::big_octet_big_bit, 32, 1>(array_c_intermediate, hash_bv.begin());
 
-    left.generate_r1cs_witness(left_bv);
+    left.generate_assignments(left_bv);
 
-    right.generate_r1cs_witness(right_bv);
+    right.generate_assignments(right_bv);
 
-    f.generate_r1cs_witness();
-    output.generate_r1cs_witness(hash_bv);
+    f.generate_assignments();
+    output.generate_assignments(hash_bv);
 
     BOOST_CHECK(bp.is_satisfied());
 

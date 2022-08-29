@@ -72,8 +72,8 @@ namespace nil {
                                                      const merkle_authentication_path_variable<FieldType, Hash> &path,
                                                      const blueprint_linear_combination<FieldType> &read_successful);
 
-                    void generate_r1cs_constraints();
-                    void generate_r1cs_witness();
+                    void generate_gates();
+                    void generate_assignments();
 
                     static std::size_t root_size_in_bits();
                     /* for debugging purposes */
@@ -133,34 +133,34 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename Hash>
-                void merkle_tree_check_read_component<FieldType, Hash>::generate_r1cs_constraints() {
+                void merkle_tree_check_read_component<FieldType, Hash>::generate_gates() {
                     /* ensure correct hash computations */
                     for (std::size_t i = 0; i < tree_depth; ++i) {
                         // Note that we check root outside and have enforced booleanity of
-                        // path.left_digests/path.right_digests outside in path.generate_r1cs_constraints
-                        hashers[i].generate_r1cs_constraints(false);
+                        // path.left_digests/path.right_digests outside in path.generate_gates
+                        hashers[i].generate_gates(false);
                     }
 
                     /* ensure consistency of path.left_digests/path.right_digests with internal_output */
                     for (std::size_t i = 0; i < tree_depth; ++i) {
-                        propagators[i].generate_r1cs_constraints();
+                        propagators[i].generate_gates();
                     }
 
-                    check_root->generate_r1cs_constraints(false, false);
+                    check_root->generate_gates(false, false);
                 }
 
                 template<typename FieldType, typename Hash>
-                void merkle_tree_check_read_component<FieldType, Hash>::generate_r1cs_witness() {
+                void merkle_tree_check_read_component<FieldType, Hash>::generate_assignments() {
                     /* do the hash computations bottom-up */
                     for (int i = tree_depth - 1; i >= 0; --i) {
                         /* propagate previous input */
-                        propagators[i].generate_r1cs_witness();
+                        propagators[i].generate_assignments();
 
                         /* compute hash */
-                        hashers[i].generate_r1cs_witness();
+                        hashers[i].generate_assignments();
                     }
 
-                    check_root->generate_r1cs_witness();
+                    check_root->generate_assignments();
                 }
 
                 template<typename FieldType, typename Hash>

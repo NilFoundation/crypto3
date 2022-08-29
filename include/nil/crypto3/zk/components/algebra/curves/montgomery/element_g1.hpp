@@ -86,7 +86,7 @@ namespace nil {
                         this->lambda = lambda_var;
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         // lambda = (y' - y) / (x' - x)
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
                             {this->p2.X - this->p1.X}, {this->lambda}, {this->p2.Y - this->p1.Y}));
@@ -100,7 +100,7 @@ namespace nil {
                             {this->p1.X - this->result.X}, this->lambda, {this->result.Y + this->p1.Y}));
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         this->bp.lc_val(this->lambda) =
                             (this->bp.lc_val(this->p2.Y) - this->bp.lc_val(this->p1.Y)) *
                             (this->bp.lc_val(this->p2.X) - this->bp.lc_val(this->p1.X)).inversed();
@@ -165,7 +165,7 @@ namespace nil {
                                   .sqrt()) {
                     }
 
-                    void generate_r1cs_constraints() {
+                    void generate_gates() {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>({this->p.Y}, {this->result.X},
                                                                                         {this->p.X * this->scale}));
                         this->bp.add_r1cs_constraint(
@@ -174,7 +174,7 @@ namespace nil {
                                                                {this->p.X - field_type::value_type::one()}));
                     }
 
-                    void generate_r1cs_witness() {
+                    void generate_assignments() {
                         typename to_group_type::value_type p_to_XY =
                             typename group_type::value_type(this->bp.lc_val(p.X), this->bp.lc_val(p.Y))
                                 .to_twisted_edwards();

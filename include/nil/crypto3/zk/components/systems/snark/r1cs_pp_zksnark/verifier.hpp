@@ -102,14 +102,14 @@ namespace nil {
                             assert(all_G1_vars.size() == num_G1);
                             assert(all_G2_vars.size() == num_G2);
                         }
-                        void generate_r1cs_constraints() {
+                        void generate_gates() {
                             for (auto &G1_checker : all_G1_checkers) {
-                                G1_checker->generate_r1cs_constraints();
+                                G1_checker->generate_gates();
                             }
 
-                            G2_checker->generate_r1cs_constraints();
+                            G2_checker->generate_gates();
                         }
-                        void generate_r1cs_witness(
+                        void generate_assignments(
                             const typename r1cs_ppzksnark<typename CurveType::pairing::pair_curve_type>::proof_type
                                 &proof) {
                             std::vector<typename CurveType::pairing::pair_curve_type::g1_type> G1_elems;
@@ -123,18 +123,18 @@ namespace nil {
                             assert(G2_elems.size() == all_G2_vars.size());
 
                             for (std::size_t i = 0; i < G1_elems.size(); ++i) {
-                                all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
+                                all_G1_vars[i]->generate_assignments(G1_elems[i]);
                             }
 
                             for (std::size_t i = 0; i < G2_elems.size(); ++i) {
-                                all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
+                                all_G2_vars[i]->generate_assignments(G2_elems[i]);
                             }
 
                             for (auto &G1_checker : all_G1_checkers) {
-                                G1_checker->generate_r1cs_witness();
+                                G1_checker->generate_assignments();
                             }
 
-                            G2_checker->generate_r1cs_witness();
+                            G2_checker->generate_assignments();
                         }
                         static std::size_t size() {
                             const std::size_t num_G1 = 7;
@@ -228,10 +228,10 @@ namespace nil {
                             packer.reset(new multipacking_component<FieldType>(
                                 bp, all_bits, all_vars, FieldType::size_in_bits()));
                         }
-                        void generate_r1cs_constraints(const bool enforce_bitness) {
-                            packer->generate_r1cs_constraints(enforce_bitness);
+                        void generate_gates(const bool enforce_bitness) {
+                            packer->generate_gates(enforce_bitness);
                         }
-                        void generate_r1cs_witness(
+                        void generate_assignments(
                             const typename r1cs_ppzksnark<
                                 typename CurveType::pairing::pair_curve_type>::verification_key_type &vk) {
                             std::vector<typename CurveType::pairing::pair_curve_type::g1_type> G1_elems;
@@ -251,18 +251,18 @@ namespace nil {
                             assert(G2_elems.size() == all_G2_vars.size());
 
                             for (std::size_t i = 0; i < G1_elems.size(); ++i) {
-                                all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
+                                all_G1_vars[i]->generate_assignments(G1_elems[i]);
                             }
 
                             for (std::size_t i = 0; i < G2_elems.size(); ++i) {
-                                all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
+                                all_G2_vars[i]->generate_assignments(G2_elems[i]);
                             }
 
-                            packer->generate_r1cs_witness_from_packed();
+                            packer->generate_assignments_from_packed();
                         }
-                        void generate_r1cs_witness(const std::vector<bool> &vk_bits) {
+                        void generate_assignments(const std::vector<bool> &vk_bits) {
                             all_bits.fill_with_bits(this->bp, vk_bits);
-                            packer->generate_r1cs_witness_from_bits();
+                            packer->generate_assignments_from_bits();
                         }
 
                         std::vector<bool> get_bits() const {
@@ -295,7 +295,7 @@ namespace nil {
                             blueprint_variable_vector<FieldType> vk_bits;
                             vk_bits.allocate(bp, vk_size_in_bits);
                             r1cs_ppzksnark_verification_key_variable<CurveType> vk(bp, vk_bits, input_size_in_elts);
-                            vk.generate_r1cs_witness(r1cs_vk);
+                            vk.generate_assignments(r1cs_vk);
 
                             return vk.get_bits();
                         }
@@ -406,26 +406,26 @@ namespace nil {
                                 new precompute_G2_component<CurveType>(bp, *vk.rC_Z_g2, *pvk.vk_rC_Z_g2_precomp));
                         }
 
-                        void generate_r1cs_constraints() {
-                            compute_vk_alphaB_g1_precomp->generate_r1cs_constraints();
-                            compute_vk_gamma_beta_g1_precomp->generate_r1cs_constraints();
+                        void generate_gates() {
+                            compute_vk_alphaB_g1_precomp->generate_gates();
+                            compute_vk_gamma_beta_g1_precomp->generate_gates();
 
-                            compute_vk_alphaA_g2_precomp->generate_r1cs_constraints();
-                            compute_vk_alphaC_g2_precomp->generate_r1cs_constraints();
-                            compute_vk_gamma_beta_g2_precomp->generate_r1cs_constraints();
-                            compute_vk_gamma_g2_precomp->generate_r1cs_constraints();
-                            compute_vk_rC_Z_g2_precomp->generate_r1cs_constraints();
+                            compute_vk_alphaA_g2_precomp->generate_gates();
+                            compute_vk_alphaC_g2_precomp->generate_gates();
+                            compute_vk_gamma_beta_g2_precomp->generate_gates();
+                            compute_vk_gamma_g2_precomp->generate_gates();
+                            compute_vk_rC_Z_g2_precomp->generate_gates();
                         }
 
-                        void generate_r1cs_witness() {
-                            compute_vk_alphaB_g1_precomp->generate_r1cs_witness();
-                            compute_vk_gamma_beta_g1_precomp->generate_r1cs_witness();
+                        void generate_assignments() {
+                            compute_vk_alphaB_g1_precomp->generate_assignments();
+                            compute_vk_gamma_beta_g1_precomp->generate_assignments();
 
-                            compute_vk_alphaA_g2_precomp->generate_r1cs_witness();
-                            compute_vk_alphaC_g2_precomp->generate_r1cs_witness();
-                            compute_vk_gamma_beta_g2_precomp->generate_r1cs_witness();
-                            compute_vk_gamma_g2_precomp->generate_r1cs_witness();
-                            compute_vk_rC_Z_g2_precomp->generate_r1cs_witness();
+                            compute_vk_alphaA_g2_precomp->generate_assignments();
+                            compute_vk_alphaC_g2_precomp->generate_assignments();
+                            compute_vk_gamma_beta_g2_precomp->generate_assignments();
+                            compute_vk_gamma_g2_precomp->generate_assignments();
+                            compute_vk_rC_Z_g2_precomp->generate_assignments();
                         }
                     };
 
@@ -617,58 +617,58 @@ namespace nil {
                             all_tests_pass.reset(new conjunction<FieldType>(bp, all_test_results, result));
                         }
 
-                        void generate_r1cs_constraints() {
-                            accumulate_input->generate_r1cs_constraints();
+                        void generate_gates() {
+                            accumulate_input->generate_gates();
 
-                            compute_proof_g_A_g_acc->generate_r1cs_constraints();
-                            compute_proof_g_A_g_acc_C->generate_r1cs_constraints();
+                            compute_proof_g_A_g_acc->generate_gates();
+                            compute_proof_g_A_g_acc_C->generate_gates();
 
-                            compute_proof_g_A_g_acc_precomp->generate_r1cs_constraints();
-                            compute_proof_g_A_g_acc_C_precomp->generate_r1cs_constraints();
+                            compute_proof_g_A_g_acc_precomp->generate_gates();
+                            compute_proof_g_A_g_acc_C_precomp->generate_gates();
 
-                            compute_proof_g_A_h_precomp->generate_r1cs_constraints();
-                            compute_proof_g_A_g_precomp->generate_r1cs_constraints();
-                            compute_proof_g_B_h_precomp->generate_r1cs_constraints();
-                            compute_proof_g_C_h_precomp->generate_r1cs_constraints();
-                            compute_proof_g_C_g_precomp->generate_r1cs_constraints();
-                            compute_proof_g_H_precomp->generate_r1cs_constraints();
-                            compute_proof_g_K_precomp->generate_r1cs_constraints();
-                            compute_proof_g_B_g_precomp->generate_r1cs_constraints();
+                            compute_proof_g_A_h_precomp->generate_gates();
+                            compute_proof_g_A_g_precomp->generate_gates();
+                            compute_proof_g_B_h_precomp->generate_gates();
+                            compute_proof_g_C_h_precomp->generate_gates();
+                            compute_proof_g_C_g_precomp->generate_gates();
+                            compute_proof_g_H_precomp->generate_gates();
+                            compute_proof_g_K_precomp->generate_gates();
+                            compute_proof_g_B_g_precomp->generate_gates();
 
-                            check_kc_A_valid->generate_r1cs_constraints();
-                            check_kc_B_valid->generate_r1cs_constraints();
-                            check_kc_C_valid->generate_r1cs_constraints();
-                            check_QAP_valid->generate_r1cs_constraints();
-                            check_CC_valid->generate_r1cs_constraints();
+                            check_kc_A_valid->generate_gates();
+                            check_kc_B_valid->generate_gates();
+                            check_kc_C_valid->generate_gates();
+                            check_QAP_valid->generate_gates();
+                            check_CC_valid->generate_gates();
 
-                            all_tests_pass->generate_r1cs_constraints();
+                            all_tests_pass->generate_gates();
                         }
 
-                        void generate_r1cs_witness() {
-                            accumulate_input->generate_r1cs_witness();
+                        void generate_assignments() {
+                            accumulate_input->generate_assignments();
 
-                            compute_proof_g_A_g_acc->generate_r1cs_witness();
-                            compute_proof_g_A_g_acc_C->generate_r1cs_witness();
+                            compute_proof_g_A_g_acc->generate_assignments();
+                            compute_proof_g_A_g_acc_C->generate_assignments();
 
-                            compute_proof_g_A_g_acc_precomp->generate_r1cs_witness();
-                            compute_proof_g_A_g_acc_C_precomp->generate_r1cs_witness();
+                            compute_proof_g_A_g_acc_precomp->generate_assignments();
+                            compute_proof_g_A_g_acc_C_precomp->generate_assignments();
 
-                            compute_proof_g_A_h_precomp->generate_r1cs_witness();
-                            compute_proof_g_A_g_precomp->generate_r1cs_witness();
-                            compute_proof_g_B_h_precomp->generate_r1cs_witness();
-                            compute_proof_g_C_h_precomp->generate_r1cs_witness();
-                            compute_proof_g_C_g_precomp->generate_r1cs_witness();
-                            compute_proof_g_H_precomp->generate_r1cs_witness();
-                            compute_proof_g_K_precomp->generate_r1cs_witness();
-                            compute_proof_g_B_g_precomp->generate_r1cs_witness();
+                            compute_proof_g_A_h_precomp->generate_assignments();
+                            compute_proof_g_A_g_precomp->generate_assignments();
+                            compute_proof_g_B_h_precomp->generate_assignments();
+                            compute_proof_g_C_h_precomp->generate_assignments();
+                            compute_proof_g_C_g_precomp->generate_assignments();
+                            compute_proof_g_H_precomp->generate_assignments();
+                            compute_proof_g_K_precomp->generate_assignments();
+                            compute_proof_g_B_g_precomp->generate_assignments();
 
-                            check_kc_A_valid->generate_r1cs_witness();
-                            check_kc_B_valid->generate_r1cs_witness();
-                            check_kc_C_valid->generate_r1cs_witness();
-                            check_QAP_valid->generate_r1cs_witness();
-                            check_CC_valid->generate_r1cs_witness();
+                            check_kc_A_valid->generate_assignments();
+                            check_kc_B_valid->generate_assignments();
+                            check_kc_C_valid->generate_assignments();
+                            check_QAP_valid->generate_assignments();
+                            check_CC_valid->generate_assignments();
 
-                            all_tests_pass->generate_r1cs_witness();
+                            all_tests_pass->generate_assignments();
                         }
                     };
 
@@ -697,15 +697,15 @@ namespace nil {
                                 bp, *pvk, input, elt_size, proof, result));
                         }
 
-                        void generate_r1cs_constraints() {
-                            compute_pvk->generate_r1cs_constraints();
+                        void generate_gates() {
+                            compute_pvk->generate_gates();
 
-                            online_verifier->generate_r1cs_constraints();
+                            online_verifier->generate_gates();
                         }
 
-                        void generate_r1cs_witness() {
-                            compute_pvk->generate_r1cs_witness();
-                            online_verifier->generate_r1cs_witness();
+                        void generate_assignments() {
+                            compute_pvk->generate_assignments();
+                            online_verifier->generate_assignments();
                         }
                     };
                 }    // namespace components

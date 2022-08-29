@@ -141,10 +141,10 @@ namespace nil {
                                     output.bits.rbegin() + (8 - i) * hashes::sha2<256>::word_bits)));
                         }
                     }
-                    void generate_r1cs_constraints() {
-                        message_schedule->generate_r1cs_constraints();
+                    void generate_gates() {
+                        message_schedule->generate_gates();
                         for (std::size_t i = 0; i < block::detail::shacal2_policy<256>::rounds; ++i) {
-                            round_functions[i].generate_r1cs_constraints();
+                            round_functions[i].generate_gates();
                         }
 
                         for (std::size_t i = 0; i < 4; ++i) {
@@ -160,14 +160,14 @@ namespace nil {
                         }
 
                         for (std::size_t i = 0; i < 8; ++i) {
-                            reduce_output[i].generate_r1cs_constraints();
+                            reduce_output[i].generate_gates();
                         }
                     }
-                    void generate_r1cs_witness() {
-                        message_schedule->generate_r1cs_witness();
+                    void generate_assignments() {
+                        message_schedule->generate_assignments();
 
                         for (std::size_t i = 0; i < block::detail::shacal2_policy<256>::rounds; ++i) {
-                            round_functions[i].generate_r1cs_witness();
+                            round_functions[i].generate_assignments();
                         }
 
                         for (std::size_t i = 0; i < 4; ++i) {
@@ -178,7 +178,7 @@ namespace nil {
                         }
 
                         for (std::size_t i = 0; i < 8; ++i) {
-                            reduce_output[i].generate_r1cs_witness();
+                            reduce_output[i].generate_assignments();
                         }
                     }
                 };
@@ -226,12 +226,12 @@ namespace nil {
                             bp, SHA256_default_IV<FieldType>(bp), input_block.bits, output));
                     }
 
-                    void generate_r1cs_constraints(bool ensure_output_bitness = true) {    // TODO: ignored for now
-                        f->generate_r1cs_constraints();
+                    void generate_gates(bool ensure_output_bitness = true) {    // TODO: ignored for now
+                        f->generate_gates();
                     }
 
-                    void generate_r1cs_witness() {
-                        f->generate_r1cs_witness();
+                    void generate_assignments() {
+                        f->generate_assignments();
                     }
 
                     static std::size_t get_block_len() {
@@ -250,8 +250,8 @@ namespace nil {
                         sha256_two_to_one_hash_component<FieldType> f(bp, hashes::sha2<256>::block_bits, input_variable,
                                                                       output_variable);
 
-                        input_variable.generate_r1cs_witness(input);
-                        f.generate_r1cs_witness();
+                        input_variable.generate_assignments(input);
+                        f.generate_assignments();
 
                         return output_variable.get_digest();
                     }
@@ -329,17 +329,17 @@ namespace nil {
                         }
                     }
 
-                    void generate_r1cs_constraints(bool ensure_output_bitness = true) {    // TODO: ignored for now
-                        padding->generate_r1cs_constraints();
+                    void generate_gates(bool ensure_output_bitness = true) {    // TODO: ignored for now
+                        padding->generate_gates();
                         for (auto f : blocks_components) {
-                            f->generate_r1cs_constraints();
+                            f->generate_gates();
                         }
                     }
 
-                    void generate_r1cs_witness() {
-                        padding->generate_r1cs_witness();
+                    void generate_assignments() {
+                        padding->generate_assignments();
                         for (auto f : blocks_components) {
-                            f->generate_r1cs_witness();
+                            f->generate_assignments();
                         }
                     }
 
@@ -359,8 +359,8 @@ namespace nil {
                         sha256_hash_component<FieldType> f(bp, input_variable.block_size, input_variable,
                                                            output_variable);
 
-                        input_variable.generate_r1cs_witness(input);
-                        f.generate_r1cs_witness();
+                        input_variable.generate_assignments(input);
+                        f.generate_assignments();
 
                         return output_variable.get_digest();
                     }
