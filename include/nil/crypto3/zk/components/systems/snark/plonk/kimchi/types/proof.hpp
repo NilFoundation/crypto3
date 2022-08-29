@@ -119,10 +119,6 @@ namespace nil {
                         zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             commitment_params_type::shifted_commitment_split>;
 
-                    using witness_comm_type = typename 
-                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
-                            commitment_params_type::w_comm_size>;
-
                     using opening_proof_type = typename 
                         zk::components::kimchi_opening_proof_base<BlueprintFieldType,
                         commitment_params_type::eval_rounds>;
@@ -130,7 +126,7 @@ namespace nil {
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
                     struct commitments_type {
-                        std::array<witness_comm_type,
+                        std::array<commitment_type,
                             KimchiParamsType::witness_columns> witness;
                         commitment_type lookup_runtime;
                         commitment_type table;

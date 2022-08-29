@@ -154,10 +154,6 @@ namespace nil {
                         zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             KimchiCommitmentParamsType::shifted_commitment_split>;
 
-                    using w_comm_type = typename 
-                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
-                            KimchiCommitmentParamsType::w_comm_size>;
-
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
                                             KimchiParamsType, KimchiCommitmentParamsType, BatchSize, W0, W1,
@@ -555,6 +551,9 @@ namespace nil {
                                  {chuncked_f_comm.X, chuncked_f_comm.Y}}, row);
                             row+=add_component::rows_amount;
                             commitment_type ft_comm = {{{ft_comm_part.X, ft_comm_part.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
 
                             
                             // evaluations
@@ -567,8 +566,10 @@ namespace nil {
                                 evaluations[eval_idx++] = chal;
                             }
 
-                            //commitment_type p_comm = {none, p_comm_unshifted};
                             commitment_type p_comm = {{{p_comm_unshifted.X, p_comm_unshifted.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
                             evaluations[eval_idx++] = p_comm;
                             evaluations[eval_idx++] = ft_comm;
                             evaluations[eval_idx++] = params.proofs[i].comm.z;
@@ -780,17 +781,22 @@ namespace nil {
                                  {chuncked_f_comm.X, chuncked_f_comm.Y}}, row);
                             row+=add_component::rows_amount;
                             commitment_type ft_comm = {{{ft_comm_part.X, ft_comm_part.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
 
                             // evaluations
-
                             std::array<commitment_type,
                                 kimchi_constants::evaluations_in_batch_size> evaluations;
                             std::size_t eval_idx = 0;
                             for (auto chal : params.proofs[i].comm.prev_challenges) {
                                 evaluations[eval_idx++] = chal;
                             }
-                            //commitment_type p_comm = {none, p_comm_unshifted};
+
                             commitment_type p_comm = {{{p_comm_unshifted.X, p_comm_unshifted.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
                             evaluations[eval_idx++] = p_comm;
                             evaluations[eval_idx++] = ft_comm;
                             evaluations[eval_idx++] = params.proofs[i].comm.z;
