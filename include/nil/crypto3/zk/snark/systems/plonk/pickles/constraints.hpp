@@ -11,16 +11,16 @@ namespace nil {
                 template<typename FieldType>
                 struct ConstraintSystem{
                     typedef typename FieldType::value_type value_type;
-                    typedef proof_evaluation_type<value_type> proof_evaluation_type;
+                    // typedef proof_evaluation_type<value_type> proof_evaluation_type;
 
                     constexpr static const std::size_t CONSTRAINTS = 3;
                     constexpr static const std::size_t ZK_ROWS = 3;
                     constexpr static const std::size_t GENERIC_REGISTERS = 3;
 
-                    static typename value_type perm_scalars(std::vector<proof_evaluation_type>& e, value_type beta,
-                                typename value_type& gamma, std::vector<typename value_type>& alphas, 
+                    static value_type perm_scalars(std::vector<proof_evaluation_type<value_type>>& e, value_type beta,
+                                value_type& gamma, std::vector<value_type>& alphas, 
                                 value_type& zkp_zeta){
-                        typename value_type res = e[1].z * beta * alphas.front() * zkp_zeta;
+                        value_type res = e[1].z * beta * alphas.front() * zkp_zeta;
                         for(int i = 0; i < e[0].w.size(); ++i){
                             res *= (gamma + (beta * e[0].s[i]) + e[0].w[i]);
                         }
@@ -28,9 +28,10 @@ namespace nil {
                         return -res;
                     }
 
-                    static void generic_gate(std::vector<typename value_type>& res, const typename value_type& alpha_pow,
-                                const std::size_t register_offset){
-                        typename value_type alpha_generic = alpha_pow * generic_zeta;
+                    static void generic_gate(std::vector<value_type>& res, const value_type& alpha_pow,
+                                             const std::size_t register_offset, const value_type& generic_zeta, 
+                                             const std::array<value_type, kimchi_constant::COLUMNS>& w_zeta){
+                        value_type alpha_generic = alpha_pow * generic_zeta;
 
                         // addition
                         res.push_back(alpha_generic * w_zeta[register_offset]);
@@ -43,13 +44,13 @@ namespace nil {
                         // constant
                         res.push_back(alpha_generic);
                     }
-                    static std::vector<typename value_type> gnrc_scalars(const std::vector<typename value_type>& alphas, 
-                                const std::array<typename value_type, kimchi_constant::COLUMNS>& w_zeta,
-                                const typename value_type& generic_zeta){
-                        std::vector<typename value_type> res;
+                    static std::vector<value_type> gnrc_scalars(const std::vector<value_type>& alphas, 
+                                                                const std::array<value_type, kimchi_constant::COLUMNS>& w_zeta,
+                                                                const value_type& generic_zeta){
+                        std::vector<value_type> res;
 
-                        generic_gate(res, alphas[0], 0);
-                        generic_gate(res, alphas[1], GENERIC_REGISTERS);
+                        generic_gate(res, alphas[0], 0, generic_zeta, w_zeta);
+                        generic_gate(res, alphas[1], GENERIC_REGISTERS, generic_zeta, w_zeta);
 
                         return res;
                     }

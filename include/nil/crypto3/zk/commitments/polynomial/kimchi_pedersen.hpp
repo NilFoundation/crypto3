@@ -85,6 +85,8 @@ namespace nil {
                             }
                         }
 
+                        params_type() = default;
+
                         void add_lagrange_basis(math::basic_radix2_domain<scalar_field_type>& domain){
                             std::size_t n = domain.size();
                             BOOST_ASSERT_MSG(n <= g.size(), "add lagrange basis: Domain size {} larger than SRS size {}");
@@ -93,7 +95,7 @@ namespace nil {
                                 return;
                             }
 
-                            std::vector<typename group_type::value_type> lg(g.begin(), g.begin() + n);
+                            // std::vector<typename group_type::value_type> lg(g.begin(), g.begin() + n);
                             lagrange_bases[n] = std::vector<typename group_type::value_type>(g.begin(), g.begin() + n);
 
                             domain.inverse_fft(lagrange_bases[n]);
@@ -111,49 +113,58 @@ namespace nil {
                         poly_comm(std::vector<value_type>& unshifted, value_type& shifted) : 
                             unshifted(unshifted), shifted(shifted) {}
 
-                        template<typename curve_type>
-                        static poly_comm<curve_type> multi_scalar_mul(std::vector<poly_comm<curve_type>>& commits,
-                        std::vector<typename curve_type::scalar_field_type::value_type>& elm){
-                            typedef typename curve_type::template g1_type<algebra::curves::coordinates::affine> group_type;
-
-                            std::vector<typename group_type::value_type> points;
+                        static poly_comm<value_type> multi_scalar_mul(std::vector<poly_comm<value_type>>& commits,
+                                                                      std::vector<typename scalar_field_type::value_type>& elm){
+                            
+                            if(commits.empty()){
+                                return poly_comm<value_type>();
+                            }
+                            std::vector<value_type> points;
                             for(auto& commit : commits){
                                 points.push_back(commit.shifted);
                             }
-                            typename group_type::value_type shifted = algebra::multiexp_with_mixed_addition<multiexp_method>(
+                            value_type shifted = algebra::multiexp_with_mixed_addition<multiexp_method>(
                                     points.begin(), points.end(), elm.begin(), elm.end(), 1);
 
-                            std::vector<typename group_type::value_type> unshifted;
-                            std::size_t n = *std::max_element(commits.begin(), commits.end(), [](auto &first, auto &second){
-                                return first.unshifted.size() < second.unshifted.size();
-                            });
+                            std::vector<value_type> unshifted;
+                            std::size_t n = commits.front().unshifted.size();
+                            for(auto &commit : commits){
+                                if(n > commit.unshifted.size()){
+                                    n = commit.unshifted.size();
+                                }
+                            }
+                            // *std::max_element(commits.begin(), commits.end(), [](auto &first, auto &second){
+                                // return first.unshifted.size() < second.unshifted.size();
+                            // });
 
                             for(int i = 0; i < n; ++i){
-                                std::vector<typename group_type::value_type> points_for_unshifted;
+                                std::vector<value_type> points_for_unshifted;
                                 std::vector<typename scalar_field_type::value_type> scalars_for_unshifted;
                                 for(int j = 0; j < commits.size(); ++j){
-                                    if(i < commits[j].size()){
+                                    if(i < commits[j].unshifted.size()){
                                         points_for_unshifted.push_back(commits[j].unshifted[i]);
                                         scalars_for_unshifted.push_back(elm[j]);
                                     }
                                 }
 
                                 unshifted.push_back(algebra::multiexp_with_mixed_addition<multiexp_method>(
-                                    points_for_unshifted.begin(), points_for_unshifted.end(), scalars_for_unshifted.begin(), scalars_for_unshifted.end(), 1));
+                                    points_for_unshifted.begin(), points_for_unshifted.end(), 
+                                    scalars_for_unshifted.begin(), scalars_for_unshifted.end(), 1));
                             }
 
-                            return poly_comm<curve_type>(unshifted, shifted);
+                            return poly_comm<value_type>(unshifted, shifted);
                         }
 
-                        poly_comm_type chunk_commitment(value_type& zeta_n){
+                        poly_comm_type chunk_commitment(typename scalar_field_type::value_type& zeta_n){
                             value_type res;
                             for(auto iter = unshifted.rbegin(); iter < unshifted.rend(); ++iter){
-                                res *= zeta_n;
-                                res += (*iter);
+                                res = res * zeta_n;
+                                res = res + (*iter);
                             }
 
+                            std::vector<value_type> unshifted_temp = {res};
                             return poly_comm_type(
-                                std::vector<value_type>({res}),
+                                unshifted_temp,
                                 shifted
                             );
                         }
@@ -178,10 +189,10 @@ namespace nil {
                             }
 
                             value_type shifted_temp;
-                            if(!this->shifted){
+                            if(this->shifted == value_type::zero()){
                                 shifted_temp = other.shifted;
                             }
-                            else if(!other.shifted){
+                            else if(other.shifted == value_type::zero()){
                                 shifted_temp = this->shifted;
                             }
                             else{
@@ -231,7 +242,8 @@ namespace nil {
                                 unshifted_temp.push_back(a * c);
                             }
 
-                            return poly_comm_type(unshifted_temp, shifted * c);
+                            value_type shifted_temp = shifted * c;
+                            return poly_comm_type(unshifted_temp, shifted_temp);
                         }
                     };
 
@@ -543,12 +555,14 @@ namespace nil {
                         for (const auto &[evals_tr, bound] : polys) {
 
                             std::vector<std::vector<typename scalar_field_type::value_type>> evals;
-                            for (int i = 0; i < evals_tr.evaluations[0].size(); ++i) {
-                                std::vector<typename scalar_field_type::value_type> ev;
-                                for (int j = 0; j < evals_tr.evaluations.size(); ++j) {
-                                    ev.push_back(evals_tr.evaluations[j][i]);
+                            if(!evals_tr.evaluations.empty()){
+                                for (int i = 0; i < evals_tr.evaluations[0].size(); ++i) {
+                                    std::vector<typename scalar_field_type::value_type> ev;
+                                    for (int j = 0; j < evals_tr.evaluations.size(); ++j) {
+                                        ev.push_back(evals_tr.evaluations[j][i]);
+                                    }
+                                    evals.push_back(ev);
                                 }
-                                evals.push_back(ev);
                             }
 
                             for (auto &eval : evals) {
@@ -599,7 +613,7 @@ namespace nil {
                     }
 
                     static std::vector<typename scalar_field_type::value_type>
-                    b_poly_coefficients(const std::vector<typename scalar_field_type::value_type> &chals) {
+                    b_poly_coefficents(const std::vector<typename scalar_field_type::value_type> &chals) {
                         auto rounds = chals.size();
                         auto s_len = 1 << rounds;
                         std::vector<typename scalar_field_type::value_type> s(
@@ -661,7 +675,7 @@ namespace nil {
                                 scale *= batch.r;
                             }
 
-                            std::vector<typename scalar_field_type::value_type> s = b_poly_coefficients(chals);
+                            std::vector<typename scalar_field_type::value_type> s = b_poly_coefficents(chals);
 
                             auto neg_rand_base_i = -rand_base_i;
 

@@ -39,53 +39,22 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                /// Contains the evaluation of a polynomial commitment at a set of points.
-                template<typename CurveType>
-                struct Evaluation {
-                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
-                    using Fr = typename CurveType::scalar_field_type;
-                    /// The commitment of the polynomial being evaluated
-                    commitment_type commitment;
-
-                    /// Contains an evaluation table
-                    std::vector<std::vector<Fr>> evaluations;
-
-                    /// optional degree bound
-                    size_t degree_bound;
-                };
-
-                // TODO: I think we should really change this name to something more correct
-                template<typename CurveType>
-                struct batch_evaluation_proof {
-                    typedef typename CurveType::scalar_field_type Fr;
-                    //                    EFqSponge sponge; TODO: return this
-                    std::vector<Evaluation<CurveType>> evaluations;
-                    /// vector of evaluation points
-                    std::vector<Fr> evaluation_points;
-                    /// scaling factor for evaluation point powers
-                    Fr xi;
-                    /// scaling factor for polynomials
-                    Fr r;
-                    /// batched opening proof
-                    typename commitments::kimchi_pedersen<CurveType>::proof_type opening;
-                };
-
                 /// The collection of constants required to evaluate an `Expr`.
                 template<typename FieldType>
                 struct Constants {
                     /// The challenge alpha from the PLONK IOP.
-                    FieldType alpha;
+                    typename FieldType::value_type alpha;
                     /// The challenge beta from the PLONK IOP.
-                    FieldType beta;
+                    typename FieldType::value_type beta;
                     /// The challenge gamma from the PLONK IOP.
-                    FieldType gamma;
+                    typename FieldType::value_type gamma;
                     /// The challenge joint_combiner which is used to combine
                     /// joint lookup tables.
-                    FieldType joint_combiner;
+                    typename FieldType::value_type joint_combiner;
                     /// The endomorphism coefficient
-                    FieldType endo_coefficient;
+                    typename FieldType::value_type endo_coefficient;
                     /// The MDS matrix
-                    std::vector<std::vector<FieldType>> mds;
+                    std::array<std::array<typename FieldType::value_type, 3>, 3> mds;
                 };
 
                 enum gate_type {
@@ -128,22 +97,7 @@ namespace nil {
                     /// The permutation argument
                     Permutation,
                     /// The lookup argument
-                    Lookup
-                };
-
-                template<typename CurveType>
-                struct common_reference_string {
-                    /// The vector of group elements for committing to polynomials in coefficient form
-                    std::vector<CurveType> g;
-                    /// A group element used for blinding commitments
-                    CurveType h;
-                    // TODO: the following field should be separated, as they are optimization values
-                    /// Commitments to Lagrange bases, per domain size
-                    std::map<size_t, std::vector<CurveType>> lagrange_bases;
-                    /// Coefficient for the curve endomorphism
-                    typename CurveType::scalar_field_type endo_r;
-                    /// Coefficient for the curve endomorphism
-                    typename CurveType::base_field_type endo_q;
+                    LookupArgument
                 };
 
                 template<typename FieldType>
@@ -158,10 +112,12 @@ namespace nil {
                     std::vector<std::vector<FieldType>> mds;
                 };
 
+                struct Column;
+
                 template<typename ContainerType>
                 struct Linearization {
-                    typename ContainerType constant_term;
-                    std::vector<std::tuple<Column, typename ContainerType>> index_term;
+                    ContainerType constant_term;
+                    std::vector<std::tuple<Column, ContainerType>> index_term;
                 };
 
                 template<typename CurveType>
@@ -171,24 +127,24 @@ namespace nil {
                     typedef typename CurveType::scalar_field_type scalar_field_type;
 
                     enum lookups_used { Single, Joint } lookup_used;
-                    std::vector<typename commitment_type> lookup_table;
-                    std::vector<typename commitment_type> lookup_selectors;
+                    std::vector<commitment_type> lookup_table;
+                    std::vector<commitment_type> lookup_selectors;
 
-                    typename commitment_type table_ids;
+                    commitment_type table_ids;
 
                     std::size_t max_joint_size;
                     
-                    typename commitment_type runtime_tables_selector;
+                    commitment_type runtime_tables_selector;
                     bool runtime_tables_selector_is_used;
                     
-                    static commitment_type combine_table(std::vector<typename commitment_type>& columns,
+                    static commitment_type combine_table(std::vector<commitment_type>& columns,
                                             typename scalar_field_type::value_type column_combiner,
                                             typename scalar_field_type::value_type table_id_combiner,
                                             commitment_type& table_id_vector, 
                                             commitment_type& runtime_vector){
                         typename scalar_field_type::value_type j = scalar_field_type::value_type::one();
                         std::vector<typename scalar_field_type::value_type> scalars;
-                        std::vector<typename commitment_type> commitments;
+                        std::vector<commitment_type> commitments;
 
                         for(auto &comm : columns){
                             scalars.push_back(j);
@@ -206,7 +162,7 @@ namespace nil {
                             commitments.push_back(runtime_vector);
                         }
 
-                        return commitment_scheme::poly_comm::multi_scalar_mul<typename CurveType>(commitments, scalars);
+                        return commitment_scheme::commitment_type::multi_scalar_mul(commitments, scalars);
                     }
                 };
             }    // namespace snark

@@ -119,6 +119,7 @@ namespace nil{
 
                     ScalarChallenge(typename FieldType::value_type _val) : _val(_val) {}
 
+                    ScalarChallenge() = default;
                     typename FieldType::value_type _val;
                 };
             }

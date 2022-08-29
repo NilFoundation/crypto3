@@ -149,8 +149,8 @@ namespace nil {
                             this->sponge.absorb(e.lookup.aggreg);
                             this->sponge.absorb(e.lookup.table);
 
-                            if(e.runtime_is_used){
-                                this->sponge.absorb(e.lookup.runtime_table);
+                            if(e.lookup.runtime_is_used){
+                                this->sponge.absorb(e.lookup.runtime);
                             }
                         }
                     }
@@ -265,6 +265,10 @@ namespace nil {
 
                     typename scalar_field_type::value_type squeeze_challenge(typename scalar_field_type::value_type endo_r) {
                         return squeeze_prechallenge().to_field(endo_r);
+                    }
+
+                    typename scalar_field_type::value_type digest(){
+                        return typename scalar_field_type::value_type(typename scalar_field_type::integral_type(this->squeeze_field().data));
                     }
                 };
             }

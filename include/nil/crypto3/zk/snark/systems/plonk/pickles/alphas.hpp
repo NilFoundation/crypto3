@@ -40,27 +40,34 @@ namespace nil {
                 struct Alphas {
                     /// The next power of alpha to use
                     /// the end result will be [1, alpha^{next_power - 1}]
-                    uint32_t next_power;
+                    std::size_t next_power;
                     /// The mapping between constraint types and powers of alpha
                     //                    std::map<argument_type, std::pair<uint32_t, uint32_t>> mapping;
                     /// The powers of alpha: 1, alpha, alpha^2, etc.
                     /// If set to [Some], you can't register new constraints.
-                    std::vector<FieldType> alphas;
+                    std::vector<typename FieldType::value_type> alphas;
 
-                    Alphas(uint32_t next_power) : next_power(next_power) {}
+                    Alphas() : next_power(0) {}
                     // Create alphas from 0 to next_power - 1
-                    void instantiate(FieldType alpha) {
-                        FieldType last_power = FieldType::one();
-                        alphas.resize(next_power);
-                        alphas[0] = last_power;
-                        for (size_t i = 0; i < next_power; ++i) {
-                            last_power *= alpha;
-                            alphas[i + 1] = last_power;
+
+                    void register_(std::size_t power){
+                        next_power += power;
+                    }
+
+                    void instantiate(typename FieldType::value_type alpha) {
+                        typename FieldType::value_type last_power = FieldType::value_type::one();
+                        alphas.clear();
+                        alphas.reserve(next_power);
+                        alphas.push_back(last_power);
+                        for (size_t i = 1; i < next_power; ++i) {
+                            alphas.push_back(alphas.back() * alpha);
+                            // last_power *= alpha;
+                            // alphas[i + 1] = last_power;
                         }
                     }
 
                     // Return num alphas
-                    std::vector<FieldType> get_alphas(uint32_t num) {
+                    std::vector<typename FieldType::value_type> get_alphas(std::size_t num) {
                         BOOST_ASSERT_MSG(num <= alphas.size(), "Not enough alphas to return");
                         return std::vector(alphas.begin(), alphas.begin() + num);
                     }
