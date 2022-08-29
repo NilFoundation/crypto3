@@ -36,6 +36,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
+#include <nil/crypto3/zk/components/algebra/fields/plonk/range_check.hpp>
+
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include <nil/crypto3/zk/component.hpp>
@@ -172,20 +174,36 @@ namespace nil {
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3,
-                         std::size_t W4>
+                         std::size_t W4,
+                         std::size_t W5,
+                         std::size_t W6,
+                         std::size_t W7,
+                         std::size_t W8,
+                         std::size_t W9,
+                         std::size_t W10,
+                         std::size_t W11,
+                         std::size_t W12,
+                         std::size_t W13,
+                         std::size_t W14>
                 class to_limbs<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    W0, W1, W2, W3, W4> {
+                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    constexpr static const std::size_t chunk_size = 64;
+                    using range_check_component = zk::components::range_check<ArithmetizationType, chunk_size, 
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                     constexpr static const std::size_t selector_seed = 0x0ff1;
+                    constexpr static const std::size_t chunck_amount = 4;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = 1 + 
+                        chunck_amount * range_check_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -222,6 +240,18 @@ namespace nil {
 
                         assignment.enable_selector(first_selector_index, component_start_row);
 
+                        std::size_t row = component_start_row;
+                        std::array<var, chunck_amount> chunks = {var(W1, row, false), 
+                            var(W2, row, false), var(W3, row, false), 
+                            var(W4, row, false)};
+
+                        row++;
+
+                        for (std::size_t i = 0; i < chunck_amount; i++) {
+                            range_check_component::generate_circuit(bp, assignment, {chunks[i]}, row);
+                            row += range_check_component::rows_amount;
+                        }
+
                         generate_copy_constraints(bp, assignment, params, component_start_row);
 
                         return result_type(component_start_row);
@@ -247,6 +277,17 @@ namespace nil {
                         value_data = value_data >> 64;
                         assignment.witness(W4)[row].data = value_data;
 
+                        std::array<var, chunck_amount> chunks = {var(W1, row, false), 
+                            var(W2, row, false), var(W3, row, false), 
+                            var(W4, row, false)};
+
+                        row++;
+
+                        for (std::size_t i = 0; i < chunck_amount; i++) {
+                            range_check_component::generate_assignments(assignment, {chunks[i]}, row);
+                            row += range_check_component::rows_amount;
+                        }
+                        
                         return result_type(component_start_row);
                     }
 
