@@ -115,7 +115,7 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     typename LPCScheme::proof_type proof;
-                    proof.T_root = make_merkle_node_value<typename LPCScheme::merkle_proof_type, Endianness>(std::get<0>(filled_proof.value()));
+                    proof.T_root = make_merkle_node_value<typename LPCScheme::commitment_type, Endianness>(std::get<0>(filled_proof.value()));
 
                     auto filled_z = std::get<1>(filled_proof.value());
                     if constexpr(LPCScheme::is_const_size){

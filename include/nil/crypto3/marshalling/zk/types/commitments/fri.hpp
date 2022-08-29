@@ -111,7 +111,7 @@ namespace nil {
                 make_fri_round_proof(const fri_round_proof<nil::marshalling::field_type<Endianness>, FRIScheme> &blob) {
                     typename FRIScheme::round_proof_type rp;
                     rp.p = make_merkle_proof<typename FRIScheme::merkle_proof_type, Endianness>(std::get<0>(blob.value()));
-                    rp.T_root = make_merkle_node_value<typename FRIScheme::merkle_proof_type, Endianness>(std::get<1>(blob.value()));
+                    rp.T_root = make_merkle_node_value<typename FRIScheme::commitment_type, Endianness>(std::get<1>(blob.value()));
                     rp.colinear_path = make_merkle_proof<typename FRIScheme::merkle_proof_type, Endianness>(std::get<2>(blob.value()));
                     return rp;
                 }
