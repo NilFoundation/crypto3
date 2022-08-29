@@ -122,44 +122,29 @@ namespace nil {
                                 accumulator.beta_g2))));
                 }
 
-                // template<typename Accumulator, typename Endianness>
-                // Accumulator make_r1cs_gg_ppzksnark_fast_proving_key(
-                //     const r1cs_gg_ppzksnark_fast_proving_key<nil::marshalling::field_type<Endianness>, Accumulator>
-                //         &filled_proving_key) {
+                template<typename Accumulator, typename Endianness>
+                Accumulator make_powers_of_tau_accumulator(
+                    const powers_of_tau_accumulator<nil::marshalling::field_type<Endianness>, Accumulator>
+                        &filled_accumulator) {
 
-                //     return Accumulator(
-                //         std::move(
-                //             make_fast_curve_element<typename Accumulator::curve_type::template g1_type<>, Endianness>(
-                //                 std::get<0>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_curve_element<typename Accumulator::curve_type::template g1_type<>, Endianness>(
-                //                 std::get<1>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_curve_element<typename Accumulator::curve_type::template g2_type<>, Endianness>(
-                //                 std::get<2>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_curve_element<typename Accumulator::curve_type::template g1_type<>, Endianness>(
-                //                 std::get<3>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_curve_element<typename Accumulator::curve_type::template g2_type<>, Endianness>(
-                //                 std::get<4>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
-                //                 std::get<5>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_knowledge_commitment_vector<nil::crypto3::zk::commitments::knowledge_commitment_vector<
-                //                                                  typename Accumulator::curve_type::template g2_type<>,
-                //                                                  typename Accumulator::curve_type::template g1_type<>>,
-                //                                              Endianness>(std::get<6>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
-                //                 std::get<7>(filled_proving_key.value()))),
-                //         std::move(
-                //             make_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
-                //                 std::get<8>(filled_proving_key.value()))),
-                //         std::move(make_r1cs_constraint_system<typename Accumulator::constraint_system_type, Endianness>(
-                //             std::get<9>(filled_proving_key.value()))));
-                // }
+                    return Accumulator(
+                        std::move(
+                            make_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
+                                std::get<0>(filled_accumulator.value()))),
+                        std::move(
+                            make_fast_curve_element_vector<typename Accumulator::curve_type::template g2_type<>, Endianness>(
+                                std::get<1>(filled_accumulator.value()))),
+                        std::move(
+                            make_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
+                                std::get<2>(filled_accumulator.value()))),
+                        std::move(
+                            make_fast_curve_element_vector<typename Accumulator::curve_type::template g1_type<>, Endianness>(
+                                std::get<3>(filled_accumulator.value()))),
+                        std::move(
+                            make_fast_curve_element<typename Accumulator::curve_type::template g2_type<>, Endianness>(
+                                std::get<4>(filled_accumulator.value())))
+                    );
+                }
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
