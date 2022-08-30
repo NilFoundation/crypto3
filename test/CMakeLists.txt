@@ -63,6 +63,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/non_native_demo"
     "non_native/plonk/reduction"
     "non_native/plonk/ed25519"
+    "non_native/plonk/signatures_verification"
     "non_native/plonk/ec_point"
     )
 
@@ -80,6 +81,7 @@ set(PLONK_TESTS_FILES
     "algebra/curves/plonk/multi_scalar_multiplication"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
+    "hashes/plonk/sha512"
     "hashes/plonk/sha256_process"
     "hashes/plonk/sha512_process"
     "hashes/plonk/decomposition"
