@@ -89,7 +89,7 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var output = var(0, 0);
+                        var output;
 
                         result_type(std::size_t component_start_row) {
                             output = var(W0,
@@ -172,7 +172,6 @@ namespace nil {
 
 
                         typename BlueprintFieldType::value_type x_reconstructed = assignment.witness(W0)[row - 1];
-
                         assert(x_reconstructed == x);
                         assert(row == start_row_index + rows_amount);
 
