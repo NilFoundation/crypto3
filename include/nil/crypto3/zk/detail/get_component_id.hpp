@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_DETAIL_HPP
-#define CRYPTO3_ZK_BLUEPRINT_DETAIL_HPP
+#ifndef CRYPTO3_ZK_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
+#define CRYPTO3_ZK_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
 
 #include <typeinfo>
 
@@ -45,4 +45,4 @@ namespace nil {
         }    // namespace zk
     }        // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_DETAIL_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_DETAIL_COMPONENT_ID_HPP

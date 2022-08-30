@@ -99,7 +99,7 @@ namespace nil {
                      std::is_same<typename BlueprintFieldType::value_type,
                                   typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
                      bool>::type = true>
-        auto prepare_component(typename ComponentType::params_type params, const PublicInput &public_input,
+        auto prepare_component(ComponentType component_instance, const PublicInput &public_input,
                                const FunctorResultCheck &result_check) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -112,18 +112,18 @@ namespace nil {
             zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
             zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
-            std::size_t start_row = zk::components::allocate<component_type>(bp);
-            if (public_input.size() > component_type::rows_amount) {
-                bp.allocate_rows(public_input.size() - component_type::rows_amount);
+            std::size_t start_row = zk::components::allocate(component_instance, bp);
+            if (public_input.size() > component_instance.rows_amount()) {
+                bp.allocate_rows(public_input.size() - component_instance.rows_amount());
             }
 
             for (std::size_t i = 0; i < public_input.size(); i++) {
                 auto allocated_pi = assignment_bp.allocate_public_input(public_input[i]);
             }
 
-            zk::components::generate_circuit<component_type>(bp, public_assignment, params, start_row);
+            zk::components::generate_circuit1<BlueprintFieldType, ArithmetizationParams>(component_instance, bp, public_assignment, start_row);
             typename component_type::result_type component_result =
-                component_type::generate_assignments(assignment_bp, params, start_row);
+                generate_assignments<BlueprintFieldType, ArithmetizationParams>(component_instance, assignment_bp, start_row);
             
             result_check(assignment_bp, component_result);
 
@@ -166,7 +166,7 @@ namespace nil {
         typename std::enable_if<
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value>::type
-            test_component(typename ComponentType::params_type params, const PublicInput &public_input,
+            test_component(ComponentType component_instance, const PublicInput &public_input,
                            FunctorResultCheck result_check) {
 
             using placeholder_params =
@@ -174,7 +174,7 @@ namespace nil {
 
             auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                  FunctorResultCheck>(params, public_input, result_check);
+                                  FunctorResultCheck>(component_instance, public_input, result_check);
 
             auto proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);

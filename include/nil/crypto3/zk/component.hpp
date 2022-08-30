@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2022 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
 
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -35,9 +38,52 @@ namespace nil {
 
             namespace components {
 
-                template<typename ArithmetizationType>
-                class component {
+                template<typename ArithmetizationType, std::uint32_t... ComponentTemplateParams>
+                class component;
+
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount>
+                class component<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount> {
                 protected:
+
+                    using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
+                    witness_container_type _W;
+
+                    std::uint32_t _gates_amount;
+                    std::uint32_t _rows_amount;
+
+                    using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    typename witness_container_type::value_type W(std::uint32_t index) const {
+                        return _W[index];
+                    }
+
+                public:
+
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
+
+                    template <typename ContainerType>
+                    component(ContainerType wires, std::uint32_t rows_amount, std::uint32_t gates_amount) :
+                        _rows_amount(rows_amount), _gates_amount(gates_amount) {
+                        std::copy_n(std::make_move_iterator(wires.begin()), WitnessAmount, _W.begin());
+                    }
+
+                    std::uint32_t rows_amount() const {
+                        return _rows_amount;
+                    }
+
+                    std::uint32_t gates_amount() const {
+                        return _gates_amount;
+                    }
+                };
+
+                template<typename BlueprintFieldType>
+                class component<snark::r1cs_constraint_system<BlueprintFieldType>> {
+                protected:
+
+                    typedef snark::r1cs_constraint_system<BlueprintFieldType>
+                        ArithmetizationType;
+
                     blueprint<ArithmetizationType> &bp;
 
                 public:

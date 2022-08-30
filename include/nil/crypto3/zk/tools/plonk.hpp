@@ -50,6 +50,12 @@ namespace nil {
                 const std::vector<snark::plonk_gate<BlueprintFieldType, snark::plonk_constraint<BlueprintFieldType>>> gates =
                             bp.gates();
 
+                const std::vector<snark::plonk_copy_constraint<BlueprintFieldType>> copy_constraints =
+                            bp.copy_constraints();
+
+                const std::vector<snark::plonk_gate<BlueprintFieldType, snark::plonk_lookup_constraint<BlueprintFieldType>>> lookup_gates =
+                            bp.lookup_gates();
+
                 for (std::size_t i = 0; i < gates.size(); i++) {
                     snark::plonk_column<BlueprintFieldType> selector = assignments.selector(gates[i].selector_index);
 
@@ -62,11 +68,19 @@ namespace nil {
                                     gates[i].constraints[j].evaluate(selector_row, assignments);
                                     
                                 if (!constraint_result.is_zero()) {
-                                    // std::cout << "constraint " << j << " from gate " << i << "on row " << std::endl;
+                                    std::cout << "Constraint " << j << " from gate " << i << "on row " << selector_row << " is not satisfied." << std::endl;
                                     return false;
                                 }
                             }
                         }
+                    }
+                }
+
+                for (std::size_t i = 0; i < copy_constraints.size(); i++) {
+                    if (assignment.var_value(copy_constraints[i].first) !=
+                        assignment.var_value(copy_constraints[i].second)){
+                        std::cout << "Copy constraint number " << i << " is not satisfied." << std::endl;
+                        return false;
                     }
                 }
 

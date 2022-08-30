@@ -33,11 +33,13 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ComponentType, typename ArithmetizationType>
-                std::size_t allocate(blueprint<ArithmetizationType> &bp,
-                            const std::size_t components_amount = 1) {    
+                template<typename ComponentType, typename BlueprintType>
+                std::uint32_t allocate(
+                    ComponentType component_instance,
+                    BlueprintType &bp,
+                    const std::uint32_t components_amount = 1) {    
 
-                    return bp.allocate_rows(ComponentType::rows_amount * components_amount);
+                    return bp.allocate_rows(component_instance.rows_amount() * components_amount);
                 }
 
             }    // namespace components
