@@ -95,7 +95,7 @@ namespace nil {
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
-                    using div_component = zk::components::division_or_zero<ArithmetizationType, W0, W1, W2, W3>;
+                    using div_component = zk::components::division_or_zero<ArithmetizationType, W0, W1, W2, W3, W4>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f30;
