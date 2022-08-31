@@ -80,7 +80,12 @@ namespace nil {
                             tau_powers_g2(tau_powers_g2),
                             alpha_tau_powers_g1(alpha_tau_powers_g1),
                             beta_tau_powers_g1(beta_tau_powers_g1),
-                            beta_g2(beta_g2) {}
+                            beta_g2(beta_g2) {
+                                BOOST_ASSERT(tau_powers_g1.size() == tau_powers_g1_length);
+                                BOOST_ASSERT(tau_powers_g2.size() == tau_powers_length);
+                                BOOST_ASSERT(alpha_tau_powers_g1.size() == tau_powers_length);
+                                BOOST_ASSERT(beta_tau_powers_g1.size() == tau_powers_length);
+                            }
 
                         void transform(const private_key_type &key) {
                             std::vector<field_value_type> taupowers;
