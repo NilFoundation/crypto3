@@ -36,9 +36,17 @@ namespace nil {
                     struct r1cs_gg_ppzksnark_mpc_public_key {
                         typedef CurveType curve_type;
                         typedef commitments::detail::element_pok<CurveType> pok_type;
+                        typedef typename curve_type::g1_type<>::value_type g1_value_type;
 
-                        typename curve_type::g1_type<>::value_type delta_after;
+                        g1_value_type delta_after;
                         pok_type delta_pok;
+
+                        r1cs_gg_ppzksnark_mpc_public_key(
+                            g1_value_type delta_after,
+                            pok_type delta_pok
+                        ) :  delta_after(delta_after), delta_pok(delta_pok)
+                        {}
+
                     };
                 } // detail
             }   // commitments
