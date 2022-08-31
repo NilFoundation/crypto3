@@ -30,27 +30,34 @@
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
-#include <map>
+#include <unordered_map>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                enum argument_type;
+
                 template<typename FieldType>
                 struct Alphas {
                     /// The next power of alpha to use
                     /// the end result will be [1, alpha^{next_power - 1}]
-                    std::size_t next_power;
+                    int next_power;
                     /// The mapping between constraint types and powers of alpha
                     //                    std::map<argument_type, std::pair<uint32_t, uint32_t>> mapping;
                     /// The powers of alpha: 1, alpha, alpha^2, etc.
                     /// If set to [Some], you can't register new constraints.
                     std::vector<typename FieldType::value_type> alphas;
+                    std::unordered_map<argument_type, std::pair<int, int>> mapping; 
 
                     Alphas() : next_power(0) {}
                     // Create alphas from 0 to next_power - 1
 
-                    void register_(std::size_t power){
+                    void register_(argument_type arg, int power){
+                        if(mapping.find(arg) == mapping.end()){
+                            mapping[arg] = std::make_pair(next_power, power);
+                        }
+                        
                         next_power += power;
                     }
 
@@ -67,9 +74,14 @@ namespace nil {
                     }
 
                     // Return num alphas
-                    std::vector<typename FieldType::value_type> get_alphas(std::size_t num) {
-                        BOOST_ASSERT_MSG(num <= alphas.size(), "Not enough alphas to return");
-                        return std::vector(alphas.begin(), alphas.begin() + num);
+                    std::vector<typename FieldType::value_type> get_alphas(argument_type arg, std::size_t num) {
+                        if(mapping.find(arg) == mapping.end()){
+                            assert(false);
+                        }
+                        std::pair<int, int> range = mapping[arg];
+                        BOOST_ASSERT_MSG(num <= range.second, "Not enough alphas to return");
+
+                        return std::vector(alphas.begin() + range.first, alphas.begin() + range.first + num);
                     }
                 };
             }    // namespace snark

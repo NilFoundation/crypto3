@@ -120,7 +120,7 @@ namespace nil {
                         // permutation
                         typename scalar_field_type::value_type zkp = index.zkpm.evaluate(oracles_res.oracles.zeta);
 
-                        std::vector<typename scalar_field_type::value_type> alphas = oracles_res.all_alphas.get_alphas(kimchi_constant::CONSTRAINTS);
+                        std::vector<typename scalar_field_type::value_type> alphas = oracles_res.all_alphas.get_alphas(argument_type::Permutation, kimchi_constant::CONSTRAINTS);
 
                         std::vector<commitment_type> commitments = {index.sigma_comm[PERMUTES - 1]};
                         std::vector<typename scalar_field_type::value_type> scalars = {ConstraintSystem<scalar_field_type>::perm_scalars(evals, oracles_res.oracles.beta,

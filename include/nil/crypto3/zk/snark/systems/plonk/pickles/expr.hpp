@@ -101,7 +101,6 @@ namespace nil {
                         return temp_eval.generic_selector;
                     }
 
-                    assert(false);
                     return typename FieldType::value_type();
                 }
 
@@ -157,7 +156,6 @@ namespace nil {
                                                             std::vector<proof_evaluation_type<typename FieldType::value_type>>& evals,
                                                             Constants<FieldType>& c){
                         std::vector<typename FieldType::value_type> stack, cache;
-                        int i = 0;
                         for(auto &t : toks){
                             if(t.token == token_type::Alpha){
                                 stack.push_back(c.alpha);

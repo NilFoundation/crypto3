@@ -186,6 +186,8 @@ BOOST_AUTO_TEST_CASE(pickles_proof_struct_test_suite) {
     proof.ft_eval1 = 0x01AEC83A8925441906ED7C843289815B1F2098EBE21BA2EC9C9BDE738323A79C_cppui256;
     
     index.domain = math::basic_radix2_domain<scalar_field_type>(64);
+    index.domain.omega = 0x1868CA50534A180D97FF23A878E088B0B9569C85B0A15D666C23DED157FCEEBA_cppui256;
+    // std::cout << "index domain size " << index.domain.size() << '\n';
     index.max_poly_size = 64;
     index.max_quot_size = 448;
 
@@ -1928,7 +1930,8 @@ BOOST_AUTO_TEST_CASE(pickles_proof_struct_test_suite) {
           PolishToken<scalar_field_type>(token_type::Mul),
         })),
     };
-    index.powers_of_alpha.register_(24);
+    index.powers_of_alpha.register_(argument_type::GateType, 21);
+    index.powers_of_alpha.register_(argument_type::Permutation, 3);
 
     group_map<curve_type> g_map;
     BOOST_CHECK(verifier<curve_type>::verify(g_map, index, proof));

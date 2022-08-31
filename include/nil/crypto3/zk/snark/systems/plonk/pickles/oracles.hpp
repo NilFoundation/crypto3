@@ -213,7 +213,6 @@ namespace nil {
                         fq_sponge.absorb_g(proof.commitments.lookup.aggreg.unshifted);
                     }
 
-                    fq_sponge.absorb_g(proof.commitments.z_comm.unshifted);
 
                     //~ 9. Absorb the commitment to the permutation trace with the Fq-Sponge.
                     fq_sponge.absorb_g(proof.commitments.z_comm.unshifted);
@@ -223,7 +222,6 @@ namespace nil {
 
                     //~ 11. Derive $\alpha$ from $\alpha'$ using the endomorphism (TODO: details).
                     typename scalar_field_type::value_type alpha = alpha_chal.to_field(index.srs.endo_r);
-
                     //~ 12. Enforce that the length of the $t$ commitment is of size `PERMUTS`.
                     BOOST_ASSERT_MSG(proof.commitments.t_comm.unshifted.size() == kimchi_constant::PERMUTES,
                                     "IncorrectCommitmentLength(t)");
@@ -252,17 +250,19 @@ namespace nil {
                     // retrieve ranges for the powers of alphas
 
                     std::vector<typename scalar_field_type::value_type> w;
-                    w.reserve(index.domain.size());
-                    w.push_back(scalar_field_type::value_type::one());
+                    w.reserve(proof.public_input.size());
+                    if(proof.public_input.size() > 0){
+                        w.push_back(scalar_field_type::value_type::one());
+                    }
 
                     Alphas<scalar_field_type> all_alphas = index.powers_of_alpha;
                     
                     all_alphas.instantiate(alpha);
                     
-                    for(int i = 1; i < index.domain.size(); ++i){
+                    for(int i = 0; i < proof.public_input.size(); ++i){
                         w.push_back(w.back() * index.domain.omega);
                     }
-            
+
                     // compute Lagrange base evaluation denominators
                     std::vector<typename scalar_field_type::value_type> zeta_minus_x;
                     for (auto &i : w) {
@@ -297,6 +297,8 @@ namespace nil {
 
                         p_eval[0].push_back(tmp * (zeta1 - scalar_field_type::value_type::one()) * size_inv);
                         p_eval[1].push_back(tmp * (zetaw.pow(n) - scalar_field_type::value_type::one()) * size_inv);
+                    } else{
+                        p_eval.resize(2);
                     }
 
                     //~ 19. Absorb all the polynomial evaluations in $\zeta$ and $\zeta\omega$:
@@ -355,16 +357,15 @@ namespace nil {
                     };
 
                     //~ 26. Compute the evaluation of $ft(\zeta)$.
-                    typename scalar_field_type::value_type ft_eval0;
                     typename scalar_field_type::value_type zkp = index.zkpm.evaluate(zeta);
                     typename scalar_field_type::value_type zeta1m1 = zeta1 - scalar_field_type::value_type::one();
 
-                    std::vector<typename scalar_field_type::value_type> alpha_powers = all_alphas.get_alphas(kimchi_constant::CONSTRAINTS);
+                    std::vector<typename scalar_field_type::value_type> alpha_powers = all_alphas.get_alphas(argument_type::Permutation, kimchi_constant::CONSTRAINTS);
                     typename scalar_field_type::value_type alpha0 = alpha_powers[0];
                     typename scalar_field_type::value_type alpha1 = alpha_powers[1];
                     typename scalar_field_type::value_type alpha2 = alpha_powers[2];
 
-                    typename scalar_field_type::value_type init = (evals[0].w[kimchi_constant::PERMUTES - 1] + gamma) * evals[1].z * alpha0 * zkp;
+                    typename scalar_field_type::value_type ft_eval0 = (evals[0].w[kimchi_constant::PERMUTES - 1] + gamma) * evals[1].z * alpha0 * zkp;
                     for (size_t i = 0; i < evals[0].s.size(); ++i) {
                         ft_eval0 *= (beta * evals[0].s[i]) + evals[0].w[i] + gamma;
                     }
@@ -377,7 +378,7 @@ namespace nil {
                     }
 
                     typename scalar_field_type::value_type tmp = alpha0 * zkp * evals[0].z;
-                    for (size_t i = 0; i < evals[0].w.size(); ++i) {
+                    for (size_t i = 0; i < std::min(evals[0].w.size(), index.shift.size()); ++i) {
                         tmp *= gamma + (beta * zeta * index.shift[i]) + evals[0].w[i];
                     }
 
@@ -393,7 +394,6 @@ namespace nil {
 
                     Constants<scalar_field_type> cs{alpha, beta, gamma, std::get<1>(joint_combiner), index.endo, index.fr_sponge_params.mds};
 
-                    std::cout << "size is " << index.linearization.constant_term.size() << '\n';
                     ft_eval0 -=
                         PolishToken<scalar_field_type>::evaluate(index.linearization.constant_term, index.domain, zeta, evals, cs);
 
@@ -406,7 +406,7 @@ namespace nil {
                     }
 
                     es.emplace_back(evaluation_type(commitment_type(), p_eval, -1), -1);
-                    std::vector<std::vector<typename scalar_field_type::value_type>> ft_eval = {{ft_eval0, proof.ft_eval1}}; 
+                    std::vector<std::vector<typename scalar_field_type::value_type>> ft_eval = {{ft_eval0}, {proof.ft_eval1}}; 
                     es.emplace_back(evaluation_type(commitment_type(), ft_eval, -1), -1);
 
                     std::vector<std::vector<typename scalar_field_type::value_type>> z;

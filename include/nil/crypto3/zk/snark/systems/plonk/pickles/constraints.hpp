@@ -21,7 +21,7 @@ namespace nil {
                                 value_type& gamma, std::vector<value_type>& alphas, 
                                 value_type& zkp_zeta){
                         value_type res = e[1].z * beta * alphas.front() * zkp_zeta;
-                        for(int i = 0; i < e[0].w.size(); ++i){
+                        for(int i = 0; i < std::min(e[0].w.size(), e[0].s.size()); ++i){
                             res *= (gamma + (beta * e[0].s[i]) + e[0].w[i]);
                         }
 
