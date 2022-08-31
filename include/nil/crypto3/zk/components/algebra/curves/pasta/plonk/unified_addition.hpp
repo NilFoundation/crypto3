@@ -254,6 +254,10 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type params,
                                                   const std::size_t start_row_index) {
+                            bp.add_copy_constraint({params.P.x, var(W0, start_row_index, false)});
+                            bp.add_copy_constraint({params.P.y, var(W1, start_row_index, false)});
+                            bp.add_copy_constraint({params.Q.x, var(W2, start_row_index, false)});
+                            bp.add_copy_constraint({params.Q.y, var(W3, start_row_index, false)});
                     }
                 };
             }    // namespace components

@@ -216,7 +216,7 @@ namespace nil {
 
                         assert(bases_idx == final_msm_size);
 
-                        auto res = msm_component::generate_assignments(assignment, {params.fr_output.scalars, bases}, row);
+                        auto res = msm_component::generate_assignments(assignment, {params.fr_output.scalars, bases}, row).output;
                         row += msm_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);
@@ -281,7 +281,7 @@ namespace nil {
 
                         assert(bases_idx == final_msm_size);
 
-                        auto res = msm_component::generate_circuit(bp, assignment, {params.fr_output.scalars, bases}, row);
+                        auto res = msm_component::generate_circuit(bp, assignment, {params.fr_output.scalars, bases}, row).output;
                         row += msm_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);

@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/map_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/table_commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/column_type.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/index_term_type.hpp>
 
@@ -109,6 +110,8 @@ namespace nil {
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using const_mul_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
+                    using table_comm_component = zk::components::table_commitment<ArithmetizationType, 
+                        KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using proof_type = kimchi_proof_base<BlueprintFieldType, KimchiParamsType>;
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
@@ -150,10 +153,6 @@ namespace nil {
                     using commitment_type = typename 
                         zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             KimchiCommitmentParamsType::shifted_commitment_split>;
-
-                    using w_comm_type = typename 
-                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
-                            KimchiCommitmentParamsType::w_comm_size>;
 
                     using batch_verify_component =
                         zk::components::batch_verify_base_field<ArithmetizationType, CurveType, 
@@ -238,6 +237,10 @@ namespace nil {
                             row+=const_mul_component::rows_amount;
 
                             row+=add_component::rows_amount;
+
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                row += table_comm_component::rows_amount;
+                            }
                         }
 
                         row += batch_verify_component::rows_amount;
@@ -402,7 +405,7 @@ namespace nil {
 
                             // p_comm is always the commitment of size 1
                             auto p_comm_unshifted = lagrange_msm_component::generate_assignments(assignment, 
-                                {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).sum;
+                                {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).output;
                             row = row + lagrange_msm_component::rows_amount;
 
                             //Oracles
@@ -498,7 +501,7 @@ namespace nil {
                                     }
                                 }
                                 auto res = msm_component::generate_assignments(assignment, {scalars, bases}, row);
-                                f_comm[j] = {res.sum.X, res.sum.Y};
+                                f_comm[j] = {res.output.X, res.output.Y};
                                 row += msm_component::rows_amount;
                             }
 
@@ -548,6 +551,9 @@ namespace nil {
                                  {chuncked_f_comm.X, chuncked_f_comm.Y}}, row);
                             row+=add_component::rows_amount;
                             commitment_type ft_comm = {{{ft_comm_part.X, ft_comm_part.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
 
                             
                             // evaluations
@@ -560,8 +566,10 @@ namespace nil {
                                 evaluations[eval_idx++] = chal;
                             }
 
-                            //commitment_type p_comm = {none, p_comm_unshifted};
                             commitment_type p_comm = {{{p_comm_unshifted.X, p_comm_unshifted.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
                             evaluations[eval_idx++] = p_comm;
                             evaluations[eval_idx++] = ft_comm;
                             evaluations[eval_idx++] = params.proofs[i].comm.z;
@@ -575,18 +583,26 @@ namespace nil {
                                 evaluations[eval_idx++] = params.verifier_index.comm.sigma[j];
                             }
 
-                            //to-do lookups
-                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
-                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
-                            // }
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.table;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
+                                }
+
+                                evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
+
+                                evaluations[eval_idx++] = table_comm_component::generate_assignments(assignment, 
+                                    {params.verifier_index.comm.lookup_table, joint_combiner, params.proofs[i].comm.lookup_runtime}, row).output;
+                                row += table_comm_component::rows_amount;
+
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                                }
+                            }
 
                             assert(eval_idx == kimchi_constants::evaluations_in_batch_size);
 
-                            batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
-                                params.proofs[i].o};
+                            batch_proof_type p = {{evaluations},
+                                params.proofs[i].o, transcript};
                         
                             batch_proofs[i] = p;
                         }
@@ -618,7 +634,7 @@ namespace nil {
                         std::array<batch_proof_type, BatchSize> batch_proofs;
                         for(std::size_t i = 0; i < BatchSize; i++) {
                             auto p_comm_unshifted = lagrange_msm_component::generate_circuit(bp, assignment,
-                                 {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).sum;
+                                 {params.fr_data.neg_pub, params.verifier_index.lagrange_bases}, row).output;
                             row = row + lagrange_msm_component::rows_amount;
 
                             std::size_t row_tmp = row;
@@ -715,7 +731,7 @@ namespace nil {
                                     }
                                 }
                                 auto res = msm_component::generate_circuit(bp, assignment, {scalars, bases}, row);
-                                f_comm[j] = {res.sum.X, res.sum.Y};
+                                f_comm[j] = {res.output.X, res.output.Y};
                                 row += msm_component::rows_amount;
                             }
 
@@ -765,17 +781,22 @@ namespace nil {
                                  {chuncked_f_comm.X, chuncked_f_comm.Y}}, row);
                             row+=add_component::rows_amount;
                             commitment_type ft_comm = {{{ft_comm_part.X, ft_comm_part.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
 
                             // evaluations
-
                             std::array<commitment_type,
                                 kimchi_constants::evaluations_in_batch_size> evaluations;
                             std::size_t eval_idx = 0;
                             for (auto chal : params.proofs[i].comm.prev_challenges) {
                                 evaluations[eval_idx++] = chal;
                             }
-                            //commitment_type p_comm = {none, p_comm_unshifted};
+
                             commitment_type p_comm = {{{p_comm_unshifted.X, p_comm_unshifted.Y}}};
+                            for (std::size_t j = 1; j < KimchiParamsType::commitment_params_type::shifted_commitment_split; j++) {
+                                ft_comm.parts[j] = {zero, zero};
+                            }
                             evaluations[eval_idx++] = p_comm;
                             evaluations[eval_idx++] = ft_comm;
                             evaluations[eval_idx++] = params.proofs[i].comm.z;
@@ -789,17 +810,26 @@ namespace nil {
                                 evaluations[eval_idx++] = params.verifier_index.comm.sigma[j];
                             }
 
-                            // for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
-                            //     evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
-                            // }
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.table;
-                            // evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                            if (KimchiParamsType::circuit_params::use_lookup) {
+                                for(std::size_t j = 0; j < params.proofs[i].comm.lookup_sorted.size(); j++){
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_sorted[j];
+                                }
+
+                                evaluations[eval_idx++] = params.proofs[i].comm.lookup_agg;
+
+                                evaluations[eval_idx++] = table_comm_component::generate_circuit(bp, assignment, 
+                                    {params.verifier_index.comm.lookup_table, joint_combiner, params.proofs[i].comm.lookup_runtime}, row).output;
+                                row += table_comm_component::rows_amount;
+
+                                if (KimchiParamsType::circuit_params::lookup_runtime) {
+                                    evaluations[eval_idx++] = params.proofs[i].comm.lookup_runtime;
+                                }
+                            }
 
                             assert(eval_idx == kimchi_constants::evaluations_in_batch_size);
 
-                            batch_proof_type p = {/*params.proofs[i].transcript,*/ {evaluations},
-                                params.proofs[i].o};
+                            batch_proof_type p = {{evaluations},
+                                params.proofs[i].o, transcript};
                             
                             batch_proofs[i] = p;
                         }

@@ -51,7 +51,7 @@ namespace nil {
                 // Fiat-Shamir transfotmation (scalar field part)
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L81
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, std::size_t... WireIndexes>
-                class kimchi_transcript;
+                class kimchi_transcript_fr;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
@@ -72,7 +72,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class kimchi_transcript<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class kimchi_transcript_fr<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                         CurveType,
                                         KimchiParamsType,
                                         W0,
@@ -104,7 +104,8 @@ namespace nil {
 
                     sponge_component sponge;
                     using pack = from_limbs<ArithmetizationType, W0, W1, W2>;
-                    using unpack = to_limbs<ArithmetizationType, W0, W1, W2, W3, W4>;
+                    using unpack = to_limbs<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                        W9, W10, W11, W12, W13, W14>;
 
                     std::vector<var> last_squeezed;
 

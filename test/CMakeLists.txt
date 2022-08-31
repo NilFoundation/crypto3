@@ -122,6 +122,7 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/element_powers"
     "algebra/fields/plonk/exponentiation"
     "algebra/fields/plonk/sqrt"
+    "algebra/fields/plonk/range_check"
     )
 
 set(FIELDS_TESTS_FILES

@@ -167,7 +167,7 @@ namespace nil {
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value>::type
             test_component(typename ComponentType::params_type params, const PublicInput &public_input,
-                           FunctorResultCheck result_check) {
+                           FunctorResultCheck result_check, bool verification_result = true) {
 
             using placeholder_params =
                 zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
@@ -185,7 +185,11 @@ namespace nil {
 #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             profiling(assignments);
 #endif
-            BOOST_CHECK(verifier_res);
+            if(verification_result) {
+                BOOST_CHECK(verifier_res);
+            } else {
+                BOOST_CHECK(!verifier_res);
+            }
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
@@ -195,7 +199,7 @@ namespace nil {
                                   typename std::iterator_traits<typename PublicInput::iterator>::value_type>::value,
                      bool>::type = true>
         auto create_component_proof(typename ComponentType::params_type params, const PublicInput &public_input,
-                                    const FunctorResultCheck &result_check) {
+                                    const FunctorResultCheck &result_check, bool verification_result = true) {
 
             using placeholder_params =
                 zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
@@ -209,7 +213,11 @@ namespace nil {
 
             bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
                 public_preprocessed_data, proof, bp, fri_params);
-            BOOST_CHECK(verifier_res);
+            if (verification_result) {
+                BOOST_CHECK(verifier_res);
+            } else {
+                BOOST_CHECK(!verifier_res);
+            }
             return std::make_tuple(proof, fri_params, public_preprocessed_data, bp);
         }
     }    // namespace crypto3

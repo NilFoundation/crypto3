@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    constexpr std::size_t WitnessColumns = 4;
+    constexpr std::size_t WitnessColumns = 5;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 1;
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::division_or_zero<ArithmetizationType, 0, 1, 2, 3>;
+    using component_type = zk::components::division_or_zero<ArithmetizationType, 0, 1, 2, 3, 4>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 0;

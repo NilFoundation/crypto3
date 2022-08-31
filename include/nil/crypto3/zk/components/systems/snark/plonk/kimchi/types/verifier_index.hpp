@@ -82,6 +82,7 @@ namespace nil {
                         std::vector<commitment_type> selectors;
                         std::vector<commitment_type> lookup_selectors;
                         commitment_type runtime_tables_selector;
+                        std::vector<commitment_type> lookup_table;
                         commitment_type complete_add;
                         commitment_type var_base_mul;
                         commitment_type endo_mul;

@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zkpm_evaluate.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/zk_w3.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/alpha_argument_type.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
@@ -114,7 +115,7 @@ namespace nil {
 
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
 
-                    using index_terms_list = KimchiParamsType::circuit_params::index_terms_list<ArithmetizationType>;
+                    using index_terms_list = typename KimchiParamsType::circuit_params::index_terms_list;
                     using constant_term_component = zk::components::rpn_expression<ArithmetizationType, KimchiParamsType, 
                                 index_terms_list::constatnt_term_rows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
