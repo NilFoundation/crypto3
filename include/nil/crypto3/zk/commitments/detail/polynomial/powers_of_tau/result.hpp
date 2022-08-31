@@ -79,11 +79,11 @@ namespace nil {
                             auto alpha_g1 = acc.alpha_tau_powers_g1[0];
                             auto beta_g1 = acc.beta_tau_powers_g1[0];
                             auto beta_g2 = acc.beta_g2; 
-                            
-                            BOOST_ASSERT(m <= TauPowersLength);
-                            
+                                                        
                             auto domain_g1 = math::make_evaluation_domain<scalar_field_type, g1_value_type>(m);
                             auto domain_g2 = math::make_evaluation_domain<scalar_field_type, g2_value_type>(m);
+                            
+                            BOOST_ASSERT(domain_g1->m <= TauPowersLength);
 
                             std::vector<g1_value_type> coeffs_g1 = domain_g1->evaluate_all_lagrange_polynomials(acc.tau_powers_g1.begin(), acc.tau_powers_g1.end());
                             
