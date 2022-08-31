@@ -100,9 +100,9 @@ namespace nil {
 
                     static inline math::polynomial<typename FieldType::value_type> quotient_polynomial(
                         const typename public_preprocessor_type::preprocessed_data_type preprocessed_public_data,
-                        std::array<math::polynomial<typename FieldType::value_type>, f_parts>
-                            F,
+                        std::array<math::polynomial<typename FieldType::value_type>, f_parts>  F,
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
+
                         // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
                         std::array<typename FieldType::value_type, f_parts> alphas =
                             transcript.template challenges<FieldType, f_parts>();
@@ -110,6 +110,7 @@ namespace nil {
                         // 7.2. Compute F_consolidated
                         math::polynomial<typename FieldType::value_type> F_consolidated = {0};
                         for (std::size_t i = 0; i < f_parts; i++) {
+                            if( F[i].size() == 0) continue;
                             F_consolidated = F_consolidated + alphas[i] * F[i];
                         }
 
@@ -138,7 +139,6 @@ namespace nil {
                             std::chrono::high_resolution_clock::now() - last);
                         std::cout << "Placeholder prover:" << std::endl;
 #endif
-
                         placeholder_proof<FieldType, ParamsType> proof;
 
                         plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
@@ -249,7 +249,6 @@ namespace nil {
                                   << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-
                         /////TEST
 #ifdef ZK_PLACEHOLDER_DEBUG_ENABLED
                         for (std::size_t i = 0; i < f_parts; i++) {
@@ -284,7 +283,7 @@ namespace nil {
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        /////
+                        ///// TODO Bug is here
                         // 7. Aggregate quotient polynomial
                         math::polynomial<typename FieldType::value_type> T =
                             quotient_polynomial(preprocessed_public_data, F, transcript);

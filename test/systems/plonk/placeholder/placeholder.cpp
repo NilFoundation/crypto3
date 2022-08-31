@@ -608,7 +608,6 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 }
 
 BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test) {
-
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit =
         circuit_test_3<FieldType>();
 
