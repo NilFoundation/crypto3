@@ -71,6 +71,22 @@ namespace nil {
                             beta_tau_powers_g1(tau_powers_length, g1_value_type::one()),
                             beta_g2(g2_value_type::one()) {}
 
+                        powers_of_tau_accumulator(std::vector<g1_value_type> tau_powers_g1,
+                                                  std::vector<g2_value_type> tau_powers_g2,
+                                                  std::vector<g1_value_type> alpha_tau_powers_g1,
+                                                  std::vector<g1_value_type> beta_tau_powers_g1,
+                                                  g2_value_type beta_g2) : 
+                            tau_powers_g1(tau_powers_g1),
+                            tau_powers_g2(tau_powers_g2),
+                            alpha_tau_powers_g1(alpha_tau_powers_g1),
+                            beta_tau_powers_g1(beta_tau_powers_g1),
+                            beta_g2(beta_g2) {
+                                BOOST_ASSERT(tau_powers_g1.size() == tau_powers_g1_length);
+                                BOOST_ASSERT(tau_powers_g2.size() == tau_powers_length);
+                                BOOST_ASSERT(alpha_tau_powers_g1.size() == tau_powers_length);
+                                BOOST_ASSERT(beta_tau_powers_g1.size() == tau_powers_length);
+                            }
+
                         void transform(const private_key_type &key) {
                             std::vector<field_value_type> taupowers;
 
