@@ -50,7 +50,7 @@ namespace nil {
 
                 /************************* PLONK constraint system ****************************/
 
-                template<typename FieldType, typename ArithmetizationParams>
+                template<typename FieldType>
                 struct plonk_constraint_system {
                     typedef std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates_type;
                     typedef std::vector<plonk_copy_constraint<FieldType>> copy_constraints_type;

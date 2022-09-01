@@ -40,115 +40,121 @@ namespace nil {
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
                 struct plonk_private_table {
 
+                    using witnesses_container_type = std::array<ColumnType, ArithmetizationParams::WitnessColumns>;
+
                 protected:
 
-                    std::array<ColumnType, ArithmetizationParams::WitnessColumns> witness_columns;
+                    witnesses_container_type _witness;
 
                 public:
                     plonk_private_table(
-                        std::array<ColumnType,
-                            ArithmetizationParams::WitnessColumns> witness_columns = {}) :
-                        witness_columns(witness_columns) {
+                        witnesses_container_type witness_columns = {}) :
+                        _witness(witness_columns) {
                     }
 
-                    ColumnType witness(std::size_t index) const {
+                    constexpr std::size_t witness_size() {
+                        return _witness.size();
+                    }
+
+                    ColumnType witness(std::uint32_t index) const {
                         assert(index < ArithmetizationParams::WitnessColumns);
-                        return witness_columns[index];
+                        return _witness[index];
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::WitnessColumns> witnesses() const {
-                        return witness_columns;
+                    witnesses_container_type witnesses() const {
+                        return _witness;
                     }
 
-                    ColumnType operator[](std::size_t index) const {
+                    ColumnType operator[](std::uint32_t index) const {
                         if (index < ArithmetizationParams::WitnessColumns)
-                            return witness_columns[index];
+                            return _witness[index];
                         index -= ArithmetizationParams::WitnessColumns;
                     }
 
                     constexpr std::size_t size() const {
-                        return witness_columns.size();
+                        return _witness.size();
                     }
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
                 struct plonk_public_table {
 
+                    using public_input_container_type = std::array<ColumnType, ArithmetizationParams::PublicInputColumns>;
+                    using constant_container_type = std::array<ColumnType, ArithmetizationParams::ConstantColumns>;
+                    using selector_container_type = std::array<ColumnType, ArithmetizationParams::SelectorColumns>;
+
                 protected:
 
-                    std::array<ColumnType, ArithmetizationParams::PublicInputColumns> public_input_columns;
-                    std::array<ColumnType, ArithmetizationParams::ConstantColumns> constant_columns;
-                    std::array<ColumnType, ArithmetizationParams::SelectorColumns> selector_columns;
+                    public_input_container_type _public_inputs;
+                    constant_container_type _constants;
+                    selector_container_type _selectors;
 
                 public:
                     plonk_public_table(
-                        std::array<ColumnType,
-                            ArithmetizationParams::PublicInputColumns> public_input_columns = {},
-                        std::array<ColumnType,
-                            ArithmetizationParams::ConstantColumns> constant_columns = {},
-                        std::array<ColumnType,
-                            ArithmetizationParams::SelectorColumns> selector_columns = {}) :
-                        public_input_columns(public_input_columns),
-                        constant_columns(constant_columns),
-                        selector_columns(selector_columns) {
+                        public_input_container_type public_input_columns = {},
+                        constant_container_type constant_columns = {},
+                        selector_container_type selector_columns = {}) :
+                        _public_inputs(public_input_columns),
+                        _constants(constant_columns),
+                        _selectors(selector_columns) {
                     }
 
-                    ColumnType public_input(std::size_t index) const {
-                        assert(index < ArithmetizationParams::PublicInputColumns);
-                        return public_input_columns[index];
+                    constexpr std::size_t public_input_size() {
+                        return _public_inputs.size();
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::PublicInputColumns> public_inputs() const {
-                        return public_input_columns;
+                    ColumnType public_input(std::uint32_t index) const {
+                        assert(index < public_input_size());
+                        return _public_inputs[index];
                     }
 
-                    std::size_t public_input_size() {
-                        return public_input_columns.size();
+                    public_input_container_type public_inputs() const {
+                        return _public_inputs;
                     }
 
-                    ColumnType constant(std::size_t index) const {
-                        assert(index < ArithmetizationParams::ConstantColumns);
-                        return constant_columns[index];
+                    constexpr std::size_t constant_size() {
+                        return _constants.size();
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::ConstantColumns> constants() const {
-                        return constant_columns;
+                    ColumnType constant(std::uint32_t index) const {
+                        assert(index < constant_size());
+                        return _constants[index];
                     }
 
-                    std::size_t constant_size() {
-                        return constant_columns.size();
+                    constant_container_type constants() const {
+                        return _constants;
                     }
 
-                    ColumnType selector(std::size_t index) const {
-                        assert(index < ArithmetizationParams::SelectorColumns);
-                        return selector_columns[index];
+                    constexpr std::size_t selector_size() {
+                        return _selectors.size();
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::SelectorColumns> selectors() const {
-                        return selector_columns;
+                    ColumnType selector(std::uint32_t index) const {
+                        assert(index < selector_size());
+                        return _selectors[index];
                     }
 
-                    std::size_t selectors_size() {
-                        return selector_columns.size();
+                    selector_container_type selectors() const {
+                        return _selectors;
                     }
 
-                    ColumnType operator[](std::size_t index) const {
-                        if (index < ArithmetizationParams::PublicInputColumns)
-                            return public_input_columns[index];
-                        index -= ArithmetizationParams::PublicInputColumns;
-                        if (index < ArithmetizationParams::ConstantColumns)
-                            return constant_columns[index];
-                        index -= ArithmetizationParams::ConstantColumns;
-                        if (index < ArithmetizationParams::SelectorColumns) {
-                            return selector_columns[index];
+                    ColumnType operator[](std::uint32_t index) const {
+                        if (index < public_input_size())
+                            return public_input(index);
+                        index -= public_input_size();
+                        if (index < constant_size())
+                            return constant(index);
+                        index -= constant_size();
+                        if (index < selector_size()) {
+                            return selector(index);
                         }
-                        index -= ArithmetizationParams::SelectorColumns;
+                        index -= selector_size();
                     }
 
                     constexpr std::size_t size() const {
-                        return ArithmetizationParams::PublicInputColumns +
-                               ArithmetizationParams::ConstantColumns +
-                               ArithmetizationParams::SelectorColumns;
+                        return public_input_size() +
+                               constant_size() +
+                               selector_size();
                     }
                 };
 
@@ -171,23 +177,23 @@ namespace nil {
                         _private_table(private_table), _public_table(public_table) {
                     }
 
-                    ColumnType witness(std::size_t index) const {
+                    ColumnType witness(std::uint32_t index) const {
                         return _private_table.witness(index);
                     }
 
-                    ColumnType public_input(std::size_t index) const {
+                    ColumnType public_input(std::uint32_t index) const {
                         return _public_table.public_input(index);
                     }
 
-                    ColumnType constant(std::size_t index) const {
+                    ColumnType constant(std::uint32_t index) const {
                         return _public_table.constant(index);
                     }
 
-                    ColumnType selector(std::size_t index) const {
+                    ColumnType selector(std::uint32_t index) const {
                         return _public_table.selector(index);
                     }
 
-                    ColumnType operator[](std::size_t index) const {
+                    ColumnType operator[](std::uint32_t index) const {
                         if (index < _private_table.size())
                             return _private_table[index];
                         index -= _private_table.size();
