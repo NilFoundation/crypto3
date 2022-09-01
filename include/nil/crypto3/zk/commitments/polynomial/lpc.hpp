@@ -106,6 +106,7 @@ namespace nil {
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
+                    using field_type = FieldType;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
@@ -170,7 +171,8 @@ namespace nil {
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                ) {
 
                     typename LPC::proof_type::z_type z;
 
@@ -337,9 +339,9 @@ namespace nil {
                     const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
-
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                ) {
 
                     std::size_t leaf_size = g.size();
                     typename LPC::proof_type::z_type z;
@@ -431,8 +433,8 @@ namespace nil {
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
-
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                ) {
                     std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp = {evaluation_points};
                     return proof_eval<LPC>(tmp, T, g, fri_params, transcript);
                 }
@@ -485,11 +487,14 @@ namespace nil {
                                                 std::vector<typename LPC::field_type::value_type>>,
                              bool>::type = true>
                 static bool verify_eval(
-                    const ContainerType &evaluation_points,
-                    typename LPC::proof_type &proof,
-                    typename LPC::basic_fri::params_type fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+                    const ContainerType                         &evaluation_points,
+                    typename LPC::proof_type                    &proof,
+                    typename LPC::commitment_type               t_polynomials,
+                    typename LPC::basic_fri::params_type        fri_params,
+                    typename LPC::basic_fri::transcript_type    &transcript = typename LPC::basic_fri::transcript_type()) {
 
+                    if( t_polynomials != proof.T_root ) return false;
+                   
                     std::size_t leaf_size = proof.z.size();
                     std::size_t eval_size = evaluation_points.size();
 
@@ -544,7 +549,8 @@ namespace nil {
 
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
                         if (!verify_eval<typename LPC::basic_fri>(
-                                proof.fri_proof[round_id], fri_params, U, V, transcript)) {
+                                proof.fri_proof[round_id], fri_params, t_polynomials, U, V, transcript
+                        )) {
                             return false;
                         }
                     }
@@ -560,13 +566,14 @@ namespace nil {
                              bool>::type = true>
                 static bool verify_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::proof_type &proof,
-                    typename LPC::basic_fri::params_type fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+                    typename LPC::proof_type                    &proof,
+                    typename LPC::commitment_type               t_polynomials,
+                    typename LPC::basic_fri::params_type        fri_params,
+                    typename LPC::basic_fri::transcript_type    &transcript = typename LPC::basic_fri::transcript_type()) {
                     
                     std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp;
                     tmp[0] = evaluation_points;
-                    return verify_eval<LPC>(tmp, proof, fri_params, transcript);
+                    return verify_eval<LPC>(tmp, proof, t_polynomials, fri_params, transcript);
                 }
 
                 template<typename LPC,

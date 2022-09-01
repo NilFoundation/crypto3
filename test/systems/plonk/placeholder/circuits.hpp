@@ -359,9 +359,9 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_params<FieldType,
-                    arithmetization_params_3>, 4, 0> circuit_test_3() {
+                    arithmetization_params_3>, 4, 3> circuit_test_3() {
                     constexpr static const std::size_t rows_log = 4;
-                    constexpr static const std::size_t permutation = 0;
+                    constexpr static const std::size_t permutation = 3;
 
                     constexpr static const std::size_t witness_columns = witness_columns_3;
                     constexpr static const std::size_t public_columns = public_columns_3;

@@ -35,6 +35,7 @@ namespace nil {
                     template<typename CurveType>
                     struct powers_of_tau_public_key {
                         typedef CurveType curve_type;
+
                         typedef commitments::detail::element_pok<curve_type> pok_type;
 
                         pok_type tau_pok;
