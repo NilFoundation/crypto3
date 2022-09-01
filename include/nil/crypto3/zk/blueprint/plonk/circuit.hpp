@@ -49,9 +49,6 @@ namespace nil {
 
                 typedef zk::snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> &_table_description;
-
                 struct component_selectors_info{
                     std::uint32_t first_selector_index;
                     std::uint32_t selectors_amount;
@@ -67,8 +64,7 @@ namespace nil {
                 typedef BlueprintFieldType blueprint_field_type;
 
                 circuit(zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
-                    ArithmetizationType(), _table_description(table_description) {
-                    _table_description.rows_amount = 0;
+                    ArithmetizationType() {
                 }
 
                 // TODO: should put constraint in some storage and return its index

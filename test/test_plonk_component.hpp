@@ -112,6 +112,7 @@ namespace nil {
             zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
             zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
+            // TODO:there should done public input (and constants?) allocation
             std::size_t start_row = zk::components::allocate(component_instance, bp);
             if (public_input.size() > component_instance.rows_amount()) {
                 bp.allocate_rows(public_input.size() - component_instance.rows_amount());
@@ -126,10 +127,6 @@ namespace nil {
                 generate_assignments<BlueprintFieldType, ArithmetizationParams>(component_instance, assignment_bp, start_row);
             
             result_check(assignment_bp, component_result);
-
-            assignment_bp.padding();
-            std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
-            std::cout << "Padded rows: " << desc.rows_amount << std::endl;
 
             zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                                      public_assignment);
