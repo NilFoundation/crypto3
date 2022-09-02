@@ -72,6 +72,10 @@ namespace nil {
                     constexpr static const std::size_t rows_amount = add_component::rows_amount + mul_rows_amount + 1;
                     constexpr static const std::size_t gates_amount = 2;
 
+                    constexpr static const typename ArithmetizationType::field_type::value_type shifted_minus_one = 0x224698fc0994a8dd8c46eb2100000000_cppui255;
+                    constexpr static const typename ArithmetizationType::field_type::value_type shifted_zero = 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255;
+                    constexpr static const typename ArithmetizationType::field_type::value_type shifted_one = 0x224698fc0994a8dd8c46eb2100000001_cppui255;
+
                     struct params_type {
                         struct var_ec_point {
                             var x;
@@ -122,7 +126,7 @@ namespace nil {
 
                         std::size_t j = start_row_index + add_component::rows_amount;
 
-                        for (std::size_t i = j; i < j + rows_amount - 3; i = i + 2) {
+                        for (std::size_t i = j; i < j + mul_rows_amount; i = i + 2) {
                             assignment.witness(W0)[i] = T.X;
                             assignment.witness(W1)[i] = T.Y;
                             if (i == j) {
@@ -170,22 +174,22 @@ namespace nil {
                             assignment.witness(W5)[i + 1] = bits[((i - j) / 2) * 5 + 3];
                             assignment.witness(W6)[i + 1] = bits[((i - j) / 2) * 5 + 4];
                         }
-                        typename ArithmetizationType::field_type::value_type m = ((n_next - 0x224698fc0994a8dd8c46eb2100000000_cppui255)*
-                        (n_next - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*(n_next - 0x224698fc0994a8dd8c46eb2100000001_cppui255));
-                        typename ArithmetizationType::field_type::value_type t0 = m.inversed();
-                        typename ArithmetizationType::field_type::value_type t1 = (n_next - 0x224698fc0994a8dd8c46eb2100000000_cppui255).inversed();
-                        typename ArithmetizationType::field_type::value_type t2 = (n_next - 0x224698fc0994a8dd8c46eb2100000001_cppui255).inversed();
+                        typename ArithmetizationType::field_type::value_type m = ((n_next - shifted_minus_one)*
+                        (n_next - shifted_zero)*(n_next - shifted_one));
+                        typename ArithmetizationType::field_type::value_type t0 = ( m == 0 ? 0 : m.inversed());
+                        typename ArithmetizationType::field_type::value_type t1 = ((n_next - shifted_minus_one) == 0) ? 0 : (n_next - shifted_minus_one).inversed();
+                        typename ArithmetizationType::field_type::value_type t2 = ((n_next - shifted_one)       == 0) ? 0 : (n_next - shifted_one).inversed();
                         typename ArithmetizationType::field_type::value_type x;
                         typename ArithmetizationType::field_type::value_type y;
-                        if (n_next == 0x224698fc0994a8dd8c46eb2100000000_cppui255) {
+                        if (n_next == shifted_minus_one) {
                             x = T.X;
                             y = -T.Y;
                         } else  {
-                            if (n_next == 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255) {
+                            if (n_next == shifted_zero) {
                                 x = 0;
                                 y = 0;
                             } else {
-                                if (n_next == 0x224698fc0994a8dd8c46eb2100000001_cppui255) {
+                                if (n_next == shifted_one) {
                                     x = T.X;
                                     y = T.Y;
                                 } else {
@@ -405,23 +409,23 @@ namespace nil {
                                                             4 * var(W4, 0) + 2 * var(W5, 0) + var(W6, 0)));
 
                         auto constraint_17 = bp.add_constraint((var(W8, +1)*var(W2, +1) - 1) * var(W8, +1));
-                        auto constraint_18 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255));
-                        auto constraint_19 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
-                        *var(W4, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255));
+                        auto constraint_18 = bp.add_constraint(((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - 1) * (var(W5, +1) - shifted_minus_one));
+                        auto constraint_19 = bp.add_constraint(((var(W5, +1) - shifted_one)
+                        *var(W4, +1) - 1) * (var(W5, +1) - shifted_one));
                         auto constraint_20 = bp.add_constraint((var(W8, +1)*var(W2, +1)*var(W0, 0)) + 
-                        ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
-                        *var(W4, +1))* ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        ((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - (var(W5, +1) - shifted_one)
+                        *var(W4, +1))* ((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - (var(W5, +1) - shifted_one)
                         *var(W4, +1)) * var(W6, +1) - var(W0, +1));
                         auto constraint_21 = bp.add_constraint((var(W8, +1)*var(W2, +1)*var(W1, 0)) + 
-                        ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        ((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - (var(W5, +1) - shifted_one)
                         *var(W4, +1)) * var(W7, +1) - var(W1, +1));
-                        auto constraint_22 = bp.add_constraint(var(W8, +1) - ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
-                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)));
+                        auto constraint_22 = bp.add_constraint(var(W8, +1) - ((var(W5, +1) - shifted_minus_one)
+                        *(var(W5, +1) - shifted_zero)*
+                        (var(W5, +1) - shifted_one)));
                         bp.add_gate(selector_index_2,
                                     {bit_check_1,   bit_check_2,   bit_check_3,   bit_check_4,   bit_check_5,
                                      constraint_1,  constraint_2,  constraint_3,  constraint_4,  constraint_5,

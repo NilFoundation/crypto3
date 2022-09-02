@@ -714,7 +714,7 @@ namespace nil {
                 public:
                     constexpr static const std::size_t rate = 2;
                     constexpr static const std::size_t selector_seed = 0x0f05;
-                    constexpr static const std::size_t rows_amount = 12;
+                    constexpr static const std::size_t rows_amount = rounds_amount / rounds_per_row + 1;
                     constexpr static const std::size_t gates_amount = 11;
 
                     struct params_type {
@@ -777,6 +777,8 @@ namespace nil {
                         assignment.witness(W0)[row] = state[0];
                         assignment.witness(W1)[row] = state[1];
                         assignment.witness(W2)[row] = state[2];
+
+                        assert(state_size == 3);
 
                         for (std::size_t i = row; i < row + rows_amount - 1; i++) {
                             for (int j = 0; j < state_size; j++) {
