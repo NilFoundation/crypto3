@@ -598,25 +598,25 @@ namespace nil {
 
                         const std::size_t j = start_row_index;
 
-                        assignment.witness(W0)[j] = assignment.var_value(params.x);                                                      // W0 = x
-                        assignment.witness(W1)[j] = assignment.var_value(params.y);                                                      // W1 = y
+                        assignment.witness(W0)[j] = assignment.var_value(params.x);
+                        assignment.witness(W1)[j] = assignment.var_value(params.y);
                         if (assignment.var_value(params.y) != 0) {
-                            assignment.witness(W2)[j] = assignment.var_value(params.x) / assignment.var_value(params.y);                 // W2 = x/y or 0
+                            assignment.witness(W2)[j] = assignment.var_value(params.x) / assignment.var_value(params.y);
                         } else {
                             assignment.witness(W2)[j] = 0;
                         }
-                        assignment.witness(W3)[j] = assignment.var_value(params.y) == 0 ? 0 : assignment.var_value(params.y).inversed(); // W3 = 1/y or 0
+                        assignment.witness(W3)[j] = assignment.var_value(params.y) == 0 ? 0 : assignment.var_value(params.y).inversed();
 
                         return result_type(params, start_row_index);
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,    // Output: z = x / y, if y != 0 else 0
-                                               const params_type &params,                                             // Input: x, y \in Fp
+                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               const params_type &params,
                                                const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint(var(W0, 0) * var(W3, 0) - var(W2, 0));                // x*(1/y) == x/y or 0==0
-//                        auto constraint_2 = bp.add_constraint(var(W1, 0) * var(W3, 0) * var(W1, 0) - var(W1, 0));   // y*(1/y)*y == y or 0==0 // useless and hould be deleted
+                        auto constraint_1 = bp.add_constraint(var(W0, 0) * var(W3, 0) - var(W2, 0));
+                        auto constraint_2 = bp.add_constraint(var(W1, 0) * var(W3, 0) * var(W1, 0) - var(W1, 0));
 
                         bp.add_gate(first_selector_index, {constraint_1});
                     }
