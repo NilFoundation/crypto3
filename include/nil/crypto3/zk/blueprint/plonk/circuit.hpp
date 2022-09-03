@@ -49,16 +49,16 @@ namespace nil {
 
                 typedef zk::snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
-                struct component_selectors_info{
-                    std::uint32_t first_selector_index;
-                    std::uint32_t selectors_amount;
-                }            
+                using component_selector_map_type = std::unordered_map<
+                    detail::blueprint_component_id_type, std::vector<std::int32_t>>;
 
-                using selector_map_type = std::map<
-                    detail::blueprint_component_id_type, component_selectors_info>;
-                selector_map_type selector_map;
+                component_selector_map_type component_selector_map;
 
-                std::size_t next_selector_index = 0;
+                std::int32_t _next_selector_global_index = 0;
+
+                std::int32_t next_selector_global_index(){
+                    return _next_selector_global_index++;
+                }
 
             public:
                 typedef BlueprintFieldType blueprint_field_type;
@@ -67,56 +67,42 @@ namespace nil {
                     ArithmetizationType() {
                 }
 
-                // TODO: should put constraint in some storage and return its index
-                zk::snark::plonk_constraint<BlueprintFieldType>
-                    add_constraint(const zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
-                    return constraint;
+                template <typename ComponentType>
+                void add_gate(ComponentType &component_instance,
+                              std::size_t selector_serial_number,
+                              const std::initializer_list<zk::snark::plonk_constraint<BlueprintFieldType>> constraints) {
+
+                    detail::blueprint_component_id_type component_instance_id =
+                        detail::get_component_id(component_instance);
+
+                    typename component_selector_map_type::const_iterator found = component_selector_map.find(
+                        component_instance_id);
+
+                    // Component add_gate is being called for the first time
+                    if (found == component_selector_map.end()){
+                        component_selector_map[component_instance_id] = component_selector_map_type::value_type(
+                            selector_serial_number + 1, -1);
+                    }
+
+                    // Selector index container resize with default values
+                    if (find->second[selector_serial_number].size < selector_serial_number + 1){
+                        find->second[selector_serial_number].resize(selector_serial_number + 1, -1);
+                    }
+
+                    // Selector with such serial number hasn't been added yet
+                    if (find->second[selector_serial_number] == -1){
+                        find->second[selector_serial_number] = next_selector_global_index();
+
+                        this->_gates.emplace_back(find->second[selector_serial_number], constraints);
+                    }
                 }
 
                 template <typename ComponentType>
-                void add_gate(ComponentType &state,
-                              std::size_t selector_index,
-                              const zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
-                    state.increase_gates_amount(1);
-                    this->_gates.emplace_back(selector_index, constraint);
-                }
+                void add_gate(ComponentType &component_instance,
+                              std::size_t selector_serial_number,
+                              const zk::snark::plonk_constraint<BlueprintFieldType> constraint) {
 
-                template <typename ComponentType>
-                void add_gate(ComponentType &state,
-                              std::size_t selector_index,
-                              const std::initializer_list<zk::snark::plonk_constraint<BlueprintFieldType>> &constraints) {
-                    state.increase_gates_amount(1);
-                    this->_gates.emplace_back(selector_index, constraints);
-                }
-
-                template <typename ComponentType>
-                void add_gate(ComponentType &state,
-                              zk::snark::plonk_gate<BlueprintFieldType, zk::snark::plonk_constraint<BlueprintFieldType>> &gate) {
-                    state.increase_gates_amount(1);
-                    this->_gates.emplace_back(gate);
-                }
-
-                bool selector_is_allocated(const typename selector_map_type::iterator &selector_iterator) const{
-                    return selector_iterator != selector_map.end();
-                }
-
-                template <typename ComponentType>
-                selector_map_type::iterator find_selector(const ComponentType &state){
-
-                    std::string component_id = get_component_id(state);
-                    return selector_map.find(component_id);
-                }
-
-                template <typename ComponentType>
-                std::size_t allocate_selector(const ComponentType &state,
-                    std::size_t selectors_amount){
-
-                    std::string component_id = get_component_id(state);
-
-                    std::size_t selector_index = next_selector_index;
-                    selector_map[component_id] = {selector_index, selectors_amount};
-                    next_selector_index += selectors_amount;
-                    return selector_index;
+                    add_gate(component_instance, selector_serial_number, {constraint});
                 }
 
                 zk::snark::plonk_constraint<BlueprintFieldType>

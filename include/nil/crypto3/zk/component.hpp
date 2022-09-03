@@ -52,14 +52,14 @@ namespace nil {
                     using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
                     using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
                     using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
+                    using underlying_components_container_type = std::array<component*>;
                     
                 private:
 
                     witness_container_type _W;
                     constant_container_type _C;
                     public_input_container_type _PI;
-
-                    std::uint32_t _rows_amount;
+                    underlying_components_container_type _underlying_components;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
@@ -115,10 +115,6 @@ namespace nil {
                         std::copy_n(std::make_move_iterator(public_input.begin()), PublicInputAmount, _PI.begin());
                     }
 
-                    std::uint32_t rows_amount() const {
-                        return _rows_amount;
-                    }
-
                     std::size_t witness_amount() const {
                         return _W.size();
                     }
@@ -134,6 +130,22 @@ namespace nil {
                     template <typename ComponentType>
                     friend zk::detail::blueprint_component_id_type zk::detail::get_component_id (ComponentType component);
                 };
+
+                // namespace detail {
+                //     /**
+                //      * The specialized hash function for `unordered_map` PLONK component keys
+                //      */
+                //     struct component_hash {
+                //         template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
+                //             ConstantAmount, PublicInputAmount>
+                //         std::size_t operator() (const component<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
+                //                 ConstantAmount, PublicInputAmount> &node) const {
+                            
+                //         }
+                //     };
+
+                // } // namespace detail
+
 
                 template<typename BlueprintFieldType>
                 class component<snark::r1cs_constraint_system<BlueprintFieldType>> {
