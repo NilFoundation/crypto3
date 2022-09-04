@@ -61,14 +61,14 @@ namespace nil {
                 template<typename TTypeBase, typename FRIScheme>
                 using fri_math_polynomial =  field_element_vector_type<TTypeBase, typename FRIScheme::field_type::value_type>;
 
-                template<typename Endianness, typename FRIScheme>
+                template<typename Endianness, typename FRIScheme, typename Range>
                 fri_math_polynomial<nil::marshalling::field_type<Endianness>, FRIScheme>
-                fill_fri_math_polynomial(const math::polynomial<typename FRIScheme::field_type::value_type> &f){
+                fill_fri_math_polynomial(const Range &f){
                     std::vector<typename FRIScheme::field_type::value_type> val;
                     for( auto it=f.begin(); it != f.end(); it++){ val.push_back(*it); }
 
                     return nil::crypto3::marshalling::types::fill_field_element_vector<
-                        typename FRIScheme::field_type::value_type,    
+                        typename FRIScheme::field_type::value_type,
                         Endianness
                     >(val);
                 }
@@ -77,7 +77,7 @@ namespace nil {
                 math::polynomial<typename FRIScheme::field_type::value_type>
                 make_fri_math_polynomial( const fri_math_polynomial<nil::marshalling::field_type<Endianness>, FRIScheme> &filled_polynomial){
                     auto val = nil::crypto3::marshalling::types::make_field_element_vector<
-                        typename FRIScheme::field_type::value_type,    
+                        typename FRIScheme::field_type::value_type,
                         Endianness
                     >(filled_polynomial);
 
@@ -89,13 +89,13 @@ namespace nil {
                  */
                 template<typename TTypeBase, typename FRIScheme>
                 using fri_round_proof = nil::marshalling::types::bundle<
-                    TTypeBase,  
+                    TTypeBase,
                     std::tuple<
                         typename types::merkle_proof<TTypeBase,      typename FRIScheme::merkle_proof_type>,  // p,
                         typename types::merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type,  // T_root,
                         typename types::merkle_proof<TTypeBase,      typename FRIScheme::merkle_proof_type>   // colinear_path*/
-                    >      
-                >;                        
+                    >
+                >;
 
                 template<typename Endianness, typename FRIScheme>
                 fri_round_proof<nil::marshalling::field_type<Endianness>, FRIScheme>
@@ -134,7 +134,7 @@ namespace nil {
                     fri_polynomial_values<nil::marshalling::field_type<Endianness>, FRIScheme> blob;
                     for( size_t i = 0; i < values.size(); i++ ){
                         for( size_t j = 0; j < FRIScheme::m; j++){
-                            blob.value().push_back( 
+                            blob.value().push_back(
                                 field_element<nil::marshalling::field_type<Endianness>, typename FRIScheme::field_type::value_type>(values[i][j])
                             );
                         }
@@ -174,7 +174,7 @@ namespace nil {
                 fill_fri_polynomials_values(const typename FRIScheme::polynomials_values_type &values) {
                     fri_polynomials_values<nil::marshalling::field_type<Endianness>, FRIScheme> blob;
                     for( size_t i = 0; i < values.size(); i++ ){
-                        blob.value().push_back( 
+                        blob.value().push_back(
                             fill_fri_polynomial_values<Endianness, FRIScheme>(values[i])
                         );
                     }
@@ -214,7 +214,7 @@ namespace nil {
                 fill_fri_rounds_polynomials_values(const typename FRIScheme::rounds_polynomials_values_type &values) {
                     fri_rounds_polynomials_values<nil::marshalling::field_type<Endianness>, FRIScheme> blob;
                     for( size_t i = 0; i < values.size(); i++ ){
-                        blob.value().push_back( 
+                        blob.value().push_back(
                             fill_fri_polynomials_values<Endianness, FRIScheme>(values[i])
                         );
                     }
@@ -239,14 +239,14 @@ namespace nil {
                  */
                 template<typename TTypeBase, typename FRIScheme>
                 using fri_proof = nil::marshalling::types::bundle<
-                    TTypeBase,  
+                    TTypeBase,
                     std::tuple<
                         // merkle_tree::root target_commitment
                         typename types::merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type,
 
                          // std::vector<round_proof_type> round_proofs;  // 0..r-2
                          // Don't want sequense_prefix option
-                        nil::marshalling::types::array_list< 
+                        nil::marshalling::types::array_list<
                             TTypeBase, fri_round_proof<TTypeBase, FRIScheme>,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >,
@@ -256,11 +256,11 @@ namespace nil {
 
                          // std::select_container<math::polynomial> final_polynomials
                         nil::marshalling::types::array_list<
-                            TTypeBase, 
+                            TTypeBase,
                             fri_math_polynomial<TTypeBase, FRIScheme>,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >
-                    >      
+                    >
                 >;
 
                 template<typename Endianness, typename FRIScheme>
@@ -275,17 +275,17 @@ namespace nil {
                     auto filled_values = fill_fri_rounds_polynomials_values<Endianness, FRIScheme>(proof.values);
 
                     // round_proofs
-                    nil::marshalling::types::array_list< 
+                    nil::marshalling::types::array_list<
                         TTypeBase, fri_round_proof<TTypeBase, FRIScheme>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_round_proofs;
                     for( size_t i = 0; i < proof.round_proofs.size(); i++){
                         filled_round_proofs.value().push_back(fill_fri_round_proof<Endianness, FRIScheme>(proof.round_proofs[i]));
                     }
-    
+
                     // final_polynomials
                     nil::marshalling::types::array_list<
-                        TTypeBase,  
+                        TTypeBase,
                         fri_math_polynomial<TTypeBase, FRIScheme>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_final_polynomials;

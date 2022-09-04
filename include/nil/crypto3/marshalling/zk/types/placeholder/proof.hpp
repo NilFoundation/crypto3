@@ -49,10 +49,10 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 template<typename TTypeBase, typename Proof,
-                         typename = typename std::enable_if<
-                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
-                                                     typename Proof::field_type, typename Proof::params_type>>::value,
-                             bool>::type,
+//                         typename = typename std::enable_if<
+//                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
+//                                                     typename Proof::field_type, typename Proof::params_type>>::value,
+//                             bool>::type,
                          typename... TOptions>
                 using placeholder_evaluation_proof = nil::marshalling::types::bundle<
                     TTypeBase,
@@ -89,10 +89,10 @@ namespace nil {
                 >;
 
                 template<typename TTypeBase, typename Proof,
-                         typename = typename std::enable_if<
-                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
-                                                     typename Proof::field_type, typename Proof::params_type>>::value,
-                             bool>::type,
+//                         typename = typename std::enable_if<
+//                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
+//                                                     typename Proof::field_type, typename Proof::params_type>>::value,
+//                             bool>::type,
                          typename... TOptions>
                 using placeholder_proof = nil::marshalling::types::bundle<
                     TTypeBase,
