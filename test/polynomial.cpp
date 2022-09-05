@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_a) {
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
-
+    
     polynomial<typename FieldType::value_type> a = {5, 0, 0, 13, 0, 1};
     polynomial<typename FieldType::value_type> b = {0};
     polynomial<typename FieldType::value_type> c(1, FieldType::value_type::zero());
@@ -274,6 +274,16 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
     }
 }
+
+/* this should throw an assertion
+BOOST_AUTO_TEST_CASE(polynomial_multiplication_constant_a_empty_b){
+
+    polynomial<typename FieldType::value_type> a = {1};
+    polynomial<typename FieldType::value_type> b = {};
+    polynomial<typename FieldType::value_type> c(1, FieldType::value_type::zero());
+
+    c = a * b;
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()
 

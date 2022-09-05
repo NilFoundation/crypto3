@@ -165,6 +165,8 @@ namespace nil {
                 typedef typename field_value_type::field_type FieldType;
                 BOOST_STATIC_ASSERT(algebra::is_field<FieldType>::value);
                 BOOST_STATIC_ASSERT(std::is_same<typename FieldType::value_type, field_value_type>::value);
+                BOOST_ASSERT_MSG(a.size() !=0, "Uninitialized polynomial");
+                BOOST_ASSERT_MSG(b.size() !=0, "Uninitialized polynomial");
 
                 const std::size_t n = detail::power_of_two(a.size() + b.size() - 1);
                 field_value_type omega = unity_root<FieldType>(n);
