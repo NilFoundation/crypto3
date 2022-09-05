@@ -69,25 +69,31 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_complete_addition) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::complete_addition<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8>;
+    using component_type =
+        zk::components::complete_addition<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    std::array<var, 4> input_var_Xa = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> input_var_Xa = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
-    std::array<var, 4> input_var_Xb = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+    std::array<var, 4> input_var_Xb = {
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
-    std::array<var, 4> input_var_Ya = {var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input),
+    std::array<var, 4> input_var_Ya = {
+        var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input),
         var(0, 10, false, var::column_type::public_input), var(0, 11, false, var::column_type::public_input)};
-    std::array<var, 4> input_var_Yb = {var(0, 12, false, var::column_type::public_input), var(0,13, false, var::column_type::public_input),
+    std::array<var, 4> input_var_Yb = {
+        var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input),
         var(0, 14, false, var::column_type::public_input), var(0, 15, false, var::column_type::public_input)};
 
     var b = var(0, 16, false, var::column_type::public_input);
 
     typename component_type::params_type params = {{input_var_Xa, input_var_Xb}, {input_var_Ya, input_var_Yb}};
 
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<ed25519_type::template g1_type<algebra::curves::coordinates::affine>>();
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type R = algebra::random_element<ed25519_type::template g1_type<algebra::curves::coordinates::affine>>();
+    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type T =
+        algebra::random_element<ed25519_type::template g1_type<algebra::curves::coordinates::affine>>();
+    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type R =
+        algebra::random_element<ed25519_type::template g1_type<algebra::curves::coordinates::affine>>();
     ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type P = T + R;
     ed25519_type::base_field_type::integral_type Tx = ed25519_type::base_field_type::integral_type(T.X.data);
     ed25519_type::base_field_type::integral_type Ty = ed25519_type::base_field_type::integral_type(T.Y.data);
@@ -98,24 +104,28 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_complete_addition) {
     typename ed25519_type::base_field_type::integral_type base = 1;
     typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {Tx & mask, (Tx >> 66) & mask, (Tx >> 132) & mask, (Tx >> 198) & mask,
-    Ty & mask, (Ty >> 66) & mask, (Ty >> 132) & mask, (Ty >> 198) & mask,
-    Rx & mask, (Rx >> 66) & mask, (Rx >> 132) & mask, (Rx >> 198) & mask,
-    Ry & mask, (Ry >> 66) & mask, (Ry >> 132) & mask, (Ry >> 198) & mask};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {
+        Tx & mask, (Tx >> 66) & mask, (Tx >> 132) & mask, (Tx >> 198) & mask,
+        Ty & mask, (Ty >> 66) & mask, (Ty >> 132) & mask, (Ty >> 198) & mask,
+        Rx & mask, (Rx >> 66) & mask, (Rx >> 132) & mask, (Rx >> 198) & mask,
+        Ry & mask, (Ry >> 66) & mask, (Ry >> 132) & mask, (Ry >> 198) & mask};
 
-    auto result_check = [Px, Py](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-            typename ed25519_type::base_field_type::integral_type base = 1;
-            typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
-            for (std::size_t i = 0; i < 4; i++) {
-                assert(typename BlueprintFieldType::value_type((Px >>66*i) & mask) == assignment.var_value(real_res.output.x[i])); 
-                assert(typename BlueprintFieldType::value_type((Py >>66*i) & mask) == assignment.var_value(real_res.output.y[i]));
-            }
+    auto result_check = [Px, Py](AssignmentType &assignment, component_type::result_type &real_res) {
+        typename ed25519_type::base_field_type::integral_type base = 1;
+        typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
+        for (std::size_t i = 0; i < 4; i++) {
+            assert(typename BlueprintFieldType::value_type((Px >> 66 * i) & mask) ==
+                   assignment.var_value(real_res.output.x[i]));
+            assert(typename BlueprintFieldType::value_type((Py >> 66 * i) & mask) ==
+                   assignment.var_value(real_res.output.y[i]));
+        }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 

@@ -69,27 +69,31 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::non_native_field_element_subtraction<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8>;
+    using component_type = zk::components::
+        non_native_field_element_subtraction<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    std::array<var, 4> input_var_a = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> input_var_a = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
-    std::array<var, 4> input_var_b = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+    std::array<var, 4> input_var_b = {
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0x2BCA8C5A0FDF3D53E_cppui253, 0x39840DDF4C421B2D5_cppui253, 0x24FCE5728D26931CA_cppui253, 0xFBD6153B4CE63_cppui253,
-    0x3CD7BA9506A76AA1C_cppui253, 0x15C58810F101DDB2F_cppui253, 0x1AA5750251F6DA658_cppui253, 0x1323F61B67242F_cppui253};
-    //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {
+        0x2BCA8C5A0FDF3D53E_cppui253, 0x39840DDF4C421B2D5_cppui253, 0x24FCE5728D26931CA_cppui253,
+        0xFBD6153B4CE63_cppui253,     0x3CD7BA9506A76AA1C_cppui253, 0x15C58810F101DDB2F_cppui253,
+        0x1AA5750251F6DA658_cppui253, 0x1323F61B67242F_cppui253};
+    // std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
 
-    auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-    };
+    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 

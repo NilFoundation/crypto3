@@ -60,7 +60,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 //     constexpr std::size_t ConstantColumns = 1;
 //     constexpr std::size_t SelectorColumns = 5;
 //     using ArithmetizationParams =
-//         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+//         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns,
+//         SelectorColumns>;
 //     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
@@ -73,21 +74,24 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 //     std::vector<typename BlueprintFieldType::value_type> public_input = {0, 1, 2, 3, 4, 5, 6, 7};
 
-//     std::array<var, 4> x = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+//     std::array<var, 4> x = {var(0, 0, false, var::column_type::public_input), var(0, 1, false,
+//     var::column_type::public_input),
 //         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
-//     std::array<var, 4> y = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+//     std::array<var, 4> y = {var(0, 4, false, var::column_type::public_input), var(0, 5, false,
+//     var::column_type::public_input),
 //         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
 //     typename component_type::params_type params = {x, y};
-    
-//     auto result_check = [](AssignmentType &assignment, 
+
+//     auto result_check = [](AssignmentType &assignment,
 //         component_type::result_type &real_res) {
 //     };
 
-//     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+//     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params,
+//     public_input, result_check);
 
-//     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-//     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
+//     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() -
+//     start); std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 // }
 
 BOOST_AUTO_TEST_CASE(blueprint_ec_point_to_work) {
@@ -109,35 +113,42 @@ BOOST_AUTO_TEST_CASE(blueprint_ec_point_to_work) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::ec_point<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8>;
+    using component_type =
+        zk::components::ec_point<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     auto value = ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
 
     typename ed25519_type::scalar_field_type::integral_type base = 1;
     typename ed25519_type::scalar_field_type::integral_type mask = (base << 66) - 1;
 
-    typename ed25519_type::base_field_type::integral_type val_x = typename ed25519_type::base_field_type::integral_type(value.X.data);
-    std::array<typename ed25519_type::base_field_type::integral_type, 4> x = {val_x & mask, (val_x >>66) & mask, (val_x >>132) & mask, (val_x >>198) & mask};
-    typename ed25519_type::base_field_type::integral_type val_y = typename ed25519_type::base_field_type::integral_type(value.Y.data);
-    std::array<typename ed25519_type::base_field_type::integral_type, 4> y = {val_y & mask, (val_y >>66) & mask, (val_y >>132) & mask, (val_y >>198) & mask};
+    typename ed25519_type::base_field_type::integral_type val_x =
+        typename ed25519_type::base_field_type::integral_type(value.X.data);
+    std::array<typename ed25519_type::base_field_type::integral_type, 4> x = {
+        val_x & mask, (val_x >> 66) & mask, (val_x >> 132) & mask, (val_x >> 198) & mask};
+    typename ed25519_type::base_field_type::integral_type val_y =
+        typename ed25519_type::base_field_type::integral_type(value.Y.data);
+    std::array<typename ed25519_type::base_field_type::integral_type, 4> y = {
+        val_y & mask, (val_y >> 66) & mask, (val_y >> 132) & mask, (val_y >> 198) & mask};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {x[0], x[1], x[2], x[3], y[0], y[1], y[2], y[3]};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {x[0], x[1], x[2], x[3],
+                                                                         y[0], y[1], y[2], y[3]};
 
-    std::array<var, 4> xx = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> xx = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
-    std::array<var, 4> yy = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+    std::array<var, 4> yy = {
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {xx, yy};
-    
-    auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-    };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
+
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
