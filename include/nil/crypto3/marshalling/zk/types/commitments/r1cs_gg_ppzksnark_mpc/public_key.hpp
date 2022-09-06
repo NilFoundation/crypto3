@@ -40,7 +40,7 @@
 
 #include <nil/crypto3/container/accumulation_vector.hpp>
 
-#include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark/mpc_generator/public_key.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/r1cs_gg_ppzksnark_mpc/public_key.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/fast_curve_element.hpp>
 
@@ -53,10 +53,10 @@ namespace nil {
                          typename PublicKey,
                          typename = typename std::enable_if<
                              std::is_same<PublicKey,
-                                          zk::snark::r1cs_gg_ppzksnark_mpc_generator_public_key<typename PublicKey::curve_type>>::value,
+                                          zk::commitments::detail::r1cs_gg_ppzksnark_mpc_public_key<typename PublicKey::curve_type>>::value,
                              bool>::type,
                          typename... TOptions>
-                using r1cs_gg_ppzksnark_mpc_generator_public_key = nil::marshalling::types::bundle<
+                using r1cs_gg_ppzksnark_mpc_public_key = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // delta after
@@ -69,12 +69,12 @@ namespace nil {
                         fast_curve_element<TTypeBase, typename PublicKey::curve_type::template g2_type<>>>>;
 
                 template<typename PublicKey, typename Endianness>
-                r1cs_gg_ppzksnark_mpc_generator_public_key<nil::marshalling::field_type<Endianness>, PublicKey>
-                    fill_r1cs_gg_ppzksnark_mpc_generator_public_key(const PublicKey &public_key) {
+                r1cs_gg_ppzksnark_mpc_public_key<nil::marshalling::field_type<Endianness>, PublicKey>
+                    fill_r1cs_gg_ppzksnark_mpc_public_key(const PublicKey &public_key) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    return r1cs_gg_ppzksnark_mpc_generator_public_key<nil::marshalling::field_type<Endianness>, PublicKey>(
+                    return r1cs_gg_ppzksnark_mpc_public_key<nil::marshalling::field_type<Endianness>, PublicKey>(
                         std::make_tuple(
                             std::move(
                                 fill_fast_curve_element<typename PublicKey::curve_type::template g1_type<>, Endianness>(
