@@ -241,9 +241,6 @@ namespace nil {
                 using fri_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-                        // merkle_tree::root target_commitment
-                        typename types::merkle_node_value<TTypeBase, typename FRIScheme::merkle_proof_type>::type,
-
                          // std::vector<round_proof_type> round_proofs;  // 0..r-2
                          // Don't want sequense_prefix option
                         nil::marshalling::types::array_list<
@@ -268,9 +265,6 @@ namespace nil {
                 fill_fri_proof(const typename FRIScheme::proof_type &proof) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    // target_commitment
-                    auto filled_target_commitment = fill_merkle_node_value<typename FRIScheme::commitment_type, Endianness>(proof.target_commitment);
-
                     // values: y-s and colinear_values
                     auto filled_values = fill_fri_rounds_polynomials_values<Endianness, FRIScheme>(proof.values);
 
@@ -294,7 +288,6 @@ namespace nil {
                     }
 
                     return fri_proof <TTypeBase, FRIScheme>(std::tuple(
-                        filled_target_commitment,
                         filled_round_proofs,
                         filled_values,
                         filled_final_polynomials
@@ -306,19 +299,16 @@ namespace nil {
                 make_fri_proof(const fri_proof<nil::marshalling::field_type<Endianness>, FRIScheme> &filled_proof) {
                     typename FRIScheme::proof_type proof;
 
-                    auto tc = std::get<0>(filled_proof.value());
-                    proof.target_commitment = make_merkle_node_value<typename FRIScheme::commitment_type, Endianness>(tc);
-
-                    auto rp = std::get<1>(filled_proof.value());
+                    auto rp = std::get<0>(filled_proof.value());
                     proof.round_proofs.resize(rp.value().size());
                     for( size_t i = 0; i < rp.value().size(); i++){
                         proof.round_proofs[i] = make_fri_round_proof<Endianness, FRIScheme>(rp.value()[i]);
                     }
 
-                    auto vals = std::get<2>(filled_proof.value());
+                    auto vals = std::get<1>(filled_proof.value());
                     proof.values = make_fri_rounds_polynomials_values<Endianness, FRIScheme>(vals);
 
-                    auto fp = std::get<3>(filled_proof.value());
+                    auto fp = std::get<2>(filled_proof.value());
                     //proof.final_polynomials.resize(fp.value().size());
                     for( size_t i = 0; i < fp.value().size(); i++){
                         if constexpr( FRIScheme::is_const_size){

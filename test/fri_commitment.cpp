@@ -213,9 +213,6 @@ typename FRIScheme::proof_type generate_random_fri_proof(size_t polynomials, siz
         proof.final_polynomials[i] = generate_random_polynomial<typename FRIScheme::field_type>(degree/(1 << (fri_params.r-1)));
     }
 
-    proof.target_commitment =
-    nil::crypto3::hash<typename FRIScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
-
     proof.values = generate_random_fri_values<FRIScheme>(polynomials, fri_params);
 
     return proof;
