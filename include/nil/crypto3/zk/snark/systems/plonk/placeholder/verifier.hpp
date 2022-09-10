@@ -399,9 +399,15 @@ namespace nil {
                                                                   challenge.pow((fri_params.max_degree + 1) * i);
                         }
 
-                        typename FieldType::value_type Z_at_challenge =
-                            preprocessed_public_data.common_data.Z.evaluate(challenge);
-
+                        // Z is polynomial -1, 0 ...., 0, 1
+                        math::polynomial<typename FieldType::value_type> Z (std::vector<typename FieldType::value_type>(
+                            preprocessed_public_data.common_data.rows_amount + 1, 
+                            FieldType::value_type::zero()
+                        ));
+                        Z[0] = -FieldType::value_type::one();
+                        Z[Z.size()-1] = FieldType::value_type::one();
+                        typename FieldType::value_type Z_at_challenge = Z.evaluate(challenge);
+                        
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
                             return false;
                         }

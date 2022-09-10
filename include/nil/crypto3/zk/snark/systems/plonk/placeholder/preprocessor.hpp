@@ -83,7 +83,6 @@ namespace nil {
                         struct common_data_type {
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            math::polynomial<typename FieldType::value_type> Z;
                             math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
 
                             public_commitments_type commitments;
@@ -471,10 +470,6 @@ namespace nil {
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.selectors(),
                                                                                    basic_domain));
 
-                        std::vector<typename FieldType::value_type> Z(N_rows + 1, FieldType::value_type::zero());
-                        Z[0] = -FieldType::value_type::one();
-                        Z[N_rows] = FieldType::value_type::one();
-
                         // prepare commitments for short verifier
                         typename preprocessed_data_type::public_precommitments_type public_precommitments =
                             precommitments(public_polynomial_table, id_perm_polys, sigma_perm_polys, q_last_q_blind,
@@ -487,8 +482,7 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data {
-                            basic_domain, nil::crypto3::math::polynomial<typename FieldType::value_type> {Z},
-                            lagrange_0,   public_commitments,
+                            basic_domain, lagrange_0,   public_commitments,
                             c_rotations,  N_rows};
 
                         preprocessed_data_type preprocessed_data({public_polynomial_table, sigma_perm_polys,
