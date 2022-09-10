@@ -34,8 +34,6 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/marshalling/math/types/variable.hpp>
-
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
@@ -44,6 +42,10 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
+                template<typename TTypeBase, typename Variable, typename = void>
+                struct variable;
+                
+                /********************************* plonk_variable ***************************/
                 template<typename TTypeBase, typename Field>
                 struct variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<Field>> {
                     using type = nil::marshalling::types::bundle<
@@ -64,7 +66,7 @@ namespace nil {
                     std::is_same<Variable,
                                  nil::crypto3::zk::snark::plonk_variable<typename Variable::field_type>>::value,
                     typename variable<nil::marshalling::field_type<Endianness>, Variable>::type>::type
-                    fill_variable(const Variable &var) {
+                fill_variable(const Variable &var) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using result_type = typename variable<TTypeBase, Variable>::type;
                     using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
@@ -89,6 +91,41 @@ namespace nil {
                                     std::get<2>(filled_var.value()).value(),
                                     typename Variable::column_type(std::get<3>(filled_var.value()).value()));
                 }
+
+                /****************** vector of plonk_variable *************************/
+                template<typename TTypeBase, typename Field>
+                using variables = nil::marshalling::types::array_list<
+                    TTypeBase, 
+                    typename variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<Field>>::type,
+                    nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                >;
+
+                template<typename Variable, typename Endianness>
+                variables<nil::marshalling::field_type<Endianness>, typename Variable::field_type>
+                fill_variables(const std::vector<Variable> &vars) {
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using Field = typename Variable::field_type;
+
+                    variables<TTypeBase, Field> filled_vars;
+                    for (const auto &var : vars) {
+                        filled_vars.value().push_back(fill_variable<Variable, Endianness>(var));
+                    }
+
+                    return filled_vars;
+                }
+
+                template<typename Variable, typename Endianness>
+                std::vector<Variable>
+                make_variables(const variables<nil::marshalling::field_type<Endianness>, typename Variable::field_type> &filled_vars){
+                    using Field = typename Variable::field_type;
+
+                    std::vector<Variable> vars;
+                    for (std::size_t i = 0; i < filled_vars.value().size(); i++) {
+                        vars.emplace_back(make_variable<Variable, Endianness>(filled_vars.value().at(i)));
+                    }
+                    return vars;
+                }
+
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
