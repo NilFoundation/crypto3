@@ -70,6 +70,8 @@ namespace nil {
                         };
 
                         struct public_commitments_type {    // TODO: verifier needs this data
+                            using params_type = ParamsType;
+
                             typename runtime_size_commitment_scheme_type::commitment_type id_permutation;
                             typename runtime_size_commitment_scheme_type::commitment_type sigma_permutation;
                             typename public_input_commitment_scheme_type::commitment_type public_input;
@@ -81,7 +83,9 @@ namespace nil {
                         // both prover and verifier use this data
                         // fields outside of the common_data_type are used by prover
                         struct common_data_type {
-                        // marshalled
+                            using field_type = FieldType;
+                            using commitments_type = public_commitments_type;
+                            // marshalled
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
                             public_commitments_type commitments;
@@ -91,6 +95,13 @@ namespace nil {
 
                             std::size_t rows_amount;
                             std::size_t usable_rows_amount;
+
+                            // not marshalled. They are derived from other fields.
+                            math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
+                            math::polynomial<typename FieldType::value_type> Z;
+
+                            // Sometimes it's useful.
+                            common_data_type(){}
 
                             common_data_type(
                                 std::shared_ptr<math::evaluation_domain<FieldType>> D, 
@@ -105,15 +116,21 @@ namespace nil {
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())
                             ) {
                                 // Z is polynomial -1, 0,..., 0, 1
-                                this->Z[0] = -FieldType::value_type::one();
-                                this->Z[this->Z.size()-1] = FieldType::value_type::one();
+                                Z[0] = -FieldType::value_type::one();
+                                Z[Z.size()-1] = FieldType::value_type::one();
 
                                 // lagrange_0:  0,0,...,1,0,0,...,0
                                 lagrange_0[usable_rows] = FieldType::value_type::one();
                             }
-                        // not marshalled
-                            math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
-                            math::polynomial<typename FieldType::value_type> Z;
+
+                            // These operators are useful for marshalling
+                            // They will be implemented with marshalling procedures implementation
+                            bool operator==(const common_data_type &rhs) const {
+                                return rows_amount == rhs.rows_amount && usable_rows_amount == rhs.usable_rows_amount;
+                            }
+                            bool operator!=(const common_data_type &rhs) const {
+                                return !(rhs == *this);
+                            }
                         };
 
                         plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
