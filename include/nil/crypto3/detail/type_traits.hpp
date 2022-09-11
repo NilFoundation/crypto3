@@ -26,7 +26,9 @@
 #ifndef CRYPTO3_TYPE_TRAITS_HPP
 #define CRYPTO3_TYPE_TRAITS_HPP
 
+#ifndef TVM
 #include <complex>
+#endif
 
 #include <boost/tti/tti.hpp>
 
