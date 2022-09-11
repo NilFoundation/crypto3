@@ -114,16 +114,8 @@ namespace nil {
                             F_consolidated = F_consolidated + alphas[i] * F[i];
                         }
 
-                        // Z is polynomial -1, 0 ...., 0, 1
-                        math::polynomial<typename FieldType::value_type> Z (std::vector<typename FieldType::value_type>(
-                            preprocessed_public_data.common_data.rows_amount + 1, 
-                            FieldType::value_type::zero()
-                        ));
-                        Z[0] = -FieldType::value_type::one();
-                        Z[Z.size()-1] = FieldType::value_type::one();
-
                         math::polynomial<typename FieldType::value_type> T_consolidated =
-                            F_consolidated / Z;
+                            F_consolidated / preprocessed_public_data.common_data.Z;
 
                         return T_consolidated;
                     }

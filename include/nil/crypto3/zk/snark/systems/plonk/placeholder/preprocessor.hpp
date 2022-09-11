@@ -81,9 +81,8 @@ namespace nil {
                         // both prover and verifier use this data
                         // fields outside of the common_data_type are used by prover
                         struct common_data_type {
+                        // marshalled
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
-
-                            math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
 
                             public_commitments_type commitments;
 
@@ -91,6 +90,30 @@ namespace nil {
                                 columns_rotations;
 
                             std::size_t rows_amount;
+                            std::size_t usable_rows_amount;
+
+                            common_data_type(
+                                std::shared_ptr<math::evaluation_domain<FieldType>> D, 
+                                public_commitments_type commts, 
+                                std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> col_rotations,
+                                std::size_t rows,
+                                std::size_t usable_rows
+                            ):  basic_domain(D), 
+                                lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()), 
+                                commitments(commts), 
+                                columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
+                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())
+                            ) {
+                                // Z is polynomial -1, 0,..., 0, 1
+                                this->Z[0] = -FieldType::value_type::one();
+                                this->Z[this->Z.size()-1] = FieldType::value_type::one();
+
+                                // lagrange_0:  0,0,...,1,0,0,...,0
+                                lagrange_0[usable_rows] = FieldType::value_type::one();
+                            }
+                        // not marshalled
+                            math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
+                            math::polynomial<typename FieldType::value_type> Z;
                         };
 
                         plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
@@ -482,8 +505,8 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data {
-                            basic_domain, lagrange_0,   public_commitments,
-                            c_rotations,  N_rows};
+                            basic_domain,   public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount
+                        };
 
                         preprocessed_data_type preprocessed_data({public_polynomial_table, sigma_perm_polys,
                                                                   id_perm_polys, q_last_q_blind[0], q_last_q_blind[1],
