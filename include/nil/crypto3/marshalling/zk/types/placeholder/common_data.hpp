@@ -46,8 +46,52 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase, typename RedshiftPolicy,
-                         typename = typename std::enable_if<
+                template<typename TTypeBase, typename CommonDataType>
+                using placeholder_common_data = nil::marshalling::types::bundle<
+                    TTypeBase,
+                    std::tuple<
+//                        std::shared_ptr<math::evaluation_domain<typename CommonDataType::field_type>> basic_domain;
+
+//                        typename CommonDataType::public_commitments_type commitments;
+
+//                        std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>
+//                            columns_rotations;
+
+//                        std::size_t rows_amount;
+                          nil::marshalling::types::integral<TTypeBase, std::size_t>,
+//                        std::size_t usable_rows_amount;
+                          nil::marshalling::types::integral<TTypeBase, std::size_t>
+                    >
+                >;
+
+                template<typename CommonDataType, typename Endianness>
+                placeholder_common_data<nil::marshalling::field_type<Endianness>, CommonDataType>
+                fill_placeholder_common_data(const CommonDataType &common_data){
+                    using TTypeBase = typename nil::marshalling::field_type<Endianness>;
+                    using FieldType = typename CommonDataType::field_type;
+                    using result_type = placeholder_common_data<TTypeBase, FieldType>;
+
+                    return result_type(std::make_tuple(
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.rows_amount),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.usable_rows_amount)
+                    ));
+                }
+
+                template<typename CommonDataType, typename Endianness>
+                CommonDataType
+                make_placeholder_common_data(const  
+                    placeholder_common_data<nil::marshalling::field_type<Endianness>, CommonDataType> &filled_common_data
+                ){
+                    using TTypeBase = typename nil::marshalling::field_type<Endianness>;
+                    using FieldType = typename CommonDataType::field_type;
+
+                    CommonDataType common_data;
+                    common_data.rows_amount = std::get<0>(filled_common_data.value()).value();
+                    common_data.usable_rows_amount = std::get<1>(filled_common_data.value()).value();
+                    return common_data;
+                }
+/*                template<typename TTypeBase, typename RedshiftPolicy,
+                    typename = typename std::enable_if<
                              std::is_same<RedshiftPolicy, nil::crypto3::zk::snark::detail::placeholder_policy<
                                                               typename RedshiftPolicy::field_type,
                                                               typename RedshiftPolicy::placeholder_params_type>>::value,
@@ -105,7 +149,7 @@ namespace nil {
 
                     return placeholder_verifier_common_data<TTypeBase, RedshiftPolicy>(
                         std::make_tuple(filled_rows_amount, filled_omega, filled_columns_rotations));
-                }
+                }*/
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3

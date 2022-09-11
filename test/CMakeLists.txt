@@ -66,6 +66,7 @@ set(TESTS_NAMES
     "fri_commitment"
     "lpc_commitment"
     "placeholder_proof"
+    "placeholder_common_data"
     "plonk_gates"
     "plonk_constraint_system"
     "eddsa")
