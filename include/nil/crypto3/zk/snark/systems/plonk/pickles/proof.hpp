@@ -40,6 +40,8 @@ namespace nil {
                 struct lookup_st {
                     std::vector<CommitmentType> sorted;
                     CommitmentType aggreg;
+                    CommitmentType table;
+                    CommitmentType runtime;
                 };
 
                 template<typename CurveType, std::size_t ColumnsAmount = 15, std::size_t PermutsAmount = 7>
@@ -70,7 +72,7 @@ namespace nil {
 
                         std::array<typename scalar_field_type::value_type, PermutsAmount - 1> s;
 
-                        lookup_st<commitment_type> lookup;
+                        lookup_st<typename scalar_field_type::value_type> lookup;
 
                         typename scalar_field_type::value_type generic_selector;
 
