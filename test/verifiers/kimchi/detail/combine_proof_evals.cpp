@@ -46,6 +46,7 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
 #include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
+#include "verifiers/kimchi/index_terms_instances/chacha_test.hpp"
 
 #include "test_plonk_component.hpp"
 #include "../proof_data.hpp"
@@ -79,7 +80,25 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
         }
         // lookup
         if (KimchiParamsType::use_lookup) {
-            // TODO
+            for (std::size_t i = 0; i < KimchiParamsType::circuit_params::lookup_columns; i++) {
+                public_input.push_back(original_proof.evals[point_idx].lookup.sorted[i]);
+                circuit_proof.proof_evals[point_idx].lookup.sorted[i] =
+                    var(0, public_input.size() - 1, false, var::column_type::public_input);
+            }
+
+            public_input.push_back(original_proof.evals[point_idx].lookup.aggreg);
+            circuit_proof.proof_evals[point_idx].lookup.aggreg = 
+                var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+            public_input.push_back(original_proof.evals[point_idx].lookup.table);
+            circuit_proof.proof_evals[point_idx].lookup.table = 
+                var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+            if (KimchiParamsType::circuit_params::lookup_runtime) {
+                public_input.push_back(original_proof.evals[point_idx].lookup.runtime);
+                circuit_proof.proof_evals[point_idx].lookup.runtime = 
+                    var(0, public_input.size() - 1, false, var::column_type::public_input);
+            }
         }
         // generic_selector
         public_input.push_back(original_proof.evals[point_idx].generic_selector);
@@ -119,7 +138,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
     constexpr static const std::size_t prev_chal_size = 1;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
-    using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
+    using index_terms_list = zk::components::index_terms_scalars_list_chacha_test<ArithmetizationType>;
     using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
@@ -128,10 +147,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
     using component_type = zk::components::combine_proof_evals<ArithmetizationType, kimchi_params, 0, 1, 2, 3, 4, 5, 6,
                                                                7, 8, 9, 10, 11, 12, 13, 14>;
 
-    zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
+    zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof_chacha();
 
     typename BlueprintFieldType::value_type zeta_value =
-        0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+        0x3CE960ABCAC273BBEEBA92D1EF87514B51187BFE5E8797B5DE97B01FF7C64484_cppui256;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {zeta_value, 1, 0};
 
@@ -158,6 +177,16 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
             assert(kimchi_proof.evals[0].s[i] * zeta_value == assignment.var_value(real_res.output.s[i]));
         }
         // lookup
+        if (kimchi_params::use_lookup) {
+            for (std::size_t i = 0; i < kimchi_proof.evals[0].lookup.sorted.size(); i++) {
+                assert(kimchi_proof.evals[0].lookup.sorted[i] * zeta_value == assignment.var_value(real_res.output.lookup.sorted[i]));
+            }
+            assert(kimchi_proof.evals[0].lookup.aggreg * zeta_value == assignment.var_value(real_res.output.lookup.aggreg));
+            assert(kimchi_proof.evals[0].lookup.table * zeta_value == assignment.var_value(real_res.output.lookup.table));
+            if (kimchi_params::circuit_params::lookup_runtime) {
+                assert(kimchi_proof.evals[0].lookup.runtime * zeta_value == assignment.var_value(real_res.output.lookup.runtime));
+            }
+        }
         // generic_selector
         assert(kimchi_proof.evals[0].generic_selector * zeta_value == assignment.var_value(real_res.output.generic_selector));
         // poseidon_selector
