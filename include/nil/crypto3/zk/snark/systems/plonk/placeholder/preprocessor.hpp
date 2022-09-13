@@ -78,6 +78,18 @@ namespace nil {
                             typename constant_commitment_scheme_type::commitment_type constant;
                             typename selector_commitment_scheme_type::commitment_type selector;
                             typename special_commitment_scheme_type::commitment_type special_selectors;
+
+                            bool operator==(const public_commitments_type &rhs) const {
+                                return  id_permutation == rhs.id_permutation &&
+                                    sigma_permutation == rhs.sigma_permutation &&
+                                    public_input == rhs.public_input &&
+                                    constant == rhs.constant &&
+                                    selector == rhs.selector &&
+                                    special_selectors == rhs.special_selectors;
+                            }
+                            bool operator!=(const public_commitments_type &rhs) const {
+                                return !(rhs == *this);
+                            }
                         };
 
                         // both prover and verifier use this data
@@ -85,31 +97,29 @@ namespace nil {
                         struct common_data_type {
                             using field_type = FieldType;
                             using commitments_type = public_commitments_type;
+                            using columns_rotations_type = std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>;
                             // marshalled
-                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
-
                             public_commitments_type commitments;
 
-                            std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>
-                                columns_rotations;
+                            columns_rotations_type columns_rotations;
 
                             std::size_t rows_amount;
                             std::size_t usable_rows_amount;
 
-                            // not marshalled. They are derived from other fields.
+                            // not marshalled. They can be derived from other fields.
                             math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
                             math::polynomial<typename FieldType::value_type> Z;
+                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                            // Sometimes it's useful.
-                            common_data_type(){}
 
+                            // Constructor with pregenerated domain
                             common_data_type(
                                 std::shared_ptr<math::evaluation_domain<FieldType>> D, 
                                 public_commitments_type commts, 
                                 std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows
-                            ):  basic_domain(D), 
+                            ):  basic_domain(D),
                                 lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()), 
                                 commitments(commts), 
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
@@ -123,10 +133,37 @@ namespace nil {
                                 lagrange_0[usable_rows] = FieldType::value_type::one();
                             }
 
+                            // Constructor for marshalling. Domain is regenerated.
+                            common_data_type(
+                                public_commitments_type commts, 
+                                std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> col_rotations,
+                                std::size_t rows,
+                                std::size_t usable_rows
+                            ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()), 
+                                commitments(commts), 
+                                columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
+                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())
+                            ) {
+                                // Z is polynomial -1, 0,..., 0, 1
+                                Z[0] = -FieldType::value_type::one();
+                                Z[Z.size()-1] = FieldType::value_type::one();
+
+                                // lagrange_0:  0,0,...,1,0,0,...,0
+                                lagrange_0[usable_rows] = FieldType::value_type::one();
+
+                                basic_domain = math::make_evaluation_domain<FieldType>(rows);
+                            }
+
                             // These operators are useful for marshalling
                             // They will be implemented with marshalling procedures implementation
                             bool operator==(const common_data_type &rhs) const {
-                                return rows_amount == rhs.rows_amount && usable_rows_amount == rhs.usable_rows_amount;
+                                return rows_amount == rhs.rows_amount && 
+                                usable_rows_amount == rhs.usable_rows_amount && 
+                                columns_rotations == rhs.columns_rotations &&
+                                commitments == rhs.commitments &&
+                                basic_domain->size() == rhs.basic_domain->size() &&
+                                lagrange_0 == rhs.lagrange_0 &&
+                                Z == rhs.Z;
                             }
                             bool operator!=(const common_data_type &rhs) const {
                                 return !(rhs == *this);
@@ -521,9 +558,9 @@ namespace nil {
                         std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
-                        typename preprocessed_data_type::common_data_type common_data {
-                            basic_domain,   public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount
-                        };
+                        typename preprocessed_data_type::common_data_type common_data (
+                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount
+                        );
 
                         preprocessed_data_type preprocessed_data({public_polynomial_table, sigma_perm_polys,
                                                                   id_perm_polys, q_last_q_blind[0], q_last_q_blind[1],
