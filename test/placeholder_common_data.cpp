@@ -53,7 +53,6 @@ void test_placeholder_common_data(CommonDataType common_data){
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using marshalling_type = nil::crypto3::marshalling::types::placeholder_common_data<TTypeBase, CommonDataType>;
 
-    std::cout << "We are in the small convenient function" << std::endl;
     auto filled_common_data = nil::crypto3::marshalling::types::fill_placeholder_common_data<CommonDataType, Endianness>(common_data);
     auto _common_data = nil::crypto3::marshalling::types::make_placeholder_common_data<CommonDataType, Endianness>(filled_common_data);
     BOOST_CHECK(common_data == _common_data);
@@ -71,9 +70,21 @@ void test_placeholder_common_data(CommonDataType common_data){
 }
 
 BOOST_AUTO_TEST_SUITE(placeholder_marshalling_proof_test_suite)
+BOOST_AUTO_TEST_CASE(placeholder_domain_test){
+    using namespace nil::crypto3;
+    using Endianness = nil::marshalling::option::big_endian;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+
+    auto D1 = math::make_evaluation_domain<FieldType>(8);
+    auto D2 = math::make_evaluation_domain<FieldType>(8);
+
+    BOOST_CHECK(D1->size() == D2->size());
+}
 
 BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
-    std::cout << "Hello world!" << std::endl;
 
     using namespace nil::crypto3;
     using Endianness = nil::marshalling::option::big_endian;
@@ -123,9 +134,6 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
         zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
 //    nil::crypto3::zk::snark::placeholder_profiling<placeholder_params>::print_params(
 //        proof, fri_params, public_preprocessed_data.common_data);*/
-    std::cout << "It's marshallilng common data test" << std::endl;
-    std::cout << public_preprocessed_data.common_data.rows_amount << " " 
-        << public_preprocessed_data.common_data.usable_rows_amount << std::endl;
     test_placeholder_common_data(public_preprocessed_data.common_data);
 }
 BOOST_AUTO_TEST_SUITE_END()
