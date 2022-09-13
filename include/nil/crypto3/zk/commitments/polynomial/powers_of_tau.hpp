@@ -22,9 +22,9 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
                     typedef typename scalar_field_type::value_type scalar_field_value_type;
-                    typedef typename CurveType::g1_type<> g1_type;
+                    typedef typename CurveType::template g1_type<> g1_type;
                     typedef typename g1_type::value_type g1_value_type;
-                    typedef typename CurveType::g2_type<> g2_type;
+                    typedef typename CurveType::template g2_type<> g2_type;
                     typedef typename g2_type::value_type g2_value_type;
                 
                 public:
