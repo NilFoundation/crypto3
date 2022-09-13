@@ -986,10 +986,14 @@ namespace nil {
                         x = x_next;
                     }
 
-                    // auto final_root = commit(precommit(proof.final_polynomials, fri_params.D[r - 1]));
-                    // if (final_root != proof.round_proofs[r - 2].colinear_path.root()) {
-                    //     return false;
-                    // }
+                    auto final_root = commit<FRI>(precommit<FRI>(
+                        proof.final_polynomials, 
+                        fri_params.D[basis_index], 
+                        fri_params.step_list[fri_params.step_list.size()-1]
+                    ));
+                    if (final_root == proof.round_proofs[fri_params.step_list.size() - 1].colinear_path.root()) {
+                        return false;
+                    }
 
                     for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
 
