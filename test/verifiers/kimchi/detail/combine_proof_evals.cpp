@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
         // generic_selector
         assert(kimchi_proof.evals[0].generic_selector * zeta_value == assignment.var_value(real_res.output.generic_selector));
         // poseidon_selector
-        assert(kimchi_proof.evals[0].generic_selector * zeta_value == assignment.var_value(real_res.output.generic_selector));
+        assert(kimchi_proof.evals[0].poseidon_selector * zeta_value == assignment.var_value(real_res.output.poseidon_selector));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
