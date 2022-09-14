@@ -281,8 +281,10 @@ typedef commitments::fri<FieldType, placeholder_test_params::merkle_hash_type,
     fri_type;
 
 typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
+typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params>
+    circuit_3_params;
     
-BOOST_AUTO_TEST_CASE(marshalling_placeholder_real_proof_pallas_test) {
+BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_2_params_test) {
 
     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
         circuit_test_2<FieldType>();
@@ -324,6 +326,47 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_real_proof_pallas_test) {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
     test_placeholder_proof_marshalling<Endianness, placeholder_proof<FieldType, circuit_2_params>>(proof);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_3_params_test) {
+    circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit =
+        circuit_test_3<FieldType>();
+
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
+
+    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 0, false> lpc_type;
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+
+    plonk_table_description<FieldType, typename circuit_3_params::arithmetization_params> desc;
+
+    desc.rows_amount = table_rows;
+    desc.usable_rows_amount = usable_rows;
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+        preprocessed_public_data =
+        placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
+            constraint_system, assignments.public_table(), desc,
+            fri_params, columns_with_copy_constraints.size());
+
+    typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+        preprocessed_private_data =
+        placeholder_private_preprocessor<FieldType, circuit_3_params>::process(constraint_system,
+                                                                               assignments.private_table(), desc, fri_params);
+
+    auto proof = placeholder_prover<FieldType, circuit_3_params>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
+
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+    
+    test_placeholder_proof_marshalling<Endianness, placeholder_proof<FieldType, circuit_3_params>>(proof);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
