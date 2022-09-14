@@ -114,14 +114,49 @@ bool are_non_linear_combinations_equal(
 }
 
 template<typename Field>
-bool are_plonk_gates_equal(const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &lhs,
-                           const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &rhs) {
+bool are_lookup_constraints_equal(
+    const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &lhs,
+    const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &rhs
+){
+    if(lhs.lookup_input.size() != rhs.lookup_input.size() ) return false;
+    for( size_t i = 0; i < lhs.lookup_input.size(); i++ ){
+        if(! are_non_linear_terms_equal(lhs.lookup_input[i], rhs.lookup_input[i])) return false;
+    }
+
+    if(lhs.lookup_value.size() != rhs.lookup_value.size() ) return false;
+    for( size_t i = 0; i < lhs.lookup_value.size(); i++ ){
+        if(!are_variables_equal(lhs.lookup_value[i], rhs.lookup_value[i])) return false;
+    }
+    return true;
+}
+
+template<typename Field>
+bool are_plonk_gates_equal(
+    const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &lhs,
+    const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &rhs
+) {
     if (lhs.selector_index != rhs.selector_index)
         return false;
     if (lhs.constraints.size() != rhs.constraints.size())
         return false;
     for (auto i = 0; i < lhs.constraints.size(); i++) {
         if (!are_non_linear_combinations_equal(lhs.constraints[i], rhs.constraints[i]))
+            return false;
+    }
+    return true;
+}
+
+template<typename Field>
+bool are_plonk_lookup_gates_equal(
+    const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &lhs,
+    const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &rhs
+) {
+    if (lhs.selector_index != rhs.selector_index)
+        return false;
+    if (lhs.constraints.size() != rhs.constraints.size())
+        return false;
+    for (auto i = 0; i < lhs.constraints.size(); i++) {
+        if (!are_lookup_constraints_equal<Field>(lhs.constraints[i], rhs.constraints[i]))
             return false;
     }
     return true;
@@ -186,6 +221,36 @@ generate_random_plonk_gate(std::size_t vars_n, std::size_t terms_n, std::size_t 
         constraints.template emplace_back(
             generate_random_plonk_non_linear_combination<nil::crypto3::zk::snark::plonk_variable<Field>>(vars_n,
                                                                                                          terms_n));
+    }
+    return {selector_index, constraints};
+}
+
+template<typename Field>
+nil::crypto3::zk::snark::plonk_lookup_constraint<Field> generate_random_plonk_lookup_constraint(size_t vars_n, size_t inp_len, size_t value_len){
+    nil::crypto3::zk::snark::plonk_lookup_constraint<Field> result;
+
+    for( size_t i = 0; i < inp_len; i++ ){
+        result.lookup_input.push_back(generate_random_plonk_non_linear_term<nil::crypto3::zk::snark::plonk_variable<Field>>(vars_n));
+    }
+    for( size_t i = 0; i < value_len; i++ ){
+        result.lookup_value.push_back(generate_random_plonk_variable<nil::crypto3::zk::snark::plonk_variable<Field>>());
+    }
+
+    return result;
+}
+
+template<typename Field>
+nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> 
+generate_random_plonk_lookup_gate(std::size_t vars_n, std::size_t terms_n, std::size_t constr_n) {
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<Field>;
+    using constraint_type = typename nil::crypto3::zk::snark::plonk_lookup_constraint<Field, variable_type>;
+    using value_type = typename nil::crypto3::zk::snark::plonk_gate<Field, constraint_type>;
+
+    std::size_t selector_index = std::random_device()();
+    std::vector<constraint_type> constraints;
+    for (auto i = 0; i < constr_n; i++) {
+        constraints.template emplace_back(
+            generate_random_plonk_lookup_constraint<Field>(vars_n, terms_n, terms_n));
     }
     return {selector_index, constraints};
 }
@@ -374,6 +439,70 @@ void test_plonk_constraints(std::size_t vars_n, std::size_t terms_n, std::size_t
     }  
 }
     
+template<typename Field, typename Endianness>
+void test_plonk_lookup_constraints(std::size_t vars_n, std::size_t terms_n, std::size_t constraints_n) {
+    using namespace nil::crypto3::marshalling;
+
+    using variable_type = nil::crypto3::zk::snark::plonk_variable<Field>;
+    using constraint_type = nil::crypto3::zk::snark::plonk_lookup_constraint<Field, variable_type>;
+    using value_type = std::vector<constraint_type>;
+    using value_marshalling_type = types::plonk_constraints<nil::marshalling::field_type<Endianness>, constraint_type>;
+
+    value_type val;
+    for( std::size_t i = 0; i < constraints_n; i++ ){
+        val.emplace_back(generate_random_plonk_lookup_constraint<Field>(vars_n, terms_n, terms_n));
+    }
+
+    auto filled_val = types::fill_plonk_constraints<constraint_type, Endianness>(val);
+    auto _val = types::make_plonk_constraints<constraint_type, Endianness>(filled_val);
+    BOOST_CHECK(val.size() == _val.size());
+    for( std::size_t i = 0; i < _val.size(); i++){
+        BOOST_CHECK(are_lookup_constraints_equal(val[i], _val[i]));
+    }  
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_val.length(), 0x00);
+
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    // print_byteblob(std::cout, cv.cbegin(), cv.cend());
+    value_marshalling_type test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    auto constructed_val_read = types::make_plonk_constraints<constraint_type, Endianness>(test_val_read);
+
+    BOOST_CHECK(val.size() == constructed_val_read.size());
+    for( std::size_t i = 0; i < val.size(); i++){
+        BOOST_CHECK(are_lookup_constraints_equal(val[i], constructed_val_read[i]));
+    } 
+}
+
+template<typename Field, typename Endianness>
+void test_plonk_lookup_constraint(std::size_t vars_n, std::size_t lookups_n) {
+    using namespace nil::crypto3::marshalling;
+
+    using variable_type = nil::crypto3::zk::snark::plonk_variable<Field>;
+    using value_type = nil::crypto3::zk::snark::plonk_lookup_constraint<Field, variable_type>;
+    using value_marshalling_type = typename types::plonk_gate_constraint<nil::marshalling::field_type<Endianness>, value_type>::type;
+
+    auto val = generate_random_plonk_lookup_constraint<Field>(vars_n, lookups_n, lookups_n);
+
+    auto filled_val = types::fill_plonk_constraint<value_type, Endianness>(val);
+    auto _val = types::make_plonk_constraint<value_type, Endianness>(filled_val);
+    BOOST_CHECK(are_lookup_constraints_equal(val, _val));
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_val.length(), 0x00);
+
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    // print_byteblob(std::cout, cv.cbegin(), cv.cend());
+    value_marshalling_type test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    auto constructed_val_read = types::make_plonk_constraint<value_type, Endianness>(test_val_read);
+    BOOST_CHECK(are_lookup_constraints_equal(val, constructed_val_read));
+}
 
 template<typename Field, typename Endianness>
 void test_plonk_gate(std::size_t vars_n, std::size_t terms_n, std::size_t constr_n) {
@@ -401,6 +530,35 @@ void test_plonk_gate(std::size_t vars_n, std::size_t terms_n, std::size_t constr
     status = test_val_read.read(read_iter, cv.size());
     auto constructed_val_read = types::make_plonk_gate<value_type, Endianness>(test_val_read);
     BOOST_CHECK(are_plonk_gates_equal(val, constructed_val_read));
+}
+
+template<typename Field, typename Endianness>
+void test_plonk_lookup_gate(std::size_t vars_n, std::size_t terms_n, std::size_t constr_n) {
+    using namespace nil::crypto3::marshalling;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    using variable_type = nil::crypto3::zk::snark::plonk_variable<Field>;
+    using constraint_type = nil::crypto3::zk::snark::plonk_lookup_constraint<Field, variable_type>;
+    using value_type = nil::crypto3::zk::snark::plonk_gate<Field, constraint_type>;
+    using value_marshalling_type = types::plonk_gate<TTypeBase, value_type>;
+
+    auto val = generate_random_plonk_lookup_gate<Field>(vars_n, terms_n, constr_n);
+
+    auto filled_val = types::fill_plonk_gate<value_type, Endianness>(val);
+    auto _val = types::make_plonk_gate<value_type, Endianness>(filled_val);
+    BOOST_CHECK(are_plonk_lookup_gates_equal(val, _val));
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_val.length(), 0x00);
+
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    // print_byteblob(std::cout, cv.cbegin(), cv.cend());
+    value_marshalling_type test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    auto constructed_val_read = types::make_plonk_gate<value_type, Endianness>(test_val_read);
+    BOOST_CHECK(are_plonk_lookup_gates_equal(val, constructed_val_read));
 }
 
 template<typename Field, typename Endianness>
@@ -440,23 +598,96 @@ void test_plonk_gates(std::size_t vars_n, std::size_t terms_n, std::size_t const
     }
 }
 
+template<typename Field, typename Endianness>
+void test_plonk_lookup_gates(std::size_t vars_n, std::size_t terms_n, std::size_t constr_n, std::size_t gates_n) {
+    using namespace nil::crypto3::marshalling;
+
+    using variable_type = nil::crypto3::zk::snark::plonk_variable<Field>;
+    using constraint_type = nil::crypto3::zk::snark::plonk_lookup_constraint<Field, variable_type>;
+    using value_type = nil::crypto3::zk::snark::plonk_gate<Field, constraint_type>;
+    using value_marshalling_type = types::plonk_gates<nil::marshalling::field_type<Endianness>, value_type>;
+
+    std::vector<value_type> val;
+    for (auto i = 0; i < gates_n; i++) {
+        val.template emplace_back(generate_random_plonk_lookup_gate<Field>(vars_n, terms_n, constr_n));
+    }
+
+    auto filled_val = types::fill_plonk_gates<value_type, Endianness>(val);
+    auto _val = types::make_plonk_gates<value_type, Endianness>(filled_val);
+    BOOST_CHECK(val.size() == _val.size());
+    for (auto i = 0; i < val.size(); i++) {
+        BOOST_CHECK(are_plonk_lookup_gates_equal(val[i], _val[i]));
+    }
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_val.length(), 0x00);
+
+    auto write_iter = cv.begin();
+    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    // print_byteblob(std::cout, cv.cbegin(), cv.cend());
+    value_marshalling_type test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    auto constructed_val_read = types::make_plonk_gates<value_type, Endianness>(test_val_read);
+    BOOST_CHECK(val.size() == constructed_val_read.size());
+    for (auto i = 0; i < val.size(); i++) {
+        BOOST_CHECK(are_plonk_lookup_gates_equal(val[i], constructed_val_read[i]));
+    }
+}
+
 // TODO add test_plonk_lookup_constraint
-BOOST_AUTO_TEST_SUITE(plonk_variable_marshalling_test_suite)
-BOOST_AUTO_TEST_CASE(alt_bn128_254_scalar) {
+BOOST_AUTO_TEST_SUITE(alt_bn128_254_scalar)
     using curve_type = nil::crypto3::algebra::curves::alt_bn128_254;
     using field_type = typename curve_type::scalar_field_type;
     using endianness = nil::marshalling::option::big_endian;
 
+BOOST_AUTO_TEST_CASE(marshalling_plonk_variable) {
     for (auto i = 0; i < 100; i++) {
         test_plonk_variable<field_type, endianness>();
     }
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_variables) {
     test_plonk_variables<field_type,endianness>(50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_non_linear_term) {
     test_plonk_non_linear_term<field_type, endianness>(50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_non_linear_combination) {
     test_non_linear_combination<field_type, endianness>(50, 50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_constraint) {
     test_plonk_constraint<field_type, endianness>(50, 50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_constraints) {
     test_plonk_constraints<field_type, endianness>(50, 50, 50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_gate){
     test_plonk_gate<field_type, endianness>(50, 50, 50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_gates){
     test_plonk_gates<field_type, endianness>(50, 50, 50, 5);
 }
 
+BOOST_AUTO_TEST_CASE(marshalling_plonk_lookup_constraint){
+    test_plonk_lookup_constraint<field_type, endianness>(10, 50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_lookup_constraints){
+    test_plonk_lookup_constraints<field_type, endianness>(10, 50, 10);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_lookup_gate){
+    test_plonk_lookup_gate<field_type, endianness>(50, 50, 50);
+}
+
+BOOST_AUTO_TEST_CASE(marshalling_plonk_lookup_gates){
+    test_plonk_lookup_gates<field_type, endianness>(50, 50, 50, 5);
+}
 BOOST_AUTO_TEST_SUITE_END()
