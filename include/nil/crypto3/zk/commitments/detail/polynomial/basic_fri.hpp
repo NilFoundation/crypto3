@@ -991,7 +991,7 @@ namespace nil {
                         fri_params.D[basis_index], 
                         fri_params.step_list[fri_params.step_list.size()-1]
                     ));
-                    if (final_root == proof.round_proofs[fri_params.step_list.size() - 1].colinear_path.root()) {
+                    if (final_root != proof.round_proofs[fri_params.step_list.size() - 2].colinear_path.root()) {
                         return false;
                     }
 
