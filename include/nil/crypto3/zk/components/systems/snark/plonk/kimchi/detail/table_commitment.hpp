@@ -34,6 +34,7 @@
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
+#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
@@ -47,13 +48,14 @@ namespace nil {
                 // Input: 
                 // Output: 
                 template<typename ArithmetizationType, 
-                    typename KimchiParamsType,
+                    typename KimchiParamsType, typename CurveType,
                     std::size_t... WireIndexes>
                 class table_commitment;
 
                 template<typename BlueprintFieldType, 
                          typename ArithmetizationParams,
                          typename KimchiParamsType,
+                         typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -72,6 +74,7 @@ namespace nil {
                 class table_commitment<
                     snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     KimchiParamsType,
+                    CurveType,
                     W0,
                     W1,
                     W2,
@@ -92,19 +95,33 @@ namespace nil {
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+
+                    constexpr static const std::size_t lookup_columns = KimchiParamsType::circuit_params::lookup_columns;
+
+                    constexpr static const std::size_t use_lookup_runtime = KimchiParamsType::circuit_params::lookup_runtime ? 1 : 0; 
+
+                    constexpr static const std::size_t use_table_ids = KimchiParamsType::circuit_params::lookup_table_ids ? 1 : 0; 
+                    constexpr static const std::size_t msm_size = (lookup_columns + use_lookup_runtime + use_table_ids) 
+                    * KimchiParamsType::commitment_params_type::shifted_commitment_split; 
 
                     using commitment_type = typename 
                         zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             KimchiParamsType::commitment_params_type::shifted_commitment_split>;
+                    using msm_component = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, CurveType,  
+                        msm_size,
+                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1;
+                    constexpr static const std::size_t rows_amount = msm_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
                         std::vector<commitment_type> table;
-                        var joint_combiner;
+                        std::vector<var> joint_combiner;
                         commitment_type runtime;
+                        commitment_type table_id;
+                        var table_id_combiner;
                     };
 
                     struct result_type {
@@ -123,6 +140,33 @@ namespace nil {
                         generate_assignments_constants(bp, assignment, params, start_row_index);
 
                         std::size_t row = start_row_index;
+                        std::array<var_ec_point, msm_size> commitments;
+                        std::array<var, msm_size> scalars;
+                        std::size_t j = 0;
+                        std::size_t comm_size = params.table[0].parts.size();
+                        for(std::size_t i = j; i < commitments.size(); i++) {
+                            for (std::size_t k = 0; k < comm_size; k++) {
+                                commitments[i*comm_size + k] = params.table[i].parts[k];
+                                scalars[i*comm_size + k] = params.joint_combiner[i];
+                                j++;
+                            }
+                        }
+                        if (KimchiParamsType::circuit_params::lookup_table_ids) {
+                            for (std::size_t k = 0; k < comm_size; k++) {
+                                commitments[j] = params.table_id.parts[k];
+                                scalars[j] = params.table_id_combiner;
+                                j++;
+                            }       
+                        }
+                        if (KimchiParamsType::circuit_params::lookup_runtime) {
+                            for (std::size_t k = 0; k < comm_size; k++) {
+                                commitments[j] = params.runtime.parts[k];
+                                scalars[j] = params.joint_combiner[1];
+                                j++;
+                            }       
+                        }
+                        msm_component::generate_circuit(bp, assignment, {scalars, commitments}, row);
+                        return result_type(row);
 
                         return result_type(row);
                     }
@@ -132,7 +176,32 @@ namespace nil {
                                                             const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
-
+                        std::array<var_ec_point, msm_size> commitments;
+                        std::array<var, msm_size> scalars;
+                        std::size_t j = 0;
+                        std::size_t comm_size = params.table[0].parts.size();
+                        for(std::size_t i = j; i < commitments.size(); i++) {
+                            for (std::size_t k = 0; k < comm_size; k++) {
+                                commitments[i*comm_size + k] = params.table[i].parts[k];
+                                scalars[i*comm_size + k] = params.joint_combiner[i];
+                                j++;
+                            }
+                        }
+                        if (KimchiParamsType::circuit_params::lookup_table_ids) {
+                            for (std::size_t k = 0; k < comm_size; k++) {
+                                commitments[j] = params.table_id.parts[k];
+                                scalars[j] = params.table_id_combiner;
+                                j++;
+                            }       
+                        }
+                        if (KimchiParamsType::circuit_params::lookup_runtime) {
+                            for (std::size_t k = 0; k < comm_size; k++) {
+                                commitments[j] = params.runtime.parts[k];
+                                scalars[j] = params.joint_combiner[1];
+                                j++;
+                            }       
+                        }
+                        msm_component::generate_assignments(assignment, {scalars, commitments}, row);
                         return result_type(row);
                     }
 
