@@ -93,15 +93,15 @@ namespace nil {
                             W9, W10, W11, W12, W13, W14>;
 
                     using exponentiation_component =
-                        zk::components::exponentiation<ArithmetizationType, 256, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
+                        zk::components::exponentiation<ArithmetizationType, 255, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                                                        W10, W11, W12, W13, W14>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     
-                    using alpha_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::alpha_powers_n, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                    using alpha_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::alpha_powers_n, W0, W1, W2, W3,
+                                                                          W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    using pi_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::public_input_size, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
+                    using pi_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::public_input_size, W0, W1, W2, W3,
+                                                                          W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using lagrange_denominators_component =
                             zk::components::lagrange_denominators<ArithmetizationType, KimchiParamsType::public_input_size, W0, W1, W2, W3, W4,
@@ -316,6 +316,8 @@ namespace nil {
                         transcript.absorb_circuit(bp, assignment, params.fq_output.fq_digest, row);
                         row += transcript_type::absorb_rows;
 
+                        // this exponentiation doesn't work
+                        // it works fine if we use the same inputs in line 386
                         // zeta_pow_n = zeta**n
                         var zeta_pow_n = exponentiation_component::generate_circuit(
                                              bp, assignment,
@@ -423,14 +425,14 @@ namespace nil {
                             bp,
                             assignment, 
                             {params.verifier_index,
-                            zeta_pow_n,
                             alpha_powers,
                             combined_evals,
                             gamma,
                             beta,
-                            public_eval,
                             zeta,
-                            joint_combiner},
+                            zeta_pow_n,
+                            joint_combiner,
+                            public_eval},
                             row
                         ).output;
                         row += ft_eval_component::rows_amount;
@@ -515,9 +517,8 @@ namespace nil {
                         transcript.absorb_assignment(assignment, fq_digest, row);
                         row += transcript_type::absorb_rows;
 
-                        var n = domain_size;
                         var zeta_pow_n = exponentiation_component::generate_assignments(
-                            assignment, {zeta, n}, row).output;
+                            assignment, {zeta, domain_size}, row).output;
                         row += exponentiation_component::rows_amount;
 
                         var zeta_omega = mul_component::generate_assignments(assignment, {zeta, 
@@ -525,7 +526,7 @@ namespace nil {
                         row += mul_component::rows_amount;
 
                         var zeta_omega_pow_n = exponentiation_component::generate_assignments(
-                            assignment, {zeta_omega, n}, row).output;
+                            assignment, {zeta_omega, domain_size}, row).output;
                         row += exponentiation_component::rows_amount;
 
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers = alpha_powers_component::generate_assignments(
@@ -548,7 +549,7 @@ namespace nil {
                                         pi,
                                         lagrange_denominators, 
                                         omega_powers,
-                                        n, one, zero}, row).output;
+                                        domain_size, one, zero}, row).output;
                         row += public_eval_component::rows_amount;
                         
                         transcript.absorb_evaluations_assignment(
@@ -610,14 +611,14 @@ namespace nil {
                         var ft_eval0 = ft_eval_component::generate_assignments(
                             assignment, 
                             {params.verifier_index,
-                            zeta_pow_n,
                             alpha_powers,
                             combined_evals,
                             gamma,
                             beta,
-                            public_eval,
                             zeta,
-                            joint_combiner},
+                            zeta_pow_n,
+                            joint_combiner,
+                            public_eval},
                             row
                         ).output;
                         row += ft_eval_component::rows_amount;
