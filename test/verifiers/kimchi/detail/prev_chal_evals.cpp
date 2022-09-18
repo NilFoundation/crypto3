@@ -41,8 +41,6 @@
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 #include "../../../test_plonk_component.hpp"
 
-#include <iostream>
-
 using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
