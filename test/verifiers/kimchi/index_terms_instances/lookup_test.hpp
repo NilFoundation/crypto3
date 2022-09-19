@@ -26,6 +26,7 @@
 #define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_CONSTRAINTS_INDEX_TERMS_INSTANCES_LOOKUP_TEST_HPP
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_expression.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/index_term_type.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/constraints/rpn_string_literal.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/alpha_argument_type.hpp>
 
@@ -73,6 +74,7 @@ namespace nil {
 
                     constexpr static const std::size_t lookup_columns = 4;
                     constexpr static const bool lookup_runtime = false;
+                    constexpr static const bool lookup_table_ids = false;
                     constexpr static const bool joint_lookup = true;
 
                     constexpr static const bool poseidon_gate = false;

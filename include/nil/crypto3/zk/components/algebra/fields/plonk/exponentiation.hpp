@@ -146,7 +146,7 @@ namespace nil {
                         typename BlueprintFieldType::integral_type integral_exp =
                             typename BlueprintFieldType::integral_type(exponent.data);
 
-                        std::array<bool, padded_exponent_size> bits = {false};
+                        std::array<bool, padded_exponent_size> bits;
                         {
                             nil::marshalling::status_type status;
                             std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
@@ -170,7 +170,9 @@ namespace nil {
                                 for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result;
                                      bit_column++) {
                                     std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
-                                    assignment.witness(column_idx)[row] = bits[current_bit];
+                                    assignment.witness(column_idx)[row] = bits[current_bit] ? 1 : 0;
+                                    // wierd stuff is here for oracles scalar
+                                    std::cout<<"column_idx "<<column_idx<<" row "<<row<<" value "<<bits[current_bit]<<std::endl;
 
                                     intermediate_exponent = 2 * intermediate_exponent + bits[current_bit];
 
@@ -211,7 +213,7 @@ namespace nil {
                             for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result; bit_column++) {
                                 std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
                                 snark::plonk_constraint<BlueprintFieldType> bit_check_constraint = bp.add_bit_check(var(column_idx, 0));
-                                constraints.push_back(bit_check_constraint);
+                                constraints.push_back(bit_check_constraint); // fail on oracles scalar 
 
                                 snark::plonk_constraint<BlueprintFieldType> bit_res = var(W0, 0) * var(column_idx, 0);
                                 if (j == 0 && bit_column == 0) {
@@ -226,7 +228,7 @@ namespace nil {
 
                             intermediate_result_constraint =
                                 intermediate_result_constraint - var(intermediate_start + j, 0);
-                            constraints.push_back(intermediate_result_constraint);
+                            constraints.push_back(intermediate_result_constraint); // fail on oracles scalar 
                         }
 
                         accumulated_n_constraint = accumulated_n_constraint + exponent_shift * var(W1, -1) - var(W1, 0);
@@ -256,7 +258,7 @@ namespace nil {
                                                 one});
                         // check that the recalculated n is equal to the input challenge
                         bp.add_copy_constraint(
-                           {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
+                           {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent}); // fail on oracles scalar 
                     }
 
                     static void generate_assignments_constants(

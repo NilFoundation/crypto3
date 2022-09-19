@@ -546,8 +546,9 @@ namespace nil {
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
-                         std::size_t W3>
-                class division_or_zero<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
+                         std::size_t W3,
+                         std::size_t W4>
+                class division_or_zero<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3, W4> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -605,7 +606,9 @@ namespace nil {
                         } else {
                             assignment.witness(W2)[j] = 0;
                         }
+
                         assignment.witness(W3)[j] = assignment.var_value(params.y) == 0 ? 0 : assignment.var_value(params.y).inversed();
+                        assignment.witness(W4)[j] = assignment.var_value(params.y) * assignment.witness(W3)[j];
 
                         return result_type(params, start_row_index);
                     }
@@ -615,10 +618,14 @@ namespace nil {
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint(var(W0, 0) * var(W3, 0) - var(W2, 0));
-                        auto constraint_2 = bp.add_constraint(var(W1, 0) * var(W3, 0) * var(W1, 0) - var(W1, 0));
+                        
+                        auto constraint_1 = bp.add_constraint(var(W1, 0) * var(W3, 0) - var(W4, 0));
+                        auto constraint_2 = bp.add_constraint(var(W4, 0) * (var(W4, 0) - 1));
+                        auto constraint_3 = bp.add_constraint((var(W3, 0) - var(W1, 0)) * (var(W4, 0) - 1));
+                        auto constraint_4 = bp.add_constraint(var(W0, 0) * var(W3, 0) - var(W2, 0));
 
-                        bp.add_gate(first_selector_index, {constraint_1});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, 
+                            constraint_3, constraint_4});
                     }
 
                     static void

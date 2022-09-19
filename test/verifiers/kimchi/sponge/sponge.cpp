@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_0) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 15;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_1) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 15;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_2) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 15;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_3) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 15;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_4) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 15;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_5) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 15;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_double_squeeze) {
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 15;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;

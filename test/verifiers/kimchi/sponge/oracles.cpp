@@ -93,10 +93,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_1) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
-    constexpr std::size_t WitnessColumns = 5;
+    constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_1) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::to_limbs<ArithmetizationType, 0, 1, 2, 3, 4>;
+    using component_type = zk::components::to_limbs<ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     typename BlueprintFieldType::value_type input = 0x1D42ED837696F2A777E7C1FF0436D46E96878B624ECDE039732E37AFCD409C88_cppui256;
     typename BlueprintFieldType::value_type x0 = 0x732E37AFCD409C88_cppui256;
@@ -138,10 +138,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_2) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
-    constexpr std::size_t WitnessColumns = 5;
+    constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_2) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::to_limbs<ArithmetizationType, 0, 1, 2, 3, 4>;
+    using component_type = zk::components::to_limbs<ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
     typename BlueprintFieldType::value_type input = 0xE826DABA538B6DF0000000000000000FB812F513D0FCC04106CB4BD3F32FAD3_cppui256;
     typename BlueprintFieldType::value_type x0 = 0x106CB4BD3F32FAD3_cppui256;

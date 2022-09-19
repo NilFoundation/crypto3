@@ -83,7 +83,7 @@ namespace nil {
                     };
 
                     struct result_type {
-                        var_ec_point sum;
+                        var_ec_point output;
 
                         result_type(const params_type &params, std::size_t start_row_index) {
                         }
@@ -116,8 +116,8 @@ namespace nil {
                         }
 
                         auto result = result_type(params, start_row_index);
-                        result.sum.X = res[0];
-                        result.sum.Y = res[1];
+                        result.output.X = res[0];
+                        result.output.Y = res[1];
                         return result;
                     }
 
@@ -158,8 +158,8 @@ namespace nil {
                         }
 
                         auto result = result_type(params, start_row_index);
-                        result.sum.X = res[0];
-                        result.sum.Y = res[1];
+                        result.output.X = res[0];
+                        result.output.Y = res[1];
                         return result;
                     }
                 };

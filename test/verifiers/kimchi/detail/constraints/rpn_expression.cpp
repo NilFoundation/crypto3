@@ -49,14 +49,194 @@
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/proof.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
 #include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 #include "test_plonk_component.hpp"
 
 using namespace nil::crypto3;
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite)
+BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_lagrange) {
+
+    using curve_type = algebra::curves::vesta;
+    using BlueprintFieldType = typename curve_type::scalar_field_type;
+    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 30;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
+
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    constexpr static std::size_t public_input_size = 3;
+    constexpr static std::size_t max_poly_size = 32;
+    constexpr static std::size_t eval_rounds = 5;
+
+    constexpr static std::size_t witness_columns = 15;
+    constexpr static std::size_t perm_size = 7;
+
+    constexpr static std::size_t srs_len = 10;
+    constexpr static const std::size_t prev_chal_size = 1;
+
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
+    using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
+                                                                           witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+                                                             public_input_size, prev_chal_size>;
+
+    typename BlueprintFieldType::value_type result = 0x1E2AE13562C642ED35261EB5927960C75105852F6F962D463BF981EF969050C4_cppui255;
+    constexpr const char *s ="UnnormalizedLagrangeBasis(-4);\0";
+
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
+    using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
+                                                          8, 9, 10, 11, 12, 13, 14>;
+
+    typename BlueprintFieldType::value_type alpha_val =
+        0x0C0D3C26FCD47AFF64D9055FCE9858335ADE6B0706289AB4019630784E8B7527_cppui256;
+    typename BlueprintFieldType::value_type beta_val =
+        0x0000000000000000000000000000000059E5EE71CFF4B24FA2A3A131F77CFFC8_cppui256;
+    typename BlueprintFieldType::value_type gamma_val =
+        0x0000000000000000000000000000000085D434481165E938FEA628354AA5B9E5_cppui256;
+    typename BlueprintFieldType::value_type joint_combiner_val =
+        0x00_cppui256;
+    typename BlueprintFieldType::value_type zeta_val =
+        0x35ABB5BAFCAFF26391BB9A23EA996222FD0D4B0F392A78E4AFD5610ECE614E49_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x1421DEB15F5CE205068512B010382353DC0AA1B40386A1C14774C65664BB8182_cppui256;
+    std::size_t domain_size = 1024;
+
+    std::vector<typename BlueprintFieldType::value_type> public_input;
+
+    public_input.push_back(alpha_val);
+    var alpha = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(beta_val);
+    var beta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(gamma_val);
+    var gamma = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(joint_combiner_val);
+    var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
+    std::array<evaluations_type, 2> evals;
+    evals[0].w[3] = gamma;
+
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
+
+    auto result_check = [&gamma_val, &beta_val, &result](AssignmentType &assignment, component_type::result_type &real_res) {
+        assert(assignment.var_value(real_res.output)== result);
+
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
+}
+BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_vanishes) {
+
+    using curve_type = algebra::curves::vesta;
+    using BlueprintFieldType = typename curve_type::scalar_field_type;
+    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 30;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
+
+    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+
+    constexpr static std::size_t public_input_size = 3;
+    constexpr static std::size_t max_poly_size = 32;
+    constexpr static std::size_t eval_rounds = 5;
+
+    constexpr static std::size_t witness_columns = 15;
+    constexpr static std::size_t perm_size = 7;
+
+    constexpr static std::size_t srs_len = 10;
+    constexpr static const std::size_t prev_chal_size = 1;
+
+    using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
+    using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
+                                                                           witness_columns, perm_size>;
+    using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
+                                                             public_input_size, prev_chal_size>;
+
+    typename BlueprintFieldType::value_type result = 0x2692756edf321604d16f4d2151fbad0a9780c75ebb49f9b56a89adde2f6a1f48_cppui255;
+    constexpr const char *s ="Alpha;Pow(24);VanishesOnLast4Rows;\0";
+    const std::size_t array_size = zk::components::count_delimiters(s);
+    const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
+    using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
+                                                          8, 9, 10, 11, 12, 13, 14>;
+
+    typename BlueprintFieldType::value_type group_gen = BlueprintFieldType::value_type::one();
+
+    typename BlueprintFieldType::value_type alpha_val =
+        0x0C0D3C26FCD47AFF64D9055FCE9858335ADE6B0706289AB4019630784E8B7527_cppui256;
+    typename BlueprintFieldType::value_type beta_val =
+        0x0000000000000000000000000000000059E5EE71CFF4B24FA2A3A131F77CFFC8_cppui256;
+    typename BlueprintFieldType::value_type gamma_val =
+        0x0000000000000000000000000000000085D434481165E938FEA628354AA5B9E5_cppui256;
+    typename BlueprintFieldType::value_type joint_combiner_val =
+        0x00_cppui256;
+    typename BlueprintFieldType::value_type zeta_val =
+        0x35ABB5BAFCAFF26391BB9A23EA996222FD0D4B0F392A78E4AFD5610ECE614E49_cppui256;
+    typename BlueprintFieldType::value_type omega_val =
+        0x1421DEB15F5CE205068512B010382353DC0AA1B40386A1C14774C65664BB8182_cppui256;
+    std::size_t domain_size = 1024;
+
+    std::vector<typename BlueprintFieldType::value_type> public_input;
+
+    public_input.push_back(alpha_val);
+    var alpha = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(beta_val);
+    var beta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(gamma_val);
+    var gamma = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(joint_combiner_val);
+    var joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(zeta_val);
+    var zeta = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    public_input.push_back(omega_val);
+    var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
+
+    using evaluations_type = typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, kimchi_params>;
+    std::array<evaluations_type, 2> evals;
+    evals[0].w[3] = gamma;
+
+    typename component_type::params_type params = {s, zeta, alpha, beta, gamma, joint_combiner, evals, omega, domain_size};
+
+    auto result_check = [&gamma_val, &beta_val, &result](AssignmentType &assignment, component_type::result_type &real_res) {
+        assert(assignment.var_value(real_res.output)== result);
+
+    };
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
+}
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup) {
 
@@ -87,7 +267,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_dup
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -175,7 +355,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_sub
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -263,7 +443,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_add
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -350,7 +530,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_mul
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -438,7 +618,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_pow
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -526,7 +706,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_loa
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -615,7 +795,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -646,7 +826,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
             0x08066B51E8C7F77F825F541E02C51A608FD217435FDF7E75AD5BBE36CB826443_cppui256,
             0x1AA8ADB147AA57E6AA5DBAF2C238352D8C6AA301ECD497BBC775E2A2804E3363_cppui256
         };
-    
+
     typename BlueprintFieldType::value_type eval0_z = 0x1480D3E4FD095CEC3688F88B105EE6F2365DCFAAA28CCB6B87DAB7E71E58010B_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval0_s = {
@@ -676,7 +856,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
             0x06BF9230E2E2424EF63FE51B0306D61BA478A06A226AEDA29DD12DA188D5F302_cppui256,
             0x29126D228A13DAF18CD96C487BF794569FB5A8BBDF14DDEC6CE22DAAED7DF34F_cppui256
         };
-    
+
     typename BlueprintFieldType::value_type eval1_z = 0x1635A182C3B5623D5E7CF31D244F389FB478B0612B27937A39D48B473DB68931_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval1_s = {
@@ -701,7 +881,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
     typename BlueprintFieldType::value_type zeta_val =
         0x03D8C35D2E1466E8514E20A8E658F4E2B1116AB123F7BF53F9A1C7376F788EB1_cppui256;
 
-    typename BlueprintFieldType::value_type omega_val = 
+    typename BlueprintFieldType::value_type omega_val =
         0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
     std::size_t domain_size = 512;
 
@@ -712,7 +892,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_com
 
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<
                         BlueprintFieldType, kimchi_params>;
-    std::array<evaluations_type, 2> evals; 
+    std::array<evaluations_type, 2> evals;
 
     for (std::size_t i = 0; i < 2; i++) {
         for (std::size_t j = 0; j < witness_columns; j++) {
@@ -790,13 +970,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_end
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
 
     constexpr const char *s = "Cell(Variable { col: Witness(11), row: Curr });Dup;Mul;Cell(Variable { col: Witness(11), row: Curr });Sub;Alpha;Pow(1);Cell(Variable { col: Witness(12), row: Curr });Dup;Mul;Cell(Variable { col: Witness(12), row: Curr });Sub;Mul;Add;Alpha;Pow(2);Cell(Variable { col: Witness(13), row: Curr });Dup;Mul;Cell(Variable { col: Witness(13), row: Curr });Sub;Mul;Add;Alpha;Pow(3);Cell(Variable { col: Witness(14), row: Curr });Dup;Mul;Cell(Variable { col: Witness(14), row: Curr });Sub;Mul;Add;Alpha;Pow(4);Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(11), row: Curr });EndoCoefficient;Literal 0000000000000000000000000000000000000000000000000000000000000001;Sub;Mul;Add;Cell(Variable { col: Witness(0), row: Curr });Mul;Store;Cell(Variable { col: Witness(4), row: Curr });Sub;Cell(Variable { col: Witness(9), row: Curr });Mul;Cell(Variable { col: Witness(12), row: Curr });Dup;Add;Literal 0000000000000000000000000000000000000000000000000000000000000001;Sub;Cell(Variable { col: Witness(1), row: Curr });Mul;Cell(Variable { col: Witness(5), row: Curr });Sub;Sub;Mul;Add;Alpha;Pow(5);Cell(Variable { col: Witness(4), row: Curr });Dup;Add;Cell(Variable { col: Witness(9), row: Curr });Dup;Mul;Store;Sub;Load(0);Add;Cell(Variable { col: Witness(4), row: Curr });Cell(Variable { col: Witness(7), row: Curr });Sub;Store;Cell(Variable { col: Witness(9), row: Curr });Mul;Cell(Variable { col: Witness(8), row: Curr });Cell(Variable { col: Witness(5), row: Curr });Add;Store;Add;Mul;Cell(Variable { col: Witness(5), row: Curr });Dup;Add;Load(2);Mul;Sub;Mul;Add;Alpha;Pow(6);Load(3);Dup;Mul;Load(2);Dup;Mul;Load(1);Load(0);Sub;Cell(Variable { col: Witness(7), row: Curr });Add;Mul;Sub;Mul;Add;Alpha;Pow(7);Literal 0000000000000000000000000000000000000000000000000000000000000001;Cell(Variable { col: Witness(13), row: Curr });EndoCoefficient;Literal 0000000000000000000000000000000000000000000000000000000000000001;Sub;Mul;Add;Cell(Variable { col: Witness(0), row: Curr });Mul;Store;Cell(Variable { col: Witness(7), row: Curr });Sub;Cell(Variable { col: Witness(10), row: Curr });Mul;Cell(Variable { col: Witness(14), row: Curr });Dup;Add;Literal 0000000000000000000000000000000000000000000000000000000000000001;Sub;Cell(Variable { col: Witness(1), row: Curr });Mul;Cell(Variable { col: Witness(8), row: Curr });Sub;Sub;Mul;Add;Alpha;Pow(8);Cell(Variable { col: Witness(7), row: Curr });Dup;Add;Cell(Variable { col: Witness(10), row: Curr });Dup;Mul;Store;Sub;Load(4);Add;Cell(Variable { col: Witness(7), row: Curr });Cell(Variable { col: Witness(4), row: Next });Sub;Store;Cell(Variable { col: Witness(10), row: Curr });Mul;Cell(Variable { col: Witness(5), row: Next });Cell(Variable { col: Witness(8), row: Curr });Add;Store;Add;Mul;Cell(Variable { col: Witness(8), row: Curr });Dup;Add;Load(6);Mul;Sub;Mul;Add;Alpha;Pow(9);Load(7);Dup;Mul;Load(6);Dup;Mul;Load(5);Load(4);Sub;Cell(Variable { col: Witness(4), row: Next });Add;Mul;Sub;Mul;Add;Alpha;Pow(10);Cell(Variable { col: Witness(6), row: Curr });Dup;Add;Cell(Variable { col: Witness(11), row: Curr });Add;Dup;Add;Cell(Variable { col: Witness(12), row: Curr });Add;Dup;Add;Cell(Variable { col: Witness(13), row: Curr });Add;Dup;Add;Cell(Variable { col: Witness(14), row: Curr });Add;Cell(Variable { col: Witness(6), row: Next });Sub;Mul;Add;\0";
-    
+
     const std::size_t array_size = zk::components::count_delimiters(s);
     const std::size_t N = zk::components::rpn_component_rows<array_size, ArithmetizationType>(s);
     using component_type = zk::components::rpn_expression<ArithmetizationType, kimchi_params, N, 0, 1, 2, 3, 4, 5, 6, 7,
@@ -822,7 +1002,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_end
             0x08066B51E8C7F77F825F541E02C51A608FD217435FDF7E75AD5BBE36CB826443_cppui256,
             0x1AA8ADB147AA57E6AA5DBAF2C238352D8C6AA301ECD497BBC775E2A2804E3363_cppui256
         };
-    
+
     typename BlueprintFieldType::value_type eval0_z = 0x1480D3E4FD095CEC3688F88B105EE6F2365DCFAAA28CCB6B87DAB7E71E58010B_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval0_s = {
@@ -852,7 +1032,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_end
             0x06BF9230E2E2424EF63FE51B0306D61BA478A06A226AEDA29DD12DA188D5F302_cppui256,
             0x29126D228A13DAF18CD96C487BF794569FB5A8BBDF14DDEC6CE22DAAED7DF34F_cppui256
         };
-    
+
     typename BlueprintFieldType::value_type eval1_z = 0x1635A182C3B5623D5E7CF31D244F389FB478B0612B27937A39D48B473DB68931_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval1_s = {
@@ -877,7 +1057,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_end
     typename BlueprintFieldType::value_type zeta_val =
         0x03D8C35D2E1466E8514E20A8E658F4E2B1116AB123F7BF53F9A1C7376F788EB1_cppui256;
 
-    typename BlueprintFieldType::value_type omega_val = 
+    typename BlueprintFieldType::value_type omega_val =
         0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
     std::size_t domain_size = 512;
 
@@ -888,7 +1068,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_rpn_expression_test_suite_end
 
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<
                         BlueprintFieldType, kimchi_params>;
-    std::array<evaluations_type, 2> evals; 
+    std::array<evaluations_type, 2> evals;
 
     for (std::size_t i = 0; i < 2; i++) {
         for (std::size_t j = 0; j < witness_columns; j++) {

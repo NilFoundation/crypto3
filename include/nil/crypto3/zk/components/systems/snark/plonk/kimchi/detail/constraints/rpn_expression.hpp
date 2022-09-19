@@ -298,7 +298,7 @@ namespace nil {
                                 token.type = token_type::unnormalized_lagrange_basis;
 
                                 std::size_t exp_start_pos = token_str.find("UnnormalizedLagrangeBasis");
-                                exp_start_pos = token_str.find("(", exp_start_pos);
+                                exp_start_pos = token_str.find("(", exp_start_pos) +1;
                                 std::size_t exp_end_pos = token_str.find(")", exp_start_pos);
                                 std::string exp_str = token_str.substr(exp_start_pos, exp_end_pos - exp_start_pos);
                                 token.int_data = std::stoi(exp_str);

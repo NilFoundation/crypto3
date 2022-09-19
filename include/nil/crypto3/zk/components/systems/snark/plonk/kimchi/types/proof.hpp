@@ -37,7 +37,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
 
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/evaluation_proof.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/binding.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
@@ -90,7 +90,7 @@ namespace nil {
                     kimchi_opening_proof_scalar<BlueprintFieldType> 
                         opening;
 
-                    using transcript_type = kimchi_transcript<ArithmetizationType, typename KimchiParamsType::curve_type,
+                    using transcript_type = kimchi_transcript_fr<ArithmetizationType, typename KimchiParamsType::curve_type,
                                         KimchiParamsType,
                                         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                         11, 12, 13, 14>;
@@ -119,10 +119,6 @@ namespace nil {
                         zk::components::kimchi_commitment_type<BlueprintFieldType, 
                             commitment_params_type::shifted_commitment_split>;
 
-                    using witness_comm_type = typename 
-                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
-                            commitment_params_type::w_comm_size>;
-
                     using opening_proof_type = typename 
                         zk::components::kimchi_opening_proof_base<BlueprintFieldType,
                         commitment_params_type::eval_rounds>;
@@ -130,7 +126,7 @@ namespace nil {
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
                     struct commitments_type {
-                        std::array<witness_comm_type,
+                        std::array<commitment_type,
                             KimchiParamsType::witness_columns> witness;
                         commitment_type lookup_runtime;
                         commitment_type table;
