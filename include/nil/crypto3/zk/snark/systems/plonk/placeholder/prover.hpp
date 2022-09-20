@@ -51,7 +51,8 @@ namespace nil {
                 namespace detail {
                     template<typename FieldType>
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
-                        split_polynomial(math::polynomial<typename FieldType::value_type> f, std::size_t max_degree) {
+                        split_polynomial(const math::polynomial<typename FieldType::value_type> &f,
+                                         std::size_t max_degree) {
                         std::size_t parts = ((f.size() - 1) / (max_degree + 1)) + 1;
                         std::vector<math::polynomial<typename FieldType::value_type>> f_splitted;
 

@@ -300,7 +300,8 @@ namespace nil {
                         identity_polynomials(std::size_t permutation_size,
                                              const typename FieldType::value_type &omega,
                                              const typename FieldType::value_type &delta,
-                                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain,
+                                             std::shared_ptr<math::evaluation_domain<FieldType>>
+                                                 domain,
                                              const typename ParamsType::commitment_params_type &commitment_params) {
 
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_id(permutation_size);
@@ -324,7 +325,8 @@ namespace nil {
                                                 const typename FieldType::value_type &omega,
                                                 const typename FieldType::value_type &delta,
                                                 cycle_representation &permutation,
-                                                const std::shared_ptr<math::evaluation_domain<FieldType>> &domain,
+                                                std::shared_ptr<math::evaluation_domain<FieldType>>
+                                                    domain,
                                                 const typename ParamsType::commitment_params_type &commitment_params) {
 
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_perm(permutation_size);
@@ -343,7 +345,8 @@ namespace nil {
 
                     static inline math::polynomial_dfs<typename FieldType::value_type>
                         selector_blind(std::size_t usable_rows,
-                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &domain,
+                                       std::shared_ptr<math::evaluation_domain<FieldType>>
+                                           domain,
                                        const typename ParamsType::commitment_params_type &commitment_params) {
                         math::polynomial_dfs<typename FieldType::value_type> q_blind(domain->size() - 1, domain->size(),
                                                                                      FieldType::value_type::zero());

@@ -71,7 +71,7 @@ namespace nil {
                         plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
-                            preprocessed_data,
+                            &preprocessed_data,
                         const plonk_assignment_table<FieldType, typename ParamsType::arithmetization_params>
                             &plonk_columns,
                         typename CommitmentSchemeTypePermutation::params_type fri_params,
@@ -255,7 +255,7 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
                         const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
-                            preprocessed_data,
+                            &preprocessed_data,
                         const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates,
                         // y
                         const typename FieldType::value_type &challenge,

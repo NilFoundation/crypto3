@@ -158,7 +158,7 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
                         const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
-                            preprocessed_data,
+                            &preprocessed_data,
                         // y
                         const typename FieldType::value_type &challenge,
                         // f(y):
@@ -187,8 +187,10 @@ namespace nil {
                         typename FieldType::value_type h = FieldType::value_type::one();
 
                         for (std::size_t i = 0; i < column_polynomials_values.size(); i++) {
-                            g = g * (column_polynomials_values[i] + beta * S_id[i].evaluate(challenge) + gamma);
-                            h = h * (column_polynomials_values[i] + beta * S_sigma[i].evaluate(challenge) + gamma);
+                            auto pp = column_polynomials_values[i] + gamma;
+
+                            g = g * (pp + beta * S_id[i].evaluate(challenge));
+                            h = h * (pp + beta * S_sigma[i].evaluate(challenge));
                         }
 
                         std::array<typename FieldType::value_type, argument_size> F;
