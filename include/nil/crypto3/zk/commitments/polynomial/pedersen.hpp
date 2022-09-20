@@ -38,7 +38,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
-                
+
                 template<typename CurveType>
                 class pedersen {
                 public:
@@ -48,29 +48,32 @@ namespace nil {
                     typedef typename group_type::value_type commitment_type;
 
                     struct params_type {
-                        //setup as an open key (non trusted, so uniform for both sides)
-                        int n;                      //n - number of parties
-                        int k;                      //k <= n - number of parties needed to open the secret message
+                        // setup as an open key (non trusted, so uniform for both sides)
+                        int n;    // n - number of parties
+                        int k;    // k <= n - number of parties needed to open the secret message
                         commitment_type g;
                         commitment_type h;
                     };
 
                     struct private_key {
-                        evaluation_type s;              //power of g
-                        evaluation_type t;              //power of h
+                        evaluation_type s;    // power of g
+                        evaluation_type t;    // power of h
 
-                        private_key() : s(0), t(0) {}
-                        private_key(evaluation_type a, evaluation_type b) : s(a), t(b) {}
+                        private_key() : s(0), t(0) {
+                        }
+                        private_key(evaluation_type a, evaluation_type b) : s(a), t(b) {
+                        }
                     };
 
                     struct proof_type {
-                        commitment_type E_0;        //initial commitment
-                        std::vector<commitment_type> E; //commitments open for everyone
-                        std::vector<private_key> pk;    //private keys for each party
+                        commitment_type E_0;               // initial commitment
+                        std::vector<commitment_type> E;    // commitments open for everyone
+                        std::vector<private_key> pk;       // private keys for each party
                     };
 
-                    static params_type key_generator(int n, int k, commitment_type g = commitment_type::one(), commitment_type h = commitment_type::one()) {
-                        //evaluates setup for current protocol
+                    static params_type key_generator(int n, int k, commitment_type g = commitment_type::one(),
+                                                     commitment_type h = commitment_type::one()) {
+                        // evaluates setup for current protocol
                         if (g == commitment_type::one()) {
                             g = algebra::random_element<group_type>();
                         }
@@ -83,20 +86,21 @@ namespace nil {
                         return params_type(n, k, g, h);
                     }
 
-                    static commitment_type commitment(const params_type& params, const private_key& pk) {
-                        //pedersen commitment
+                    static commitment_type commitment(const params_type &params, const private_key &pk) {
+                        // pedersen commitment
                         return params.g * pk.s + params.h * pk.t;
                     }
 
-                    static std::vector<evaluation_type> poly_eval(const params_type& params, const std::vector<evaluation_type>& coeffs) {
-                        //computes F(i) for i in range 1..n for polynom F of degree k - proof.E
+                    static std::vector<evaluation_type> poly_eval(const params_type &params,
+                                                                  const std::vector<evaluation_type> &coeffs) {
+                        // computes F(i) for i in range 1..n for polynom F of degree k - proof.E
                         std::vector<evaluation_type> p_i;
                         evaluation_type spare;
                         evaluation_type sum;
                         for (int i = 1; i <= params.n; ++i) {
                             spare = 1;
                             sum = coeffs[0];
-                            for (int j = 1; j < params.k; ++ j) {
+                            for (int j = 1; j < params.k; ++j) {
                                 spare *= i;
                                 sum += spare * coeffs[j];
                             }
@@ -105,8 +109,8 @@ namespace nil {
                         return p_i;
                     }
 
-                    static proof_type proof_eval(const params_type& params, const evaluation_type w) {
-                        //evaluates proof according to pedersen commitment '81
+                    static proof_type proof_eval(const params_type &params, const evaluation_type &w) {
+                        // evaluates proof according to pedersen commitment '81
                         proof_type prf;
 
                         evaluation_type t = algebra::random_element<field_type>();
@@ -124,8 +128,9 @@ namespace nil {
                             g_coeffs.push_back(spare);
                         }
 
-                        std::vector<evaluation_type> s_i = poly_eval(params, f_coeffs); //pair (s_i[j], t_i[j]) is given exclusively
-                        std::vector<evaluation_type> t_i = poly_eval(params, g_coeffs); //to party number j
+                        std::vector<evaluation_type> s_i =
+                            poly_eval(params, f_coeffs);    // pair (s_i[j], t_i[j]) is given exclusively
+                        std::vector<evaluation_type> t_i = poly_eval(params, g_coeffs);    // to party number j
                         for (int i = 0; i < params.n; ++i) {
                             prf.pk.push_back(private_key(s_i[i], t_i[i]));
                         }
@@ -136,8 +141,8 @@ namespace nil {
                         return prf;
                     }
 
-                    static bool verify_eval(params_type params, proof_type prf) {
-                        //vefifies that everyone is sure one knows the secret message
+                    static bool verify_eval(const params_type &params, const proof_type &prf) {
+                        // vefifies that everyone is sure one knows the secret message
                         bool answer = true;
 
                         evaluation_type power;
@@ -157,9 +162,10 @@ namespace nil {
                         return answer;
                     }
 
-                    static evaluation_type message_eval(params_type params, proof_type prf, std::vector<int> idx) {
-                        //for a given number of people learns if they can open message
-                        //and if so, opens it
+                    static evaluation_type message_eval(const params_type &params, const proof_type &prf,
+                                                        const std::vector<int32_t> &idx) {
+                        // for a given number of people learns if they can open message
+                        // and if so, opens it
                         if ((idx.size() < params.k) || (!verify_eval(params, prf))) {
                             return 0;
                         }
@@ -178,7 +184,6 @@ namespace nil {
                         return sum;
                     }
                 };
-
             }    // namespace commitments
         }        // namespace zk
     }            // namespace crypto3

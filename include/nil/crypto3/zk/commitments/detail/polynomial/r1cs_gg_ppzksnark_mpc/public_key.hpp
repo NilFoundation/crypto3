@@ -36,22 +36,19 @@ namespace nil {
                     struct r1cs_gg_ppzksnark_mpc_public_key {
                         typedef CurveType curve_type;
                         typedef commitments::detail::element_pok<CurveType> pok_type;
-                        typedef typename curve_type::g1_type<>::value_type g1_value_type;
+                        typedef typename curve_type::template g1_type<>::value_type g1_value_type;
 
                         g1_value_type delta_after;
                         pok_type delta_pok;
 
-                        r1cs_gg_ppzksnark_mpc_public_key(
-                            g1_value_type delta_after,
-                            pok_type delta_pok
-                        ) :  delta_after(delta_after), delta_pok(delta_pok)
-                        {}
-
+                        r1cs_gg_ppzksnark_mpc_public_key(g1_value_type delta_after, pok_type delta_pok) :
+                            delta_after(delta_after), delta_pok(delta_pok) {
+                        }
                     };
-                } // detail
-            }   // commitments
-        }   // zk
-    }   // crypto3
-}   // nil
+                }    // namespace detail
+            }        // namespace commitments
+        }            // namespace zk
+    }                // namespace crypto3
+}    // namespace nil
 
-#endif  // CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PUBLIC_KEY_HPP
+#endif    // CRYPTO3_ZK_R1CS_GG_PPZKSNARK_MPC_PUBLIC_KEY_HPP

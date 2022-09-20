@@ -66,11 +66,19 @@ namespace nil {
                          std::size_t M,
                          std::size_t BatchedSize = 0,
                          bool IsConstSize = (bool)BatchedSize>
-                struct fri : public detail::
-                                 basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize, IsConstSize> {
+                struct fri : public detail::basic_batched_fri<FieldType,
+                                                              MerkleTreeHashType,
+                                                              TranscriptHashType,
+                                                              M,
+                                                              BatchedSize,
+                                                              IsConstSize> {
 
-                    using basic_fri =
-                        detail::basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchedSize, IsConstSize>;
+                    using basic_fri = detail::basic_batched_fri<FieldType,
+                                                                MerkleTreeHashType,
+                                                                TranscriptHashType,
+                                                                M,
+                                                                BatchedSize,
+                                                                IsConstSize>;
                     constexpr static const std::size_t m = basic_fri::m;
                     constexpr static const std::size_t leaf_size = basic_fri::leaf_size;
                     constexpr static const bool is_const_size = IsConstSize;
@@ -141,7 +149,7 @@ namespace nil {
                 static bool verify_eval(
                     typename FRI::basic_fri::proof_type &proof,
                     typename FRI::basic_fri::params_type &fri_params,
-                    typename FRI::commitment_type        t_polynomials,
+                    const typename FRI::commitment_type &t_polynomials,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
 
                     std::array<math::polynomial<typename FRI::field_type::value_type>, 1> U;
