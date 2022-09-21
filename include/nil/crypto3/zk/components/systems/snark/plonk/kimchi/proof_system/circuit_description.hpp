@@ -34,9 +34,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template<typename IndexTermsList,
-                    std::size_t WitnessColumns,
-                    std::size_t PermutSize>
+                template<typename IndexTermsList, std::size_t WitnessColumns, std::size_t PermutSize>
                 struct kimchi_circuit_description {
                     using index_terms_list = IndexTermsList;
 

@@ -64,16 +64,16 @@ namespace nil {
                 }
 
                 snark::plonk_column<BlueprintFieldType> &witness(std::size_t witness_index) {
-                    assert(witness_index < ArithmetizationParams::WitnessColumns);
+                    assert(witness_index < ArithmetizationParams::witness_columns);
                     this->witness_columns[witness_index].resize(_table_description.rows_amount);
                     return this->witness_columns[witness_index];
                 }
 
                 snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
-                    if (index < ArithmetizationParams::WitnessColumns) {
+                    if (index < ArithmetizationParams::witness_columns) {
                         return witness(index);
                     }
-                    index -= ArithmetizationParams::WitnessColumns;
+                    index -= ArithmetizationParams::witness_columns;
 
                     // Usupposed input
                     return this->witness(0);
@@ -97,7 +97,7 @@ namespace nil {
                     }
                     
                     for (std::size_t w_index = 0; w_index <
-                        ArithmetizationParams::WitnessColumns; w_index++){
+                        ArithmetizationParams::witness_columns; w_index++){
 
                         this->witness_columns[w_index].resize(_table_description.rows_amount,
                             decltype(this->witness_columns)::value_type::value_type::zero());
@@ -386,11 +386,11 @@ namespace nil {
 
                 // shared interface
                 snark::plonk_column<BlueprintFieldType> &operator[](std::size_t index) {
-                    if (index < ArithmetizationParams::WitnessColumns) {
+                    if (index < ArithmetizationParams::witness_columns) {
                         return _private_assignment[index];
                     }
 
-                    index -= ArithmetizationParams::WitnessColumns;
+                    index -= ArithmetizationParams::witness_columns;
                     return _public_assignment[index];
                 }
 
