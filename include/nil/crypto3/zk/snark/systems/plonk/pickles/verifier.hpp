@@ -39,8 +39,8 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename CurveType, std::size_t WiresAmount>
-                batch_evaluation_proof<CurveType>
-                    to_batch(verifier_index<CurveType> index, commitments::kimchi_pedersen<CurveType> proof) {
+                batch_evaluation_proof<CurveType> to_batch(verifier_index<CurveType> index,
+                                                           commitments::kimchi_pedersen<CurveType> proof) {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
                     using Fr = typename CurveType::scalar_field_type;
@@ -195,8 +195,8 @@ namespace nil {
                     // MSM
                     commitment_type f_comm = PolyComm::multi_scalar_mul(&commitments, &scalars);
 
-                        //~ 5. Compute the (chuncked) commitment of $ft$
-                        //~    (see [Maller's optimization](../crypto/plonk/maller_15.html)).
+                    //~ 5. Compute the (chuncked) commitment of $ft$
+                    //~    (see [Maller's optimization](../crypto/plonk/maller_15.html)).
                     Fr zeta_to_srs_len = oracles_res.oracles.zeta.pow(index.max_poly_size);
                     commitment_type chunked_f_comm = f_comm.chunk_commitment(zeta_to_srs_len);
                     commitment_type chunked_t_comm = proof.commitments.t_comm.chunk_commitment(zeta_to_srs_len);
@@ -251,7 +251,7 @@ namespace nil {
                 std::vector<Fr> evaluation_points = {oracles_res.oracles.zeta,
                                                      oracles_res.oracles.zeta * index.domain.group_gen};
                 return batch_evaluation_proof {oracles_res.fq_sponge, evaluations,           evaluation_points,
-                                             oracles_res.oracles.v, oracles_res.oracles.u, proof.proof};
+                                               oracles_res.oracles.v, oracles_res.oracles.u, proof.proof};
                 }
             }    // namespace snark
         }        // namespace zk

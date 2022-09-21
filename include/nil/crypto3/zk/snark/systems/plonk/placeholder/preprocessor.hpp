@@ -88,7 +88,7 @@ namespace nil {
 
                             public_commitments_type commitments;
 
-                            std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>
+                            std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns>
                                 columns_rotations;
 
                             std::size_t rows_amount;
@@ -209,14 +209,14 @@ namespace nil {
                     };
 
                 public:
-                    static inline std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>
+                    static inline std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns>
                         columns_rotations(
                             plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                                 &constraint_system,
                             const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                                 &table_description) {
 
-                        std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> result;
+                        std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> result;
 
                         std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates =
                             constraint_system.gates();
@@ -287,7 +287,7 @@ namespace nil {
                             }
                         }
 
-                        for (std::size_t i = 0; i < ParamsType::arithmetization_params::TotalColumns; i++) {
+                        for (std::size_t i = 0; i < ParamsType::arithmetization_params::total_columns; i++) {
                             if (std::find(result[i].begin(), result[i].end(), 0) == result[i].end()) {
                                 result[i].push_back(0);
                             }
@@ -486,7 +486,7 @@ namespace nil {
                         typename preprocessed_data_type::public_commitments_type public_commitments =
                             commitments(public_precommitments);
 
-                        std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> c_rotations =
+                        std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data {
@@ -542,7 +542,6 @@ namespace nil {
                         return preprocessed_data_type({basic_domain, private_polynomial_table});
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

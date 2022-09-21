@@ -44,10 +44,10 @@ namespace nil {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
 
-                    constexpr static const std::size_t witness_columns = ArithmetizationParams::WitnessColumns;
-                    constexpr static const std::size_t public_input_columns = ArithmetizationParams::PublicInputColumns;
-                    constexpr static const std::size_t constant_columns = ArithmetizationParams::ConstantColumns;
-                    constexpr static const std::size_t selector_columns = ArithmetizationParams::SelectorColumns;
+                    constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
+                    constexpr static const std::size_t public_input_columns = ArithmetizationParams::public_input_columns;
+                    constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
+                    constexpr static const std::size_t selector_columns = ArithmetizationParams::selector_columns;
 
                     using arithmetization_params = ArithmetizationParams;
 

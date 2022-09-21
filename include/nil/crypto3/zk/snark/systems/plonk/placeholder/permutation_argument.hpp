@@ -96,9 +96,10 @@ namespace nil {
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> g_v;
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> h_v;
                         for (std::size_t i = 0; i < S_id.size(); i++) {
-                            assert(column_polynomials[i].size() == basic_domain->size());
-                            assert(S_id[i].size() == basic_domain->size());
-                            assert(S_sigma[i].size() == basic_domain->size());
+                            BOOST_ASSERT(column_polynomials[i].size() == basic_domain->size());
+                            BOOST_ASSERT(S_id[i].size() == basic_domain->size());
+                            BOOST_ASSERT(S_sigma[i].size() == basic_domain->size());
+
                             g_v.push_back(column_polynomials[i] + beta * S_id[i] + gamma);
                             h_v.push_back(column_polynomials[i] + beta * S_sigma[i] + gamma);
                         }

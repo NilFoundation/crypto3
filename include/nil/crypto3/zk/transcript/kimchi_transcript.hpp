@@ -41,7 +41,7 @@ namespace nil {
                 const int HIGH_ENTROPY_LIMBS = 2;
 
                 template<typename curve_type>
-                class sponge{
+                class sponge {
                 public:
                     using group_type = typename curve_type::template g1_type<>;
                     using scalar_field_type = typename curve_type::scalar_field_type;
@@ -51,7 +51,8 @@ namespace nil {
                     typename hashes::detail::poseidon_sponge_construction<policy_type> pos_sponge;
                     std::vector<std::uint64_t> last_squeezed;
 
-                    sponge() : last_squeezed(), pos_sponge() {}
+                    sponge() : last_squeezed(), pos_sponge() {
+                    }
 
                     void print_state() {
                         std::cout << "STATE: ";
@@ -61,7 +62,7 @@ namespace nil {
                         std::cout << '\n';
                     }
 
-                    typename scalar_field_type::value_type pack(const std::vector<std::uint64_t>& limbs) {
+                    typename scalar_field_type::value_type pack(const std::vector<std::uint64_t> &limbs) {
                         typename scalar_field_type::value_type res(0);
                         typename scalar_field_type::value_type zero(0);
                         auto x = zero.data;
@@ -88,14 +89,16 @@ namespace nil {
                     std::vector<std::uint64_t> squeeze_limbs(int num_limbs) {
                         if (this->last_squeezed.size() >= num_limbs) {
                             auto copy_last_squeezed = this->last_squeezed;
-                            std::vector<std::uint64_t> limbs = {copy_last_squeezed.begin(), copy_last_squeezed.begin() + num_limbs};
-                            std::vector<std::uint64_t> remaining = {copy_last_squeezed.begin() + num_limbs, copy_last_squeezed.end()};
+                            std::vector<std::uint64_t> limbs = {copy_last_squeezed.begin(),
+                                                                copy_last_squeezed.begin() + num_limbs};
+                            std::vector<std::uint64_t> remaining = {copy_last_squeezed.begin() + num_limbs,
+                                                                    copy_last_squeezed.end()};
                             this->last_squeezed = remaining;
                             return limbs;
                         }
                         auto sq = this->pos_sponge.squeeze();
                         auto x = unpack(sq);
-                        for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
+                        for (int i = 0; i < HIGH_ENTROPY_LIMBS; ++i) {
                             this->last_squeezed.push_back(x[i]);
                         }
                         return this->squeeze_limbs(num_limbs);
@@ -113,7 +116,7 @@ namespace nil {
                         return res;
                     }
 
-                    void absorb_g(const std::vector<typename group_type::value_type>& gs) {
+                    void absorb_g(const std::vector<typename group_type::value_type> &gs) {
                         this->last_squeezed = {};
                         for (auto g : gs) {
                             // for infinite groups need to check if inf - then absorb [zero, zero]
@@ -123,7 +126,7 @@ namespace nil {
                         return;
                     }
 
-                    int from_bits(const std::array<bool, 128>& bits) {
+                    int from_bits(const std::array<bool, 128> &bits) {
                         int res = 1;
                         // int a = 1;
                         // for (auto bit : bits) {
@@ -142,7 +145,7 @@ namespace nil {
                         return bits;
                     }
 
-                    void absorb_fr(const std::vector<typename scalar_field_type::value_type>& xs) {
+                    void absorb_fr(const std::vector<typename scalar_field_type::value_type> &xs) {
                         // this->last_squeezed = {};
                         // for (auto x : xs) {
                         //     auto bits = to_bits(x.data);
@@ -155,8 +158,9 @@ namespace nil {
                         //                                         typename base_field_type::value_type::zero());
                         //         typename base_field_type::value_type high_bits = base_field_type::value_type(
                         //                                         from_bits(newVec(bits.begin() + 1, bits.end())));
-                                
-                        //         this->pos_sponge.absorb(std::vector<typename base_field_type::value_type>(high_bits));
+
+                        //         this->pos_sponge.absorb(std::vector<typename
+                        //         base_field_type::value_type>(high_bits));
                         //         this->pos_sponge.absorb(std::vector<typename base_field_type::value_type>(low_bit));
                         //     }
                         // }

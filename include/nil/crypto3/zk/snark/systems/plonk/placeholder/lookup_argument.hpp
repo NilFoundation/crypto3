@@ -242,15 +242,13 @@ namespace nil {
                              (F_perm_input - F_perm_value) * (F_perm_input - F_perm_input_shifted))
                                 .coefficients());
 
-                        prover_lookup_result res = {F,
-                                                    F_perm_input_normal,
-                                                    F_perm_input_tree,
-                                                    F_perm_value_normal,
-                                                    F_perm_value_tree,
-                                                    V_L_normal,
-                                                    V_L_tree};
-
-                        return res;
+                        return {F,
+                                F_perm_input_normal,
+                                F_perm_input_tree,
+                                F_perm_value_normal,
+                                F_perm_value_tree,
+                                V_L_normal,
+                                V_L_tree};
                     }
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(

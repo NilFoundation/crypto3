@@ -72,9 +72,7 @@ namespace nil {
                     std::size_t index;
                     bool relative;
 
-                    constexpr plonk_variable() :
-                        index(0),
-                        rotation(0), relative(false), type(column_type::witness) {};
+                    constexpr plonk_variable() : index(0), rotation(0), relative(false), type(column_type::witness) {};
 
                     constexpr plonk_variable(const std::size_t index,
                                              std::int32_t rotation,
@@ -120,8 +118,8 @@ namespace nil {
                     }
 
                     bool operator==(const plonk_variable &other) const {
-                        return ((this->index == other.index) && (this->rotation == other.rotation)
-                            && this->type == other.type);
+                        return ((this->index == other.index) && (this->rotation == other.rotation) &&
+                                this->type == other.type);
                     }
 
                     bool operator<(const plonk_variable &other) const {
