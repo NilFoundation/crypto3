@@ -80,14 +80,14 @@ namespace nil {
                     constexpr static const bool joint_lookup = false;
 
                     constexpr static const bool poseidon_gate = false;
-                    constexpr static const bool ec_arithmetic_gates = false;
+                    constexpr static const bool ec_arithmetic_gates = true;
                     constexpr static const bool generic_gate = false;
-                    constexpr static const bool chacha_gate = true;
+                    constexpr static const bool chacha_gate = false;
 
                     constexpr static const std::size_t poseidon_gates_count = 15;
                     constexpr static const std::size_t ec_arithmetic_gates_count = 4;
 
-                    constexpr static const std::size_t alpha_powers_n = 30;
+                    constexpr static const std::size_t alpha_powers_n = 24;
 
                     constexpr static const std::array<char*, poseidon_gates_count> coefficient_str = {
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;\0",
@@ -140,16 +140,6 @@ namespace nil {
                     constexpr static const std::size_t endo_mul_scalar_array_size = count_delimiters(endo_mul_scalar_str);
 
                     constexpr static const std::size_t constatnt_term_array_size = count_delimiters(constant_term_str);
-
-                    constexpr static const std::size_t lookup_gate_array_size = count_delimiters(lookup_gate_str);
-
-                    constexpr static const std::size_t chacha0_array_size = count_delimiters(chacha0_str);
-
-                    constexpr static const std::size_t chacha1_array_size = count_delimiters(chacha1_str);
-
-                    constexpr static const std::size_t chacha2_array_size = count_delimiters(chacha2_str);
-
-                    constexpr static const std::size_t chacha_final_array_size = count_delimiters(chacha_final_str);
 
                     constexpr static const std::array<std::size_t, poseidon_gates_count> 
                         coefficient_rows = {

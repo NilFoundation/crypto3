@@ -78,18 +78,18 @@ namespace nil {
 
                     constexpr static const std::size_t lookup_columns = 5;
                     constexpr static const bool lookup_runtime = false;
-                    constexpr static const bool lookup_table_ids = false;
+                    constexpr static const bool lookup_table_ids = true;
                     constexpr static const bool joint_lookup = false;
 
                     constexpr static const bool poseidon_gate = false;
-                    constexpr static const bool ec_arithmetic_gates = false;
-                    constexpr static const bool generic_gate = false;
+                    constexpr static const bool ec_arithmetic_gates = true;
+                    constexpr static const bool generic_gate = true;
                     constexpr static const bool chacha_gate = true;
 
                     constexpr static const std::size_t poseidon_gates_count = 15;
                     constexpr static const std::size_t ec_arithmetic_gates_count = 4;
 
-                    constexpr static const std::size_t alpha_powers_n = 30;
+                    constexpr static const std::size_t alpha_powers_n = 31;
 
                     constexpr static const std::array<char*, poseidon_gates_count> coefficient_str = {
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;\0",
