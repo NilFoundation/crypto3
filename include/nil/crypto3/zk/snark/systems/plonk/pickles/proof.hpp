@@ -36,12 +36,12 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename CommitmentType>
+                template<typename Type>
                 struct lookup_st {
-                    std::vector<CommitmentType> sorted;
-                    CommitmentType aggreg;
-                    CommitmentType table;
-                    CommitmentType runtime;
+                    std::vector<Type> sorted;
+                    Type aggreg;
+                    Type table;
+                    Type runtime;
                 };
 
                 template<typename CurveType, std::size_t ColumnsAmount = 15, std::size_t PermutsAmount = 7>
