@@ -230,7 +230,7 @@ namespace nil {
                         }
 
                         assignment.enable_selector(first_selector_index, start_row_index + add_component::rows_amount,
-                                                   start_row_index + rows_amount - 3, 2);
+                                                   start_row_index + rows_amount - 4, 2);
                         assignment.enable_selector(first_selector_index + 1, start_row_index + rows_amount - 2);
 
                         typename add_component::params_type addition_params = {{params.T.x, params.T.y},
