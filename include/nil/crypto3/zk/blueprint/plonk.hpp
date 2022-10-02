@@ -118,6 +118,11 @@ namespace nil {
                               const std::initializer_list<snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
                     this->_lookup_gates.emplace_back(selector_index, constraints);
                 }
+
+                snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> table_description() const {
+                    return _table_description;
+                }
             };
         }    // namespace zk
     }        // namespace crypto3
