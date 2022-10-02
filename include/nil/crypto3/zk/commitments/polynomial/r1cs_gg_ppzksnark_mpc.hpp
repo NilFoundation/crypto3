@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/proof_of_knowledge.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/vector_pairs.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/r1cs_gg_ppzksnark_mpc/crs_operatios.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/r1cs_gg_ppzksnark_mpc/crs_operations.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
