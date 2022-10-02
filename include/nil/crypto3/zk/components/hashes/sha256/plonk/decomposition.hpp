@@ -41,29 +41,11 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class decomposition;
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4,
+                         std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8>
                 class decomposition<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                    CurveType,
-                                    W0,
-                                    W1,
-                                    W2,
-                                    W3,
-                                    W4,
-                                    W5,
-                                    W6,
-                                    W7,
-                                    W8> {
+                                    CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -171,8 +153,8 @@ namespace nil {
                         auto constraint_9 = bp.add_constraint(var(W6, 0) - (var(W4, +1) + var(W5, +1) * (1 << 16)));
                         auto constraint_10 = bp.add_constraint(var(W7, 0) - (var(W6, +1) + var(W7, +1) * (1 << 16)));
                         bp.add_gate(selector_index,
-                                    { constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
-                                     constraint_6, constraint_7, constraint_8, constraint_9, constraint_10});
+                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                     constraint_7, constraint_8, constraint_9, constraint_10});
                     }
 
                     static void

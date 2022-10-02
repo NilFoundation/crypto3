@@ -149,8 +149,13 @@ namespace nil {
                         std::array<bool, padded_exponent_size> bits = {false};
                         {
                             nil::marshalling::status_type status;
-                            std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
-                            std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
+                            std::array<bool, 255> bits_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
+                            if (status == nil::marshalling::status_type::success) {
+                                std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
+                            } else {
+                                return {};
+                            }
                         }
 
                         typename ArithmetizationType::field_type::value_type accumulated_n = 0;
@@ -210,7 +215,8 @@ namespace nil {
 
                             for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result; bit_column++) {
                                 std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
-                                snark::plonk_constraint<BlueprintFieldType> bit_check_constraint = bp.add_bit_check(var(column_idx, 0));
+                                snark::plonk_constraint<BlueprintFieldType> bit_check_constraint =
+                                    bp.add_bit_check(var(column_idx, 0));
                                 constraints.push_back(bit_check_constraint);
 
                                 snark::plonk_constraint<BlueprintFieldType> bit_res = var(W0, 0) * var(column_idx, 0);
@@ -247,7 +253,8 @@ namespace nil {
                         var zero(0, component_start_row, false, var::column_type::constant);
                         var one(0, component_start_row + 1, false, var::column_type::constant);
 
-                        for (std::size_t row = component_start_row + 1; row < component_start_row + rows_amount; row++) {
+                        for (std::size_t row = component_start_row + 1; row < component_start_row + rows_amount;
+                             row++) {
                             bp.add_copy_constraint({{W0, static_cast<int>(row), false}, params.base});
                         }
                         bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, zero});
@@ -256,13 +263,13 @@ namespace nil {
                                                 one});
                         // check that the recalculated n is equal to the input challenge
                         bp.add_copy_constraint(
-                           {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
+                            {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
                     }
 
                     static void generate_assignments_constants(
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                         assignment.constant(0)[row] = 0;
                         row++;

@@ -29,7 +29,7 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_G1_AFFINE_COMPONENT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_G1_AFFINE_COMPONENT_HPP
 
-#include <nil/crypto3/zk/components/component.hpp>
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/element_fp.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/element_ops.hpp>
 
@@ -58,7 +58,7 @@ namespace nil {
                     using group_value_type = typename group_type::value_type;
                     using field_value_type = typename field_type::value_type;
 
-                    using underlying_element_type = element_fp<field_type>;
+                    using underlying_element_type = algebra::fields::detail::element_fp<field_type>;
 
                     using addition_component = element_g1_addition<curve_type, form, coordinates>;
                     using is_well_formed_component = element_g1_is_well_formed<curve_type, form, coordinates>;
@@ -69,7 +69,7 @@ namespace nil {
                     underlying_element_type Y;
 
                     element_g1(blueprint<field_type> &bp) : component<field_type>(bp) {
-                        blueprint_variable<field_type> X_var, Y_var;
+                        detail::blueprint_variable<field_type> X_var, Y_var;
 
                         X_var.allocate(bp);
                         Y_var.allocate(bp);
@@ -100,7 +100,7 @@ namespace nil {
 
                     // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
                     // we mark this function noinline.) TODO: remove later
-                    static std::size_t __attribute__((noinline)) size_in_bits() {
+                    static std::size_t BOOST_NOINLINE size_in_bits() {
                         return 2 * field_type::modulus_bits;    // This probably should be value_bits, not
                                                                 // modulus_bits
                     }

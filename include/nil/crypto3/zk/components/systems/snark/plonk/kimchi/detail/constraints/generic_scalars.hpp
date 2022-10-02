@@ -47,46 +47,16 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/polynomials/generic.rs#L242
                 // Input:
                 // Output: generic-gate-related scalar x for linearization
-                template<typename ArithmetizationType, typename KimchiParamsType,
-                    std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename KimchiParamsType, std::size_t... WireIndexes>
                 class generic_scalars;
 
-                template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         typename KimchiParamsType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class generic_scalars<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    KimchiParamsType,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename KimchiParamsType,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
+                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
+                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                class generic_scalars<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                      KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13,
+                                      W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -107,7 +77,8 @@ namespace nil {
 
                     struct params_type {
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
-                            KimchiParamsType::eval_points_amount> evals;
+                                   KimchiParamsType::eval_points_amount>
+                            evals;
                         std::array<var, KimchiParamsType::alpha_powers_n> alphas;
                         std::size_t start_idx;
                     };
@@ -140,11 +111,11 @@ namespace nil {
                                 // constant
                                 output[5 * i + 4] = alpha_generic;
                             }
-
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -158,35 +129,34 @@ namespace nil {
                             params.alphas[params.start_idx],
                             params.alphas[params.start_idx + 1],
                         };
-                        std::array<std::size_t, parts> offsets = {
-                            0, generic_registers
-                        };
+                        std::array<std::size_t, parts> offsets = {0, generic_registers};
 
                         for (std::size_t i = 0; i < parts; i++) {
-                            var alpha_generic = zk::components::generate_circuit<mul_component>(
-                                bp, assignment, 
-                                {alpha_pows[i], params.evals[0].generic_selector}, row).output;
+                            var alpha_generic =
+                                zk::components::generate_circuit<mul_component>(
+                                    bp, assignment, {alpha_pows[i], params.evals[0].generic_selector}, row)
+                                    .output;
                             row += mul_component::rows_amount;
 
                             // addition part
                             // alpha_generic * w_zeta[register_offset + j]
                             for (std::size_t j = 0; j < 3; j++) {
-                                output[5 * i + j] = zk::components::generate_circuit<mul_component>(
-                                    bp, assignment, 
-                                    {alpha_generic, params.evals[0].w[offsets[i] + j]}, row).output;
+                                output[5 * i + j] =
+                                    zk::components::generate_circuit<mul_component>(
+                                        bp, assignment, {alpha_generic, params.evals[0].w[offsets[i] + j]}, row)
+                                        .output;
                                 row += mul_component::rows_amount;
                             }
 
                             // multiplication
                             var tmp = zk::components::generate_circuit<mul_component>(
-                                bp, assignment, 
-                                {params.evals[0].w[offsets[i]],
-                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                                          bp, assignment,
+                                          {params.evals[0].w[offsets[i]], params.evals[0].w[offsets[i] + 1]}, row)
+                                          .output;
                             row += mul_component::rows_amount;
                             output[5 * i + 3] = zk::components::generate_circuit<mul_component>(
-                                bp, assignment, 
-                                {alpha_generic,
-                                 tmp}, row).output;
+                                                    bp, assignment, {alpha_generic, tmp}, row)
+                                                    .output;
                             row += mul_component::rows_amount;
 
                             // constant
@@ -209,35 +179,32 @@ namespace nil {
                             params.alphas[params.start_idx],
                             params.alphas[params.start_idx + 1],
                         };
-                        std::array<std::size_t, parts> offsets = {
-                            0, generic_registers
-                        };
+                        std::array<std::size_t, parts> offsets = {0, generic_registers};
 
                         for (std::size_t i = 0; i < parts; i++) {
                             var alpha_generic = mul_component::generate_assignments(
-                                assignment, 
-                                {alpha_pows[i], params.evals[0].generic_selector}, row).output;
+                                                    assignment, {alpha_pows[i], params.evals[0].generic_selector}, row)
+                                                    .output;
                             row += mul_component::rows_amount;
 
                             // addition part
                             // alpha_generic * w_zeta[register_offset + j]
                             for (std::size_t j = 0; j < 3; j++) {
-                                output[5 * i + j] = mul_component::generate_assignments(
-                                    assignment, 
-                                    {alpha_generic, params.evals[0].w[offsets[i] + j]}, row).output;
+                                output[5 * i + j] =
+                                    mul_component::generate_assignments(
+                                        assignment, {alpha_generic, params.evals[0].w[offsets[i] + j]}, row)
+                                        .output;
                                 row += mul_component::rows_amount;
                             }
 
                             // multiplication
-                            var tmp = mul_component::generate_assignments(
-                                assignment, 
-                                {params.evals[0].w[offsets[i]],
-                                 params.evals[0].w[offsets[i] + 1]}, row).output;
+                            var tmp =
+                                mul_component::generate_assignments(
+                                    assignment, {params.evals[0].w[offsets[i]], params.evals[0].w[offsets[i] + 1]}, row)
+                                    .output;
                             row += mul_component::rows_amount;
-                            output[5 * i + 3] = mul_component::generate_assignments(
-                                assignment, 
-                                {alpha_generic,
-                                 tmp}, row).output;
+                            output[5 * i + 3] =
+                                mul_component::generate_assignments(assignment, {alpha_generic, tmp}, row).output;
                             row += mul_component::rows_amount;
 
                             // constant
@@ -252,19 +219,20 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                     }
 
-                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
+                    static void generate_assignments_constants(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index) {
                     }
                 };
             }    // namespace components

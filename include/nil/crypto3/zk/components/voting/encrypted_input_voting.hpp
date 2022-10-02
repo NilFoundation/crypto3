@@ -76,10 +76,10 @@ namespace nil {
                                            const block_variable<field_type> &eid,
                                            const digest_variable<field_type> &sn,
                                            const digest_variable<field_type> &rt,
-                                           const blueprint_linear_combination_vector<field_type> &address_bits,
+                                           const detail::blueprint_linear_combination_vector<field_type> &address_bits,
                                            const merkle_proof_component &path,
                                            const block_variable<field_type> &sk,
-                                           const blueprint_linear_combination<field_type> &read_successful) :
+                                           const detail::blueprint_linear_combination<field_type> &read_successful) :
                         component<field_type>(bp),
                         // private fields
                         sn_computed(bp, hash_component::digest_bits), pk(bp, hash_component::digest_bits),
@@ -105,11 +105,11 @@ namespace nil {
                         sn_hasher.generate_r1cs_constraints();
                         check_sn.generate_r1cs_constraints(false, false);
 
-                        snark::linear_combination<field_type> sum_m_i;
+                        math::linear_combination<field_type> sum_m_i;
                         for (const auto &m_i : m.bits) {
                             // m_i == 0 or m_i == 1
                             generate_boolean_r1cs_constraint(
-                                this->bp, static_cast<blueprint_linear_combination<field_type>>(m_i));
+                                this->bp, static_cast<detail::blueprint_linear_combination<field_type>>(m_i));
                             sum_m_i = sum_m_i + m_i;
                         }
                         // sum_m_i == 1

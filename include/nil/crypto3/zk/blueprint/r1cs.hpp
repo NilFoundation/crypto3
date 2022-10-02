@@ -54,7 +54,7 @@ namespace nil {
                allocated variable of the blueprint, *NOT* constant 1 */
                 typename BlueprintFieldType::value_type constant_term;
 
-                typename snark::variable<BlueprintFieldType>::index_type next_free_var;
+                typename math::linear_variable<BlueprintFieldType>::index_type next_free_var;
                 typename detail::blueprint_linear_combination<ArithmetizationType>::index_type next_free_lc;
                 std::vector<typename BlueprintFieldType::value_type> lc_values;
                 snark::r1cs_constraint_system<BlueprintFieldType> constraint_system;
@@ -151,7 +151,7 @@ namespace nil {
                 friend class detail::blueprint_linear_combination<ArithmetizationType>;
 
             private:
-                typename snark::variable<BlueprintFieldType>::index_type allocate_var_index() {
+                typename math::linear_variable<BlueprintFieldType>::index_type allocate_var_index() {
                     ++constraint_system.auxiliary_input_size;
                     values.emplace_back(BlueprintFieldType::value_type::zero());
                     return next_free_var++;

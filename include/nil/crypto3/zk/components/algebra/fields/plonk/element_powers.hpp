@@ -1,4 +1,4 @@
-/---------------------------------------------------------------------------//
+//---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
@@ -91,7 +91,7 @@ namespace nil {
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    
+
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0fff;
@@ -100,7 +100,7 @@ namespace nil {
                     constexpr static const std::size_t rows_amount = n * mul_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
-                    struct params_type { 
+                    struct params_type {
                         var base;
                         var n;
                         var one;
@@ -114,7 +114,7 @@ namespace nil {
                                 output[0] = var(W0, component_start_row, false);
                             }
                             if (n > 1) {
-                               output[1] = var(W1, component_start_row, false);
+                                output[1] = var(W1, component_start_row, false);
                             }
                             for (std::size_t i = 2; i < n; i++) {
                                 output[i] = mul_component::result_type(component_start_row + i).output;
@@ -122,12 +122,13 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
 
-                        std::cout<<"ELEMENT POWERS COMPONENT IS NOT IMPLEMENTED"<<std::endl;
+                        std::cout << "ELEMENT POWERS COMPONENT IS NOT IMPLEMENTED" << std::endl;
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
                         return result_type(params, start_row_index);
@@ -170,18 +171,16 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-
                     }
 
-                    static void generate_copy_constraints(bblueprint<ArithmetizationType> &bp,
+                    static void
+                        generate_copy_constraints(bblueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
 
-                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false},
-                                                params.one});
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false},
-                                                params.base});
+                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, params.one});
+                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, params.base});
                     }
                 };
             }    // namespace components

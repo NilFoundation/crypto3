@@ -38,7 +38,7 @@ namespace nil {
                     Z,
                     LookupSorted,
                     LookupAggreg,
-                    LookupKindIndex, // ChaCha = 0, ChaChaFinal = 1, LookupGate = 2, RangeCheckGate = 3
+                    LookupKindIndex,    // ChaCha = 0, ChaChaFinal = 1, LookupGate = 2, RangeCheckGate = 3
                     LookupTable,
                     LookupRuntimeSelector,
                     LookupRuntimeTable,

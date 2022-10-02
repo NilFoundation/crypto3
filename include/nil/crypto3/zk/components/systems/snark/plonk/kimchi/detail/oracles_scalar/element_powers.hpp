@@ -49,57 +49,28 @@ namespace nil {
                 template<typename ArithmetizationType, std::size_t n, std::size_t... WireIndexes>
                 class element_powers;
 
-                template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         std::size_t n,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class element_powers<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    n,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t n, std::size_t W0,
+                         std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6,
+                         std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11,
+                         std::size_t W12, std::size_t W13, std::size_t W14>
+                class element_powers<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, n, W0,
+                                     W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
-                    
+
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f0c;
 
                 public:
-                    constexpr static const std::size_t rows_amount = n <= 1 ? 1 : (n - 2) * mul_component::rows_amount + 1;
+                    constexpr static const std::size_t rows_amount =
+                        n <= 1 ? 1 : (n - 2) * mul_component::rows_amount + 1;
                     constexpr static const std::size_t gates_amount = 0;
 
-                    struct params_type { 
+                    struct params_type {
                         var base;
                         var one;
                     };
@@ -110,7 +81,7 @@ namespace nil {
                         result_type(std::size_t component_start_row) {
                             output[0] = var(W0, component_start_row, false);
                             if (n > 0) {
-                               output[1] = var(W1, component_start_row, false);
+                                output[1] = var(W1, component_start_row, false);
                             }
                             for (std::size_t i = 2; i < n; i++) {
                                 output[i] = typename mul_component::result_type(component_start_row + i - 1).output;
@@ -118,7 +89,8 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -128,7 +100,8 @@ namespace nil {
                         std::size_t row = start_row_index + 1;
                         for (std::size_t i = 2; i < n; i++) {
                             last_result = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {base, last_result}, row).output;
+                                                                                          {base, last_result}, row)
+                                              .output;
                             row += mul_component::rows_amount;
                         }
 
@@ -147,10 +120,10 @@ namespace nil {
                         var base(W1, start_row_index, false);
                         var last_result(W1, start_row_index, false);
                         row++;
-                        
+
                         for (std::size_t i = 2; i < n; i++) {
-                            last_result = mul_component::generate_assignments(assignment,
-                                {base, last_result}, row).output;
+                            last_result =
+                                mul_component::generate_assignments(assignment, {base, last_result}, row).output;
                             row += mul_component::rows_amount;
                         }
 
@@ -162,18 +135,16 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
 
-                        bp.add_copy_constraint({{W0, static_cast<int>(start_row_index), false},
-                                                params.one});
-                        bp.add_copy_constraint({{W1, static_cast<int>(start_row_index), false},
-                                               params.base});
+                        bp.add_copy_constraint({{W0, static_cast<int>(start_row_index), false}, params.one});
+                        bp.add_copy_constraint({{W1, static_cast<int>(start_row_index), false}, params.base});
                     }
                 };
             }    // namespace components
