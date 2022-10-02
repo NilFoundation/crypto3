@@ -36,7 +36,7 @@ namespace nil {
             namespace detail {
                 /// See definition of \p c in https://zips.z.cash/protocol/protocol.pdf#concretepedersenhash
                 template<typename Field>
-                constexpr std::size_t get_chunks_per_base_point(std::size_t chunk_bits) {
+                constexpr std::size_t chunks_per_base_point(std::size_t chunk_bits) {
                     typename Field::extended_integral_type two(2);
                     std::size_t c = 1;
                     std::size_t prev_c = 0;

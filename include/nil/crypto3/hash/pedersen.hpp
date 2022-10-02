@@ -87,7 +87,7 @@ namespace nil {
                 static constexpr std::size_t chunk_bits = 3;
                 /// See definition of \p c in https://zips.z.cash/protocol/protocol.pdf#concretepedersenhash
                 static constexpr std::size_t chunks_per_base_point =
-                    detail::get_chunks_per_base_point<typename curve_type::scalar_field_type>(chunk_bits);
+                    detail::chunks_per_base_point<typename curve_type::scalar_field_type>(chunk_bits);
 
                 class internal_accumulator_type {
                     std::size_t bits_supplied = 0;
