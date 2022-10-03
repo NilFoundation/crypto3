@@ -86,10 +86,10 @@ namespace nil {
                     typename scalar_field_type::value_type combined_inner_product;
                 };
 
-                template<typename CurveType>
+                template<typename CurveType, typename VerifierIndexType = verifier_index<CurveType>>
                 std::vector<std::vector<std::vector<typename CurveType::scalar_field_type::value_type>>> prev_chal_evals(
                             proof_type<CurveType> proof,
-                            verifier_index<CurveType> index,
+                            VerifierIndexType index,
                             std::vector<typename CurveType::scalar_field_type::value_type> evaluation_points,
                             std::array<typename CurveType::scalar_field_type::value_type, 2> powers_of_eval_points_for_chunks){
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
@@ -137,9 +137,9 @@ namespace nil {
                 }
 
                 /// This function runs the random oracle argument
-                template<typename CurveType, typename EFqSponge, typename EFrSponge>
+                template<typename CurveType, typename EFqSponge, typename EFrSponge, typename VerifierIndexType = verifier_index<CurveType>>
                 OraclesResult<CurveType, EFqSponge> oracles(proof_type<CurveType> proof,
-                            verifier_index<CurveType> index,
+                            VerifierIndexType index,
                             typename commitments::kimchi_pedersen<CurveType>::commitment_type p_comm) {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitment_scheme::commitment_type commitment_type;

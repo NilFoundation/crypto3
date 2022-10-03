@@ -48,7 +48,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename CurveType>
+                template<typename CurveType, typename VerifierIndexType = verifier_index<CurveType>>
                 struct verifier{
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitment_scheme::commitment_type commitment_type;
@@ -57,7 +57,7 @@ namespace nil {
                     typedef typename commitment_scheme::base_field_type base_field_type; // Fq;
                     typedef typename commitment_scheme::group_type group_type; // Fq;
                     typedef typename commitment_scheme::batchproof_type batchproof_type;
-                    typedef typename std::vector<std::tuple<verifier_index<CurveType>, proof_type<CurveType>>> proofs_type;
+                    typedef typename std::vector<std::tuple<VerifierIndexType, proof_type<CurveType>>> proofs_type;
 
                     typedef typename commitment_scheme::sponge_type EFqSponge;
                     typedef transcript::DefaultFrSponge<CurveType> EFrSponge;
@@ -65,7 +65,7 @@ namespace nil {
                     constexpr static const std::size_t COLUMNS = kimchi_constant::COLUMNS;
                     constexpr static const std::size_t PERMUTES = kimchi_constant::PERMUTES;
 
-                    static batchproof_type to_batch(verifier_index<CurveType> index, proof_type<CurveType> proof) {
+                    static batchproof_type to_batch(VerifierIndexType index, proof_type<CurveType> proof) {
                         //~
                         //~ #### Partial verification
                         //~
@@ -77,7 +77,7 @@ namespace nil {
                         //~ 1. Commit to the negated public input polynomial.
                         BOOST_ASSERT_MSG(index.srs.lagrange_bases.find(index.domain.size()) != index.srs.lagrange_bases.end(), "pre-computed committed lagrange bases not found");
                         std::vector<typename group_type::value_type> lgr_comm = index.srs.lagrange_bases[index.domain.size()];    // calculate lgr_comm
-                        // BOOST_ASSERT(lgr_comm.size() == 512);                          // ??
+                        BOOST_ASSERT(lgr_comm.size() == 512);                          // ??
                         std::vector<commitment_type> com;
 
                         for (size_t i = 0; i < proof.public_input.size(); ++i) {
@@ -94,7 +94,7 @@ namespace nil {
                         commitment_type p_comm = commitment_type::multi_scalar_mul(com, elm);
 
                         //~ 2. Run the [Fiat-Shamir argument](#fiat-shamir-argument).
-                        OraclesResult<CurveType, EFqSponge> oracles_res = oracles<CurveType, EFqSponge, EFrSponge>(proof, index, p_comm);
+                        OraclesResult<CurveType, EFqSponge> oracles_res = oracles<CurveType, EFqSponge, EFrSponge, VerifierIndexType>(proof, index, p_comm);
                         //                        fq_sponge,
                         //                        oracles,
                         //                        all_alphas,
@@ -378,7 +378,7 @@ namespace nil {
                     }
 
                     static bool verify(group_map<CurveType> &g_map,
-                                verifier_index<CurveType> &index, 
+                                VerifierIndexType &index, 
                                 proof_type<CurveType> &proof){
                         proofs_type proofs;
                         proofs.emplace_back(index, proof);

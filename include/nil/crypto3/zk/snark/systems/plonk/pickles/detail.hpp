@@ -109,7 +109,7 @@ namespace nil {
                 template<typename FieldType>
                 struct arithmetic_sponge_params {
                     std::vector<std::vector<FieldType>> round_constants;
-                    std::vector<std::vector<FieldType>> mds;
+                    std::array<std::array<FieldType,3>,3> mds;
                 };
 
                 struct Column;

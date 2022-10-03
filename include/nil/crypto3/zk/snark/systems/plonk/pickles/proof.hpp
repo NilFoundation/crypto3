@@ -84,14 +84,15 @@ namespace nil {
                 template <typename value_type>
                 struct proof_evaluation_type<std::vector<value_type>> : base_proof_evaluation_type<std::vector<value_type>>{
                     using base_proof_evaluation_type<std::vector<value_type>>::base_proof_evaluation_type;
+                    
                     proof_evaluation_type<value_type> combine(value_type& pt){
-                        std::array<value_type, this->Permuts - 1> s_combined;
+                        std::array<value_type, kimchi_constant::PERMUTES - 1> s_combined;
                         for(int i = 0; i < s_combined.size(); ++i){
                             math::polynomial<value_type> temp_polynomial(this->s[i].begin(), this->s[i].end());
                             s_combined[i] = temp_polynomial.evaluate(pt);
                         }
 
-                        std::array<value_type, this->WiresAmount> w_combined;
+                        std::array<value_type, kimchi_constant::COLUMNS> w_combined;
                         for(int i = 0; i < w_combined.size(); ++i){
                             math::polynomial<value_type> temp_polynomial(this->w[i].begin(), this->w[i].end());
                             w_combined[i] = temp_polynomial.evaluate(pt);
@@ -179,8 +180,11 @@ namespace nil {
                     std::vector<typename scalar_field_type::value_type> public_input;
                     // Previous challenges
                     std::vector<
-                        std::pair<std::vector<typename CurveType::scalar_field_type::value_type>, commitment_type>>
-                        prev_challenges;
+                        std::pair<
+                            std::vector<typename CurveType::scalar_field_type::value_type>, 
+                            commitment_type
+                        >
+                    >   prev_challenges;
                 };
             }    // namespace snark
         }        // namespace zk
