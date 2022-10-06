@@ -42,29 +42,11 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class sha256;
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8>
-                class sha256<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                             CurveType,
-                             W0,
-                             W1,
-                             W2,
-                             W3,
-                             W4,
-                             W5,
-                             W6,
-                             W7,
-                             W8> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4,
+                         std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8>
+                class sha256<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
+                             W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -77,8 +59,7 @@ namespace nil {
                         decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                 public:
-                    constexpr static const std::size_t rows_amount =
-                        8000;
+                    constexpr static const std::size_t rows_amount = 8000;
                     constexpr static const std::size_t selector_seed = 0x0f19;
                     //        constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 0;
@@ -95,10 +76,11 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        std::size_t component_start_row) {
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
                         std::array<var, 2> input_params_1 = {params.block_data[0], params.block_data[1]};
@@ -222,10 +204,11 @@ namespace nil {
                         std::size_t row = component_start_row;
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row) {
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row) {
                         std::size_t j = component_start_row;
                     }
                 };

@@ -38,15 +38,15 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template <std::size_t EvalRounds,
-                    std::size_t MaxPolySize, std::size_t SrsLen>
+                template<std::size_t EvalRounds, std::size_t MaxPolySize, std::size_t SrsLen>
                 struct kimchi_commitment_params_type {
                     constexpr static std::size_t max_poly_size = MaxPolySize;
                     constexpr static std::size_t eval_rounds = EvalRounds;
                     constexpr static std::size_t split_poly_eval_size = max_poly_size == (1 << eval_rounds) ? 1 : 2;
                     constexpr static std::size_t srs_len = SrsLen;
 
-                    // TODO we can set commitments size values from template but for now it looks like we can just fix it
+                    // TODO we can set commitments size values from template but for now it looks like we can just fix
+                    // it
                     constexpr static std::size_t shifted_commitment_split = 1;
                     constexpr static std::size_t max_comm_size = 1;
                     constexpr static std::size_t w_comm_size = 1;

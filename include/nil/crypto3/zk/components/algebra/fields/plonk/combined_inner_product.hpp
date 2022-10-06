@@ -46,12 +46,12 @@ namespace nil {
 
                 template<typename ArithmetizationType, std::size_t k, std::size_t... WireIndexes>
                 class combined_inner_product;
-                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t k,
-                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
-                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
-                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t k, std::size_t W0,
+                         std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6,
+                         std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11,
+                         std::size_t W12, std::size_t W13, std::size_t W14>
                 class combined_inner_product<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                     k, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+                                             k, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -62,7 +62,8 @@ namespace nil {
 
                     constexpr static const std::size_t witness_per_row = 5;
 
-                    constexpr static const std::size_t main_rows = (k + ((witness_per_row - (k % witness_per_row))% witness_per_row)) / witness_per_row;
+                    constexpr static const std::size_t main_rows =
+                        (k + ((witness_per_row - (k % witness_per_row)) % witness_per_row)) / witness_per_row;
 
                 public:
                     constexpr static const std::size_t rows_amount = 1 + main_rows;
@@ -79,8 +80,7 @@ namespace nil {
                         var output;
 
                         result_type(const params_type &params, std::size_t component_start_row) {
-                            output = var(W2,
-                                         component_start_row + rows_amount - 1, false);
+                            output = var(W2, component_start_row + rows_amount - 1, false);
                         }
                     };
 
@@ -89,7 +89,7 @@ namespace nil {
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          std::size_t start_row_index) {
-                        
+
                         generate_assignments_constant(bp, assignment, params, start_row_index);
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
@@ -132,23 +132,23 @@ namespace nil {
                         typename BlueprintFieldType::value_type s = 0;
                         typename BlueprintFieldType::value_type acc_xi = 1;
 
-                        for (std::size_t i = row; i < row + rows_amount - 1; i++){
+                        for (std::size_t i = row; i < row + rows_amount - 1; i++) {
                             assignment.witness(W0)[i] = r;
                             assignment.witness(W1)[i] = acc_xi;
                             assignment.witness(W2)[i] = s;
-                            for (std::size_t j = 0; j < witness_per_row ; j ++) {
-                                s += acc_xi * (f_zeta1[(i - row)*witness_per_row + j] + r * f_zeta2[(i - row)*witness_per_row + j]);
+                            for (std::size_t j = 0; j < witness_per_row; j++) {
+                                s += acc_xi * (f_zeta1[(i - row) * witness_per_row + j] +
+                                               r * f_zeta2[(i - row) * witness_per_row + j]);
                                 acc_xi *= xi;
-                                assignment.witness(3 + j*2)[i] = f_zeta1[(i - row)*witness_per_row + j];
-                                assignment.witness(4 + j*2)[i] = f_zeta2[(i - row)*witness_per_row + j];
+                                assignment.witness(3 + j * 2)[i] = f_zeta1[(i - row) * witness_per_row + j];
+                                assignment.witness(4 + j * 2)[i] = f_zeta2[(i - row) * witness_per_row + j];
                             }
                             assignment.witness(W13)[i] = xi;
-                       }
+                        }
                         assignment.witness(W0)[row + rows_amount - 1] = r;
                         assignment.witness(W1)[row + rows_amount - 1] = acc_xi;
                         assignment.witness(W2)[row + rows_amount - 1] = s;
                         assignment.witness(W13)[row + rows_amount - 1] = xi;
-
 
                         return result_type(params, start_row_index);
                     }
@@ -159,25 +159,22 @@ namespace nil {
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
-                        
-                        auto constraint_1 = bp.add_constraint(var(W0, 0) - var(W0, + 1));
-                        auto constraint_2 = bp.add_constraint(var(W13, 0) - var(W13, + 1));
-                        snark::plonk_constraint<BlueprintFieldType> xi_deg = var(W13, + 1);
-                        for (int i = 0; i< witness_per_row - 1; i++){
-                            xi_deg = xi_deg * var(W13, + 1);
+                        auto constraint_1 = bp.add_constraint(var(W0, 0) - var(W0, +1));
+                        auto constraint_2 = bp.add_constraint(var(W13, 0) - var(W13, +1));
+                        snark::plonk_constraint<BlueprintFieldType> xi_deg = var(W13, +1);
+                        for (int i = 0; i < witness_per_row - 1; i++) {
+                            xi_deg = xi_deg * var(W13, +1);
                         }
                         auto constraint_3 = bp.add_constraint(var(W1, +1) - var(W1, 0) * xi_deg);
                         snark::plonk_constraint<BlueprintFieldType> s = var(W2, 0);
                         snark::plonk_constraint<BlueprintFieldType> acc_xi = var(W1, 0);
-                        for (std::size_t j = 0; j < witness_per_row ; j ++) {
-                            s = s + acc_xi * (var(3 + j*2, 0) + var(W0, 0) * var(4 + j*2, 0));
+                        for (std::size_t j = 0; j < witness_per_row; j++) {
+                            s = s + acc_xi * (var(3 + j * 2, 0) + var(W0, 0) * var(4 + j * 2, 0));
                             acc_xi = acc_xi * var(W13, 0);
                         }
-                        auto constraint_4 = bp.add_constraint(var(W2, +1) - s); 
+                        auto constraint_4 = bp.add_constraint(var(W2, +1) - s);
 
-                        bp.add_gate(first_selector_index,
-                                    {constraint_1, constraint_2,
-                                     constraint_3, constraint_4});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
                     }
 
                     static void
@@ -187,21 +184,26 @@ namespace nil {
                                                   std::size_t component_start_row) {
                         bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, params.r});
                         bp.add_copy_constraint({{W13, static_cast<int>(component_start_row), false}, params.xi});
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false}, {0, component_start_row + 1, false, var::column_type::constant}});
-                        bp.add_copy_constraint({{W2, static_cast<int>(component_start_row), false}, {0, component_start_row, false, var::column_type::constant}});
-
+                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false},
+                                                {0, component_start_row + 1, false, var::column_type::constant}});
+                        bp.add_copy_constraint({{W2, static_cast<int>(component_start_row), false},
+                                                {0, component_start_row, false, var::column_type::constant}});
 
                         for (std::size_t i = 0; i < k; i++) {
-                            bp.add_copy_constraint({{3 + (2*i) % 10, static_cast<int>(component_start_row + (i/5)), false}, params.f_zeta1[i]});
-                            bp.add_copy_constraint({{4 + (2*i) % 10, static_cast<int>(component_start_row + (i/5)), false}, params.f_zeta2[i]});
+                            bp.add_copy_constraint(
+                                {{3 + (2 * i) % 10, static_cast<int>(component_start_row + (i / 5)), false},
+                                 params.f_zeta1[i]});
+                            bp.add_copy_constraint(
+                                {{4 + (2 * i) % 10, static_cast<int>(component_start_row + (i / 5)), false},
+                                 params.f_zeta2[i]});
                         }
                     }
 
-                    static void
-                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                const params_type &params,
-                                                std::size_t component_start_row) {
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
                         std::size_t row = component_start_row;
 
                         assignment.constant(0)[row] = 0;

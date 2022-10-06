@@ -63,19 +63,19 @@ namespace nil {
                 //          verifier index (public data)
                 // Output: batch evaluation proof, scalar field part
                 //      (https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L881-L888)
-                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
-                    typename KimchiCommitmentParamsType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType,
+                         typename KimchiCommitmentParamsType, std::size_t... WireIndexes>
                 class prepare_batch_scalar;
 
-                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
-                         typename KimchiCommitmentParamsType, std::size_t W0, std::size_t W1,
-                         std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
-                         std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
-                         std::size_t W13, std::size_t W14>
+                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,
+                         typename KimchiCommitmentParamsType, std::size_t W0, std::size_t W1, std::size_t W2,
+                         std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8,
+                         std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13,
+                         std::size_t W14>
                 class prepare_batch_scalar<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
-                    CurveType, KimchiParamsType, KimchiCommitmentParamsType, 
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+                    CurveType, KimchiParamsType, KimchiCommitmentParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
+                    W10, W11, W12, W13, W14> {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
 
@@ -85,32 +85,30 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
-                    
-                    using oracles_component = oracles_scalar<ArithmetizationType, CurveType, KimchiParamsType,
-                                KimchiCommitmentParamsType, W0, W1, W2, W3, W4, W5,
-                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    using zkpm_evaluate_component = zkpm_evaluate<ArithmetizationType,
-                                W0, W1, W2, W3, W4, W5,
-                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using oracles_component =
+                        oracles_scalar<ArithmetizationType, CurveType, KimchiParamsType, KimchiCommitmentParamsType, W0,
+                                       W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    using perm_scalars_component = perm_scalars<ArithmetizationType, KimchiParamsType,
-                                W0, W1, W2, W3, W4, W5,
-                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using zkpm_evaluate_component = zkpm_evaluate<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6, W7,
+                                                                  W8, W9, W10, W11, W12, W13, W14>;
 
-                    using generic_scalars_component = generic_scalars<ArithmetizationType, KimchiParamsType,
-                                W0, W1, W2, W3, W4, W5,
-                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using perm_scalars_component = perm_scalars<ArithmetizationType, KimchiParamsType, W0, W1, W2, W3,
+                                                                W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
-                    using index_terms_scalars_component = index_terms_scalars<ArithmetizationType, KimchiParamsType,
-                                W0, W1, W2, W3, W4, W5,
-                                W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using generic_scalars_component =
+                        generic_scalars<ArithmetizationType, KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
+                                        W10, W11, W12, W13, W14>;
 
-                    using proof_binding = typename zk::components::binding<ArithmetizationType,
-                        BlueprintFieldType, KimchiParamsType>;
+                    using index_terms_scalars_component =
+                        index_terms_scalars<ArithmetizationType, KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
+                                            W9, W10, W11, W12, W13, W14>;
 
-                    using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
-                        ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
+                    using proof_binding =
+                        typename zk::components::binding<ArithmetizationType, BlueprintFieldType, KimchiParamsType>;
+
+                    using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, ArithmetizationType,
+                                                                      KimchiParamsType, KimchiCommitmentParamsType>;
 
                     using index_terms_list = typename KimchiParamsType::circuit_params::index_terms_list;
 
@@ -123,7 +121,7 @@ namespace nil {
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
 
-                        row += oracles_component::rows_amount; 
+                        row += oracles_component::rows_amount;
 
                         row += zkpm_evaluate_component::rows_amount;
 
@@ -142,13 +140,12 @@ namespace nil {
                     constexpr static const std::size_t rows_amount = rows();
                     constexpr static const std::size_t gates_amount = 0;
 
-                    constexpr static const std::size_t f_comm_msm_size = 
-                        kimchi_constants::f_comm_msm_size;
+                    constexpr static const std::size_t f_comm_msm_size = kimchi_constants::f_comm_msm_size;
 
                     struct params_type {
                         verifier_index_type &verifier_index;
                         kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
-                            KimchiCommitmentParamsType::eval_rounds> &proof;
+                                            KimchiCommitmentParamsType::eval_rounds> &proof;
                         typename proof_binding::fq_sponge_output &fq_output;
                     };
 
@@ -172,61 +169,62 @@ namespace nil {
                         var domain_size = var(0, start_row_index + 2, false, var::column_type::constant);
                         var max_poly_size = var(0, start_row_index + 3, false, var::column_type::constant);
 
-                        typename oracles_component::params_type oracles_params(
-                            params.verifier_index, params.proof, params.fq_output
-                        );
-                        auto oracles_output = oracles_component::generate_circuit(bp, assignment,
-                            oracles_params, row);
-                        row += oracles_component::rows_amount; 
+                        typename oracles_component::params_type oracles_params(params.verifier_index, params.proof,
+                                                                               params.fq_output);
+                        auto oracles_output = oracles_component::generate_circuit(bp, assignment, oracles_params, row);
+                        row += oracles_component::rows_amount;
 
                         std::array<var, f_comm_msm_size> f_comm_scalars;
                         std::size_t f_comm_idx = 0;
 
                         var zkp = zkpm_evaluate_component::generate_circuit(bp, assignment,
-                            {params.verifier_index.omega, params.verifier_index.domain_size,
-                            oracles_output.oracles.zeta}, row).output;
+                                                                            {params.verifier_index.omega,
+                                                                             params.verifier_index.domain_size,
+                                                                             oracles_output.oracles.zeta},
+                                                                            row)
+                                      .output;
                         row += zkpm_evaluate_component::rows_amount;
 
-                        std::pair<std::size_t, std::size_t> alpha_idxs = 
+                        std::pair<std::size_t, std::size_t> alpha_idxs =
                             index_terms_list::alpha_map(argument_type::Permutation);
-                        f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_circuit(bp,
-                            assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
-                            alpha_idxs.first,
-                            params.fq_output.beta, params.fq_output.gamma,
-                            zkp}, row).output;
+                        f_comm_scalars[f_comm_idx] =
+                            perm_scalars_component::generate_circuit(
+                                bp, assignment,
+                                {oracles_output.combined_evals, oracles_output.alpha_powers, alpha_idxs.first,
+                                 params.fq_output.beta, params.fq_output.gamma, zkp},
+                                row)
+                                .output;
                         f_comm_idx += 1;
                         row += perm_scalars_component::rows_amount;
 
-                        alpha_idxs = 
-                            index_terms_list::alpha_map(argument_type::Generic);
-                        std::array<var, generic_scalars_component::output_size> generic_scalars = 
-                            generic_scalars_component::generate_circuit(bp,
-                                assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
-                                alpha_idxs.first}, row).output;
+                        alpha_idxs = index_terms_list::alpha_map(argument_type::Generic);
+                        std::array<var, generic_scalars_component::output_size> generic_scalars =
+                            generic_scalars_component::generate_circuit(
+                                bp, assignment,
+                                {oracles_output.combined_evals, oracles_output.alpha_powers, alpha_idxs.first}, row)
+                                .output;
                         std::copy(std::begin(generic_scalars), std::end(generic_scalars),
-                            std::begin(f_comm_scalars) + f_comm_idx);
+                                  std::begin(f_comm_scalars) + f_comm_idx);
                         f_comm_idx += generic_scalars_component::output_size;
                         row += generic_scalars_component::rows_amount;
 
                         // xi^n - 1
-                        var vanishing_eval = zk::components::generate_circuit<sub_component>(bp,
-                            assignment, {oracles_output.zeta_pow_n, one}, row
-                            ).output;
+                        var vanishing_eval = zk::components::generate_circuit<sub_component>(
+                                                 bp, assignment, {oracles_output.zeta_pow_n, one}, row)
+                                                 .output;
                         row += sub_component::rows_amount;
 
-                        auto index_scalars = index_terms_scalars_component::generate_circuit(
-                                bp, assignment, {
-                                oracles_output.oracles.zeta,
-                                oracles_output.oracles.alpha,
-                                params.fq_output.beta, params.fq_output.gamma,
-                                params.fq_output.joint_combiner,
-                                oracles_output.combined_evals,
-                                params.verifier_index.omega,
-                                params.verifier_index.domain_size}, row
-                            ).output;
+                        auto index_scalars =
+                            index_terms_scalars_component::generate_circuit(
+                                bp, assignment,
+                                {oracles_output.oracles.zeta, oracles_output.oracles.alpha, params.fq_output.beta,
+                                 params.fq_output.gamma, params.fq_output.joint_combiner, oracles_output.combined_evals,
+                                 params.verifier_index.omega, params.verifier_index.domain_size},
+                                row)
+                                .output;
                         row += index_terms_scalars_component::rows_amount;
 
-                        for(std::size_t i = 0; i < index_scalars.size(); i++) {
+                        for (std::size_t i = 0; i < index_scalars.size(); i++) {
                             f_comm_scalars[f_comm_idx++] = index_scalars[i];
                         }
 
@@ -234,17 +232,11 @@ namespace nil {
 
                         assert(row == start_row_index + rows_amount);
 
-                        result_type res = {
-                            {oracles_output.cip,
-                            params.fq_output,
-                            oracles_output.eval_points,
-                            oracles_output.oracles.u,
-                            oracles_output.oracles.v,
-                            params.proof.opening,
-                            oracles_output.transcript},
-                            zeta_to_srs_len,
-                            f_comm_scalars
-                        };
+                        result_type res = {{oracles_output.cip, params.fq_output, oracles_output.eval_points,
+                                            oracles_output.oracles.u, oracles_output.oracles.v, params.proof.opening,
+                                            oracles_output.transcript},
+                                           zeta_to_srs_len,
+                                           f_comm_scalars};
 
                         return res;
                     }
@@ -260,59 +252,60 @@ namespace nil {
                         var domain_size = var(0, start_row_index + 2, false, var::column_type::constant);
                         var max_poly_size = var(0, start_row_index + 3, false, var::column_type::constant);
 
-                        typename oracles_component::params_type oracles_params(
-                            params.verifier_index, params.proof, params.fq_output
-                        );
-                        auto oracles_output = oracles_component::generate_assignments(assignment,
-                            oracles_params, row);
-                        row += oracles_component::rows_amount; 
+                        typename oracles_component::params_type oracles_params(params.verifier_index, params.proof,
+                                                                               params.fq_output);
+                        auto oracles_output = oracles_component::generate_assignments(assignment, oracles_params, row);
+                        row += oracles_component::rows_amount;
 
                         std::array<var, f_comm_msm_size> f_comm_scalars;
                         std::size_t f_comm_idx = 0;
                         var zkp = zkpm_evaluate_component::generate_assignments(assignment,
-                            {params.verifier_index.omega, params.verifier_index.domain_size,
-                            oracles_output.oracles.zeta}, row).output;
+                                                                                {params.verifier_index.omega,
+                                                                                 params.verifier_index.domain_size,
+                                                                                 oracles_output.oracles.zeta},
+                                                                                row)
+                                      .output;
                         row += zkpm_evaluate_component::rows_amount;
 
-                        std::pair<std::size_t, std::size_t> alpha_idxs = 
+                        std::pair<std::size_t, std::size_t> alpha_idxs =
                             index_terms_list::alpha_map(argument_type::Permutation);
-                        f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_assignments(
-                            assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
-                            alpha_idxs.first,
-                            params.fq_output.beta, params.fq_output.gamma,
-                            zkp}, row).output;
+                        f_comm_scalars[f_comm_idx] =
+                            perm_scalars_component::generate_assignments(
+                                assignment,
+                                {oracles_output.combined_evals, oracles_output.alpha_powers, alpha_idxs.first,
+                                 params.fq_output.beta, params.fq_output.gamma, zkp},
+                                row)
+                                .output;
                         f_comm_idx += 1;
                         row += perm_scalars_component::rows_amount;
 
-                        alpha_idxs = 
-                            index_terms_list::alpha_map(argument_type::Generic);
-                        std::array<var, generic_scalars_component::output_size> generic_scalars = 
+                        alpha_idxs = index_terms_list::alpha_map(argument_type::Generic);
+                        std::array<var, generic_scalars_component::output_size> generic_scalars =
                             generic_scalars_component::generate_assignments(
-                                assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
-                                alpha_idxs.first}, row).output;
+                                assignment,
+                                {oracles_output.combined_evals, oracles_output.alpha_powers, alpha_idxs.first}, row)
+                                .output;
                         std::copy(std::begin(generic_scalars), std::end(generic_scalars),
-                            std::begin(f_comm_scalars) + f_comm_idx);
+                                  std::begin(f_comm_scalars) + f_comm_idx);
                         f_comm_idx += generic_scalars_component::output_size;
                         row += generic_scalars_component::rows_amount;
 
                         // xi^n - 1
-                        var vanishing_eval = sub_component::generate_assignments(
-                            assignment, {oracles_output.zeta_pow_n, one}, row
-                            ).output;
+                        var vanishing_eval =
+                            sub_component::generate_assignments(assignment, {oracles_output.zeta_pow_n, one}, row)
+                                .output;
                         row += sub_component::rows_amount;
 
-                        auto index_scalars = index_terms_scalars_component::generate_assignments(
-                                assignment, {   
-                                oracles_output.oracles.zeta,
-                                oracles_output.oracles.alpha,
-                                params.fq_output.beta, params.fq_output.gamma,
-                                params.fq_output.joint_combiner,
-                                oracles_output.combined_evals,
-                                params.verifier_index.omega,
-                                params.verifier_index.domain_size}, row
-                            ).output;
-                            row += index_terms_scalars_component::rows_amount;
-                        for(std::size_t i = 0; i < index_scalars.size(); i++) {
+                        auto index_scalars =
+                            index_terms_scalars_component::generate_assignments(
+                                assignment,
+                                {oracles_output.oracles.zeta, oracles_output.oracles.alpha, params.fq_output.beta,
+                                 params.fq_output.gamma, params.fq_output.joint_combiner, oracles_output.combined_evals,
+                                 params.verifier_index.omega, params.verifier_index.domain_size},
+                                row)
+                                .output;
+                        row += index_terms_scalars_component::rows_amount;
+                        for (std::size_t i = 0; i < index_scalars.size(); i++) {
                             f_comm_scalars[f_comm_idx] = index_scalars[i];
                         }
 
@@ -320,17 +313,11 @@ namespace nil {
 
                         assert(row == start_row_index + rows_amount);
 
-                        result_type res = {
-                            {oracles_output.cip,
-                            params.fq_output,
-                            oracles_output.eval_points,
-                            oracles_output.oracles.u,
-                            oracles_output.oracles.v,
-                            params.proof.opening,
-                            oracles_output.transcript},
-                            zeta_to_srs_len,
-                            f_comm_scalars
-                        };
+                        result_type res = {{oracles_output.cip, params.fq_output, oracles_output.eval_points,
+                                            oracles_output.oracles.u, oracles_output.oracles.v, params.proof.opening,
+                                            oracles_output.transcript},
+                                           zeta_to_srs_len,
+                                           f_comm_scalars};
 
                         return res;
                     }
@@ -347,23 +334,22 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   std::size_t component_start_row = 0) {
-                        
                     }
 
-                    static void
-                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
-                            assignment.constant(0)[row] = 0;
-                            row++;
-                            assignment.constant(0)[row] = 1;
-                            row++;
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
+                        std::size_t row = component_start_row;
+                        assignment.constant(0)[row] = 0;
+                        row++;
+                        assignment.constant(0)[row] = 1;
+                        row++;
 
-                            assignment.constant(0)[row] = params.verifier_index.domain_size;
-                            row++;
-                            assignment.constant(0)[row] = KimchiCommitmentParamsType::max_poly_size;
+                        assignment.constant(0)[row] = params.verifier_index.domain_size;
+                        row++;
+                        assignment.constant(0)[row] = KimchiCommitmentParamsType::max_poly_size;
                     }
                 };
             }    // namespace components

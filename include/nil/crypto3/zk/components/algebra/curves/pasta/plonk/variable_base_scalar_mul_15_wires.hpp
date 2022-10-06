@@ -113,7 +113,8 @@ namespace nil {
                             typename CurveType::scalar_field_type::integral_type(b.data);
                         const std::size_t scalar_size = 255;
                         nil::marshalling::status_type status;
-                        std::array<bool, scalar_size> bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                        std::array<bool, scalar_size> bits =
+                            nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
 
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
@@ -218,7 +219,7 @@ namespace nil {
                                          const std::size_t start_row_index) {
 
                         generate_assignments_constant(bp, assignment, params, start_row_index);
-                        
+
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
 
@@ -337,15 +338,15 @@ namespace nil {
                         bit_check_5 = bp.add_bit_check(var(W6, 0));
 
                         constraint_1 = bp.add_constraint((var(W2, -1) - var(W0, -1)) * var(W7, 0) -
-                                                              (var(W3, -1) - (2 * var(W2, 0) - 1) * var(W1, -1)));
+                                                         (var(W3, -1) - (2 * var(W2, 0) - 1) * var(W1, -1)));
                         constraint_2 = bp.add_constraint((var(W7, -1) - var(W0, -1)) * var(W8, 0) -
-                                                              (var(W8, -1) - (2 * var(W3, 0) - 1) * var(W1, -1)));
+                                                         (var(W8, -1) - (2 * var(W3, 0) - 1) * var(W1, -1)));
                         constraint_3 = bp.add_constraint((var(W9, -1) - var(W0, -1)) * var(W9, 0) -
-                                                              (var(W10, -1) - (2 * var(W4, 0) - 1) * var(W1, -1)));
+                                                         (var(W10, -1) - (2 * var(W4, 0) - 1) * var(W1, -1)));
                         constraint_4 = bp.add_constraint((var(W11, -1) - var(W0, -1)) * var(W10, 0) -
-                                                              (var(W12, -1) - (2 * var(W5, 0) - 1) * var(W1, -1)));
+                                                         (var(W12, -1) - (2 * var(W5, 0) - 1) * var(W1, -1)));
                         constraint_5 = bp.add_constraint((var(W13, -1) - var(W0, -1)) * var(W11, 0) -
-                                                              (var(W14, -1) - (2 * var(W6, 0) - 1) * var(W1, -1)));
+                                                         (var(W14, -1) - (2 * var(W6, 0) - 1) * var(W1, -1)));
 
                         constraint_6 = bp.add_constraint(
                             (2 * var(W3, -1) - var(W7, 0) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1))) *
@@ -367,19 +368,20 @@ namespace nil {
                              (var(W11, -1) - var(W0, -1) + var(W9, 0).pow(2))));
                         constraint_9 = bp.add_constraint(
                             ((2 * var(W12, -1) - var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) *
-                                (2 * var(W12, -1) -
-                                 var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) -
-                            ((2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
-                             (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
-                             (var(W13, -1) - var(W0, -1) + var(W10, 0).pow(2))))*
-                             var(W8, +1)*var(W2, +1));
+                                 (2 * var(W12, -1) -
+                                  var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) -
+                             ((2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
+                              (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
+                              (var(W13, -1) - var(W0, -1) + var(W10, 0).pow(2)))) *
+                            var(W8, +1) * var(W2, +1));
                         constraint_10 = bp.add_constraint(
                             ((2 * var(W14, -1) - var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) *
-                                (2 * var(W14, -1) -
-                                 var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) -
-                            ((2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
-                             (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
-                             (var(W0, 0) - var(W0, -1) + var(W11, 0).pow(2))))*var(W8, + 1)*var(W2, +1));
+                                 (2 * var(W14, -1) -
+                                  var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) -
+                             ((2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
+                              (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
+                              (var(W0, 0) - var(W0, -1) + var(W11, 0).pow(2)))) *
+                            var(W8, +1) * var(W2, +1));
 
                         constraint_11 = bp.add_constraint(
                             (var(W8, -1) + var(W3, -1)) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1)) -
@@ -390,19 +392,21 @@ namespace nil {
                             ((var(W7, -1) - var(W9, -1)) *
                              (2 * var(W8, -1) - var(W8, 0) * (2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1)))));
                         constraint_13 = bp.add_constraint(
-                                                         (var(W12, -1) + var(W10, -1)) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)) -
+                            (var(W12, -1) + var(W10, -1)) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)) -
                             ((var(W9, -1) - var(W11, -1)) *
                              (2 * var(W10, -1) - var(W9, 0) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)))));
                         constraint_14 = bp.add_constraint(
                             ((var(W14, -1) + var(W12, -1)) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) -
-                            ((var(W11, -1) - var(W13, -1)) *
-                             (2 * var(W12, -1) - var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)))))*
-                             var(W8, +1)*var(W2, +1));
+                             ((var(W11, -1) - var(W13, -1)) *
+                              (2 * var(W12, -1) -
+                               var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))))) *
+                            var(W8, +1) * var(W2, +1));
                         constraint_15 = bp.add_constraint(
                             ((var(W1, 0) + var(W14, -1)) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) -
-                            ((var(W13, -1) - var(W0, 0)) *
-                             (2 * var(W14, -1) - var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)))))*
-                             var(W8, +1)*var(W2, +1));
+                             ((var(W13, -1) - var(W0, 0)) *
+                              (2 * var(W14, -1) -
+                               var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))))) *
+                            var(W8, +1) * var(W2, +1));
 
                         constraint_16 =
                             bp.add_constraint(var(W5, -1) - (32 * (var(W4, -1)) + 16 * var(W2, 0) + 8 * var(W3, 0) +
@@ -470,29 +474,25 @@ namespace nil {
                             bp.add_copy_constraint(
                                 {{W4, (std::int32_t)(j + z), false}, {W5, (std::int32_t)(j + z - 2), false}});
                         }
-                        bp.add_copy_constraint(
-                                {{W5, (std::int32_t)(start_row_index + rows_amount - 1), false},
-                                 {W5, (std::int32_t)(start_row_index + rows_amount - 3), false}});
-                        bp.add_copy_constraint(
-                                {{W6, (std::int32_t)(start_row_index + rows_amount - 1), false},
-                                 {W0, (std::int32_t)(start_row_index + rows_amount - 3), false}});
-                        bp.add_copy_constraint(
-                                {{W7, (std::int32_t)(start_row_index + rows_amount - 1), false},
-                                 {W1, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint({{W5, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                                {W5, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint({{W6, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                                {W0, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint({{W7, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                                {W1, (std::int32_t)(start_row_index + rows_amount - 3), false}});
 
-                        bp.add_copy_constraint(
-                            {{W4, (std::int32_t)(j), false},
-                             {0, (std::int32_t)(j), false, var::column_type::constant}});
+                        bp.add_copy_constraint({{W4, (std::int32_t)(j), false},
+                                                {0, (std::int32_t)(j), false, var::column_type::constant}});
 
                         bp.add_copy_constraint(
                             {params.b, {W5, (std::int32_t)(j + rows_amount - 4), false}});    // scalar value check
                     }
 
-                    static void
-                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                const params_type &params,
-                                                std::size_t component_start_row) {
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
                         std::size_t row = component_start_row + add_component::rows_amount;
 
                         assignment.constant(0)[row] = ArithmetizationType::field_type::value_type::zero();

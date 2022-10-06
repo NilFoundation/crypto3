@@ -108,9 +108,10 @@ namespace nil {
                         std::array<var, 4> output;
 
                         result_type(const std::size_t &component_start_row) {
-                            output = {var(W3, component_start_row + rows_amount - 2, false), 
-                            var(W4, component_start_row + rows_amount - 2, false), var(W5, component_start_row + rows_amount - 2, false), 
-                            var(W6, component_start_row + rows_amount - 2, false)};
+                            output = {var(W3, component_start_row + rows_amount - 2, false),
+                                      var(W4, component_start_row + rows_amount - 2, false),
+                                      var(W5, component_start_row + rows_amount - 2, false),
+                                      var(W6, component_start_row + rows_amount - 2, false)};
                         }
                     };
 
@@ -216,10 +217,12 @@ namespace nil {
                         u0_chunks[2] = (u0_integral >> 44) & ((1 << 22) - 1);
                         u0_chunks[3] = (u0_integral >> 66) & ((1 << 4) - 1);
 
-                        typename CurveType::base_field_type::value_type u1 = t[2] - r[2] + t[3]*(pasta_base<<66)
-                        - r[3]*(pasta_base<<66) + typename CurveType::base_field_type::value_type(u0_integral); 
+                        typename CurveType::base_field_type::value_type u1 =
+                            t[2] - r[2] + t[3] * (pasta_base << 66) - r[3] * (pasta_base << 66) +
+                            typename CurveType::base_field_type::value_type(u0_integral);
 
-                        typename CurveType::base_field_type::integral_type u1_integral = typename CurveType::base_field_type::integral_type(u1.data) >> 125;
+                        typename CurveType::base_field_type::integral_type u1_integral =
+                            typename CurveType::base_field_type::integral_type(u1.data) >> 125;
                         std::array<typename CurveType::base_field_type::value_type, 4> u1_chunks;
                         u1_chunks[0] = u1_integral & ((1 << 22) - 1);
                         u1_chunks[1] = (u1_integral >> 22) & ((1 << 22) - 1);
@@ -287,33 +290,41 @@ namespace nil {
                         p[3] = (minus_eddsa_p >> 198) & (mask);
 
                         std::array<snark::plonk_constraint<BlueprintFieldType>, 5> t;
-                        t[0] =  var(W0, -1)*var(W4, - 1)  + p[0] * var(W8, - 1);
-                        t[1] = var(W1, - 1)*var(W4, - 1) + var(W0, -1)*var(W5, - 1) + p[0]*var(W0, 0) + p[1] * var(W8, - 1);
-                        t[2] = var(W2, -1)*var(W4, - 1) + var(W0, -1)*var(W6, - 1) + var(W1, - 1)*var(W5, - 1) + p[2]*var(W8, - 1) + var(W1, 0) * p[0]
-                        + p[1]* var(W0, 0);
-                        t[3] = var(W3, -1) * var(W4, - 1) + var(W7, -1)*var(W0, -1) + var(W1, - 1)*var(W6, - 1) + var(W5, - 1)*var(W2, -1) +
-                        p[3] * var(W8, - 1) + var(W2, 0)*p[0] + p[1]*var(W1, 0) + var(W0, 0)*p[2];
-                        auto constraint_1 = bp.add_constraint(
-                            var(W7, 0) * (base << 132) - (t[0] - var(W3, 0) + t[1]*(base<<66)
-                        - var(W4, 0)*(base<<66)));
-                        auto constraint_2 = bp.add_constraint(var(W8, 0) * (base<< 125) - 
-                        (t[2] - var(W5, 0) + t[3]*(base<<66)
-                        - var(W6, 0)*(base<<66) + var(W7, 0)));
-                        auto constraint_3 = bp.add_constraint(var(W7, 0) - (var(W0, +1) + var(W1, +1) * (1 << 22) + var(W2, +1) *(base<< 44) +
-                        var(W3, +1) * (base << 66)));
-                        auto constraint_4 = bp.add_constraint(var(W8, 0) - (var(W4, +1) + var(W5, +1) * (1 << 22) + var(W6, +1) *(base<< 44) +
-                        var(W7, +1) * (base << 66)));
-                        auto constraint_5 = bp.add_constraint( (var(W0, -1) + var(W1, -1) * (base << 66) + var(W2, -1)
-                        *(base<< 132) + var(W3, - 1) * (base << 198)) *
-                        (var(W4, -1) + var(W5, -1) * (base << 66) + var(W6, -1)*(base<< 132) + var(W7, - 1) 
-                        * (base << 198)) - 
-                        ((var(W8, -1) + var(W0, 0) * (base << 66) + var(W1, 0)*(base<< 132) + var(W2, 0) * (base << 198))* pasta_eddsa_p + 
-                        (var(W3, 0) + var(W4, 0) * (base << 66) + var(W5, 0)*(base<< 132) + var(W6, 0) * (base << 198)) ));
+                        t[0] = var(W0, -1) * var(W4, -1) + p[0] * var(W8, -1);
+                        t[1] = var(W1, -1) * var(W4, -1) + var(W0, -1) * var(W5, -1) + p[0] * var(W0, 0) +
+                               p[1] * var(W8, -1);
+                        t[2] = var(W2, -1) * var(W4, -1) + var(W0, -1) * var(W6, -1) + var(W1, -1) * var(W5, -1) +
+                               p[2] * var(W8, -1) + var(W1, 0) * p[0] + p[1] * var(W0, 0);
+                        t[3] = var(W3, -1) * var(W4, -1) + var(W7, -1) * var(W0, -1) + var(W1, -1) * var(W6, -1) +
+                               var(W5, -1) * var(W2, -1) + p[3] * var(W8, -1) + var(W2, 0) * p[0] + p[1] * var(W1, 0) +
+                               var(W0, 0) * p[2];
+                        auto constraint_1 =
+                            bp.add_constraint(var(W7, 0) * (base << 132) -
+                                              (t[0] - var(W3, 0) + t[1] * (base << 66) - var(W4, 0) * (base << 66)));
+                        auto constraint_2 =
+                            bp.add_constraint(var(W8, 0) * (base << 125) - (t[2] - var(W5, 0) + t[3] * (base << 66) -
+                                                                            var(W6, 0) * (base << 66) + var(W7, 0)));
+                        auto constraint_3 =
+                            bp.add_constraint(var(W7, 0) - (var(W0, +1) + var(W1, +1) * (1 << 22) +
+                                                            var(W2, +1) * (base << 44) + var(W3, +1) * (base << 66)));
+                        auto constraint_4 =
+                            bp.add_constraint(var(W8, 0) - (var(W4, +1) + var(W5, +1) * (1 << 22) +
+                                                            var(W6, +1) * (base << 44) + var(W7, +1) * (base << 66)));
+                        auto constraint_5 =
+                            bp.add_constraint((var(W0, -1) + var(W1, -1) * (base << 66) + var(W2, -1) * (base << 132) +
+                                               var(W3, -1) * (base << 198)) *
+                                                  (var(W4, -1) + var(W5, -1) * (base << 66) +
+                                                   var(W6, -1) * (base << 132) + var(W7, -1) * (base << 198)) -
+                                              ((var(W8, -1) + var(W0, 0) * (base << 66) + var(W1, 0) * (base << 132) +
+                                                var(W2, 0) * (base << 198)) *
+                                                   pasta_eddsa_p +
+                                               (var(W3, 0) + var(W4, 0) * (base << 66) + var(W5, 0) * (base << 132) +
+                                                var(W6, 0) * (base << 198))));
 
-                        bp.add_gate(first_selector_index, 
-                            { constraint_1, constraint_2, constraint_3, constraint_4, constraint_5
-                            
-                        }); 
+                        bp.add_gate(first_selector_index,
+                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5
+
+                                    });
                     }
 
                     static void generate_copy_constraints(
@@ -324,10 +335,10 @@ namespace nil {
 
                         std::size_t row = component_start_row;
 
-                         bp.add_copy_constraint({var(W0, row + 4, false), params.A[0]});
-                         bp.add_copy_constraint({var(W1, row + 4, false), params.A[1]});
-                         bp.add_copy_constraint({var(W2, row + 4, false), params.A[2]});
-                         bp.add_copy_constraint({var(W3, row + 4, false), params.A[3]});
+                        bp.add_copy_constraint({var(W0, row + 4, false), params.A[0]});
+                        bp.add_copy_constraint({var(W1, row + 4, false), params.A[1]});
+                        bp.add_copy_constraint({var(W2, row + 4, false), params.A[2]});
+                        bp.add_copy_constraint({var(W3, row + 4, false), params.A[3]});
                         bp.add_copy_constraint({var(W4, row + 4, false), params.B[0]});
                         bp.add_copy_constraint({var(W5, row + 4, false), params.B[1]});
                         bp.add_copy_constraint({var(W6, row + 4, false), params.B[2]});

@@ -50,14 +50,8 @@ namespace nil {
                 class multiplication;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2>
-                class multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                     W0,
-                                     W1,
-                                     W2> {
+                         typename ArithmetizationParams, std::size_t W0, std::size_t W1, std::size_t W2>
+                class multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -146,10 +140,7 @@ namespace nil {
                 class addition;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2>
+                         typename ArithmetizationParams, std::size_t W0, std::size_t W1, std::size_t W2>
                 class addition<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
@@ -241,11 +232,7 @@ namespace nil {
                 class division;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3>
+                         typename ArithmetizationParams, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3>
                 class division<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
@@ -338,14 +325,8 @@ namespace nil {
                 class subtraction;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2>
-                class subtraction<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                  W0,
-                                  W1,
-                                  W2> {
+                         typename ArithmetizationParams, std::size_t W0, std::size_t W1, std::size_t W2>
+                class subtraction<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -434,13 +415,8 @@ namespace nil {
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class mul_by_constant;
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1>
-                class mul_by_constant<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                  W0,
-                                  W1> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t W0, std::size_t W1>
+                class mul_by_constant<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -455,7 +431,7 @@ namespace nil {
 
                     struct params_type {
                         var x;
-                        typename BlueprintFieldType::value_type constant; 
+                        typename BlueprintFieldType::value_type constant;
                     };
 
                     struct result_type {
@@ -512,7 +488,8 @@ namespace nil {
                                                const params_type params,
                                                const std::size_t first_selector_index) {
 
-                        auto constraint_1 = bp.add_constraint(var(W0, 0) * var(0, 0, true, var::column_type::constant) - var(W1, 0));
+                        auto constraint_1 =
+                            bp.add_constraint(var(W0, 0) * var(0, 0, true, var::column_type::constant) - var(W1, 0));
 
                         bp.add_gate(first_selector_index, {constraint_1});
                     }
@@ -526,13 +503,13 @@ namespace nil {
                         bp.add_copy_constraint({component_x, params.x});
                     }
 
-                    static void
-                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
-                            assignment.constant(0)[row] = params.constant;  
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
+                        std::size_t row = component_start_row;
+                        assignment.constant(0)[row] = params.constant;
                     }
                 };
 
@@ -542,13 +519,10 @@ namespace nil {
                 class division_or_zero;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
+                         typename ArithmetizationParams, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
                          std::size_t W4>
-                class division_or_zero<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3, W4> {
+                class division_or_zero<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1,
+                                       W2, W3, W4> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -618,14 +592,12 @@ namespace nil {
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
-                        
                         auto constraint_1 = bp.add_constraint(var(W1, 0) * var(W3, 0) - var(W4, 0));
                         auto constraint_2 = bp.add_constraint(var(W4, 0) * (var(W4, 0) - 1));
                         auto constraint_3 = bp.add_constraint((var(W3, 0) - var(W1, 0)) * (var(W4, 0) - 1));
                         auto constraint_4 = bp.add_constraint(var(W0, 0) * var(W3, 0) - var(W2, 0));
 
-                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, 
-                            constraint_3, constraint_4});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
                     }
 
                     static void

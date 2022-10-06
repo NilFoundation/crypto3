@@ -45,25 +45,25 @@ namespace nil {
         template<typename FieldType, typename ArithmetizationParams>
         void profiling(zk::snark::plonk_assignment_table<FieldType, ArithmetizationParams> assignments) {
 
-            for (std::size_t w_index = 0; w_index < ArithmetizationParams::WitnessColumns; w_index++) {
+            for (std::size_t w_index = 0; w_index < ArithmetizationParams::witness_columns; w_index++) {
                 std::cout << "W" << w_index << ":";
                 profiling(assignments.witness(w_index));
                 std::cout << std::endl;
             }
 
-            for (std::size_t pi_index = 0; pi_index < ArithmetizationParams::PublicInputColumns; pi_index++) {
+            for (std::size_t pi_index = 0; pi_index < ArithmetizationParams::public_input_columns; pi_index++) {
                 std::cout << "PI" << pi_index << ":";
                 profiling(assignments.public_input(pi_index));
                 std::cout << std::endl;
             }
 
-            for (std::size_t c_index = 0; c_index < ArithmetizationParams::ConstantColumns; c_index++) {
+            for (std::size_t c_index = 0; c_index < ArithmetizationParams::constant_columns; c_index++) {
                 std::cout << "C" << c_index << ":";
                 profiling(assignments.constant(c_index));
                 std::cout << std::endl;
             }
 
-            for (std::size_t s_index = 0; s_index < ArithmetizationParams::SelectorColumns; s_index++) {
+            for (std::size_t s_index = 0; s_index < ArithmetizationParams::selector_columns; s_index++) {
                 std::cout << "S" << s_index << ":";
                 profiling(assignments.selector(s_index));
                 std::cout << std::endl;

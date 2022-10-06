@@ -36,8 +36,11 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, typename Ed25519Type, std::size_t k,
-                     std::size_t... WireIndexes>
+                template<typename ArithmetizationType,
+                         typename CurveType,
+                         typename Ed25519Type,
+                         std::size_t k,
+                         std::size_t... WireIndexes>
                 class signatures_verification;
 
                 template<typename BlueprintFieldType,
@@ -55,32 +58,32 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8>
                 class signatures_verification<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                       Ed25519Type,
-                                                       k,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8> {
+                                              CurveType,
+                                              Ed25519Type,
+                                              k,
+                                              W0,
+                                              W1,
+                                              W2,
+                                              W3,
+                                              W4,
+                                              W5,
+                                              W6,
+                                              W7,
+                                              W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
 
-                    using ed25519_component = eddsa25519<ArithmetizationType, CurveType, Ed25519Type,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8>;
-                    
+                    using ed25519_component =
+                        eddsa25519<ArithmetizationType, CurveType, Ed25519Type, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using var_ec_point = typename ed25519_component::params_type::var_ec_point;
                     using signature = typename ed25519_component::params_type::signature;
                     constexpr static const std::size_t selector_seed = 0xfcc7;
 
                 public:
-                    constexpr static const std::size_t rows_amount = ed25519_component::rows_amount*k;
+                    constexpr static const std::size_t rows_amount = ed25519_component::rows_amount * k;
 
                     constexpr static const std::size_t gates_amount = 0;
 
@@ -99,48 +102,50 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        for (std::size_t i = 0; i < k; i++){
-                            ed25519_component::generate_assignments(assignment, {params.signatures[i], params.public_keys[i], params.M}, row);
+                        for (std::size_t i = 0; i < k; i++) {
+                            ed25519_component::generate_assignments(
+                                assignment, {params.signatures[i], params.public_keys[i], params.M}, row);
                             row += ed25519_component::rows_amount;
                         }
                         return result_type(component_start_row);
                     }
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        const std::size_t component_start_row){
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        for (std::size_t i = 0; i < k; i++){
-                            ed25519_component::generate_circuit(bp, assignment, {params.signatures[i], params.public_keys[i], params.M}, row);
+                        for (std::size_t i = 0; i < k; i++) {
+                            ed25519_component::generate_circuit(
+                                bp, assignment, {params.signatures[i], params.public_keys[i], params.M}, row);
                             row += ed25519_component::rows_amount;
                         }
                         return result_type(component_start_row);
                     }
 
                 private:
+                    static void
+                        generate_gates(blueprint<ArithmetizationType> &bp,
+                                       blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                                       const params_type &params,
+                                       const std::size_t first_selector_index) {
+                    }
 
-                    static void generate_gates(
+                    static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const params_type &params,
-                        const std::size_t first_selector_index) {
-                        
-                    }
-
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row) {
+                        std::size_t component_start_row) {
                     }
 
                     static void generate_lookup_table(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                            const params_type &params,
-                                                            std::size_t component_start_row) {
-                    
+                                                      const params_type &params,
+                                                      std::size_t component_start_row) {
+
                         std::size_t row = component_start_row;
                         std::size_t n = (1 << 16);
-                        for(std::size_t i = 0; i < 2; i++) {
+                        for (std::size_t i = 0; i < 2; i++) {
                             assignment.constant(1)[i] = 0;
                         }
                     }

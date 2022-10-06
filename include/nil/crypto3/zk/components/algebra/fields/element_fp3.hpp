@@ -63,10 +63,10 @@ namespace nil {
 
                     data_type data;
 
-                    blueprint_linear_combination_vector<base_field_type> all_vars;
+                    detail::blueprint_linear_combination_vector<base_field_type> all_vars;
 
                     element_fp3(blueprint<base_field_type> &bp) : component<base_field_type>(bp) {
-                        blueprint_variable<base_field_type> c0_var, c1_var, c2_var;
+                        detail::blueprint_variable<base_field_type> c0_var, c1_var, c2_var;
 
                         c0_var.allocate(bp);
                         c1_var.allocate(bp);
@@ -104,7 +104,7 @@ namespace nil {
 
                     element_fp3(blueprint<base_field_type> &bp,
                                 const typename Fp3T::value_type &el,
-                                const blueprint_linear_combination<base_field_type> &coeff) :
+                                const detail::blueprint_linear_combination<base_field_type> &coeff) :
                         component<base_field_type>(bp) {
 
                         underlying_element_type c0_lc;
@@ -222,8 +222,8 @@ namespace nil {
                     element_fp3<Fp3T> B;
                     element_fp3<Fp3T> result;
 
-                    blueprint_variable<base_field_type> v0;
-                    blueprint_variable<base_field_type> v4;
+                    detail::blueprint_variable<base_field_type> v0;
+                    detail::blueprint_variable<base_field_type> v4;
 
                     element_fp3_mul(blueprint<base_field_type> &bp,
                                     const element_fp3<Fp3T> &A,
@@ -321,12 +321,12 @@ namespace nil {
                     using base_field_type = typename Fp3T::underlying_field_type;
 
                     element_fp3<Fp3T> A;
-                    blueprint_linear_combination<base_field_type> lc;
+                    detail::blueprint_linear_combination<base_field_type> lc;
                     element_fp3<Fp3T> result;
 
                     element_fp3_mul_by_lc(blueprint<base_field_type> &bp,
                                           const element_fp3<Fp3T> &A,
-                                          const blueprint_linear_combination<base_field_type> &lc,
+                                          const detail::blueprint_linear_combination<base_field_type> &lc,
                                           const element_fp3<Fp3T> &result) :
                         component<base_field_type>(bp),
                         A(A), lc(lc), result(result) {

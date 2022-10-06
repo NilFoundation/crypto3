@@ -42,7 +42,7 @@ namespace nil {
                 class digest_variable : public component<FieldType> {
                 public:
                     std::size_t digest_size;
-                    blueprint_variable_vector<FieldType> bits;
+                    detail::blueprint_variable_vector<FieldType> bits;
 
                     digest_variable(blueprint<FieldType> &bp, std::size_t digest_size) :
                         component<FieldType>(bp), digest_size(digest_size) {
@@ -52,8 +52,8 @@ namespace nil {
 
                     digest_variable(blueprint<FieldType> &bp,
                                     std::size_t digest_size,
-                                    const blueprint_variable_vector<FieldType> &partial_bits,
-                                    const blueprint_variable<FieldType> &padding) :
+                                    const detail::blueprint_variable_vector<FieldType> &partial_bits,
+                                    const detail::blueprint_variable<FieldType> &padding) :
                         component<FieldType>(bp),
                         digest_size(digest_size) {
 
@@ -83,7 +83,7 @@ namespace nil {
                 class block_variable : public component<FieldType> {
                 public:
                     std::size_t block_size;
-                    blueprint_variable_vector<FieldType> bits;
+                    detail::blueprint_variable_vector<FieldType> bits;
 
                     block_variable(blueprint<FieldType> &bp, std::size_t block_size) :
                         component<FieldType>(bp), block_size(block_size) {
@@ -91,7 +91,7 @@ namespace nil {
                     }
 
                     block_variable(blueprint<FieldType> &bp,
-                                   const std::vector<blueprint_variable_vector<FieldType>> &parts) :
+                                   const std::vector<detail::blueprint_variable_vector<FieldType>> &parts) :
                         component<FieldType>(bp) {
 
                         for (auto &part : parts) {
@@ -130,9 +130,9 @@ namespace nil {
                 template<typename FieldType>
                 class merkle_damagard_padding : public component<FieldType> {
                 public:
-                    blueprint_variable_vector<FieldType> bits;
-                    blueprint_variable<FieldType> one;
-                    blueprint_variable<FieldType> zero;
+                    detail::blueprint_variable_vector<FieldType> bits;
+                    detail::blueprint_variable<FieldType> one;
+                    detail::blueprint_variable<FieldType> zero;
 
                     merkle_damagard_padding(blueprint<FieldType> &bp,
                                             size_t message_length,

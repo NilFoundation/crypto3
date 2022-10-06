@@ -38,10 +38,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace components {
-                template<typename CurveType, typename CommitmentParamsType,
-                    typename CircuitDescriptionType,
-                    std::size_t PublicInputSize,
-                    std::size_t PrevChalSize>
+                template<typename CurveType, typename CommitmentParamsType, typename CircuitDescriptionType,
+                         std::size_t PublicInputSize, std::size_t PrevChalSize>
                 struct kimchi_params_type {
                     using commitment_params_type = CommitmentParamsType;
                     using curve_type = CurveType;
@@ -59,7 +57,7 @@ namespace nil {
 
                     constexpr static std::size_t prev_challenges_size = PrevChalSize;
 
-                    constexpr static std::size_t lookup_comm_size = 0; // TODO: 
+                    constexpr static std::size_t lookup_comm_size = 0;    // TODO:
                     constexpr static std::size_t index_term_size() {
                         return circuit_params::index_terms_list::size;
                     }

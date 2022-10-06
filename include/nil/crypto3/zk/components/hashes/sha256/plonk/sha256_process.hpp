@@ -85,21 +85,21 @@ namespace nil {
 
                         result_type(const std::size_t &start_row_index) {
                             output_state = {var(W0, start_row_index + rows_amount - 3, false),
-                                                               var(W1, start_row_index + rows_amount - 3, false),
-                                                               var(W2, start_row_index + rows_amount - 3, false),
-                                                               var(W3, start_row_index + rows_amount - 3, false),
-                                                               var(W0, start_row_index + rows_amount - 1, false),
-                                                               var(W1, start_row_index + rows_amount - 1, false),
-                                                               var(W2, start_row_index + rows_amount - 1, false),
-                                                               var(W3, start_row_index + rows_amount - 1, false)};
+                                            var(W1, start_row_index + rows_amount - 3, false),
+                                            var(W2, start_row_index + rows_amount - 3, false),
+                                            var(W3, start_row_index + rows_amount - 3, false),
+                                            var(W0, start_row_index + rows_amount - 1, false),
+                                            var(W1, start_row_index + rows_amount - 1, false),
+                                            var(W2, start_row_index + rows_amount - 1, false),
+                                            var(W3, start_row_index + rows_amount - 1, false)};
                         }
                     };
 
-
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        const std::size_t start_row_index) {
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t start_row_index) {
                         generate_assignments_constant(bp, assignment, params, start_row_index);
                         std::size_t j = start_row_index;
                         j = j + 2;
@@ -159,13 +159,17 @@ namespace nil {
                             std::vector<bool> input_state_sparse(32);
                             {
                                 nil::marshalling::status_type status;
-                                std::vector<bool> input_state_sparse_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse, status);
-                                std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(), input_state_sparse.begin());
+                                std::vector<bool> input_state_sparse_all =
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian>(
+                                        integral_input_state_sparse, status);
+                                std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
+                                          input_state_sparse.begin());
                             }
 
                             std::vector<std::size_t> input_state_sparse_sizes = {32};
-                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> input_state_sparse_chunks =
-                                split_and_sparse(input_state_sparse, input_state_sparse_sizes, base4);
+                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                                input_state_sparse_chunks =
+                                    split_and_sparse(input_state_sparse, input_state_sparse_sizes, base4);
                             assignment.witness(i)[row + 1] = input_state_sparse_chunks[1][0];
                             sparse_values[i] = input_state_sparse_chunks[1][0];
                         }
@@ -176,13 +180,17 @@ namespace nil {
                             std::vector<bool> input_state_sparse(32);
                             {
                                 nil::marshalling::status_type status;
-                                std::vector<bool> input_state_sparse_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse, status);
-                                std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(), input_state_sparse.begin());
+                                std::vector<bool> input_state_sparse_all =
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian>(
+                                        integral_input_state_sparse, status);
+                                std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
+                                          input_state_sparse.begin());
                             }
 
                             std::vector<std::size_t> input_state_sparse_sizes = {32};
-                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> input_state_sparse_chunks =
-                                split_and_sparse(input_state_sparse, input_state_sparse_sizes, base7);
+                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                                input_state_sparse_chunks =
+                                    split_and_sparse(input_state_sparse, input_state_sparse_sizes, base7);
                             assignment.witness(i)[row + 1] = input_state_sparse_chunks[1][0];
                             sparse_values[i] = input_state_sparse_chunks[1][0];
                         }
@@ -199,12 +207,14 @@ namespace nil {
                             std::vector<bool> a(32);
                             {
                                 nil::marshalling::status_type status;
-                                std::vector<bool> a_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
+                                std::vector<bool> a_all =
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
                                 std::copy(a_all.end() - 32, a_all.end(), a.begin());
                             }
 
                             std::vector<std::size_t> a_sizes = {3, 4, 11, 14};
-                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> a_chunks = split_and_sparse(a, a_sizes, base4);
+                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> a_chunks =
+                                split_and_sparse(a, a_sizes, base4);
                             assignment.witness(W1)[i] = a_chunks[0][0];
                             assignment.witness(W2)[i] = a_chunks[0][1];
                             assignment.witness(W3)[i] = a_chunks[0][2];
@@ -218,7 +228,8 @@ namespace nil {
                             typename CurveType::base_field_type::integral_type sparse_sigma0 =
                                 a_chunks[1][1] * (1 + (one << 56) + (one << 34)) +
                                 a_chunks[1][2] * ((1 << 8) + 1 + (one << 42)) +
-                                a_chunks[1][3] * ((1 << 30) + (1 << 22) + 1) + a_chunks[1][0] * ((one << 50) + (1 << 28));
+                                a_chunks[1][3] * ((1 << 30) + (1 << 22) + 1) +
+                                a_chunks[1][0] * ((one << 50) + (1 << 28));
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
                                 sigma0_chunks = reversed_sparse_and_split(sparse_sigma0, sigma_sizes, base4);
                             assignment.witness(W5)[i + 1] = sigma0_chunks[1][0];
@@ -237,12 +248,14 @@ namespace nil {
                             std::vector<bool> b(32);
                             {
                                 nil::marshalling::status_type status;
-                                std::vector<bool> b_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                                std::vector<bool> b_all =
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
                                 std::copy(b_all.end() - 32, b_all.end(), b.begin());
                             }
 
                             std::vector<std::size_t> b_sizes = {10, 7, 2, 13};
-                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> b_chunks = split_and_sparse(b, b_sizes, base4);
+                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> b_chunks =
+                                split_and_sparse(b, b_sizes, base4);
                             assignment.witness(W0)[i + 4] = message_scheduling_words[(i - row) / 5 + 14];
                             assignment.witness(W1)[i + 4] = b_chunks[0][0];
                             assignment.witness(W2)[i + 4] = b_chunks[0][1];
@@ -270,15 +283,21 @@ namespace nil {
                             assignment.witness(W6)[i + 2] = sigma1_chunks[0][1];
                             assignment.witness(W7)[i + 2] = sigma1_chunks[0][2];
                             assignment.witness(W8)[i + 2] = sigma1_chunks[0][3];
-                            typename CurveType::base_field_type::value_type sum = message_scheduling_words[(i - row) / 5 + 9] + message_scheduling_words[(i - row) / 5] +
+                            typename CurveType::base_field_type::value_type sum =
+                                message_scheduling_words[(i - row) / 5 + 9] + message_scheduling_words[(i - row) / 5] +
                                 sigma1_chunks[0][0] + sigma0_chunks[0][0] +
                                 (one << 14) * (sigma1_chunks[0][1] + sigma0_chunks[0][1]) +
                                 (one << 28) * (sigma1_chunks[0][2] + sigma0_chunks[0][2]) +
                                 (one << 30) * (sigma1_chunks[0][3] + sigma0_chunks[0][3]);
                             message_scheduling_words[(i - row) / 5 + 16] =
-                                typename CurveType::base_field_type::integral_type(sum.data) % typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                                typename CurveType::base_field_type::integral_type(sum.data) %
+                                typename CurveType::base_field_type::integral_type(
+                                    typename CurveType::base_field_type::value_type(2).pow(32).data);
                             assignment.witness(W0)[i + 2] = message_scheduling_words[(i - row) / 5 + 16];
-                            assignment.witness(W0)[i + 3] = (sum - message_scheduling_words[(i - row) / 5 + 16]) / typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            assignment.witness(W0)[i + 3] =
+                                (sum - message_scheduling_words[(i - row) / 5 + 16]) /
+                                typename CurveType::base_field_type::integral_type(
+                                    typename CurveType::base_field_type::value_type(2).pow(32).data);
                         }
                         row = row + 240;
                         for (std::size_t i = row; i < row + 512; i = i + 8) {
@@ -288,12 +307,14 @@ namespace nil {
                             std::vector<bool> e_bits(32);
                             {
                                 nil::marshalling::status_type status;
-                                std::vector<bool> e_bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_e, status);
+                                std::vector<bool> e_bits_all =
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_e, status);
                                 std::copy(e_bits_all.end() - 32, e_bits_all.end(), e_bits.begin());
                             }
 
                             std::vector<std::size_t> e_sizes = {6, 5, 14, 7};
-                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> e_chunks = split_and_sparse(e_bits, e_sizes, base7);
+                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> e_chunks =
+                                split_and_sparse(e_bits, e_sizes, base7);
                             assignment.witness(W2)[i] = e_chunks[0][0];
                             assignment.witness(W3)[i] = e_chunks[0][1];
                             assignment.witness(W4)[i] = e_chunks[0][2];
@@ -304,17 +325,20 @@ namespace nil {
                             assignment.witness(W3)[i + 1] = e_chunks[1][2];
                             assignment.witness(W4)[i + 1] = e_chunks[1][3];
 
-                            sparse_values[4] = typename CurveType::base_field_type::integral_type((e_chunks[1][0] + 
-                                                e_chunks[1][1] * base7_value.pow(e_sizes[0]) +
-                                               e_chunks[1][2] * base7_value.pow(e_sizes[0] + e_sizes[1]) +
-                                               e_chunks[1][3] * base7_value.pow(e_sizes[0] + e_sizes[1] + e_sizes[2])).data);
+                            sparse_values[4] = typename CurveType::base_field_type::integral_type(
+                                (e_chunks[1][0] + e_chunks[1][1] * base7_value.pow(e_sizes[0]) +
+                                 e_chunks[1][2] * base7_value.pow(e_sizes[0] + e_sizes[1]) +
+                                 e_chunks[1][3] * base7_value.pow(e_sizes[0] + e_sizes[1] + e_sizes[2]))
+                                    .data);
                             assignment.witness(W0)[i + 1] = sparse_values[4];
                             assignment.witness(W1)[i + 1] = sparse_values[5];
                             typename CurveType::base_field_type::integral_type sparse_Sigma1 =
-                                typename CurveType::base_field_type::integral_type((e_chunks[1][1] * (base7_value.pow(27) + base7_value.pow(13) + 1) +
-                                e_chunks[1][2] * (base7_value.pow(5) + base7_value.pow(18) + 1) +
-                                e_chunks[1][3] * (base7_value.pow(19) + base7_value.pow(14) + 1)+
-                                e_chunks[1][0] * (base7_value.pow(26) + base7_value.pow(21) + base7_value.pow(7))).data);
+                                typename CurveType::base_field_type::integral_type(
+                                    (e_chunks[1][1] * (base7_value.pow(27) + base7_value.pow(13) + 1) +
+                                     e_chunks[1][2] * (base7_value.pow(5) + base7_value.pow(18) + 1) +
+                                     e_chunks[1][3] * (base7_value.pow(19) + base7_value.pow(14) + 1) +
+                                     e_chunks[1][0] * (base7_value.pow(26) + base7_value.pow(21) + base7_value.pow(7)))
+                                        .data);
                             std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
                                 Sigma1_chunks = reversed_sparse_and_split(sparse_Sigma1, sigma_sizes, base7);
                             assignment.witness(W5)[i + 2] = Sigma1_chunks[0][0];
@@ -330,10 +354,10 @@ namespace nil {
                                 Sigma1_chunks[0][2] * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
                                 Sigma1_chunks[0][3] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]));
                             typename CurveType::base_field_type::integral_type sparse_ch =
-                                sparse_values[4] + 2 * sparse_values[5] + 3 * sparse_values[6];                         
+                                sparse_values[4] + 2 * sparse_values[5] + 3 * sparse_values[6];
 
-                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
-                                ch_chunks = reversed_sparse_and_split_ch(sparse_ch, ch_and_maj_sizes, base7);
+                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> ch_chunks =
+                                reversed_sparse_and_split_ch(sparse_ch, ch_and_maj_sizes, base7);
                             assignment.witness(W5)[i + 3] = ch_chunks[0][0];
                             assignment.witness(W6)[i + 3] = ch_chunks[0][1];
                             assignment.witness(W7)[i + 3] = ch_chunks[0][2];
@@ -351,20 +375,27 @@ namespace nil {
                                 ch_chunks[0][0] + ch_chunks[0][1] * (1 << 8) + ch_chunks[0][2] * (1 << 16) +
                                 ch_chunks[0][3] * (1 << 24);
 
-                            typename CurveType::base_field_type::value_type tmp1 = h + Sigma1 + ch + round_constant[(i - row) / 8] +
-                                         message_scheduling_words[(i - row) / 8];
+                            typename CurveType::base_field_type::value_type tmp1 =
+                                h + Sigma1 + ch + round_constant[(i - row) / 8] +
+                                message_scheduling_words[(i - row) / 8];
                             typename CurveType::base_field_type::value_type sum = tmp1 + d;
-                            typename CurveType::base_field_type::value_type e_new = typename CurveType::base_field_type::integral_type(sum.data) % typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            typename CurveType::base_field_type::value_type e_new =
+                                typename CurveType::base_field_type::integral_type(sum.data) %
+                                typename CurveType::base_field_type::integral_type(
+                                    typename CurveType::base_field_type::value_type(2).pow(32).data);
                             assignment.witness(W4)[i + 4] = tmp1;
                             assignment.witness(W4)[i + 3] = e_new;
-                            assignment.witness(W4)[i + 2] = (sum - e_new)/typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            assignment.witness(W4)[i + 2] =
+                                (sum - e_new) / typename CurveType::base_field_type::integral_type(
+                                                    typename CurveType::base_field_type::value_type(2).pow(32).data);
                             assignment.witness(W0)[i + 7] = a;
                             typename CurveType::base_field_type::integral_type integral_a =
                                 typename CurveType::base_field_type::integral_type(a.data);
                             std::vector<bool> a_bits(32);
                             {
                                 nil::marshalling::status_type status;
-                                std::vector<bool> a_bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
+                                std::vector<bool> a_bits_all =
+                                    nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
                                 std::copy(a_bits_all.end() - 32, a_bits_all.end(), a_bits.begin());
                             }
 
@@ -377,13 +408,15 @@ namespace nil {
                             assignment.witness(W5)[i + 7] = a_chunks[0][3];
 
                             assignment.witness(W2)[i + 6] = a_chunks[1][0];
-                            assignment.witness(W3)[i + 6] = a_chunks[1][1]; 
+                            assignment.witness(W3)[i + 6] = a_chunks[1][1];
                             assignment.witness(W4)[i + 6] = a_chunks[1][2];
                             assignment.witness(W5)[i + 6] = a_chunks[1][3];
 
-                            sparse_values[0] = typename CurveType::base_field_type::integral_type((a_chunks[1][0] + a_chunks[1][1] * base4_value.pow(a_sizes[0]) +
-                                               a_chunks[1][2] * base4_value.pow(a_sizes[0] + a_sizes[1]) +
-                                               a_chunks[1][3] * base4_value.pow(a_sizes[0] + a_sizes[1] + a_sizes[2])).data);
+                            sparse_values[0] = typename CurveType::base_field_type::integral_type(
+                                (a_chunks[1][0] + a_chunks[1][1] * base4_value.pow(a_sizes[0]) +
+                                 a_chunks[1][2] * base4_value.pow(a_sizes[0] + a_sizes[1]) +
+                                 a_chunks[1][3] * base4_value.pow(a_sizes[0] + a_sizes[1] + a_sizes[2]))
+                                    .data);
                             assignment.witness(W0)[i + 5] = sparse_values[0];
                             assignment.witness(W1)[i + 5] = sparse_values[1];
                             typename CurveType::base_field_type::integral_type sparse_Sigma0 =
@@ -409,8 +442,8 @@ namespace nil {
 
                             typename CurveType::base_field_type::integral_type sparse_maj =
                                 (sparse_values[0] + sparse_values[1] + sparse_values[2]);
-                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
-                                maj_chunks = reversed_sparse_and_split_maj(sparse_maj, ch_and_maj_sizes, base4);
+                            std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> maj_chunks =
+                                reversed_sparse_and_split_maj(sparse_maj, ch_and_maj_sizes, base4);
                             assignment.witness(W5)[i + 4] = maj_chunks[0][0];
                             assignment.witness(W6)[i + 4] = maj_chunks[0][1];
                             assignment.witness(W7)[i + 4] = maj_chunks[0][2];
@@ -424,10 +457,13 @@ namespace nil {
                                 maj_chunks[0][3] * (1 << 24);
                             assignment.witness(W4)[i + 5] = sparse_values[2];
                             typename CurveType::base_field_type::value_type sum1 = tmp1 + Sigma0 + maj;
-                            typename CurveType::base_field_type::value_type a_new = typename CurveType::base_field_type::integral_type(sum1.data) % 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            typename CurveType::base_field_type::value_type a_new =
+                                typename CurveType::base_field_type::integral_type(sum1.data) %
+                                typename CurveType::base_field_type::integral_type(
+                                    typename CurveType::base_field_type::value_type(2).pow(32).data);
                             assignment.witness(W2)[i + 5] = a_new;
-                            assignment.witness(W3)[i + 5] = (sum1 - a_new)/ typename CurveType::base_field_type::value_type(2).pow(32);
+                            assignment.witness(W3)[i + 5] =
+                                (sum1 - a_new) / typename CurveType::base_field_type::value_type(2).pow(32);
                             h = g;
                             sparse_values[7] = sparse_values[6];
                             g = f;
@@ -443,28 +479,37 @@ namespace nil {
                             sparse_values[1] = sparse_values[0];
                             a = a_new;
                         }
-                        std::array<typename CurveType::base_field_type::value_type, 8> output_state = {a, b, c, d, e, f, g, h};
+                        std::array<typename CurveType::base_field_type::value_type, 8> output_state = {a, b, c, d,
+                                                                                                       e, f, g, h};
                         row = row + 512;
-                        for(std::size_t i = 0; i < 4; i ++){
+                        for (std::size_t i = 0; i < 4; i++) {
                             assignment.witness(i)[row] = input_state[i];
-                            auto sum = typename CurveType::base_field_type::integral_type(input_state[i].data) + typename CurveType::base_field_type::integral_type(output_state[i].data); 
-                            assignment.witness(i)[row + 1] = sum % 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            auto sum = typename CurveType::base_field_type::integral_type(input_state[i].data) +
+                                       typename CurveType::base_field_type::integral_type(output_state[i].data);
+                            assignment.witness(i)[row + 1] =
+                                sum % typename CurveType::base_field_type::integral_type(
+                                          typename CurveType::base_field_type::value_type(2).pow(32).data);
                             assignment.witness(i + 4)[row] = output_state[i];
-                            assignment.witness(i + 4)[row + 1] = (sum - sum % 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data))/
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            assignment.witness(i + 4)[row + 1] =
+                                (sum - sum % typename CurveType::base_field_type::integral_type(
+                                                 typename CurveType::base_field_type::value_type(2).pow(32).data)) /
+                                typename CurveType::base_field_type::integral_type(
+                                    typename CurveType::base_field_type::value_type(2).pow(32).data);
                         }
                         row = row + 2;
-                            for(std::size_t i = 0; i < 4; i ++){
+                        for (std::size_t i = 0; i < 4; i++) {
                             assignment.witness(i)[row] = input_state[i + 4];
-                            auto sum = typename CurveType::base_field_type::integral_type(input_state[i + 4].data) + typename CurveType::base_field_type::integral_type(output_state[i + 4].data); 
-                            assignment.witness(i)[row + 1] = sum % 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            auto sum = typename CurveType::base_field_type::integral_type(input_state[i + 4].data) +
+                                       typename CurveType::base_field_type::integral_type(output_state[i + 4].data);
+                            assignment.witness(i)[row + 1] =
+                                sum % typename CurveType::base_field_type::integral_type(
+                                          typename CurveType::base_field_type::value_type(2).pow(32).data);
                             assignment.witness(i + 4)[row] = output_state[i + 4];
-                            assignment.witness(i + 4)[row + 1] = (sum - sum % 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data))/
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                            assignment.witness(i + 4)[row + 1] =
+                                (sum - sum % typename CurveType::base_field_type::integral_type(
+                                                 typename CurveType::base_field_type::value_type(2).pow(32).data)) /
+                                typename CurveType::base_field_type::integral_type(
+                                    typename CurveType::base_field_type::value_type(2).pow(32).data);
                         }
                         /*std::vector<std::size_t> value_sizes = {14};
                         // lookup table for sparse values with base = 4
@@ -518,9 +563,10 @@ namespace nil {
                     }
 
                 private:
-                    static void generate_sigma0_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                    static void
+                        generate_sigma0_gates(blueprint<ArithmetizationType> &bp,
+                                              blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                              const std::size_t first_selector_index) {
                         typename ArithmetizationType::field_type::integral_type one = 1;
                         auto constraint_1 =
                             bp.add_constraint(var(W0, -1) - (var(W1, -1) + var(W2, -1) * (one << 3) +
@@ -530,15 +576,15 @@ namespace nil {
                             (var(W1, -1) - 3) * (var(W1, -1) - 2) * (var(W1, -1) - 1) * var(W1, -1));
                         auto constraint_3 = bp.add_constraint(
                             var(W5, 0) + var(W6, 0) * (1 << 28) + var(W7, 0) * (one << 56) + var(W8, 0) * (one << 60) -
-                            (var(W2, 0) * (1 + (one << 56) + (one << 34)) + var(W3, 0) * ((one << 8) + 1 + (one << 42)) +
-                             var(W4, 0) * ((1 << 30) + (1 << 22) + 1) + var(W7, -1) * ((one << 50) + (1 << 28))));
+                            (var(W2, 0) * (1 + (one << 56) + (one << 34)) +
+                             var(W3, 0) * ((one << 8) + 1 + (one << 42)) + var(W4, 0) * ((1 << 30) + (1 << 22) + 1) +
+                             var(W7, -1) * ((one << 50) + (1 << 28))));
                         /*auto constraint_4 =
                             bp.add_constraint((var(W3, 0) - 3) * (var(W3, 0) - 2) * (var(W3, 0) - 1) * var(W3, 0));
                         auto constraint_5 =
                             bp.add_constraint((var(W8, 0) - 3) * (var(W8, 0) - 2) * (var(W8, 0) - 1) * var(W8, 0));*/
 
-                        bp.add_gate(first_selector_index,
-                                    {constraint_1, constraint_2, constraint_3});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
 
                         /*auto lookup_constraint_1 = bp.add_lookup_constraint(
                             {var(W1, -1), var(W7, -1)},
@@ -575,9 +621,10 @@ namespace nil {
                                             lookup_constraint_10});*/
                     }
 
-                    static void generate_sigma1_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                    static void
+                        generate_sigma1_gates(blueprint<ArithmetizationType> &bp,
+                                              blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                              const std::size_t first_selector_index) {
 
                         typename ArithmetizationType::field_type::integral_type one = 1;
                         auto constraint_1 =
@@ -585,17 +632,18 @@ namespace nil {
                                                             var(W3, 0) * (1 << 17) + var(W4, 0) * (1 << 19)));
                         auto constraint_2 =
                             bp.add_constraint((var(W3, 0) - 3) * (var(W3, 0) - 2) * (var(W3, 0) - 1) * var(W3, 0));
-                        auto constraint_3 = bp.add_constraint(
-                            var(W5, -1) + var(W6, -1) * (one << 28) + var(W7, -1) * (one << 56) + var(W8, -1) * (one << 60) -
-                            (var(W2, -1) * (1 + (one << 50) + (one << 46)) + var(W3, -1) * ((one << 14) + 1 + (one << 60)) +
-                             var(W4, -1) * ((one << 18) + (one << 4) + 1) + var(W1, -1) * ((one << 30) + (1 << 26))));
+                        auto constraint_3 = bp.add_constraint(var(W5, -1) + var(W6, -1) * (one << 28) +
+                                                              var(W7, -1) * (one << 56) + var(W8, -1) * (one << 60) -
+                                                              (var(W2, -1) * (1 + (one << 50) + (one << 46)) +
+                                                               var(W3, -1) * ((one << 14) + 1 + (one << 60)) +
+                                                               var(W4, -1) * ((one << 18) + (one << 4) + 1) +
+                                                               var(W1, -1) * ((one << 30) + (1 << 26))));
                         /*auto constraint_4 =
                             bp.add_constraint((var(W7, 0) - 3) * (var(W7, 0) - 2) * (var(W7, 0) - 1) * var(W7, 0));
                         auto constraint_5 =
                             bp.add_constraint((var(W8, 0) - 3) * (var(W8, 0) - 2) * (var(W8, 0) - 1) * var(W8, 0));*/
 
-                        bp.add_gate(first_selector_index,
-                                    {constraint_1, constraint_2, constraint_3});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
 
                         /*std::size_t selector_lookup_index = assignment.add_selector(j);
                         auto lookup_constraint_1 =
@@ -635,26 +683,31 @@ namespace nil {
                                             lookup_constraint_10, lookup_constraint_11});*/
                     }
 
-                    static void
-                        generate_message_scheduling_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                    static void generate_message_scheduling_gates(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const std::size_t first_selector_index) {
                         generate_sigma0_gates(bp, assignment, first_selector_index);
                         std::size_t selector_index_1 = first_selector_index + 1;
                         typename ArithmetizationType::field_type::integral_type one = 1;
-                        typename CurveType::base_field_type::integral_type m = typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
+                        typename CurveType::base_field_type::integral_type m =
+                            typename CurveType::base_field_type::integral_type(
+                                typename CurveType::base_field_type::value_type(2).pow(32).data);
                         auto constraint_1 = bp.add_constraint(
-                            var(W0, 0) + m*var(W0, +1) - (var(W0, -1) + var(W1, -1) + var(W1, 0) + var(W2, 0) * (one << 14) +
-                                          var(W3, 0) * (one << 28) + var(W4, 0) * (one << 30) + var(W5, 0) +
-                                          var(W6, 0) * (one << 14) + var(W7, 0) * (one << 28) + var(W8, 0) * (one << 30)));
-                        auto constraint_2 = bp.add_constraint((var(W0, +1) - 3) * (var(W0, +1) - 2) * (var(W0, +1)  - 1) * var(W0, +1)); 
+                            var(W0, 0) + m * var(W0, +1) -
+                            (var(W0, -1) + var(W1, -1) + var(W1, 0) + var(W2, 0) * (one << 14) +
+                             var(W3, 0) * (one << 28) + var(W4, 0) * (one << 30) + var(W5, 0) +
+                             var(W6, 0) * (one << 14) + var(W7, 0) * (one << 28) + var(W8, 0) * (one << 30)));
+                        auto constraint_2 =
+                            bp.add_constraint((var(W0, +1) - 3) * (var(W0, +1) - 2) * (var(W0, +1) - 1) * var(W0, +1));
                         bp.add_gate(selector_index_1, {constraint_1, constraint_2});
-                        generate_sigma1_gates(bp, assignment, first_selector_index + 2); 
+                        generate_sigma1_gates(bp, assignment, first_selector_index + 2);
                     }
 
-                    static void generate_Sigma0_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                    static void
+                        generate_Sigma0_gates(blueprint<ArithmetizationType> &bp,
+                                              blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                              const std::size_t first_selector_index) {
                         typename ArithmetizationType::field_type::integral_type one = 1;
                         auto constraint_1 =
                             bp.add_constraint(var(W0, +1) - (var(W2, +1) + var(W3, +1) * (1 << 2) +
@@ -673,9 +726,7 @@ namespace nil {
                             bp.add_constraint((var(W6, 0) - 3) * (var(W6, 0) - 2) * (var(W6, 0) - 1) * var(W6, 0));
                         auto constraint_6 =
                             bp.add_constraint((var(W7, 0) - 3) * (var(W7, 0) - 2) * (var(W7, 0) - 1) * var(W7, 0));*/
-                        bp.add_gate(
-                            first_selector_index,
-                            {constraint_1, constraint_2, constraint_3, constraint_4});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
                         /*std::size_t selector_lookup_index = assignment.add_selector(start_row_index);
                         auto lookup_constraint_1 =
                             bp.add_lookup_constraint({var(W3, +1) * 8}, {{0, 0, false, var::column_type::constant}});
@@ -714,29 +765,31 @@ namespace nil {
                                             lookup_constraint_10, lookup_constraint_11});*/
                     }
 
-                    static void generate_Sigma1_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                    static void
+                        generate_Sigma1_gates(blueprint<ArithmetizationType> &bp,
+                                              blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                              const std::size_t first_selector_index) {
                         typename ArithmetizationType::field_type::integral_type one = 1;
                         typename CurveType::base_field_type::value_type base7_value = base7;
                         auto constraint_1 =
                             bp.add_constraint(var(W0, -1) - (var(W2, -1) + var(W3, -1) * (1 << 6) +
                                                              var(W4, -1) * (1 << 11) + var(W5, -1) * (1 << 25)));
-                        auto constraint_2 =
-                            bp.add_constraint(var(W0, 0) - (var(W1, -1) + var(W2, 0) * base7_value.pow(6) +
-                                                            var(W3, 0) * base7_value.pow(11) + var(W4, 0) * base7_value.pow(25)));
+                        auto constraint_2 = bp.add_constraint(
+                            var(W0, 0) - (var(W1, -1) + var(W2, 0) * base7_value.pow(6) +
+                                          var(W3, 0) * base7_value.pow(11) + var(W4, 0) * base7_value.pow(25)));
                         auto constraint_3 = bp.add_constraint(
-                            var(W5, 0) + var(W6, 0) * base7_value.pow(14) + var(W7, 0) * base7_value.pow(28) + var(W8, 0) * base7_value.pow(30) -
-                            (var(W2, 0) * (base7_value.pow(27) + base7_value.pow(13) + 1) + var(W3, 0) * (base7_value.pow(5) + 1 + base7_value.pow(18)) +
-                             var(W4, 0) * (base7_value.pow(19) + base7_value.pow(14) + 1) + 
+                            var(W5, 0) + var(W6, 0) * base7_value.pow(14) + var(W7, 0) * base7_value.pow(28) +
+                            var(W8, 0) * base7_value.pow(30) -
+                            (var(W2, 0) * (base7_value.pow(27) + base7_value.pow(13) + 1) +
+                             var(W3, 0) * (base7_value.pow(5) + 1 + base7_value.pow(18)) +
+                             var(W4, 0) * (base7_value.pow(19) + base7_value.pow(14) + 1) +
                              var(W1, -1) * (base7_value.pow(26) + base7_value.pow(21) + base7_value.pow(7))));
                         /*auto constraint_4 =
                             bp.add_constraint((var(W3, 0) - 3) * (var(W3, 0) - 2) * (var(W3, 0) - 1) * var(W3, 0));
                         auto constraint_5 =
                             bp.add_constraint((var(W4, 0) - 3) * (var(W4, 0) - 2) * (var(W4, 0) - 1) * var(W4, 0));*/
 
-                        bp.add_gate(first_selector_index,
-                                    {constraint_1, constraint_2, constraint_3});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
 
                         /*std::size_t selector_lookup_index = assignment.add_selector(j);
                         auto lookup_constraint_1 =
@@ -777,8 +830,8 @@ namespace nil {
                     }
 
                     static void generate_Maj_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                   const std::size_t first_selector_index) {
                         typename ArithmetizationType::field_type::integral_type one = 1;
                         auto constraint_1 =
                             bp.add_constraint(var(W0, 0) + var(W1, 0) * (1 << 16) + var(W2, 0) * (one << 32) +
@@ -804,8 +857,8 @@ namespace nil {
                     }
 
                     static void generate_Ch_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const std::size_t first_selector_index) {
 
                         typename ArithmetizationType::field_type::value_type base7_value = base7;
                         auto constraint_1 = bp.add_constraint(
@@ -830,46 +883,57 @@ namespace nil {
                             {lookup_constraint_1, lookup_constraint_2, lookup_constraint_3, lookup_constraint_4});*/
                     }
 
-                    static void generate_compression_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const std::size_t first_selector_index) {
+                    static void
+                        generate_compression_gates(blueprint<ArithmetizationType> &bp,
+                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                   const std::size_t first_selector_index) {
                         generate_Sigma1_gates(bp, assignment, first_selector_index);
                         generate_Ch_gates(bp, assignment, first_selector_index + 5);
-                        typename CurveType::base_field_type::integral_type m = typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(32).data);
-                        auto constraint_1 = bp.add_constraint( var(W4, +1) - (var(W2, 0) + var(W5, -1) + var(W6, -1) * (1 << 14) +
-                                              var(W7, -1) * (1 << 28) + var(W8, -1) * (1 << 30) + var(W5, 0) +
-                                              var(W6, 0) * (1 << 8) + var(W7, 0) * (1 << 16) + var(W8, 0) * (1 << 24) +
-                                              var(W0, 0, true, var::column_type::constant) + var(W3, 0)));
-                        auto constraint_2 = bp.add_constraint(
-                                var(W4, 0) + m*var(W4, - 1) - (var(W1, 0) + var(W4, +1)));
-                        auto constraint_3 = bp.add_constraint((var(W4, - 1) - 5)* (var(W4, - 1) - 4)*(var(W4, - 1) - 3)*
-                        (var(W4, - 1) - 2) * (var(W4, - 1) - 1) * var(W4, - 1));
+                        typename CurveType::base_field_type::integral_type m =
+                            typename CurveType::base_field_type::integral_type(
+                                typename CurveType::base_field_type::value_type(2).pow(32).data);
+                        auto constraint_1 = bp.add_constraint(
+                            var(W4, +1) -
+                            (var(W2, 0) + var(W5, -1) + var(W6, -1) * (1 << 14) + var(W7, -1) * (1 << 28) +
+                             var(W8, -1) * (1 << 30) + var(W5, 0) + var(W6, 0) * (1 << 8) + var(W7, 0) * (1 << 16) +
+                             var(W8, 0) * (1 << 24) + var(W0, 0, true, var::column_type::constant) + var(W3, 0)));
+                        auto constraint_2 =
+                            bp.add_constraint(var(W4, 0) + m * var(W4, -1) - (var(W1, 0) + var(W4, +1)));
+                        auto constraint_3 =
+                            bp.add_constraint((var(W4, -1) - 5) * (var(W4, -1) - 4) * (var(W4, -1) - 3) *
+                                              (var(W4, -1) - 2) * (var(W4, -1) - 1) * var(W4, -1));
                         bp.add_gate(first_selector_index + 2, {constraint_1, constraint_2, constraint_3});
-                        auto constraint_4 = bp.add_constraint(
-                            var(W2, +1) + m* var(W3, +1) - (var(W4, 0) + var(W5, +1) + var(W6, +1) * (1 << 14) +
-                                          var(W7, +1) * (1 << 28) + var(W8, +1) * (1 << 30) + var(W5, 0) +
-                                          var(W6, 0) * (1 << 8) + var(W7, 0) * (1 << 16) + var(W8, 0) * (1 << 24)));
-                        auto constraint_5 = bp.add_constraint((var(W3, +1) - 6) * (var(W3, +1) - 5) *
-                        (var(W3, +1) - 4)* (var(W3, +1) - 3) * (var(W3, +1) - 2) * (var(W3, +1) - 1) *var(W3, +1));
+                        auto constraint_4 = bp.add_constraint(var(W2, +1) + m * var(W3, +1) -
+                                                              (var(W4, 0) + var(W5, +1) + var(W6, +1) * (1 << 14) +
+                                                               var(W7, +1) * (1 << 28) + var(W8, +1) * (1 << 30) +
+                                                               var(W5, 0) + var(W6, 0) * (1 << 8) +
+                                                               var(W7, 0) * (1 << 16) + var(W8, 0) * (1 << 24)));
+                        auto constraint_5 =
+                            bp.add_constraint((var(W3, +1) - 6) * (var(W3, +1) - 5) * (var(W3, +1) - 4) *
+                                              (var(W3, +1) - 3) * (var(W3, +1) - 2) * (var(W3, +1) - 1) * var(W3, +1));
                         bp.add_gate(first_selector_index + 3, {constraint_4, constraint_5});
                         generate_Maj_gates(bp, assignment, first_selector_index + 4);
                         generate_Sigma0_gates(bp, assignment, first_selector_index + 1);
 
-                        auto constraint_out_1 = bp.add_constraint(var(W0, +1) + m*var(W4, +1)- (var(W0, 0) + var(W4, 0)));
-                        auto constraint_out_2 = bp.add_constraint(var(W1, +1) + m*var(W5, +1) - (var(W1, 0) + var(W5, 0)));
-                        auto constraint_out_3 = bp.add_constraint(var(W2, +1) + m*var(W6, +1) - (var(W2, 0) + var(W6, 0)));
-                        auto constraint_out_4 = bp.add_constraint(var(W3, +1) + m*var(W7, +1) - (var(W3, 0) + var(W7, 0)));
+                        auto constraint_out_1 =
+                            bp.add_constraint(var(W0, +1) + m * var(W4, +1) - (var(W0, 0) + var(W4, 0)));
+                        auto constraint_out_2 =
+                            bp.add_constraint(var(W1, +1) + m * var(W5, +1) - (var(W1, 0) + var(W5, 0)));
+                        auto constraint_out_3 =
+                            bp.add_constraint(var(W2, +1) + m * var(W6, +1) - (var(W2, 0) + var(W6, 0)));
+                        auto constraint_out_4 =
+                            bp.add_constraint(var(W3, +1) + m * var(W7, +1) - (var(W3, 0) + var(W7, 0)));
 
-                        bp.add_gate(first_selector_index + 6, {constraint_out_1, 
-                        constraint_out_2, constraint_out_3, constraint_out_4});
+                        bp.add_gate(first_selector_index + 6,
+                                    {constraint_out_1, constraint_out_2, constraint_out_3, constraint_out_4});
                     }
 
-                    static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> split_and_sparse(std::vector<bool> bits,
-                                                                                 const std::vector<size_t> &sizes,
-                                                                                 std::size_t base) {
+                    static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                        split_and_sparse(std::vector<bool> bits, const std::vector<size_t> &sizes, std::size_t base) {
                         std::size_t size = sizes.size() - 1;
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {std::vector<typename CurveType::base_field_type::integral_type>(size + 1),
-                                                                    std::vector<typename CurveType::base_field_type::integral_type>(size + 1)};
+                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {
+                            std::vector<typename CurveType::base_field_type::integral_type>(size + 1),
+                            std::vector<typename CurveType::base_field_type::integral_type>(size + 1)};
                         std::size_t k = 0;
                         for (int i = size; i > -1; i--) {
                             res[0][i] = int(bits[k]);
@@ -901,13 +965,15 @@ namespace nil {
                             res[0][i] = 0;
                             res[1][i] = 0;
                             for (int j = sizes[i] - 1; j > -1; j--) {
-                                if (tmp > typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
-                                    typename CurveType::base_field_type::integral_type r = (tmp - (tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data))) / 
-                                    typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
-                                    res[0][i] = res[0][i] * 2 + (r&1);
+                                if (tmp >
+                                    typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
+                                    typename CurveType::base_field_type::integral_type r =
+                                        (tmp - (tmp % typename CurveType::base_field_type::integral_type(
+                                                          value_base.pow(k).data))) /
+                                        typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                                    res[0][i] = res[0][i] * 2 + (r & 1);
                                     res[1][i] = res[1][i] * sparse_base + r;
-                                }
-                                else {
+                                } else {
                                     res[0][i] = res[0][i] * 2;
                                     res[1][i] = res[1][i] * sparse_base;
                                 }
@@ -920,7 +986,7 @@ namespace nil {
 
                     static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
                         reversed_sparse_and_split_maj(typename CurveType::base_field_type::integral_type sparse_value,
-                                                  const std::vector<size_t> &sizes, std::size_t base) {
+                                                      const std::vector<size_t> &sizes, std::size_t base) {
                         std::size_t size = sizes.size();
                         std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {
                             std::vector<typename CurveType::base_field_type::integral_type>(size),
@@ -931,19 +997,21 @@ namespace nil {
                         for (int i = sizes.size() - 1; i > -1; i--) {
                             k = k + sizes[i];
                         }
-                        std::array<std::size_t, 4> r_values = {0,0,1,1};
+                        std::array<std::size_t, 4> r_values = {0, 0, 1, 1};
                         typename CurveType::base_field_type::integral_type tmp = sparse_value;
                         for (int i = sizes.size() - 1; i > -1; i--) {
                             res[0][i] = 0;
                             res[1][i] = 0;
                             for (int j = sizes[i] - 1; j > -1; j--) {
-                                if (tmp > typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
-                                    typename CurveType::base_field_type::integral_type r = (tmp - (tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data))) / 
-                                    typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                                if (tmp >
+                                    typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
+                                    typename CurveType::base_field_type::integral_type r =
+                                        (tmp - (tmp % typename CurveType::base_field_type::integral_type(
+                                                          value_base.pow(k).data))) /
+                                        typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
                                     res[0][i] = res[0][i] * 2 + r_values[std::size_t(r)];
                                     res[1][i] = res[1][i] * sparse_base + r;
-                                }
-                                else {
+                                } else {
                                     res[0][i] = res[0][i] * 2;
                                     res[1][i] = res[1][i] * sparse_base;
                                 }
@@ -956,7 +1024,7 @@ namespace nil {
 
                     static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
                         reversed_sparse_and_split_ch(typename CurveType::base_field_type::integral_type sparse_value,
-                                                  const std::vector<size_t> &sizes, std::size_t base) {
+                                                     const std::vector<size_t> &sizes, std::size_t base) {
                         std::size_t size = sizes.size();
                         std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {
                             std::vector<typename CurveType::base_field_type::integral_type>(size),
@@ -967,19 +1035,21 @@ namespace nil {
                         for (int i = sizes.size() - 1; i > -1; i--) {
                             k = k + sizes[i];
                         }
-                        std::array<std::size_t, 6> r_values = {0,0,1,0,1,1};
+                        std::array<std::size_t, 6> r_values = {0, 0, 1, 0, 1, 1};
                         typename CurveType::base_field_type::integral_type tmp = sparse_value;
                         for (int i = sizes.size() - 1; i > -1; i--) {
                             res[0][i] = 0;
                             res[1][i] = 0;
                             for (int j = sizes[i] - 1; j > -1; j--) {
-                                if (tmp > typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
-                                    typename CurveType::base_field_type::integral_type r = (tmp - (tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data))) / 
-                                    typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                                if (tmp >
+                                    typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
+                                    typename CurveType::base_field_type::integral_type r =
+                                        (tmp - (tmp % typename CurveType::base_field_type::integral_type(
+                                                          value_base.pow(k).data))) /
+                                        typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
                                     res[0][i] = res[0][i] * 2 + r_values[std::size_t(r) - 1];
                                     res[1][i] = res[1][i] * sparse_base + r;
-                                }
-                                else {
+                                } else {
                                     res[0][i] = res[0][i] * 2;
                                     res[1][i] = res[1][i] * sparse_base;
                                 }
@@ -997,20 +1067,21 @@ namespace nil {
                         generate_compression_gates(bp, assignment, first_selector_index + 3);
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                          const params_type &params,
-                                                          size_t start_row_index) {
-                    }
                     static void
-                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
-                                                  std::size_t component_start_row) {
-                            std::size_t row = component_start_row + 242 + 3;
-                            for (std::size_t i = 0; i < 64; i ++){
-                                assignment.constant(0)[row + i*8] = round_constant[i];
-                            }
+                                                  size_t start_row_index) {
+                    }
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
+                        std::size_t row = component_start_row + 242 + 3;
+                        for (std::size_t i = 0; i < 64; i++) {
+                            assignment.constant(0)[row + i * 8] = round_constant[i];
+                        }
                     }
                 };
 

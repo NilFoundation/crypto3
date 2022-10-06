@@ -43,7 +43,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/weierstrass/element_g1.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/weierstrass/element_g2.hpp>
 #include <nil/crypto3/zk/components/algebra/pairing/pairing_checks.hpp>
-//#include <nil/crypto3/zk/components/algebra/pairing/pairing_params.hpp>
+// #include <nil/crypto3/zk/components/algebra/pairing/pairing_params.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_ppzksnark.hpp>
 
 namespace nil {

@@ -41,25 +41,20 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, 
-                    typename BlueprintFieldType,
-                    typename KimchiParamsType>
+                template<typename ArithmetizationType, typename BlueprintFieldType, typename KimchiParamsType>
                 struct binding {
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using commitment_parms_type = typename KimchiParamsType::commitment_params_type;
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
-                    template<typename VarType,
-                        std::size_t BatchSize>
+                    template<typename VarType, std::size_t BatchSize>
                     struct fr_data {
-                        private:
-                        constexpr static const std::size_t f_comm_msm_size = 
-                            kimchi_constants::f_comm_msm_size;
-                                
-                        public: 
+                    private:
+                        constexpr static const std::size_t f_comm_msm_size = kimchi_constants::f_comm_msm_size;
+
+                    public:
                         std::array<VarType, kimchi_constants::final_msm_size(BatchSize)> scalars;
-                        std::array<std::array<VarType, f_comm_msm_size>,
-                            BatchSize> f_comm_scalars;
+                        std::array<std::array<VarType, f_comm_msm_size>, BatchSize> f_comm_scalars;
                         std::array<VarType, BatchSize> cip_shifted;
 
                         std::array<var, KimchiParamsType::public_input_size> neg_pub;
@@ -68,9 +63,7 @@ namespace nil {
                     };
 
                     template<typename VarType>
-                    struct fq_data {
-
-                    };
+                    struct fq_data { };
 
                     struct fq_sponge_output {
                         var joint_combiner;

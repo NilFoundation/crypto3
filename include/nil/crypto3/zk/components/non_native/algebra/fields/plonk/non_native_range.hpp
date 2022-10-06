@@ -129,12 +129,11 @@ namespace nil {
                         for (std::size_t i = 0; i < 4; i++) {
                             for (std::size_t j = 0; j < 3; j++) {
                                 if (i == 3) {
-                                    if (j == 2){
-                                        mask = (base << 15) - 1; 
+                                    if (j == 2) {
+                                        mask = (base << 15) - 1;
                                         range_chunks[9 + j] = (ed25519_value[i] >> (21 * j)) & mask;
                                         xi += range_chunks[i * 3 + j] - (base << 15) + 1;
-                                    }
-                                    else {
+                                    } else {
                                         mask = (base << 21) - 1;
                                         range_chunks[9 + j] = (ed25519_value[i] >> (21 * j)) & mask;
                                         xi += range_chunks[i * 3 + j] - (base << 21) + 1;
@@ -149,8 +148,8 @@ namespace nil {
                             }
                         }
                         if (xi != 0) {
-                            xi = xi.inversed(); }
-                        else {
+                            xi = xi.inversed();
+                        } else {
                             xi = 0;
                         }
                         assignment.witness(W4)[row] = range_chunks[0];
@@ -215,14 +214,10 @@ namespace nil {
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        bp.add_copy_constraint({{W0, static_cast<int>(row), false},
-                            params.input[0]});
-                        bp.add_copy_constraint({{W1, static_cast<int>(row), false},
-                            params.input[1]});
-                        bp.add_copy_constraint({{W2, static_cast<int>(row), false},
-                            params.input[2]});
-                        bp.add_copy_constraint({{W3, static_cast<int>(row), false},
-                            params.input[3]});
+                        bp.add_copy_constraint({{W0, static_cast<int>(row), false}, params.input[0]});
+                        bp.add_copy_constraint({{W1, static_cast<int>(row), false}, params.input[1]});
+                        bp.add_copy_constraint({{W2, static_cast<int>(row), false}, params.input[2]});
+                        bp.add_copy_constraint({{W3, static_cast<int>(row), false}, params.input[3]});
                     }
                 };
 

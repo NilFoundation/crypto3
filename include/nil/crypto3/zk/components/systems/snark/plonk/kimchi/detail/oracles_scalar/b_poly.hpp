@@ -46,46 +46,15 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L239
                 // Input: challenges, x
                 // Output: (1 + challenges[-1] x)(1 + challenges[-2] x^2)(1 + challenges[-3] x^4)...
-                template<typename ArithmetizationType, std::size_t EvalRounds, 
-                    std::size_t... WireIndexes>
+                template<typename ArithmetizationType, std::size_t EvalRounds, std::size_t... WireIndexes>
                 class b_poly;
 
-                template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         std::size_t EvalRounds,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class b_poly<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    EvalRounds,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t EvalRounds,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
+                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
+                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                class b_poly<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, EvalRounds, W0,
+                             W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -133,7 +102,8 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -143,22 +113,27 @@ namespace nil {
                         std::array<var, EvalRounds> pow_twos;
                         pow_twos[0] = params.eval_point;
                         for (std::size_t i = 1; i < EvalRounds; i++) {
-                            pow_twos[i] = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {pow_twos[i - 1], pow_twos[i - 1]}, row).output;
+                            pow_twos[i] = zk::components::generate_circuit<mul_component>(
+                                              bp, assignment, {pow_twos[i - 1], pow_twos[i - 1]}, row)
+                                              .output;
                             row += mul_component::rows_amount;
                         }
                         var res = params.one;
                         for (std::size_t i = 0; i < EvalRounds; i++) {
-                            var mul_result = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row).output;
+                            var mul_result =
+                                zk::components::generate_circuit<mul_component>(
+                                    bp, assignment, {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row)
+                                    .output;
                             row += mul_component::rows_amount;
 
-                            var sum_result = zk::components::generate_circuit<add_component>(bp, assignment,
-                                {params.one, mul_result}, row).output;
+                            var sum_result = zk::components::generate_circuit<add_component>(
+                                                 bp, assignment, {params.one, mul_result}, row)
+                                                 .output;
                             row += add_component::rows_amount;
 
-                            res = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {res, sum_result}, row).output;
+                            res =
+                                zk::components::generate_circuit<mul_component>(bp, assignment, {res, sum_result}, row)
+                                    .output;
                             row += mul_component::rows_amount;
                         }
 
@@ -175,22 +150,23 @@ namespace nil {
                         std::array<var, EvalRounds> pow_twos;
                         pow_twos[0] = params.eval_point;
                         for (std::size_t i = 1; i < EvalRounds; i++) {
-                            pow_twos[i] = mul_component::generate_assignments(assignment,
-                                {pow_twos[i - 1], pow_twos[i - 1]}, row).output;
+                            pow_twos[i] =
+                                mul_component::generate_assignments(assignment, {pow_twos[i - 1], pow_twos[i - 1]}, row)
+                                    .output;
                             row += mul_component::rows_amount;
                         }
                         var res = params.one;
                         for (std::size_t i = 0; i < EvalRounds; i++) {
-                            var mul_result = mul_component::generate_assignments(assignment,
-                                {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row).output;
+                            var mul_result = mul_component::generate_assignments(
+                                                 assignment, {params.challenges[i], pow_twos[EvalRounds - 1 - i]}, row)
+                                                 .output;
                             row += mul_component::rows_amount;
 
-                            var sum_result = add_component::generate_assignments(assignment,
-                                {params.one, mul_result}, row).output;
+                            var sum_result =
+                                add_component::generate_assignments(assignment, {params.one, mul_result}, row).output;
                             row += add_component::rows_amount;
 
-                            res = mul_component::generate_assignments(assignment,
-                                {res, sum_result}, row).output;
+                            res = mul_component::generate_assignments(assignment, {res, sum_result}, row).output;
                             row += mul_component::rows_amount;
                         }
 
@@ -202,10 +178,10 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
