@@ -72,6 +72,10 @@ namespace nil {
                     constexpr static const std::size_t rows_amount = add_component::rows_amount + mul_rows_amount + 1;
                     constexpr static const std::size_t gates_amount = 2;
 
+                    constexpr static const typename ArithmetizationType::field_type::value_type shifted_minus_one = 0x224698fc0994a8dd8c46eb2100000000_cppui255;
+                    constexpr static const typename ArithmetizationType::field_type::value_type shifted_zero = 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255;
+                    constexpr static const typename ArithmetizationType::field_type::value_type shifted_one = 0x224698fc0994a8dd8c46eb2100000001_cppui255;
+
                     struct params_type {
                         struct var_ec_point {
                             var x;
@@ -109,7 +113,8 @@ namespace nil {
                             typename CurveType::scalar_field_type::integral_type(b.data);
                         const std::size_t scalar_size = 255;
                         nil::marshalling::status_type status;
-                        std::array<bool, scalar_size> bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                        std::array<bool, scalar_size> bits =
+                            nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
 
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
@@ -122,7 +127,7 @@ namespace nil {
 
                         std::size_t j = start_row_index + add_component::rows_amount;
 
-                        for (std::size_t i = j; i < j + rows_amount - 3; i = i + 2) {
+                        for (std::size_t i = j; i < j + mul_rows_amount; i = i + 2) {
                             assignment.witness(W0)[i] = T.X;
                             assignment.witness(W1)[i] = T.Y;
                             if (i == j) {
@@ -170,22 +175,22 @@ namespace nil {
                             assignment.witness(W5)[i + 1] = bits[((i - j) / 2) * 5 + 3];
                             assignment.witness(W6)[i + 1] = bits[((i - j) / 2) * 5 + 4];
                         }
-                        typename ArithmetizationType::field_type::value_type m = ((n_next - 0x224698fc0994a8dd8c46eb2100000000_cppui255)*
-                        (n_next - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*(n_next - 0x224698fc0994a8dd8c46eb2100000001_cppui255));
-                        typename ArithmetizationType::field_type::value_type t0 = m.inversed();
-                        typename ArithmetizationType::field_type::value_type t1 = (n_next - 0x224698fc0994a8dd8c46eb2100000000_cppui255).inversed();
-                        typename ArithmetizationType::field_type::value_type t2 = (n_next - 0x224698fc0994a8dd8c46eb2100000001_cppui255).inversed();
+                        typename ArithmetizationType::field_type::value_type m = ((n_next - shifted_minus_one)*
+                        (n_next - shifted_zero)*(n_next - shifted_one));
+                        typename ArithmetizationType::field_type::value_type t0 = ( m == 0 ? 0 : m.inversed());
+                        typename ArithmetizationType::field_type::value_type t1 = ((n_next - shifted_minus_one) == 0) ? 0 : (n_next - shifted_minus_one).inversed();
+                        typename ArithmetizationType::field_type::value_type t2 = ((n_next - shifted_one)       == 0) ? 0 : (n_next - shifted_one).inversed();
                         typename ArithmetizationType::field_type::value_type x;
                         typename ArithmetizationType::field_type::value_type y;
-                        if (n_next == 0x224698fc0994a8dd8c46eb2100000000_cppui255) {
+                        if (n_next == shifted_minus_one) {
                             x = T.X;
                             y = -T.Y;
                         } else  {
-                            if (n_next == 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255) {
+                            if (n_next == shifted_zero) {
                                 x = 0;
                                 y = 0;
                             } else {
-                                if (n_next == 0x224698fc0994a8dd8c46eb2100000001_cppui255) {
+                                if (n_next == shifted_one) {
                                     x = T.X;
                                     y = T.Y;
                                 } else {
@@ -214,7 +219,7 @@ namespace nil {
                                          const std::size_t start_row_index) {
 
                         generate_assignments_constant(bp, assignment, params, start_row_index);
-                        
+
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
 
@@ -226,7 +231,7 @@ namespace nil {
                         }
 
                         assignment.enable_selector(first_selector_index, start_row_index + add_component::rows_amount,
-                                                   start_row_index + rows_amount - 3, 2);
+                                                   start_row_index + rows_amount - 4, 2);
                         assignment.enable_selector(first_selector_index + 1, start_row_index + rows_amount - 2);
 
                         typename add_component::params_type addition_params = {{params.T.x, params.T.y},
@@ -333,15 +338,15 @@ namespace nil {
                         bit_check_5 = bp.add_bit_check(var(W6, 0));
 
                         constraint_1 = bp.add_constraint((var(W2, -1) - var(W0, -1)) * var(W7, 0) -
-                                                              (var(W3, -1) - (2 * var(W2, 0) - 1) * var(W1, -1)));
+                                                         (var(W3, -1) - (2 * var(W2, 0) - 1) * var(W1, -1)));
                         constraint_2 = bp.add_constraint((var(W7, -1) - var(W0, -1)) * var(W8, 0) -
-                                                              (var(W8, -1) - (2 * var(W3, 0) - 1) * var(W1, -1)));
+                                                         (var(W8, -1) - (2 * var(W3, 0) - 1) * var(W1, -1)));
                         constraint_3 = bp.add_constraint((var(W9, -1) - var(W0, -1)) * var(W9, 0) -
-                                                              (var(W10, -1) - (2 * var(W4, 0) - 1) * var(W1, -1)));
+                                                         (var(W10, -1) - (2 * var(W4, 0) - 1) * var(W1, -1)));
                         constraint_4 = bp.add_constraint((var(W11, -1) - var(W0, -1)) * var(W10, 0) -
-                                                              (var(W12, -1) - (2 * var(W5, 0) - 1) * var(W1, -1)));
+                                                         (var(W12, -1) - (2 * var(W5, 0) - 1) * var(W1, -1)));
                         constraint_5 = bp.add_constraint((var(W13, -1) - var(W0, -1)) * var(W11, 0) -
-                                                              (var(W14, -1) - (2 * var(W6, 0) - 1) * var(W1, -1)));
+                                                         (var(W14, -1) - (2 * var(W6, 0) - 1) * var(W1, -1)));
 
                         constraint_6 = bp.add_constraint(
                             (2 * var(W3, -1) - var(W7, 0) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1))) *
@@ -363,19 +368,20 @@ namespace nil {
                              (var(W11, -1) - var(W0, -1) + var(W9, 0).pow(2))));
                         constraint_9 = bp.add_constraint(
                             ((2 * var(W12, -1) - var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) *
-                                (2 * var(W12, -1) -
-                                 var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) -
-                            ((2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
-                             (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
-                             (var(W13, -1) - var(W0, -1) + var(W10, 0).pow(2))))*
-                             var(W8, +1)*var(W2, +1));
+                                 (2 * var(W12, -1) -
+                                  var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))) -
+                             ((2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
+                              (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) *
+                              (var(W13, -1) - var(W0, -1) + var(W10, 0).pow(2)))) *
+                            var(W8, +1) * var(W2, +1));
                         constraint_10 = bp.add_constraint(
                             ((2 * var(W14, -1) - var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) *
-                                (2 * var(W14, -1) -
-                                 var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) -
-                            ((2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
-                             (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
-                             (var(W0, 0) - var(W0, -1) + var(W11, 0).pow(2))))*var(W8, + 1)*var(W2, +1));
+                                 (2 * var(W14, -1) -
+                                  var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))) -
+                             ((2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
+                              (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) *
+                              (var(W0, 0) - var(W0, -1) + var(W11, 0).pow(2)))) *
+                            var(W8, +1) * var(W2, +1));
 
                         constraint_11 = bp.add_constraint(
                             (var(W8, -1) + var(W3, -1)) * (2 * var(W2, -1) - var(W7, 0).pow(2) + var(W0, -1)) -
@@ -386,42 +392,44 @@ namespace nil {
                             ((var(W7, -1) - var(W9, -1)) *
                              (2 * var(W8, -1) - var(W8, 0) * (2 * var(W7, -1) - var(W8, 0).pow(2) + var(W0, -1)))));
                         constraint_13 = bp.add_constraint(
-                                                         (var(W12, -1) + var(W10, -1)) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)) -
+                            (var(W12, -1) + var(W10, -1)) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)) -
                             ((var(W9, -1) - var(W11, -1)) *
                              (2 * var(W10, -1) - var(W9, 0) * (2 * var(W9, -1) - var(W9, 0).pow(2) + var(W0, -1)))));
                         constraint_14 = bp.add_constraint(
                             ((var(W14, -1) + var(W12, -1)) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)) -
-                            ((var(W11, -1) - var(W13, -1)) *
-                             (2 * var(W12, -1) - var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1)))))*
-                             var(W8, +1)*var(W2, +1));
+                             ((var(W11, -1) - var(W13, -1)) *
+                              (2 * var(W12, -1) -
+                               var(W10, 0) * (2 * var(W11, -1) - var(W10, 0).pow(2) + var(W0, -1))))) *
+                            var(W8, +1) * var(W2, +1));
                         constraint_15 = bp.add_constraint(
                             ((var(W1, 0) + var(W14, -1)) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)) -
-                            ((var(W13, -1) - var(W0, 0)) *
-                             (2 * var(W14, -1) - var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1)))))*
-                             var(W8, +1)*var(W2, +1));
+                             ((var(W13, -1) - var(W0, 0)) *
+                              (2 * var(W14, -1) -
+                               var(W11, 0) * (2 * var(W13, -1) - var(W11, 0).pow(2) + var(W0, -1))))) *
+                            var(W8, +1) * var(W2, +1));
 
                         constraint_16 =
                             bp.add_constraint(var(W5, -1) - (32 * (var(W4, -1)) + 16 * var(W2, 0) + 8 * var(W3, 0) +
                                                             4 * var(W4, 0) + 2 * var(W5, 0) + var(W6, 0)));
 
                         auto constraint_17 = bp.add_constraint((var(W8, +1)*var(W2, +1) - 1) * var(W8, +1));
-                        auto constraint_18 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255));
-                        auto constraint_19 = bp.add_constraint(((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
-                        *var(W4, +1) - 1) * (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255));
+                        auto constraint_18 = bp.add_constraint(((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - 1) * (var(W5, +1) - shifted_minus_one));
+                        auto constraint_19 = bp.add_constraint(((var(W5, +1) - shifted_one)
+                        *var(W4, +1) - 1) * (var(W5, +1) - shifted_one));
                         auto constraint_20 = bp.add_constraint((var(W8, +1)*var(W2, +1)*var(W0, 0)) + 
-                        ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
-                        *var(W4, +1))* ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        ((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - (var(W5, +1) - shifted_one)
+                        *var(W4, +1))* ((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - (var(W5, +1) - shifted_one)
                         *var(W4, +1)) * var(W6, +1) - var(W0, +1));
                         auto constraint_21 = bp.add_constraint((var(W8, +1)*var(W2, +1)*var(W1, 0)) + 
-                        ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *var(W3, +1) - (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)
+                        ((var(W5, +1) - shifted_minus_one)
+                        *var(W3, +1) - (var(W5, +1) - shifted_one)
                         *var(W4, +1)) * var(W7, +1) - var(W1, +1));
-                        auto constraint_22 = bp.add_constraint(var(W8, +1) - ((var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000000_cppui255)
-                        *(var(W5, +1) - 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255)*
-                        (var(W5, +1) - 0x224698fc0994a8dd8c46eb2100000001_cppui255)));
+                        auto constraint_22 = bp.add_constraint(var(W8, +1) - ((var(W5, +1) - shifted_minus_one)
+                        *(var(W5, +1) - shifted_zero)*
+                        (var(W5, +1) - shifted_one)));
                         bp.add_gate(selector_index_2,
                                     {bit_check_1,   bit_check_2,   bit_check_3,   bit_check_4,   bit_check_5,
                                      constraint_1,  constraint_2,  constraint_3,  constraint_4,  constraint_5,
@@ -466,29 +474,25 @@ namespace nil {
                             bp.add_copy_constraint(
                                 {{W4, (std::int32_t)(j + z), false}, {W5, (std::int32_t)(j + z - 2), false}});
                         }
-                        bp.add_copy_constraint(
-                                {{W5, (std::int32_t)(start_row_index + rows_amount - 1), false},
-                                 {W5, (std::int32_t)(start_row_index + rows_amount - 3), false}});
-                        bp.add_copy_constraint(
-                                {{W6, (std::int32_t)(start_row_index + rows_amount - 1), false},
-                                 {W0, (std::int32_t)(start_row_index + rows_amount - 3), false}});
-                        bp.add_copy_constraint(
-                                {{W7, (std::int32_t)(start_row_index + rows_amount - 1), false},
-                                 {W1, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint({{W5, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                                {W5, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint({{W6, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                                {W0, (std::int32_t)(start_row_index + rows_amount - 3), false}});
+                        bp.add_copy_constraint({{W7, (std::int32_t)(start_row_index + rows_amount - 1), false},
+                                                {W1, (std::int32_t)(start_row_index + rows_amount - 3), false}});
 
-                        bp.add_copy_constraint(
-                            {{W4, (std::int32_t)(j), false},
-                             {0, (std::int32_t)(j), false, var::column_type::constant}});
+                        bp.add_copy_constraint({{W4, (std::int32_t)(j), false},
+                                                {0, (std::int32_t)(j), false, var::column_type::constant}});
 
                         bp.add_copy_constraint(
                             {params.b, {W5, (std::int32_t)(j + rows_amount - 4), false}});    // scalar value check
                     }
 
-                    static void
-                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                const params_type &params,
-                                                std::size_t component_start_row) {
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
                         std::size_t row = component_start_row + add_component::rows_amount;
 
                         assignment.constant(0)[row] = ArithmetizationType::field_type::value_type::zero();

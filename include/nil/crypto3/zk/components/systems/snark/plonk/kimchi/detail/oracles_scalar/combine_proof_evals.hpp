@@ -46,49 +46,19 @@ namespace nil {
 
                 // Proof evals are element of the finite field, so combine works just as scalar multiplication
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/proof.rs#L105
-                // Input: x, proof_evaluations (see kimchi_proof_evaluations): {w_0, ... w_14, z, ..., poseidon_selector}
-                // Output: proof_evaluations: {x * w_0, ... x * w_14, x * z, ..., x * poseidon_selector}
-                template<typename ArithmetizationType,
-                    typename KimchiParamsType,
-                    std::size_t... WireIndexes>
+                // Input: x, proof_evaluations (see kimchi_proof_evaluations): {w_0, ... w_14, z, ...,
+                // poseidon_selector} Output: proof_evaluations: {x * w_0, ... x * w_14, x * z, ..., x *
+                // poseidon_selector}
+                template<typename ArithmetizationType, typename KimchiParamsType, std::size_t... WireIndexes>
                 class combine_proof_evals;
 
-                template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         typename KimchiParamsType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class combine_proof_evals<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    KimchiParamsType,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename KimchiParamsType,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
+                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
+                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                class combine_proof_evals<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                          KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13,
+                                          W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -115,13 +85,12 @@ namespace nil {
                     }
 
                 public:
-                    constexpr static const std::size_t rows_amount = 
-                        KimchiParamsType::witness_columns * mul_component::rows_amount // w
-                        + mul_component::rows_amount // z
-                        + (KimchiParamsType::permut_size - 1) * mul_component::rows_amount  // s
-                        + lookup_rows()
-                        + mul_component::rows_amount // generic
-                        + mul_component::rows_amount; // poseidon
+                    constexpr static const std::size_t rows_amount =
+                        KimchiParamsType::witness_columns * mul_component::rows_amount        // w
+                        + mul_component::rows_amount                                          // z
+                        + (KimchiParamsType::permut_size - 1) * mul_component::rows_amount    // s
+                        + lookup_rows() + mul_component::rows_amount                          // generic
+                        + mul_component::rows_amount;                                         // poseidon
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -175,7 +144,8 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -185,48 +155,48 @@ namespace nil {
                         // w
                         for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
                             zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.w[i], params.x}, row);
+                                                                            {params.evals.w[i], params.x}, row);
                             row += mul_component::rows_amount;
                         }
                         // z
-                        zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.z, params.x}, row);
+                        zk::components::generate_circuit<mul_component>(bp, assignment, {params.evals.z, params.x},
+                                                                        row);
                         row += mul_component::rows_amount;
                         // s
                         for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
                             zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.s[i], params.x}, row);
+                                                                            {params.evals.s[i], params.x}, row);
                             row += mul_component::rows_amount;
                         }
                         // lookup
                         if (KimchiParamsType::circuit_params::lookup_columns > 0) {
                             for (std::size_t i = 0; i < KimchiParamsType::circuit_params::lookup_columns; i++) {
-                                zk::components::generate_circuit<mul_component>(bp,assignment,
-                                    {params.evals.lookup.sorted[i], params.x}, row);
+                                zk::components::generate_circuit<mul_component>(
+                                    bp, assignment, {params.evals.lookup.sorted[i], params.x}, row);
                                 row += mul_component::rows_amount;
                             }
 
-                            zk::components::generate_circuit<mul_component>(bp,assignment,
-                                    {params.evals.lookup.aggreg, params.x}, row);
+                            zk::components::generate_circuit<mul_component>(
+                                bp, assignment, {params.evals.lookup.aggreg, params.x}, row);
                             row += mul_component::rows_amount;
 
-                            zk::components::generate_circuit<mul_component>(bp,assignment,
-                                    {params.evals.lookup.table, params.x}, row);
+                            zk::components::generate_circuit<mul_component>(bp, assignment,
+                                                                            {params.evals.lookup.table, params.x}, row);
                             row += mul_component::rows_amount;
 
                             if (KimchiParamsType::circuit_params::lookup_runtime) {
-                                zk::components::generate_circuit<mul_component>(bp,assignment,
-                                        {params.evals.lookup.runtime, params.x}, row);
+                                zk::components::generate_circuit<mul_component>(
+                                    bp, assignment, {params.evals.lookup.runtime, params.x}, row);
                                 row += mul_component::rows_amount;
                             }
                         }
                         // generic_selector
                         zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.generic_selector, params.x}, row);
+                                                                        {params.evals.generic_selector, params.x}, row);
                         row += mul_component::rows_amount;
                         // poseidon_selector
-                        zk::components::generate_circuit<mul_component>(bp, assignment,
-                                {params.evals.poseidon_selector, params.x}, row);
+                        zk::components::generate_circuit<mul_component>(
+                            bp, assignment, {params.evals.poseidon_selector, params.x}, row);
                         row += mul_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);
@@ -242,49 +212,44 @@ namespace nil {
 
                         // w
                         for (std::size_t i = 0; i < KimchiParamsType::witness_columns; i++) {
-                            mul_component::generate_assignments(assignment,
-                                {params.evals.w[i], params.x}, row);
+                            mul_component::generate_assignments(assignment, {params.evals.w[i], params.x}, row);
                             row += mul_component::rows_amount;
                         }
                         // z
-                        mul_component::generate_assignments(assignment,
-                                {params.evals.z, params.x}, row);
+                        mul_component::generate_assignments(assignment, {params.evals.z, params.x}, row);
                         row += mul_component::rows_amount;
                         // s
                         for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
-                            mul_component::generate_assignments(assignment,
-                                {params.evals.s[i], params.x}, row);
+                            mul_component::generate_assignments(assignment, {params.evals.s[i], params.x}, row);
                             row += mul_component::rows_amount;
                         }
                         // lookup
                         if (KimchiParamsType::circuit_params::lookup_columns > 0) {
                             for (std::size_t i = 0; i < KimchiParamsType::circuit_params::lookup_columns; i++) {
                                 mul_component::generate_assignments(assignment,
-                                    {params.evals.lookup.sorted[i], params.x}, row);
+                                                                    {params.evals.lookup.sorted[i], params.x}, row);
                                 row += mul_component::rows_amount;
                             }
 
-                            mul_component::generate_assignments(assignment,
-                                    {params.evals.lookup.aggreg, params.x}, row);
+                            mul_component::generate_assignments(assignment, {params.evals.lookup.aggreg, params.x},
+                                                                row);
                             row += mul_component::rows_amount;
 
-                            mul_component::generate_assignments(assignment,
-                                    {params.evals.lookup.table, params.x}, row);
+                            mul_component::generate_assignments(assignment, {params.evals.lookup.table, params.x}, row);
                             row += mul_component::rows_amount;
 
                             if (KimchiParamsType::circuit_params::lookup_runtime) {
-                                mul_component::generate_assignments(assignment,
-                                        {params.evals.lookup.runtime, params.x}, row);
+                                mul_component::generate_assignments(assignment, {params.evals.lookup.runtime, params.x},
+                                                                    row);
                                 row += mul_component::rows_amount;
                             }
                         }
                         // generic_selector
-                        mul_component::generate_assignments(assignment,
-                                {params.evals.generic_selector, params.x}, row);
+                        mul_component::generate_assignments(assignment, {params.evals.generic_selector, params.x}, row);
                         row += mul_component::rows_amount;
                         // poseidon_selector
-                        mul_component::generate_assignments(assignment,
-                                {params.evals.poseidon_selector, params.x}, row);
+                        mul_component::generate_assignments(assignment, {params.evals.poseidon_selector, params.x},
+                                                            row);
                         row += mul_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);

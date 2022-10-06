@@ -47,7 +47,6 @@
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -57,17 +56,19 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/expr.rs#L467
                 // Input: RPN expression E, variables values V
                 // Output: E(V) \in F_r
-                template<typename ArithmetizationType, typename KimchiParamsType, std::size_t NRows,
+                template<typename ArithmetizationType,
+                         typename KimchiParamsType,
+                         std::size_t NRows,
                          std::size_t... WireIndexes>
                 class rpn_expression;
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, typename KimchiParamsType,
                          std::size_t NRows, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
-                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9,
-                         std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8,
+                         std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
                 class rpn_expression<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                     KimchiParamsType, NRows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12,
-                                     W13, W14> {
+                                     KimchiParamsType,
+                                     NRows, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -77,24 +78,96 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
-                    using endo_scalar_component =
-                        zk::components::endo_scalar<ArithmetizationType, typename KimchiParamsType::curve_type,
-                                                    KimchiParamsType::scalar_challenge_size, W0, W1, W2, W3, W4, W5, W6,
-                                                    W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType,
+                                                                              typename KimchiParamsType::curve_type,
+                                                                              KimchiParamsType::scalar_challenge_size,
+                                                                              W0,
+                                                                              W1,
+                                                                              W2,
+                                                                              W3,
+                                                                              W4,
+                                                                              W5,
+                                                                              W6,
+                                                                              W7,
+                                                                              W8,
+                                                                              W9,
+                                                                              W10,
+                                                                              W11,
+                                                                              W12,
+                                                                              W13,
+                                                                              W14>;
 
-                    using poseidon_component = zk::components::poseidon<ArithmetizationType, BlueprintFieldType, W0, W1,
-                                                                        W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using poseidon_component = zk::components::poseidon<ArithmetizationType,
+                                                                        BlueprintFieldType,
+                                                                        W0,
+                                                                        W1,
+                                                                        W2,
+                                                                        W3,
+                                                                        W4,
+                                                                        W5,
+                                                                        W6,
+                                                                        W7,
+                                                                        W8,
+                                                                        W9,
+                                                                        W10,
+                                                                        W11,
+                                                                        W12,
+                                                                        W13,
+                                                                        W14>;
 
-                    using exponentiation_component =
-                        zk::components::exponentiation<ArithmetizationType, 64, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
-                                                       W10, W11, W12, W13, W14>;
+                    using exponentiation_component = zk::components::exponentiation<ArithmetizationType,
+                                                                                    64,
+                                                                                    W0,
+                                                                                    W1,
+                                                                                    W2,
+                                                                                    W3,
+                                                                                    W4,
+                                                                                    W5,
+                                                                                    W6,
+                                                                                    W7,
+                                                                                    W8,
+                                                                                    W9,
+                                                                                    W10,
+                                                                                    W11,
+                                                                                    W12,
+                                                                                    W13,
+                                                                                    W14>;
 
-                    using vanishes_on_last_4_rows_component = zk::components::vanishes_on_last_4_rows<
-                        ArithmetizationType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
-                                                                    W11, W12, W13, W14>;
+                    using vanishes_on_last_4_rows_component =
+                        zk::components::vanishes_on_last_4_rows<ArithmetizationType,
+                                                                W0,
+                                                                W1,
+                                                                W2,
+                                                                W3,
+                                                                W4,
+                                                                W5,
+                                                                W6,
+                                                                W7,
+                                                                W8,
+                                                                W9,
+                                                                W10,
+                                                                W11,
+                                                                W12,
+                                                                W13,
+                                                                W14>;
 
-                    using unnormalized_lagrange_basis_component = zk::components::unnormalized_lagrange_basis<ArithmetizationType,
-                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using unnormalized_lagrange_basis_component =
+                        zk::components::unnormalized_lagrange_basis<ArithmetizationType,
+                                                                    W0,
+                                                                    W1,
+                                                                    W2,
+                                                                    W3,
+                                                                    W4,
+                                                                    W5,
+                                                                    W6,
+                                                                    W7,
+                                                                    W8,
+                                                                    W9,
+                                                                    W10,
+                                                                    W11,
+                                                                    W12,
+                                                                    W13,
+                                                                    W14>;
 
                     using evaluations_type =
                         typename zk::components::kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>;
@@ -152,9 +225,9 @@ namespace nil {
                                 break;
                         }
 
-                        assert(var_column <= KimchiParamsType::witness_columns + 
-                            6 + KimchiParamsType::circuit_params::lookup_columns);
-                        
+                        assert(var_column <= KimchiParamsType::witness_columns + 6 +
+                                                 KimchiParamsType::circuit_params::lookup_columns);
+
                         return evals.lookup.sorted[var_column - KimchiParamsType::witness_columns - 7];
                     }
 
@@ -185,8 +258,7 @@ namespace nil {
                         int int_data;
                     };
 
-                    static std::vector<token_value_type>
-                        rpn_from_string(const std::string_view expression) {
+                    static std::vector<token_value_type> rpn_from_string(const std::string_view expression) {
 
                         std::vector<std::string> tokens_str;
                         boost::split(tokens_str, expression, boost::is_any_of(";"));
@@ -298,7 +370,7 @@ namespace nil {
                                 token.type = token_type::unnormalized_lagrange_basis;
 
                                 std::size_t exp_start_pos = token_str.find("UnnormalizedLagrangeBasis");
-                                exp_start_pos = token_str.find("(", exp_start_pos) +1;
+                                exp_start_pos = token_str.find("(", exp_start_pos) + 1;
                                 std::size_t exp_end_pos = token_str.find(")", exp_start_pos);
                                 std::string exp_str = token_str.substr(exp_start_pos, exp_end_pos - exp_start_pos);
                                 token.int_data = std::stoi(exp_str);
@@ -328,7 +400,7 @@ namespace nil {
                     struct params_type {
                         std::string_view expression;
 
-                        var eval_point; // zeta
+                        var eval_point;    // zeta
 
                         var alpha;
                         var beta;
@@ -464,14 +536,22 @@ namespace nil {
                                 }
                                 case token_type::vanishes_on_last_4_rows: {
                                     var res = vanishes_on_last_4_rows_component::generate_circuit(
-                                                  bp, assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
+                                                  bp,
+                                                  assignment,
+                                                  {params.group_gen, params.domain_size, params.eval_point},
+                                                  row)
+                                                  .output;
                                     row += vanishes_on_last_4_rows_component::rows_amount;
                                     stack.push_back(res);
                                     break;
                                 }
                                 case token_type::unnormalized_lagrange_basis: {
                                     var res = unnormalized_lagrange_basis_component::generate_circuit(
-                                                  bp, assignment, {params.group_gen, params.domain_size, params.eval_point, t.int_data}, row).output;
+                                                  bp,
+                                                  assignment,
+                                                  {params.group_gen, params.domain_size, params.eval_point, t.int_data},
+                                                  row)
+                                                  .output;
                                     row += unnormalized_lagrange_basis_component::rows_amount;
                                     stack.push_back(res);
                                     break;
@@ -558,7 +638,7 @@ namespace nil {
                                     break;
                                 case token_type::pow: {
                                     var exponent(0, row, false, var::column_type::constant);
-                                    row++; 
+                                    row++;
 
                                     var res = exponentiation_component::generate_assignments(
                                                   assignment, {stack.back(), exponent}, row)
@@ -599,15 +679,20 @@ namespace nil {
                                     break;
                                 }
                                 case token_type::vanishes_on_last_4_rows: {
-                                    var res = vanishes_on_last_4_rows_component::generate_assignments(
-                                                  assignment, {params.group_gen, params.domain_size, params.eval_point}, row).output;
+                                    var res =
+                                        vanishes_on_last_4_rows_component::generate_assignments(
+                                            assignment, {params.group_gen, params.domain_size, params.eval_point}, row)
+                                            .output;
                                     row += vanishes_on_last_4_rows_component::rows_amount;
                                     stack.push_back(res);
                                     break;
                                 }
                                 case token_type::unnormalized_lagrange_basis: {
                                     var res = unnormalized_lagrange_basis_component::generate_assignments(
-                                                  assignment, {params.group_gen, params.domain_size, params.eval_point, t.int_data}, row).output;
+                                                  assignment,
+                                                  {params.group_gen, params.domain_size, params.eval_point, t.int_data},
+                                                  row)
+                                                  .output;
                                     row += unnormalized_lagrange_basis_component::rows_amount;
                                     stack.push_back(res);
                                     break;
@@ -633,14 +718,14 @@ namespace nil {
                     }
 
                 private:
-
                     static void generate_assignments_constants(
                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
-                        typename KimchiParamsType::curve_type::base_field_type::integral_type endo_integral_base = 
-                            typename KimchiParamsType::curve_type::base_field_type::integral_type(endo_scalar_component::endo_q.data);
+                        typename KimchiParamsType::curve_type::base_field_type::integral_type endo_integral_base =
+                            typename KimchiParamsType::curve_type::base_field_type::integral_type(
+                                endo_scalar_component::endo_q.data);
                         typename BlueprintFieldType::integral_type endo_integral = endo_integral_base;
                         assignment.constant(0)[row] = typename BlueprintFieldType::value_type(endo_integral);
                         row++;

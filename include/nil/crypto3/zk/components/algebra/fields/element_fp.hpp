@@ -44,7 +44,7 @@ namespace nil {
                  * Component that represents an element_fp.
                  */
                 template<typename FieldType>
-                using element_fp = blueprint_linear_combination<FieldType>;
+                using element_fp = detail::blueprint_linear_combination<FieldType>;
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3

@@ -93,7 +93,7 @@ namespace nil {
                     }
 
                     element_fp4<field_type> Frobenius_map(const std::size_t power) const {
-                        blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
+                        detail::blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
                         new_c0c0.assign(this->bp, data[0].data[0]);
                         new_c0c1.assign(this->bp,
                                         data[0].data[1] * underlying_field_type::Frobenius_coeffs_c1[power % 2]);
@@ -131,22 +131,22 @@ namespace nil {
                     element_fp4<field_type> B;
                     element_fp4<field_type> result;
 
-                    blueprint_linear_combination<base_field_type> v0_c0;
-                    blueprint_linear_combination<base_field_type> v0_c1;
+                    detail::blueprint_linear_combination<base_field_type> v0_c0;
+                    detail::blueprint_linear_combination<base_field_type> v0_c1;
 
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
                     std::shared_ptr<underlying_element_type> Ac0_plus_Ac1;
 
                     std::shared_ptr<underlying_element_type> v0;
                     std::shared_ptr<underlying_element_type> v1;
 
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
                     std::shared_ptr<underlying_element_type> Bc0_plus_Bc1;
 
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
 
                     std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
@@ -251,9 +251,9 @@ namespace nil {
                     element_fp4<field_type> B;
                     element_fp4<field_type> result;
 
-                    blueprint_variable<base_field_type> v1;
-                    blueprint_variable<base_field_type> v2;
-                    blueprint_variable<base_field_type> v6;
+                    detail::blueprint_variable<base_field_type> v1;
+                    detail::blueprint_variable<base_field_type> v2;
+                    detail::blueprint_variable<base_field_type> v6;
 
                     element_fp4_direct_mul(blueprint<base_field_type> &bp,
                                            const element_fp4<field_type> &A,
@@ -328,18 +328,18 @@ namespace nil {
 
                         const base_field_value_type u = (base_field_value_type::one() - beta).inversed();
 
-                        const blueprint_linear_combination<base_field_type> &a0 = A.data[0].data[0],
-                                                                            &a1 = A.data[1].data[0],
-                                                                            &a2 = A.data[0].data[1],
-                                                                            &a3 = A.data[1].data[1],
-                                                                            &b0 = B.data[0].data[0],
-                                                                            &b1 = B.data[1].data[0],
-                                                                            &b2 = B.data[0].data[1],
-                                                                            &b3 = B.data[1].data[1],
-                                                                            &c0 = result.data[0].data[0],
-                                                                            &c1 = result.data[1].data[0],
-                                                                            &c2 = result.data[0].data[1],
-                                                                            &c3 = result.data[1].data[1];
+                        const detail::blueprint_linear_combination<base_field_type> &a0 = A.data[0].data[0],
+                                                                                    &a1 = A.data[1].data[0],
+                                                                                    &a2 = A.data[0].data[1],
+                                                                                    &a3 = A.data[1].data[1],
+                                                                                    &b0 = B.data[0].data[0],
+                                                                                    &b1 = B.data[1].data[0],
+                                                                                    &b2 = B.data[0].data[1],
+                                                                                    &b3 = B.data[1].data[1],
+                                                                                    &c0 = result.data[0].data[0],
+                                                                                    &c1 = result.data[1].data[0],
+                                                                                    &c2 = result.data[0].data[1],
+                                                                                    &c3 = result.data[1].data[1];
 
                         this->bp.add_r1cs_constraint(
                             snark::r1cs_constraint<base_field_type>(a0 + a1 + a2 + a3, b0 + b1 + b2 + b3, v1));
@@ -394,7 +394,7 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness() {
-                        const blueprint_linear_combination<base_field_type> &a0 = A.data[0].data[0],
+                        const detail::blueprint_linear_combination<base_field_type> &a0 = A.data[0].data[0],
                                                                             &a1 = A.data[1].data[0],
                                                                             &a2 = A.data[0].data[1],
                                                                             &a3 = A.data[1].data[1],
@@ -444,19 +444,19 @@ namespace nil {
 
                     std::shared_ptr<underlying_element_type> v1;
 
-                    blueprint_linear_combination<base_field_type> v0_c0;
-                    blueprint_linear_combination<base_field_type> v0_c1;
+                    detail::blueprint_linear_combination<base_field_type> v0_c0;
+                    detail::blueprint_linear_combination<base_field_type> v0_c1;
                     std::shared_ptr<underlying_element_type> v0;
 
                     std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_v0;
                     std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_v1;
 
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
                     std::shared_ptr<underlying_element_type> Ac0_plus_Ac1;
 
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
 
                     std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
@@ -550,17 +550,17 @@ namespace nil {
                     element_fp4<field_type> A;
                     element_fp4<field_type> result;
 
-                    blueprint_linear_combination<base_field_type> c0_expr_c0;
-                    blueprint_linear_combination<base_field_type> c0_expr_c1;
+                    detail::blueprint_linear_combination<base_field_type> c0_expr_c0;
+                    detail::blueprint_linear_combination<base_field_type> c0_expr_c1;
                     std::shared_ptr<underlying_element_type> c0_expr;
                     std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_c0_expr;
 
-                    blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c0;
-                    blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c1;
+                    detail::blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c0;
+                    detail::blueprint_linear_combination<base_field_type> A_c0_plus_A_c1_c1;
                     std::shared_ptr<underlying_element_type> A_c0_plus_A_c1;
 
-                    blueprint_linear_combination<base_field_type> c1_expr_c0;
-                    blueprint_linear_combination<base_field_type> c1_expr_c1;
+                    detail::blueprint_linear_combination<base_field_type> c1_expr_c0;
+                    detail::blueprint_linear_combination<base_field_type> c1_expr_c1;
                     std::shared_ptr<underlying_element_type> c1_expr;
                     std::shared_ptr<element_fp2_squared<underlying_field_type>> compute_c1_expr;
 

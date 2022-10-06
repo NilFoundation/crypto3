@@ -41,14 +41,14 @@ namespace nil {
                 /* forces lc to take value 0 or 1 by adding constraint lc * (1-lc) = 0 */
                 template<typename Field>
                 void generate_boolean_r1cs_constraint(blueprint<Field> &bp,
-                                                      const blueprint_linear_combination<Field> &lc) {
+                                                      const detail::blueprint_linear_combination<Field> &lc) {
                     bp.add_r1cs_constraint(
                         snark::r1cs_constraint<Field>(lc, Field::value_type::one() - lc, Field::value_type::zero()));
                 }
 
                 template<typename Field>
                 void generate_r1cs_equals_const_constraint(blueprint<Field> &bp,
-                                                           const blueprint_linear_combination<Field> &lc,
+                                                           const detail::blueprint_linear_combination<Field> &lc,
                                                            const typename Field::value_type &c) {
                     bp.add_r1cs_constraint(snark::r1cs_constraint<Field>(Field::value_type::one(), lc, c));
                 }
@@ -58,12 +58,12 @@ namespace nil {
                     using field_type = Field;
                     using field_value_type = typename field_type::value_type;
 
-                    const blueprint_linear_combination_vector<field_type> bits;
-                    const blueprint_linear_combination<field_type> packed;
+                    const detail::blueprint_linear_combination_vector<field_type> bits;
+                    const detail::blueprint_linear_combination<field_type> packed;
 
                     packing(blueprint<field_type> &bp,
-                            const blueprint_linear_combination_vector<field_type> &bits,
-                            const blueprint_linear_combination<field_type> &packed) :
+                            const detail::blueprint_linear_combination_vector<field_type> &bits,
+                            const detail::blueprint_linear_combination<field_type> &packed) :
                         component<field_type>(bp),
                         bits(bits), packed(packed) {
                     }
@@ -71,7 +71,7 @@ namespace nil {
                     /* adds constraint result = \sum  bits[i] * 2^i */
                     void generate_r1cs_constraints(bool enforce_bitness) {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                            field_type::value_type::one(), blueprint_packing_sum<field_type>(bits), packed));
+                            field_type::value_type::one(), detail::blueprint_packing_sum<field_type>(bits), packed));
 
                         if (enforce_bitness) {
                             for (std::size_t i = 0; i < bits.size(); ++i) {
@@ -103,8 +103,8 @@ namespace nil {
                     std::vector<packing<Field>> packers;
 
                 public:
-                    const blueprint_linear_combination_vector<Field> bits;
-                    const blueprint_linear_combination_vector<Field> packed_vars;
+                    const detail::blueprint_linear_combination_vector<Field> bits;
+                    const detail::blueprint_linear_combination_vector<Field> packed_vars;
 
                     const std::size_t chunk_size;
                     const std::size_t num_chunks;
@@ -112,8 +112,8 @@ namespace nil {
 
                     // last_chunk_size(bits.size() - (num_chunks-1) * chunk_size)
                     multipacking_component(blueprint<Field> &bp,
-                                           const blueprint_linear_combination_vector<Field> &bits,
-                                           const blueprint_linear_combination_vector<Field> &packed_vars,
+                                           const detail::blueprint_linear_combination_vector<Field> &bits,
+                                           const detail::blueprint_linear_combination_vector<Field> &packed_vars,
                                            std::size_t chunk_size) :
                         component<Field>(bp),
                         bits(bits), packed_vars(packed_vars), chunk_size(chunk_size),
@@ -123,7 +123,7 @@ namespace nil {
                         for (std::size_t i = 0; i < num_chunks; ++i) {
                             packers.emplace_back(
                                 packing<Field>(this->bp,
-                                               blueprint_linear_combination_vector<Field>(
+                                               detail::blueprint_linear_combination_vector<Field>(
                                                    bits.begin() + i * chunk_size,
                                                    bits.begin() + std::min((i + 1) * chunk_size, bits.size())),
                                                packed_vars[i]));
@@ -152,14 +152,14 @@ namespace nil {
                 template<typename Field>
                 class field_vector_copy_component : public component<Field> {
                 public:
-                    const blueprint_variable_vector<Field> source;
-                    const blueprint_variable_vector<Field> target;
-                    const blueprint_linear_combination<Field> do_copy;
+                    const detail::blueprint_variable_vector<Field> source;
+                    const detail::blueprint_variable_vector<Field> target;
+                    const detail::blueprint_linear_combination<Field> do_copy;
 
                     field_vector_copy_component(blueprint<Field> &bp,
-                                                const blueprint_variable_vector<Field> &source,
-                                                const blueprint_variable_vector<Field> &target,
-                                                const blueprint_linear_combination<Field> &do_copy) :
+                                                const detail::blueprint_variable_vector<Field> &source,
+                                                const detail::blueprint_variable_vector<Field> &target,
+                                                const detail::blueprint_linear_combination<Field> &do_copy) :
                         component<Field>(bp),
                         source(source), target(target), do_copy(do_copy) {
 
@@ -187,12 +187,12 @@ namespace nil {
                 template<typename Field>
                 class bit_vector_copy_component : public component<Field> {
                 public:
-                    const blueprint_variable_vector<Field> source_bits;
-                    const blueprint_variable_vector<Field> target_bits;
-                    const blueprint_linear_combination<Field> do_copy;
+                    const detail::blueprint_variable_vector<Field> source_bits;
+                    const detail::blueprint_variable_vector<Field> target_bits;
+                    const detail::blueprint_linear_combination<Field> do_copy;
 
-                    blueprint_variable_vector<Field> packed_source;
-                    blueprint_variable_vector<Field> packed_target;
+                    detail::blueprint_variable_vector<Field> packed_source;
+                    detail::blueprint_variable_vector<Field> packed_target;
 
                     std::shared_ptr<multipacking_component<Field>> pack_source;
                     std::shared_ptr<multipacking_component<Field>> pack_target;
@@ -202,9 +202,9 @@ namespace nil {
                     const std::size_t num_chunks;
 
                     bit_vector_copy_component(blueprint<Field> &bp,
-                                              const blueprint_variable_vector<Field> &source_bits,
-                                              const blueprint_variable_vector<Field> &target_bits,
-                                              const blueprint_linear_combination<Field> &do_copy,
+                                              const detail::blueprint_variable_vector<Field> &source_bits,
+                                              const detail::blueprint_variable_vector<Field> &target_bits,
+                                              const detail::blueprint_linear_combination<Field> &do_copy,
                                               std::size_t chunk_size) :
                         component<Field>(bp),
                         source_bits(source_bits), target_bits(target_bits), do_copy(do_copy), chunk_size(chunk_size),
@@ -251,8 +251,8 @@ namespace nil {
                     std::shared_ptr<packing<Field>> consistency_check;
 
                 public:
-                    blueprint_variable<Field> packed;
-                    blueprint_variable_vector<Field> bits;
+                    detail::blueprint_variable<Field> packed;
+                    detail::blueprint_variable_vector<Field> bits;
 
                     dual_variable_component(blueprint<Field> &bp, std::size_t width) : component<Field>(bp) {
                         packed.allocate(bp);
@@ -260,13 +260,13 @@ namespace nil {
                         consistency_check.reset(new packing<Field>(bp, bits, packed));
                     }
 
-                    dual_variable_component(blueprint<Field> &bp, const blueprint_variable_vector<Field> &bits) :
+                    dual_variable_component(blueprint<Field> &bp, const detail::blueprint_variable_vector<Field> &bits) :
                         component<Field>(bp), bits(bits) {
                         packed.allocate(bp);
                         consistency_check.reset(new packing<Field>(bp, bits, packed));
                     }
 
-                    dual_variable_component(blueprint<Field> &bp, const blueprint_variable<Field> &packed,
+                    dual_variable_component(blueprint<Field> &bp, const detail::blueprint_variable<Field> &packed,
                                             std::size_t width) :
                         component<Field>(bp),
                         packed(packed) {
@@ -294,10 +294,10 @@ namespace nil {
                     const VarT &target) {
 
                     for (std::size_t i = 0; i < base.size(); ++i) {
-                        blueprint_linear_combination<Field> a, b, c;
+                        detail::blueprint_linear_combination<Field> a, b, c;
 
-                        a.add_term(blueprint_variable<Field>(0));
-                        b.add_term(blueprint_variable<Field>(0), base[i]);
+                        a.add_term(detail::blueprint_variable<Field>(0));
+                        b.add_term(detail::blueprint_variable<Field>(0), base[i]);
 
                         for (auto &p : v) {
                             b.add_term(p.first.all_vars[i], p.second);

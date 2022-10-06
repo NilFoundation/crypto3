@@ -53,11 +53,11 @@ namespace nil {
                     underlying_element_type X;
                     underlying_element_type Y;
 
-                    blueprint_linear_combination_vector<underlying_field_type> all_vars;
+                    ::nil::crypto3::zk::detail::blueprint_linear_combination_vector<underlying_field_type> all_vars;
 
                     element_g1(blueprint<underlying_field_type> &bp) : component<underlying_field_type>(bp) {
 
-                        blueprint_variable<underlying_field_type> X_var, Y_var;
+                        ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type> X_var, Y_var;
 
                         X_var.allocate(bp);
                         Y_var.allocate(bp);
@@ -112,8 +112,8 @@ namespace nil {
 
                 public:
                     element_g1<CurveType> P;
-                    blueprint_variable<underlying_field_type> P_X_squared;
-                    blueprint_variable<underlying_field_type> P_Y_squared;
+                    ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type> P_X_squared;
+                    ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type> P_Y_squared;
 
                     element_g1_is_well_formed(blueprint<underlying_field_type> &bp, const element_g1<CurveType> &P) :
                         component<underlying_field_type>(bp), P(P) {
@@ -127,9 +127,9 @@ namespace nil {
                             snark::r1cs_constraint<underlying_field_type>({P.Y}, {P.Y}, {P_Y_squared}));
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>(
                             {P.X},
-                            {P_X_squared,
-                             blueprint_variable<underlying_field_type>(0) * CurveType::pairing::pair_curve_type::a},
-                            {P_Y_squared, blueprint_variable<underlying_field_type>(0) *
+                            {P_X_squared, ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type>(0) *
+                                              CurveType::pairing::pair_curve_type::a},
+                            {P_Y_squared, ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type>(0) *
                                               (-CurveType::pairing::pair_curve_type::b)}));
                     }
                     void generate_r1cs_witness() {
@@ -147,8 +147,8 @@ namespace nil {
                     using underlying_field_type = typename CurveType::scalar_field_type;
 
                 public:
-                    blueprint_variable<underlying_field_type> lambda;
-                    blueprint_variable<underlying_field_type> inv;
+                    ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type> lambda;
+                    ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type> inv;
 
                     element_g1<CurveType> A;
                     element_g1<CurveType> B;
@@ -191,7 +191,9 @@ namespace nil {
                             snark::r1cs_constraint<underlying_field_type>({lambda}, {A.X, C.X * (-1)}, {C.Y, A.Y}));
 
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>(
-                            {inv}, {B.X, A.X * (-1)}, {blueprint_variable<underlying_field_type>(0)}));
+                            {inv},
+                            {B.X, A.X * (-1)},
+                            {::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type>(0)}));
                     }
                     void generate_r1cs_witness() {
                         this->bp.val(inv) = (this->bp.lc_val(B.X) - this->bp.lc_val(A.X)).inversed();
@@ -212,8 +214,8 @@ namespace nil {
                     using underlying_field_type = typename CurveType::scalar_field_type;
 
                 public:
-                    blueprint_variable<underlying_field_type> Xsquared;
-                    blueprint_variable<underlying_field_type> lambda;
+                    ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type> Xsquared;
+                    ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type> lambda;
 
                     element_g1<CurveType> A;
                     element_g1<CurveType> B;
@@ -233,7 +235,7 @@ namespace nil {
                         this->bp.add_r1cs_constraint(snark::r1cs_constraint<underlying_field_type>(
                             {lambda * 2},
                             {A.Y},
-                            {Xsquared * 3, blueprint_variable<underlying_field_type>(0x00) *
+                            {Xsquared * 3, ::nil::crypto3::zk::detail::blueprint_variable<underlying_field_type>(0x00) *
                                                CurveType::pairing::pair_curve_type::a}));
 
                         this->bp.add_r1cs_constraint(

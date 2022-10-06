@@ -76,43 +76,12 @@ namespace nil {
                         0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
                 };
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t ScalarSize,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                         std::size_t ScalarSize, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
+                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9,
+                         std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
                 class endo_scalar<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                  CurveType,
-                                  ScalarSize,
-                                  W0,
-                                  W1,
-                                  W2,
-                                  W3,
-                                  W4,
-                                  W5,
-                                  W6,
-                                  W7,
-                                  W8,
-                                  W9,
-                                  W10,
-                                  W11,
-                                  W12,
-                                  W13,
-                                  W14> {
+                                  CurveType, ScalarSize, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -170,9 +139,9 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        std::size_t crumbs_per_row = 8;
-                        std::size_t bits_per_crumb = 2;
-                        std::size_t bits_per_row =
+                        const std::size_t crumbs_per_row = 8;
+                        const std::size_t bits_per_crumb = 2;
+                        const std::size_t bits_per_row =
                             bits_per_crumb * crumbs_per_row;    // we suppose that ScalarSize % bits_per_row = 0
 
                         typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
@@ -181,13 +150,24 @@ namespace nil {
                         std::array<bool, ScalarSize> bits_msb;
                         {
                             nil::marshalling::status_type status;
-                            std::array<bool, 255> bits_msb_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_scalar, status);
+                            assert(ScalarSize <= 255);
+
+                            std::array<bool, 255> bits_msb_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_scalar, status);
+                            
+                            assert(status == nil::marshalling::status_type::success);
+
                             std::copy(bits_msb_all.end() - ScalarSize, bits_msb_all.end(), bits_msb.begin());
+                            
+                            for(std::size_t i = 0; i < 255 - ScalarSize; ++i) {
+                                assert(bits_msb_all[i] == false);
+                            }
                         }
                         typename BlueprintFieldType::value_type a = 2;
                         typename BlueprintFieldType::value_type b = 2;
                         typename BlueprintFieldType::value_type n = 0;
 
+                        assert (ScalarSize % bits_per_row == 0);
                         for (std::size_t chunk_start = 0; chunk_start < bits_msb.size(); chunk_start += bits_per_row) {
                             assignment.witness(W0)[row] = n;
                             assignment.witness(W2)[row] = a;

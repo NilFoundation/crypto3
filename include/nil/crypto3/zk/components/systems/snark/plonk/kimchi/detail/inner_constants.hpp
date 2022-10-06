@@ -41,49 +41,44 @@ namespace nil {
                 template<typename KimchiParamsType>
                 struct kimchi_inner_constants {
 
-                    public:
+                public:
                     using commitment_params_type = typename KimchiParamsType::commitment_params_type;
 
                     constexpr static std::size_t ft_generic_size = 2 * 5;
                     constexpr static std::size_t permutation_constraints = 3;
 
-                    constexpr static std::size_t evaluations_in_batch_size = 
-                        KimchiParamsType::prev_challenges_size // recursion
-                        + 1 // p_comm
-                        + 1 // ft_comm
-                        + 1 // z_comm
-                        + 1 // generic_comm
-                        + 1 // psm_comm
-                        + KimchiParamsType::witness_columns // w_comm
-                        + KimchiParamsType::permut_size - 1
-                        + KimchiParamsType::lookup_comm_size;
+                    constexpr static std::size_t evaluations_in_batch_size =
+                        KimchiParamsType::prev_challenges_size    // recursion
+                        + 1                                       // p_comm
+                        + 1                                       // ft_comm
+                        + 1                                       // z_comm
+                        + 1                                       // generic_comm
+                        + 1                                       // psm_comm
+                        + KimchiParamsType::witness_columns       // w_comm
+                        + KimchiParamsType::permut_size - 1 + KimchiParamsType::lookup_comm_size;
 
                     constexpr static std::size_t srs_padding_size() {
-                        std::size_t srs_two_power = 
-                            1 << (boost::static_log2<commitment_params_type::srs_len>::value);
-                        std::size_t padding_size = 
-                                srs_two_power == commitment_params_type::srs_len ? 0 : 
-                                srs_two_power * 2 - commitment_params_type::srs_len;
+                        std::size_t srs_two_power = 1 << (boost::static_log2<commitment_params_type::srs_len>::value);
+                        std::size_t padding_size = srs_two_power == commitment_params_type::srs_len ?
+                                                       0 :
+                                                       srs_two_power * 2 - commitment_params_type::srs_len;
                         return padding_size;
                     }
 
                     constexpr static std::size_t final_msm_size(const std::size_t batch_size) {
-                        return 1 // H
-                            + commitment_params_type::srs_len   // G
-                            + srs_padding_size()
-                            + (1 // opening.G
-                                + 1 // U
-                                + 2 * commitment_params_type::eval_rounds
-                                + evaluations_in_batch_size
-                                    * commitment_params_type::shifted_commitment_split
-                                + 1 // U
-                                + 1) // opening.delta 
-                            * batch_size;
+                        return 1                                    // H
+                               + commitment_params_type::srs_len    // G
+                               + srs_padding_size() +
+                               (1      // opening.G
+                                + 1    // U
+                                + 2 * commitment_params_type::eval_rounds +
+                                evaluations_in_batch_size * commitment_params_type::shifted_commitment_split + 1    // U
+                                + 1)    // opening.delta
+                                   * batch_size;
                     }
 
-                    constexpr static std::size_t f_comm_msm_size = 1 
-                                + ft_generic_size
-                                + KimchiParamsType::circuit_params::index_terms_list::size;
+                    constexpr static std::size_t f_comm_msm_size =
+                        1 + ft_generic_size + KimchiParamsType::circuit_params::index_terms_list::size;
                 };
             }    // namespace components
         }        // namespace zk

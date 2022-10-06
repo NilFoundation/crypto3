@@ -40,9 +40,11 @@
 
 #include <nil/crypto3/detail/static_pow.hpp>
 
-#include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
-#include <nil/crypto3/zk/components/blueprint_linear_combination.hpp>
+#include <nil/crypto3/hash/detail/pedersen/basic_functions.hpp>
+
+#include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_linear_combination.hpp>
 
 #include <nil/crypto3/zk/components/lookup_signed_3bit.hpp>
 
@@ -75,7 +77,7 @@ namespace nil {
 
                     /// See definition of \p c in https://zips.z.cash/protocol/protocol.pdf#concretepedersenhash
                     static constexpr std::size_t chunks_per_base_point =
-                        nil::crypto3::hashes::detail::get_chunks_per_base_point<typename curve_type::scalar_field_type>(
+                        nil::crypto3::hashes::detail::chunks_per_base_point<typename curve_type::scalar_field_type>(
                             lookup_component::chunk_bits);
 
                     std::vector<typename montgomery_element_component::addition_component> montgomery_adders;
@@ -92,7 +94,8 @@ namespace nil {
                                      typename twisted_edwards_element_component::group_value_type,
                                      typename std::iterator_traits<typename BasePoints::iterator>::value_type>::value,
                                  bool>::type = true>
-                    void init(const BasePoints &base_points, const blueprint_variable_vector<field_type> &in_scalar) {
+                    void init(const BasePoints &base_points,
+                              const detail::blueprint_variable_vector<field_type> &in_scalar) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<const BasePoints>));
                         assert(!in_scalar.empty());
                         assert((in_scalar.size() % lookup_component::chunk_bits) == 0);
@@ -133,22 +136,22 @@ namespace nil {
                             }
 
                             const auto bits_begin = in_scalar.begin() + (i * lookup_component::chunk_bits);
-                            const blueprint_variable_vector<field_type> window_bits_x(
+                            const detail::blueprint_variable_vector<field_type> window_bits_x(
                                 bits_begin, bits_begin + lookup_component::lookup_bits);
-                            const blueprint_variable_vector<field_type> window_bits_y(
+                            const detail::blueprint_variable_vector<field_type> window_bits_y(
                                 bits_begin, bits_begin + lookup_component::chunk_bits);
                             this->m_windows_y.emplace_back(this->bp, lookup_y, window_bits_y);
 
                             // Pass x lookup as a linear combination to avoid extra constraint.
                             // x_lc = c[0] + b[0] * (c[1]-c[0]) + b[1] * (c[2]-c[0]) + b[0]&b[1] * (c[3] - c[2] - c[1] +
                             // c[0])
-                            blueprint_linear_combination<field_type> x_lc;
+                            detail::blueprint_linear_combination<field_type> x_lc;
                             x_lc.assign(
                                 this->bp,
-                                snark::linear_term<field_type>(blueprint_variable<field_type>(0), lookup_x[0]) +
-                                    snark::linear_term<field_type>(window_bits_x[0], (lookup_x[1] - lookup_x[0])) +
-                                    snark::linear_term<field_type>(window_bits_x[1], (lookup_x[2] - lookup_x[0])) +
-                                    snark::linear_term<field_type>(
+                                math::linear_term<field_type>(detail::blueprint_variable<field_type>(0), lookup_x[0]) +
+                                    math::linear_term<field_type>(window_bits_x[0], (lookup_x[1] - lookup_x[0])) +
+                                    math::linear_term<field_type>(window_bits_x[1], (lookup_x[2] - lookup_x[0])) +
+                                    math::linear_term<field_type>(
                                         this->m_windows_y.back().b0b1,
                                         (lookup_x[3] - lookup_x[2] - lookup_x[1] + lookup_x[0])));
                             this->m_windows_x.emplace_back(x_lc);
@@ -210,16 +213,17 @@ namespace nil {
                         }
                     }
 
-                    static blueprint_variable_vector<field_type>
-                        pad_input(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &input) {
-                        blueprint_variable_vector<field_type> padded_input = input;
+                    static detail::blueprint_variable_vector<field_type>
+                        pad_input(blueprint<field_type> &bp,
+                                  const detail::blueprint_variable_vector<field_type> &input) {
+                        detail::blueprint_variable_vector<field_type> padded_input = input;
                         for (std::size_t i = 0;
                              // TODO: simplify calculation of the padding length
                              i < (input.size() % lookup_component::chunk_bits ?
                                       (lookup_component::chunk_bits - input.size() % lookup_component::chunk_bits) :
                                       0);
                              ++i) {
-                            blueprint_variable<field_type> pad_i;
+                            detail::blueprint_variable<field_type> pad_i;
                             pad_i.allocate(bp);
                             bp.val(pad_i) = field_value_type::zero();
                             padded_input.template emplace_back(pad_i);
@@ -237,7 +241,7 @@ namespace nil {
                     template<typename BasePoints>
                     fixed_base_mul_zcash(blueprint<field_type> &bp,
                                          const BasePoints &base_points,
-                                         const blueprint_variable_vector<field_type> &in_scalar,
+                                         const detail::blueprint_variable_vector<field_type> &in_scalar,
                                          const bool do_pad_input = true) :
                         component<field_type>(bp),
                         result(bp) {
@@ -248,7 +252,7 @@ namespace nil {
                     template<typename BasePoints>
                     fixed_base_mul_zcash(blueprint<field_type> &bp,
                                          const BasePoints &base_points,
-                                         const blueprint_variable_vector<field_type> &in_scalar,
+                                         const detail::blueprint_variable_vector<field_type> &in_scalar,
                                          const result_type &in_result,
                                          const bool do_pad_input = true) :
                         component<field_type>(bp),
@@ -276,17 +280,17 @@ namespace nil {
                         // formal check
                         if (!this->edward_adders.empty()) {
                             this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                                {blueprint_variable<field_type>(0)}, {this->result.X},
+                                {detail::blueprint_variable<field_type>(0)}, {this->result.X},
                                 {this->edward_adders.back().result.X}));
                             this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                                {blueprint_variable<field_type>(0)}, {this->result.Y},
+                                {detail::blueprint_variable<field_type>(0)}, {this->result.Y},
                                 {this->edward_adders.back().result.Y}));
                         } else {
                             this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                                {blueprint_variable<field_type>(0)}, {this->result.X},
+                                {detail::blueprint_variable<field_type>(0)}, {this->result.X},
                                 {this->point_converters.back().result.X}));
                             this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(
-                                {blueprint_variable<field_type>(0)}, {this->result.Y},
+                                {detail::blueprint_variable<field_type>(0)}, {this->result.Y},
                                 {this->point_converters.back().result.Y}));
                         }
                     }

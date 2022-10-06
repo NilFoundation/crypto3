@@ -52,7 +52,7 @@ namespace nil {
                     std::size_t... WireIndexes>
                 class table_commitment;
 
-                template<typename BlueprintFieldType, 
+                template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename KimchiParamsType,
                          typename CurveType,
@@ -132,7 +132,8 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -210,19 +211,20 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                     }
 
-                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
+                    static void generate_assignments_constants(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                     }
                 };

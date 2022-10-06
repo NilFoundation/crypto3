@@ -27,9 +27,8 @@
 #ifndef CRYPTO3_ZK_BLUEPRINT_DETAIL_LOOKUP_1BIT_HPP
 #define CRYPTO3_ZK_BLUEPRINT_DETAIL_LOOKUP_1BIT_HPP
 
-#include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/component.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -42,17 +41,17 @@ namespace nil {
                 struct lookup_1bit : public component<Field> {
                     using field_type = Field;
                     using field_value_type = typename Field::value_type;
-                    using result_type = blueprint_variable<Field>;
+                    using result_type = detail::blueprint_variable<Field>;
 
                     const std::vector<field_value_type> constants;
-                    const blueprint_variable<Field> bit;
+                    const detail::blueprint_variable<Field> bit;
                     result_type result;
 
                     /// Auto allocation of the result
                     template<typename Constants>
                     lookup_1bit(blueprint<Field> &bp,
                                 const Constants &in_constants,
-                                const blueprint_variable<Field> &in_bit) :
+                                const detail::blueprint_variable<Field> &in_bit) :
                         component<Field>(bp),
                         constants(std::cbegin(in_constants), std::cend(in_constants)), bit(in_bit) {
                         assert(this->constants.size() == 2);
@@ -63,7 +62,7 @@ namespace nil {
                     template<typename Constants>
                     lookup_1bit(blueprint<Field> &bp,
                                 const Constants &in_constants,
-                                const blueprint_variable<Field> &in_bit,
+                                const detail::blueprint_variable<Field> &in_bit,
                                 const result_type &in_result) :
                         component<Field>(bp),
                         constants(std::cbegin(in_constants), std::cend(in_constants)), bit(in_bit), result(in_result) {

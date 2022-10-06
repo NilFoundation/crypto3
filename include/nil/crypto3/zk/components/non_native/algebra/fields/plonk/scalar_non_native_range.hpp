@@ -36,13 +36,16 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType,  typename Ed25519Type, std::size_t... WireIndexes>
+                template<typename ArithmetizationType,
+                         typename CurveType,
+                         typename Ed25519Type,
+                         std::size_t... WireIndexes>
                 class scalar_non_native_range;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
-                          typename Ed25519Type,
+                         typename Ed25519Type,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -53,17 +56,17 @@ namespace nil {
                          std::size_t W7,
                          std::size_t W8>
                 class scalar_non_native_range<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                       CurveType,
-                                        Ed25519Type,
-                                       W0,
-                                       W1,
-                                       W2,
-                                       W3,
-                                       W4,
-                                       W5,
-                                       W6,
-                                       W7,
-                                       W8> {
+                                              CurveType,
+                                              Ed25519Type,
+                                              W0,
+                                              W1,
+                                              W2,
+                                              W3,
+                                              W4,
+                                              W5,
+                                              W6,
+                                              W7,
+                                              W8> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -77,17 +80,18 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
-                        var k; 
+                        var k;
                     };
 
                     struct result_type {
                         std::array<var, 12> output;
                         result_type(std::size_t component_start_row) {
-                            output = { var(W1, component_start_row, false), var(W2, component_start_row, false), var(W3, component_start_row, false),
-                            var(W4, component_start_row, false), var(W5, component_start_row, false), var(W6, component_start_row, false),
-                            var(W7, component_start_row, false), var(W8, component_start_row, false), var(W0, component_start_row + 1, false),
-                            var(W1, component_start_row + 1, false), var(W2, component_start_row + 1, false), var(W3, component_start_row + 1, false)
-                            };
+                            output = {var(W1, component_start_row, false),     var(W2, component_start_row, false),
+                                      var(W3, component_start_row, false),     var(W4, component_start_row, false),
+                                      var(W5, component_start_row, false),     var(W6, component_start_row, false),
+                                      var(W7, component_start_row, false),     var(W8, component_start_row, false),
+                                      var(W0, component_start_row + 1, false), var(W1, component_start_row + 1, false),
+                                      var(W2, component_start_row + 1, false), var(W3, component_start_row + 1, false)};
                         }
                     };
 
@@ -118,16 +122,20 @@ namespace nil {
                         typename Ed25519Type::scalar_field_type::integral_type base = 1;
                         typename Ed25519Type::scalar_field_type::extended_integral_type extended_base = 1;
                         typename Ed25519Type::scalar_field_type::integral_type mask = (base << 22) - 1;
-                        typename CurveType::base_field_type::integral_type pasta_k = typename CurveType::base_field_type::integral_type(assignment.var_value(params.k).data);
-                        typename Ed25519Type::scalar_field_type::integral_type k = typename Ed25519Type::scalar_field_type::integral_type(pasta_k);
-                        typename Ed25519Type::scalar_field_type::extended_integral_type q = Ed25519Type::scalar_field_type::modulus;
+                        typename CurveType::base_field_type::integral_type pasta_k =
+                            typename CurveType::base_field_type::integral_type(assignment.var_value(params.k).data);
+                        typename Ed25519Type::scalar_field_type::integral_type k =
+                            typename Ed25519Type::scalar_field_type::integral_type(pasta_k);
+                        typename Ed25519Type::scalar_field_type::extended_integral_type q =
+                            Ed25519Type::scalar_field_type::modulus;
                         typename Ed25519Type::scalar_field_type::extended_integral_type d = (extended_base << 253) - q;
-                        typename Ed25519Type::scalar_field_type::integral_type dk = k + typename Ed25519Type::scalar_field_type::integral_type(d);
+                        typename Ed25519Type::scalar_field_type::integral_type dk =
+                            k + typename Ed25519Type::scalar_field_type::integral_type(d);
                         std::array<typename Ed25519Type::scalar_field_type::integral_type, 12> k_chunks;
                         std::array<typename Ed25519Type::scalar_field_type::integral_type, 12> dk_chunks;
-                        for (std::size_t i = 0; i < 12 ; i++){
-                            k_chunks[i] = (k >> i*22) & mask;
-                            dk_chunks[i] = (dk >> i*22) & mask;
+                        for (std::size_t i = 0; i < 12; i++) {
+                            k_chunks[i] = (k >> i * 22) & mask;
+                            dk_chunks[i] = (dk >> i * 22) & mask;
                         }
                         assignment.witness(W0)[row] = k;
                         assignment.witness(W1)[row] = k_chunks[0];
@@ -168,17 +176,22 @@ namespace nil {
                                                std::size_t first_selector_index) {
                         typename CurveType::base_field_type::integral_type base = 1;
                         typename Ed25519Type::scalar_field_type::extended_integral_type extended_base = 1;
-                        typename Ed25519Type::scalar_field_type::extended_integral_type q = Ed25519Type::scalar_field_type::modulus;
+                        typename Ed25519Type::scalar_field_type::extended_integral_type q =
+                            Ed25519Type::scalar_field_type::modulus;
                         typename Ed25519Type::scalar_field_type::extended_integral_type d = (extended_base << 253) - q;
-                        auto constraint_1 = bp.add_constraint(var(W0, -1) - (var(W1, -1) + var(W2, -1) * (base<< 22) + var(W3, -1) * (base << 44) +
-                        var(W4, -1)* (base << 66) + var(W5, -1) * (base <<88) + var(W6, -1) * (base << 110) + var(W7, -1) * (base << 132) + 
-                        var(W8, -1) * (base << 154) + var(W0, 0)* (base << 176) + var(W1, 0) * (base << 198) + var(W2, 0) * (base << 220) +
-                        var(W3, 0) * (base << 242))); 
+                        auto constraint_1 = bp.add_constraint(
+                            var(W0, -1) -
+                            (var(W1, -1) + var(W2, -1) * (base << 22) + var(W3, -1) * (base << 44) +
+                             var(W4, -1) * (base << 66) + var(W5, -1) * (base << 88) + var(W6, -1) * (base << 110) +
+                             var(W7, -1) * (base << 132) + var(W8, -1) * (base << 154) + var(W0, 0) * (base << 176) +
+                             var(W1, 0) * (base << 198) + var(W2, 0) * (base << 220) + var(W3, 0) * (base << 242)));
                         auto constraint_2 = bp.add_constraint(var(W4, 0) - var(W0, -1) - d);
-                        auto constraint_3 = bp.add_constraint(var(W4, 0) - (var(W5, 0) + var(W6, 0) * (base<< 22) + var(W7, 0) * (base << 44) +
-                        var(W8, 0)* (base << 66) + var(W0, +1) * (base <<88) + var(W1, +1) * (base << 110) + var(W2, +1) * (base << 132) + 
-                        var(W3, +1) * (base << 154) + var(W4, +1)* (base << 176) + var(W5, +1) * (base << 198) + var(W6, +1) * (base << 220) +
-                        var(W7, +1) * (base << 242))); 
+                        auto constraint_3 = bp.add_constraint(
+                            var(W4, 0) -
+                            (var(W5, 0) + var(W6, 0) * (base << 22) + var(W7, 0) * (base << 44) +
+                             var(W8, 0) * (base << 66) + var(W0, +1) * (base << 88) + var(W1, +1) * (base << 110) +
+                             var(W2, +1) * (base << 132) + var(W3, +1) * (base << 154) + var(W4, +1) * (base << 176) +
+                             var(W5, +1) * (base << 198) + var(W6, +1) * (base << 220) + var(W7, +1) * (base << 242)));
                         bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
                     }
 
@@ -188,8 +201,7 @@ namespace nil {
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        bp.add_copy_constraint({{W0, static_cast<int>(row), false},
-                            params.k});
+                        bp.add_copy_constraint({{W0, static_cast<int>(row), false}, params.k});
                     }
                 };
 

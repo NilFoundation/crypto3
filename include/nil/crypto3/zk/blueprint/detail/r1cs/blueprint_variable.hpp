@@ -39,7 +39,6 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,21 +46,21 @@ namespace nil {
 
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
-                
+
             namespace detail {
 
                 template<typename ArithmetizationType>
                 class blueprint_variable;
 
-                // template<std::size_t WireIndex, typename Rotation, typename ArithmetizationType, typename BlueprintFieldType>
-                // class blueprint_variable;
+                // template<std::size_t WireIndex, typename Rotation, typename ArithmetizationType, typename
+                // BlueprintFieldType> class blueprint_variable;
 
                 template<typename BlueprintFieldType>
-                class blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>> :
-                    public snark::variable<BlueprintFieldType, false> {
+                class blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>>
+                    : public math::linear_variable<BlueprintFieldType> {
                 public:
-                    blueprint_variable(const typename snark::variable<BlueprintFieldType>::index_type index = 0) :
-                        snark::variable<BlueprintFieldType>(index) {};
+                    blueprint_variable(const typename math::linear_variable<BlueprintFieldType>::index_type index = 0) :
+                        math::linear_variable<BlueprintFieldType>(index) {};
 
                     template<typename ArithmetizationType>
                     void allocate(blueprint<ArithmetizationType> &bp) {
@@ -77,8 +76,8 @@ namespace nil {
                 class blueprint_variable_vector;
 
                 template<typename BlueprintFieldType>
-                class blueprint_variable_vector<snark::r1cs_constraint_system<BlueprintFieldType>> : 
-                    private std::vector<blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>>> {
+                class blueprint_variable_vector<snark::r1cs_constraint_system<BlueprintFieldType>>
+                    : private std::vector<blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
                     typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef typename BlueprintFieldType::value_type field_value_type;
@@ -92,9 +91,9 @@ namespace nil {
 
                     using contents::begin;
                     using contents::emplace_back;
-                    using contents::erase;
                     using contents::empty;
                     using contents::end;
+                    using contents::erase;
                     using contents::insert;
                     using contents::rbegin;
                     using contents::rend;
@@ -104,8 +103,7 @@ namespace nil {
                     using contents::resize;
 
                     blueprint_variable_vector() : contents() {};
-                    blueprint_variable_vector(std::size_t count, 
-                        const blueprint_variable<ArithmetizationType> &value) :
+                    blueprint_variable_vector(std::size_t count, const blueprint_variable<ArithmetizationType> &value) :
                         contents(count, value) {};
                     blueprint_variable_vector(typename contents::const_iterator first,
                                               typename contents::const_iterator last) :
@@ -135,7 +133,7 @@ namespace nil {
                     typename std::enable_if<std::is_same<
                         bool,
                         typename std::iterator_traits<typename InputRange::iterator>::value_type>::value>::type
-                        fill_with_bits(blueprint<field_type> &bp, const InputRange &bits) const {
+                        fill_with_bits(blueprint<BlueprintFieldType> &bp, const InputRange &bits) const {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::RandomAccessRangeConcept<const InputRange>));
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
@@ -147,7 +145,8 @@ namespace nil {
                         this->fill_with_bits_of_field_element(bp, field_value_type(i));
                     }
 
-                    void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp, const field_value_type &r) const {
+                    void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp,
+                                                         const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r.data, i) ?
                                                      field_value_type::one() :

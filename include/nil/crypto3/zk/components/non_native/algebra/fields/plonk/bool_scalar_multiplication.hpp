@@ -35,14 +35,16 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, typename Ed25519Type,
+                template<typename ArithmetizationType,
+                         typename CurveType,
+                         typename Ed25519Type,
                          std::size_t... WireIndexes>
                 class bool_scalar_multiplication;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename CurveType,
-                          typename Ed25519Type,
+                         typename Ed25519Type,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2,
@@ -52,22 +54,23 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class bool_scalar_multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                                       CurveType,
-                                                        Ed25519Type,
-                                                       W0,
-                                                       W1,
-                                                       W2,
-                                                       W3,
-                                                       W4,
-                                                       W5,
-                                                       W6,
-                                                       W7,
-                                                       W8> {
+                class bool_scalar_multiplication<
+                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    CurveType,
+                    Ed25519Type,
+                    W0,
+                    W1,
+                    W2,
+                    W3,
+                    W4,
+                    W5,
+                    W6,
+                    W7,
+                    W8> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> ArithmetizationType;
-                    
+                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
+
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     constexpr static const std::size_t selector_seed = 0xf182;
 
@@ -95,11 +98,10 @@ namespace nil {
 
                         result_type(std::size_t component_start_row) {
                             output.y = {var(W5, component_start_row, false), var(W6, component_start_row, false),
-                             var(W7, component_start_row, false), var(W8, component_start_row, false)};
-                            output.x = {var(W5, component_start_row + 1, false),
-                             var(W6, component_start_row + 1, false),
-                             var(W7, component_start_row + 1, false),
-                              var(W8, component_start_row + 1, false)};
+                                        var(W7, component_start_row, false), var(W8, component_start_row, false)};
+                            output.x = {
+                                var(W5, component_start_row + 1, false), var(W6, component_start_row + 1, false),
+                                var(W7, component_start_row + 1, false), var(W8, component_start_row + 1, false)};
                         }
                     };
 
@@ -107,13 +109,16 @@ namespace nil {
                                                             const params_type &params,
                                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
-                        typename Ed25519Type::base_field_type::integral_type b = typename Ed25519Type::base_field_type::integral_type(assignment.var_value(params.k).data);
+                        typename Ed25519Type::base_field_type::integral_type b =
+                            typename Ed25519Type::base_field_type::integral_type(assignment.var_value(params.k).data);
                         std::array<var, 4> T_x = params.T.x;
                         std::array<var, 4> T_y = params.T.y;
-                        std::array<typename CurveType::base_field_type::value_type, 4> T_x_array = {assignment.var_value(params.T.x[0]),
-                        assignment.var_value(params.T.x[1]), assignment.var_value(params.T.x[2]), assignment.var_value(params.T.x[3])};
-                        std::array<typename CurveType::base_field_type::value_type, 4> T_y_array = {assignment.var_value(params.T.y[0]),
-                        assignment.var_value(params.T.y[1]), assignment.var_value(params.T.y[2]), assignment.var_value(params.T.y[3])};
+                        std::array<typename CurveType::base_field_type::value_type, 4> T_x_array = {
+                            assignment.var_value(params.T.x[0]), assignment.var_value(params.T.x[1]),
+                            assignment.var_value(params.T.x[2]), assignment.var_value(params.T.x[3])};
+                        std::array<typename CurveType::base_field_type::value_type, 4> T_y_array = {
+                            assignment.var_value(params.T.y[0]), assignment.var_value(params.T.y[1]),
+                            assignment.var_value(params.T.y[2]), assignment.var_value(params.T.y[3])};
 
                         assignment.witness(W0)[row] = T_y_array[0];
                         assignment.witness(W1)[row] = T_y_array[1];
@@ -136,14 +141,15 @@ namespace nil {
                         assignment.witness(W7)[row] = b * T_x_array[2];
                         assignment.witness(W8)[row] = b * T_x_array[3];
                         std::array<var, 4> Q_x = {var(W5, row), var(W6, row), var(W7, row), var(W8, row)};
-                        
+
                         return result_type(component_start_row);
                     }
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                        const params_type &params,
-                        const std::size_t start_row_index){
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t start_row_index) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -162,45 +168,35 @@ namespace nil {
                     }
 
                 private:
+                    static void
+                        generate_gates(blueprint<ArithmetizationType> &bp,
+                                       blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
+                                       const params_type &params,
+                                       const std::size_t first_selector_index) {
+                        auto constraint_1 =
+                            bp.add_constraint(var(W5, 0) - (var(W0, 0) * var(W4, 0) + (1 - var(W4, 0))));
+                        auto constraint_2 = bp.add_constraint(var(W6, 0) - var(W1, 0) * var(W4, 0));
+                        auto constraint_3 = bp.add_constraint(var(W7, 0) - var(W2, 0) * var(W4, 0));
+                        auto constraint_4 = bp.add_constraint(var(W8, 0) - var(W3, 0) * var(W4, 0));
+                        auto constraint_5 = bp.add_constraint(var(W5, +1) - var(W0, +1) * var(W4, +1));
+                        auto constraint_6 = bp.add_constraint(var(W6, +1) - var(W1, +1) * var(W4, +1));
+                        auto constraint_7 = bp.add_constraint(var(W7, +1) - var(W2, +1) * var(W4, +1));
+                        auto constraint_8 = bp.add_constraint(var(W8, +1) - var(W3, +1) * var(W4, +1));
+                        auto constraint_9 = bp.add_constraint(var(W4, 0) * (var(W4, 0) - 1));
+                        auto constraint_10 = bp.add_constraint(var(W4, 0) - var(W4, +1));
 
-                    static void generate_gates(
+                        bp.add_gate(first_selector_index,
+                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                     constraint_7, constraint_8
+
+                                    });
+                    }
+
+                    static void generate_copy_constraints(
                         blueprint<ArithmetizationType> &bp,
                         blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const params_type &params,
-                        const std::size_t first_selector_index) {
-                        auto constraint_1 = bp.add_constraint(
-                            var(W5, 0) - (var(W0, 0) * var(W4, 0) + (1 - var(W4, 0))));
-                        auto constraint_2 = bp.add_constraint(
-                            var(W6, 0) - var(W1, 0) * var(W4, 0));
-                        auto constraint_3 = bp.add_constraint(
-                            var(W7, 0) - var(W2, 0) * var(W4, 0));
-                        auto constraint_4 = bp.add_constraint(
-                            var(W8, 0) - var(W3, 0) * var(W4, 0));
-                        auto constraint_5 = bp.add_constraint(
-                            var(W5, +1) - var(W0, +1) * var(W4, +1));
-                        auto constraint_6 = bp.add_constraint(
-                            var(W6, +1) - var(W1, +1) * var(W4, +1));
-                        auto constraint_7 = bp.add_constraint(
-                            var(W7, +1) - var(W2, +1) * var(W4, +1));
-                        auto constraint_8 = bp.add_constraint(
-                            var(W8, +1) - var(W3, +1) * var(W4, +1));
-                        auto constraint_9 = bp.add_constraint(
-                             var(W4, 0)*( var(W4, 0) - 1));
-                        auto constraint_10 = bp.add_constraint(
-                             var(W4, 0) - var(W4, +1));
-
-                        bp.add_gate(first_selector_index, 
-                            { constraint_1, constraint_2, constraint_3, constraint_4,
-                            constraint_5, constraint_6, constraint_7, constraint_8
-                            
-                        });
-                        
-                    }
-
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row) {
+                        std::size_t component_start_row) {
                         std::size_t row = component_start_row;
 
                         bp.add_copy_constraint({var(W0, row + 1, false), params.T.x[0]});

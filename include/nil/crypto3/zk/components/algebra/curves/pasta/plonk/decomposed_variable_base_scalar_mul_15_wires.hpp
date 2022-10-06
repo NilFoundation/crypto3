@@ -64,14 +64,16 @@ namespace nil {
                         zk::components::curve_element_unified_addition<ArithmetizationType, CurveType, W0, W1, W2, W3,
                                                                        W4, W5, W6, W7, W8, W9, W10>;
                     using mul_component =
-                        zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType,
-                                                             W0, W1, W2, W3,
-                                                                       W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                        zk::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType, W0, W1,
+                                                                               W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
+                                                                               W12, W13, W14>;
                     using mul_field_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
                 public:
                     constexpr static const std::size_t selector_seed = 0x0f45;
-                    constexpr static const std::size_t rows_amount = 2*mul_component::rows_amount + add_component::rows_amount + 2*mul_field_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 2 * mul_component::rows_amount +
+                                                                     add_component::rows_amount +
+                                                                     2 * mul_field_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -89,9 +91,11 @@ namespace nil {
                         var X;
                         var Y;
                         result_type(std::size_t start_row_index) {
-                            auto res = typename add_component::result_type(typename add_component::params_type{{var(0, 0, false), var(0, 0, false)}, {var(0, 0, false), var(0, 0, false)}},
-                            start_row_index +
-                             2*mul_component::rows_amount + 2*mul_field_component::rows_amount);
+                            auto res = typename add_component::result_type(
+                                typename add_component::params_type {{var(0, 0, false), var(0, 0, false)},
+                                                                     {var(0, 0, false), var(0, 0, false)}},
+                                start_row_index + 2 * mul_component::rows_amount +
+                                    2 * mul_field_component::rows_amount);
                             X = res.X;
                             Y = res.Y;
                         }
@@ -101,25 +105,26 @@ namespace nil {
                                                             const params_type params,
                                                             const std::size_t start_row_index) {
 
-
                         std::size_t row = start_row_index;
-                        auto mul_res = mul_component::generate_assignments(
-                            assignment, {{params.T.x, params.T.y}, params.b1}, row);
+                        auto mul_res =
+                            mul_component::generate_assignments(assignment, {{params.T.x, params.T.y}, params.b1}, row);
                         row += mul_component::rows_amount;
                         auto const_mul_res = mul_component::generate_assignments(
-                            assignment, {{params.T.x, params.T.y}, var(0, start_row_index, false, var::column_type::constant)}, row);
+                            assignment,
+                            {{params.T.x, params.T.y}, var(0, start_row_index, false, var::column_type::constant)},
+                            row);
                         row += mul_component::rows_amount;
 
-                        auto x = mul_field_component::generate_assignments(
-                            assignment, {const_mul_res.X, params.b2}, row).output;
+                        auto x =
+                            mul_field_component::generate_assignments(assignment, {const_mul_res.X, params.b2}, row)
+                                .output;
                         row += mul_field_component::rows_amount;
-                        auto y = mul_field_component::generate_assignments(
-                            assignment, {const_mul_res.Y, params.b2}, row).output;
+                        auto y =
+                            mul_field_component::generate_assignments(assignment, {const_mul_res.Y, params.b2}, row)
+                                .output;
                         row += mul_field_component::rows_amount;
 
-                        add_component::generate_assignments(
-                            assignment, {{x, y}, {mul_res.X, mul_res.Y}}, row);
-
+                        add_component::generate_assignments(assignment, {{x, y}, {mul_res.X, mul_res.Y}}, row);
 
                         return result_type(start_row_index);
                     }
@@ -131,23 +136,27 @@ namespace nil {
                                          const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
-                        auto mul_res = mul_component::generate_circuit(bp, 
-                            assignment, {{params.T.x, params.T.y}, params.b1}, row);
+                        auto mul_res =
+                            mul_component::generate_circuit(bp, assignment, {{params.T.x, params.T.y}, params.b1}, row);
                         row += mul_component::rows_amount;
-                        auto const_mul_res = mul_component::generate_circuit(bp, 
-                            assignment, {{params.T.x, params.T.y}, var(0, start_row_index, false, var::column_type::constant)}, row);
+                        auto const_mul_res = mul_component::generate_circuit(
+                            bp, assignment,
+                            {{params.T.x, params.T.y}, var(0, start_row_index, false, var::column_type::constant)},
+                            row);
                         row += mul_component::rows_amount;
 
-                        auto x = zk::components::generate_circuit<mul_field_component>(bp, 
-                            assignment, {const_mul_res.X, params.b2}, row).output;
+                        auto x = zk::components::generate_circuit<mul_field_component>(
+                                     bp, assignment, {const_mul_res.X, params.b2}, row)
+                                     .output;
                         row += mul_field_component::rows_amount;
-                        auto y = zk::components::generate_circuit<mul_field_component>(bp, 
-                            assignment, {const_mul_res.Y, params.b2}, row).output;
+                        auto y = zk::components::generate_circuit<mul_field_component>(
+                                     bp, assignment, {const_mul_res.Y, params.b2}, row)
+                                     .output;
                         row += mul_field_component::rows_amount;
 
-                        zk::components::generate_circuit<add_component>(bp, 
-                            assignment, {{x, y}, {mul_res.X, mul_res.Y}}, row);
-                        
+                        zk::components::generate_circuit<add_component>(bp, assignment,
+                                                                        {{x, y}, {mul_res.X, mul_res.Y}}, row);
+
                         return result_type(start_row_index);
                     }
 
@@ -163,14 +172,13 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type params,
                                                   const std::size_t start_row_index) {
-
                     }
 
-                    static void
-                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                const params_type &params,
-                                                std::size_t component_start_row) {
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         typename BlueprintFieldType::integral_type one = 1;
                         assignment.constant(0)[row] = (one << 254);
