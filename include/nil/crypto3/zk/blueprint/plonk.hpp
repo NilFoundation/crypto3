@@ -57,6 +57,10 @@ namespace nil {
             public:
                 typedef BlueprintFieldType blueprint_field_type;
 
+                blueprint(snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> arithmetization_type_in, snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
+                        ArithmetizationType(arithmetization_type_in), _table_description(table_description) { }
+
                 blueprint(snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
                     ArithmetizationType(), _table_description(table_description) {
                     _table_description.rows_amount = 0;
