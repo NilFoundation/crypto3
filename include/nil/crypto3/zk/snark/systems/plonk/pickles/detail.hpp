@@ -28,122 +28,33 @@
 #define CRYPTO3_ZK_PLONK_BATCHED_PICKLES_DETAIL_HPP
 
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
-
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/permutation.hpp>
+#include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <map>
+#include <array>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                //                template<typename CurveType>
-                //                typename commitments::kimchi_pedersen<CurveType>::proof combine(typename
-                //                commitments::kimchi_pedersen<CurveType>::proof eval, typename
-                //                CurveType::scalar_field_type pt)  {
-                //                    s: array_init(|i| DensePolynomial::eval_polynomial(&self.s[i], pt)),
-                //                    w: array_init(|i| DensePolynomial::eval_polynomial(&self.w[i], pt)),
-                //                        z: DensePolynomial::eval_polynomial(&self.z, pt),
-                //                            lookup: self.lookup.as_ref().map(|l| LookupEvaluations {
-                //                                table: DensePolynomial::eval_polynomial(&l.table, pt),
-                //                                aggreg: DensePolynomial::eval_polynomial(&l.aggreg, pt),
-                //                                sorted: l
-                //                                    .sorted
-                //                                    .iter()
-                //                                    .map(|x| DensePolynomial::eval_polynomial(x, pt))
-                //                                    .collect(),
-                //                            }),
-                //                            generic_selector: DensePolynomial::eval_polynomial(&self.generic_selector,
-                //                            pt),
-                //                                               poseidon_selector:
-                //                                               DensePolynomial::eval_polynomial(&self.poseidon_selector,
-                //                                               pt),
-                //                    }
-                //                };
-
-                /// Contains the evaluation of a polynomial commitment at a set of points.
-                template<typename CurveType>
-                struct Evaluation {
-                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
-                    using Fr = typename CurveType::scalar_field_type;
-                    /// The commitment of the polynomial being evaluated
-                    commitment_type commitment;
-
-                    /// Contains an evaluation table
-                    std::vector<std::vector<Fr>> evaluations;
-
-                    /// optional degree bound
-                    size_t degree_bound;
-                };
-
-                // TODO: I think we should really change this name to something more correct
-                template<typename CurveType>
-                struct batch_evaluation_proof {
-                    typedef typename CurveType::scalar_field_type Fr;
-                    //                    EFqSponge sponge; TODO: return this
-                    std::vector<Evaluation<CurveType>> evaluations;
-                    /// vector of evaluation points
-                    std::vector<Fr> evaluation_points;
-                    /// scaling factor for evaluation point powers
-                    Fr xi;
-                    /// scaling factor for polynomials
-                    Fr r;
-                    /// batched opening proof
-                    typename commitments::kimchi_pedersen<CurveType>::proof_type opening;
-                };
-
                 /// The collection of constants required to evaluate an `Expr`.
                 template<typename FieldType>
                 struct Constants {
                     /// The challenge alpha from the PLONK IOP.
-                    FieldType alpha;
+                    typename FieldType::value_type alpha;
                     /// The challenge beta from the PLONK IOP.
-                    FieldType beta;
+                    typename FieldType::value_type beta;
                     /// The challenge gamma from the PLONK IOP.
-                    FieldType gamma;
+                    typename FieldType::value_type gamma;
                     /// The challenge joint_combiner which is used to combine
                     /// joint lookup tables.
-                    FieldType joint_combiner;
+                    typename FieldType::value_type joint_combiner;
                     /// The endomorphism coefficient
-                    FieldType endo_coefficient;
+                    typename FieldType::value_type endo_coefficient;
                     /// The MDS matrix
-                    std::vector<std::vector<FieldType>> mds;
-                };
-
-                template<typename FieldType>
-                struct ScalarChallenge {
-                    typename FieldType::value_type to_field(const typename FieldType::value_type &endo_coeff) {
-                        uint64_t length_in_bits = (64 * CHALLENGE_LENGTH_IN_LIMBS);
-                        typename FieldType::integral_type rep = typename FieldType::integral_type(_val.data);
-
-                        typename FieldType::value_type a = 2;
-                        typename FieldType::value_type b = 2;
-
-                        typename FieldType::value_type one = FieldType::value_type::one();
-                        typename FieldType::value_type neg_one = -one;
-
-                        for (int32_t i = length_in_bits / 2 - 1; i >= 0; --i) {
-                            a = a.doubled();
-                            b = b.doubled();
-
-                            bool r_2i = multiprecision::bit_test(rep, 2 * i);
-                            typename FieldType::value_type s;
-                            if (r_2i) {
-                                s = one;
-                            } else {
-                                s = neg_one;
-                            }
-                            if (multiprecision::bit_test(rep, 2 * i + 1) == 0) {
-                                b += s;
-                            } else {
-                                a += s;
-                            }
-                        }
-
-                        return a * endo_coeff + b;
-                    };
-
-                    typename FieldType::value_type _val;
+                    std::array<std::array<typename FieldType::value_type, 3>, 3> mds;
                 };
 
                 enum gate_type {
@@ -166,6 +77,16 @@ namespace nil {
                     ChaCha1 = 8,
                     ChaCha2 = 9,
                     ChaChaFinal = 10,
+                    /// Lookup
+                    Lookup = 11,
+                    /// Cairo
+                    CairoClaim = 12,
+                    CairoInstruction = 13,
+                    CairoFlags = 14,
+                    CairoTransition = 15,
+                    // Range check (16-24)
+                    RangeCheck0 = 16,
+                    RangeCheck1 = 17,
                 };
 
                 enum argument_type {
@@ -176,22 +97,7 @@ namespace nil {
                     /// The permutation argument
                     Permutation,
                     /// The lookup argument
-                    Lookup
-                };
-
-                template<typename CurveType>
-                struct common_reference_string {
-                    /// The vector of group elements for committing to polynomials in coefficient form
-                    std::vector<CurveType> g;
-                    /// A group element used for blinding commitments
-                    CurveType h;
-                    // TODO: the following field should be separated, as they are optimization values
-                    /// Commitments to Lagrange bases, per domain size
-                    std::map<size_t, std::vector<CurveType>> lagrange_bases;
-                    /// Coefficient for the curve endomorphism
-                    typename CurveType::scalar_field_type endo_r;
-                    /// Coefficient for the curve endomorphism
-                    typename CurveType::base_field_type endo_q;
+                    LookupArgument
                 };
 
                 template<typename FieldType>
@@ -203,52 +109,61 @@ namespace nil {
                 template<typename FieldType>
                 struct arithmetic_sponge_params {
                     std::vector<std::vector<FieldType>> round_constants;
-                    std::vector<std::vector<FieldType>> mds;
+                    std::array<std::array<FieldType,3>,3> mds;
                 };
 
-                enum Column {
-                    Witness,
-                    Z,
-                    LookupSorted,
-                    LookupAggreg,
-                    LookupTable,
-                    LookupKindIndex,
-                    Index,
-                    Coefficient
-                };
+                struct Column;
 
-                enum PolishToken {
-                    Alpha,
-                    Beta,
-                    Gamma,
-                    JointCombiner,
-                    EndoCoefficient,
-                    Mds,
-                    Literal,
-                    Cell,
-                    Dup,
-                    Pow,
-                    Add,
-                    Mul,
-                    Sub,
-                    VanishesOnLast4Rows,
-                    UnnormalizedLagrangeBasis,
-                    Store,
-                    Load
-                };
-
-                template<typename Container>
-                struct linearization {
-                    Container constant_term;
-                    std::vector<std::tuple<Column, Container>> index_term;
+                template<typename ContainerType>
+                struct Linearization {
+                    ContainerType constant_term;
+                    std::vector<std::tuple<Column, ContainerType>> index_term;
                 };
 
                 template<typename CurveType>
                 struct lookup_verifier_index {
-                    typedef typename commitments::kimchi_pedersen<CurveType>::commitment_type commitment_type;
+                    typedef typename commitments::kimchi_pedersen<CurveType> commitment_scheme;
+                    typedef typename commitment_scheme::commitment_type commitment_type;
+                    typedef typename CurveType::scalar_field_type scalar_field_type;
+
                     enum lookups_used { Single, Joint } lookup_used;
                     std::vector<commitment_type> lookup_table;
                     std::vector<commitment_type> lookup_selectors;
+
+                    commitment_type table_ids;
+
+                    std::size_t max_joint_size;
+                    
+                    commitment_type runtime_tables_selector;
+                    bool runtime_tables_selector_is_used;
+                    
+                    static commitment_type combine_table(std::vector<commitment_type>& columns,
+                                            typename scalar_field_type::value_type column_combiner,
+                                            typename scalar_field_type::value_type table_id_combiner,
+                                            commitment_type& table_id_vector, 
+                                            commitment_type& runtime_vector){
+                        typename scalar_field_type::value_type j = scalar_field_type::value_type::one();
+                        std::vector<typename scalar_field_type::value_type> scalars;
+                        std::vector<commitment_type> commitments;
+
+                        for(auto &comm : columns){
+                            scalars.push_back(j);
+                            commitments.push_back(comm);
+                            j *= column_combiner;
+                        }
+
+                        if(table_id_vector.unshifted.size() != 0){
+                            scalars.push_back(table_id_combiner);
+                            commitments.push_back(table_id_vector);
+                        }
+
+                        if(runtime_vector.unshifted.size() != 0){
+                            scalars.push_back(column_combiner);
+                            commitments.push_back(runtime_vector);
+                        }
+
+                        return commitment_scheme::commitment_type::multi_scalar_mul(commitments, scalars);
+                    }
                 };
             }    // namespace snark
         }        // namespace zk
