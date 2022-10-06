@@ -61,11 +61,10 @@ namespace nil {
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2>
-                class from_limbs<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    W0,
-                    W1,
-                    W2> {
+                class from_limbs<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                 W0,
+                                 W1,
+                                 W2> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -81,8 +80,10 @@ namespace nil {
                     struct params_type {
                         var first_limb = var(0, 0, false);
                         var second_limb = var(0, 0, false);
-                        params_type(std::array<var, 2> input) : first_limb(input[0]), second_limb(input[1]) {}
-                        params_type(var first, var second) : first_limb(first), second_limb(second) {}
+                        params_type(std::array<var, 2> input) : first_limb(input[0]), second_limb(input[1]) {
+                        }
+                        params_type(var first, var second) : first_limb(first), second_limb(second) {
+                        }
                     };
 
                     struct result_type {
@@ -93,10 +94,11 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        const std::size_t component_start_row) {
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t component_start_row) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -120,10 +122,8 @@ namespace nil {
                                                             const std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type first_limb =
-                            assignment.var_value(params.first_limb);
-                        typename BlueprintFieldType::value_type second_limb =
-                            assignment.var_value(params.second_limb);
+                        typename BlueprintFieldType::value_type first_limb = assignment.var_value(params.first_limb);
+                        typename BlueprintFieldType::value_type second_limb = assignment.var_value(params.second_limb);
                         assignment.witness(W0)[row] = first_limb;
                         assignment.witness(W1)[row] = second_limb;
                         typename BlueprintFieldType::value_type scalar = 2;
@@ -145,17 +145,18 @@ namespace nil {
                         bp.add_gate(first_selector_index, {constraint_1});
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row = 0) {
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row = 0) {
 
-                        bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false},
-                                                {params.first_limb.index, params.first_limb.rotation,
-                                                 false, params.first_limb.type}});
-                        bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false},
-                                                {params.second_limb.index, params.second_limb.rotation,
-                                                 false, params.second_limb.type}});
+                        bp.add_copy_constraint(
+                            {{W0, static_cast<int>(component_start_row), false},
+                             {params.first_limb.index, params.first_limb.rotation, false, params.first_limb.type}});
+                        bp.add_copy_constraint(
+                            {{W1, static_cast<int>(component_start_row), false},
+                             {params.second_limb.index, params.second_limb.rotation, false, params.second_limb.type}});
                     }
                 };
 
@@ -164,30 +165,17 @@ namespace nil {
                 // It's a part of transcript functionality
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L110
                 // Input: x = [a_0, ...., a255]
-                // Output: y0 = [a_0, ..., a_63], y1 = [a_64, ..., a_127], y2 = [a_128, ..., a_191], y3 = [a_192, ..., a_255]
+                // Output: y0 = [a_0, ..., a_63], y1 = [a_64, ..., a_127], y2 = [a_128, ..., a_191], y3 = [a_192, ...,
+                // a_255]
                 template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class to_limbs;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class to_limbs<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
+                         typename ArithmetizationParams, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
+                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9,
+                         std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                class to_limbs<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                               W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -195,21 +183,24 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t chunk_size = 64;
-                    using range_check_component = zk::components::range_check<ArithmetizationType, chunk_size, 
-                        W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using range_check_component = zk::components::range_check<ArithmetizationType, chunk_size,
+                                                                              W0, W1, W2, W3, W4, W5,
+                                                                              W6, W7, W8, W9, W10, W11,
+                                                                              W12, W13, W14>;
 
                     constexpr static const std::size_t selector_seed = 0x0ff1;
                     constexpr static const std::size_t chunk_amount = 4;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + 
-                        2*chunk_amount * range_check_component::rows_amount;
+                    constexpr static const std::size_t rows_amount =
+                        1 + 2 * chunk_amount * range_check_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
                         var param;
 
-                        params_type(var value) : param(value) {}
+                        params_type(var value) : param(value) {
+                        }
                     };
 
                     struct result_type {
@@ -217,16 +208,17 @@ namespace nil {
 
                         result_type(std::size_t component_start_row) {
                             result = {var(W1, static_cast<int>(component_start_row), false, var::column_type::witness),
-                                    var(W2, static_cast<int>(component_start_row), false, var::column_type::witness),
-                                    var(W3, static_cast<int>(component_start_row), false, var::column_type::witness),
-                                    var(W4, static_cast<int>(component_start_row), false, var::column_type::witness)};
+                                      var(W2, static_cast<int>(component_start_row), false, var::column_type::witness),
+                                      var(W3, static_cast<int>(component_start_row), false, var::column_type::witness),
+                                      var(W4, static_cast<int>(component_start_row), false, var::column_type::witness)};
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        const std::size_t component_start_row) {
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
+                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         const params_type &params,
+                                         const std::size_t component_start_row) {
 
                         auto selector_iterator = assignment.find_selector(selector_seed);
                         std::size_t first_selector_index;
@@ -241,12 +233,10 @@ namespace nil {
                         assignment.enable_selector(first_selector_index, component_start_row);
 
                         std::size_t row = component_start_row;
-                        std::array<var, chunk_amount> chunks = {var(W1, row, false), 
-                            var(W2, row, false), var(W3, row, false), 
-                            var(W4, row, false)};
-                        std::array<var, chunk_amount> b_chunks_vars = {var(W5, row, false), 
-                            var(W6, row, false), var(W7, row, false), 
-                            var(W8, row, false)};
+                        std::array<var, chunk_amount> chunks = {var(W1, row, false), var(W2, row, false),
+                                                                var(W3, row, false), var(W4, row, false)};
+                        std::array<var, chunk_amount> b_chunks_vars = {var(W5, row, false), var(W6, row, false),
+                                                                       var(W7, row, false), var(W8, row, false)};
 
                         row++;
 
@@ -267,12 +257,11 @@ namespace nil {
                                                             const std::size_t component_start_row) {
 
                         std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type value =
-                            assignment.var_value(params.param);
+                        typename BlueprintFieldType::value_type value = assignment.var_value(params.param);
                         auto value_data = value.data;
                         auto shifted_data = value_data >> 64 << 64;
-                        assignment.witness(W0)[row]= value_data;
-                        assignment.witness(W1)[row]= value_data - shifted_data;
+                        assignment.witness(W0)[row] = value_data;
+                        assignment.witness(W1)[row] = value_data - shifted_data;
                         value_data = value_data >> 64;
                         shifted_data = shifted_data >> 64 >> 64 << 64;
                         assignment.witness(W2)[row] = value_data - shifted_data;
@@ -282,36 +271,40 @@ namespace nil {
                         value_data = value_data >> 64;
                         assignment.witness(W4)[row] = value_data;
 
-                        typename BlueprintFieldType::extended_integral_type modulus_p =
-                            BlueprintFieldType::modulus;
+                        typename BlueprintFieldType::extended_integral_type modulus_p = BlueprintFieldType::modulus;
                         typename BlueprintFieldType::extended_integral_type one = 1;
                         typename BlueprintFieldType::extended_integral_type power = (one << 256);
                         typename BlueprintFieldType::extended_integral_type c = power - modulus_p;
                         typename BlueprintFieldType::extended_integral_type mask = (one << 64) - 1;
-                        std::array<typename BlueprintFieldType::extended_integral_type, 4> c_chunks = 
-                        {c & mask, (c >> 64) & mask, (c >> 128) & mask, (c >> 192) & mask};
+                        std::array<typename BlueprintFieldType::extended_integral_type, 4> c_chunks = {
+                            c & mask, (c >> 64) & mask, (c >> 128) & mask, (c >> 192) & mask};
 
-                        typename BlueprintFieldType::extended_integral_type b = typename BlueprintFieldType::extended_integral_type(value.data) + c;
-                        std::array<typename BlueprintFieldType::extended_integral_type, 4> b_chunks = 
-                        {b & mask, (b >> 64) & mask, (b >> 128) & mask, (b >> 192) & mask};
+                        typename BlueprintFieldType::extended_integral_type b =
+                            typename BlueprintFieldType::extended_integral_type(value.data) + c;
+                        std::array<typename BlueprintFieldType::extended_integral_type, 4> b_chunks = {
+                            b & mask, (b >> 64) & mask, (b >> 128) & mask, (b >> 192) & mask};
                         assignment.witness(W5)[row] = b_chunks[0];
                         assignment.witness(W6)[row] = b_chunks[1];
                         assignment.witness(W7)[row] = b_chunks[2];
                         assignment.witness(W8)[row] = b_chunks[3];
-                        assignment.witness(W9)[row] = (typename BlueprintFieldType::extended_integral_type(assignment.witness(W1)[row].data)
-                         + c_chunks[0] - b_chunks[0]) >> 64;
-                        assignment.witness(W10)[row] = (typename BlueprintFieldType::extended_integral_type(assignment.witness(W2)[row].data)
-                         + c_chunks[1] - b_chunks[1]
-                        + typename BlueprintFieldType::extended_integral_type(assignment.witness(W9)[row].data)) >> 64;
-                        assignment.witness(W11)[row] = (typename BlueprintFieldType::extended_integral_type(assignment.witness(W3)[row].data)
-                         + c_chunks[2] - b_chunks[2]
-                        + typename BlueprintFieldType::extended_integral_type(assignment.witness(W10)[row].data)) >> 64;
-                        std::array<var, chunk_amount> chunks = {var(W1, row, false), 
-                            var(W2, row, false), var(W3, row, false), 
-                            var(W4, row, false)};
-                        std::array<var, chunk_amount> b_chunks_vars = {var(W5, row, false), 
-                            var(W6, row, false), var(W7, row, false), 
-                            var(W8, row, false)};
+                        assignment.witness(W9)[row] =
+                            (typename BlueprintFieldType::extended_integral_type(assignment.witness(W1)[row].data) +
+                             c_chunks[0] - b_chunks[0]) >>
+                            64;
+                        assignment.witness(W10)[row] =
+                            (typename BlueprintFieldType::extended_integral_type(assignment.witness(W2)[row].data) +
+                             c_chunks[1] - b_chunks[1] +
+                             typename BlueprintFieldType::extended_integral_type(assignment.witness(W9)[row].data)) >>
+                            64;
+                        assignment.witness(W11)[row] =
+                            (typename BlueprintFieldType::extended_integral_type(assignment.witness(W3)[row].data) +
+                             c_chunks[2] - b_chunks[2] +
+                             typename BlueprintFieldType::extended_integral_type(assignment.witness(W10)[row].data)) >>
+                            64;
+                        std::array<var, chunk_amount> chunks = {var(W1, row, false), var(W2, row, false),
+                                                                var(W3, row, false), var(W4, row, false)};
+                        std::array<var, chunk_amount> b_chunks_vars = {var(W5, row, false), var(W6, row, false),
+                                                                       var(W7, row, false), var(W8, row, false)};
 
                         row++;
 
@@ -321,8 +314,7 @@ namespace nil {
                             range_check_component::generate_assignments(assignment, {b_chunks_vars[i]}, row);
                             row += range_check_component::rows_amount;
                         }
-                        
-                        
+
                         return result_type(component_start_row);
                     }
 
@@ -333,33 +325,43 @@ namespace nil {
                                                const std::size_t first_selector_index) {
 
                         typename BlueprintFieldType::value_type scalar = 2;
-                        typename BlueprintFieldType::extended_integral_type modulus_p =
-                            BlueprintFieldType::modulus;
+                        typename BlueprintFieldType::extended_integral_type modulus_p = BlueprintFieldType::modulus;
                         typename BlueprintFieldType::extended_integral_type one = 1;
                         typename BlueprintFieldType::extended_integral_type power = (one << 256);
                         typename BlueprintFieldType::extended_integral_type c = power - modulus_p;
                         typename BlueprintFieldType::extended_integral_type mask = (one << 64) - 1;
-                        std::array<typename BlueprintFieldType::extended_integral_type, 4> c_chunks = 
-                        {c & mask, (c >> 64) & mask, (c >> 128) & mask, (c >> 192) & mask};
-                        auto constraint_1 = bp.add_constraint(var(W1, 0) + var(W2, 0) * scalar.pow(64) +
-                                                            var(W3, 0) * scalar.pow(128) + var(W4, 0) * scalar.pow(192) - var(W0, 0));
-                        auto constraint_2 = bp.add_constraint(-var(W1, 0) - typename BlueprintFieldType::value_type(c_chunks[0]) + var(W5, 0) + var(W9, 0) * (one << 64));
-                        auto constraint_3 = bp.add_constraint(-var(W2, 0) - typename BlueprintFieldType::value_type(c_chunks[1]) - var(W9, 0) + var(W6, 0) + var(W10, 0) * (one << 64));
-                        auto constraint_4 = bp.add_constraint(-var(W3, 0) - typename BlueprintFieldType::value_type(c_chunks[2]) - var(W10, 0) + var(W7, 0) + var(W11, 0) * (one << 64));
-                        auto constraint_5 = bp.add_constraint(-var(W4, 0) - typename BlueprintFieldType::value_type(c_chunks[3]) - var(W11, 0) + var(W8, 0));
+                        std::array<typename BlueprintFieldType::extended_integral_type, 4> c_chunks = {
+                            c & mask, (c >> 64) & mask, (c >> 128) & mask, (c >> 192) & mask};
+                        auto constraint_1 =
+                            bp.add_constraint(var(W1, 0) + var(W2, 0) * scalar.pow(64) + var(W3, 0) * scalar.pow(128) +
+                                              var(W4, 0) * scalar.pow(192) - var(W0, 0));
+                        auto constraint_2 =
+                            bp.add_constraint(-var(W1, 0) - typename BlueprintFieldType::value_type(c_chunks[0]) +
+                                              var(W5, 0) + var(W9, 0) * (one << 64));
+                        auto constraint_3 =
+                            bp.add_constraint(-var(W2, 0) - typename BlueprintFieldType::value_type(c_chunks[1]) -
+                                              var(W9, 0) + var(W6, 0) + var(W10, 0) * (one << 64));
+                        auto constraint_4 =
+                            bp.add_constraint(-var(W3, 0) - typename BlueprintFieldType::value_type(c_chunks[2]) -
+                                              var(W10, 0) + var(W7, 0) + var(W11, 0) * (one << 64));
+                        auto constraint_5 =
+                            bp.add_constraint(-var(W4, 0) - typename BlueprintFieldType::value_type(c_chunks[3]) -
+                                              var(W11, 0) + var(W8, 0));
 
-                        auto constraint_6 = bp.add_constraint(var(W9, 0)*(var(W9,0) - 1));
-                        auto constraint_7 = bp.add_constraint(var(W10, 0)*(var(W10,0) - 1));
-                        auto constraint_8 = bp.add_constraint(var(W11, 0)*(var(W11,0) - 1));
+                        auto constraint_6 = bp.add_constraint(var(W9, 0) * (var(W9, 0) - 1));
+                        auto constraint_7 = bp.add_constraint(var(W10, 0) * (var(W10, 0) - 1));
+                        auto constraint_8 = bp.add_constraint(var(W11, 0) * (var(W11, 0) - 1));
 
-                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
-                        constraint_6, constraint_7, constraint_8});
+                        bp.add_gate(first_selector_index,
+                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                     constraint_7, constraint_8});
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                          const params_type &params,
-                                                          std::size_t component_start_row = 0) {
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  const params_type &params,
+                                                  std::size_t component_start_row = 0) {
 
                         bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false},
                                                 {params.param.index, params.param.rotation, false, params.param.type}});

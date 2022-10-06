@@ -55,13 +55,13 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 //     using curve_type = algebra::curves::pallas;
 //     using ed25519_type = algebra::curves::ed25519;
 //     using BlueprintFieldType = typename curve_type::base_field_type;
-//     constexpr std::size_t WitnessColumns = 9;
-//     constexpr std::size_t PublicInputColumns = 1;
-//     constexpr std::size_t ConstantColumns = 1;
-//     constexpr std::size_t SelectorColumns = 5;
+//     constexpr std::size_t witness_columns = 9;
+//     constexpr std::size_t public_input_columns = 1;
+//     constexpr std::size_t constant_columns = 1;
+//     constexpr std::size_t selector_columns = 5;
 //     using ArithmetizationParams =
-//         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns,
-//         SelectorColumns>;
+//         zk::snark::plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns,
+//         selector_columns>;
 //     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
 //     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
 //     using hash_type = nil::crypto3::hashes::keccak_1600<256>;

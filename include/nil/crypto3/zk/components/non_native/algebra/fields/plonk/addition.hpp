@@ -109,9 +109,8 @@ namespace nil {
                         std::array<var, 4> output;
 
                         result_type(const std::size_t &component_start_row) {
-                        output = {var(W0, component_start_row + 2, false), 
-                            var(W1, component_start_row + 2, false), var(W2, component_start_row + 2, false), 
-                            var(W3, component_start_row + 2, false)};
+                            output = {var(W0, component_start_row + 2, false), var(W1, component_start_row + 2, false),
+                                      var(W2, component_start_row + 2, false), var(W3, component_start_row + 2, false)};
                         }
                     };
 
@@ -258,17 +257,17 @@ namespace nil {
 
                         auto constraint_3 =
                             bp.add_constraint(var(W7, -1) - (var(W3, -1) + var(W4, -1) * (1 << 22) +
-                                                            var(W5, -1) * (base << 44) + var(W6, -1) * (base << 66)));
+                                                             var(W5, -1) * (base << 44) + var(W6, -1) * (base << 66)));
 
-                        auto constraint_4 = bp.add_constraint( (var(W0, 0) + var(W3, 0) * (base << 66) + var(W4, 0)
-                        *(base<< 132) + var(W5, 0) * (base << 198)) +
-                        (var(W1, 0) + var(W6, 0) * (base << 66) + var(W7, 0)*(base<< 132) + var(W8, 0) 
-                        * (base << 198)) - 
-                        (var(W2, 0)* pasta_eddsa_p + 
-                        (var(W0, +1) + var(W1, +1) * (base << 66) + var(W2, +1)*(base<< 132) + var(W3, +1) * (base << 198)) ));
+                        auto constraint_4 = bp.add_constraint(
+                            (var(W0, 0) + var(W3, 0) * (base << 66) + var(W4, 0) * (base << 132) +
+                             var(W5, 0) * (base << 198)) +
+                            (var(W1, 0) + var(W6, 0) * (base << 66) + var(W7, 0) * (base << 132) +
+                             var(W8, 0) * (base << 198)) -
+                            (var(W2, 0) * pasta_eddsa_p + (var(W0, +1) + var(W1, +1) * (base << 66) +
+                                                           var(W2, +1) * (base << 132) + var(W3, +1) * (base << 198))));
 
-                        bp.add_gate(first_selector_index,
-                                    {constraint_1, constraint_2, constraint_3, constraint_4});
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
                     }
 
                     static void generate_copy_constraints(

@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 	using curve_type = algebra::curves::bls12<381>;
 	using BlueprintFieldType = typename curve_type::base_field_type;
-	constexpr std::size_t WitnessColumns = 5;
+	constexpr std::size_t witness_columns = 5;
 	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
 	zk::blueprint<ArithmetizationType> bp;
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(variable_base_scalar_mul_9_wires_test_case) {
 
 	using curve_type = algebra::curves::bls12<381>;
 	using BlueprintFieldType = typename curve_type::base_field_type;
-	constexpr std::size_t WitnessColumns = 9;
+	constexpr std::size_t witness_columns = 9;
 	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
 	zk::blueprint<ArithmetizationType> bp;

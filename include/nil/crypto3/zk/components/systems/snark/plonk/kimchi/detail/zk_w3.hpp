@@ -42,48 +42,20 @@ namespace nil {
         namespace zk {
             namespace components {
 
-                // Returns the end of the circuit, which is used for introducing zero-knowledge in the permutation polynomial
+                // Returns the end of the circuit, which is used for introducing zero-knowledge in the permutation
+                // polynomial
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/circuits/polynomials/permutation.rs#L85
                 // Input: verifier_index
                 // Output: g**(domain_size - zk_rows)
-                template<typename ArithmetizationType,
-                    std::size_t... WireIndexes>
+                template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class zk_w3;
 
-                template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class zk_w3<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t W0, std::size_t W1,
+                         std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
+                         std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
+                         std::size_t W13, std::size_t W14>
+                class zk_w3<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3,
+                            W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -91,8 +63,9 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static std::size_t exp_size = 64;
-                    using exp_component = zk::components::exponentiation<ArithmetizationType, exp_size, W0, W1, W2,
-                        W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using exp_component =
+                        zk::components::exponentiation<ArithmetizationType, exp_size, W0, W1, W2, W3, W4, W5, W6, W7,
+                                                       W8, W9, W10, W11, W12, W13, W14>;
 
                     using verifier_index_type = kimchi_verifier_index_scalar<BlueprintFieldType>;
 
@@ -117,7 +90,8 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -126,9 +100,10 @@ namespace nil {
 
                         // domain.group_gen.pow(&[domain.size - (ZK_ROWS)])
                         var exponent(0, start_row_index, false, var::column_type::constant);
-                        row++; // exponent component also uses constant column
+                        row++;    // exponent component also uses constant column
                         var res = exp_component::generate_circuit(bp, assignment,
-                            {params.verifier_index.omega, exponent}, row).output;
+                                                                  {params.verifier_index.omega, exponent}, row)
+                                      .output;
                         row += exp_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);
@@ -145,9 +120,10 @@ namespace nil {
 
                         // domain.group_gen.pow(&[domain.size - (ZK_ROWS)])
                         var exponent(0, start_row_index, false, var::column_type::constant);
-                        row++; // exponent component also uses constant column
+                        row++;    // exponent component also uses constant column
                         var res = exp_component::generate_assignments(assignment,
-                            {params.verifier_index.omega, exponent}, row).output;
+                                                                      {params.verifier_index.omega, exponent}, row)
+                                      .output;
                         row += exp_component::rows_amount;
 
                         assert(row == start_row_index + rows_amount);
@@ -157,9 +133,9 @@ namespace nil {
 
                 private:
                     static void generate_assignments_constants(
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                         assignment.constant(0)[row] = params.verifier_index.domain_size - zk_rows;
                         row++;

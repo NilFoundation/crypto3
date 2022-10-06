@@ -42,8 +42,8 @@ namespace nil {
 
                 template<typename BlueprintFieldType, std::size_t SplitSize>
                 struct kimchi_commitment_type {
-                            using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
-                            std::array<var_ec_point, SplitSize> parts;
+                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+                    std::array<var_ec_point, SplitSize> parts;
                 };
             }    // namespace components
         }        // namespace zk

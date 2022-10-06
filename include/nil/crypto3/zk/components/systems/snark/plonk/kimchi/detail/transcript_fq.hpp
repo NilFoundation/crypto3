@@ -58,41 +58,12 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class kimchi_transcript_fq;
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4,
+                         std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9,
+                         std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
                 class kimchi_transcript_fq<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                        CurveType,
-                                        W0,
-                                        W1,
-                                        W2,
-                                        W3,
-                                        W4,
-                                        W5,
-                                        W6,
-                                        W7,
-                                        W8,
-                                        W9,
-                                        W10,
-                                        W11,
-                                        W12,
-                                        W13,
-                                        W14> {
+                                           CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -119,26 +90,29 @@ namespace nil {
                     static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
                     static const std::size_t HIGH_ENTROPY_LIMBS = 2;
 
-                    using sponge_component = kimchi_sponge<ArithmetizationType, CurveType,
-                       W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    using sponge_component = kimchi_sponge<ArithmetizationType,
+                                                           CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11,
+                                                           W12, W13, W14>;
                     sponge_component sponge;
 
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
                     using pack = from_limbs<ArithmetizationType, W0, W1, W2>;
-                    using unpack = to_limbs<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6, W7, W8,
-                        W9, W10, W11, W12, W13, W14>;
+                    using unpack =
+                        to_limbs<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
                     using compare = compare_with_const<ArithmetizationType, CurveType, W0, W1, W2>;
 
                     std::vector<var> last_squeezed;
 
-                    std::array<var, 2> squeeze_limbs_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                    std::size_t component_start_row) {
+                    std::array<var, 2>
+                        squeeze_limbs_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                 std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         if (last_squeezed.size() >= CHALLENGE_LENGTH_IN_LIMBS) {
                             std::array<var, 2> limbs = {last_squeezed[0], last_squeezed[1]};
-                            std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, last_squeezed.end()};
+                            std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS,
+                                                          last_squeezed.end()};
                             last_squeezed = remaining;
                             return limbs;
                         }
@@ -146,19 +120,21 @@ namespace nil {
                         row += sponge_component::squeeze_rows;
                         auto x = unpack::generate_assignments(assignment, {sq}, row).result;
                         row += unpack::rows_amount;
-                        for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
+                        for (int i = 0; i < HIGH_ENTROPY_LIMBS; ++i) {
                             last_squeezed.push_back(x[i]);
                         }
                         return squeeze_limbs_assignment(assignment, row);
                     }
 
-                    std::array<var, 2> squeeze_limbs_circuit(blueprint<ArithmetizationType> &bp,
-                                                    blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                    std::size_t component_start_row) {
+                    std::array<var, 2>
+                        squeeze_limbs_circuit(blueprint<ArithmetizationType> &bp,
+                                              blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                              std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         if (last_squeezed.size() >= CHALLENGE_LENGTH_IN_LIMBS) {
                             std::array<var, 2> limbs = {last_squeezed[0], last_squeezed[1]};
-                            std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS, last_squeezed.end()};
+                            std::vector<var> remaining = {last_squeezed.begin() + CHALLENGE_LENGTH_IN_LIMBS,
+                                                          last_squeezed.end()};
                             last_squeezed = remaining;
                             return limbs;
                         }
@@ -166,23 +142,22 @@ namespace nil {
                         row += sponge_component::squeeze_rows;
                         auto x = unpack::generate_circuit(bp, assignment, {sq}, row).result;
                         row += unpack::rows_amount;
-                        for (int i = 0 ; i < HIGH_ENTROPY_LIMBS; ++i) {
+                        for (int i = 0; i < HIGH_ENTROPY_LIMBS; ++i) {
                             last_squeezed.push_back(x[i]);
                         }
                         return squeeze_limbs_circuit(bp, assignment, row);
                     }
-                    
+
                 public:
                     constexpr static const std::size_t rows_amount = 0;
                     constexpr static const std::size_t init_rows = sponge_component::init_rows;
                     constexpr static const std::size_t absorb_group_rows = 2 * sponge_component::absorb_rows;
                     constexpr static const std::size_t absorb_fr_rows = fr_value_size * sponge_component::absorb_rows;
-                    constexpr static const std::size_t challenge_rows = 
-                        sponge_component::squeeze_rows + unpack::rows_amount 
-                        + pack::rows_amount;
+                    constexpr static const std::size_t challenge_rows =
+                        sponge_component::squeeze_rows + unpack::rows_amount + pack::rows_amount;
                     constexpr static const std::size_t challenge_fq_rows = sponge_component::squeeze_rows;
-                    constexpr static const std::size_t digest_rows = sponge_component::squeeze_rows
-                        + compare::rows_amount + mul_component::rows_amount;
+                    constexpr static const std::size_t digest_rows =
+                        sponge_component::squeeze_rows + compare::rows_amount + mul_component::rows_amount;
 
                     void init_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
                                          var zero,
@@ -200,9 +175,9 @@ namespace nil {
                     }
 
                     void absorb_g_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                        group_value g,
-                                        std::size_t component_start_row) {
-                        //accepts {g.X, g.Y}
+                                             group_value g,
+                                             std::size_t component_start_row) {
+                        // accepts {g.X, g.Y}
                         std::size_t row = component_start_row;
                         last_squeezed = {};
                         sponge.absorb_assignment(assignment, g.X, row);
@@ -211,10 +186,10 @@ namespace nil {
                     }
 
                     void absorb_g_circuit(blueprint<ArithmetizationType> &bp,
-                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                        group_value g,
-                                        std::size_t component_start_row) {
-                        //accepts {g.X, g.Y}
+                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                          group_value g,
+                                          std::size_t component_start_row) {
+                        // accepts {g.X, g.Y}
                         std::size_t row = component_start_row;
                         last_squeezed = {};
                         sponge.absorb_circuit(bp, assignment, g.X, row);
@@ -223,8 +198,8 @@ namespace nil {
                     }
 
                     void absorb_fr_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                            fr_value absorbing_value,
-                                            std::size_t component_start_row) {
+                                              fr_value absorbing_value,
+                                              std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
                         for (std::size_t i = 0; i < fr_value_size; i++) {
@@ -234,9 +209,9 @@ namespace nil {
                     }
 
                     void absorb_fr_circuit(blueprint<ArithmetizationType> &bp,
-                                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                        fr_value absorbing_value,
-                                        std::size_t &component_start_row) {
+                                           blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                           fr_value absorbing_value,
+                                           std::size_t &component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
                         for (std::size_t i = 0; i < fr_value_size; i++) {
@@ -245,9 +220,8 @@ namespace nil {
                         }
                     }
 
-                    var challenge_assignment(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t component_start_row) {
+                    var challenge_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                             std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         auto limbs = squeeze_limbs_assignment(assignment, row);
                         row += sponge_component::squeeze_rows;
@@ -256,8 +230,8 @@ namespace nil {
                     }
 
                     var challenge_circuit(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t component_start_row) {
+                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                          std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         auto limbs = squeeze_limbs_circuit(bp, assignment, row);
                         row += sponge_component::squeeze_rows;
@@ -265,23 +239,21 @@ namespace nil {
                         return pack::generate_circuit(bp, assignment, limbs, row).result;
                     }
 
-                    var challenge_fq_assignment(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t component_start_row) {
+                    var challenge_fq_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                                std::size_t component_start_row) {
                         last_squeezed = {};
                         return sponge.squeeze_assignment(assignment, component_start_row);
                     }
 
                     var challenge_fq_circuit(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t component_start_row) {
-                        last_squeezed  = {};
+                                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                             std::size_t component_start_row) {
+                        last_squeezed = {};
                         return sponge.squeeze_circuit(bp, assignment, component_start_row);
                     }
 
-                    var digest_assignment(
-                            blueprint_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t component_start_row) {
+                    var digest_assignment(blueprint_assignment_table<ArithmetizationType> &assignment,
+                                          std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
                         var sq = sponge.squeeze_assignment(assignment, row);
@@ -295,8 +267,8 @@ namespace nil {
                     }
 
                     var digest_circuit(blueprint<ArithmetizationType> &bp,
-                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                            std::size_t component_start_row) {
+                                       blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                       std::size_t component_start_row) {
                         std::size_t row = component_start_row;
                         last_squeezed = {};
                         var sq = sponge.squeeze_circuit(bp, assignment, row);
@@ -306,9 +278,10 @@ namespace nil {
                         }
                         var compare_result = compare::generate_circuit(bp, assignment, sq, row).output;
                         row += compare::rows_amount;
-                        return zk::components::generate_circuit<mul_component>(bp, assignment, {compare_result, sq}, row).output;
+                        return zk::components::generate_circuit<mul_component>(
+                                   bp, assignment, {compare_result, sq}, row)
+                            .output;
                     }
-
                 };
             }    // namespace components
         }        // namespace zk

@@ -41,9 +41,8 @@ namespace nil {
                 struct kimchi_lookup_evaluations {
                     using var = snark::plonk_variable<FieldType>;
 
-                    std::array<var, 
-                        KimchiParamsType::circuit_params::lookup_columns> sorted;
-                    
+                    std::array<var, KimchiParamsType::circuit_params::lookup_columns> sorted;
+
                     var aggreg;
                     var table;
 

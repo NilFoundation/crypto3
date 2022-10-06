@@ -95,7 +95,7 @@ namespace nil {
                     }
 
                     element_fp6_2over3<field_type> Frobenius_map(const std::size_t power) const {
-                        blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1,
+                        detail::blueprint_linear_combination<base_field_type> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1,
                             new_c1c2;
                         new_c0c0.assign(this->bp, data[0].data[0]);
                         new_c0c1.assign(this->bp,
@@ -146,26 +146,26 @@ namespace nil {
                     element_fp6_2over3<field_type> B;
                     element_fp6_2over3<field_type> result;
 
-                    blueprint_linear_combination<base_field_type> v0_c0;
-                    blueprint_linear_combination<base_field_type> v0_c1;
-                    blueprint_linear_combination<base_field_type> v0_c2;
+                    detail::blueprint_linear_combination<base_field_type> v0_c0;
+                    detail::blueprint_linear_combination<base_field_type> v0_c1;
+                    detail::blueprint_linear_combination<base_field_type> v0_c2;
 
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c2;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c2;
                     std::shared_ptr<underlying_element_type> Ac0_plus_Ac1;
 
                     std::shared_ptr<underlying_element_type> v0;
                     std::shared_ptr<underlying_element_type> v1;
 
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c2;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c2;
                     std::shared_ptr<underlying_element_type> Bc0_plus_Bc1;
 
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c2;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c2;
                     std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
                     std::shared_ptr<element_fp3_mul<underlying_field_type>> compute_v0;
@@ -285,26 +285,26 @@ namespace nil {
                     element_fp6_2over3<field_type> B;
                     element_fp6_2over3<field_type> result;
 
-                    blueprint_linear_combination<base_field_type> v0_c0;
-                    blueprint_linear_combination<base_field_type> v0_c1;
-                    blueprint_linear_combination<base_field_type> v0_c2;
+                    detail::blueprint_linear_combination<base_field_type> v0_c0;
+                    detail::blueprint_linear_combination<base_field_type> v0_c1;
+                    detail::blueprint_linear_combination<base_field_type> v0_c2;
 
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
-                    blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c2;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c0;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c1;
+                    detail::blueprint_linear_combination<base_field_type> Ac0_plus_Ac1_c2;
                     std::shared_ptr<underlying_element_type> Ac0_plus_Ac1;
 
                     std::shared_ptr<underlying_element_type> v0;
                     std::shared_ptr<underlying_element_type> v1;
 
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
-                    blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c2;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c0;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c1;
+                    detail::blueprint_linear_combination<base_field_type> Bc0_plus_Bc1_c2;
                     std::shared_ptr<underlying_element_type> Bc0_plus_Bc1;
 
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
-                    blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c2;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c0;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c1;
+                    detail::blueprint_linear_combination<base_field_type> result_c1_plus_v0_plus_v1_c2;
                     std::shared_ptr<underlying_element_type> result_c1_plus_v0_plus_v1;
 
                     std::shared_ptr<element_fp3_mul<underlying_field_type>> compute_v1;
@@ -484,14 +484,14 @@ namespace nil {
                     std::shared_ptr<element_fp2<Fp2T>> b;
                     std::shared_ptr<element_fp2<Fp2T>> c;
 
-                    blueprint_linear_combination<base_field_type> asq_c0;
-                    blueprint_linear_combination<base_field_type> asq_c1;
+                    detail::blueprint_linear_combination<base_field_type> asq_c0;
+                    detail::blueprint_linear_combination<base_field_type> asq_c1;
 
-                    blueprint_linear_combination<base_field_type> bsq_c0;
-                    blueprint_linear_combination<base_field_type> bsq_c1;
+                    detail::blueprint_linear_combination<base_field_type> bsq_c0;
+                    detail::blueprint_linear_combination<base_field_type> bsq_c1;
 
-                    blueprint_linear_combination<base_field_type> csq_c0;
-                    blueprint_linear_combination<base_field_type> csq_c1;
+                    detail::blueprint_linear_combination<base_field_type> csq_c0;
+                    detail::blueprint_linear_combination<base_field_type> csq_c1;
 
                     std::shared_ptr<element_fp2<Fp2T>> asq;
                     std::shared_ptr<element_fp2<Fp2T>> bsq;

@@ -32,9 +32,9 @@
 
 #include <nil/crypto3/multiprecision/number.hpp>
 
-#include <nil/crypto3/zk/components/component.hpp>
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/blueprint_variable.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+
+#include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/lookup_1bit.hpp>
 
@@ -97,14 +97,14 @@ namespace nil {
                 struct field_to_bits_strict : public component<Field> {
                     using field_type = Field;
                     using field_value_type = typename field_type::value_type;
-                    using result_type = blueprint_variable_vector<field_type>;
+                    using result_type = detail::blueprint_variable_vector<field_type>;
 
                     // Output bits
                     result_type result;
 
                     // Intermediate variables & components
                     packing<field_type> packer;
-                    blueprint_variable_vector<field_type> results;
+                    detail::blueprint_variable_vector<field_type> results;
                     std::vector<lookup_1bit<field_type>> comparisons;
 
                 private:
@@ -135,15 +135,15 @@ namespace nil {
                 public:
                     /// Auto allocation of the result
                     field_to_bits_strict(blueprint<field_type> &bp,
-                                         const blueprint_linear_combination<field_type> &in_field_element) :
+                                         const detail::blueprint_linear_combination<field_type> &in_field_element) :
                         component<field_type>(bp),
                         result([&]() {
-                            blueprint_variable_vector<field_type> r;
+                            detail::blueprint_variable_vector<field_type> r;
                             r.allocate(bp, field_type::value_bits);
                             return r;
                         }()),
                         packer(bp, result, in_field_element), results([&]() {
-                            blueprint_variable_vector<field_type> r;
+                            detail::blueprint_variable_vector<field_type> r;
                             r.allocate(bp, field_type::value_bits - 1);
                             return r;
                         }()) {
@@ -152,11 +152,11 @@ namespace nil {
 
                     /// Manual allocation of the result
                     field_to_bits_strict(blueprint<field_type> &bp,
-                                         const blueprint_linear_combination<field_type> &in_field_element,
+                                         const detail::blueprint_linear_combination<field_type> &in_field_element,
                                          const result_type &in_result) :
                         component<field_type>(bp),
                         result(in_result), packer(bp, result, in_field_element), results([&]() {
-                            blueprint_variable_vector<field_type> r;
+                            detail::blueprint_variable_vector<field_type> r;
                             r.allocate(bp, field_type::value_bits - 1);
                             return r;
                         }()) {

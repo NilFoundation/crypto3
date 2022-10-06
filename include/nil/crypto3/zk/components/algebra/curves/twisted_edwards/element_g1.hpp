@@ -201,7 +201,7 @@ namespace nil {
 
                     element_g1_is_well_formed(blueprint<field_type> &bp, const element_component &in_p) :
                         component<field_type>(bp), p(in_p) {
-                        blueprint_variable<field_type> XX_var, aXX_var, dXX_var, YY_var, dXXYY_var, lhs_var, rhs_var;
+                        detail::blueprint_variable<field_type> XX_var, aXX_var, dXX_var, YY_var, dXXYY_var, lhs_var, rhs_var;
 
                         XX_var.allocate(this->bp);
                         aXX_var.allocate(this->bp);
@@ -333,13 +333,13 @@ namespace nil {
                     const element_component p2;
                     element_component result;
 
-                    const blueprint_variable<field_type> can_add;
+                    const detail::blueprint_variable<field_type> can_add;
 
                     // intermediate variables
                     element_component p_to_add;
                     element_fp<field_type> Y_intermediate_to_add1;
                     element_fp<field_type> Y_intermediate_to_add2;
-                    blueprint_variable<field_type> cannot_add;
+                    detail::blueprint_variable<field_type> cannot_add;
 
                     // TODO: refactor
                     // std::shared_ptr<element_g1_add<CurveType>> el_add;
@@ -347,11 +347,11 @@ namespace nil {
                     element_g1_conditional_addition(blueprint<field_type> &bp,
                                                     const element_component &in_p1,
                                                     const element_component &in_p2,
-                                                    const blueprint_variable<field_type> &in_can_add,
+                                                    const detail::blueprint_variable<field_type> &in_can_add,
                                                     const element_component &in_result) :
                         component<field_type>(bp),
                         p1(in_p1), p2(in_p2), can_add(in_can_add), p_to_add(bp), result(in_result) {
-                        blueprint_variable<field_type> Y_intermediate_to_add1_var, Y_intermediate_to_add2_var;
+                        detail::blueprint_variable<field_type> Y_intermediate_to_add1_var, Y_intermediate_to_add2_var;
 
                         Y_intermediate_to_add1_var.allocate(this->bp);
                         Y_intermediate_to_add2_var.allocate(this->bp);
