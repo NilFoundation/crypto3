@@ -121,16 +121,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
 
     constexpr std::size_t use_lookup_runtime = KimchiParamsType::circuit_params::lookup_runtime ? 1 : 0; 
 
-    constexpr std::size_t use_table_ids = KimchiParamsType::circuit_params::lookup_table_ids ? 1 : 0; 
-
     // zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
     std::vector<commitment_type> lookup_columns_var;
-    std::vector<var> lookup_scalars_var;
+    std::array<var, lookup_columns> lookup_scalars_var;
     commitment_type runtime_var;
-    commitment_type table_ids_var;
-    var table_id_combiner;
     std::size_t j = 0;
     std::size_t size = KimchiParamsType::commitment_params_type::shifted_commitment_split;
     for (std::size_t i = j; i < lookup_columns; i++){
@@ -144,15 +140,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
         }
         lookup_columns_var.push_back(column_var);
     }
-    if (KimchiParamsType::circuit_params::lookup_table_ids){
-        for (std::size_t k = 0; k < size; k++) {
-            public_input.push_back(algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>().X);
-            public_input.push_back(algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>().Y);
-            table_ids_var.parts[k] = {var(0, j + k*2, false, var::column_type::public_input),
-            var(0, j + k*2 + 1, false, var::column_type::public_input)};
-            j+=2;
-        }
-    }
+
     if (KimchiParamsType::circuit_params::lookup_runtime){
         for (std::size_t k = 0; k < size; k++) {
             public_input.push_back(algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>().X);
@@ -166,17 +154,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
     for (std::size_t i = j; i < s; i++){
         for (std::size_t k = 0; k < size; k++) {
             public_input.push_back(algebra::random_element<curve_type::base_field_type>());
-            lookup_scalars_var.push_back(var(0, i, false, var::column_type::public_input));
+            lookup_scalars_var[i - j] = (var(0, i, false, var::column_type::public_input));
             j++;
         }
     }
-    if (KimchiParamsType::circuit_params::lookup_table_ids){
-        public_input.push_back(algebra::random_element<curve_type::base_field_type>());
-        table_id_combiner = var(0, j, false, var::column_type::public_input);
-        j++;
-    }
 
-    typename component_type::params_type params = {lookup_columns_var, lookup_scalars_var, runtime_var, table_ids_var, table_id_combiner};
+    typename component_type::params_type params = {lookup_columns_var, lookup_scalars_var, runtime_var};
 
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 

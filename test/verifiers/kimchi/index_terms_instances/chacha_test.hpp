@@ -78,7 +78,6 @@ namespace nil {
 
                     constexpr static const std::size_t lookup_columns = 5;
                     constexpr static const bool lookup_runtime = false;
-                    constexpr static const bool lookup_table_ids = true;
                     constexpr static const bool joint_lookup = false;
 
                     constexpr static const bool poseidon_gate = false;
