@@ -41,29 +41,28 @@ namespace nil {
                 struct plonk_private_table {
 
                 protected:
-
-                    std::array<ColumnType, ArithmetizationParams::WitnessColumns> witness_columns;
+                    std::array<ColumnType, ArithmetizationParams::witness_columns> witness_columns;
 
                 public:
                     plonk_private_table(
-                        std::array<ColumnType,
-                            ArithmetizationParams::WitnessColumns> witness_columns = {}) :
+                        std::array<ColumnType, ArithmetizationParams::witness_columns> witness_columns = {}) :
                         witness_columns(witness_columns) {
                     }
 
                     ColumnType witness(std::size_t index) const {
-                        assert(index < ArithmetizationParams::WitnessColumns);
+                        BOOST_ASSERT(index < ArithmetizationParams::witness_columns);
+
                         return witness_columns[index];
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::WitnessColumns> witnesses() const {
+                    std::array<ColumnType, ArithmetizationParams::witness_columns> witnesses() const {
                         return witness_columns;
                     }
 
                     ColumnType operator[](std::size_t index) const {
-                        if (index < ArithmetizationParams::WitnessColumns)
+                        if (index < ArithmetizationParams::witness_columns)
                             return witness_columns[index];
-                        index -= ArithmetizationParams::WitnessColumns;
+                        index -= ArithmetizationParams::witness_columns;
                     }
 
                     constexpr std::size_t size() const {
@@ -75,30 +74,26 @@ namespace nil {
                 struct plonk_public_table {
 
                 protected:
-
-                    std::array<ColumnType, ArithmetizationParams::PublicInputColumns> public_input_columns;
-                    std::array<ColumnType, ArithmetizationParams::ConstantColumns> constant_columns;
-                    std::array<ColumnType, ArithmetizationParams::SelectorColumns> selector_columns;
+                    std::array<ColumnType, ArithmetizationParams::public_input_columns> public_input_columns;
+                    std::array<ColumnType, ArithmetizationParams::constant_columns> constant_columns;
+                    std::array<ColumnType, ArithmetizationParams::selector_columns> selector_columns;
 
                 public:
                     plonk_public_table(
-                        std::array<ColumnType,
-                            ArithmetizationParams::PublicInputColumns> public_input_columns = {},
-                        std::array<ColumnType,
-                            ArithmetizationParams::ConstantColumns> constant_columns = {},
-                        std::array<ColumnType,
-                            ArithmetizationParams::SelectorColumns> selector_columns = {}) :
+                        std::array<ColumnType, ArithmetizationParams::public_input_columns> public_input_columns = {},
+                        std::array<ColumnType, ArithmetizationParams::constant_columns> constant_columns = {},
+                        std::array<ColumnType, ArithmetizationParams::selector_columns> selector_columns = {}) :
                         public_input_columns(public_input_columns),
-                        constant_columns(constant_columns),
-                        selector_columns(selector_columns) {
+                        constant_columns(constant_columns), selector_columns(selector_columns) {
                     }
 
                     ColumnType public_input(std::size_t index) const {
-                        assert(index < ArithmetizationParams::PublicInputColumns);
+                        BOOST_ASSERT(index < ArithmetizationParams::public_input_columns);
+
                         return public_input_columns[index];
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::PublicInputColumns> public_inputs() const {
+                    std::array<ColumnType, ArithmetizationParams::public_input_columns> public_inputs() const {
                         return public_input_columns;
                     }
 
@@ -107,11 +102,12 @@ namespace nil {
                     }
 
                     ColumnType constant(std::size_t index) const {
-                        assert(index < ArithmetizationParams::ConstantColumns);
+                        BOOST_ASSERT(index < ArithmetizationParams::constant_columns);
+
                         return constant_columns[index];
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::ConstantColumns> constants() const {
+                    std::array<ColumnType, ArithmetizationParams::constant_columns> constants() const {
                         return constant_columns;
                     }
 
@@ -120,11 +116,12 @@ namespace nil {
                     }
 
                     ColumnType selector(std::size_t index) const {
-                        assert(index < ArithmetizationParams::SelectorColumns);
+                        BOOST_ASSERT(index < ArithmetizationParams::selector_columns);
+
                         return selector_columns[index];
                     }
 
-                    std::array<ColumnType, ArithmetizationParams::SelectorColumns> selectors() const {
+                    std::array<ColumnType, ArithmetizationParams::selector_columns> selectors() const {
                         return selector_columns;
                     }
 
@@ -133,42 +130,39 @@ namespace nil {
                     }
 
                     ColumnType operator[](std::size_t index) const {
-                        if (index < ArithmetizationParams::PublicInputColumns)
+                        if (index < ArithmetizationParams::public_input_columns)
                             return public_input_columns[index];
-                        index -= ArithmetizationParams::PublicInputColumns;
-                        if (index < ArithmetizationParams::ConstantColumns)
+                        index -= ArithmetizationParams::public_input_columns;
+                        if (index < ArithmetizationParams::constant_columns)
                             return constant_columns[index];
-                        index -= ArithmetizationParams::ConstantColumns;
-                        if (index < ArithmetizationParams::SelectorColumns) {
+                        index -= ArithmetizationParams::constant_columns;
+                        if (index < ArithmetizationParams::selector_columns) {
                             return selector_columns[index];
                         }
-                        index -= ArithmetizationParams::SelectorColumns;
+                        index -= ArithmetizationParams::selector_columns;
                     }
 
                     constexpr std::size_t size() const {
-                        return ArithmetizationParams::PublicInputColumns +
-                               ArithmetizationParams::ConstantColumns +
-                               ArithmetizationParams::SelectorColumns;
+                        return ArithmetizationParams::public_input_columns + ArithmetizationParams::constant_columns +
+                               ArithmetizationParams::selector_columns;
                     }
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
                 struct plonk_table {
 
-                    using private_table_type = plonk_private_table<FieldType,
-                        ArithmetizationParams, ColumnType>;
-                    using public_table_type = plonk_public_table<FieldType,
-                        ArithmetizationParams, ColumnType>;
+                    using private_table_type = plonk_private_table<FieldType, ArithmetizationParams, ColumnType>;
+                    using public_table_type = plonk_public_table<FieldType, ArithmetizationParams, ColumnType>;
 
                 protected:
-
                     private_table_type _private_table;
                     public_table_type _public_table;
 
                 public:
-                    plonk_table(private_table_type private_table = private_table_type(), 
+                    plonk_table(private_table_type private_table = private_table_type(),
                                 public_table_type public_table = public_table_type()) :
-                        _private_table(private_table), _public_table(public_table) {
+                        _private_table(private_table),
+                        _public_table(public_table) {
                     }
 
                     ColumnType witness(std::size_t index) const {
@@ -214,42 +208,42 @@ namespace nil {
 
                 template<typename FieldType, typename ArithmetizationParams>
                 using plonk_public_assignment_table =
-                    plonk_public_table<FieldType, ArithmetizationParams,
-                        plonk_column<FieldType>>;
+                    plonk_public_table<FieldType, ArithmetizationParams, plonk_column<FieldType>>;
 
                 template<typename FieldType, typename ArithmetizationParams>
-                using plonk_assignment_table = plonk_table<FieldType, ArithmetizationParams,
-                        plonk_column<FieldType>>;
+                using plonk_assignment_table = plonk_table<FieldType, ArithmetizationParams, plonk_column<FieldType>>;
 
                 template<typename FieldType, typename ArithmetizationParams>
                 using plonk_private_polynomial_table =
-                    plonk_private_table<FieldType, ArithmetizationParams,
-                        math::polynomial<typename FieldType::value_type>>;
+                    plonk_private_table<FieldType,
+                                        ArithmetizationParams,
+                                        math::polynomial<typename FieldType::value_type>>;
 
                 template<typename FieldType, typename ArithmetizationParams>
                 using plonk_public_polynomial_table =
-                    plonk_public_table<FieldType, ArithmetizationParams,
-                        math::polynomial<typename FieldType::value_type>>;
+                    plonk_public_table<FieldType,
+                                       ArithmetizationParams,
+                                       math::polynomial<typename FieldType::value_type>>;
 
                 template<typename FieldType, typename ArithmetizationParams>
                 using plonk_polynomial_table =
-                    plonk_table<FieldType, ArithmetizationParams,
-                        math::polynomial<typename FieldType::value_type>>;
+                    plonk_table<FieldType, ArithmetizationParams, math::polynomial<typename FieldType::value_type>>;
 
                 template<typename FieldType, typename ArithmetizationParams>
                 using plonk_private_polynomial_dfs_table =
-                    plonk_private_table<FieldType, ArithmetizationParams,
-                        math::polynomial_dfs<typename FieldType::value_type>>;
+                    plonk_private_table<FieldType,
+                                        ArithmetizationParams,
+                                        math::polynomial_dfs<typename FieldType::value_type>>;
 
                 template<typename FieldType, typename ArithmetizationParams>
                 using plonk_public_polynomial_dfs_table =
-                    plonk_public_table<FieldType, ArithmetizationParams,
-                        math::polynomial_dfs<typename FieldType::value_type>>;
+                    plonk_public_table<FieldType,
+                                       ArithmetizationParams,
+                                       math::polynomial_dfs<typename FieldType::value_type>>;
 
                 template<typename FieldType, typename ArithmetizationParams>
                 using plonk_polynomial_dfs_table =
-                    plonk_table<FieldType, ArithmetizationParams,
-                        math::polynomial_dfs<typename FieldType::value_type>>;
+                    plonk_table<FieldType, ArithmetizationParams, math::polynomial_dfs<typename FieldType::value_type>>;
 
             }    // namespace snark
         }        // namespace zk

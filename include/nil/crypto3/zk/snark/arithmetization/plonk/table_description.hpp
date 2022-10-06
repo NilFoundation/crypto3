@@ -36,40 +36,29 @@ namespace nil {
 
                 template<typename FieldType, typename ArithmetizationParams>
                 struct plonk_table_description {
-                    constexpr static const std::size_t witness_columns =
-                        ArithmetizationParams::WitnessColumns;
-                    constexpr static const std::size_t public_input_columns =
-                        ArithmetizationParams::PublicInputColumns;
-                    constexpr static const std::size_t constant_columns =
-                        ArithmetizationParams::ConstantColumns;
-                    constexpr static const std::size_t selector_columns =
-                        ArithmetizationParams::SelectorColumns;
+                    constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
+                    constexpr static const std::size_t public_input_columns = ArithmetizationParams::public_input_columns;
+                    constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
+                    constexpr static const std::size_t selector_columns = ArithmetizationParams::selector_columns;
 
                     std::size_t rows_amount = 0;
                     std::size_t usable_rows_amount = 0;
 
                     std::size_t global_index(const plonk_variable<FieldType> &a) const {
-                        switch (a.type)
-                        {
-                        case plonk_variable<FieldType>::column_type::witness:
-                            return a.index;
-                        case plonk_variable<FieldType>::column_type::public_input:
-                            return witness_columns + a.index;
-                        case plonk_variable<FieldType>::column_type::constant:
-                            return witness_columns +
-                            public_input_columns + a.index;
-                        case plonk_variable<FieldType>::column_type::selector:
-                            return witness_columns +
-                            public_input_columns +
-                            constant_columns + a.index;
+                        switch (a.type) {
+                            case plonk_variable<FieldType>::column_type::witness:
+                                return a.index;
+                            case plonk_variable<FieldType>::column_type::public_input:
+                                return witness_columns + a.index;
+                            case plonk_variable<FieldType>::column_type::constant:
+                                return witness_columns + public_input_columns + a.index;
+                            case plonk_variable<FieldType>::column_type::selector:
+                                return witness_columns + public_input_columns + constant_columns + a.index;
                         }
                     }
 
                     std::size_t table_width() const {
-                        return witness_columns +
-                            public_input_columns +
-                            constant_columns +
-                            selector_columns;
+                        return witness_columns + public_input_columns + constant_columns + selector_columns;
                     }
                 };
 
@@ -85,27 +74,20 @@ namespace nil {
                     std::size_t usable_rows_amount = 0;
 
                     std::size_t global_index(const plonk_variable<FieldType> &a) const {
-                        switch (a.type)
-                        {
-                        case plonk_variable<FieldType>::column_type::witness:
-                            return a.index;
-                        case plonk_variable<FieldType>::column_type::public_input:
-                            return witness_columns + a.index;
-                        case plonk_variable<FieldType>::column_type::constant:
-                            return witness_columns +
-                            public_input_columns + a.index;
-                        case plonk_variable<FieldType>::column_type::selector:
-                            return witness_columns +
-                            public_input_columns +
-                            constant_columns + a.index;
+                        switch (a.type) {
+                            case plonk_variable<FieldType>::column_type::witness:
+                                return a.index;
+                            case plonk_variable<FieldType>::column_type::public_input:
+                                return witness_columns + a.index;
+                            case plonk_variable<FieldType>::column_type::constant:
+                                return witness_columns + public_input_columns + a.index;
+                            case plonk_variable<FieldType>::column_type::selector:
+                                return witness_columns + public_input_columns + constant_columns + a.index;
                         }
                     }
 
                     std::size_t table_width() const {
-                        return witness_columns +
-                            public_input_columns +
-                            constant_columns +
-                            selector_columns;
+                        return witness_columns + public_input_columns + constant_columns + selector_columns;
                     }
                 };
 #endif

@@ -138,7 +138,7 @@ namespace nil {
                         static qap_instance_evaluation<FieldType>
                             instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                          const typename FieldType::value_type &t) {
-                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain =
+                            const std::shared_ptr<math::evaluation_domain<FieldType>> domain = 
                                 math::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                             std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
