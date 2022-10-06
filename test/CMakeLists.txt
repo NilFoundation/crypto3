@@ -124,6 +124,8 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/exponentiation"
     "algebra/fields/plonk/sqrt"
     "algebra/fields/plonk/range_check"
+    "verifiers/pickles/verify_heterogenous_scalar"
+    "verifiers/pickles/verify_heterogenous_base"
     )
 
 set(FIELDS_TESTS_FILES
