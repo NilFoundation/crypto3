@@ -142,6 +142,22 @@ namespace nil {
                 std::size_t selector_index = 0;
             public:
                 blueprint_public_assignment_table(
+                        std::array<std::vector<typename BlueprintFieldType::value_type>, ArithmetizationParams::public_input_columns> public_input_columns,
+                        std::array<std::vector<typename BlueprintFieldType::value_type>, ArithmetizationParams::constant_columns> constant_columns,
+                        std::array<std::vector<typename BlueprintFieldType::value_type>, ArithmetizationParams::selector_columns> selector_columns,
+                        snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description_in,
+                        std::map<std::size_t, std::size_t> selector_map_in,
+                        std::size_t next_selector_index_in, std::size_t allocated_public_input_rows_in,
+                        std::size_t selector_index_in) :
+                        snark::plonk_public_assignment_table<BlueprintFieldType, ArithmetizationParams>(
+                                public_input_columns, constant_columns, selector_columns),
+                        _table_description(table_description_in), selector_map(selector_map_in),
+                        next_selector_index(next_selector_index_in),
+                        allocated_public_input_rows(allocated_public_input_rows_in),
+                        selector_index(selector_index_in) {
+                }
+
+                blueprint_public_assignment_table(
                         snark::plonk_table_description<BlueprintFieldType,
                                 ArithmetizationParams> &table_description) :
                         snark::plonk_public_assignment_table<BlueprintFieldType,
