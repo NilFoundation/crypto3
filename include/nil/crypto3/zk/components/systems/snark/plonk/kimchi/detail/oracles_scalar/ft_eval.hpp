@@ -92,13 +92,14 @@ namespace nil {
 
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
+                        row += 2; // skip rows for constant in zkpm
                         row += zkpm_eval_component::rows_amount;
                         row += sub_component::rows_amount;
 
                         row += add_component::rows_amount;
                         row += 3 * mul_component::rows_amount;
 
-                        for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
                             row += 2 * mul_component::rows_amount;
                             row += 2 * add_component::rows_amount;
                         }
@@ -141,25 +142,23 @@ namespace nil {
 
                     struct params_type {
                         verifier_index_type &verifier_index;
-                        var zeta_pow_n;
                         std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers;
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount>
                             combined_evals;
                         var gamma;
                         var beta;
-                        std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, eval_points_amount>
-                            evals;
                         var zeta;
+                        var zeta_pow_n;
                         var joint_combiner;
-                        std::array<std::optional<var>, eval_points_amount> public_eval;
+                        std::array<var, eval_points_amount> public_eval;
                     };
 
                     struct result_type {
                         var output;
 
                         result_type(std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
-                            output = typename mul_component::result_type(row).output;
+                            std::size_t row = component_start_row + rows_amount - sub_component::rows_amount;
+                            output = typename sub_component::result_type(row).output;
                         }
                     };
 
@@ -174,6 +173,8 @@ namespace nil {
                         var zero(0, start_row_index, false, var::column_type::constant);
                         var one(0, start_row_index + 1, false, var::column_type::constant);
 
+                        row += 2; // skip rows for constant in zkpm
+
                         // zkp = index.zkpm().evaluate(&zeta);
                         var zkp =
                             zkpm_eval_component::generate_circuit(
@@ -182,16 +183,15 @@ namespace nil {
                                 .output;
                         row += zkpm_eval_component::rows_amount;
 
-                        // zeta1m1 = zeta1 - ScalarField::<G>::one();
-                        var zeta1m1 =
-                            zk::components::generate_circuit<sub_component>(bp, assignment, {params.zeta, one}, row)
-                                .output;
+                        // zeta1m1 = zeta_pow_n - ScalarField::<G>::one();
+                        var zeta1m1 = zk::components::generate_circuit<sub_component>(bp, 
+                            assignment, {params.zeta_pow_n, one}, row).output;
                         row += sub_component::rows_amount;
 
                         // get alpha0, alpha1, alpha2
                         std::pair<std::size_t, std::size_t> alpha_idxs =
                             index_terms_list::alpha_map(argument_type::Permutation);
-                        assert(alpha_idxs.second >= alpha_idxs.first + 3);
+                        assert(alpha_idxs.second >= 3);
                         var alpha0 = params.alpha_powers[alpha_idxs.first];
                         var alpha1 = params.alpha_powers[alpha_idxs.first + 1];
                         var alpha2 = params.alpha_powers[alpha_idxs.first + 2];
@@ -203,9 +203,8 @@ namespace nil {
                                 {params.combined_evals[0].w[KimchiParamsType::permut_size - 1], params.gamma}, row)
                                 .output;
                         row += add_component::rows_amount;
-                        init = zk::components::generate_circuit<mul_component>(bp, assignment,
-                                                                               {init, params.combined_evals[0].z}, row)
-                                   .output;
+                        init  = zk::components::generate_circuit<mul_component>(bp, 
+                            assignment, {init, params.combined_evals[1].z}, row).output;
                         row += mul_component::rows_amount;
                         init =
                             zk::components::generate_circuit<mul_component>(bp, assignment, {init, alpha0}, row).output;
@@ -220,7 +219,7 @@ namespace nil {
                         //         .map(|(w, s)| (beta * s) + w + gamma)
                         //         .fold(init, |x, y| x * y);
                         var ft_eval0 = init;
-                        for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
                             var w = params.combined_evals[0].w[i];
                             var s = params.combined_evals[0].s[i];
                             var beta_s =
@@ -242,10 +241,9 @@ namespace nil {
                         }
 
                         // ft_eval0 - p_eval[0]
-                        if (params.public_eval[0].has_value()) {
-                            var ft_eval0 = zk::components::generate_circuit<sub_component>(
-                                               bp, assignment, {ft_eval0, params.public_eval[0].value()}, row)
-                                               .output;
+                        if (KimchiParamsType::public_input_size > 0) {
+                            var ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
+                                assignment, {ft_eval0, params.public_eval[0]}, row).output;
                             row += sub_component::rows_amount;
                         }
 
@@ -403,6 +401,8 @@ namespace nil {
                         var zero(0, start_row_index, false, var::column_type::constant);
                         var one(0, start_row_index + 1, false, var::column_type::constant);
 
+                        row += 2; // skip rows for constant in zkpm
+
                         // zkp = index.zkpm().evaluate(&zeta);
                         var zkp =
                             zkpm_eval_component::generate_assignments(
@@ -411,14 +411,15 @@ namespace nil {
                                 .output;
                         row += zkpm_eval_component::rows_amount;
 
-                        // zeta1m1 = zeta1 - ScalarField::<G>::one();
-                        var zeta1m1 = sub_component::generate_assignments(assignment, {params.zeta, one}, row).output;
+                        // zeta1m1 = zeta_pow_n - ScalarField::<G>::one();
+                        var zeta1m1 = sub_component::generate_assignments(
+                            assignment, {params.zeta_pow_n, one}, row).output;
                         row += sub_component::rows_amount;
 
                         // get alpha0, alpha1, alpha2
                         std::pair<std::size_t, std::size_t> alpha_idxs =
                             index_terms_list::alpha_map(argument_type::Permutation);
-                        assert(alpha_idxs.second >= alpha_idxs.first + 3);
+                        assert(alpha_idxs.second >= 3);
                         var alpha0 = params.alpha_powers[alpha_idxs.first];
                         var alpha1 = params.alpha_powers[alpha_idxs.first + 1];
                         var alpha2 = params.alpha_powers[alpha_idxs.first + 2];
@@ -430,8 +431,8 @@ namespace nil {
                                 {params.combined_evals[0].w[KimchiParamsType::permut_size - 1], params.gamma}, row)
                                 .output;
                         row += add_component::rows_amount;
-                        init = mul_component::generate_assignments(assignment, {init, params.combined_evals[0].z}, row)
-                                   .output;
+                        init  = mul_component::generate_assignments(
+                            assignment, {init, params.combined_evals[1].z}, row).output;
                         row += mul_component::rows_amount;
                         init = mul_component::generate_assignments(assignment, {init, alpha0}, row).output;
                         row += mul_component::rows_amount;
@@ -445,7 +446,7 @@ namespace nil {
                         //         .map(|(w, s)| (beta * s) + w + gamma)
                         //         .fold(init, |x, y| x * y);
                         var ft_eval0 = init;
-                        for (std::size_t i = 0; i < KimchiParamsType::permut_size; i++) {
+                        for (std::size_t i = 0; i < KimchiParamsType::permut_size - 1; i++) {
                             var w = params.combined_evals[0].w[i];
                             var s = params.combined_evals[0].s[i];
                             var beta_s = mul_component::generate_assignments(assignment, {params.beta, s}, row).output;
@@ -461,10 +462,9 @@ namespace nil {
                         }
 
                         // ft_eval0 - p_eval[0]
-                        if (params.public_eval[0].has_value()) {
+                        if (KimchiParamsType::public_input_size > 0) {
                             var ft_eval0 = sub_component::generate_assignments(
-                                               assignment, {ft_eval0, params.public_eval[0].value()}, row)
-                                               .output;
+                                assignment, {ft_eval0, params.public_eval[0]}, row).output;
                             row += sub_component::rows_amount;
                         }
 

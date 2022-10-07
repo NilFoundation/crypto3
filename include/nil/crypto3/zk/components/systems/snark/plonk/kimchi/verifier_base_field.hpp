@@ -76,7 +76,7 @@ namespace nil {
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                     using const_mul_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
                     using table_comm_component =
-                        zk::components::table_commitment<ArithmetizationType, KimchiParamsType, W0, W1, W2, W3, W4, W5,
+                        zk::components::table_commitment<ArithmetizationType, KimchiParamsType, CurveType, W0, W1, W2, W3, W4, W5,
                                                          W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using proof_type = kimchi_proof_base<BlueprintFieldType, KimchiParamsType>;
@@ -567,7 +567,7 @@ namespace nil {
 
                                 evaluations[eval_idx++] = table_comm_component::generate_assignments(
                                                               assignment,
-                                                              {params.verifier_index.comm.lookup_table, joint_combiner,
+                                                              {params.verifier_index.comm.lookup_table, params.fr_data.joint_combiner_powers_prepared,
                                                                params.proofs[i].comm.lookup_runtime},
                                                               row)
                                                               .output;
@@ -815,7 +815,7 @@ namespace nil {
 
                                 evaluations[eval_idx++] = table_comm_component::generate_circuit(
                                                               bp, assignment,
-                                                              {params.verifier_index.comm.lookup_table, joint_combiner,
+                                                              {params.verifier_index.comm.lookup_table, params.fr_data.joint_combiner_powers_prepared,
                                                                params.proofs[i].comm.lookup_runtime},
                                                               row)
                                                               .output;

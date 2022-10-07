@@ -90,6 +90,7 @@ set(PLONK_TESTS_FILES
     "verifiers/kimchi/prepare_batch_scalar"
     "verifiers/kimchi/verify_scalar"
     "verifiers/kimchi/basic_verifier"
+    "verifiers/kimchi/table_commitment"
     "verifiers/kimchi/demo_verifier"
     "verifiers/kimchi/oracles_scalar"
     "verifiers/kimchi/batch_verify_base_field"
@@ -123,6 +124,8 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/exponentiation"
     "algebra/fields/plonk/sqrt"
     "algebra/fields/plonk/range_check"
+    "verifiers/pickles/verify_heterogenous_scalar"
+    "verifiers/pickles/verify_heterogenous_base"
     )
 
 set(FIELDS_TESTS_FILES

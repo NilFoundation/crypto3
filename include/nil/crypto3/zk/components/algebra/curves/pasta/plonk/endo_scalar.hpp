@@ -139,9 +139,9 @@ namespace nil {
 
                         std::size_t row = start_row_index;
 
-                        std::size_t crumbs_per_row = 8;
-                        std::size_t bits_per_crumb = 2;
-                        std::size_t bits_per_row =
+                        const std::size_t crumbs_per_row = 8;
+                        const std::size_t bits_per_crumb = 2;
+                        const std::size_t bits_per_row =
                             bits_per_crumb * crumbs_per_row;    // we suppose that ScalarSize % bits_per_row = 0
 
                         typename BlueprintFieldType::value_type scalar = assignment.var_value(params.scalar);
@@ -150,18 +150,24 @@ namespace nil {
                         std::array<bool, ScalarSize> bits_msb;
                         {
                             nil::marshalling::status_type status;
+                            assert(ScalarSize <= 255);
+
                             std::array<bool, 255> bits_msb_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_scalar, status);
-                            if (status == nil::marshalling::status_type::success) {
-                                std::copy(bits_msb_all.end() - ScalarSize, bits_msb_all.end(), bits_msb.begin());
-                            } else {
-                                return {};
+                            
+                            assert(status == nil::marshalling::status_type::success);
+
+                            std::copy(bits_msb_all.end() - ScalarSize, bits_msb_all.end(), bits_msb.begin());
+                            
+                            for(std::size_t i = 0; i < 255 - ScalarSize; ++i) {
+                                assert(bits_msb_all[i] == false);
                             }
                         }
                         typename BlueprintFieldType::value_type a = 2;
                         typename BlueprintFieldType::value_type b = 2;
                         typename BlueprintFieldType::value_type n = 0;
 
+                        assert (ScalarSize % bits_per_row == 0);
                         for (std::size_t chunk_start = 0; chunk_start < bits_msb.size(); chunk_start += bits_per_row) {
                             assignment.witness(W0)[row] = n;
                             assignment.witness(W2)[row] = a;

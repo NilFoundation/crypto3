@@ -67,10 +67,10 @@ namespace nil {
                     constexpr static const std::size_t selector_seed = 0xf20;
 
                 public:
-                    constexpr static const std::size_t rows_amount =
-                        EvalRounds * mul_component::rows_amount +
-                        EvalRounds *
-                            (mul_component::rows_amount + add_component::rows_amount + mul_component::rows_amount);
+                    constexpr static const std::size_t rows_amount = (EvalRounds - 1) * mul_component::rows_amount
+                        + EvalRounds * (
+                            mul_component::rows_amount + add_component::rows_amount + mul_component::rows_amount
+                        );
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {

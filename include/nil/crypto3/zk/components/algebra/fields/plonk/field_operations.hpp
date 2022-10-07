@@ -580,8 +580,8 @@ namespace nil {
                         } else {
                             assignment.witness(W2)[j] = 0;
                         }
-                        assignment.witness(3)[j] =
-                            assignment.var_value(params.y) == 0 ? 0 : assignment.var_value(params.y).inversed();
+
+                        assignment.witness(W3)[j] = assignment.var_value(params.y) == 0 ? 0 : assignment.var_value(params.y).inversed();
                         assignment.witness(W4)[j] = assignment.var_value(params.y) * assignment.witness(W3)[j];
 
                         return result_type(params, start_row_index);
