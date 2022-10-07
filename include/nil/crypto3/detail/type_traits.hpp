@@ -135,16 +135,11 @@ namespace nil {
 
             template<typename T>
             struct is_codec {
-                static const bool value = has_type_encoded_value_type<T>::value &&
-                                          has_static_member_data_encoded_value_bits<T, const std::size_t>::value &&
-                                          has_type_decoded_value_type<T>::value &&
-                                          has_static_member_data_decoded_value_bits<T, const std::size_t>::value &&
-                                          has_type_encoded_block_type<T>::value &&
-                                          has_static_member_data_encoded_block_bits<T, const std::size_t>::value &&
-                                          has_type_decoded_block_type<T>::value &&
-                                          has_static_member_data_decoded_block_bits<T, const std::size_t>::value &&
-                                          has_member_function_encode<T, typename T::block_type>::value &&
-                                          has_member_function_decode<T, typename T::block_type>::value;
+                static const bool value = has_encoded_value_type<T>::value && has_encoded_value_bits<T>::value &&
+                                          has_decoded_value_type<T>::value && has_decoded_value_bits<T>::value &&
+                                          has_encoded_block_type<T>::value && has_encoded_block_bits<T>::value &&
+                                          has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value &&
+                                          has_encode<T>::value && has_decode<T>::value;
                 typedef T type;
             };
 
