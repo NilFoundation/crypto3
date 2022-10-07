@@ -52,7 +52,8 @@ namespace nil {
          *
          * @return Output iterator to the element in the destination range, one past the last element inserted.
          */
-        template<typename Decoder, typename InputIterator, typename OutputIterator>
+        template<typename Decoder, typename InputIterator, typename OutputIterator, typename std::enable_if<
+                detail::is_codec<Decoder>::value, bool>::type = true>
         typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(InputIterator first, InputIterator last, OutputIterator out) {
 
@@ -87,7 +88,8 @@ namespace nil {
          */
         template<typename Decoder,
                  typename InputIterator,
-                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>, typename std::enable_if<
+                        detail::is_codec<Decoder>::value, bool>::type = true>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> decode(InputIterator first,
                                                                                                   InputIterator last) {
 
@@ -116,7 +118,8 @@ namespace nil {
          */
         template<typename Decoder,
                  typename InputIterator,
-                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>, typename std::enable_if<
+                        detail::is_codec<Decoder>::value, bool>::type = true>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
             decode(InputIterator first, InputIterator last, CodecAccumulator &acc) {
@@ -143,7 +146,8 @@ namespace nil {
          * @param out Defines the beginning of destination range.
          * @return CodecAccumulator AccumulatorSet non-const reference equal to acc.
          */
-        template<typename Decoder, typename SinglePassRange, typename OutputIterator>
+        template<typename Decoder, typename SinglePassRange, typename OutputIterator, typename std::enable_if<
+                detail::is_codec<Decoder>::value, bool>::type = true>
         typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(const SinglePassRange &rng, OutputIterator out) {
 
@@ -174,7 +178,8 @@ namespace nil {
          */
         template<typename Decoder,
                  typename SinglePassRange,
-                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>, typename std::enable_if<
+                        detail::is_codec<Decoder>::value, bool>::type = true>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
             decode(const SinglePassRange &rng, CodecAccumulator &acc) {
@@ -205,7 +210,8 @@ namespace nil {
          */
         template<typename Decoder,
                  typename SinglePassRange,
-                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>, typename std::enable_if<
+                        detail::is_codec<Decoder>::value, bool>::type = true>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>>
             decode(const SinglePassRange &r) {
 
@@ -231,7 +237,8 @@ namespace nil {
          * @param out Defines the beginning of destination range.
          * @return CodecAccumulator AccumulatorSet non-const reference equal to acc.
          */
-        template<typename Decoder, typename T, typename OutputIterator>
+        template<typename Decoder, typename T, typename OutputIterator, typename std::enable_if<
+                detail::is_codec<Decoder>::value, bool>::type = true>
         typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(std::initializer_list<T> rng, OutputIterator out) {
 
@@ -262,7 +269,8 @@ namespace nil {
          */
         template<typename Decoder,
                  typename T,
-                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>, typename std::enable_if<
+                        detail::is_codec<Decoder>::value, bool>::type = true>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
             decode(std::initializer_list<T> rng, CodecAccumulator &acc) {
@@ -293,7 +301,8 @@ namespace nil {
          */
         template<typename Decoder,
                  typename T,
-                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>, typename std::enable_if<
+                        detail::is_codec<Decoder>::value, bool>::type = true>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>>
             decode(std::initializer_list<T> r) {
 
