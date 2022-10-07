@@ -25,54 +25,64 @@
 #ifndef CRYPTO3_TYPE_TRAITS_HPP
 #define CRYPTO3_TYPE_TRAITS_HPP
 
-#define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
-                                                                                      \
-    template<class T>                                                                 \
-    class HasMemberType_##Type {                                                      \
-    private:                                                                          \
-        using Yes = char[2];                                                          \
-        using No = char[1];                                                           \
-                                                                                      \
-        struct Fallback {                                                             \
-            struct Type { };                                                          \
-        };                                                                            \
-        struct Derived : T, Fallback { };                                             \
-                                                                                      \
-        template<class U>                                                             \
-        static No &test(typename U::Type *);                                          \
-        template<typename U>                                                          \
-        static Yes &test(U *);                                                        \
-                                                                                      \
-    public:                                                                           \
-        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes); \
-    };                                                                                \
-                                                                                      \
-    template<class T>                                                                 \
+#define GENERATE_HAS_MEMBER_TYPE(Type)                                                                                 \
+    template<class T, typename Enable = void>                                                                          \
+    class HasMemberType_##Type {                                                                                       \
+    public:                                                                                                            \
+        static constexpr bool RESULT = false;                                                                          \
+    };                                                                                                                 \
+                                                                                                                       \
+    template<class T>                                                                                                  \
+    class HasMemberType_##Type<T, typename std::enable_if<std::is_class<T>::value || std::is_union<T>::value>::type> { \
+    private:                                                                                                           \
+        using Yes = char[2];                                                                                           \
+        using No = char[1];                                                                                            \
+                                                                                                                       \
+        struct Fallback {                                                                                              \
+            struct Type { };                                                                                           \
+        };                                                                                                             \
+        struct Derived : T, Fallback { };                                                                              \
+                                                                                                                       \
+        template<class U>                                                                                              \
+        static No &test(typename U::Type *);                                                                           \
+        template<typename U>                                                                                           \
+        static Yes &test(U *);                                                                                         \
+                                                                                                                       \
+    public:                                                                                                            \
+        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes);                                  \
+    };                                                                                                                 \
+                                                                                                                       \
+    template<class T>                                                                                                  \
     struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> { };
 
-#define GENERATE_HAS_MEMBER(member)                                                   \
-                                                                                      \
-    template<class T>                                                                 \
-    class HasMember_##member {                                                        \
-    private:                                                                          \
-        using Yes = char[2];                                                          \
-        using No = char[1];                                                           \
-                                                                                      \
-        struct Fallback {                                                             \
-            int member;                                                               \
-        };                                                                            \
-        struct Derived : T, Fallback { };                                             \
-                                                                                      \
-        template<class U>                                                             \
-        static No &test(decltype(U::member) *);                                       \
-        template<typename U>                                                          \
-        static Yes &test(U *);                                                        \
-                                                                                      \
-    public:                                                                           \
-        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes); \
-    };                                                                                \
-                                                                                      \
-    template<class T>                                                                 \
+#define GENERATE_HAS_MEMBER(member)                                                                                  \
+    template<class T, typename Enable = void>                                                                        \
+    class HasMember_##member {                                                                                       \
+    public:                                                                                                          \
+        static constexpr bool RESULT = false;                                                                        \
+    };                                                                                                               \
+                                                                                                                     \
+    template<class T>                                                                                                \
+    class HasMember_##member<T, typename std::enable_if<std::is_class<T>::value || std::is_union<T>::value>::type> { \
+    private:                                                                                                         \
+        using Yes = char[2];                                                                                         \
+        using No = char[1];                                                                                          \
+                                                                                                                     \
+        struct Fallback {                                                                                            \
+            int member;                                                                                              \
+        };                                                                                                           \
+        struct Derived : T, Fallback { };                                                                            \
+                                                                                                                     \
+        template<class U>                                                                                            \
+        static No &test(decltype(U::member) *);                                                                      \
+        template<typename U>                                                                                         \
+        static Yes &test(U *);                                                                                       \
+                                                                                                                     \
+    public:                                                                                                          \
+        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes);                                \
+    };                                                                                                               \
+                                                                                                                     \
+    template<class T>                                                                                                \
     struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
 
 #define GENERATE_HAS_MEMBER_FUNCTION(Function, ...)                                  \
@@ -210,11 +220,11 @@ namespace nil {
             GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
             GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
 
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, block_type)
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, block_type)
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, encoded_block_type);
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, decoded_block_type);
 
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type)
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type)
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type);
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type);
 
             GENERATE_HAS_MEMBER_FUNCTION(generate)
             GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
