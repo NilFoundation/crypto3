@@ -244,11 +244,11 @@ namespace nil {
             GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
             GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
 
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, block_type)
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, block_type)
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, encoded_block_type);
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, decoded_block_type);
 
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type)
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type)
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type);
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type);
 
             GENERATE_HAS_MEMBER_FUNCTION(generate)
             GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
@@ -312,6 +312,7 @@ namespace nil {
                                           has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value &&
                                           has_encode<T>::value && has_decode<T>::value;
                 typedef T type;
+
             };
 
             template<typename T>
