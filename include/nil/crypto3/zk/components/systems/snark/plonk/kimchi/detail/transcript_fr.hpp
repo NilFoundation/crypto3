@@ -71,8 +71,8 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
-                    const std::size_t HIGH_ENTROPY_LIMBS = 2;
+                    static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
+                    static const std::size_t HIGH_ENTROPY_LIMBS = 2;
 
                     using sponge_component = kimchi_sponge<ArithmetizationType,
                                                            CurveType,

@@ -169,7 +169,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i < kimchi_constants::evaluations_in_batch_size; i++) {
                                 for (std::size_t j = 0;
-                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split + 1;
+                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split;
                                      j++) {
                                     row += mul_component::rows_amount;
 
@@ -359,9 +359,9 @@ namespace nil {
 
                             var xi_i = one;
                             for (std::size_t i = 0; i < kimchi_constants::evaluations_in_batch_size; i++) {
-                                // iterating over the polynomial segments + shifted part
+                                // iterating over the polynomial segments
                                 for (std::size_t j = 0;
-                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split + 1;
+                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split;
                                      j++) {
 
                                     // rand_base_i_c_i * xi_i
@@ -548,9 +548,9 @@ namespace nil {
 
                             var xi_i = one;
                             for (std::size_t i = 0; i < kimchi_constants::evaluations_in_batch_size; i++) {
-                                // iterating over the polynomial segments + shifted part
+                                // iterating over the polynomial segments
                                 for (std::size_t j = 0;
-                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split + 1;
+                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split;
                                      j++) {
 
                                     // rand_base_i_c_i * xi_i
