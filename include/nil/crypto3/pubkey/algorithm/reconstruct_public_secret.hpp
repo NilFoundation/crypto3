@@ -42,7 +42,7 @@ namespace nil {
 
             template<typename Scheme>
             using public_secret_reconstructing_processing_mode =
-                typename modes::isomorphic<Scheme>::template bind<public_secret_reconstructing_policy<Scheme>>::type
+                typename modes::isomorphic<Scheme>::template bind<public_secret_reconstructing_policy<Scheme>>::type;
         }    // namespace pubkey
 
         /*!
