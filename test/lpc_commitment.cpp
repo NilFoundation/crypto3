@@ -66,6 +66,58 @@
 
 using namespace nil::crypto3;
 
+template<typename ValueType, std::size_t N>
+typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::array<ValueType, N>>>::type
+    generate_random_data(std::size_t leaf_number) {
+    std::vector<std::array<ValueType, N>> v;
+    for (std::size_t i = 0; i < leaf_number; ++i) {
+        std::array<ValueType, N> leaf;
+        std::generate(std::begin(leaf), std::end(leaf),
+                      [&]() { return std::rand() % (std::numeric_limits<ValueType>::max() + 1); });
+        v.emplace_back(leaf);
+    }
+    return v;
+}
+
+std::vector<std::vector<std::uint8_t>>
+generate_random_data_for_merkle_tree(size_t leafs_number, size_t leaf_bytes){
+    std::vector<std::vector<std::uint8_t>> rdata(leafs_number, std::vector<std::uint8_t>(leaf_bytes));
+    std::random_device rd;
+    for (std::size_t i = 0; i < leafs_number; ++i) {
+        std::vector<uint8_t> leaf(leaf_bytes);
+        for( size_t i = 0; i < leaf_bytes; i++){
+            leaf[i] = rd() % (std::numeric_limits<std::uint8_t>::max() + 1);
+        }
+        rdata.emplace_back(leaf);
+    }    
+    return rdata;
+}
+
+template<typename FRIScheme>
+typename FRIScheme::round_proof_type generate_random_fri_round_proof(std::size_t tree_depth) {
+    std::random_device rd;
+    std::size_t leafs_number = 1 << tree_depth;
+    std::size_t leaf_size = 32;
+    typename FRIScheme::round_proof_type proof;
+
+    auto rdata1 = generate_random_data_for_merkle_tree(leafs_number, leaf_size);
+    auto tree1 = containers::make_merkle_tree<typename FRIScheme::merkle_tree_hash_type, FRIScheme::m>(rdata1.begin(), rdata1.end());
+    std::size_t idx1 = rd() % leafs_number;
+    typename FRIScheme::merkle_proof_type mp1(tree1, idx1);
+    proof.colinear_path = mp1;
+
+    auto rdata2 = generate_random_data_for_merkle_tree(leafs_number, leaf_size);
+    auto tree2 = containers::make_merkle_tree<typename FRIScheme::merkle_tree_hash_type, FRIScheme::m>(rdata2.begin(), rdata2.end());
+    std::size_t idx2 = rd() % leafs_number;
+    typename FRIScheme::merkle_proof_type mp2(tree2, idx2);
+    proof.colinear_path = mp2;
+
+    proof.T_root =
+        nil::crypto3::hash<typename FRIScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
+
+    return proof;
+}
+
 inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
     using dist_type = std::uniform_int_distribution<int>;
     static std::random_device random_engine;
@@ -86,6 +138,103 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
         }
     }
     return step_list;
+}
+
+template<typename FRIScheme> 
+typename FRIScheme::rounds_polynomials_values_type generate_random_fri_values(size_t polynomials, typename FRIScheme::params_type fri_params){
+    nil::crypto3::random::algebraic_random_device<typename FRIScheme::field_type> d;
+    typename FRIScheme::rounds_polynomials_values_type values;
+    values.resize(fri_params.step_list.size());
+    for( size_t i = 0; i < fri_params.step_list.size(); i++){
+        std::size_t coset_size = 1 << fri_params.step_list[i];
+        if constexpr(!FRIScheme::is_const_size){
+            values[i].resize(polynomials);
+        }
+        for( size_t pol = 0; pol < polynomials; pol++ ){
+            values[i][pol].resize(coset_size/FRIScheme::m);
+            for( size_t j = 0; j < coset_size/FRIScheme::m; j++){
+                values[i][pol][j][0] = d();
+                values[i][pol][j][1] = d();
+            }
+        }
+    }
+    return values;
+}
+
+template<typename FieldType>
+math::polynomial<typename FieldType::value_type> generate_random_polynomial(size_t degree){
+    math::polynomial<typename FieldType::value_type> poly;
+    poly.resize(degree);
+
+    nil::crypto3::random::algebraic_random_device<FieldType> d;
+    for (std::size_t i = 0; i < degree; ++i) {
+        poly[i] = d();
+    }
+    return poly;
+}
+
+template<typename FRIScheme>
+typename FRIScheme::proof_type generate_random_fri_proof(size_t polynomials, size_t degree, typename FRIScheme::params_type &fri_params){
+    typename FRIScheme::proof_type proof;
+
+    proof.round_proofs.resize(fri_params.step_list.size()-1);
+    for( size_t i = 0; i < fri_params.step_list.size() - 1; i++){
+        proof.round_proofs[i] = generate_random_fri_round_proof<FRIScheme>(3);
+    }
+
+    if constexpr(!FRIScheme::is_const_size){
+        proof.final_polynomials.resize(polynomials);
+    }
+    for( size_t i = 0; i < polynomials; i++){
+        proof.final_polynomials[i] = generate_random_polynomial<typename FRIScheme::field_type>(degree/(1 << (fri_params.r-1)));
+    }
+
+    proof.values = generate_random_fri_values<FRIScheme>(polynomials, fri_params);
+
+    return proof;
+}
+
+template <typename LPCScheme, typename FRIScheme>
+typename LPCScheme::proof_type generate_random_lpc_proof( 
+    size_t k,                           // number of evaluation points
+    size_t polynomials,                 // number of polynomials
+    size_t deg,                           // maximum degree of polynomials
+    typename FRIScheme::params_type f_params
+){
+    typename LPCScheme::proof_type proof;
+
+    for( size_t i = 0; i < LPCScheme::lambda; i++ ){
+        proof.fri_proof[i] = generate_random_fri_proof<FRIScheme>(polynomials, deg, f_params);
+    }
+
+    proof.T_root =
+        nil::crypto3::hash<typename FRIScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
+
+    if constexpr(!LPCScheme::is_const_size){
+        proof.z.resize(polynomials);
+    }
+
+    nil::crypto3::random::algebraic_random_device<typename LPCScheme::field_type> d;
+    for( size_t poly = 0; poly < polynomials; poly++){
+        proof.z[poly].resize(k);
+        for( size_t i = 0; i < k; i++ )
+            proof.z[poly][i] = d();
+    }
+
+    return proof;
+}
+
+/*********************************************************************************************
+ * This function is useful when you want to check if random generated proof structures are 
+ * the same size as a real proof.
+ *********************************************************************************************/
+template <typename LPCScheme>
+void test_lpc_proofs_equal_size(typename LPCScheme::proof_type proof, typename LPCScheme::proof_type proof2){
+    BOOST_CHECK(proof.fri_proof.size() == proof2.fri_proof.size());
+    BOOST_CHECK(proof.z.size() == proof2.z.size());
+    for( size_t i = 0; i < proof.z.size(); i++ ){
+        BOOST_CHECK(proof.z[i].size() == proof2.z[i].size());
+    }
 }
 
 template <typename Endianness, typename LPCScheme>
@@ -115,6 +264,8 @@ void test_lpc_proof(typename LPCScheme::proof_type &proof){
 
 BOOST_AUTO_TEST_SUITE(lpc_marshalling_test_suite)
 
+/*
+We have to do good test
 BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
     using curve_type = nil::crypto3::algebra::curves::bls12<381>;
     using field_type = typename curve_type::scalar_field_type;
@@ -127,7 +278,7 @@ BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
     constexpr static const std::size_t m = 2;
 
 //    test_lpc<field_type, hash_type, lambda, r, m, nil::marshalling::option::big_endian>(5, 6, 7, 3);
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_test) {
     // setup
@@ -181,16 +332,11 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_test) {
 
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_points = {
         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points.size(), 1, f.size(), fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -215,14 +361,14 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_skipping_layers_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
         lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> LPCScheme;
 
-    static_assert(zk::is_commitment<fri_type>::value);
+    static_assert(zk::is_commitment<FRIScheme>::value);
     static_assert(zk::is_commitment<LPCScheme>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
@@ -235,7 +381,7 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_skipping_layers_test) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -243,7 +389,6 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_skipping_layers_test) {
     fri_params.step_list = generate_random_step_list(r, 5);
 
     // commit
-
     nil::crypto3::random::algebraic_random_device<FieldType> rnd;
     math::polynomial<typename FieldType::value_type> f(d);
     std::generate(std::begin(f), std::end(f), [&rnd]() { return rnd(); });
@@ -258,7 +403,7 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_skipping_layers_test) {
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points.size(), 1, f.size(), fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -283,14 +428,14 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_dfs_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
         lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> LPCScheme;
 
-    static_assert(zk::is_commitment<fri_type>::value);
+    static_assert(zk::is_commitment<FRIScheme>::value);
     static_assert(zk::is_commitment<LPCScheme>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
@@ -303,7 +448,7 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_dfs_basic_test) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -316,16 +461,11 @@ BOOST_AUTO_TEST_CASE(marshalling_lpc_dfs_basic_test) {
     math::polynomial_dfs<typename FieldType::value_type> f;
     f.from_coefficients(f_data);
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_points = {
         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points.size(), 1, f.size(), fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -353,7 +493,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, is_const_size> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, is_const_size> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
                                                                leaf_size, is_const_size>
@@ -367,7 +507,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -379,16 +519,11 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test) {
     std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f = {
         {{1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}}};
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = {
         {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), f.size(), f[0].size(), fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -414,7 +549,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_skipping_layers_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
                                                                leaf_size, true>
@@ -428,7 +563,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_skipping_layers_test) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -445,17 +580,18 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_skipping_layers_test) {
         f_i.back() = FieldType::value_type::one();
     }
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = {
             {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
              {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    size_t max_d = 0;
+    for( size_t i = 0; i < f.size(); i++){
+        if( max_d < f[i].size() ){
+            max_d = f[i].size();
+        }
+    }
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), 2, max_d, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -482,7 +618,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_2) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
                                                                leaf_size, true>
@@ -496,7 +632,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_2) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -508,17 +644,18 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_2) {
     std::array<math::polynomial<typename FieldType::value_type>, leaf_size> f = {
         {{1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}, {1, 2, 5, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}}};
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = {
         {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
          {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    size_t max_d = 0;
+    for( size_t i = 0; i < f.size(); i++){
+        if( max_d < f[i].size() ){
+            max_d = f[i].size();
+        }
+    }
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), 2, max_d, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -545,7 +682,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_2) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, leaf_size, true> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m,
                                                                leaf_size, true>
@@ -559,7 +696,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_2) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -576,17 +713,18 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_2) {
         f[polynom_index].from_coefficients(f_data[polynom_index]);
     }
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::array<std::vector<typename FieldType::value_type>, leaf_size> evaluation_points = {
         {{algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
          {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}}};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    size_t max_d = 0;
+    for( size_t i = 0; i < f.size(); i++){
+        if( max_d < f[i].size() ){
+            max_d = f[i].size();
+        }
+    }
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), 2, max_d, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -613,7 +751,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_runtime_size) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -627,7 +765,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_runtime_size) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -639,17 +777,18 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_runtime_size) {
     std::vector<math::polynomial<typename FieldType::value_type>> f = {
         {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}, {1, 2, 5, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1}};
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::vector<std::vector<typename FieldType::value_type>> evaluation_points = {
         {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
         {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    size_t max_d = 0;
+    for( size_t i = 0; i < f.size(); i++){
+        if( max_d < f[i].size() ){
+            max_d = f[i].size();
+        }
+    }
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), 2, max_d, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -675,7 +814,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_runtime_size_skipping_la
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -689,7 +828,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_runtime_size_skipping_la
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -706,8 +845,6 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_runtime_size_skipping_la
         f_i.back() = FieldType::value_type::one();
     }
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::vector<std::vector<typename FieldType::value_type>> evaluation_points = {
         {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
@@ -716,7 +853,13 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_basic_test_runtime_size_skipping_la
     std::array<std::uint8_t, 96> x_data {};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    size_t max_d = 0;
+    for( size_t i = 0; i < f.size(); i++){
+        if( max_d < f[i].size() ){
+            max_d = f[i].size();
+        }
+    }
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), 5, max_d, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -742,7 +885,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_runtime_size) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -756,7 +899,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_runtime_size) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -773,17 +916,18 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_runtime_size) {
         f[polynom_index].from_coefficients(f_data[polynom_index]);
     }
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::vector<std::vector<typename FieldType::value_type>> evaluation_points = {
         {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
         {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    size_t max_d = 0;
+    for( size_t i = 0; i < f.size(); i++){
+        if( max_d < f[i].size() ){
+            max_d = f[i].size();
+        }
+    }
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), 2, max_d, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -809,7 +953,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_runtime_size_skippin
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0, false> FRIScheme;
 
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 0,
                                                                false>
@@ -823,7 +967,7 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_runtime_size_skippin
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
+    typename FRIScheme::params_type fri_params;
 
     fri_params.r = r;
     fri_params.D = D;
@@ -845,17 +989,18 @@ BOOST_AUTO_TEST_CASE(marshalling_batched_lpc_dfs_basic_test_runtime_size_skippin
         f[polynom_index].from_coefficients(f_data[polynom_index]);
     }
 
-    merkle_tree_type tree = zk::algorithms::precommit<LPCScheme>(f, D[0], fri_params.step_list.front());
-
     // TODO: take a point outside of the basic domain
     std::vector<std::vector<typename FieldType::value_type>> evaluation_points = {
         {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator},
         {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator}};
 
-    std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-
-    auto proof = zk::algorithms::proof_eval<LPCScheme>(evaluation_points, tree, f, fri_params, transcript);
+    size_t max_d = 0;
+    for( size_t i = 0; i < f.size(); i++){
+        if( max_d < f[i].size() ){
+            max_d = f[i].size();
+        }
+    }
+    auto proof = generate_random_lpc_proof<LPCScheme, FRIScheme>(evaluation_points[0].size(), 10, max_d, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;

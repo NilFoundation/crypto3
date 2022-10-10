@@ -34,32 +34,163 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
+#include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
-#include <nil/crypto3/marshalling/zk/types/math/non_linear_combination.hpp>
+#include <nil/crypto3/marshalling/math/types/non_linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template<typename TTypeBase, typename PlonkConstraint,
-                         typename = typename std::enable_if<
-                             std::is_same<PlonkConstraint, nil::crypto3::zk::snark::plonk_constraint<
-                                                               typename PlonkConstraint::field_type,
-                                                               typename PlonkConstraint::variable_type>>::value>::type>
+                /*********************** Plonk constraint ****************************/
+                template<typename TTypeBase, typename PlonkConstraint>
                 using plonk_constraint =
                     typename non_linear_combination<TTypeBase, typename PlonkConstraint::base_type>::type;
 
-                template<typename PlonkConstraint, typename Endianness>
+                template<typename PlonkConstraint, typename Endianness,  typename = typename std::enable_if<
+                             std::is_same<PlonkConstraint, nil::crypto3::zk::snark::plonk_constraint<
+                                                               typename PlonkConstraint::field_type,
+                                                               typename PlonkConstraint::variable_type>>::value>::type>
                 plonk_constraint<nil::marshalling::field_type<Endianness>, PlonkConstraint>
-                    fill_plonk_constraint(const PlonkConstraint &constr) {
+                fill_plonk_constraint(const PlonkConstraint &constr) {
                     return fill_non_linear_combination<typename PlonkConstraint::base_type, Endianness>(constr);
                 }
 
-                template<typename PlonkConstraint, typename Endianness>
+                template<typename PlonkConstraint, typename Endianness,  typename = typename std::enable_if<
+                             std::is_same<PlonkConstraint, nil::crypto3::zk::snark::plonk_constraint<
+                                                               typename PlonkConstraint::field_type,
+                                                               typename PlonkConstraint::variable_type>>::value>::type>
                 PlonkConstraint make_plonk_constraint(
-                    const plonk_constraint<nil::marshalling::field_type<Endianness>, PlonkConstraint> &filled_constr) {
+                    const plonk_constraint<nil::marshalling::field_type<Endianness>, PlonkConstraint> &filled_constr
+                ) {
                     return make_non_linear_combination<typename PlonkConstraint::base_type, Endianness>(filled_constr);
+                }
+
+                /*********************** Plonk lookup constraint ****************************/
+                template<typename TTypeBase, typename PlonkLookupConstraint>
+                using plonk_lookup_constraint =  nil::marshalling::types::bundle<
+                    TTypeBase, std::tuple<                  
+                        // std::vector<math::non_linear_term<VariableType>> lookup_input;          
+                        nil::marshalling::types::array_list<
+                            TTypeBase, typename non_linear_term<TTypeBase, typename PlonkLookupConstraint::non_linear_term>::type,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                        >,
+                        //  std::vector<VariableType> lookup_value;
+                        nil::crypto3::marshalling::types::variables<TTypeBase, typename PlonkLookupConstraint::field_type>
+                    >
+                >;
+
+                // Plonk_constraint and plonk_lookup_constraint are template inputs for plonk_gate types.
+                // That's why we use the same marshalling function names for them.
+                template<typename PlonkLookupConstraint, typename Endianness,  typename = typename std::enable_if<
+                             std::is_same<PlonkLookupConstraint, nil::crypto3::zk::snark::plonk_lookup_constraint<
+                                                               typename PlonkLookupConstraint::field_type,
+                                                               typename PlonkLookupConstraint::variable_type>>::value>::type>
+                plonk_lookup_constraint<nil::marshalling::field_type<Endianness>, PlonkLookupConstraint>
+                fill_plonk_constraint(const PlonkLookupConstraint &constr) {
+
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using result_type = plonk_lookup_constraint<TTypeBase, PlonkLookupConstraint>;
+
+                    nil::marshalling::types::array_list<
+                            TTypeBase, typename non_linear_term<TTypeBase, typename PlonkLookupConstraint::non_linear_term>::type,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                    > filled_lookup_input;
+                    for(std::size_t i = 0; i < constr.lookup_input.size(); i++){
+                        filled_lookup_input.value().push_back(
+                            fill_non_linear_term<typename PlonkLookupConstraint::non_linear_term, Endianness>(constr.lookup_input[i])
+                        );
+                    }
+
+                    auto filled_variables = fill_variables<typename PlonkLookupConstraint::variable_type, Endianness>(constr.lookup_value);
+
+                    return result_type(std::make_tuple(
+                        filled_lookup_input,
+                        filled_variables
+                    ));
+                }
+
+                template<typename PlonkLookupConstraint, typename Endianness,  typename = typename std::enable_if<
+                             std::is_same<PlonkLookupConstraint, nil::crypto3::zk::snark::plonk_lookup_constraint<
+                                                               typename PlonkLookupConstraint::field_type,
+                                                               typename PlonkLookupConstraint::variable_type>>::value>::type>
+                PlonkLookupConstraint make_plonk_constraint(
+                    const plonk_lookup_constraint<nil::marshalling::field_type<Endianness>, PlonkLookupConstraint> &filled_constr
+                ) {
+                    PlonkLookupConstraint lookup_constraint;
+                    auto filled_lookup_input = std::get<0>(filled_constr.value());
+                    for(size_t i = 0; i < filled_lookup_input.value().size(); i++){
+                        lookup_constraint.lookup_input.emplace_back(
+                            make_non_linear_term<typename PlonkLookupConstraint::non_linear_term, Endianness>(
+                                filled_lookup_input.value().at(i)
+                            )
+                        );
+                    }
+                    lookup_constraint.lookup_value = make_variables<typename PlonkLookupConstraint::variable_type, Endianness>(
+                        std::get<1>(filled_constr.value())
+                    );
+
+                    return lookup_constraint;
+                }
+
+                /*********************** Plonk gates constraints  ****************************/
+                /*                 Universal interface for gates marshalling                 */
+                /*****************************************************************************/
+                template <typename TTypeBase, typename Constraint, typename T=void > 
+                struct plonk_gate_constraint_base_type;
+
+                template <typename TTypeBase, typename Constraint> 
+                struct plonk_gate_constraint_base_type< TTypeBase, Constraint, nil::crypto3::zk::snark::plonk_constraint<
+                    typename Constraint::field_type,
+                    typename Constraint::variable_type
+                >>
+                {
+                    using type = plonk_constraint<TTypeBase, Constraint>;
+                };
+
+                template <typename TTypeBase, typename Constraint> 
+                struct plonk_gate_constraint_base_type< TTypeBase, Constraint, nil::crypto3::zk::snark::plonk_lookup_constraint<
+                    typename Constraint::field_type,
+                    typename Constraint::variable_type
+                >>
+                {
+                    using type = plonk_lookup_constraint<TTypeBase, Constraint>;
+                };
+
+                template <typename TTypeBase, typename Constraint> 
+                using plonk_gate_constraint = plonk_gate_constraint_base_type<TTypeBase, Constraint, Constraint>;
+
+                /*********************** Universal vector of plonk constraints as input to gate ****************************/
+                template<typename TTypeBase, typename Constraint>
+                using plonk_constraints = nil::marshalling::types::array_list<
+                    TTypeBase, 
+                    typename plonk_gate_constraint<TTypeBase, Constraint>::type,
+                    nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                >;
+
+                template<typename Constraint, typename Endianness>
+                plonk_constraints<nil::marshalling::field_type<Endianness>, Constraint>
+                fill_plonk_constraints(const std::vector<Constraint> &constraints) {
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+                    plonk_constraints<TTypeBase, Constraint> filled_constraints;
+                    for (const auto &constraint : constraints) {
+                        filled_constraints.value().push_back(fill_plonk_constraint<Constraint, Endianness>(constraint));
+                    }
+
+                    return filled_constraints;
+                }
+
+                template<typename Constraint, typename Endianness>
+                std::vector<Constraint>
+                make_plonk_constraints(const plonk_constraints<nil::marshalling::field_type<Endianness>, Constraint> &filled_constraints){
+                    std::vector<Constraint> constraints;
+                    for (auto i = 0; i < filled_constraints.value().size(); i++) {
+                        constraints.emplace_back(make_plonk_constraint<Constraint, Endianness>(filled_constraints.value().at(i)));
+                    }
+                    return constraints;
                 }
             }    // namespace types
         }        // namespace marshalling

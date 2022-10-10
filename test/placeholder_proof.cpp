@@ -225,6 +225,8 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(marshalling_real_proof)
+
+
 // using curve_type = algebra::curves::bls12<381>;
 using curve_type = algebra::curves::pallas;
 using FieldType = typename curve_type::base_field_type;
@@ -278,23 +280,22 @@ typedef commitments::fri<FieldType, placeholder_test_params::merkle_hash_type,
                          placeholder_test_params::transcript_hash_type, m, 1>
     fri_type;
 
-typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params>
-    circuit_3_params;
-
-
+typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
+    
 BOOST_AUTO_TEST_CASE(marshalling_placeholder_real_proof_pallas_test) {
-    nil::crypto3::zk::snark::circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit =
-        circuit_test_3<FieldType>();
 
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
+    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
+        circuit_test_2<FieldType>();
+
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
 //    typedef commitments::list_polynomial_commitment<FieldType,
 //        circuit_2_params::batched_commitment_params_type> lpc_type;
-    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 0, false> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type, 0, false> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
-    plonk_table_description<FieldType, typename circuit_3_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
 
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
@@ -305,24 +306,24 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_real_proof_pallas_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
         preprocessed_public_data =
-        placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
+        placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
             constraint_system, assignments.public_table(), desc,
             fri_params, columns_with_copy_constraints.size());
 
-    typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
         preprocessed_private_data =
-        placeholder_private_preprocessor<FieldType, circuit_3_params>::process(constraint_system,
+        placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
                                                                                assignments.private_table(), desc, fri_params);
 
-    placeholder_proof<FieldType, circuit_3_params> proof = placeholder_prover<FieldType, circuit_3_params>::process(
+    auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    test_placeholder_proof_marshalling<Endianness, placeholder_proof<FieldType, circuit_3_params>>(proof);
+    test_placeholder_proof_marshalling<Endianness, placeholder_proof<FieldType, circuit_2_params>>(proof);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

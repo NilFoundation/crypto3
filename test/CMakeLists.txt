@@ -67,6 +67,7 @@ set(TESTS_NAMES
     "lpc_commitment"
     "placeholder_proof"
     "plonk_gates"
+    "plonk_constraint_system"
     "eddsa")
 
 foreach(TEST_NAME ${TESTS_NAMES})

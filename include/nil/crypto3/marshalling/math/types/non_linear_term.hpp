@@ -36,8 +36,6 @@
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
-#include <nil/crypto3/marshalling/math/types/variable.hpp>
-
 #include <nil/crypto3/zk/math/non_linear_combination.hpp>
 
 namespace nil {
