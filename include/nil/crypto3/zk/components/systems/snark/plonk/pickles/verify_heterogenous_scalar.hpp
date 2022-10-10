@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/evals_of_split_evals.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/derive_plonk.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/prepare_scalars_inversion.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/oracles_cip.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly.hpp>
@@ -94,13 +95,13 @@ namespace nil {
                     using derive_plonk_component = zk::components::derive_plonk<ArithmetizationType, KimchiParamsType, W0, W1, W2, W3, W4, W5, W6,
                                                                         W7, W8, W9, W10, W11, W12, W13, W14>;
 
+                    using prepare_scalars_inversion_component = zk::components::prepare_scalars_inversion<ArithmetizationType, KimchiParamsType, evals_size, W0, W1, W2, W3, W4, W5, W6,
+                                                                        W7, W8, W9, W10, W11, W12, W13, W14>;
+
                     using cip_component =
                         zk::components::oracles_cip<ArithmetizationType, KimchiParamsType, W0, W1, W2, W3, W4, W5, W6,
                                                     W7, W8, W9, W10, W11, W12, W13, W14>;
                     
-                    using shift_to_field_component = zk::components::shift_to_field<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
-                                                                        W7, W8, W9, W10, W11, W12, W13, W14>;
-
                     constexpr static const std::size_t poly_size = 4 + (KimchiParamsType::circuit_params::used_lookup ? 1 : 0); 
 
                     constexpr static std::size_t rows() {
@@ -131,6 +132,104 @@ namespace nil {
                                          const params_type &params,
                                          const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
+
+                                                var zero = var(0, start_row_index, false, var::column_type::constant);
+                        var one = var(0, start_row_index + 1, false, var::column_type::constant);
+                        for(std::size_t i = 0; i < list_size; i++) {
+                            auto def_values_xi = endo_scalar_component::generate_circuit(bp, assignment, {params.def_values[i].xi}, row).output;
+                            row += endo_scalar_component::rows_amount;
+                            auto zeta = endo_scalar_component::generate_circuit(bp, assignment, {params.def_values[i].plonk.zeta}, row).output;
+                            row += endo_scalar_component::rows_amount;
+                            auto alpha = endo_scalar_component::generate_circuit(bp, assignment, {params.def_values[i].plonk.alpha}, row).output;
+                            row += endo_scalar_component::rows_amount;
+                            auto zetaw = zk::components::generate_circuit<mul_component>(bp, assignment, {zets, params.domain_generator}, row).output;
+                            row += mul_component::rows_amount;
+                            var min_poly_joint_combiner;
+                            if (KimchiParamsType::circuit_params::lookup_used) {
+                                min_poly_joint_combiner = endo_scalar_component::generate_circuit(bp, assignment, {params.def_values[i].plonk.joint_combiner}, row).output;
+                                row += endo_scalar_component::rows_amount;
+                            }
+                            std::array<var, poly_size> min_poly = {alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, zeta, min_poly_joint_combiner};
+                            std::array<var, poly_size> plonk0_poly= {params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta, 
+                                params.def_values[i].plonk.joint_combiner};
+                            auto tick_combined_evals = combined_evals_component::generate_circuit(bp, assignment, {params.evals[i], {zeta, zetaw}}, row).output;
+                            row += combined_evals_component::rows_amount;
+                            auto plonk = derive_plonk_component::generate_circuit(bp, assignment, {kimchi_verifier_index_scalar,
+                             params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta, 
+                                params.def_values[i].plonk.joint_combiner, tick_combined_evals}, row).output;
+                            row += derive_plonk_component::rows_amount;
+                            std::size_t bulletproofs_size = params.messages_for_next_step_proof[i].old_bulletproof_challenges.size();
+                            std::array<var, bulletproofs_size> old_bulletproof_challenges;
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                old_bulletproof_challenges[j] = endo_scalar_component::generate_circuit(bp, assignment,
+                                 {params.messages_for_next_step_proof[i].old_bulletproof_challenges[j]}, row).output;
+                                row += endo_scalar_component::rows_amount;
+                            }
+                            transcript_type bulletproofs_transcript;
+                            bulletproofs_transcript.init_circuit(bp, assignment, zero, row);
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                bulletproofs_transcript.absorb_circuit(bp, assignment, old_bulletproof_challenges[j], row);
+                                row += transcript_type::absorb_rows;
+                            }
+                            var challenges_digest = bulletproofs_transcript.challenge_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            transcript_type transcript;
+                            transcript.init_circuit(bp, assignment, zero, row);
+                            transcript.absorb_circuit(bp, assignment, challenges_digest, row);
+                            row += transcript_type::absorb_rows;
+                            transcript.absorb_circuit(bp, assignment, params.evals.ft_eval1, row);
+                            row += transcript_type::absorb_rows;
+
+                            transcript.absorb_evaluations_circuit(bp, assignment, params.evals[i].evals.public_input[0],
+                                                                 evals[i].evals.evals[0], row);
+                            row += transcript_type::absorb_evaluations_rows;
+                            transcript.absorb_evaluations_ciruit(bp, assignment, params.evals[i].evals.public_input[1],
+                                                                    evals[i].evals.evals[1], row);
+                            row += transcript_type::absorb_evaluations_rows;
+
+                            var xi_actual_challenge = transcript.challenge_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
+s
+                            var r_actual_challenge = transcript.challenge_circuit(bp, assignment, row);
+                            row += transcript_type::challenge_rows;
+
+                            var combined_inner_product_actual = cip_component::generate_circuit(bp, assignment,
+                                                                      {r_actual_challenge, min_poly, params.evals[i].ft_eval1,
+                                                                       evals[i].evals},
+                                                                      row)
+                                      .output;
+                            row += cip_component::rows_amount;
+
+                            std::array<var, bulletproofs_size> bulletproof_challenges;
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                bulletproof_challenges[j] = endo_scalar_component::generate_circuit(bp, assignment,
+                                {params.def_values[i].bulletproof_challenges[j]}, row).output;
+                                row += endo_scalar_component::rows_amount;
+                            }
+
+                            auto chal_zeta = b_poly_component::generate_circuit(
+                                        bp, assignment, {bulletproof_challenges, zeta, one}, row)
+                                        .output;
+                            row += b_poly_component::rows_amount;
+
+                            auto chal_zetaw = b_poly_component::generate_circuit(
+                                        assignment, {bp, bulletproof_challenges, zetaw, one}, row)
+                                        .output;
+                            row += b_poly_component::rows_amount;
+
+                            auto t = zk::components::generate_circuit<mul_component>(bp, assignment, {chal_zetaw, r_actual}, row).output;
+                            row += mul_component::rows_amount;
+
+                            auto b_actual = zk::components::generate_circuit<add_component>(bp, assignment, {chal_zeta, t}, row).output;
+                            row += add_component::rows_amount;
+
+                            shifted_combined_inner_product = prepare_scalars_inversion_component::generate_circuit(bp, assignment, {
+                                params.def_values[i].combined_inner_product}, row).output;
+                            row += prepare_scalars_inversion_component::rows_amount;
+                            shifted_b = prepare_scalars_inversion_component::generate_circuit(bp, assignment, {
+                                params.def_values[i].b}, row).output;
+                            row += prepare_scalars_inversion_component::rows_amount;
 
                         generate_assignments_constant(bp, assignment, params, start_row_index);
 
@@ -233,12 +332,12 @@ s
                             auto b_actual = add_component::generate_assignments(assignment, {chal_zeta, t}, row).output;
                             row += add_component::rows_amount;
 
-                            shifted_combined_inner_product = shift_to_field_component::generate_assignments(assignment, {
+                            shifted_combined_inner_product = prepare_scalars_inversion_component::generate_assignments(assignment, {
                                 params.def_values[i].combined_inner_product}, row).output;
-                            row += compute_challenges_component::rows_amount;
-                            shifted_b = shift_to_field_component::generate_assignments(assignment, {
+                            row += prepare_scalars_inversion_component::rows_amount;
+                            shifted_b = prepare_scalars_inversion_component::generate_assignments(assignment, {
                                 params.def_values[i].b}, row).output;
-                            row += compute_challenges_component::rows_amount;
+                            row += prepare_scalars_inversion_component::rows_amount;
                         }        
                         return result_type();
                     }
@@ -267,7 +366,9 @@ s
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
                             std::size_t row = component_start_row;
-                            
+                            assignment.constant(0)[row] = 0;
+                            row++;
+                            assignment.constant(0)[row] = 1;
                     }
                 };
             }    // namespace components
