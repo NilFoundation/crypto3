@@ -97,7 +97,7 @@ namespace nil {
                         struct common_data_type {
                             using field_type = FieldType;
                             using commitments_type = public_commitments_type;
-                            using columns_rotations_type = std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>;
+                            using columns_rotations_type = std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns>;
                             // marshalled
                             public_commitments_type commitments;
 
@@ -116,7 +116,7 @@ namespace nil {
                             common_data_type(
                                 std::shared_ptr<math::evaluation_domain<FieldType>> D, 
                                 public_commitments_type commts, 
-                                std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> col_rotations,
+                                std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows
                             ):  basic_domain(D),
@@ -136,7 +136,7 @@ namespace nil {
                             // Constructor for marshalling. Domain is regenerated.
                             common_data_type(
                                 public_commitments_type commts, 
-                                std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> col_rotations,
+                                std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows
                             ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()), 
