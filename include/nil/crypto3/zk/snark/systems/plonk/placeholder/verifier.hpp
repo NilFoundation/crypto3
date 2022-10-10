@@ -385,9 +385,9 @@ namespace nil {
                                                                   challenge.pow((fri_params.max_degree + 1) * i);
                         }
 
-                        typename FieldType::value_type Z_at_challenge =
-                            preprocessed_public_data.common_data.Z.evaluate(challenge);
-
+                        // Z is polynomial -1, 0 ...., 0, 1
+                        typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);
+                        
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
                             return false;
                         }

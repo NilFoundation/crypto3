@@ -218,7 +218,7 @@ namespace nil {
 
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
                         fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
-                        BOOST_ASSERT(fri_proof[round_id].target_commitment == commit<typename LPC::basic_fri>(T));
+                        BOOST_ASSERT(fri_proof[round_id].round_proofs[0].T_root == commit<typename LPC::basic_fri>(T));
                     }
 
                     return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
@@ -389,7 +389,7 @@ namespace nil {
 
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
                         fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
-                        BOOST_ASSERT(fri_proof[round_id].target_commitment == commit<typename LPC::basic_fri>(T));
+                        BOOST_ASSERT(fri_proof[round_id].round_proofs[0].T_root == commit<typename LPC::basic_fri>(T));
                     }
 
                     return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
@@ -588,7 +588,7 @@ namespace nil {
 
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
                         fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(Q, g, T, fri_params, transcript);
-                        BOOST_ASSERT(fri_proof[round_id].target_commitment == commit<typename LPC::basic_fri>(T));
+                        BOOST_ASSERT(fri_proof[round_id].round_proofs[0].T_root == commit<typename LPC::basic_fri>(T));
                     }
 
                     return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});

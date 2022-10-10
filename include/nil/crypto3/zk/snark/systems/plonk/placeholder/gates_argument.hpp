@@ -73,6 +73,7 @@ namespace nil {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
+                        F[0] = {0};
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 

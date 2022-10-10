@@ -151,9 +151,7 @@ namespace nil {
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
-                                return values == rhs.values && round_proofs == rhs.round_proofs &&
-                                       final_polynomials == rhs.final_polynomials &&
-                                       target_commitment == rhs.target_commitment;
+                                return values == rhs.values && round_proofs == rhs.round_proofs && final_polynomials == rhs.final_polynomials;
                             }
 
                             bool operator!=(const proof_type &rhs) const {
@@ -176,7 +174,6 @@ namespace nil {
 
                             std::vector<round_proof_type> round_proofs;    // 0..r-2
                             final_polynomials_type final_polynomials;
-                            commitment_type target_commitment;
 
                             rounds_polynomials_values_type values;    // y-s and colinear_values for round_proof_type
                         };
@@ -704,8 +701,7 @@ namespace nil {
                             final_polynomials[polynom_index] = f[polynom_index];
                         }
                     }
-
-                    return typename FRI::proof_type({round_proofs, final_polynomials, commit<FRI>(T), values});
+                    return typename FRI::proof_type({round_proofs, final_polynomials, values});
                 }
 
                 template<
@@ -802,7 +798,7 @@ namespace nil {
                         leaf_size = FRI::leaf_size;
                     }
 
-                    transcript(proof.target_commitment);
+                    transcript(t_polynomials);
 
                     std::size_t domain_size = fri_params.D[0]->size();
                     std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
@@ -997,10 +993,14 @@ namespace nil {
                         x = x_next;
                     }
 
-                    // auto final_root = commit(precommit(proof.final_polynomials, fri_params.D[r - 1]));
-                    // if (final_root != proof.round_proofs[r - 2].colinear_path.root()) {
-                    //     return false;
-                    // }
+                    auto final_root = commit<FRI>(precommit<FRI>(
+                        proof.final_polynomials, 
+                        fri_params.D[basis_index], 
+                        fri_params.step_list[fri_params.step_list.size()-1]
+                    ));
+                    if (final_root != proof.round_proofs[fri_params.step_list.size() - 2].colinear_path.root()) {
+                        return false;
+                    }
 
                     for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
 
