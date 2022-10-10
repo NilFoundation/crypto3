@@ -36,6 +36,7 @@
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/evals_of_split_evals.hpp>
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
@@ -47,17 +48,17 @@ namespace nil {
                 // scalar field part of verify_generogenous
                 // https://github.com/MinaProtocol/mina/blob/09348bccf281d54e6fa9dd2d8bbd42e3965e1ff5/src/lib/pickles/verify.ml#L30
                 template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
-                    std::size_t BatchSize, std::size_t list_size, std::size_t... WireIndexes>
+                    std::size_t BatchSize, std::size_t list_size, std::size_t evals_size, std::size_t... WireIndexes>
                 class verify_generogenous_scalar;
 
                 template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
-                         std::size_t BatchSize, std::size_t list_size, std::size_t W0, std::size_t W1,
+                         std::size_t BatchSize, std::size_t list_size, std::size_t evals_size, std::size_t W0, std::size_t W1,
                          std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                          std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                          std::size_t W13, std::size_t W14>
                 class verify_generogenous_scalar<
                     snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
-                    CurveType, KimchiParamsType, BatchSize, list_size,
+                    CurveType, KimchiParamsType, BatchSize, list_size, evals_size,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
@@ -70,23 +71,12 @@ namespace nil {
 
                     using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType, ScalarSize, W0, W1, W2, W3, W4, W5, W6,
                                                                         W7, W8, W9, W10, W11, W12, W13, W14>;
-                    using get_domain_generator_component = zk::components::get_domain_generator<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
-                                                                        W7, W8, W9, W10, W11, W12, W13, W14>;
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
 
-                    using to_tick_field_component = zk::components::to_tick_field<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
-                                                                        W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using combined_evals_component = zk::components::combined_evals<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
-                                                                        W7, W8, W9, W10, W11, W12, W13, W14>;
-                    
-                    using scalars_env_component = zk::components::scalars_env<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
+                    using combined_evals_component = zk::components::combined_evals<ArithmetizationType, KimchiParamsType, evals_size, W0, W1, W2, W3, W4, W5, W6,
                                                                         W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using derive_plonk_component = zk::components::derive_plonk<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
-                                                                        W7, W8, W9, W10, W11, W12, W13, W14>;
-
-                    using compute_challenges_component = zk::components::compute_challenges<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
                                                                         W7, W8, W9, W10, W11, W12, W13, W14>;
 
                     using combined_inner_product_component = zk::components::combined_inner_product<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6,
@@ -159,23 +149,27 @@ namespace nil {
                                 min_poly = {alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, zeta};
                                 plonk0_poly = {params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta};
                             }
-                            auto tick_combined_evals = combined_evals_component::generate_assignments(assignment, {params.def_values[i].plonk.gamma}, row).output;
+                            auto tick_combined_evals = combined_evals_component::generate_assignments(assignment, {params.evals[i], {zeta, zetaw}}, row).output;
                             row += combined_evals_component::rows_amount;
-                            auto tick_env = scalars_env_component::generate_assignments(assignment, {params.def_values.branch_data, min_poly, tick_combined_evals}
-                            , row).output;
-                            row += scalars_env_component::rows_amount;
-                            auto plonk = derive_plonk_component::generate_assignments(assignment, {tick_env, min_poly, plonk0_poly, tick_combined_evals}, row).output;
+                            auto plonk = derive_plonk_component::generate_assignments(assignment, {min_poly, plonk0_poly, tick_combined_evals}, row).output;
                             row += derive_plonk_component::rows_amount;
-                            auto old_bulletproof_challenges = compute_challenges_component::generate_assignments(assignment, {
-                                params.messages_for_next_step_proof[i].old_bulletproof_challenges}, row).output;
-                            row += compute_challenges_component::rows_amount;
+                            std::size_t bulletproofs_size = params.messages_for_next_step_proof[i].old_bulletproof_challenges.size();
+                            std::array<var, bulletproofs_size> old_bulletproof_challenges;
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                old_bulletproof_challenges[j] = endo_scalar_component::generate_assignments(assignment,
+                                 {params.messages_for_next_step_proof[i].old_bulletproof_challenges[j]}, row).output;
+                                row += endo_scalar_component::rows_amount;
+                            }
                             // absorb sequence
                             auto combined_inner_product_actual = combined_inner_product_component::generate_assignments(assignment, {
                                 tick_env, min_poly, params.evals[i].ft_eval1, evals[i].evals, r_actual}, row).output;
                             row += combined_inner_product_component::rows_amount;
-                            auto bulletproof_challenges = compute_challenges_component::generate_assignments(assignment, {
-                                params.def_values[i].bulletproof_challenges}, row).output;
-                            row += compute_challenges_component::rows_amount;
+                            std::array<var, bulletproofs_size> bulletproof_challenges;
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                bulletproof_challenges[j] = endo_scalar_component::generate_assignments(assignment,
+                                 {params.def_values[i].bulletproof_challenges[j]}, row).output;
+                                row += endo_scalar_component::rows_amount;
+                            }
                             //get b_actual
                             shifted_combined_inner_product = shift_to_field_component::generate_assignments(assignment, {
                                 params.def_values[i].combined_inner_product}, row).output;
