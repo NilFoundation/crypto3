@@ -122,7 +122,7 @@ namespace nil {
                     };
 
                     struct result_type {
-                        kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType> output;
+                        var output;
 
                         result_type(std::size_t component_start_row) {
                             std::size_t row = component_start_row;
