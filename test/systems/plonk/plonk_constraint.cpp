@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(plonk_constraint_basic_test) {
     constraint_type constraint9 = var(0,0).pow(1) - var(0,0);
 
     std::array<zk::snark::plonk_column<FieldType>,
-        arithmetization_params::WitnessColumns> witness_columns;
+        arithmetization_params::witness_columns> witness_columns;
     witness_columns[0] = {algebra::random_element<FieldType>()};
     witness_columns[1] = {algebra::random_element<FieldType>()};
     witness_columns[2] = {algebra::random_element<FieldType>()};

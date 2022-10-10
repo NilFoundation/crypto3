@@ -25,7 +25,7 @@
 #ifndef CRYPTO3_ZK_PROOF_OF_KNOWLEDGE_HPP
 #define CRYPTO3_ZK_PROOF_OF_KNOWLEDGE_HPP
 
-#include<nil/crypto3/zk/commitments/detail/polynomial/element_proof_of_knowledge.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/element_proof_of_knowledge.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
@@ -50,19 +50,15 @@ namespace nil {
 
                     template<typename RNG = boost::random_device>
                     static proof_type proof_eval(const scalar_field_value_type &x,
-                                            const std::vector<std::uint8_t> &transcript,
-                                            std::uint8_t personalization,
-                                            RNG&& rng = boost::random_device()) {
+                                                 const std::vector<std::uint8_t> &transcript,
+                                                 std::uint8_t personalization,
+                                                 RNG &&rng = boost::random_device()) {
                         const g1_value_type g1_s = algebra::random_element<g1_type>(rng);
                         const g1_value_type g1_s_x = x * g1_s;
                         const g2_value_type g2_s = compute_g2_s(g1_s, g1_s_x, transcript, personalization);
                         const g2_value_type g2_s_x = x * g2_s;
 
-                        return proof_type(
-                            g1_s,
-                            g1_s_x,
-                            g2_s_x
-                        );
+                        return proof_type(g1_s, g1_s_x, g2_s_x);
                     }
 
                     static bool verify_eval(const proof_type &proof,
@@ -72,35 +68,32 @@ namespace nil {
                         return verify_eval(proof, g2_s);
                     }
 
-                    static bool verify_eval(const proof_type &proof,
-                                            const g2_value_type &g2_s) {
-                        return algebra::pair_reduced<curve_type>(proof.g1_s, proof.g2_s_x) == algebra::pair_reduced<curve_type>(proof.g1_s_x, g2_s);
+                    static bool verify_eval(const proof_type &proof, const g2_value_type &g2_s) {
+                        return algebra::pair_reduced<curve_type>(proof.g1_s, proof.g2_s_x) ==
+                               algebra::pair_reduced<curve_type>(proof.g1_s_x, g2_s);
                     }
 
                     static g2_value_type compute_g2_s(const g1_value_type &g1_s,
-                                                const g1_value_type &g1_s_x,
-                                                const std::vector<std::uint8_t> &transcript,
-                                                std::uint8_t personalization) {
-                        std::vector<std::uint8_t> personalization_transcript_g1s_g1sx; 
-                    
+                                                      const g1_value_type &g1_s_x,
+                                                      const std::vector<std::uint8_t> &transcript,
+                                                      std::uint8_t personalization) {
+                        std::vector<std::uint8_t> personalization_transcript_g1s_g1sx;
+
                         personalization_transcript_g1s_g1sx.emplace_back(personalization);
 
                         std::copy(std::cbegin(transcript),
-                                    std::cend(transcript),
-                                    std::back_inserter(personalization_transcript_g1s_g1sx));
-                        
-                        auto g1_s_blob = serialize_g1_uncompressed(g1_s);
-                        std::copy(std::cbegin(g1_s_blob),
-                                    std::cend(g1_s_blob),
-                                    std::back_inserter(g1_s_blob));
-                        
-                        auto g1_s_x_blob = serialize_g1_uncompressed(g1_s_x);
-                        std::copy(std::cbegin(g1_s_x_blob),
-                                    std::cend(g1_s_x_blob),
-                                    std::back_inserter(g1_s_x_blob));
+                                  std::cend(transcript),
+                                  std::back_inserter(personalization_transcript_g1s_g1sx));
 
-                        std::vector<std::uint8_t> hash = nil::crypto3::hash<hashes::blake2b<256>>(personalization_transcript_g1s_g1sx);
-                        
+                        auto g1_s_blob = serialize_g1_uncompressed(g1_s);
+                        std::copy(std::cbegin(g1_s_blob), std::cend(g1_s_blob), std::back_inserter(g1_s_blob));
+
+                        auto g1_s_x_blob = serialize_g1_uncompressed(g1_s_x);
+                        std::copy(std::cbegin(g1_s_x_blob), std::cend(g1_s_x_blob), std::back_inserter(g1_s_x_blob));
+
+                        std::vector<std::uint8_t> hash =
+                            nil::crypto3::hash<hashes::blake2b<256>>(personalization_transcript_g1s_g1sx);
+
                         // this is unsecure as it's only using the first byte,
                         // it should be chacha which is currently broken
                         boost::random::mt19937 gen;
@@ -110,19 +103,23 @@ namespace nil {
                         return algebra::random_element<g2_type>(gen);
                     }
 
-                    static std::vector<std::uint8_t> serialize_g1_uncompressed(g1_value_type g) {
+                    static std::vector<std::uint8_t> serialize_g1_uncompressed(const g1_value_type &g) {
                         using endianness = nil::marshalling::option::little_endian;
-                        auto filled_val = nil::crypto3::marshalling::types::fill_fast_curve_element<g1_type, endianness>(g);
+                        auto filled_val =
+                            nil::crypto3::marshalling::types::fill_fast_curve_element<g1_type, endianness>(g);
                         std::vector<std::uint8_t> blob(filled_val.length());
                         auto it = std::begin(blob);
                         nil::marshalling::status_type status = filled_val.write(it, blob.size());
-                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                        return blob;
+                        if (status != nil::marshalling::status_type::success) {
+                            return {};
+                        } else {
+                            return blob;
+                        }
                     }
                 };
-            }   // commitments
-        }   // zk
-    }   // crypto3
-}   // nil
+            }    // namespace commitments
+        }        // namespace zk
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif  // CRYPTO3_ZK_PROOF_OF_KNOWLEDGE_HPP
+#endif    // CRYPTO3_ZK_PROOF_OF_KNOWLEDGE_HPP

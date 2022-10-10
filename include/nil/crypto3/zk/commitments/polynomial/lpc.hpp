@@ -43,13 +43,8 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
-                template<typename MerkleTreeHashType,
-                         typename TranscriptHashType,
-                         std::size_t Lambda = 40,
-                         std::size_t R = 1,
-                         std::size_t M = 2,
-                         std::size_t BatchSize = 0,
-                         bool IsConstSize = false>
+                template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda = 40,
+                         std::size_t R = 1, std::size_t M = 2, std::size_t BatchSize = 0, bool IsConstSize = false>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -78,12 +73,9 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams>
                 struct batched_list_polynomial_commitment
-                    : public detail::basic_batched_fri<FieldType,
-                                                       typename LPCParams::merkle_hash_type,
-                                                       typename LPCParams::transcript_hash_type,
-                                                       LPCParams::m,
-                                                       LPCParams::leaf_size,
-                                                       LPCParams::is_const_size> {
+                    : public detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
+                                                       typename LPCParams::transcript_hash_type, LPCParams::m,
+                                                       LPCParams::leaf_size, LPCParams::is_const_size> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
@@ -97,11 +89,8 @@ namespace nil {
 
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
-                    using basic_fri = detail::basic_batched_fri<FieldType,
-                                                                typename LPCParams::merkle_hash_type,
-                                                                typename LPCParams::transcript_hash_type,
-                                                                m,
-                                                                leaf_size,
+                    using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
+                                                                typename LPCParams::transcript_hash_type, m, leaf_size,
                                                                 is_const_size>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
@@ -115,10 +104,9 @@ namespace nil {
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
-                        typedef
-                            typename std::conditional<is_const_size,
-                                                  std::array<std::vector<typename FieldType::value_type>, leaf_size>,
-                                                  std::vector<std::vector<typename FieldType::value_type>>>::type z_type;
+                        typedef typename std::conditional<
+                            is_const_size, std::array<std::vector<typename FieldType::value_type>, leaf_size>,
+                            std::vector<std::vector<typename FieldType::value_type>>>::type z_type;
 
                         z_type z;
                         commitment_type T_root;
@@ -129,24 +117,14 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
                 using batched_lpc = batched_list_polynomial_commitment<
-                    FieldType,
-                    commitments::list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
-                                                                   typename LPCParams::transcript_hash_type,
-                                                                   LPCParams::lambda,
-                                                                   LPCParams::r,
-                                                                   LPCParams::m,
-                                                                   BatchSize,
-                                                                   IsConstSize>>;
+                    FieldType, commitments::list_polynomial_commitment_params<
+                                   typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                                   LPCParams::lambda, LPCParams::r, LPCParams::m, BatchSize, IsConstSize>>;
                 template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
                 using lpc = batched_list_polynomial_commitment<
-                    FieldType,
-                    list_polynomial_commitment_params<typename LPCParams::merkle_hash_type,
-                                                      typename LPCParams::transcript_hash_type,
-                                                      LPCParams::lambda,
-                                                      LPCParams::r,
-                                                      LPCParams::m,
-                                                      BatchSize,
-                                                      IsConstSize>>;
+                    FieldType, list_polynomial_commitment_params<
+                                   typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                                   LPCParams::lambda, LPCParams::r, LPCParams::m, BatchSize, IsConstSize>>;
 
                 template<typename FieldType, typename LPCParams>
                 using list_polynomial_commitment = batched_list_polynomial_commitment<FieldType, LPCParams>;
@@ -154,25 +132,24 @@ namespace nil {
             }    // namespace commitments
 
             namespace algorithms {
-                template<typename LPC,
-                         typename ContainerType,    // TODO: check for value_type == std::vector<typename
-                                                    // LPC::field_type::value_type>?
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value &&
-                                 std::is_same_v<typename ContainerType::value_type,
-                                                std::vector<typename LPC::field_type::value_type>>,
-                             bool>::type = true>
+                template<
+                    typename LPC,
+                    typename ContainerType,    // TODO: check for value_type == std::vector<typename
+                                               // LPC::field_type::value_type>?
+                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                                typename LPC::field_type, typename LPC::lpc_params>,
+                                                            LPC>::value &&
+                                                std::is_same_v<typename ContainerType::value_type,
+                                                               std::vector<typename LPC::field_type::value_type>>,
+                                            bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
-                    typename LPC::precommitment_type &T,
+                    const typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
-                ) {
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     typename LPC::proof_type::z_type z;
 
@@ -247,19 +224,19 @@ namespace nil {
                     return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
                 }
 
-                template<typename LPC,
-                         typename ContainerType,    // TODO: check for value_type == std::vector<typename
-                                                    // LPC::field_type::value_type>?
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value &&
-                                 std::is_same_v<typename ContainerType::value_type,
-                                                std::vector<typename LPC::field_type::value_type>>,
-                             bool>::type = true>
+                template<
+                    typename LPC,
+                    typename ContainerType,    // TODO: check for value_type == std::vector<typename
+                                               // LPC::field_type::value_type>?
+                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                                typename LPC::field_type, typename LPC::lpc_params>,
+                                                            LPC>::value &&
+                                                std::is_same_v<typename ContainerType::value_type,
+                                                               std::vector<typename LPC::field_type::value_type>>,
+                                            bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
-                    typename LPC::precommitment_type &T,
+                    const typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
@@ -281,16 +258,16 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, T, g_normal, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename ContainerType,    // TODO: check for value_type == std::vector<typename
-                                                    // LPC::field_type::value_type>?
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value &&
-                                 std::is_same_v<typename ContainerType::value_type,
-                                                std::vector<typename LPC::field_type::value_type>>,
-                             bool>::type = true>
+                template<
+                    typename LPC,
+                    typename ContainerType,    // TODO: check for value_type == std::vector<typename
+                                               // LPC::field_type::value_type>?
+                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                                typename LPC::field_type, typename LPC::lpc_params>,
+                                                            LPC>::value &&
+                                                std::is_same_v<typename ContainerType::value_type,
+                                                               std::vector<typename LPC::field_type::value_type>>,
+                                            bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
                     const typename select_container<LPC::is_const_size,
@@ -304,16 +281,16 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, T, g, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename ContainerType,    // TODO: check for value_type == std::vector<typename
-                                                    // LPC::field_type::value_type>?
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value &&
-                                 std::is_same_v<typename ContainerType::value_type,
-                                                std::vector<typename LPC::field_type::value_type>>,
-                             bool>::type = true>
+                template<
+                    typename LPC,
+                    typename ContainerType,    // TODO: check for value_type == std::vector<typename
+                                               // LPC::field_type::value_type>?
+                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                                typename LPC::field_type, typename LPC::lpc_params>,
+                                                            LPC>::value &&
+                                                std::is_same_v<typename ContainerType::value_type,
+                                                               std::vector<typename LPC::field_type::value_type>>,
+                                            bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const ContainerType &evaluation_points,
                     const typename select_container<LPC::is_const_size,
@@ -327,21 +304,19 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, T, g, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
+                    const typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
                                                     math::polynomial_dfs<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
-                ) {
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
                     std::size_t leaf_size = g.size();
                     typename LPC::proof_type::z_type z;
@@ -420,31 +395,28 @@ namespace nil {
                     return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
+                    const typename LPC::precommitment_type &T,
                     const typename select_container<LPC::is_const_size,
                                                     math::polynomial<typename LPC::field_type::value_type>,
                                                     LPC::leaf_size>::type &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
-                ) {
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
                     std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp = {evaluation_points};
                     return proof_eval<LPC>(tmp, T, g, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     const typename select_container<LPC::is_const_size,
@@ -459,12 +431,11 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, g, T, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     const typename select_container<LPC::is_const_size,
@@ -478,23 +449,24 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, g, T, fri_params, transcript);
                 }
 
-                template<typename LPC, typename ContainerType,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value &&
-                             std::is_same_v<typename ContainerType::value_type,
-                                                std::vector<typename LPC::field_type::value_type>>,
-                             bool>::type = true>
+                template<
+                    typename LPC, typename ContainerType,
+                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                                typename LPC::field_type, typename LPC::lpc_params>,
+                                                            LPC>::value &&
+                                                std::is_same_v<typename ContainerType::value_type,
+                                                               std::vector<typename LPC::field_type::value_type>>,
+                                            bool>::type = true>
                 static bool verify_eval(
-                    const ContainerType                         &evaluation_points,
-                    typename LPC::proof_type                    &proof,
-                    typename LPC::commitment_type               t_polynomials,
-                    typename LPC::basic_fri::params_type        fri_params,
-                    typename LPC::basic_fri::transcript_type    &transcript = typename LPC::basic_fri::transcript_type()) {
+                    const ContainerType &evaluation_points,
+                    typename LPC::proof_type &proof,
+                    const typename LPC::commitment_type &t_polynomials,
+                    typename LPC::basic_fri::params_type fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
 
-                    if( t_polynomials != proof.T_root ) return false;
-                   
+                    if (t_polynomials != proof.T_root)
+                        return false;
+
                     std::size_t leaf_size = proof.z.size();
                     std::size_t eval_size = evaluation_points.size();
 
@@ -524,7 +496,8 @@ namespace nil {
 
                     typename select_container<LPC::is_const_size,
                                               math::polynomial<typename LPC::field_type::value_type>,
-                                              LPC::leaf_size>::type U, V;
+                                              LPC::leaf_size>::type U,
+                        V;
 
                     if constexpr (!LPC::is_const_size) {
                         U.resize(leaf_size);
@@ -548,9 +521,8 @@ namespace nil {
                     }
 
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
-                        if (!verify_eval<typename LPC::basic_fri>(
-                                proof.fri_proof[round_id], fri_params, t_polynomials, U, V, transcript
-                        )) {
+                        if (!verify_eval<typename LPC::basic_fri>(proof.fri_proof[round_id], fri_params, t_polynomials,
+                                                                  U, V, transcript)) {
                             return false;
                         }
                     }
@@ -558,33 +530,31 @@ namespace nil {
                     return true;
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static bool verify_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::proof_type                    &proof,
-                    typename LPC::commitment_type               t_polynomials,
-                    typename LPC::basic_fri::params_type        fri_params,
-                    typename LPC::basic_fri::transcript_type    &transcript = typename LPC::basic_fri::transcript_type()) {
-                    
+                    typename LPC::proof_type &proof,
+                    typename LPC::commitment_type t_polynomials,
+                    typename LPC::basic_fri::params_type fri_params,
+                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
+
                     std::array<std::vector<typename LPC::field_type::value_type>, 1> tmp;
                     tmp[0] = evaluation_points;
                     return verify_eval<LPC>(tmp, proof, t_polynomials, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
+                    const typename LPC::precommitment_type &T,
                     const math::polynomial<typename LPC::field_type::value_type> &g,
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
@@ -624,15 +594,14 @@ namespace nil {
                     return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(T), fri_proof});
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
-                    typename LPC::precommitment_type &T,
+                    const typename LPC::precommitment_type &T,
                     const math::polynomial_dfs<typename LPC::field_type::value_type> &g,
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()) {
@@ -642,12 +611,11 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, T, g_normal, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     const math::polynomial<typename LPC::field_type::value_type> &g,
@@ -659,12 +627,11 @@ namespace nil {
                     return proof_eval<LPC>(evaluation_points, T, g, fri_params, transcript);
                 }
 
-                template<typename LPC,
-                         typename std::enable_if<
-                             std::is_base_of<commitments::batched_list_polynomial_commitment<typename LPC::field_type,
-                                                                                             typename LPC::lpc_params>,
-                                             LPC>::value,
-                             bool>::type = true>
+                template<typename LPC, typename std::enable_if<
+                                           std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                                               typename LPC::field_type, typename LPC::lpc_params>,
+                                                           LPC>::value,
+                                           bool>::type = true>
                 static typename LPC::proof_type proof_eval(
                     const std::vector<typename LPC::field_type::value_type> &evaluation_points,
                     const math::polynomial_dfs<typename LPC::field_type::value_type> &g,

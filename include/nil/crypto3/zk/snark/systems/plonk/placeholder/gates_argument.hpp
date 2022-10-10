@@ -62,11 +62,13 @@ namespace nil {
                     constexpr static const std::size_t argument_size = 1;
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
-                        prove_eval(typename policy_type::constraint_system_type &constraint_system,
-                                   const plonk_polynomial_dfs_table<FieldType,
-                                        typename ParamsType::arithmetization_params> &column_polynomials,
-                                        std::shared_ptr<math::evaluation_domain<FieldType>> domain,
-                                   transcript_type &transcript = transcript_type()) { //TODO: remove domain 
+                        prove_eval(
+                            typename policy_type::constraint_system_type &constraint_system,
+                            const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
+                                &column_polynomials,
+                            std::shared_ptr<math::evaluation_domain<FieldType>>
+                                domain,
+                            transcript_type &transcript = transcript_type()) {    // TODO: remove domain
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -75,15 +77,16 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates = constraint_system.gates();
+                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates =
+                            constraint_system.gates();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             math::polynomial_dfs<typename FieldType::value_type> gate_result(
                                 0, domain->m, FieldType::value_type::zero());
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-                                gate_result =
-                                    gate_result + gates[i].constraints[j].evaluate(column_polynomials, domain) * theta_acc;
+                                gate_result = gate_result +
+                                              gates[i].constraints[j].evaluate(column_polynomials, domain) * theta_acc;
                                 theta_acc *= theta;
                             }
 
@@ -98,7 +101,7 @@ namespace nil {
                     static inline std::array<typename FieldType::value_type, argument_size>
                         verify_eval(const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
                                     typename policy_type::evaluation_map &evaluations,
-                                    typename FieldType::value_type challenge,
+                                    const typename FieldType::value_type &challenge,
                                     transcript_type &transcript = transcript_type()) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -114,14 +117,11 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
-                            std::tuple<std::size_t,
-                                           int,
-                                           typename plonk_variable<FieldType>::column_type>
-                                selector_key = std::make_tuple(gates[i].selector_index, 0,
-                                    plonk_variable<FieldType>::column_type::selector);
+                            std::tuple<std::size_t, int, typename plonk_variable<FieldType>::column_type> selector_key =
+                                std::make_tuple(gates[i].selector_index, 0,
+                                                plonk_variable<FieldType>::column_type::selector);
 
-                            gate_result =
-                                gate_result * evaluations[selector_key];
+                            gate_result = gate_result * evaluations[selector_key];
 
                             F[0] = F[0] + gate_result;
                         }
