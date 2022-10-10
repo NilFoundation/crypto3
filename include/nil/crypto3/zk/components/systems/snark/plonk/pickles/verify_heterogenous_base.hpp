@@ -37,6 +37,10 @@
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/base_details/batch_dlog_accumulator_check_base.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -64,6 +68,15 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
+                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+
+                    using batch_verify_component =
+                        zk::components::batch_dlog_accumulator_check_base<ArithmetizationType, CurveType, KimchiParamsType,
+                                                                W0, W1, W2, W3,
+                                                                W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using verifier_index_type = kimchi_verifier_index_base<CurveType, KimchiParamsType>;
+
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
 
@@ -75,6 +88,9 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
+                        std::vector<var_ec_point> comms;
+                        verifier_index_type verifier_index;
+                        typename proof_binding::template fr_data<var, 1> fr_output;
                     };
 
                     struct result_type {
@@ -90,6 +106,10 @@ namespace nil {
 
                         generate_assignments_constant(bp, assignment, params, start_row_index);
 
+                        batch_verify_component::generate_circuit(bp, assignmet,
+                            {comms, verifier_index, fr_output}, row);
+                        row += batch_verify_component::rows_amount;
+
                         return result_type();
                     }
 
@@ -98,16 +118,15 @@ namespace nil {
                                                             std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
+
+                        batch_verify_component::generate_assignments(assignmet,
+                            {comms, verifier_index, fr_output}, row);
+                        row += batch_verify_component::rows_amount;
                         
                         return result_type();
                     }
 
                 private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               std::size_t component_start_row = 0) {
-                    }
 
                     static void
                         generate_copy_constraints(blueprint<ArithmetizationType> &bp,
