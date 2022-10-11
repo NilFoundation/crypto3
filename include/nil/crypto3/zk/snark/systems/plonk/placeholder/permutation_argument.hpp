@@ -96,9 +96,10 @@ namespace nil {
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> g_v;
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> h_v;
                         for (std::size_t i = 0; i < S_id.size(); i++) {
-                            assert(column_polynomials[i].size() == basic_domain->size());
-                            assert(S_id[i].size() == basic_domain->size());
-                            assert(S_sigma[i].size() == basic_domain->size());
+                            BOOST_ASSERT(column_polynomials[i].size() == basic_domain->size());
+                            BOOST_ASSERT(S_id[i].size() == basic_domain->size());
+                            BOOST_ASSERT(S_sigma[i].size() == basic_domain->size());
+
                             g_v.push_back(column_polynomials[i] + beta * S_id[i] + gamma);
                             h_v.push_back(column_polynomials[i] + beta * S_sigma[i] + gamma);
                         }
@@ -158,7 +159,7 @@ namespace nil {
 
                     static inline std::array<typename FieldType::value_type, argument_size> verify_eval(
                         const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
-                            preprocessed_data,
+                            &preprocessed_data,
                         // y
                         const typename FieldType::value_type &challenge,
                         // f(y):
@@ -187,8 +188,10 @@ namespace nil {
                         typename FieldType::value_type h = FieldType::value_type::one();
 
                         for (std::size_t i = 0; i < column_polynomials_values.size(); i++) {
-                            g = g * (column_polynomials_values[i] + beta * S_id[i].evaluate(challenge) + gamma);
-                            h = h * (column_polynomials_values[i] + beta * S_sigma[i].evaluate(challenge) + gamma);
+                            auto pp = column_polynomials_values[i] + gamma;
+
+                            g = g * (pp + beta * S_id[i].evaluate(challenge));
+                            h = h * (pp + beta * S_sigma[i].evaluate(challenge));
                         }
 
                         std::array<typename FieldType::value_type, argument_size> F;

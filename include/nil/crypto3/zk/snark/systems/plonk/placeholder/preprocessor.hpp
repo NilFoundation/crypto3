@@ -70,28 +70,104 @@ namespace nil {
                         };
 
                         struct public_commitments_type {    // TODO: verifier needs this data
+                            using params_type = ParamsType;
+
                             typename runtime_size_commitment_scheme_type::commitment_type id_permutation;
                             typename runtime_size_commitment_scheme_type::commitment_type sigma_permutation;
                             typename public_input_commitment_scheme_type::commitment_type public_input;
                             typename constant_commitment_scheme_type::commitment_type constant;
                             typename selector_commitment_scheme_type::commitment_type selector;
                             typename special_commitment_scheme_type::commitment_type special_selectors;
+
+                            bool operator==(const public_commitments_type &rhs) const {
+                                return  id_permutation == rhs.id_permutation &&
+                                    sigma_permutation == rhs.sigma_permutation &&
+                                    public_input == rhs.public_input &&
+                                    constant == rhs.constant &&
+                                    selector == rhs.selector &&
+                                    special_selectors == rhs.special_selectors;
+                            }
+                            bool operator!=(const public_commitments_type &rhs) const {
+                                return !(rhs == *this);
+                            }
                         };
 
                         // both prover and verifier use this data
                         // fields outside of the common_data_type are used by prover
                         struct common_data_type {
-                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
-
-                            math::polynomial<typename FieldType::value_type> Z;
-                            math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
-
+                            using field_type = FieldType;
+                            using commitments_type = public_commitments_type;
+                            using columns_rotations_type = std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns>;
+                            // marshalled
                             public_commitments_type commitments;
 
-                            std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>
-                                columns_rotations;
+                            columns_rotations_type columns_rotations;
 
                             std::size_t rows_amount;
+                            std::size_t usable_rows_amount;
+
+                            // not marshalled. They can be derived from other fields.
+                            math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
+                            math::polynomial<typename FieldType::value_type> Z;
+                            std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
+
+
+                            // Constructor with pregenerated domain
+                            common_data_type(
+                                std::shared_ptr<math::evaluation_domain<FieldType>> D, 
+                                public_commitments_type commts, 
+                                std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
+                                std::size_t rows,
+                                std::size_t usable_rows
+                            ):  basic_domain(D),
+                                lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()), 
+                                commitments(commts), 
+                                columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
+                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())
+                            ) {
+                                // Z is polynomial -1, 0,..., 0, 1
+                                Z[0] = -FieldType::value_type::one();
+                                Z[Z.size()-1] = FieldType::value_type::one();
+
+                                // lagrange_0:  0,0,...,1,0,0,...,0
+                                lagrange_0[usable_rows] = FieldType::value_type::one();
+                            }
+
+                            // Constructor for marshalling. Domain is regenerated.
+                            common_data_type(
+                                public_commitments_type commts, 
+                                std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
+                                std::size_t rows,
+                                std::size_t usable_rows
+                            ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()), 
+                                commitments(commts), 
+                                columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
+                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())
+                            ) {
+                                // Z is polynomial -1, 0,..., 0, 1
+                                Z[0] = -FieldType::value_type::one();
+                                Z[Z.size()-1] = FieldType::value_type::one();
+
+                                // lagrange_0:  0,0,...,1,0,0,...,0
+                                lagrange_0[usable_rows] = FieldType::value_type::one();
+
+                                basic_domain = math::make_evaluation_domain<FieldType>(rows);
+                            }
+
+                            // These operators are useful for marshalling
+                            // They will be implemented with marshalling procedures implementation
+                            bool operator==(const common_data_type &rhs) const {
+                                return rows_amount == rhs.rows_amount && 
+                                usable_rows_amount == rhs.usable_rows_amount && 
+                                columns_rotations == rhs.columns_rotations &&
+                                commitments == rhs.commitments &&
+                                basic_domain->size() == rhs.basic_domain->size() &&
+                                lagrange_0 == rhs.lagrange_0 &&
+                                Z == rhs.Z;
+                            }
+                            bool operator!=(const common_data_type &rhs) const {
+                                return !(rhs == *this);
+                            }
                         };
 
                         plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
@@ -184,8 +260,7 @@ namespace nil {
                                 key_type &left = x;
                                 key_type &right = y;
                                 if (_sizes[_aux[left]] < _sizes[_aux[right]]) {
-                                    left = y;
-                                    right = x;
+                                    std::swap(left, right);
                                 }
 
                                 _sizes[_aux[left]] = _sizes[_aux[left]] + _sizes[_aux[right]];
@@ -210,14 +285,14 @@ namespace nil {
                     };
 
                 public:
-                    static inline std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns>
+                    static inline std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns>
                         columns_rotations(
                             plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                                 &constraint_system,
                             const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                                 &table_description) {
 
-                        std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> result;
+                        std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> result;
 
                         std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates =
                             constraint_system.gates();
@@ -288,7 +363,7 @@ namespace nil {
                             }
                         }
 
-                        for (std::size_t i = 0; i < ParamsType::arithmetization_params::TotalColumns; i++) {
+                        for (std::size_t i = 0; i < ParamsType::arithmetization_params::total_columns; i++) {
                             if (std::find(result[i].begin(), result[i].end(), 0) == result[i].end()) {
                                 result[i].push_back(0);
                             }
@@ -301,7 +376,8 @@ namespace nil {
                         identity_polynomials(std::size_t permutation_size,
                                              const typename FieldType::value_type &omega,
                                              const typename FieldType::value_type &delta,
-                                             const std::shared_ptr<math::evaluation_domain<FieldType>> &domain,
+                                             std::shared_ptr<math::evaluation_domain<FieldType>>
+                                                 domain,
                                              const typename ParamsType::commitment_params_type &commitment_params) {
 
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_id(permutation_size);
@@ -325,7 +401,8 @@ namespace nil {
                                                 const typename FieldType::value_type &omega,
                                                 const typename FieldType::value_type &delta,
                                                 cycle_representation &permutation,
-                                                const std::shared_ptr<math::evaluation_domain<FieldType>> &domain,
+                                                std::shared_ptr<math::evaluation_domain<FieldType>>
+                                                    domain,
                                                 const typename ParamsType::commitment_params_type &commitment_params) {
 
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> S_perm(permutation_size);
@@ -344,7 +421,8 @@ namespace nil {
 
                     static inline math::polynomial_dfs<typename FieldType::value_type>
                         selector_blind(std::size_t usable_rows,
-                                       const std::shared_ptr<math::evaluation_domain<FieldType>> &domain,
+                                       std::shared_ptr<math::evaluation_domain<FieldType>>
+                                           domain,
                                        const typename ParamsType::commitment_params_type &commitment_params) {
                         math::polynomial_dfs<typename FieldType::value_type> q_blind(domain->size() - 1, domain->size(),
                                                                                      FieldType::value_type::zero());
@@ -472,10 +550,6 @@ namespace nil {
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.selectors(),
                                                                                    basic_domain));
 
-                        std::vector<typename FieldType::value_type> Z(N_rows + 1, FieldType::value_type::zero());
-                        Z[0] = -FieldType::value_type::one();
-                        Z[N_rows] = FieldType::value_type::one();
-
                         // prepare commitments for short verifier
                         typename preprocessed_data_type::public_precommitments_type public_precommitments =
                             precommitments(public_polynomial_table, id_perm_polys, sigma_perm_polys, q_last_q_blind,
@@ -484,13 +558,12 @@ namespace nil {
                         typename preprocessed_data_type::public_commitments_type public_commitments =
                             commitments(public_precommitments);
 
-                        std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> c_rotations =
+                        std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
-                        typename preprocessed_data_type::common_data_type common_data {
-                            basic_domain, nil::crypto3::math::polynomial<typename FieldType::value_type> {Z},
-                            lagrange_0,   public_commitments,
-                            c_rotations,  N_rows};
+                        typename preprocessed_data_type::common_data_type common_data (
+                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount
+                        );
 
                         preprocessed_data_type preprocessed_data({public_polynomial_table, sigma_perm_polys,
                                                                   id_perm_polys, q_last_q_blind[0], q_last_q_blind[1],
@@ -540,7 +613,6 @@ namespace nil {
                         return preprocessed_data_type({basic_domain, private_polynomial_table});
                     }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

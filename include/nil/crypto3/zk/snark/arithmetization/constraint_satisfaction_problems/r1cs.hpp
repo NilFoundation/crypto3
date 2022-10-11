@@ -37,7 +37,7 @@
 #include <cstdlib>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/arithmetization/variable.hpp>
+#include <nil/crypto3/zk/math/linear_variable.hpp>
 #include <nil/crypto3/zk/math/linear_combination.hpp>
 
 namespace nil {
@@ -57,23 +57,23 @@ namespace nil {
                  *
                  * A R1CS constraint is used to construct a R1CS constraint system (see below).
                  */
-                template<typename FieldType>
+                template<typename FieldType, typename VariableType = math::linear_variable<FieldType>>
                 struct r1cs_constraint {
                     typedef FieldType field_type;
 
-                    linear_combination<FieldType> a, b, c;
+                    math::linear_combination<VariableType> a, b, c;
 
                     r1cs_constraint() {};
-                    r1cs_constraint(const linear_combination<FieldType> &a,
-                                    const linear_combination<FieldType> &b,
-                                    const linear_combination<FieldType> &c) :
+                    r1cs_constraint(const math::linear_combination<VariableType> &a,
+                                    const math::linear_combination<VariableType> &b,
+                                    const math::linear_combination<VariableType> &c) :
                         a(a),
                         b(b), c(c) {
                     }
 
-                    r1cs_constraint(const std::initializer_list<linear_combination<FieldType>> &A,
-                                    const std::initializer_list<linear_combination<FieldType>> &B,
-                                    const std::initializer_list<linear_combination<FieldType>> &C) {
+                    r1cs_constraint(const std::initializer_list<math::linear_combination<VariableType>> &A,
+                                    const std::initializer_list<math::linear_combination<VariableType>> &B,
+                                    const std::initializer_list<math::linear_combination<VariableType>> &C) {
                         for (auto lc_A : A) {
                             a.terms.insert(a.terms.end(), lc_A.terms.begin(), lc_A.terms.end());
                         }

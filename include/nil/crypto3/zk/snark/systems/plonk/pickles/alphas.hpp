@@ -27,41 +27,62 @@
 #ifndef CRYPTO3_ZK_PLONK_BATCHED_PICKLES_ALPHAS_HPP
 #define CRYPTO3_ZK_PLONK_BATCHED_PICKLES_ALPHAS_HPP
 
+#include <nil/crypto3/zk/snark/systems/plonk/pickles/detail.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
-#include <map>
+#include <unordered_map>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                enum argument_type;
+
                 template<typename FieldType>
                 struct Alphas {
                     /// The next power of alpha to use
                     /// the end result will be [1, alpha^{next_power - 1}]
-                    uint32_t next_power;
+                    int next_power;
                     /// The mapping between constraint types and powers of alpha
                     //                    std::map<argument_type, std::pair<uint32_t, uint32_t>> mapping;
                     /// The powers of alpha: 1, alpha, alpha^2, etc.
                     /// If set to [Some], you can't register new constraints.
-                    std::vector<FieldType> alphas;
+                    std::vector<typename FieldType::value_type> alphas;
+                    std::unordered_map<argument_type, std::pair<int, int>> mapping; 
 
+                    Alphas() : next_power(0) {}
                     // Create alphas from 0 to next_power - 1
-                    void instantiate(FieldType alpha) {
-                        FieldType last_power = FieldType::one();
-                        alphas.resize(next_power);
-                        alphas[0] = last_power;
-                        for (size_t i = 0; i < next_power; ++i) {
-                            last_power *= alpha;
-                            alphas[i + 1] = last_power;
+
+                    void register_(argument_type arg, int power){
+                        if(mapping.find(arg) == mapping.end()){
+                            mapping[arg] = std::make_pair(next_power, power);
+                        }
+                        
+                        next_power += power;
+                    }
+
+                    void instantiate(typename FieldType::value_type alpha) {
+                        typename FieldType::value_type last_power = FieldType::value_type::one();
+                        alphas.clear();
+                        alphas.reserve(next_power);
+                        alphas.push_back(last_power);
+                        for (size_t i = 1; i < next_power; ++i) {
+                            alphas.push_back(alphas.back() * alpha);
+                            // last_power *= alpha;
+                            // alphas[i + 1] = last_power;
                         }
                     }
 
                     // Return num alphas
-                    std::vector<FieldType> get_alphas(uint32_t num) {
-                        BOOST_ASSERT_MSG(num <= alphas.size(), "Not enough alphas to return");
-                        return std::vector(alphas.begin(), alphas.begin() + num);
+                    std::vector<typename FieldType::value_type> get_alphas(argument_type arg, std::size_t num) {
+                        if(mapping.find(arg) == mapping.end()){
+                            assert(false);
+                        }
+                        std::pair<int, int> range = mapping[arg];
+                        BOOST_ASSERT_MSG(num <= range.second, "Not enough alphas to return");
+
+                        return std::vector(alphas.begin() + range.first, alphas.begin() + range.first + num);
                     }
                 };
             }    // namespace snark

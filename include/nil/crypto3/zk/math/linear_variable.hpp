@@ -58,6 +58,9 @@ namespace nil {
                 using variable_type = linear_variable<FieldType>;
             public:
 
+                using field_type = FieldType;
+                using value_type = typename FieldType::value_type;
+                using index_type = std::size_t;
                 std::size_t index;
 
                 linear_variable(const std::size_t index = 0) : index(index) {};
@@ -78,7 +81,7 @@ namespace nil {
                 }
 
                 linear_combination<variable_type>
-                    operator-(const linear_combination<FieldType> &other) const {
+                    operator-(const linear_combination<variable_type> &other) const {
                     return (*this) + (-other);
                 }
 

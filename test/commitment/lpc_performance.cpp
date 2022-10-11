@@ -93,6 +93,28 @@ std::vector<math::polynomial<typename FieldType::value_type>> generate(NumberTyp
     return res;
 }
 
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+    using dist_type = std::uniform_int_distribution<int>;
+    static std::random_device random_engine;
+
+    std::vector<std::size_t> step_list;
+    std::size_t steps_sum = 0;
+    while (steps_sum != r) {
+        if (r - steps_sum <= max_step) {
+            while (r - steps_sum != 1) {
+                step_list.emplace_back(r - steps_sum - 1);
+                steps_sum += step_list.back();
+            }
+            step_list.emplace_back(1);
+            steps_sum += step_list.back();
+        } else {
+            step_list.emplace_back(dist_type(1, max_step)(random_engine));
+            steps_sum += step_list.back();
+        }
+    }
+    return step_list;
+}
+
 BOOST_AUTO_TEST_SUITE(lpc_performance_test_suite)
 
 BOOST_AUTO_TEST_CASE(lpc_performance_test) {
@@ -127,6 +149,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     fri_params.r = r;
     fri_params.D = D;
     fri_params.max_degree = d - 1;
+    fri_params.step_list = generate_random_step_list(r, 5);
 
     typedef boost::random::independent_bits_engine<boost::random::mt19937,
                                                    FieldType::modulus_bits,
@@ -148,7 +171,7 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         for (int j = 0; j < fri_params.max_degree + 1; j++) {
             poly[i] = typename FieldType::value_type(polynomial_element_gen());
         }
-        merkle_tree_type tree = zk::algorithms::precommit<lpc_type>(poly, D[0]); // phase_1: Commit
+        merkle_tree_type tree = zk::algorithms::precommit<lpc_type>(poly, D[0], fri_params.step_list.front()); // phase_1: Commit
 
         // TODO: take a point outside of the basic domain
         std::vector<typename FieldType::value_type> evaluation_points = {
