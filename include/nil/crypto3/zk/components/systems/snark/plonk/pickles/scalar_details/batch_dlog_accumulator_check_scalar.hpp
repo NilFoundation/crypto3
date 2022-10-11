@@ -195,7 +195,7 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
-                        std::array<batch_proof, BatchSize> batches;
+                        std::vector<var> challenges;
                     };
 
                     struct result_type {

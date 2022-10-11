@@ -36,12 +36,18 @@
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/evals_of_split_evals.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/derive_plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/prepare_scalars_inversion.hpp>
+
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fr.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/oracles_cip.hpp>
 #include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/b_poly.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verify_scalar.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/binding.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/proof.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/base_details/batch_dlog_accumulator_check_scalar.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/evals_of_split_evals.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/derive_plonk.hpp>
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/scalar_details/prepare_scalars_inversion.hpp>
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
@@ -101,6 +107,20 @@ namespace nil {
                     using cip_component =
                         zk::components::oracles_cip<ArithmetizationType, KimchiParamsType, W0, W1, W2, W3, W4, W5, W6,
                                                     W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using batch_verify_component =
+                        zk::components::batch_dlog_accumulator_check_scalar<ArithmetizationType, CurveType, KimchiParamsType,
+                                                                W0, W1, W2, W3,
+                                                                W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using kimchi_verify_component =
+                        zk::components::verify_scalar<ArithmetizationType, CurveType, KimchiParamsType,
+                            KimchiParamsType::commitment_params_type, BatchSize,
+                                                                W0, W1, W2, W3,
+                                                                W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using proof_binding =
+                        typename zk::components::binding<ArithmetizationType, BlueprintFieldType, KimchiParamsType>;
                     
                     constexpr static const std::size_t poly_size = 4 + (KimchiParamsType::circuit_params::used_lookup ? 1 : 0); 
 
@@ -120,6 +140,13 @@ namespace nil {
                         std::array<deferred_values, list_size> messages_for_next_step_proof;
                         var domain_generator;
                         kimchi_verifier_index_scalar<BlueprintFieldType> &verifier_index;
+                        std::array<kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
+                                                       KimchiCommitmentParamsType::eval_rounds>,
+                                   BatchSize> &proof;
+
+                        typename proof_binding::template fr_data<var, BatchSize> fr_data;
+                        typename proof_binding::template fq_data<var> fq_data;
+                        std::array<typename proof_binding::fq_sponge_output, BatchSize> &fq_output;
                     };
 
                     struct result_type {
@@ -231,6 +258,15 @@ s
                                 params.def_values[i].b}, row).output;
                             row += prepare_scalars_inversion_component::rows_amount;
 
+                        batch_dlog_accumulator_check_scalar::generate_circuit(bp, assignment,
+                            {deferred_values.bulletproof_challenges}, row);
+                        row += batch_dlog_accumulator_check_scalar::rows_amount;
+
+                        kimchi_verify_component::generate_circuit(bp, assignment,
+                            {params.fr_data, params.fq_data, verifier_index, params.proof, params.fq_output},
+                            row);
+                        row += kimchi_verify_component::rows_amount;
+
                         generate_assignments_constant(bp, assignment, params, start_row_index);
 
                         return result_type();
@@ -338,16 +374,20 @@ s
                             shifted_b = prepare_scalars_inversion_component::generate_assignments(assignment, {
                                 params.def_values[i].b}, row).output;
                             row += prepare_scalars_inversion_component::rows_amount;
-                        }        
+                        }
+                        
+                        batch_dlog_accumulator_check_scalar::generate_assignments(assignment,
+                            {deferred_values.bulletproof_challenges}, row);
+                        row += batch_dlog_accumulator_check_scalar::rows_amount;
+
+                        kimchi_verify_component::generate_assignments(assignment,
+                            {params.fr_data, params.fq_data, verifier_index, params.proof, params.fq_output},
+                            row);
+                        row += kimchi_verify_component::rows_amount;
                         return result_type();
                     }
 
                 private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               std::size_t component_start_row = 0) {
-                    }
 
                     static void
                         generate_copy_constraints(blueprint<ArithmetizationType> &bp,
