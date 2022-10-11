@@ -127,6 +127,63 @@ namespace nil {
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
 
+                        for(std::size_t i = 0; i < list_size; i++) {
+                            row += endo_scalar_component::rows_amount;
+                            row += endo_scalar_component::rows_amount;
+                            row += endo_scalar_component::rows_amount;
+                            row += mul_component::rows_amount;
+
+                            if (KimchiParamsType::circuit_params::lookup_used) {
+                                row += endo_scalar_component::rows_amount;
+                            }
+
+                            row += combined_evals_component::rows_amount;
+                            row += derive_plonk_component::rows_amount;
+
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                row += endo_scalar_component::rows_amount;
+                            }
+
+                            row += transcript_type::init_rows;
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                row += transcript_type::absorb_rows;
+                            }
+                            row += transcript_type::challenge_rows;
+
+                            row += transcript_type::init_rows;
+                            row += transcript_type::absorb_rows;
+                            row += transcript_type::absorb_rows;
+
+                            row += transcript_type::absorb_evaluations_rows;
+                            row += transcript_type::absorb_evaluations_rows;
+
+                            row += transcript_type::challenge_rows;
+
+                            row += transcript_type::challenge_rows;
+
+                            row += cip_component::rows_amount;
+
+                            for(std::size_t j = 0; j < bulletproofs_size; j++) {
+                                row += endo_scalar_component::rows_amount;
+                            }
+
+                            row += b_poly_component::rows_amount;
+
+                            row += b_poly_component::rows_amount;
+
+                            row += mul_component::rows_amount;
+
+                            row += add_component::rows_amount;
+
+                            row += prepare_scalars_inversion_component::rows_amount;
+
+                            row += prepare_scalars_inversion_component::rows_amount;
+                        }
+                        
+                        row += batch_dlog_accumulator_check_scalar::rows_amount;
+
+                        row += kimchi_verify_component::rows_amount;
+
                         return row;
                     }
 
@@ -194,6 +251,7 @@ namespace nil {
                             }
                             transcript_type bulletproofs_transcript;
                             bulletproofs_transcript.init_circuit(bp, assignment, zero, row);
+                            row += transcript_type::init_rows;
                             for(std::size_t j = 0; j < bulletproofs_size; j++) {
                                 bulletproofs_transcript.absorb_circuit(bp, assignment, old_bulletproof_challenges[j], row);
                                 row += transcript_type::absorb_rows;
@@ -203,6 +261,7 @@ namespace nil {
 
                             transcript_type transcript;
                             transcript.init_circuit(bp, assignment, zero, row);
+                            row += transcript_type::init_rows;
                             transcript.absorb_circuit(bp, assignment, challenges_digest, row);
                             row += transcript_type::absorb_rows;
                             transcript.absorb_circuit(bp, assignment, params.evals.ft_eval1, row);
@@ -217,6 +276,8 @@ namespace nil {
 
                             var xi_actual_challenge = transcript.challenge_circuit(bp, assignment, row);
                             row += transcript_type::challenge_rows;
+
+                            bp.add_copy_constraint({xi_actual_challenge, params.def_values[i].xi});
 s
                             var r_actual_challenge = transcript.challenge_circuit(bp, assignment, row);
                             row += transcript_type::challenge_rows;
@@ -254,9 +315,13 @@ s
                             shifted_combined_inner_product = prepare_scalars_inversion_component::generate_circuit(bp, assignment, {
                                 params.def_values[i].combined_inner_product}, row).output;
                             row += prepare_scalars_inversion_component::rows_amount;
+                            bp.add_copy_constraint({shifted_combined_inner_product, combined_inner_product_actual});
+
                             shifted_b = prepare_scalars_inversion_component::generate_circuit(bp, assignment, {
                                 params.def_values[i].b}, row).output;
                             row += prepare_scalars_inversion_component::rows_amount;
+                            bp.add_copy_constraint({shifted_b, b_actual});
+                        }
 
                         batch_dlog_accumulator_check_scalar::generate_circuit(bp, assignment,
                             {deferred_values.bulletproof_challenges}, row);
@@ -311,6 +376,7 @@ s
                             }
                             transcript_type bulletproofs_transcript;
                             bulletproofs_transcript.init_assignment(assignment, zero, row);
+                            row += transcript_type::init_rows;
                             for(std::size_t j = 0; j < bulletproofs_size; j++) {
                                 bulletproofs_transcript.absorb_assignment(assignment, old_bulletproof_challenges[j], row);
                                 row += transcript_type::absorb_rows;
@@ -320,6 +386,7 @@ s
 
                             transcript_type transcript;
                             transcript.init_assignment(assignment, zero, row);
+                            row += transcript_type::init_rows;
                             transcript.absorb_assignment(assignment, challenges_digest, row);
                             row += transcript_type::absorb_rows;
                             transcript.absorb_assignment(assignment, params.evals.ft_eval1, row);
@@ -371,6 +438,7 @@ s
                             shifted_combined_inner_product = prepare_scalars_inversion_component::generate_assignments(assignment, {
                                 params.def_values[i].combined_inner_product}, row).output;
                             row += prepare_scalars_inversion_component::rows_amount;
+
                             shifted_b = prepare_scalars_inversion_component::generate_assignments(assignment, {
                                 params.def_values[i].b}, row).output;
                             row += prepare_scalars_inversion_component::rows_amount;
@@ -388,17 +456,6 @@ s
                     }
 
                 private:
-
-                    static void
-                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  std::size_t component_start_row = 0) {
-                        // xi xi_actual
-                        // shifted_combined_inner_product combined_inner_product_actual
-                        // shifted_b b
-                        
-                    }
 
                     static void
                         generate_assignments_constant(blueprint<ArithmetizationType> &bp,
