@@ -183,6 +183,7 @@ namespace nil {
               public_preprocessed_data, proof, bp, fri_params);
 
 #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+            profiling_plonk_circuit<BlueprintFieldType, ArithmetizationParams, Hash, Lambda>::process(std::cout, bp, public_preprocessed_data);
             profiling(assignments);
 #endif
             if(verification_result) {
