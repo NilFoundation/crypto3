@@ -169,7 +169,7 @@ namespace nil {
 
                             for (std::size_t i = 0; i < kimchi_constants::evaluations_in_batch_size; i++) {
                                 for (std::size_t j = 0;
-                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split + 1;
+                                     j < KimchiParamsType::commitment_params_type::shifted_commitment_split;
                                      j++) {
                                     row += mul_component::rows_amount;
 

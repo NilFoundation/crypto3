@@ -185,9 +185,9 @@ namespace nil {
                         bp.add_copy_constraint({{W0, static_cast<int>(component_start_row), false}, params.r});
                         bp.add_copy_constraint({{W13, static_cast<int>(component_start_row), false}, params.xi});
                         bp.add_copy_constraint({{W1, static_cast<int>(component_start_row), false},
-                                                {0, component_start_row + 1, false, var::column_type::constant}});
+                                                {0, static_cast<int32_t>(component_start_row + 1), false, var::column_type::constant}});
                         bp.add_copy_constraint({{W2, static_cast<int>(component_start_row), false},
-                                                {0, component_start_row, false, var::column_type::constant}});
+                                                {0, static_cast<int32_t>(component_start_row), false, var::column_type::constant}});
 
                         for (std::size_t i = 0; i < k; i++) {
                             bp.add_copy_constraint(
