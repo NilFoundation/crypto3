@@ -37,6 +37,10 @@
 
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
+#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
+
+#include <nil/crypto3/zk/components/systems/snark/plonk/pickles/base_details/batch_dlog_accumulator_check_base.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -62,10 +66,30 @@ namespace nil {
 
                     using ArithmetizationType = snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
 
+                    using KimchiCommitmentParamsType = typename KimchiParamsType::commitment_params_type;
+
                     using var = snark::plonk_variable<BlueprintFieldType>;
+
+                    using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
+
+                    using batch_verify_component =
+                        zk::components::batch_dlog_accumulator_check_base<ArithmetizationType, CurveType, KimchiParamsType,
+                                                                W0, W1, W2, W3,
+                                                                W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+                    
+                    using kimchi_verify_component = zk::components::base_field<ArithmetizationType,
+                        CurveType, KimchiParamsType, KimchiCommitmentParamsType, BatchSize,
+                        W0, W1, W2, W3,
+                                W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
+                    using verifier_index_type = kimchi_verifier_index_base<CurveType, KimchiParamsType>;
 
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
+
+                        row += batch_verify_component::rows_amount;
+
+                        row += kimchi_verify_component::rows_amount;
 
                         return row;
                     }
@@ -75,6 +99,13 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
+                        std::vector<var_ec_point> comms;
+
+                        std::array<proof_type, BatchSize> proofs;
+                        verifier_index_type verifier_index;
+
+                        typename proof_binding::template fr_data<var, BatchSize> fr_data;
+                        typename proof_binding::template fq_data<var> fq_data;
                     };
 
                     struct result_type {
@@ -88,7 +119,13 @@ namespace nil {
                                          const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
 
-                        generate_assignments_constant(bp, assignment, params, start_row_index);
+                        batch_verify_component::generate_circuit(bp, assignmet,
+                            {params.comms, params.verifier_index, params.fr_output}, row);
+                        row += batch_verify_component::rows_amount;
+
+                        kimchi_verify_component::generate_circuit(bp, assignmet,
+                            {params.proofs, params.verifier_index, params.ft_data, params.fq_data}, row);
+                        row += kimchi_verify_component::rows_amount;
 
                         return result_type();
                     }
@@ -98,32 +135,16 @@ namespace nil {
                                                             std::size_t start_row_index) {
 
                         std::size_t row = start_row_index;
+
+                        batch_verify_component::generate_assignments(assignmet,
+                            {params.comms, params.verifier_index, params.fr_output}, row);
+                        row += batch_verify_component::rows_amount;
+
+                        kimchi_verify_component::generate_assignments(assignmet,
+                            {params.proofs, params.verifier_index, params.ft_data, params.fq_data}, row);
+                        row += kimchi_verify_component::rows_amount;
                         
                         return result_type();
-                    }
-
-                private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               std::size_t component_start_row = 0) {
-                    }
-
-                    static void
-                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  std::size_t component_start_row = 0) {
-                        
-                    }
-
-                    static void
-                        generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  std::size_t component_start_row) {
-                            std::size_t row = component_start_row;
-                            
                     }
                 };
             }    // namespace components
