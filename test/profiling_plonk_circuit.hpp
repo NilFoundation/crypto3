@@ -63,7 +63,7 @@ namespace nil {
                     std::begin(public_preprocessed_data.common_data.columns_rotations.at(var.index));
                 os << "get_W_i_by_rotation_idx(" << var.index << "," << rotation_idx
                    << ","
-                      "mload(add(gate_params, WITNESS_EVALUATIONS_OFFSET))"
+                      "mload(add(gate_params, WITNESS_EVALUATIONS_OFFSETS_OFFSET))"
                       ")";
             }
 
