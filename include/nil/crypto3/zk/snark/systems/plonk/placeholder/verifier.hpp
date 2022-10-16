@@ -237,8 +237,13 @@ namespace nil {
                                 preprocessed_public_data.common_data.columns_rotations[witness_index];
 
                             for (int &rotation_index : witness_rotation) {
-                                witness_evaluation_points[witness_index].push_back(challenge *
-                                                                                   omega.pow(rotation_index));
+                                if (rotation_index < 0) {
+                                    witness_evaluation_points[witness_index].push_back(challenge *
+                                                                                       omega.pow(rotation_index));
+                                } else {
+                                    witness_evaluation_points[witness_index].push_back(challenge *
+                                                                                       omega.inversed().pow(-rotation_index));
+                                }
                             }
                         }
                         if (!algorithms::verify_eval<witness_commitment_scheme_type>(
