@@ -60,6 +60,8 @@ namespace nil {
 
                     using runtime_size_commitment_scheme_type =
                         typename ParamsType::runtime_size_commitment_scheme_type;
+                    using fixed_values_commitment_scheme_type =
+                        typename ParamsType::fixed_values_commitment_scheme_type;
                     using witness_commitment_scheme_type = typename ParamsType::witness_commitment_scheme_type;
                     using public_input_commitment_scheme_type =
                         typename ParamsType::public_input_commitment_scheme_type;
@@ -93,7 +95,7 @@ namespace nil {
                         transcript(proof.witness_commitment);
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
-                        std::size_t permutation_size = proof.eval_proof.id_permutation.z.size();
+                        std::size_t permutation_size = (proof.eval_proof.fixed_values.z.size() - 2 - constant_columns - selector_columns) / 2;
                         std::vector<typename FieldType::value_type> f(permutation_size);
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
@@ -111,8 +113,8 @@ namespace nil {
                             } else if (i < witness_columns + public_input_columns) {
                                 f[i] = proof.eval_proof.public_input.z[i - witness_columns][zero_index];
                             } else if (i < witness_columns + public_input_columns + constant_columns) {
-                                std::size_t idx = i - witness_columns - public_input_columns;
-                                f[i] = proof.eval_proof.constant.z[idx][zero_index];
+                                std::size_t idx = i - witness_columns - public_input_columns + permutation_size*2;
+                                f[i] = proof.eval_proof.fixed_values.z[idx][zero_index];
                             }
                         }
 
@@ -167,7 +169,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::constant);
-                                columns_at_y[key] = proof.eval_proof.constant.z[i][j];
+                                columns_at_y[key] = proof.eval_proof.fixed_values.z[i + permutation_size*2][j];
                             }
                         }
 
@@ -182,7 +184,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::selector);
-                                columns_at_y[key] = proof.eval_proof.selector.z[i][j];
+                                columns_at_y[key] = proof.eval_proof.fixed_values.z[i + permutation_size*2 + constant_columns][j];
                             }
                         }
 
@@ -313,19 +315,11 @@ namespace nil {
                         // public data
                         std::vector<typename FieldType::value_type> &evaluation_points_public =
                             evaluation_points_quotient;
-                        if (!algorithms::verify_eval<runtime_size_commitment_scheme_type>(
-                                evaluation_points_public,
-                                proof.eval_proof.id_permutation,
-                                preprocessed_public_data.common_data.commitments.id_permutation,
-                                fri_params,
-                                transcript)) {
-                            return false;
-                        }
 
-                        if (!algorithms::verify_eval<runtime_size_commitment_scheme_type>(
+                        if (!algorithms::verify_eval<fixed_values_commitment_scheme_type>(
                                 evaluation_points_public,
-                                proof.eval_proof.sigma_permutation,
-                                preprocessed_public_data.common_data.commitments.sigma_permutation,
+                                proof.eval_proof.fixed_values,
+                                preprocessed_public_data.common_data.commitments.fixed_values,
                                 fri_params,
                                 transcript)) {
                             return false;
@@ -335,33 +329,6 @@ namespace nil {
                                 evaluation_points_public,
                                 proof.eval_proof.public_input,
                                 preprocessed_public_data.common_data.commitments.public_input,
-                                fri_params,
-                                transcript)) {
-                            return false;
-                        }
-
-                        if (!algorithms::verify_eval<constant_commitment_scheme_type>(
-                                evaluation_points_public,
-                                proof.eval_proof.constant,
-                                preprocessed_public_data.common_data.commitments.constant,
-                                fri_params,
-                                transcript)) {
-                            return false;
-                        }
-
-                        if (!algorithms::verify_eval<selector_commitment_scheme_type>(
-                                evaluation_points_public,
-                                proof.eval_proof.selector,
-                                preprocessed_public_data.common_data.commitments.selector,
-                                fri_params,
-                                transcript)) {
-                            return false;
-                        }
-
-                        if (!algorithms::verify_eval<special_commitment_scheme_type>(
-                                evaluation_points_public,
-                                proof.eval_proof.special_selectors,
-                                preprocessed_public_data.common_data.commitments.special_selectors,
                                 fri_params,
                                 transcript)) {
                             return false;

@@ -62,6 +62,9 @@ namespace nil {
                                                                            Lambda, R, M>
                         batched_commitment_params_type;
 
+                    using fixed_values_commitment_scheme_type =
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, constant_columns + selector_columns + 2, false>;
+                
                     using runtime_size_commitment_scheme_type =
                         commitments::batched_lpc<FieldType, batched_commitment_params_type, 0, false>;
                     using witness_commitment_scheme_type =
