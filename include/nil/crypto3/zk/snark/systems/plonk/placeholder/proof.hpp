@@ -47,29 +47,29 @@ namespace nil {
 
                     using fixed_values_commitment_scheme_type =
                         typename ParamsType::fixed_values_commitment_scheme_type;
-                    using witness_commitment_scheme_type = typename ParamsType::witness_commitment_scheme_type;
-                    using public_input_commitment_scheme_type =
-                        typename ParamsType::public_input_commitment_scheme_type;
+                    using variable_values_commitment_scheme_type =
+                        typename ParamsType::variable_values_commitment_scheme_type;
+                    using runtime_size_commitment_scheme_type =
+                        typename ParamsType::runtime_size_commitment_scheme_type;
                     using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
                     using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
                         typename FieldType::value_type lagrange_0;
-                        typename witness_commitment_scheme_type::proof_type witness;
 
                         typename fixed_values_commitment_scheme_type::proof_type fixed_values;
+                        typename variable_values_commitment_scheme_type::proof_type variable_values;
                         typename permutation_commitment_scheme_type::proof_type permutation;
                         typename runtime_size_commitment_scheme_type::proof_type quotient;
                         std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
 
-                        typename public_input_commitment_scheme_type::proof_type public_input;
 
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && lagrange_0 == rhs.lagrange_0 &&
-                                   witness == rhs.witness && permutation == rhs.permutation &&
-                                   quotient == rhs.quotient && lookups == rhs.lookups &&
-                                   public_input == rhs.public_input && 
+                                    permutation == rhs.permutation &&
+                                   quotient == rhs.quotient && lookups == rhs.lookups
+                                   && variable_values == rhs.variable_values
                                    && fixed_values == rhs.fixed_values;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
@@ -80,7 +80,7 @@ namespace nil {
                     placeholder_proof() {
                     }
 
-                    typename witness_commitment_scheme_type::commitment_type witness_commitment;
+                    typename variable_values_commitment_scheme_type::commitment_type variable_values_commitment;
 
                     typename permutation_commitment_scheme_type::commitment_type v_perm_commitment;
 
@@ -95,7 +95,7 @@ namespace nil {
                     evaluation_proof eval_proof;
 
                     bool operator==(const placeholder_proof &rhs) const {
-                        return witness_commitment == rhs.witness_commitment &&
+                        return /*witness_commitment == rhs.witness_commitment &&*/
                                v_perm_commitment == rhs.v_perm_commitment &&
                                input_perm_commitment == rhs.input_perm_commitment &&
                                value_perm_commitment == rhs.value_perm_commitment &&

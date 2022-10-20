@@ -51,24 +51,19 @@ namespace nil {
 
                     using fixed_values_commitment_scheme_type =
                         typename ParamsType::fixed_values_commitment_scheme_type;
-                    using public_input_commitment_scheme_type =
-                        typename ParamsType::public_input_commitment_scheme_type;
                 public:
                     struct preprocessed_data_type {
 
                         struct public_precommitments_type {
                             typename fixed_values_commitment_scheme_type::precommitment_type fixed_values;
-                            typename public_input_commitment_scheme_type::precommitment_type public_input;
                         };
 
                         struct public_commitments_type {    // TODO: verifier needs this data
                             using params_type = ParamsType;
                             typename fixed_values_commitment_scheme_type::commitment_type fixed_values;
-                            typename public_input_commitment_scheme_type::commitment_type public_input;
 
                             bool operator==(const public_commitments_type &rhs) const {
-                                return  fixed_values == rhs.fixed_values &&
-                                    public_input == rhs.public_input;
+                                return  fixed_values == rhs.fixed_values;
                             }
                             bool operator!=(const public_commitments_type &rhs) const {
                                 return !(rhs == *this);
@@ -442,13 +437,8 @@ namespace nil {
                                 fixed_polys, commitment_params.D[0],
                                 commitment_params.step_list.front());
 
-                        typename public_input_commitment_scheme_type::precommitment_type public_input_precommitment =
-                            algorithms::precommit<public_input_commitment_scheme_type>(
-                                public_table.public_inputs(), commitment_params.D[0],
-                                commitment_params.step_list.front());
-
                         return typename preprocessed_data_type::public_precommitments_type {
-                            fixed_values_precommitment,      public_input_precommitment};
+                            fixed_values_precommitment};
                     }
 
                     static inline typename preprocessed_data_type::public_commitments_type
@@ -456,11 +446,8 @@ namespace nil {
 
                         typename fixed_values_commitment_scheme_type::commitment_type fixed_values_commitment =
                             algorithms::commit<fixed_values_commitment_scheme_type>(precommitments.fixed_values);
-
-                        typename public_input_commitment_scheme_type::commitment_type public_input_commitment =
-                            algorithms::commit<public_input_commitment_scheme_type>(precommitments.public_input);
                         return typename preprocessed_data_type::public_commitments_type {
-                            fixed_values_commitment,   public_input_commitment};
+                            fixed_values_commitment};
                     }
 
                     static inline preprocessed_data_type process(

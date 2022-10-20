@@ -58,16 +58,11 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    using runtime_size_commitment_scheme_type =
-                        typename ParamsType::runtime_size_commitment_scheme_type;
                     using fixed_values_commitment_scheme_type =
                         typename ParamsType::fixed_values_commitment_scheme_type;
-                    using witness_commitment_scheme_type = typename ParamsType::witness_commitment_scheme_type;
-                    using public_input_commitment_scheme_type =
-                        typename ParamsType::public_input_commitment_scheme_type;
-                    using constant_commitment_scheme_type = typename ParamsType::constant_commitment_scheme_type;
-                    using selector_commitment_scheme_type = typename ParamsType::selector_commitment_scheme_type;
-                    using special_commitment_scheme_type = typename ParamsType::special_commitment_scheme_type;
+                    using variable_values_commitment_scheme_type = typename ParamsType::variable_values_commitment_scheme_type;
+                    using runtime_size_commitment_scheme_type = typename ParamsType::runtime_size_commitment_scheme_type;
+                    
                     using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
                     using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
 
@@ -92,7 +87,7 @@ namespace nil {
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
 
                         // 3. append witness commitments to transcript
-                        transcript(proof.witness_commitment);
+                        transcript(proof.variable_values_commitment);
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
                         std::size_t permutation_size = (proof.eval_proof.fixed_values.z.size() - 2 - constant_columns - selector_columns) / 2;
@@ -108,10 +103,8 @@ namespace nil {
                                     zero_index = j;
                                 }
                             }
-                            if (i < witness_columns) {
-                                f[i] = proof.eval_proof.witness.z[i][zero_index];
-                            } else if (i < witness_columns + public_input_columns) {
-                                f[i] = proof.eval_proof.public_input.z[i - witness_columns][zero_index];
+                            if (i < witness_columns + public_input_columns) {
+                                f[i] = proof.eval_proof.variable_values.z[i][zero_index];
                             } else if (i < witness_columns + public_input_columns + constant_columns) {
                                 std::size_t idx = i - witness_columns - public_input_columns + permutation_size*2;
                                 f[i] = proof.eval_proof.fixed_values.z[idx][zero_index];
@@ -142,7 +135,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::witness);
-                                columns_at_y[key] = proof.eval_proof.witness.z[i][j];
+                                columns_at_y[key] = proof.eval_proof.variable_values.z[i][j];
                             }
                         }
                         for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
@@ -156,7 +149,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::public_input);
-                                columns_at_y[key] = proof.eval_proof.public_input.z[i][j];
+                                columns_at_y[key] = proof.eval_proof.variable_values.z[witness_columns + i][j];
                             }
                         }
                         for (std::size_t i = 0; i < 0 + constant_columns; i++) {
@@ -193,7 +186,7 @@ namespace nil {
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument;
                         if (use_lookup) {
                             lookup_argument = placeholder_lookup_argument<
-                                FieldType, public_input_commitment_scheme_type,
+                                FieldType, permutation_commitment_scheme_type,
                                 ParamsType>::verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
                                                          proof.eval_proof.challenge, columns_at_y,
                                                          proof.eval_proof.lookups[1].z[0][0],
@@ -230,26 +223,26 @@ namespace nil {
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
-                        std::array<std::vector<typename FieldType::value_type>, witness_columns>
-                            witness_evaluation_points;
-                        // witnesses
-                        for (std::size_t witness_index = 0; witness_index < witness_columns; witness_index++) {
+                        std::array<std::vector<typename FieldType::value_type>, witness_columns + public_input_columns>
+                            variable_values_evaluation_points;
 
-                            std::vector<int> witness_rotation =
-                                preprocessed_public_data.common_data.columns_rotations[witness_index];
+                        // variable_values polynomials (table columns)
+                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns; variable_values_index++) {
 
-                            for (int &rotation_index : witness_rotation) {
-                                if (rotation_index < 0) {
-                                    witness_evaluation_points[witness_index].push_back(challenge *
-                                                                                       omega.pow(rotation_index));
-                                } else {
-                                    witness_evaluation_points[witness_index].push_back(challenge *
-                                                                                       omega.inversed().pow(-rotation_index));
-                                }
+                            std::vector<int> variable_values_rotation =
+                                preprocessed_public_data.common_data.columns_rotations[variable_values_index];
+
+                            for (std::size_t rotation_index = 0; rotation_index < variable_values_rotation.size();
+                                 rotation_index++) {
+                                variable_values_evaluation_points[variable_values_index].push_back(
+                                    challenge * omega.pow(variable_values_rotation[rotation_index]));
                             }
                         }
-                        if (!algorithms::verify_eval<witness_commitment_scheme_type>(
-                                witness_evaluation_points, proof.eval_proof.witness, proof.witness_commitment,
+                        for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i ++) {
+                            variable_values_evaluation_points[i].push_back(challenge);
+                        }
+                        if (!algorithms::verify_eval<variable_values_commitment_scheme_type>(
+                                variable_values_evaluation_points, proof.eval_proof.variable_values, proof.variable_values_commitment,
                                 fri_params, transcript)) {
                             return false;
                         }
@@ -320,15 +313,6 @@ namespace nil {
                                 evaluation_points_public,
                                 proof.eval_proof.fixed_values,
                                 preprocessed_public_data.common_data.commitments.fixed_values,
-                                fri_params,
-                                transcript)) {
-                            return false;
-                        }
-
-                        if (!algorithms::verify_eval<public_input_commitment_scheme_type>(
-                                evaluation_points_public,
-                                proof.eval_proof.public_input,
-                                preprocessed_public_data.common_data.commitments.public_input,
                                 fri_params,
                                 transcript)) {
                             return false;

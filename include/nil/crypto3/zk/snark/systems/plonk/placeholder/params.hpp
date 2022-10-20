@@ -67,6 +67,8 @@ namespace nil {
                 
                     using runtime_size_commitment_scheme_type =
                         commitments::batched_lpc<FieldType, batched_commitment_params_type, 0, false>;
+                    using variable_values_commitment_scheme_type =
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, witness_columns + public_input_columns, false>;
                     using witness_commitment_scheme_type =
                         commitments::batched_lpc<FieldType, batched_commitment_params_type, witness_columns, true>;
                     using public_input_commitment_scheme_type =
