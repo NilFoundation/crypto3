@@ -36,8 +36,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
 
 #include "../../../test_plonk_component.hpp"
@@ -58,19 +58,19 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::multiplication<ArithmetizationType, 3>;
+    using component_type = blueprint::components::multiplication<ArithmetizationType, 3>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 12;
     typename BlueprintFieldType::value_type expected_res = x * y;
 
-    typename component_type::params_type params = {
+    typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y, expected_res};
@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
         assert(expected_res == assignment.var_value(real_res.output));
     };
 
-    component_type component_instance({0, 1, 2}, params);
+    component_type component_instance({0, 1, 2},{},{});
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(component_instance, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(component_instance, public_input, result_check, instance_input);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "multiplication: " << duration.count() << "ms" << std::endl;

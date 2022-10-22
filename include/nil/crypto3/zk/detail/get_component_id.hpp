@@ -30,11 +30,13 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace detail {
 
+                using blueprint_component_id_type = std::string;
+
                 template <typename ComponentType>
-                std::string get_component_id (ComponentType component){
+                blueprint_component_id_type get_component_id (ComponentType component){
                     std::stringstream id;
 
                     id << typeid(component).name() ;
@@ -42,7 +44,7 @@ namespace nil {
                 }
 
             }    // namespace detail
-        }    // namespace zk
+        }    // namespace blueprint
     }        // namespace crypto3
 }    // namespace nil
 #endif    // CRYPTO3_ZK_BLUEPRINT_DETAIL_COMPONENT_ID_HPP

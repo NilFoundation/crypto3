@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2022 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2022 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 //
 // MIT License
@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_CIRCUIT_PLONK_HPP
-#define CRYPTO3_ZK_BLUEPRINT_CIRCUIT_PLONK_HPP
+#ifndef CRYPTO3_BLUEPRINT_CIRCUIT_PLONK_HPP
+#define CRYPTO3_BLUEPRINT_CIRCUIT_PLONK_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
@@ -44,65 +44,56 @@ namespace nil {
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            class circuit<zk::snark::plonk_constraint_system<BlueprintFieldType>>
-                : public zk::snark::plonk_constraint_system<BlueprintFieldType> {
+            class circuit<zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                           ArithmetizationParams>>
+                : public zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                        ArithmetizationParams> {
 
-                typedef zk::snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
+                typedef zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                       ArithmetizationParams> ArithmetizationType;
 
-                using component_selector_map_type = std::unordered_map<
-                    detail::blueprint_component_id_type, std::vector<std::int32_t>>;
-
-                component_selector_map_type component_selector_map;
-
-                std::int32_t _next_selector_global_index = 0;
-
-                std::int32_t next_selector_global_index(){
-                    return _next_selector_global_index++;
-                }
-
+                zk::snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> &_table_description;
             public:
                 typedef BlueprintFieldType blueprint_field_type;
 
+                circuit(zk::snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams> arithmetization_type_in, zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
+                        ArithmetizationType(arithmetization_type_in), _table_description(table_description) { }
+
                 circuit(zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
-                    ArithmetizationType() {
+                    ArithmetizationType(), _table_description(table_description) {
+                    _table_description.rows_amount = 0;
                 }
 
-                template <typename ComponentType>
-                void add_gate(ComponentType &component_instance,
-                              std::size_t selector_serial_number,
-                              const std::initializer_list<zk::snark::plonk_constraint<BlueprintFieldType>> constraints) {
-
-                    detail::blueprint_component_id_type component_instance_id =
-                        detail::get_component_id(component_instance);
-
-                    typename component_selector_map_type::const_iterator found = component_selector_map.find(
-                        component_instance_id);
-
-                    // Component add_gate is being called for the first time
-                    if (found == component_selector_map.end()){
-                        component_selector_map[component_instance_id] = component_selector_map_type::value_type(
-                            selector_serial_number + 1, -1);
-                    }
-
-                    // Selector index container resize with default values
-                    if (find->second[selector_serial_number].size < selector_serial_number + 1){
-                        find->second[selector_serial_number].resize(selector_serial_number + 1, -1);
-                    }
-
-                    // Selector with such serial number hasn't been added yet
-                    if (find->second[selector_serial_number] == -1){
-                        find->second[selector_serial_number] = next_selector_global_index();
-
-                        this->_gates.emplace_back(find->second[selector_serial_number], constraints);
-                    }
+                std::size_t allocate_rows(std::size_t required_amount = 1) {
+                    std::size_t result = _table_description.rows_amount;
+                    _table_description.rows_amount += required_amount;
+                    return result;
                 }
 
-                template <typename ComponentType>
-                void add_gate(ComponentType &component_instance,
-                              std::size_t selector_serial_number,
-                              const zk::snark::plonk_constraint<BlueprintFieldType> constraint) {
+                std::size_t allocate_row() {
+                    return allocate_rows(1);
+                }
 
-                    add_gate(component_instance, selector_serial_number, {constraint});
+                // TODO: should put constraint in some storage and return its index
+                zk::snark::plonk_constraint<BlueprintFieldType>
+                    add_constraint(const zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                    return constraint;
+                }
+
+                void add_gate(std::size_t selector_index,
+                              const zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                    this->_gates.emplace_back(selector_index, constraint);
+                }
+
+                void add_gate(std::size_t selector_index,
+                              const std::initializer_list<zk::snark::plonk_constraint<BlueprintFieldType>> &constraints) {
+                    this->_gates.emplace_back(selector_index, constraints);
+                }
+
+                void add_gate(zk::snark::plonk_gate<BlueprintFieldType, zk::snark::plonk_constraint<BlueprintFieldType>> &gate) {
+                    this->_gates.emplace_back(gate);
                 }
 
                 zk::snark::plonk_constraint<BlueprintFieldType>
@@ -131,8 +122,13 @@ namespace nil {
                               const std::initializer_list<zk::snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
                     this->_lookup_gates.emplace_back(selector_index, constraints);
                 }
+
+                zk::snark::plonk_table_description<BlueprintFieldType,
+                        ArithmetizationParams> table_description() const {
+                    return _table_description;
+                }
             };
         }    // namespace blueprint
     }        // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_CIRCUIT_PLONK_HPP
+#endif    // CRYPTO3_BLUEPRINT_CIRCUIT_PLONK_HPP

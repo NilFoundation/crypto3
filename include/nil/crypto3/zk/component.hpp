@@ -33,7 +33,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
 
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
@@ -44,24 +44,24 @@ namespace nil {
                 class component;
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
-                    ConstantAmount, PublicInputAmount>
-                class component<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
+                    std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
+                class component<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
                     ConstantAmount, PublicInputAmount> {
                 protected:
 
                     using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
                     using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
                     using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
-                    using underlying_components_container_type = std::array<component*>;
+                    // using underlying_components_container_type = std::array<component*>;
                     
-                private:
+                public:
 
                     witness_container_type _W;
                     constant_container_type _C;
                     public_input_container_type _PI;
-                    underlying_components_container_type _underlying_components;
+                    // underlying_components_container_type _underlying_components;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                     /**
                      * Get Witness column global index by its internal index.
@@ -90,9 +90,7 @@ namespace nil {
                         return _PI[(PublicInputAmount + index)%PublicInputAmount];
                     }
 
-                public:
-
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
                     /**
@@ -108,8 +106,7 @@ namespace nil {
                     template <typename WitnessContainerType, typename ConstantContainerType,
                         typename PublicInputContainerType>
                     component(WitnessContainerType witness, ConstantContainerType constant,
-                            PublicInputContainerType public_input, std::uint32_t rows_amount = 0) :
-                        _rows_amount(rows_amount) {
+                            PublicInputContainerType public_input, std::uint32_t rows_amount = 0) {
                         std::copy_n(std::make_move_iterator(witness.begin()), WitnessAmount, _W.begin());
                         std::copy_n(std::make_move_iterator(constant.begin()), ConstantAmount, _C.begin());
                         std::copy_n(std::make_move_iterator(public_input.begin()), PublicInputAmount, _PI.begin());
@@ -128,7 +125,7 @@ namespace nil {
                     }
 
                     template <typename ComponentType>
-                    friend zk::detail::blueprint_component_id_type zk::detail::get_component_id (ComponentType component);
+                    friend detail::blueprint_component_id_type detail::get_component_id (ComponentType component);
                 };
 
                 // namespace detail {
@@ -138,7 +135,7 @@ namespace nil {
                 //     struct component_hash {
                 //         template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
                 //             ConstantAmount, PublicInputAmount>
-                //         std::size_t operator() (const component<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
+                //         std::size_t operator() (const component<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
                 //                 ConstantAmount, PublicInputAmount> &node) const {
                             
                 //         }
@@ -148,10 +145,10 @@ namespace nil {
 
 
                 template<typename BlueprintFieldType>
-                class component<snark::r1cs_constraint_system<BlueprintFieldType>> {
+                class component<zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
                 protected:
 
-                    typedef snark::r1cs_constraint_system<BlueprintFieldType>
+                    typedef zk::snark::r1cs_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     blueprint<ArithmetizationType> &bp;
@@ -162,7 +159,7 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 

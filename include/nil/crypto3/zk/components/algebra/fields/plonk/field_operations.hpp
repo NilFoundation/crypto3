@@ -28,21 +28,20 @@
 // @file Declaration of interfaces for PLONK unified addition component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
+#ifndef CRYPTO3_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
+#define CRYPTO3_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
 
 #include <cmath>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
 #include <nil/crypto3/zk/component.hpp>
-#include <nil/crypto3/zk/detail/component_friends.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 // Input: x, y \in Fp
@@ -50,37 +49,37 @@ namespace nil {
                 template<typename ArithmetizationType, std::int32_t WitnessAmount>
                 class multiplication;
 
-                DECLARE_BLUEPRINT_COMPONENT_FRIENDS(multiplication, 3);
-
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams>
-                class multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>:
-                    public component<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        3> {
+                class multiplication<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>:
+                    public component<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                        3,0,0> {
 
                     constexpr static const std::int32_t WitnessAmount = 3;
                 
                     using component_type = component<
-                        snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        WitnessAmount>;
+                        zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                        WitnessAmount,0,0>;
 
                 public:
 
-                    constexpr static const std::size_t selector_seed = 0x0fc1;
+                    // constexpr static const std::size_t selector_seed = 0x0fc1;
+                    const std::size_t rows_amount = 1;
+                    const std::size_t gates_amount = 1;
 
                     using var = typename component_type::var;
 
-                    struct params_type {
+                    struct input_type {
                         var x = var(0, 0, false);
                         var y = var(0, 0, false);
-                    } params;
+                    };
 
                     struct result_type {
                         var output = var(0, 0, false);
                         result_type(
-                            const multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                WitnessAmount> &state, std::uint32_t start_row_index) {
-                            output = var(state.W(2), start_row_index, false, var::column_type::witness);
+                            const multiplication<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                WitnessAmount> &component, std::uint32_t start_row_index) {
+                            output = var(component.W(2), start_row_index, false, var::column_type::witness);
                         }
 
                         result_type(std::size_t start_row_index) {
@@ -88,69 +87,95 @@ namespace nil {
                         }
                     };
 
-                    template <typename ContainerType>
-                    multiplication(ContainerType wires, params_type params):
-                        component_type(wires, 1, 1), params(params){};
+                    // template <typename ContainerType>
+                    // multiplication(ContainerType wires):
+                    //     component_type(wires, 1, 1){};
 
                     multiplication(std::initializer_list<
-                            typename component_type::witness_container_type::value_type> wires, params_type params):
-                        component_type(wires, 1, 1), params(params){};
-
-                    friend
-                    INCLASS_BLUEPRINT_COMPONENT_GENERATE_ASSIGNMENTS_FRIEND(
-                        multiplication, BlueprintFieldType, ArithmetizationParams, 3);
-
-                    friend
-                    INCLASS_BLUEPRINT_COMPONENT_GENERATE_GATES_FRIEND(
-                        multiplication, BlueprintFieldType, ArithmetizationParams, 3);
-
-                    friend
-                    INCLASS_BLUEPRINT_COMPONENT_GENERATE_COPY_CONSTRAINTS_FRIEND(
-                        multiplication, BlueprintFieldType, ArithmetizationParams, 3);
-
-                    friend
-                    INCLASS_BLUEPRINT_COMPONENT_GENERATE_CIRCUIT_FRIEND(
-                        multiplication, BlueprintFieldType, ArithmetizationParams, 3);
+                            typename component_type::witness_container_type::value_type> witnesses,
+                                   std::initializer_list<
+                            typename component_type::constant_container_type::value_type> constants,
+                                   std::initializer_list<
+                            typename component_type::public_input_container_type::value_type> public_inputs):
+                        component_type(witnesses, constants, public_inputs){};
                 };
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          std::int32_t WitnessAmount>
                 using plonk_multiplication =
-                    multiplication<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
+                    multiplication<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
+
+                template<typename BlueprintFieldType,
+                         typename ArithmetizationParams>
+                std::size_t allocate(
+                    const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                    circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                    const std::size_t components_amount = 1) {
+
+                    return bp.allocate_rows(component.rows_amount * components_amount);
+                }
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams>
                 typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type
                     generate_assignments(
-                        const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &state,
-                        blueprint_assignment_table<
-                            snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                        const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                        assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                        const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type instance_input,
                         const std::uint32_t start_row_index) {
 
-                    const std::uint32_t j = start_row_index;
+                    const std::size_t j = start_row_index;
 
-                    assignment.witness(state.W(0))[j] = assignment.var_value(state.params.x);
-                    assignment.witness(state.W(1))[j] = assignment.var_value(state.params.y);
-                    assignment.witness(state.W(2))[j] = assignment.var_value(state.params.x) *
-                        assignment.var_value(state.params.y);
+                    assignment.witness(component.W(0), j) = assignment.var_value(instance_input.x);
+                    assignment.witness(component.W(1), j) = assignment.var_value(instance_input.y);
+                    assignment.witness(component.W(2), j) = assignment.var_value(instance_input.x) *
+                        assignment.var_value(instance_input.y);
 
-                    return typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::
-                        result_type(state, start_row_index);
+                    return typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type(component, start_row_index);
                 }
+
+                // template<typename BlueprintFieldType,
+                //          typename ArithmetizationParams>
+                // typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type
+                //     generate_assignments(
+                //         const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                //         assignment<
+                //             zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                //         circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                //         const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type instance_input) {
+
+                //     assignment.lock();
+
+                //     const int32_t row_0 = assignment.allocate_row();
+
+                //     assignment.witness(0, row_0) = assignment.var_value(instance_input.x);
+                //     assignment.witness(1, row_0) = assignment.var_value(instance_input.y);
+                //     assignment.witness(2, row_0) = assignment.var_value(instance_input.x) *
+                //         assignment.var_value(instance_input.y);
+
+
+
+                //     assignment.unlock();
+
+                //     return typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::
+                //         result_type(component, start_row_index);
+                // }
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams>
                 void generate_gates(
-                    const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &state,
-                    blueprint<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    blueprint_public_assignment_table<
-                        snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const std::uint32_t first_selector_index) {
+                    const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                    circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                    public_assignment<
+                        zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                    const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input,
+                    const std::size_t first_selector_index) {
 
                     using var = typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::var;
 
-                    auto constraint_1 = bp.add_constraint(var(state.W(0), 0) * var(state.W(1), 0) - var(state.W(2), 0));
+                    auto constraint_1 = bp.add_constraint(
+                        var(component.W(0), 0) * var(component.W(1), 0) - var(component.W(2), 0));
 
                     bp.add_gate(first_selector_index, {constraint_1});
                 }
@@ -158,52 +183,106 @@ namespace nil {
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams>
                 void generate_copy_constraints(
-                    const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &state,
-                    blueprint<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    blueprint_public_assignment_table<
-                        snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const std::uint32_t start_row_index) {
+                    const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                    circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                    public_assignment<
+                        zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                    const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input,
+                    const std::size_t start_row_index) {
 
                     using var = typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::var;
 
-                    std::uint32_t public_input_column_index = 0;
+                    std::size_t public_input_column_index = 0;
 
-                    const std::uint32_t j = start_row_index;
-                    var component_x = var(state.W(0), static_cast<int>(j), false);
-                    var component_y = var(state.W(1), static_cast<int>(j), false);
-                    bp.add_copy_constraint({state.params.x, component_x});
-                    bp.add_copy_constraint({component_y, state.params.y});
+                    const std::size_t j = start_row_index;
+                    var component_x = var(component.W(0), static_cast<int>(j), false);
+                    var component_y = var(component.W(1), static_cast<int>(j), false);
+                    bp.add_copy_constraint({instance_input.x, component_x});
+                    bp.add_copy_constraint({component_y, instance_input.y});
                 }
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams>
                 typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type
-                    generate_circuit1(
-                        const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &state,
-                        blueprint<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                        blueprint_public_assignment_table<
-                            snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const std::uint32_t start_row_index){
+                    generate_circuit(
+                        const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                        circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                        public_assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                        const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input,
+                        const std::size_t start_row_index){
 
-                    using ComponentType = plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>;
+                    auto selector_iterator = pub_assignment.find_selector(component);
+                    std::size_t first_selector_index;
 
-                    auto selector_iterator = assignment.find_selector(state.selector_seed);
-                    std::uint32_t first_selector_index;
-
-                    if (selector_iterator == assignment.selectors_end()){
-                        first_selector_index = assignment.allocate_selector(state.selector_seed,
-                            state.gates_amount());
-                        generate_gates(state, bp, assignment, first_selector_index);
+                    if (selector_iterator == pub_assignment.selectors_end()){
+                        first_selector_index = pub_assignment.allocate_selector(component,
+                            component.gates_amount);
+                        generate_gates(component, bp, pub_assignment, instance_input, first_selector_index);
                     } else {
                         first_selector_index = selector_iterator->second;
                     }
 
-                    assignment.enable_selector(first_selector_index, start_row_index);
+                    pub_assignment.enable_selector(first_selector_index, start_row_index);
 
-                    generate_copy_constraints<BlueprintFieldType, ArithmetizationParams>(state, bp, assignment, start_row_index);
+                    generate_copy_constraints(component, bp, pub_assignment, instance_input, start_row_index);
 
-                    return typename ComponentType::result_type(state, start_row_index);
+                    return typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type(component, start_row_index);
                 }
+
+                // template<typename BlueprintFieldType,
+                //          typename ArithmetizationParams>
+                // void generate_copy_constraints(
+                //     const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                //     circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                //     public_assignment<
+                //         zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                //     const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input) {
+
+                //     using var = typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::var;
+
+                //     std::uint32_t public_input_column_index = 0;
+
+                //     const std::uint32_t j = start_row_index;
+                //     var component_x = var(component.W(0), static_cast<int>(j), false);
+                //     var component_y = var(component.W(1), static_cast<int>(j), false);
+                //     bp.add_copy_constraint({instance_input.x, component_x});
+                //     bp.add_copy_constraint({component_y, instance_input.y});
+                // }
+
+                // template<typename BlueprintFieldType,
+                //          typename ArithmetizationParams>
+                // typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type
+                //     generate_instance(
+                //         const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                //         assignment<
+                //             zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                //         circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                //         const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input) {
+
+                //     typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::
+                //         result_type result = generate_assignments<BlueprintFieldType, ArithmetizationParams>(
+                //             component, assignment, bp);
+
+                //     generate_copy_constraints<BlueprintFieldType, ArithmetizationParams>(component, bp, assignment, start_row_index);
+
+                //     return (component, start_row_index);
+                // }
+
+                // template<typename BlueprintFieldType,
+                //          typename ArithmetizationParams>
+                // void generate_gates(
+                //     const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                //     circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                //     public_assignment<
+                //         zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+
+                //     using var = typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::var;
+
+                //     auto constraint_1 = bp.add_constraint(var(component.W(0), 0) * var(component.W(1), 0) - var(component.W(2), 0));
+
+                //     bp.add_gate({constraint_1});
+                // }
+
 /*
                 // Input: x, y \in Fp
                 // Output: z = x + y
@@ -215,12 +294,12 @@ namespace nil {
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2>
-                class addition<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2> {
+                class addition<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0fc2;
 
@@ -230,12 +309,12 @@ namespace nil {
                             ComponentType,
                             typename ComponentType::result_type,
                             boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                               blueprint_public_assignment_table<ArithmetizationType> &,
+                                               public_assignment<ArithmetizationType> &,
                                                const typename ComponentType::params_type &,
                                                const std::size_t>>::value)),
                         typename ComponentType::result_type>::type
                         generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         public_assignment<ArithmetizationType> &assignment,
                                          const typename ComponentType::params_type &params,
                                          const std::size_t start_row_index);
 
@@ -275,7 +354,7 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               public_assignment<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
@@ -286,7 +365,7 @@ namespace nil {
 
                     static void
                         generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  public_assignment<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
 
@@ -311,12 +390,12 @@ namespace nil {
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3>
-                class division<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
+                class division<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0fc3;
 
@@ -326,12 +405,12 @@ namespace nil {
                             ComponentType,
                             typename ComponentType::result_type,
                             boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                               blueprint_public_assignment_table<ArithmetizationType> &,
+                                               public_assignment<ArithmetizationType> &,
                                                const typename ComponentType::params_type &,
                                                const std::size_t>>::value)),
                         typename ComponentType::result_type>::type
                         generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         public_assignment<ArithmetizationType> &assignment,
                                          const typename ComponentType::params_type &params,
                                          const std::size_t start_row_index);
 
@@ -371,7 +450,7 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               public_assignment<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
@@ -383,7 +462,7 @@ namespace nil {
 
                     static void
                         generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  public_assignment<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
 
@@ -407,15 +486,15 @@ namespace nil {
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2>
-                class subtraction<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class subtraction<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                   W0,
                                   W1,
                                   W2> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0fc4;
 
@@ -425,12 +504,12 @@ namespace nil {
                             ComponentType,
                             typename ComponentType::result_type,
                             boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                               blueprint_public_assignment_table<ArithmetizationType> &,
+                                               public_assignment<ArithmetizationType> &,
                                                const typename ComponentType::params_type &,
                                                const std::size_t>>::value)),
                         typename ComponentType::result_type>::type
                         generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         public_assignment<ArithmetizationType> &assignment,
                                          const typename ComponentType::params_type &params,
                                          const std::size_t start_row_index);
 
@@ -469,7 +548,7 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               public_assignment<ArithmetizationType> &assignment,
                                                const params_type params,
                                                const std::size_t first_selector_index) {
 
@@ -480,7 +559,7 @@ namespace nil {
 
                     static void
                         generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  public_assignment<ArithmetizationType> &assignment,
                                                   const params_type params,
                                                   const std::size_t start_row_index) {
 
@@ -503,14 +582,14 @@ namespace nil {
                          typename ArithmetizationParams,
                          std::size_t W0,
                          std::size_t W1>
-                class mul_by_constant<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class mul_by_constant<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                   W0,
                                   W1> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0fc5;
 
@@ -537,7 +616,7 @@ namespace nil {
 
                     static result_type
                         generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         public_assignment<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          std::size_t start_row_index) {
 
@@ -573,7 +652,7 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               public_assignment<ArithmetizationType> &assignment,
                                                const params_type params,
                                                const std::size_t first_selector_index) {
 
@@ -584,7 +663,7 @@ namespace nil {
 
                     static void
                         generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  public_assignment<ArithmetizationType> &assignment,
                                                   const params_type params,
                                                   const std::size_t start_row_index) {
                         var component_x = var(W0, static_cast<int>(start_row_index), false);
@@ -593,7 +672,7 @@ namespace nil {
 
                     static void
                         generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  public_assignment<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   std::size_t component_start_row) {
                             std::size_t row = component_start_row;
@@ -612,12 +691,12 @@ namespace nil {
                          std::size_t W1,
                          std::size_t W2,
                          std::size_t W3>
-                class division_or_zero<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
+                class division_or_zero<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0, W1, W2, W3> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                     constexpr static const std::size_t selector_seed = 0x0fc7;
 
@@ -627,12 +706,12 @@ namespace nil {
                             ComponentType,
                             typename ComponentType::result_type,
                             boost::mpl::vector<blueprint<ArithmetizationType> &,
-                                               blueprint_public_assignment_table<ArithmetizationType> &,
+                                               public_assignment<ArithmetizationType> &,
                                                const typename ComponentType::params_type &,
                                                const std::size_t>>::value)),
                         typename ComponentType::result_type>::type
                         generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                         public_assignment<ArithmetizationType> &assignment,
                                          const typename ComponentType::params_type &params,
                                          const std::size_t start_row_index);
 
@@ -676,7 +755,7 @@ namespace nil {
                     }
 
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                               public_assignment<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
 
@@ -688,7 +767,7 @@ namespace nil {
 
                     static void
                         generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                                                  public_assignment<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
 
@@ -704,8 +783,8 @@ namespace nil {
 
                 */
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
+#endif    // CRYPTO3_BLUEPRINT_PLONK_FIELD_OPERATIONS_HPP
