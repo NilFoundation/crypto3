@@ -106,7 +106,7 @@ namespace nil {
                     template <typename WitnessContainerType, typename ConstantContainerType,
                         typename PublicInputContainerType>
                     component(WitnessContainerType witness, ConstantContainerType constant,
-                            PublicInputContainerType public_input, std::uint32_t rows_amount = 0) {
+                            PublicInputContainerType public_input) {
                         std::copy_n(std::make_move_iterator(witness.begin()), WitnessAmount, _W.begin());
                         std::copy_n(std::make_move_iterator(constant.begin()), ConstantAmount, _C.begin());
                         std::copy_n(std::make_move_iterator(public_input.begin()), PublicInputAmount, _PI.begin());

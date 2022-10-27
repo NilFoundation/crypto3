@@ -124,12 +124,14 @@ namespace nil {
 
             // typename component_type::result_type component_result =
             blueprint::components::generate_circuit<BlueprintFieldType, ArithmetizationParams>(component_instance, bp, public_assignment, instance_input, start_row);
-            
             typename component_type::result_type component_result =
                 blueprint::components::generate_assignments<BlueprintFieldType, ArithmetizationParams>(
                     component_instance, assignment_bp, instance_input, start_row);
-
             result_check(assignment_bp, component_result);
+
+            assignment_bp.padding();
+            std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
+            std::cout << "Padded rows: " << desc.rows_amount << std::endl;
 
             zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
                                                                                                      public_assignment);

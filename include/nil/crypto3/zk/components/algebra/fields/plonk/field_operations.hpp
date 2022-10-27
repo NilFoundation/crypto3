@@ -63,7 +63,6 @@ namespace nil {
 
                 public:
 
-                    // constexpr static const std::size_t selector_seed = 0x0fc1;
                     const std::size_t rows_amount = 1;
                     const std::size_t gates_amount = 1;
 
@@ -87,9 +86,15 @@ namespace nil {
                         }
                     };
 
-                    // template <typename ContainerType>
-                    // multiplication(ContainerType wires):
-                    //     component_type(wires, 1, 1){};
+                    template <typename ContainerType>
+                    multiplication(ContainerType witness):
+                        component_type(witness, {}, {}){};
+
+                    template <typename WitnessContainerType, typename ConstantContainerType,
+                        typename PublicInputContainerType>
+                    multiplication(WitnessContainerType witness, ConstantContainerType constant,
+                            PublicInputContainerType public_input):
+                        component_type(witness, constant, public_input){};
 
                     multiplication(std::initializer_list<
                             typename component_type::witness_container_type::value_type> witnesses,
@@ -131,7 +136,6 @@ namespace nil {
                     assignment.witness(component.W(1), j) = assignment.var_value(instance_input.y);
                     assignment.witness(component.W(2), j) = assignment.var_value(instance_input.x) *
                         assignment.var_value(instance_input.y);
-
                     return typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type(component, start_row_index);
                 }
 
