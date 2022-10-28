@@ -27,7 +27,9 @@
 #ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_HPP
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
+#include <algorithm>
+
+#include <nil/crypto3/zk/snark/arithmetization/plonk/padding.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,42 +40,53 @@ namespace nil {
                 using plonk_column = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
+                struct plonk_table;
+
+                template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
                 struct plonk_private_table {
 
                     using witnesses_container_type = std::array<ColumnType, ArithmetizationParams::WitnessColumns>;
 
                 protected:
 
-                    witnesses_container_type _witness;
+                    witnesses_container_type _witnesses;
 
                 public:
                     plonk_private_table(
                         witnesses_container_type witness_columns = {}) :
-                        _witness(witness_columns) {
+                        _witnesses(witness_columns) {
                     }
 
-                    constexpr std::size_t witness_size() {
-                        return _witness.size();
+                    std::uint32_t witnesses_amount() const {
+                        return _witnesses.size();
+                    }
+
+                    std::uint32_t witness_column_size(std::uint32_t index) const {
+                        return _witnesses[index].size();
                     }
 
                     ColumnType witness(std::uint32_t index) const {
                         assert(index < ArithmetizationParams::WitnessColumns);
-                        return _witness[index];
+                        return _witnesses[index];
                     }
 
                     witnesses_container_type witnesses() const {
-                        return _witness;
+                        return _witnesses;
                     }
 
                     ColumnType operator[](std::uint32_t index) const {
                         if (index < ArithmetizationParams::WitnessColumns)
-                            return _witness[index];
+                            return _witnesses[index];
                         index -= ArithmetizationParams::WitnessColumns;
+                        return {};
                     }
 
-                    constexpr std::size_t size() const {
-                        return _witness.size();
+                    constexpr std::uint32_t size() const {
+                        return witnesses_amount();
                     }
+
+                    friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
+                        plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
@@ -99,12 +112,16 @@ namespace nil {
                         _selectors(selector_columns) {
                     }
 
-                    constexpr std::size_t public_input_size() {
+                    std::uint32_t public_inputs_amount() const {
                         return _public_inputs.size();
                     }
 
+                    std::uint32_t public_input_column_size(std::uint32_t index) const {
+                        return _public_inputs[index].size();
+                    }
+
                     ColumnType public_input(std::uint32_t index) const {
-                        assert(index < public_input_size());
+                        assert(index < public_inputs_amount());
                         return _public_inputs[index];
                     }
 
@@ -112,12 +129,16 @@ namespace nil {
                         return _public_inputs;
                     }
 
-                    constexpr std::size_t constant_size() {
+                    std::uint32_t constants_amount() const {
                         return _constants.size();
                     }
 
+                    std::uint32_t constant_column_size(std::uint32_t index) const {
+                        return _constants[index].size();
+                    }
+
                     ColumnType constant(std::uint32_t index) const {
-                        assert(index < constant_size());
+                        assert(index < constants_amount());
                         return _constants[index];
                     }
 
@@ -125,12 +146,16 @@ namespace nil {
                         return _constants;
                     }
 
-                    constexpr std::size_t selector_size() {
+                    constexpr std::uint32_t selectors_amount() const {
                         return _selectors.size();
                     }
 
+                    std::uint32_t selector_column_size(std::uint32_t index) const {
+                        return _selectors[index].size();
+                    }
+
                     ColumnType selector(std::uint32_t index) const {
-                        assert(index < selector_size());
+                        assert(index < selectors_amount());
                         return _selectors[index];
                     }
 
@@ -139,23 +164,27 @@ namespace nil {
                     }
 
                     ColumnType operator[](std::uint32_t index) const {
-                        if (index < public_input_size())
+                        if (index < public_inputs_amount())
                             return public_input(index);
-                        index -= public_input_size();
-                        if (index < constant_size())
+                        index -= public_inputs_amount();
+                        if (index < constants_amount())
                             return constant(index);
-                        index -= constant_size();
-                        if (index < selector_size()) {
+                        index -= constants_amount();
+                        if (index < selectors_amount()) {
                             return selector(index);
                         }
-                        index -= selector_size();
+                        index -= selectors_amount();
+                        return {};
                     }
 
-                    constexpr std::size_t size() const {
-                        return public_input_size() +
-                               constant_size() +
-                               selector_size();
+                    constexpr std::uint32_t size() const {
+                        return public_inputs_amount() +
+                               constants_amount() +
+                               selectors_amount();
                     }
+
+                    friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
+                        plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
@@ -199,6 +228,7 @@ namespace nil {
                         index -= _private_table.size();
                         if (index < _public_table.size())
                             return _public_table[index];
+                        return {};
                     }
 
                     private_table_type private_table() const {
@@ -209,9 +239,38 @@ namespace nil {
                         return _public_table;
                     }
 
-                    std::size_t size() const {
+                    std::uint32_t size() const {
                         return _private_table.size() + _public_table.size();
                     }
+
+                    std::uint32_t rows_amount() const {
+                        std::uint32_t rows_amount = 0;
+
+                        for (std::uint32_t w_index = 0; w_index <
+                                                       _private_table.witnesses_amount(); w_index++) {
+                            rows_amount = std::max(rows_amount, _private_table.witness_column_size(w_index));
+                        }
+
+                        for (std::uint32_t pi_index = 0; pi_index <
+                                                       _public_table.public_inputs_amount(); pi_index++) {
+                            rows_amount = std::max(rows_amount, _public_table.public_input_column_size(pi_index));
+                        }
+
+                        for (std::uint32_t c_index = 0; c_index <
+                                                      _public_table.constants_amount(); c_index++) {
+                            rows_amount = std::max(rows_amount, _public_table.constant_column_size(c_index));
+                        }
+
+                        for (std::uint32_t s_index = 0; s_index <
+                                                      _public_table.selectors_amount(); s_index++) {
+                            rows_amount = std::max(rows_amount, _public_table.selector_column_size(s_index));
+                        }
+
+                        return rows_amount;
+                    }
+
+                    friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
+                        plonk_table &table);
                 };
 
                 template<typename FieldType, typename ArithmetizationParams>
