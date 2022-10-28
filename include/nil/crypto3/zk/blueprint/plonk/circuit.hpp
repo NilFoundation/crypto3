@@ -52,28 +52,14 @@ namespace nil {
                 typedef zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                        ArithmetizationParams> ArithmetizationType;
 
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> &_table_description;
             public:
                 typedef BlueprintFieldType blueprint_field_type;
 
                 circuit(zk::snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> arithmetization_type_in, zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
-                        ArithmetizationType(arithmetization_type_in), _table_description(table_description) { }
+                        ArithmetizationParams> constraint_system) :
+                        ArithmetizationType(constraint_system) { }
 
-                circuit(zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description) :
-                    ArithmetizationType(), _table_description(table_description) {
-                    _table_description.rows_amount = 0;
-                }
-
-                std::size_t allocate_rows(std::size_t required_amount = 1) {
-                    std::size_t result = _table_description.rows_amount;
-                    _table_description.rows_amount += required_amount;
-                    return result;
-                }
-
-                std::size_t allocate_row() {
-                    return allocate_rows(1);
+                circuit() : ArithmetizationType() {
                 }
 
                 // TODO: should put constraint in some storage and return its index
@@ -121,11 +107,6 @@ namespace nil {
                 void add_lookup_gate(std::size_t selector_index,
                               const std::initializer_list<zk::snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
                     this->_lookup_gates.emplace_back(selector_index, constraints);
-                }
-
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> table_description() const {
-                    return _table_description;
                 }
             };
         }    // namespace blueprint

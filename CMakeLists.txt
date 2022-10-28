@@ -29,11 +29,18 @@ if(ZK_PLACEHOLDER_DEBUG)
     add_definitions(-DZK_PLACEHOLDER_DEBUG_ENABLED)
 endif()
 
-option(BLUEPRINT_DEBUG "Build with blueprint debug profiling" FALSE)
+option(BLUEPRINT_DEBUG "Build with blueprint debug output" FALSE)
 
 if(BLUEPRINT_DEBUG)
     message(STATUS "BLUEPRINT DEBUG enabled")
     add_definitions(-DBLUEPRINT_DEBUG_ENABLED)
+endif()
+
+option(BLUEPRINT_TESTS_PROFILING "Build tests with blueprint table profiling" FALSE)
+
+if(BLUEPRINT_TESTS_PROFILING)
+    message(STATUS "BLUEPRINT TESTS PROFILING enabled")
+    add_definitions(-DBLUEPRINT_PLONK_PROFILING_ENABLED)
 endif()
 
 macro(cm_find_package NAME)

@@ -45,6 +45,11 @@ namespace nil {
         template<typename FieldType, typename ArithmetizationParams>
         void profiling(zk::snark::plonk_assignment_table<FieldType, ArithmetizationParams> assignments) {
 
+            for (std::size_t row_index = 0; row_index < assignments.rows_amount(); row_index++) {
+                std::cout << "\t" << row_index;
+            }
+            std::cout << std::endl;
+
             for (std::size_t w_index = 0; w_index < ArithmetizationParams::WitnessColumns; w_index++) {
                 std::cout << "W" << w_index << ":";
                 profiling(assignments.witness(w_index));

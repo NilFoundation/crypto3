@@ -31,7 +31,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace detail {
                 template<typename T1, typename T2, typename T3>
                 static void blueprint_assert(T1 line, T2 file, T3 expr){
@@ -40,13 +40,13 @@ namespace nil {
                     throw std::runtime_error(errMsg.str().c_str());
                 }
             }    // namespace detail
-        }    // namespace zk
+        }    // namespace blueprint
     }        // namespace crypto3
 }    // namespace nil
 
 #ifdef BLUEPRINT_DEBUG_ENABLED
 #define BLUEPRINT_ASSERT( expr ) \
-    ( (expr) ? (void)0 : nil::crypto3::zk::detail::blueprint_assert( __LINE__, __FILE__, #expr))
+    ( (expr) ? (void)0 : nil::crypto3::blueprint::detail::blueprint_assert( __LINE__, __FILE__, #expr))
 #else
 #define BLUEPRINT_ASSERT( expr ) ((void)0)
 #endif

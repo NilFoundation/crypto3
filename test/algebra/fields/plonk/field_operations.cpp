@@ -73,11 +73,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
     typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {x, y, expected_res};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
+        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
     };
 
     component_type component_instance({0, 1, 2},{},{});
@@ -115,7 +116,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
     typename component_type::params_type params = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {x, y, expected_res};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
     auto result_check = [&expected_res](AssignmentType &assignment, 
         component_type::result_type &real_res) {

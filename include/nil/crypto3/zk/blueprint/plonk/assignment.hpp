@@ -29,6 +29,7 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
+#include <nil/crypto3/zk/assert.hpp>
 
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/detail/get_component_id.hpp>
@@ -56,59 +57,32 @@ namespace nil {
                 typedef zk::snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams> ArithmetizationType;
 
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> &_table_description;
             public:
                 private_assignment(zk::snark::plonk_private_assignment_table<BlueprintFieldType,
-                        ArithmetizationParams> assigment_table,
-                                                   zk::snark::plonk_table_description<BlueprintFieldType,
-                                                           ArithmetizationParams> &table_description) :
+                        ArithmetizationParams> assigment_table) :
                         zk::snark::plonk_private_assignment_table<BlueprintFieldType,
-                                ArithmetizationParams>(assigment_table), _table_description(table_description) {
+                                ArithmetizationParams>(assigment_table) {
                 }
 
-                private_assignment(
-                        zk::snark::plonk_table_description<BlueprintFieldType,
-                                ArithmetizationParams> &table_description) :
+                private_assignment() :
                         zk::snark::plonk_private_assignment_table<BlueprintFieldType,
-                                ArithmetizationParams>(), _table_description(table_description) {
+                                ArithmetizationParams>() {
                 }
 
                 typename BlueprintFieldType::value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
-                    // BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
+                    BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
 
-                    if (this->_witness[witness_index].size() <= row_index)
-                        this->_witness[witness_index].resize(row_index + 1);
+                    if (this->_witnesses[witness_index].size() <= row_index)
+                        this->_witnesses[witness_index].resize(row_index + 1);
 
-                    return this->_witness[witness_index][row_index];
+                    return this->_witnesses[witness_index][row_index];
                 }
 
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> table_description() const {
-                    return _table_description;
-                }
+                typename BlueprintFieldType::value_type witness(std::uint32_t witness_index, std::uint32_t row_index) const {
+                    BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
+                    BLUEPRINT_ASSERT(row_index < this->_witnesses[witness_index].size());
 
-                std::size_t padding() {
-
-                    if (_table_description.usable_rows_amount == 0) {
-                        _table_description.usable_rows_amount =
-                                _table_description.rows_amount;
-                        _table_description.rows_amount = std::pow(2,
-                                                                  std::ceil(std::log2(_table_description.rows_amount)));
-
-                        if (_table_description.rows_amount < 8)
-                            _table_description.rows_amount = 8;
-                    }
-
-                    for (std::size_t w_index = 0; w_index <
-                                                  this->witness_size(); w_index++) {
-
-                        this->_witness[w_index].resize(_table_description.rows_amount,
-                                                              decltype(this->_witness)::value_type::value_type::zero());
-                    }
-
-
-                    return _table_description.rows_amount;
+                    return this->_witnesses[witness_index][row_index];
                 }
             };
 
@@ -127,9 +101,6 @@ namespace nil {
 
                 using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> &_table_description;
-
                 using component_selector_map_type = std::map<
                     detail::blueprint_component_id_type,
                     std::size_t>;
@@ -141,28 +112,10 @@ namespace nil {
                 std::size_t allocated_public_input_rows = 0;
                 std::size_t selector_index = 0;
             public:
-                // public_assignment(
-                //         std::array<std::vector<typename BlueprintFieldType::value_type>, ArithmetizationParams::public_input> public_input,
-                //         std::array<std::vector<typename BlueprintFieldType::value_type>, ArithmetizationParams::constant> constant,
-                //         std::array<std::vector<typename BlueprintFieldType::value_type>, ArithmetizationParams::selector> selector,
-                //         zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> &table_description_in,
-                //         std::map<std::size_t, std::size_t> selector_map_in,
-                //         std::size_t next_selector_index_in, std::size_t allocated_public_input_rows_in,
-                //         std::size_t selector_index_in) :
-                //         zk::snark::plonk_public_assignment_table<BlueprintFieldType, ArithmetizationParams>(
-                //                 public_input, constant, selector),
-                //         _table_description(table_description_in), selector_map(selector_map_in),
-                //         next_selector_index(next_selector_index_in),
-                //         allocated_public_input_rows(allocated_public_input_rows_in),
-                //         selector_index(selector_index_in) {
-                // }
 
-                public_assignment(
-                        zk::snark::plonk_table_description<BlueprintFieldType,
-                                ArithmetizationParams> &table_description) :
+                public_assignment() :
                         zk::snark::plonk_public_assignment_table<BlueprintFieldType,
-                                ArithmetizationParams>(),
-                        _table_description(table_description) {
+                                ArithmetizationParams>() {
                 }
 
                 typename BlueprintFieldType::value_type &selector(std::size_t selector_index,
@@ -258,85 +211,42 @@ namespace nil {
                 typename BlueprintFieldType::value_type &public_input(std::size_t public_input_index,
                     std::uint32_t row_index) {
 
-                    assert(public_input_index < this->_public_inputs.size());
+                    BLUEPRINT_ASSERT(public_input_index < zk_type::public_inputs_amount());
 
-                    if (this->_public_inputs[public_input_index].size() <= row_index)
+                    if (zk_type::public_input_column_size(public_input_index) <= row_index)
                         this->_public_inputs[public_input_index].resize(row_index + 1);
 
                     return this->_public_inputs[public_input_index][row_index];
                 }
 
+                typename BlueprintFieldType::value_type public_input(
+                    std::uint32_t public_input_index, std::uint32_t row_index) const {
+
+                    BLUEPRINT_ASSERT(public_input_index < zk_type::public_inputs_amount());
+                    BLUEPRINT_ASSERT(row_index < zk_type::public_input_column_size(public_input_index));
+
+                    return zk_type::public_input(public_input_index)[row_index];
+                }
+
                 typename BlueprintFieldType::value_type &constant(std::size_t constant_index,
                     std::uint32_t row_index) {
 
-                    assert(constant_index < this->_constants.size());
+                    assert(constant_index < zk_type::constants_amount());
 
-                    if (this->_constants[constant_index].size() <= row_index)
+                    if (zk_type::public_input_column_size(constant_index) <= row_index)
                         this->_constants[constant_index].resize(row_index + 1);
 
                     return this->_constants[constant_index][row_index];
                 }
 
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> table_description() const {
-                    return _table_description;
+                typename BlueprintFieldType::value_type constant(
+                    std::uint32_t constant_index, std::uint32_t row_index) const {
+
+                    BLUEPRINT_ASSERT(constant_index < zk_type::constants_amount());
+                    BLUEPRINT_ASSERT(row_index < zk_type::constant_column_size(constant_index));
+
+                    return zk_type::constant(constant_index)[row_index];
                 }
-
-                std::size_t padding() {
-                    if (_table_description.usable_rows_amount == 0) {
-
-                        _table_description.usable_rows_amount =
-                                _table_description.rows_amount;
-
-                        _table_description.rows_amount = std::pow(2,
-                                                                  std::ceil(std::log2(_table_description.rows_amount)));
-
-                        if (_table_description.rows_amount < 4)
-                            _table_description.rows_amount = 4;
-                    }
-
-                    for (std::size_t pi_index = 0; pi_index <
-                                                   this->_public_inputs.size(); pi_index++) {
-
-                        this->_public_inputs[pi_index].resize(_table_description.rows_amount,
-                                                                    decltype(this->_public_inputs)::value_type::value_type::zero());
-                    }
-
-                    for (std::size_t c_index = 0; c_index <
-                                                  this->_constants.size(); c_index++) {
-
-                        this->_constants[c_index].resize(_table_description.rows_amount,
-                                                               decltype(this->_constants)::value_type::value_type::zero());
-                    }
-
-                    for (std::size_t s_index = 0; s_index <
-                                                  this->_selectors.size(); s_index++) {
-
-                        this->_selectors[s_index].resize(_table_description.rows_amount,
-                                                               decltype(this->_selectors)::value_type::value_type::zero());
-                    }
-
-                    return _table_description.rows_amount;
-                }
-
-                var allocate_public_input(typename BlueprintFieldType::value_type data) {
-
-                    public_input(0, allocated_public_input_rows) = data;
-                    allocated_public_input_rows++;
-                    return var(0, allocated_public_input_rows - 1, false, var::column_type::public_input);
-                }
-
-                std::size_t get_next_selector_index() const {
-                    return next_selector_index;
-                };
-
-                std::size_t get_allocated_public_input_rows() const {
-                    return allocated_public_input_rows;
-                };
-
-                std::size_t get_selector_index() const {
-                    return selector_index;
-                };
             };
 
             template<typename BlueprintFieldType,
@@ -355,14 +265,19 @@ namespace nil {
             public:
                 assignment(
                         private_assignment<ArithmetizationType> &private_assignment,
-                        public_assignment<ArithmetizationType> &public_assignmen) :
-                        _private_assignment(private_assignment), _public_assignment(public_assignmen) {
+                        public_assignment<ArithmetizationType> &public_assignment) :
+                        _private_assignment(private_assignment), _public_assignment(public_assignment) {
 
                 }
 
                 // private_assignment interface
                 typename BlueprintFieldType::value_type &witness(std::size_t witness_index,
                     std::uint32_t row_index) {
+                    return _private_assignment.witness(witness_index, row_index);
+                }
+
+                typename BlueprintFieldType::value_type witness(std::size_t witness_index,
+                    std::uint32_t row_index) const {
                     return _private_assignment.witness(witness_index, row_index);
                 }
 
@@ -400,37 +315,40 @@ namespace nil {
                     return _public_assignment.public_input(public_input_index, row_index);
                 }
 
+                typename BlueprintFieldType::value_type public_input(std::size_t public_input_index,
+                    std::uint32_t row_index) const {
+                    const public_assignment<ArithmetizationType> &const_public_assignment = _public_assignment;
+                    return const_public_assignment.public_input(public_input_index, row_index);
+                }
+
                 typename BlueprintFieldType::value_type &constant(std::size_t constant_index,
                     std::uint32_t row_index) {
                     return _public_assignment.constant(constant_index, row_index);
                 }
 
-                var allocate_public_input(typename BlueprintFieldType::value_type data) {
-                    return _public_assignment.allocate_public_input(data);
-                }
-
-                zk::snark::plonk_table_description<BlueprintFieldType,
-                        ArithmetizationParams> table_description() const {
-                    return _public_assignment.table_description();
-                }
-
-                std::size_t padding() {
-                    std::size_t rows = _private_assignment.padding();
-                    rows = _public_assignment.padding();
-                    return rows;
-                }
-
-                typename BlueprintFieldType::value_type var_value(const var &a) {
-                    switch(a.type){
-                        case var::column_type::witness:
-                            return witness(a.index, a.rotation);
-                        case var::column_type::public_input:
-                            return public_input(a.index, a.rotation);
-                        default:
-                            return constant(a.index, a.rotation);
-                    }
+                typename BlueprintFieldType::value_type constant(std::size_t constant_index,
+                    std::uint32_t row_index) const {
+                    return _public_assignment.constant(constant_index, row_index);
                 }
             };
+
+            template<typename BlueprintFieldType,
+                    typename ArithmetizationParams>
+            typename BlueprintFieldType::value_type var_value(
+                    const private_assignment<zk::snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>> &input_priv_assignment,
+                    const public_assignment<zk::snark::plonk_constraint_system<BlueprintFieldType,
+                        ArithmetizationParams>> &input_pub_assignment,
+                    const zk::snark::plonk_variable<BlueprintFieldType> &input_var) {
+                switch(input_var.type){
+                    case zk::snark::plonk_variable<BlueprintFieldType>::column_type::witness:
+                        return input_priv_assignment.witness(input_var.index, input_var.rotation);
+                    case zk::snark::plonk_variable<BlueprintFieldType>::column_type::public_input:
+                        return input_pub_assignment.public_input(input_var.index, input_var.rotation);
+                    default:
+                        return input_pub_assignment.constant(input_var.index, input_var.rotation);
+                }
+            }
 
         }    // namespace blueprint
     }        // namespace crypto3

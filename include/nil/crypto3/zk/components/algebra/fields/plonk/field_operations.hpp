@@ -126,16 +126,19 @@ namespace nil {
                 typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type
                     generate_assignments(
                         const plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3> &component,
-                        assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                        private_assignment<
+                            zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &priv_assignment,
+                        public_assignment<
+                            zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
                         const typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::input_type instance_input,
                         const std::uint32_t start_row_index) {
 
                     const std::size_t j = start_row_index;
 
-                    assignment.witness(component.W(0), j) = assignment.var_value(instance_input.x);
-                    assignment.witness(component.W(1), j) = assignment.var_value(instance_input.y);
-                    assignment.witness(component.W(2), j) = assignment.var_value(instance_input.x) *
-                        assignment.var_value(instance_input.y);
+                    priv_assignment.witness(component.W(0), j) = var_value(priv_assignment, pub_assignment, instance_input.x);
+                    priv_assignment.witness(component.W(1), j) = var_value(priv_assignment, pub_assignment, instance_input.y);
+                    priv_assignment.witness(component.W(2), j) = var_value(priv_assignment, pub_assignment, instance_input.x) *
+                        var_value(priv_assignment, pub_assignment, instance_input.y);
                     return typename plonk_multiplication<BlueprintFieldType, ArithmetizationParams, 3>::result_type(component, start_row_index);
                 }
 
