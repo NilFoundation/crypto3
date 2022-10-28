@@ -44,9 +44,6 @@ namespace nil {
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class public_assignment;
 
-            template<typename ArithmetizationType, std::size_t... BlueprintParams>
-            class assignment;
-
             template<typename BlueprintFieldType,
                     typename ArithmetizationParams>
             class private_assignment<zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -233,7 +230,7 @@ namespace nil {
 
                     assert(constant_index < zk_type::constants_amount());
 
-                    if (zk_type::public_input_column_size(constant_index) <= row_index)
+                    if (zk_type::constant_column_size(constant_index) <= row_index)
                         this->_constants[constant_index].resize(row_index + 1);
 
                     return this->_constants[constant_index][row_index];

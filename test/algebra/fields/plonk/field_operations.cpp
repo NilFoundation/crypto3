@@ -38,7 +38,12 @@
 
 #include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
 #include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/field_operations.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/multiplication.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/addition.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/division.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/subtraction.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/multiplication_by_constant.hpp>
+#include <nil/crypto3/zk/components/algebra/fields/plonk/division_or_zero.hpp>
 
 #include "../../../test_plonk_component.hpp"
 
@@ -58,7 +63,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
@@ -89,7 +93,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
     std::cout << "multiplication: " << duration.count() << "ms" << std::endl;
 }
 
-/*BOOST_AUTO_TEST_CASE(blueprint_plonk_addition) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_addition) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
@@ -101,29 +105,31 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::addition<ArithmetizationType, 0, 1, 2>;
+    using component_type = blueprint::components::addition<ArithmetizationType, 3>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 22;
     typename BlueprintFieldType::value_type expected_res = x + y;
 
-    typename component_type::params_type params = {
+    typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
+        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    component_type component_instance({0, 1, 2},{},{});
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(component_instance, public_input, result_check, instance_input);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "addition: " << duration.count() << "ms" << std::endl;
@@ -141,29 +147,31 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_division) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::division<ArithmetizationType, 0, 1, 2, 3>;
+    using component_type = blueprint::components::division<ArithmetizationType, 4>;
 
     typename BlueprintFieldType::value_type x = 16;
     typename BlueprintFieldType::value_type y = 2;
     typename BlueprintFieldType::value_type expected_res = x / y;
 
-    typename component_type::params_type params = {
+    typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
+        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    component_type component_instance({0, 1, 2, 3},{},{});
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(component_instance, public_input, result_check, instance_input);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "division: " << duration.count() << "ms" << std::endl;
@@ -181,29 +189,31 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_subtraction) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::subtraction<ArithmetizationType, 0, 1, 2>;
+    using component_type = blueprint::components::subtraction<ArithmetizationType, 3>;
 
     typename BlueprintFieldType::value_type x = 0x56BC8334B5713726A_cppui256;
     typename BlueprintFieldType::value_type y = 101;
     typename BlueprintFieldType::value_type expected_res = x - y;
 
-    typename component_type::params_type params = {
+    typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
+        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    component_type component_instance({0, 1, 2},{},{});
+
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(component_instance, public_input, result_check, instance_input);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "subtraction: " << duration.count() << "ms" << std::endl;
@@ -221,29 +231,30 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_mul_by_constant) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::mul_by_constant<ArithmetizationType, 0, 1>;
+    using component_type = blueprint::components::mul_by_constant<ArithmetizationType, 2>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 22;
     typename BlueprintFieldType::value_type expected_res = x * y;
 
-    typename component_type::params_type params = {
+    typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), y};
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
+        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    component_type component_instance({0, 1},{},{});
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(component_instance, public_input, result_check, instance_input);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "mul_by_constant: " << duration.count() << "ms" << std::endl;
@@ -261,32 +272,33 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::division_or_zero<ArithmetizationType, 0, 1, 2, 3>;
+    using component_type = blueprint::components::division_or_zero<ArithmetizationType, 4>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 0;
     typename BlueprintFieldType::value_type expected_res = 0;
 
-    typename component_type::params_type params = {
+    typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
+        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == assignment.var_value(real_res.output));
+        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    component_type component_instance({0, 1, 2, 3},{},{});
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(component_instance, public_input, result_check, instance_input);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "division_with_zero: " << duration.count() << "ms" << std::endl;
-}*/
+    std::cout << "division_or_zero: " << duration.count() << "ms" << std::endl;
+}
 
 BOOST_AUTO_TEST_SUITE_END()
