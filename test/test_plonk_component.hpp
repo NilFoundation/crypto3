@@ -40,11 +40,11 @@
 
 #include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
 #include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
+#include <nil/crypto3/zk/utils/table_profiling.hpp>
 
 #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 // #include "profiling_plonk_circuit.hpp"
-#include "profiling.hpp"
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
