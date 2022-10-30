@@ -23,11 +23,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_TOOLS_PLONK_HPP
-#define CRYPTO3_ZK_BLUEPRINT_TOOLS_PLONK_HPP
+#ifndef CRYPTO3_BLUEPRINT_UTILS_PLONK_SATISFIABILITY_CHECK_HPP
+#define CRYPTO3_BLUEPRINT_UTILS_PLONK_SATISFIABILITY_CHECK_HPP
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
@@ -38,26 +38,26 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            bool is_satisfied(blueprint<snark::plonk_constraint_system<BlueprintFieldType,
+            bool is_satisfied(circuit<zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                            ArithmetizationParams>> bp,
-                              snark::plonk_assignment_table<BlueprintFieldType,
+                              zk::snark::plonk_assignment_table<BlueprintFieldType,
                                                         ArithmetizationParams> assignments){
 
-                const std::vector<snark::plonk_gate<BlueprintFieldType, snark::plonk_constraint<BlueprintFieldType>>> gates =
+                const std::vector<zk::snark::plonk_gate<BlueprintFieldType, zk::snark::plonk_constraint<BlueprintFieldType>>> gates =
                             bp.gates();
 
-                const std::vector<snark::plonk_copy_constraint<BlueprintFieldType>> copy_constraints =
+                const std::vector<zk::snark::plonk_copy_constraint<BlueprintFieldType>> copy_constraints =
                             bp.copy_constraints();
 
-                const std::vector<snark::plonk_gate<BlueprintFieldType, snark::plonk_lookup_constraint<BlueprintFieldType>>> lookup_gates =
+                const std::vector<zk::snark::plonk_gate<BlueprintFieldType, zk::snark::plonk_lookup_constraint<BlueprintFieldType>>> lookup_gates =
                             bp.lookup_gates();
 
                 for (std::size_t i = 0; i < gates.size(); i++) {
-                    snark::plonk_column<BlueprintFieldType> selector = assignments.selector(gates[i].selector_index);
+                    zk::snark::plonk_column<BlueprintFieldType> selector = assignments.selector(gates[i].selector_index);
 
                     for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
 
@@ -77,8 +77,8 @@ namespace nil {
                 }
 
                 for (std::size_t i = 0; i < copy_constraints.size(); i++) {
-                    if (assignment.var_value(copy_constraints[i].first) !=
-                        assignment.var_value(copy_constraints[i].second)){
+                    if (var_value(assignments, copy_constraints[i].first) !=
+                        var_value(assignments, copy_constraints[i].second)){
                         std::cout << "Copy constraint number " << i << " is not satisfied." << std::endl;
                         return false;
                     }
@@ -87,7 +87,7 @@ namespace nil {
                 return true;
             }
 
-        }    // namespace zk
+        }    // namespace blueprint
     }        // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_TOOLS_PLONK_HPP
+#endif    // CRYPTO3_BLUEPRINT_UTILS_PLONK_SATISFIABILITY_CHECK_HPP

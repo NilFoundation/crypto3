@@ -126,20 +126,17 @@ namespace nil {
                 typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2>::result_type
                     generate_assignments(
                         const plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2> &component,
-                        private_assignment<
-                            zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &priv_assignment,
-                        public_assignment<
-                            zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                        assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
                         const typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2>::input_type instance_input,
                         const std::uint32_t start_row_index) {
 
                     const std::size_t j = start_row_index;
 
-                    priv_assignment.witness(component.W(0), j) = var_value(priv_assignment, pub_assignment, instance_input.x);
-                    priv_assignment.witness(component.W(1), j) = instance_input.constant *
-                        var_value(priv_assignment, pub_assignment, instance_input.x);
+                    assignment.witness(component.W(0), j) = var_value(assignment, instance_input.x);
+                    assignment.witness(component.W(1), j) = instance_input.constant *
+                        var_value(assignment, instance_input.x);
 
-                    pub_assignment.constant(0, j) = instance_input.constant;
+                    assignment.constant(0, j) = instance_input.constant;
 
                     return typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2>::result_type(component, start_row_index);
                 }
@@ -149,8 +146,7 @@ namespace nil {
                 void generate_gates(
                     const plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2> &component,
                     circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    public_assignment<
-                        zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                    assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
                     const typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2>::input_type &instance_input,
                     const std::size_t first_selector_index) {
 
@@ -167,8 +163,7 @@ namespace nil {
                 void generate_copy_constraints(
                     const plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2> &component,
                     circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    public_assignment<
-                        zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                    assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
                     const typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2>::input_type &instance_input,
                     const std::size_t start_row_index) {
 
@@ -187,24 +182,24 @@ namespace nil {
                     generate_circuit(
                         const plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2> &component,
                         circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                        public_assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &pub_assignment,
+                        assignment<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
                         const typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2>::input_type &instance_input,
                         const std::size_t start_row_index){
 
-                    auto selector_iterator = pub_assignment.find_selector(component);
+                    auto selector_iterator = assignment.find_selector(component);
                     std::size_t first_selector_index;
 
-                    if (selector_iterator == pub_assignment.selectors_end()){
-                        first_selector_index = pub_assignment.allocate_selector(component,
+                    if (selector_iterator == assignment.selectors_end()){
+                        first_selector_index = assignment.allocate_selector(component,
                             component.gates_amount);
-                        generate_gates(component, bp, pub_assignment, instance_input, first_selector_index);
+                        generate_gates(component, bp, assignment, instance_input, first_selector_index);
                     } else {
                         first_selector_index = selector_iterator->second;
                     }
 
-                    pub_assignment.enable_selector(first_selector_index, start_row_index);
+                    assignment.enable_selector(first_selector_index, start_row_index);
 
-                    generate_copy_constraints(component, bp, pub_assignment, instance_input, start_row_index);
+                    generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
                     return typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams, 2>::result_type(component, start_row_index);
                 }
