@@ -45,20 +45,25 @@ namespace nil {
 
                 // Input: [x_0, x_1, x_2] \in Fp
                 // Output: [y_0, y_1, y_2] - Poseidon permutation of [x_0, x_1, x_2]
-                template<typename ArithmetizationType, typename FieldType, std::int32_t WitnessAmount>>
+                template<typename ArithmetizationType, typename FieldType, std::int32_t WitnessAmount>
                 class poseidon;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
                          typename FieldType>
-                class poseidon<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15>:
+                class poseidon<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, FieldType, 15>:
                     public component<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                         15,0,0> {
-                public:
-                    constexpr static const std::size_t state_size = 3;
-                    constexpr static const std::size_t rounds_amount = 55;
 
-                private:
+                    constexpr static const std::int32_t WitnessAmount = 15;
+                
+                    using component_type = component<
+                        zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                        WitnessAmount,0,0>;
+
+                public:
+                    constexpr static const std::uint32_t state_size = 3;
+                    constexpr static const std::uint32_t rounds_amount = 55;
 
                     constexpr static const std::size_t rounds_per_row = 5;
 
@@ -69,9 +74,9 @@ namespace nil {
                     constexpr static const std::array<std::array<typename FieldType::value_type, state_size>,
                                                       rounds_amount> round_constant = detail::poseidon_constants<FieldType, state_size, rounds_amount>::round_constant;
 
-                public:
                     constexpr static const std::size_t rate = 2;
                     constexpr static const std::size_t gates_amount = 11;
+                    constexpr static const std::size_t rows_amount = 12;
 
                     using var = typename component_type::var;
 
@@ -84,14 +89,13 @@ namespace nil {
                                                                     var(0, 0, false)};
 
                         result_type(const poseidon<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                FieldType,
                                 WitnessAmount> &component, std::uint32_t start_row_index) {
+
                             output_state = {
-
-                                std::uint32_t rows_amount = 12;
-
-                                var(component.W(0), start_row_index + rows_amount - 1, false),
-                                var(component.W(1), start_row_index + rows_amount - 1, false),
-                                var(component.W(2), start_row_index + rows_amount - 1, false)};
+                                var(component.W(0), start_row_index + component.rows_amount - 1, false),
+                                var(component.W(1), start_row_index + component.rows_amount - 1, false),
+                                var(component.W(2), start_row_index + component.rows_amount - 1, false)};
                         }
                     };
 
@@ -99,6 +103,24 @@ namespace nil {
                                     state_size> mds_constants() {
                                 return mds;
                     }
+
+                    template <typename ContainerType>
+                    poseidon(ContainerType witness):
+                        component_type(witness, {}, {}){};
+
+                    template <typename WitnessContainerType, typename ConstantContainerType,
+                        typename PublicInputContainerType>
+                    poseidon(WitnessContainerType witness, ConstantContainerType constant,
+                            PublicInputContainerType public_input):
+                        component_type(witness, constant, public_input){};
+
+                    poseidon(std::initializer_list<
+                            typename component_type::witness_container_type::value_type> witnesses,
+                                   std::initializer_list<
+                            typename component_type::constant_container_type::value_type> constants,
+                                   std::initializer_list<
+                            typename component_type::public_input_container_type::value_type> public_inputs):
+                        component_type(witnesses, constants, public_inputs){};
                 };
 
                 template<typename BlueprintFieldType,
@@ -119,8 +141,9 @@ namespace nil {
                             ArithmetizationParams, FieldType, 15>::input_type instance_input,
                         const std::uint32_t start_row_index) {
 
-                    constexpr static const std::uint32_t state_size =
-                        plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::state_size;
+                    using component_type = plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>;
+
+                    constexpr static const std::uint32_t state_size = component_type::state_size;
 
                     std::array<typename BlueprintFieldType::value_type, state_size> state = {
                         var_value(assignment, instance_input.input_state[0]),
@@ -133,11 +156,12 @@ namespace nil {
                     assignment.witness(component.W(1), row) = state[1];
                     assignment.witness(component.W(2), row) = state[2];
 
-                    for (std::size_t i = row; i < row + rows_amount - 1; i++) {
+                    for (std::size_t i = row; i < row + component_type::rows_amount - 1; i++) {
                         for (int j = 0; j < state_size; j++) {
-                            next_state[j] = state[0].pow(sbox_alpha) * mds[j][0] +
-                                            state[1].pow(sbox_alpha) * mds[j][1] +
-                                            state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row) * 5][j];
+                            next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                            state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                            state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                            component_type::round_constant[(i - row) * 5][j];
                         }
                         assignment.witness(component.W(3), i) = next_state[0];
                         assignment.witness(component.W(4), i) = next_state[1];
@@ -145,8 +169,10 @@ namespace nil {
                         state = next_state;
                         for (int j = 0; j < state_size; j++) {
                             next_state[j] =
-                                state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] +
-                                state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row) * 5 + 1][j];
+                                state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                component_type::round_constant[(i - row) * 5 + 1][j];
                         }
                         assignment.witness(component.W(6), i) = next_state[0];
                         assignment.witness(component.W(7), i) = next_state[1];
@@ -154,8 +180,10 @@ namespace nil {
                         state = next_state;
                         for (int j = 0; j < state_size; j++) {
                             next_state[j] =
-                                state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] +
-                                state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row) * 5 + 2][j];
+                                state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                component_type::round_constant[(i - row) * 5 + 2][j];
                         }
                         assignment.witness(component.W(9), i) = next_state[0];
                         assignment.witness(component.W(10), i) = next_state[1];
@@ -163,8 +191,10 @@ namespace nil {
                         state = next_state;
                         for (int j = 0; j < state_size; j++) {
                             next_state[j] =
-                                state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] +
-                                state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row) * 5 + 3][j];
+                                state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                component_type::round_constant[(i - row) * 5 + 3][j];
                         }
                         assignment.witness(component.W(12), i) = next_state[0];
                         assignment.witness(component.W(13), i) = next_state[1];
@@ -172,8 +202,10 @@ namespace nil {
                         state = next_state;
                         for (int j = 0; j < state_size; j++) {
                             next_state[j] =
-                                state[0].pow(sbox_alpha) * mds[j][0] + state[1].pow(sbox_alpha) * mds[j][1] +
-                                state[2].pow(sbox_alpha) * mds[j][2] + round_constant[(i - row) * 5 + 4][j];
+                                state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                component_type::round_constant[(i - row) * 5 + 4][j];
                         }
                         assignment.witness(component.W(0), i + 1) = next_state[0];
                         assignment.witness(component.W(1), i + 1) = next_state[1];
@@ -198,102 +230,104 @@ namespace nil {
 
                     using component_type = plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>;
 
+                    using var = typename component_type::var;
+
                     std::size_t j = 0;
-                    for (std::size_t z = 0; z < rounds_amount; z += component_type::rounds_per_row) {
+                    for (std::size_t z = 0; z < component_type::rounds_amount; z += component_type::rounds_per_row) {
                         auto constraint_1 = bp.add_constraint(
                             var(component.W(3), 0) -
-                            (var(component.W(0), 0).pow(sbox_alpha) * component_type::mds[0][0] +
-                             var(component.W(1), 0).pow(sbox_alpha) * mds[0][1] +
-                             var(component.W(2), 0).pow(sbox_alpha) * component_type::mds[0][2] +
+                            (var(component.W(0), 0).pow(component_type::sbox_alpha) * component_type::mds[0][0] +
+                             var(component.W(1), 0).pow(component_type::sbox_alpha) * component_type::mds[0][1] +
+                             var(component.W(2), 0).pow(component_type::sbox_alpha) * component_type::mds[0][2] +
                              component_type::round_constant[z][0]));
                         auto constraint_2 = bp.add_constraint(
                             var(component.W(4), 0) -
-                            (var(component.W(0), 0).pow(sbox_alpha) * component_type::mds[1][0] +
-                             var(component.W(1), 0).pow(sbox_alpha) * component_type::mds[1][1] +
-                             var(component.W(2), 0).pow(sbox_alpha) * component_type::mds[1][2] +
+                            (var(component.W(0), 0).pow(component_type::sbox_alpha) * component_type::mds[1][0] +
+                             var(component.W(1), 0).pow(component_type::sbox_alpha) * component_type::mds[1][1] +
+                             var(component.W(2), 0).pow(component_type::sbox_alpha) * component_type::mds[1][2] +
                              component_type::round_constant[z][1]));
                         auto constraint_3 = bp.add_constraint(
                             var(component.W(5), 0) -
-                            (var(component.W(0), 0).pow(sbox_alpha) * component_type::mds[2][0] +
-                             var(component.W(1), 0).pow(sbox_alpha) * component_type::mds[2][1] +
-                             var(component.W(2), 0).pow(sbox_alpha) * component_type::mds[2][2] +
+                            (var(component.W(0), 0).pow(component_type::sbox_alpha) * component_type::mds[2][0] +
+                             var(component.W(1), 0).pow(component_type::sbox_alpha) * component_type::mds[2][1] +
+                             var(component.W(2), 0).pow(component_type::sbox_alpha) * component_type::mds[2][2] +
                              component_type::round_constant[z][2]));
 
                         auto constraint_4 = bp.add_constraint(
                             var(component.W(6), 0) -
-                            (var(component.W(3), 0).pow(sbox_alpha) * component_type::mds[0][0] +
-                             var(component.W(4), 0).pow(sbox_alpha) * component_type::mds[0][1] +
-                             var(component.W(5), 0).pow(sbox_alpha) * component_type::mds[0][2] +
+                            (var(component.W(3), 0).pow(component_type::sbox_alpha) * component_type::mds[0][0] +
+                             var(component.W(4), 0).pow(component_type::sbox_alpha) * component_type::mds[0][1] +
+                             var(component.W(5), 0).pow(component_type::sbox_alpha) * component_type::mds[0][2] +
                              component_type::round_constant[z + 1][0]));
                         auto constraint_5 = bp.add_constraint(
                             var(component.W(7), 0) -
-                            (var(component.W(3), 0).pow(sbox_alpha) * component_type::mds[1][0] +
-                             var(component.W(4), 0).pow(sbox_alpha) * component_type::mds[1][1] +
-                             var(component.W(5), 0).pow(sbox_alpha) * component_type::mds[1][2] +
+                            (var(component.W(3), 0).pow(component_type::sbox_alpha) * component_type::mds[1][0] +
+                             var(component.W(4), 0).pow(component_type::sbox_alpha) * component_type::mds[1][1] +
+                             var(component.W(5), 0).pow(component_type::sbox_alpha) * component_type::mds[1][2] +
                              component_type::round_constant[z + 1][1]));
                         auto constraint_6 = bp.add_constraint(
                             var(component.W(8), 0) -
-                            (var(component.W(3), 0).pow(sbox_alpha) * component_type::mds[2][0] +
-                             var(component.W(4), 0).pow(sbox_alpha) * component_type::mds[2][1] +
-                             var(component.W(5), 0).pow(sbox_alpha) * component_type::mds[2][2] +
+                            (var(component.W(3), 0).pow(component_type::sbox_alpha) * component_type::mds[2][0] +
+                             var(component.W(4), 0).pow(component_type::sbox_alpha) * component_type::mds[2][1] +
+                             var(component.W(5), 0).pow(component_type::sbox_alpha) * component_type::mds[2][2] +
                              component_type::round_constant[z + 1][2]));
 
                         auto constraint_7 = bp.add_constraint(
                             var(component.W(9), 0) -
-                            (var(component.W(6), 0).pow(sbox_alpha) * component_type::mds[0][0] +
-                             var(component.W(7), 0).pow(sbox_alpha) * component_type::mds[0][1] +
-                             var(component.W(8), 0).pow(sbox_alpha) * component_type::mds[0][2] +
+                            (var(component.W(6), 0).pow(component_type::sbox_alpha) * component_type::mds[0][0] +
+                             var(component.W(7), 0).pow(component_type::sbox_alpha) * component_type::mds[0][1] +
+                             var(component.W(8), 0).pow(component_type::sbox_alpha) * component_type::mds[0][2] +
                              component_type::round_constant[z + 2][0]));
 
                         auto constraint_8 = bp.add_constraint(
                             var(component.W(10), 0) -
-                            (var(component.W(6), 0).pow(sbox_alpha) * component_type::mds[1][0] +
-                             var(component.W(7), 0).pow(sbox_alpha) * component_type::mds[1][1] +
-                             var(component.W(8), 0).pow(sbox_alpha) * component_type::mds[1][2] +
+                            (var(component.W(6), 0).pow(component_type::sbox_alpha) * component_type::mds[1][0] +
+                             var(component.W(7), 0).pow(component_type::sbox_alpha) * component_type::mds[1][1] +
+                             var(component.W(8), 0).pow(component_type::sbox_alpha) * component_type::mds[1][2] +
                              component_type::round_constant[z + 2][1]));
                         auto constraint_9 = bp.add_constraint(
                             var(component.W(11), 0) -
-                            (var(component.W(6), 0).pow(sbox_alpha) * component_type::mds[2][0] +
-                             var(component.W(7), 0).pow(sbox_alpha) * component_type::mds[2][1] +
-                             var(component.W(8), 0).pow(sbox_alpha) * component_type::mds[2][2] +
+                            (var(component.W(6), 0).pow(component_type::sbox_alpha) * component_type::mds[2][0] +
+                             var(component.W(7), 0).pow(component_type::sbox_alpha) * component_type::mds[2][1] +
+                             var(component.W(8), 0).pow(component_type::sbox_alpha) * component_type::mds[2][2] +
                              component_type::round_constant[z + 2][2]));
 
                         auto constraint_10 = bp.add_constraint(
                             var(component.W(12), 0) -
-                            (var(component.W(9), 0).pow(sbox_alpha) * component_type::mds[0][0] +
-                             var(component.W(10), 0).pow(sbox_alpha) * component_type::mds[0][1] +
-                             var(component.W(11), 0).pow(sbox_alpha) * component_type::mds[0][2] +
+                            (var(component.W(9), 0).pow(component_type::sbox_alpha) * component_type::mds[0][0] +
+                             var(component.W(10), 0).pow(component_type::sbox_alpha) * component_type::mds[0][1] +
+                             var(component.W(11), 0).pow(component_type::sbox_alpha) * component_type::mds[0][2] +
                              component_type::round_constant[z + 3][0]));
                         auto constraint_11 = bp.add_constraint(
                             var(component.W(13), 0) -
-                            (var(component.W(9), 0).pow(sbox_alpha) * component_type::mds[1][0] +
-                             var(component.W(10), 0).pow(sbox_alpha) * component_type::mds[1][1] +
-                             var(component.W(11), 0).pow(sbox_alpha) * component_type::mds[1][2] +
+                            (var(component.W(9), 0).pow(component_type::sbox_alpha) * component_type::mds[1][0] +
+                             var(component.W(10), 0).pow(component_type::sbox_alpha) * component_type::mds[1][1] +
+                             var(component.W(11), 0).pow(component_type::sbox_alpha) * component_type::mds[1][2] +
                              component_type::round_constant[z + 3][1]));
                         auto constraint_12 = bp.add_constraint(
                             var(component.W(14), 0) -
-                            (var(component.W(9), 0).pow(sbox_alpha) * component_type::mds[2][0] +
-                             var(component.W(10), 0).pow(sbox_alpha) * component_type::mds[2][1] +
-                             var(component.W(11), 0).pow(sbox_alpha) * component_type::mds[2][2] +
+                            (var(component.W(9), 0).pow(component_type::sbox_alpha) * component_type::mds[2][0] +
+                             var(component.W(10), 0).pow(component_type::sbox_alpha) * component_type::mds[2][1] +
+                             var(component.W(11), 0).pow(component_type::sbox_alpha) * component_type::mds[2][2] +
                              component_type::round_constant[z + 3][2]));
 
                         auto constraint_13 = bp.add_constraint(
                             var(component.W(0), +1) -
-                            (var(component.W(12), 0).pow(sbox_alpha) * component_type::mds[0][0] +
-                             var(component.W(13), 0).pow(sbox_alpha) * component_type::mds[0][1] +
-                             var(component.W(14), 0).pow(sbox_alpha) * component_type::mds[0][2] +
+                            (var(component.W(12), 0).pow(component_type::sbox_alpha) * component_type::mds[0][0] +
+                             var(component.W(13), 0).pow(component_type::sbox_alpha) * component_type::mds[0][1] +
+                             var(component.W(14), 0).pow(component_type::sbox_alpha) * component_type::mds[0][2] +
                              component_type::round_constant[z + 4][0]));
                         auto constraint_14 = bp.add_constraint(
                             var(component.W(1), +1) -
-                            (var(component.W(12), 0).pow(sbox_alpha) * component_type::mds[1][0] +
-                             var(component.W(13), 0).pow(sbox_alpha) * component_type::mds[1][1] +
-                             var(component.W(14), 0).pow(sbox_alpha) * component_type::mds[1][2] +
+                            (var(component.W(12), 0).pow(component_type::sbox_alpha) * component_type::mds[1][0] +
+                             var(component.W(13), 0).pow(component_type::sbox_alpha) * component_type::mds[1][1] +
+                             var(component.W(14), 0).pow(component_type::sbox_alpha) * component_type::mds[1][2] +
                              component_type::round_constant[z + 4][1]));
                         auto constraint_15 = bp.add_constraint(
                             var(component.W(2), +1) -
-                            (var(component.W(12), 0).pow(sbox_alpha) * component_type::mds[2][0] +
-                             var(component.W(13), 0).pow(sbox_alpha) * component_type::mds[2][1] +
-                             var(component.W(14), 0).pow(sbox_alpha) * component_type::mds[2][2] +
+                            (var(component.W(12), 0).pow(component_type::sbox_alpha) * component_type::mds[2][0] +
+                             var(component.W(13), 0).pow(component_type::sbox_alpha) * component_type::mds[2][1] +
+                             var(component.W(14), 0).pow(component_type::sbox_alpha) * component_type::mds[2][2] +
                              component_type::round_constant[z + 4][2]));
                         bp.add_gate(j + first_selector_index,
                                     {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
@@ -314,7 +348,7 @@ namespace nil {
                         ArithmetizationParams, FieldType, 15>::input_type &instance_input,
                     const std::size_t start_row_index) {
 
-                    using var = typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, 3>::var;
+                    using var = typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::var;
 
                 }
 
@@ -334,8 +368,9 @@ namespace nil {
                     std::size_t first_selector_index;
 
                     if (selector_iterator == assignment.selectors_end()) {
-                        first_selector_index = assignment.allocate_selector(component, gates_amount);
-                        generate_gates(bp, assignment, instance_input, first_selector_index);
+                        first_selector_index = assignment.allocate_selector(component,
+                            plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::gates_amount);
+                        generate_gates(component, bp, assignment, instance_input, first_selector_index);
                     } else {
                         first_selector_index = selector_iterator->second;
                     }
@@ -343,13 +378,14 @@ namespace nil {
                     std::size_t i = 0;
                     for (std::size_t z = 0; z <
                         plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::rounds_amount;
-                        z += rounds_per_row) {
+                        z += plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::rounds_per_row) {
                         assignment.enable_selector(first_selector_index + i, start_row_index + i);
                         ++i;
                     }
 
-                    generate_copy_constraints(bp, assignment, instance_input, start_row_index);
-                    return result_type(instance_input, start_row_index);
+                    generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
+                    return typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::result_type(
+                        component, start_row_index);
 
                 }
             }    // namespace components
