@@ -33,8 +33,15 @@
 
 namespace nil {
     namespace crypto3 {
+        namespace blueprint {
+            template<typename ArithmetizationType, std::size_t... BlueprintParams>
+            class assignment;
+        } // namespace blueprint
         namespace zk {
             namespace snark {
+
+                template<typename FieldType, typename ArithmetizationParams>
+                struct plonk_constraint_system;
 
                 template<typename FieldType>
                 using plonk_column = std::vector<typename FieldType::value_type>;
@@ -87,6 +94,9 @@ namespace nil {
 
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
+
+                    friend struct blueprint::assignment<zk::snark::plonk_constraint_system<FieldType,
+                        ArithmetizationParams>>;
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
@@ -185,6 +195,9 @@ namespace nil {
 
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
+
+                    friend struct blueprint::assignment<zk::snark::plonk_constraint_system<FieldType,
+                        ArithmetizationParams>>;
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
@@ -243,27 +256,59 @@ namespace nil {
                         return _private_table.size() + _public_table.size();
                     }
 
+                    std::uint32_t witnesses_amount() const {
+                        return _private_table.witnesses_amount();
+                    }
+
+                    std::uint32_t witness_column_size(std::uint32_t index) const {
+                        return _private_table.witness_column_size(index);
+                    }
+
+                    std::uint32_t public_inputs_amount() const {
+                        return _public_table.public_inputs_amount();
+                    }
+
+                    std::uint32_t public_input_column_size(std::uint32_t index) const {
+                        return _public_table.public_input_column_size(index);
+                    }
+
+                    std::uint32_t constants_amount() const {
+                        return _public_table.constants_amount();
+                    }
+
+                    std::uint32_t constant_column_size(std::uint32_t index) const {
+                        return _public_table.constant_column_size(index);
+                    }
+
+                    std::uint32_t selectors_amount() const {
+                        return _public_table.selectors_amount();
+                    }
+
+                    std::uint32_t selector_column_size(std::uint32_t index) const {
+                        return _public_table.selector_column_size(index);
+                    }
+
                     std::uint32_t rows_amount() const {
                         std::uint32_t rows_amount = 0;
 
                         for (std::uint32_t w_index = 0; w_index <
-                                                       _private_table.witnesses_amount(); w_index++) {
-                            rows_amount = std::max(rows_amount, _private_table.witness_column_size(w_index));
+                                                       witnesses_amount(); w_index++) {
+                            rows_amount = std::max(rows_amount, witness_column_size(w_index));
                         }
 
                         for (std::uint32_t pi_index = 0; pi_index <
-                                                       _public_table.public_inputs_amount(); pi_index++) {
-                            rows_amount = std::max(rows_amount, _public_table.public_input_column_size(pi_index));
+                                                       public_inputs_amount(); pi_index++) {
+                            rows_amount = std::max(rows_amount, public_input_column_size(pi_index));
                         }
 
                         for (std::uint32_t c_index = 0; c_index <
-                                                      _public_table.constants_amount(); c_index++) {
-                            rows_amount = std::max(rows_amount, _public_table.constant_column_size(c_index));
+                                                      constants_amount(); c_index++) {
+                            rows_amount = std::max(rows_amount, constant_column_size(c_index));
                         }
 
                         for (std::uint32_t s_index = 0; s_index <
-                                                      _public_table.selectors_amount(); s_index++) {
-                            rows_amount = std::max(rows_amount, _public_table.selector_column_size(s_index));
+                                                      selectors_amount(); s_index++) {
+                            rows_amount = std::max(rows_amount, selector_column_size(s_index));
                         }
 
                         return rows_amount;
