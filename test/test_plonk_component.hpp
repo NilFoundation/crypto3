@@ -107,33 +107,29 @@ namespace nil {
             using component_type = ComponentType;
 
             blueprint::circuit<ArithmetizationType> bp;
-            blueprint::private_assignment<ArithmetizationType> private_assignment;
-            blueprint::public_assignment<ArithmetizationType> public_assignment;
+            blueprint::assignment<ArithmetizationType> assignment;
 
             std::size_t start_row = 0;
 
             for (std::size_t i = 0; i < public_input.size(); i++) {
-                public_assignment.public_input(0, start_row +i) = (public_input[i]);
+                assignment.public_input(0, start_row +i) = (public_input[i]);
             }
 
             blueprint::components::generate_circuit<BlueprintFieldType, ArithmetizationParams>(
-                component_instance, bp, public_assignment, instance_input, start_row);
+                component_instance, bp, assignment, instance_input, start_row);
             typename component_type::result_type component_result =
                 blueprint::components::generate_assignments<BlueprintFieldType, ArithmetizationParams>(
-                    component_instance, private_assignment, public_assignment, instance_input, start_row);
-            result_check(private_assignment, public_assignment, component_result);
-
-            zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
-                                                                                                     public_assignment);
+                    component_instance, assignment, instance_input, start_row);
+            result_check(assignment, component_result);
 
             zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
-            desc.usable_rows_amount = assignments.rows_amount();
-            desc.rows_amount = zk::snark::basic_padding(assignments);
+            desc.usable_rows_amount = assignment.rows_amount();
+            desc.rows_amount = zk::snark::basic_padding(assignment);
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
             std::cout << "Padded rows: " << desc.rows_amount << std::endl;
 
 #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
-            profiling(assignments);
+            profiling(assignment);
 #endif
 
             using placeholder_params =
@@ -153,13 +149,13 @@ namespace nil {
             typename zk::snark::placeholder_public_preprocessor<
                 BlueprintFieldType, placeholder_params>::preprocessed_data_type public_preprocessed_data =
                 zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params>::process(
-                    bp, assignments.public_table(), desc, fri_params, permutation_size);
+                    bp, assignment.public_table(), desc, fri_params, permutation_size);
             typename zk::snark::placeholder_private_preprocessor<
                 BlueprintFieldType, placeholder_params>::preprocessed_data_type private_preprocessed_data =
                 zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params>::process(
-                    bp, assignments.private_table(), desc, fri_params);
+                    bp, assignment.private_table(), desc, fri_params);
 
-            return std::make_tuple(desc, bp, fri_params, assignments, public_preprocessed_data,
+            return std::make_tuple(desc, bp, fri_params, assignment, public_preprocessed_data,
                                    private_preprocessed_data);
         }
 

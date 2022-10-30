@@ -23,64 +23,49 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_9_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_9_WIRES_HPP
+#ifndef CRYPTO3_BLUEPRINT_PLONK_POSEIDON_9_WIRES_HPP
+#define CRYPTO3_BLUEPRINT_PLONK_POSEIDON_9_WIRES_HPP
 
 #include <nil/crypto3/algebra/matrix/matrix.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
+#include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
+#include <nil/crypto3/zk/component.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
-                template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::int32_t WitnessAmount>>
                 class poseidon;
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8>
-                class poseidon<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                               CurveType,
-                               W0,
-                               W1,
-                               W2,
-                               W3,
-                               W4,
-                               W5,
-                               W6,
-                               W7,
-                               W8> {
-
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
-                        ArithmetizationType;
+                         typename CurveType>
+                class poseidon<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 9>:
+                    public component<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                        9,0,0> {
+                
+                    constexpr static const std::int32_t WitnessAmount = 9;
+                
+                    using component_type = component<
+                        zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                        WitnessAmount,0,0>;
 
                     const algebra::matrix<typename CurveType::scalar_field_type::value_type, 3, 3> M;
                     const algebra::vector<typename CurveType::scalar_field_type::value_type, 3> RC;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
-
                 public:
-                    constexpr static const std::size_t rows_amount = 22;
 
-                    struct init_params_type { };
+                    using var = typename component_type::var;
+                    // constexpr static const std::size_t rows_amount = 22;
 
-                    struct assignment_params_type { };
+                    struct input_type {
+                    };
 
-                    static std::size_t allocate_rows(blueprint<ArithmetizationType> &bp) {
-                        return bp.allocate_rows(rows_amount);
-                    }
+                    struct result_type {
+                    };
 
                     static void
                         generate_gates(blueprint<ArithmetizationType> &bp,
@@ -287,8 +272,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
+#endif    // CRYPTO3_BLUEPRINT_PLONK_POSEIDON_9_WIRES_HPP

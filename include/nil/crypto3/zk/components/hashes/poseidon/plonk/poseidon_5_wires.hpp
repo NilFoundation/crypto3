@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
+#ifndef CRYPTO3_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
+#define CRYPTO3_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
 
 #include <nil/crypto3/algebra/matrix/matrix.hpp>
 
@@ -142,4 +142,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP
+#endif    // CRYPTO3_BLUEPRINT_PLONK_POSEIDON_5_WIRES_HPP

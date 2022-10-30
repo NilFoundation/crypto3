@@ -101,6 +101,9 @@ namespace nil {
                     ComponentType &component,
                     std::size_t selectors_amount) {
 
+                    // if (next_selector_index >= this->_public_table._selectors.size()){
+                    //     this->_public_table._selectors.resize(next_selector_index);
+                    // }
                     std::size_t selector_index = next_selector_index;
                     selector_map[detail::get_component_id(component)] = selector_index;
                     next_selector_index += selectors_amount;

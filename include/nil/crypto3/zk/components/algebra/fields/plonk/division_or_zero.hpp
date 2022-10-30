@@ -64,7 +64,6 @@ namespace nil {
 
                 public:
 
-                    const std::size_t rows_amount = 1;
                     const std::size_t gates_amount = 1;
 
                     using var = typename component_type::var;
@@ -111,16 +110,6 @@ namespace nil {
                          std::int32_t WitnessAmount>
                 using plonk_division_or_zero =
                     division_or_zero<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
-
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams>
-                std::size_t allocate(
-                    const plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams, 4> &component,
-                    circuit<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    const std::size_t components_amount = 1) {
-
-                    return bp.allocate_rows(component.rows_amount * components_amount);
-                }
 
                 template<typename BlueprintFieldType,
                          typename ArithmetizationParams>
@@ -176,8 +165,6 @@ namespace nil {
                     const std::size_t start_row_index) {
 
                     using var = typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams, 4>::var;
-
-                    std::size_t public_input_column_index = 0;
 
                     const std::size_t j = start_row_index;
                     var component_x = var(component.W(0), static_cast<int>(j), false);

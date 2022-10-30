@@ -79,10 +79,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
-        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
+    auto result_check = [&expected_res](blueprint::assignment<ArithmetizationType> &assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
+        assert(expected_res == var_value(assignment, real_res.output));
     };
 
     component_type component_instance({0, 1, 2},{},{});
@@ -121,10 +120,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_addition) {
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
-        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
+    auto result_check = [&expected_res](blueprint::assignment<ArithmetizationType> &assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
+        assert(expected_res == var_value(assignment, real_res.output));
     };
 
     component_type component_instance({0, 1, 2},{},{});
@@ -163,10 +161,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_division) {
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
-        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
+    auto result_check = [&expected_res](blueprint::assignment<ArithmetizationType> &assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
+        assert(expected_res == var_value(assignment, real_res.output));
     };
 
     component_type component_instance({0, 1, 2, 3},{},{});
@@ -205,10 +202,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_subtraction) {
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
-        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
+    auto result_check = [&expected_res](blueprint::assignment<ArithmetizationType> &assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
+        assert(expected_res == var_value(assignment, real_res.output));
     };
 
     component_type component_instance({0, 1, 2},{},{});
@@ -247,10 +243,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_mul_by_constant) {
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x};
 
-    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
-        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
+    auto result_check = [&expected_res](blueprint::assignment<ArithmetizationType> &assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
+        assert(expected_res == var_value(assignment, real_res.output));
     };
 
     component_type component_instance({0, 1},{},{});
@@ -288,10 +283,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
-    auto result_check = [&expected_res](blueprint::private_assignment<ArithmetizationType> &priv_assignment,
-        blueprint::public_assignment<ArithmetizationType> &pub_assignment,
+    auto result_check = [&expected_res](blueprint::assignment<ArithmetizationType> &assignment,
         component_type::result_type &real_res) {
-        assert(expected_res == var_value(priv_assignment, pub_assignment, real_res.output));
+        assert(expected_res == var_value(assignment, real_res.output));
     };
 
     component_type component_instance({0, 1, 2, 3},{},{});

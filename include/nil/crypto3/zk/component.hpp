@@ -52,7 +52,6 @@ namespace nil {
                     using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
                     using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
                     using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
-                    // using underlying_components_container_type = std::array<component*>;
                     
                 public:
 
