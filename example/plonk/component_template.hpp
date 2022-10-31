@@ -35,9 +35,9 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/component.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/component.hpp>
 
 namespace nil {
     namespace crypto3 {

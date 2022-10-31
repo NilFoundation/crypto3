@@ -31,11 +31,11 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/disjunction.hpp>
-#include <nil/crypto3/zk/components/conjunction.hpp>
-#include <nil/crypto3/zk/components/comparison.hpp>
-#include <nil/crypto3/zk/components/inner_product.hpp>
-#include <nil/crypto3/zk/components/loose_multiplexing.hpp>
+#include <nil/blueprint/components/disjunction.hpp>
+#include <nil/blueprint/components/conjunction.hpp>
+#include <nil/blueprint/components/comparison.hpp>
+#include <nil/blueprint/components/inner_product.hpp>
+#include <nil/blueprint/components/loose_multiplexing.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;

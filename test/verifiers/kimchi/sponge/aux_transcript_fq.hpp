@@ -33,10 +33,10 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/transcript_fq.hpp>
 
 namespace nil {
     namespace crypto3 {

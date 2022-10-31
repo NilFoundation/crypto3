@@ -19,11 +19,11 @@
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
 
-#include <nil/crypto3/zk/components/algebra/curves/weierstrass/element_g1.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/weierstrass/element_g2.hpp>
+#include <nil/blueprint/components/algebra/curves/weierstrass/element_g1.hpp>
+#include <nil/blueprint/components/algebra/curves/weierstrass/element_g2.hpp>
 
-#include <nil/crypto3/zk/components/algebra/pairing/weierstrass/precomputation.hpp>
-#include <nil/crypto3/zk/components/algebra/pairing/weierstrass/miller_loop.hpp>
+#include <nil/blueprint/components/algebra/pairing/weierstrass/precomputation.hpp>
+#include <nil/blueprint/components/algebra/pairing/weierstrass/miller_loop.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>

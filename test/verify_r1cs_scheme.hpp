@@ -33,7 +33,7 @@
 #include <nil/crypto3/zk/snark/algorithms/prove.hpp>
 #include <nil/crypto3/zk/snark/schemes/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/blueprint/components/blueprint.hpp>
 
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 

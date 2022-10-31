@@ -35,10 +35,10 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/oracles_scalar/prev_chal_evals.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/oracles_scalar/prev_chal_evals.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include "../../../test_plonk_component.hpp"
 
 using namespace nil::crypto3;

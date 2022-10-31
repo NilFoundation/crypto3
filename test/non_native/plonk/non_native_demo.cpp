@@ -50,8 +50,8 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/crypto3/zk/algorithms/allocate.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
@@ -63,8 +63,8 @@
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
 
-#include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/variable_base_multiplication_edwards25519.hpp>
-#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha256_process.hpp>
+#include <nil/blueprint/components/non_native/algebra/fields/plonk/variable_base_multiplication_edwards25519.hpp>
+#include <nil/blueprint/components/hashes/sha256/plonk/sha256_process.hpp>
 
 using namespace nil::crypto3;
 

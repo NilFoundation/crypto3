@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/blueprint/components/blueprint.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>

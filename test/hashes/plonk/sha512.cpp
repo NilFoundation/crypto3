@@ -38,9 +38,9 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/hashes/sha256/plonk/sha512.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/components/hashes/sha256/plonk/sha512.hpp>
 
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>

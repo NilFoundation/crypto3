@@ -38,8 +38,8 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
-#include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/crypto3/zk/utils/table_profiling.hpp>
 
 #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>

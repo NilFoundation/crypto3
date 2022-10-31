@@ -38,9 +38,9 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
-#include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
-#include <nil/crypto3/zk/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
 
 #include "../../test_plonk_component.hpp"
 

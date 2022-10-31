@@ -36,8 +36,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <../test/verifiers/kimchi/sponge/aux_transcript_fr.hpp>
 
 #include "test_plonk_component.hpp"

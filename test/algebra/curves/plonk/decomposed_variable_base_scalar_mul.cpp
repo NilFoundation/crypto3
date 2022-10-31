@@ -40,9 +40,9 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/decomposed_variable_base_scalar_mul_15_wires.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/decomposed_variable_base_scalar_mul_15_wires.hpp>
 #include "test_plonk_component.hpp"
 
 #include "../../../profiling.hpp"

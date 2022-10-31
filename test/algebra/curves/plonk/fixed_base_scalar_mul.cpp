@@ -31,9 +31,9 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-// #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/fixed_base_scalar_mul_5_wires.hpp>
-// #include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/fixed_base_scalar_mul_9_wires.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/fixed_base_scalar_mul_15_wires.hpp>
+// #include <nil/blueprint/components/algebra/curves/pasta/plonk/fixed_base_scalar_mul_5_wires.hpp>
+// #include <nil/blueprint/components/algebra/curves/pasta/plonk/fixed_base_scalar_mul_9_wires.hpp>
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/fixed_base_scalar_mul_15_wires.hpp>
 
 #include "../../../test_plonk_component.hpp"
 

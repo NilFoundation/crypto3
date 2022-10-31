@@ -29,9 +29,9 @@
 
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 
-#include <nil/crypto3/zk/components/hashes/pedersen.hpp>
+#include <nil/blueprint/components/hashes/pedersen.hpp>
 
-#include <nil/crypto3/zk/components/voting/encrypted_input_voting.hpp>
+#include <nil/blueprint/components/voting/encrypted_input_voting.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 

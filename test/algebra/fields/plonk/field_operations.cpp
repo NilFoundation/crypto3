@@ -36,14 +36,14 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
-#include <nil/crypto3/zk/blueprint/plonk/circuit.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/multiplication.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/addition.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/division.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/subtraction.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/multiplication_by_constant.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/plonk/division_or_zero.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/multiplication.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/addition.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/division.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/subtraction.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/multiplication_by_constant.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/division_or_zero.hpp>
 
 #include "../../../test_plonk_component.hpp"
 

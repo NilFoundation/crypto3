@@ -31,7 +31,7 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/hashes/sha256/sha256_component.hpp>
+#include <nil/blueprint/components/hashes/sha256/sha256_component.hpp>
 #include <nil/crypto3/zk/snark/components/set_commitment/set_commitment_component.hpp>
 
 using namespace nil::crypto3::zk;

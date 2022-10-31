@@ -42,9 +42,9 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/components/algebra/fields/exponentiation.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/element_fp4.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/element_fp6_2over3.hpp>
+#include <nil/blueprint/components/algebra/fields/exponentiation.hpp>
+#include <nil/blueprint/components/algebra/fields/element_fp4.hpp>
+#include <nil/blueprint/components/algebra/fields/element_fp6_2over3.hpp>
 
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;

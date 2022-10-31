@@ -38,20 +38,20 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verify_scalar.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/binding.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/verify_scalar.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/types.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
 #include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 
 #include "test_plonk_component.hpp"

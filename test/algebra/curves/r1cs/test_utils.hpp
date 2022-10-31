@@ -31,7 +31,7 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
+#include <nil/blueprint/components/algebra/curves/element_g1_affine.hpp>
 
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;

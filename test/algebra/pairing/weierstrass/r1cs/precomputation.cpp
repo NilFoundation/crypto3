@@ -30,10 +30,10 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/algebra/pairing/detail/mnt4.hpp>
-#include <nil/crypto3/zk/components/algebra/pairing/detail/mnt6.hpp>
+#include <nil/blueprint/components/algebra/pairing/detail/mnt4.hpp>
+#include <nil/blueprint/components/algebra/pairing/detail/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/algebra/pairing/weierstrass/precomputation.hpp>
+#include <nil/blueprint/components/algebra/pairing/weierstrass/precomputation.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

@@ -32,9 +32,9 @@
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/montgomery/element_g1.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/twisted_edwards/element_g1.hpp>
-#include <nil/crypto3/zk/components/hashes/pedersen.hpp>
+#include <nil/blueprint/components/algebra/curves/montgomery/element_g1.hpp>
+#include <nil/blueprint/components/algebra/curves/twisted_edwards/element_g1.hpp>
+#include <nil/blueprint/components/hashes/pedersen.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;

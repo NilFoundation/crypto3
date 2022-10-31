@@ -33,7 +33,7 @@
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 
-#include <nil/crypto3/zk/components/hashes/knapsack/knapsack_component.hpp>
+#include <nil/blueprint/components/hashes/knapsack/knapsack_component.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk;

@@ -20,8 +20,8 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/edwards/element_g1.hpp>
+#include <nil/blueprint/components/blueprint.hpp>
+#include <nil/blueprint/components/algebra/curves/edwards/element_g1.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>

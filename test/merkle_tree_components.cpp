@@ -31,12 +31,12 @@
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 
 // TODO: fix sha256 component
-// #include <nil/crypto3/zk/components/hashes/sha256/sha256_component.hpp>
-#include <nil/crypto3/zk/components/hashes/pedersen.hpp>
+// #include <nil/blueprint/components/hashes/sha256/sha256_component.hpp>
+#include <nil/blueprint/components/hashes/pedersen.hpp>
 
 // TODO: fix update component
-// #include <nil/crypto3/zk/components/merkle_tree/update.hpp>
-#include <nil/crypto3/zk/components/merkle_tree/validate.hpp>
+// #include <nil/blueprint/components/merkle_tree/update.hpp>
+#include <nil/blueprint/components/merkle_tree/validate.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
