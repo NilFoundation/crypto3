@@ -28,14 +28,14 @@
 // where non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_FP_COMPONENTS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_FP_COMPONENTS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_FP_COMPONENTS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_FP_COMPONENTS_HPP
 
 #include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 /******************************** element_fp ************************************/
@@ -46,8 +46,8 @@ namespace nil {
                 template<typename FieldType>
                 using element_fp = blueprint_linear_combination<FieldType>;
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_FP_COMPONENTS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_FP_COMPONENTS_HPP

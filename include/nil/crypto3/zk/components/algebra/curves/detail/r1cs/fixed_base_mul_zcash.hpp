@@ -26,8 +26,8 @@
 // @file
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP
 
 #include <type_traits>
 #include <vector>
@@ -53,7 +53,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<typename Curve>
                 struct fixed_base_mul_zcash : public component<typename Curve::base_field_type> {
@@ -324,8 +324,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_FIXED_BASE_MUL_ZCASH_COMPONENT_HPP

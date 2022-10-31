@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_PROOF_TEST_DATA_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_PROOF_TEST_DATA_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_PICKLES_VERIFIER_PROOF_TEST_DATA_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_PICKLES_VERIFIER_PROOF_TEST_DATA_HPP
 
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
@@ -235,4 +235,4 @@ nil::crypto3::zk::snark::pickles_proof<algebra::curves::vesta> test_proof() {
     return proof;
 }
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PICKLES_VERIFIER_PROOF_TEST_DATA_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_PICKLES_VERIFIER_PROOF_TEST_DATA_HPP

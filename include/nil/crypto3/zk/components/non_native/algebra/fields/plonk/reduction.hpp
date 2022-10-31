@@ -27,8 +27,8 @@
 // @file Declaration of interfaces for auxiliary components for the DECOMPOSITION component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_VARIABLE_BASE_DECOMPOSITION_EDWARD25519_HPP
-#define CRYPTO3_ZK_BLUEPRINT_VARIABLE_BASE_DECOMPOSITION_EDWARD25519_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_DECOMPOSITION_EDWARD25519_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_DECOMPOSITION_EDWARD25519_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -37,7 +37,7 @@
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
@@ -55,7 +55,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class reduction<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class reduction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                 CurveType,
                                 W0,
                                 W1,
@@ -292,8 +292,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_REDUCTION_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_REDUCTION_HPP

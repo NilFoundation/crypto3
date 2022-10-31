@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_R1CS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_R1CS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_BLUEPRINT_R1CS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_BLUEPRINT_R1CS_HPP
 
 #include <algorithm>
 #include <cassert>
@@ -40,13 +40,13 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
 
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
 
             template<typename BlueprintFieldType>
-            class blueprint<snark::r1cs_constraint_system<BlueprintFieldType>> {
+            class blueprint<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
                 typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
 
                 snark::r1cs_variable_assignment<BlueprintFieldType>
@@ -162,7 +162,7 @@ namespace nil {
                     return next_free_lc++;
                 }
             };
-        }    // namespace zk
+        }    // namespace blueprint
     }        // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_BLUEPRINT_R1CS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_BLUEPRINT_R1CS_HPP

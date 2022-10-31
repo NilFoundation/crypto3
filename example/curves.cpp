@@ -49,11 +49,11 @@ void verify_component(blueprint<typename CurveType::scalar_field_type> bp){
 
     const snark::r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
 
-    const typename snark::r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = snark::generate<snark::r1cs_gg_ppzksnark<curve_type>>(constraint_system);
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = snark::generate<crypto3::zk::snark::r1cs_gg_ppzksnark<curve_type>>(constraint_system);
 
-    const typename snark::r1cs_gg_ppzksnark<curve_type>::proof_type proof = snark::prove<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::proof_type proof = snark::prove<crypto3::zk::snark::r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
 
-    bool verified = snark::verify<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
+    bool verified = snark::verify<crypto3::zk::snark::r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
 
     std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
     std::cout << "Verification status: " << verified << std::endl;

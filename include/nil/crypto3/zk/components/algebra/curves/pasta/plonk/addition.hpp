@@ -25,15 +25,15 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
@@ -48,7 +48,7 @@ namespace nil {
                          std::size_t W4,
                          std::size_t W5,
                          std::size_t W6>
-                class element_g1_addition<snark::plonk_constraint_system<BlueprintFieldType>,
+                class element_g1_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                                           CurveType,
                                           W0,
                                           W1,
@@ -107,8 +107,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_ADDITION_COMPONENT_HPP

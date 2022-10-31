@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_FIELD_TO_BITS_COMPONENTS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_FIELD_TO_BITS_COMPONENTS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_FIELD_TO_BITS_COMPONENTS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_FIELD_TO_BITS_COMPONENTS_HPP
 
 #include <cassert>
 #include <memory>
@@ -40,7 +40,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 /**
                  * Converts a field element to bits, with strict validation that
@@ -207,7 +207,7 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_FIELD_TO_BITS_COMPONENTS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_FIELD_TO_BITS_COMPONENTS_HPP

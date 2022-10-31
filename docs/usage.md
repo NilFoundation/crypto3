@@ -147,7 +147,7 @@ Now that we have our circuit in the form of R1CS constraints on the blueprint we
 ```
 const r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
 
-typename snark::r1cs_gg_ppzksnark<bls12<381>>::keypair_type keypair = generate<snark::r1cs_gg_ppzksnark<bls12<381>>>(constraint_system);
+typename snark::r1cs_gg_ppzksnark<bls12<381>>::keypair_type keypair = generate<crypto3::zk::snark::r1cs_gg_ppzksnark<bls12<381>>>(constraint_system);
 ```
 
 Note that the above is the so-called "trusted setup". We can access the proving key through `keypair.pk` and the verification key through `keypair.vk`.
@@ -166,13 +166,13 @@ bp.val(sym_2) = 30;
 Now that the values are set in the blueprint we can access the public values through `bp.primary_input()` and the private values through `bp.auxiliary_input()`. Let's use the proving key, the public inputs and the private inputs to create a proof that we know the witness values:
 
 ```
-typename snark::r1cs_gg_ppzksnark<bls12<381>>::proof_type proof = prove<snark::r1cs_gg_ppzksnark<bls12<381>>>(keypair.pk, bp.primary_input(), bp.auxiliary_input());
+typename snark::r1cs_gg_ppzksnark<bls12<381>>::proof_type proof = prove<crypto3::zk::snark::r1cs_gg_ppzksnark<bls12<381>>>(keypair.pk, bp.primary_input(), bp.auxiliary_input());
 ```
 
 Now that we have a proof we can also verify it, using the previously created `proof`, the verifying key `keypair.vk` and the public input `bp.primary_input()`:
 
 ```
-bool verified = verify<snark::r1cs_gg_ppzksnark<bls12<381>>>(keypair.vk, bp.primary_input(), proof);
+bool verified = verify<crypto3::zk::snark::r1cs_gg_ppzksnark<bls12<381>>>(keypair.vk, bp.primary_input(), proof);
 ```
 
 At this stage the boolean `verified` should have the value `true`, given that we put in the correct values for the witness variables.

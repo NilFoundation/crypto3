@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -41,7 +41,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 // Proof evals are element of the finite field, so combine works just as scalar multiplication
@@ -293,8 +293,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_DETAIL_COMBINE_PROOF_EVALS_HPP

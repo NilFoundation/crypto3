@@ -36,80 +36,77 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace blueprint {
+    namespace blueprint {
 
-            template<typename ArithmetizationType, std::size_t... BlueprintParams>
-            class circuit;
+        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        class circuit;
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
-            class circuit<zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                           ArithmetizationParams>>
-                : public zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                        ArithmetizationParams> {
+        template<typename BlueprintFieldType,
+                 typename ArithmetizationParams>
+        class circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                       ArithmetizationParams>>
+            : public crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                    ArithmetizationParams> {
 
-                typedef zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                       ArithmetizationParams> ArithmetizationType;
+            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                   ArithmetizationParams> ArithmetizationType;
 
-            public:
-                typedef BlueprintFieldType blueprint_field_type;
+        public:
+            typedef BlueprintFieldType blueprint_field_type;
 
-                circuit(zk::snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams> constraint_system) :
-                        ArithmetizationType(constraint_system) { }
+            circuit(crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                    ArithmetizationParams> constraint_system) :
+                    ArithmetizationType(constraint_system) { }
 
-                circuit() : ArithmetizationType() {
+            circuit() : ArithmetizationType() {
+            }
+
+            // TODO: should put constraint in some storage and return its index
+            crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
+                add_constraint(const crypto3::zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                return constraint;
+            }
+
+            void add_gate(std::size_t selector_index,
+                          const crypto3::zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
+                this->_gates.emplace_back(selector_index, constraint);
+            }
+
+            void add_gate(std::size_t selector_index,
+                          const std::initializer_list<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> &constraints) {
+                this->_gates.emplace_back(selector_index, constraints);
+            }
+
+            void add_gate(crypto3::zk::snark::plonk_gate<BlueprintFieldType, crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> &gate) {
+                this->_gates.emplace_back(gate);
+            }
+
+            crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
+                add_bit_check(const crypto3::zk::snark::plonk_variable<BlueprintFieldType> &bit_variable) {
+                return add_constraint(bit_variable * (bit_variable - 1));
+            }
+
+            void add_copy_constraint(const crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
+                if (copy_constraint.first == copy_constraint.second) {
+                    return;
                 }
+                this->_copy_constraints.emplace_back(copy_constraint);
+            }
 
-                // TODO: should put constraint in some storage and return its index
-                zk::snark::plonk_constraint<BlueprintFieldType>
-                    add_constraint(const zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
-                    return constraint;
-                }
+            crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>
+                add_lookup_constraint(std::vector<crypto3::math::non_linear_term<crypto3::zk::snark::plonk_variable<BlueprintFieldType>>> lookup_input, 
+                std::vector<crypto3::zk::snark::plonk_variable<BlueprintFieldType>> lookup_value) {
+                crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType> lookup_constraint;
+                lookup_constraint.lookup_input = lookup_input;
+                lookup_constraint.lookup_value = lookup_value;
+                return lookup_constraint;
+            }
 
-                void add_gate(std::size_t selector_index,
-                              const zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
-                    this->_gates.emplace_back(selector_index, constraint);
-                }
-
-                void add_gate(std::size_t selector_index,
-                              const std::initializer_list<zk::snark::plonk_constraint<BlueprintFieldType>> &constraints) {
-                    this->_gates.emplace_back(selector_index, constraints);
-                }
-
-                void add_gate(zk::snark::plonk_gate<BlueprintFieldType, zk::snark::plonk_constraint<BlueprintFieldType>> &gate) {
-                    this->_gates.emplace_back(gate);
-                }
-
-                zk::snark::plonk_constraint<BlueprintFieldType>
-                    add_bit_check(const zk::snark::plonk_variable<BlueprintFieldType> &bit_variable) {
-                    return add_constraint(bit_variable * (bit_variable - 1));
-                }
-
-                void add_copy_constraint(const zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
-                    if (copy_constraint.first == copy_constraint.second) {
-                        return;
-                    }
-                    this->_copy_constraints.emplace_back(copy_constraint);
-                }
-
-                zk::snark::plonk_lookup_constraint<BlueprintFieldType>
-                    add_lookup_constraint(std::vector<math::non_linear_term<zk::snark::plonk_variable<BlueprintFieldType>>> lookup_input, 
-                    std::vector<zk::snark::plonk_variable<BlueprintFieldType>> lookup_value) {
-                    zk::snark::plonk_lookup_constraint<BlueprintFieldType> lookup_constraint;
-                    lookup_constraint.lookup_input = lookup_input;
-                    lookup_constraint.lookup_value = lookup_value;
-                    return lookup_constraint;
-                }
-
-
-                void add_lookup_gate(std::size_t selector_index,
-                              const std::initializer_list<zk::snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
-                    this->_lookup_gates.emplace_back(selector_index, constraints);
-                }
-            };
-        }    // namespace blueprint
-    }        // namespace crypto3
+            void add_lookup_gate(std::size_t selector_index,
+                          const std::initializer_list<crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
+                this->_lookup_gates.emplace_back(selector_index, constraints);
+            }
+        };
+    }    // namespace blueprint
 }    // namespace nil
 #endif    // CRYPTO3_BLUEPRINT_CIRCUIT_PLONK_HPP

@@ -25,15 +25,15 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP
-#define CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_SHA256_AUX_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_SHA256_AUX_HPP
 
 #include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename FieldType>
@@ -338,8 +338,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_SHA256_AUX_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_SHA256_AUX_HPP

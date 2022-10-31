@@ -27,8 +27,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -53,7 +53,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 // partial verification of the proof before batched verification (scalar field part)
@@ -367,8 +367,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_PREPARE_BATCH_SCALAR_HPP

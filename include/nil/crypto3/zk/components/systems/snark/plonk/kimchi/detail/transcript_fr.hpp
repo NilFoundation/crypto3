@@ -25,8 +25,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_TRANSCRIPT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_TRANSCRIPT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_TRANSCRIPT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_TRANSCRIPT_HPP
 
 #include <vector>
 #include <array>
@@ -45,7 +45,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 // Fiat-Shamir transfotmation (scalar field part)
@@ -72,7 +72,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class kimchi_transcript<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class kimchi_transcript<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                         CurveType,
                                         KimchiParamsType,
                                         W0,
@@ -261,8 +261,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_TRANSCRIPT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_TRANSCRIPT_HPP

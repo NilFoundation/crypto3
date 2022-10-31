@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_CURVES_TEST_UTILS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_CURVES_TEST_UTILS_HPP
 
 #include <vector>
 
@@ -256,4 +256,4 @@ void check_affine_twisted_edwards_g1_operations(
     check_is_well_formed_component<Curve, ElementComponent>(points);
 }
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_CURVES_TEST_UTILS_HPP

@@ -23,32 +23,30 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_ASSERT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_ASSERT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_ASSERT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_ASSERT_HPP
 
 #include <stdexcept>
 #include <boost/format.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace blueprint {
-            namespace detail {
-                template<typename T1, typename T2, typename T3>
-                static void blueprint_assert(T1 line, T2 file, T3 expr){
-                    std::stringstream errMsg;
-                    errMsg << "Assertion " << expr << " failed on line " << line << " in file " << file;
-                    throw std::runtime_error(errMsg.str().c_str());
-                }
-            }    // namespace detail
-        }    // namespace blueprint
-    }        // namespace crypto3
+    namespace blueprint {
+        namespace detail {
+            template<typename T1, typename T2, typename T3>
+            static void blueprint_assert(T1 line, T2 file, T3 expr){
+                std::stringstream errMsg;
+                errMsg << "Assertion " << expr << " failed on line " << line << " in file " << file;
+                throw std::runtime_error(errMsg.str().c_str());
+            }
+        }    // namespace detail
+    }    // namespace blueprint
 }    // namespace nil
 
 #ifdef BLUEPRINT_DEBUG_ENABLED
 #define BLUEPRINT_ASSERT( expr ) \
-    ( (expr) ? (void)0 : nil::crypto3::blueprint::detail::blueprint_assert( __LINE__, __FILE__, #expr))
+    ( (expr) ? (void)0 : nil::blueprint::detail::blueprint_assert( __LINE__, __FILE__, #expr))
 #else
 #define BLUEPRINT_ASSERT( expr ) ((void)0)
 #endif
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_ASSERT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_ASSERT_HPP

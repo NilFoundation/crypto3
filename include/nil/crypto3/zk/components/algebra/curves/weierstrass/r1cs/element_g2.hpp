@@ -28,8 +28,8 @@
 // is an elliptic curve over F^e in short Weierstrass form.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G2_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G2_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_WEIERSTRASS_G2_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_WEIERSTRASS_G2_COMPONENT_HPP
 
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 
@@ -38,7 +38,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 using namespace nil::crypto3::algebra::pairing;
@@ -158,8 +158,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_G2_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_WEIERSTRASS_G2_COMPONENT_HPP

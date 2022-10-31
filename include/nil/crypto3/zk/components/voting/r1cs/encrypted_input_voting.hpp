@@ -24,15 +24,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/merkle_tree/validate.hpp>
 #include <nil/crypto3/zk/components/hashes/pedersen.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<std::size_t Arity = 2,
                          typename HashComponent = pedersen<>,
@@ -141,8 +141,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_VOTING_ENCRYPTED_INPUT_VOTING_COMPONENT_HPP

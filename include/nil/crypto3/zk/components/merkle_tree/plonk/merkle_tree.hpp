@@ -26,8 +26,8 @@
 // @file Declaration of interfaces for auxiliary components for the MERKLE_TREE component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_TREE_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_TREE_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -35,7 +35,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
@@ -44,7 +44,7 @@ namespace nil {
                 template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
                          std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                          std::size_t W6, std::size_t W7, std::size_t W8>
-                class merkle_tree<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
+                class merkle_tree<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
                                   W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
@@ -147,8 +147,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_MERKLE_TREE_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_MERKLE_TREE_HPP

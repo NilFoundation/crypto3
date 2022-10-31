@@ -34,49 +34,47 @@
 #include <nil/crypto3/zk/blueprint/plonk/assignment.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace blueprint {
-            template<typename ValueType>
-            void profiling(std::vector<ValueType> column) {
-                for (std::size_t index = 0; index < column.size(); index++) {
-                    std::cout << "\t" << column[index].data;
-                }
+    namespace blueprint {
+        template<typename ValueType>
+        void profiling(std::vector<ValueType> column) {
+            for (std::size_t index = 0; index < column.size(); index++) {
+                std::cout << "\t" << column[index].data;
             }
+        }
 
-            template<typename FieldType, typename ArithmetizationParams>
-            void profiling(zk::snark::plonk_assignment_table<FieldType, ArithmetizationParams> assignments) {
+        template<typename FieldType, typename ArithmetizationParams>
+        void profiling(crypto3::zk::snark::plonk_assignment_table<FieldType, ArithmetizationParams> assignments) {
 
-                for (std::size_t row_index = 0; row_index < assignments.rows_amount(); row_index++) {
-                    std::cout << "\t" << row_index;
-                }
+            for (std::size_t row_index = 0; row_index < assignments.rows_amount(); row_index++) {
+                std::cout << "\t" << row_index;
+            }
+            std::cout << std::endl;
+
+            for (std::size_t w_index = 0; w_index < ArithmetizationParams::WitnessColumns; w_index++) {
+                std::cout << "W" << w_index << ":";
+                profiling(assignments.witness(w_index));
                 std::cout << std::endl;
-
-                for (std::size_t w_index = 0; w_index < ArithmetizationParams::WitnessColumns; w_index++) {
-                    std::cout << "W" << w_index << ":";
-                    profiling(assignments.witness(w_index));
-                    std::cout << std::endl;
-                }
-
-                for (std::size_t pi_index = 0; pi_index < ArithmetizationParams::PublicInputColumns; pi_index++) {
-                    std::cout << "PI" << pi_index << ":";
-                    profiling(assignments.public_input(pi_index));
-                    std::cout << std::endl;
-                }
-
-                for (std::size_t c_index = 0; c_index < ArithmetizationParams::ConstantColumns; c_index++) {
-                    std::cout << "C" << c_index << ":";
-                    profiling(assignments.constant(c_index));
-                    std::cout << std::endl;
-                }
-
-                for (std::size_t s_index = 0; s_index < ArithmetizationParams::SelectorColumns; s_index++) {
-                    std::cout << "S" << s_index << ":";
-                    profiling(assignments.selector(s_index));
-                    std::cout << std::endl;
-                }
             }
-        }    // namespace blueprint
-    }    // namespace crypto3
+
+            for (std::size_t pi_index = 0; pi_index < ArithmetizationParams::PublicInputColumns; pi_index++) {
+                std::cout << "PI" << pi_index << ":";
+                profiling(assignments.public_input(pi_index));
+                std::cout << std::endl;
+            }
+
+            for (std::size_t c_index = 0; c_index < ArithmetizationParams::ConstantColumns; c_index++) {
+                std::cout << "C" << c_index << ":";
+                profiling(assignments.constant(c_index));
+                std::cout << std::endl;
+            }
+
+            for (std::size_t s_index = 0; s_index < ArithmetizationParams::SelectorColumns; s_index++) {
+                std::cout << "S" << s_index << ":";
+                profiling(assignments.selector(s_index));
+                std::cout << std::endl;
+            }
+        }
+    }    // namespace blueprint
 }    // namespace nil
 
 #endif    // CRYPTO3_BLUEPRINT_TABLE_PROFILING_HPP

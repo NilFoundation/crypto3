@@ -28,15 +28,15 @@
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MNT6_BASIC_PAIRING_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MNT6_BASIC_PAIRING_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_MNT6_BASIC_PAIRING_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_MNT6_BASIC_PAIRING_HPP
 
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/detail/mnt6.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 namespace detail {
 
@@ -94,8 +94,8 @@ namespace nil {
                     };
                 }    // namespace detail
             }        // namespace components
-        }            // namespace zk
+        }            // namespace blueprint
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_MNT6_BASIC_PAIRING_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_MNT6_BASIC_PAIRING_HPP

@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENT_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
@@ -32,134 +32,132 @@
 #include <nil/crypto3/zk/detail/get_component_id.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace blueprint {
+    namespace blueprint {
 
-            template<typename ArithmetizationType, std::size_t... BlueprintParams>
-            class blueprint;
+        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        class blueprint;
 
-            namespace components {
+        namespace components {
 
-                template<typename ArithmetizationType, std::uint32_t... ComponentTemplateParams>
-                class component;
+            template<typename ArithmetizationType, std::uint32_t... ComponentTemplateParams>
+            class component;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
-                    std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
-                class component<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
-                    ConstantAmount, PublicInputAmount> {
-                protected:
+            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
+                std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
+            class component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
+                ConstantAmount, PublicInputAmount> {
+            protected:
 
-                    using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
-                    using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
-                    using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
-                    
-                public:
+                using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
+                using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
+                using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
+                
+            public:
 
-                    witness_container_type _W;
-                    constant_container_type _C;
-                    public_input_container_type _PI;
-                    // underlying_components_container_type _underlying_components;
+                witness_container_type _W;
+                constant_container_type _C;
+                public_input_container_type _PI;
+                // underlying_components_container_type _underlying_components;
 
-                    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+                using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-                    /**
-                     * Get Witness column global index by its internal index.
-                     * 
-                     * @param[in] internal witness signed index. For -1, last witness assumed.
-                     */
-                    typename witness_container_type::value_type W(std::int32_t index) const {
-                        return _W[(WitnessAmount + index)%WitnessAmount];
-                    }
+                /**
+                 * Get Witness column global index by its internal index.
+                 * 
+                 * @param[in] internal witness signed index. For -1, last witness assumed.
+                 */
+                typename witness_container_type::value_type W(std::int32_t index) const {
+                    return _W[(WitnessAmount + index)%WitnessAmount];
+                }
 
-                    /**
-                     * Get Constant column global index by its internal index.
-                     * 
-                     * @param[in] internal constant signed index. For -1, last constant assumed.
-                     */
-                    typename constant_container_type::value_type C(std::int32_t index) const {
-                        return _C[(ConstantAmount + index)%ConstantAmount];
-                    }
+                /**
+                 * Get Constant column global index by its internal index.
+                 * 
+                 * @param[in] internal constant signed index. For -1, last constant assumed.
+                 */
+                typename constant_container_type::value_type C(std::int32_t index) const {
+                    return _C[(ConstantAmount + index)%ConstantAmount];
+                }
 
-                    /**
-                     * Get Public Input column global index by its internal index.
-                     * 
-                     * @param[in] internal public input signed index. For -1, last public input assumed.
-                     */
-                    typename public_input_container_type::value_type PI(std::int32_t index) const {
-                        return _PI[(PublicInputAmount + index)%PublicInputAmount];
-                    }
+                /**
+                 * Get Public Input column global index by its internal index.
+                 * 
+                 * @param[in] internal public input signed index. For -1, last public input assumed.
+                 */
+                typename public_input_container_type::value_type PI(std::int32_t index) const {
+                    return _PI[(PublicInputAmount + index)%PublicInputAmount];
+                }
 
-                    typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
-                        ArithmetizationType;
+                typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    ArithmetizationType;
 
-                    /**
-                     * Constructor from arbitrary container types.
-                     * 
-                     * @tparam WitnessContainerType Input Witness Container Type
-                     * @tparam ConstantContainerType Input Constant Container Type
-                     * @tparam PublicInputContainerType Input PublicInput Container Type
-                     * @param[in] witness Container with witness columns global indices.
-                     * @param[in] constant Container with constant columns global indices.
-                     * @param[in] public_input Container with public input columns global indices.
-                     */
-                    template <typename WitnessContainerType, typename ConstantContainerType,
-                        typename PublicInputContainerType>
-                    component(WitnessContainerType witness, ConstantContainerType constant,
-                            PublicInputContainerType public_input) {
-                        std::copy_n(std::make_move_iterator(witness.begin()), WitnessAmount, _W.begin());
-                        std::copy_n(std::make_move_iterator(constant.begin()), ConstantAmount, _C.begin());
-                        std::copy_n(std::make_move_iterator(public_input.begin()), PublicInputAmount, _PI.begin());
-                    }
+                /**
+                 * Constructor from arbitrary container types.
+                 * 
+                 * @tparam WitnessContainerType Input Witness Container Type
+                 * @tparam ConstantContainerType Input Constant Container Type
+                 * @tparam PublicInputContainerType Input PublicInput Container Type
+                 * @param[in] witness Container with witness columns global indices.
+                 * @param[in] constant Container with constant columns global indices.
+                 * @param[in] public_input Container with public input columns global indices.
+                 */
+                template <typename WitnessContainerType, typename ConstantContainerType,
+                    typename PublicInputContainerType>
+                component(WitnessContainerType witness, ConstantContainerType constant,
+                        PublicInputContainerType public_input) {
+                    std::copy_n(std::make_move_iterator(witness.begin()), WitnessAmount, _W.begin());
+                    std::copy_n(std::make_move_iterator(constant.begin()), ConstantAmount, _C.begin());
+                    std::copy_n(std::make_move_iterator(public_input.begin()), PublicInputAmount, _PI.begin());
+                }
 
-                    std::size_t witness_amount() const {
-                        return _W.size();
-                    }
+                std::size_t witness_amount() const {
+                    return _W.size();
+                }
 
-                    std::size_t constant_amount() const {
-                        return _C.size();
-                    }
+                std::size_t constant_amount() const {
+                    return _C.size();
+                }
 
-                    std::size_t public_input_amount() const {
-                        return _PI.size();
-                    }
+                std::size_t public_input_amount() const {
+                    return _PI.size();
+                }
 
-                    template <typename ComponentType>
-                    friend detail::blueprint_component_id_type detail::get_component_id (ComponentType component);
-                };
+                template <typename ComponentType>
+                friend detail::blueprint_component_id_type detail::get_component_id (ComponentType component);
+            };
 
-                // namespace detail {
-                //     /**
-                //      * The specialized hash function for `unordered_map` PLONK component keys
-                //      */
-                //     struct component_hash {
-                //         template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
-                //             ConstantAmount, PublicInputAmount>
-                //         std::size_t operator() (const component<zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
-                //                 ConstantAmount, PublicInputAmount> &node) const {
-                            
-                //         }
-                //     };
+            // namespace detail {
+            //     /**
+            //      * The specialized hash function for `unordered_map` PLONK component keys
+            //      */
+            //     struct component_hash {
+            //         template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
+            //             ConstantAmount, PublicInputAmount>
+            //         std::size_t operator() (const component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
+            //                 ConstantAmount, PublicInputAmount> &node) const {
+                        
+            //         }
+            //     };
 
-                // } // namespace detail
+            // } // namespace detail
 
 
-                template<typename BlueprintFieldType>
-                class component<zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
-                protected:
+            template<typename BlueprintFieldType>
+            class component<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
+            protected:
 
-                    typedef zk::snark::r1cs_constraint_system<BlueprintFieldType>
-                        ArithmetizationType;
+                typedef crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>
+                    ArithmetizationType;
 
-                    blueprint<ArithmetizationType> &bp;
+                blueprint<ArithmetizationType> &bp;
 
-                public:
-                    component(blueprint<ArithmetizationType> &bp) : bp(bp) {
-                    }
-                };
+            public:
+                component(blueprint<ArithmetizationType> &bp) : bp(bp) {
+                }
+            };
 
-            }    // namespace components
-        }        // namespace blueprint
-    }            // namespace crypto3
+        }    // namespace components
+    }        // namespace blueprint
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENT_HPP

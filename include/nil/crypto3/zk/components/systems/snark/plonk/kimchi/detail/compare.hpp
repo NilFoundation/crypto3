@@ -26,8 +26,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_COMPARE_WITH_CONSTANT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_COMPARE_WITH_CONSTANT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_COMPARE_WITH_CONSTANT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_COMPARE_WITH_CONSTANT_HPP
 
 #include <vector>
 #include <array>
@@ -45,7 +45,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 ///////////////// Compare Value with Constant ////////////////////////////////
@@ -329,8 +329,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_ORACLES_DETAIL_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_ORACLES_DETAIL_COMPONENT_15_WIRES_HPP

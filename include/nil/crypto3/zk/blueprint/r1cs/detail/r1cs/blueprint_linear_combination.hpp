@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_LINEAR_COMBINATION_HPP
-#define CRYPTO3_ZK_BLUEPRINT_LINEAR_COMBINATION_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_LINEAR_COMBINATION_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_LINEAR_COMBINATION_HPP
 
 #include <vector>
 
@@ -37,7 +37,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
 
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
@@ -48,7 +48,7 @@ namespace nil {
                 class blueprint_linear_combination;
 
                 template<typename BlueprintFieldType>
-                class blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>> : 
+                class blueprint_linear_combination<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> : 
                     public snark::linear_combination<BlueprintFieldType> {
 
                     typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
@@ -123,8 +123,8 @@ namespace nil {
                 class blueprint_linear_combination_vector;
 
                 template<typename BlueprintFieldType>
-                class blueprint_linear_combination_vector<snark::r1cs_constraint_system<BlueprintFieldType>>
-                    : private std::vector<blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>>> {
+                class blueprint_linear_combination_vector<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>
+                    : private std::vector<blueprint_linear_combination<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
                     typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef typename BlueprintFieldType::value_type field_value_type;
@@ -246,7 +246,7 @@ namespace nil {
 
                     typename FieldType::value_type twoi =
                         FieldType::value_type::one();    // will hold 2^i entering each iteration
-                    std::vector<snark::linear_term<FieldType>> all_terms;
+                    std::vector<crypto3::zk::snark::linear_term<FieldType>> all_terms;
                     for (auto &lc : v) {
                         for (auto &term : lc.terms) {
                             all_terms.emplace_back(twoi * term);
@@ -263,7 +263,7 @@ namespace nil {
                                         const std::vector<typename FieldType::value_type> &coeffs) {
 
                     assert(v.size() == coeffs.size());
-                    std::vector<snark::linear_term<FieldType>> all_terms;
+                    std::vector<crypto3::zk::snark::linear_term<FieldType>> all_terms;
 
                     auto coeff_it = coeffs.begin();
                     for (auto &lc : v) {
@@ -276,8 +276,8 @@ namespace nil {
                     return snark::linear_combination<FieldType>(all_terms);
                 }
             }    // namespace detail
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_LINEAR_COMBINATION_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_LINEAR_COMBINATION_HPP

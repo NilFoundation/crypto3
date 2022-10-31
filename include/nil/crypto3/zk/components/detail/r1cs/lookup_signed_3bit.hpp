@@ -26,8 +26,8 @@
 // list of constants `c`
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_LOOKUP_SIGNED_3BIT_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_LOOKUP_SIGNED_3BIT_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_LOOKUP_SIGNED_3BIT_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_LOOKUP_SIGNED_3BIT_COMPONENT_HPP
 
 #include <vector>
 #include <iterator>
@@ -40,7 +40,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<typename Field>
                 struct lookup_signed_3bit : public component<Field> {
@@ -122,8 +122,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_LOOKUP_SIGNED_3BIT_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_LOOKUP_SIGNED_3BIT_COMPONENT_HPP

@@ -28,8 +28,8 @@
 // It relies on classes declared in components.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_CP_HANDLER_HPP
-#define CRYPTO3_ZK_BLUEPRINT_CP_HANDLER_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_CP_HANDLER_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_CP_HANDLER_HPP
 
 #include <numeric>
 
@@ -40,7 +40,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace snark {
 
                 /***************************** Message variable ******************************/
@@ -297,8 +297,8 @@ namespace nil {
                     return snark::r1cs_variable_assignment<FieldType>(va.begin() + witness_pos, va.end());
                 }
             }    // namespace snark
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_CP_HANDLER_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_CP_HANDLER_HPP

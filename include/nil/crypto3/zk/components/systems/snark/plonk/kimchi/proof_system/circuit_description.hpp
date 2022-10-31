@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_PROOF_SYSTEM_CIRCUIT_DESCRIPTION_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_PROOF_SYSTEM_CIRCUIT_DESCRIPTION_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_PROOF_SYSTEM_CIRCUIT_DESCRIPTION_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_PROOF_SYSTEM_CIRCUIT_DESCRIPTION_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
@@ -32,7 +32,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<typename IndexTermsList,
                     std::size_t WitnessColumns,
@@ -59,8 +59,8 @@ namespace nil {
                     static const bool lookup_runtime = index_terms_list::lookup_runtime;
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_PROOF_SYSTEM_CIRCUIT_DESCRIPTION_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_PROOF_SYSTEM_CIRCUIT_DESCRIPTION_HPP

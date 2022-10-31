@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_DIGEST_SELECTOR_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_DIGEST_SELECTOR_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_DIGEST_SELECTOR_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_DIGEST_SELECTOR_COMPONENT_HPP
 
 #include <vector>
 
@@ -33,7 +33,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename FieldType>
@@ -82,8 +82,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_DIGEST_SELECTOR_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_DIGEST_SELECTOR_COMPONENT_HPP

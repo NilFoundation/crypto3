@@ -34,7 +34,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(generate_circuit)
@@ -91,7 +91,7 @@ namespace nil {
                 }
 
             }    // namespace components
-        }    // namespace zk
+        }    // namespace blueprint
     }        // namespace crypto3
 }    // namespace nil
 

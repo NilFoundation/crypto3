@@ -27,8 +27,8 @@
 // The components verify correct precomputation of values for the G1 and G2 elements.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_AS_WAKSMAN_HPP
-#define CRYPTO3_ZK_BLUEPRINT_AS_WAKSMAN_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_AS_WAKSMAN_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_AS_WAKSMAN_HPP
 
 #include <memory>
 
@@ -45,7 +45,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 using namespace nil::crypto3::algebra::pairing;
@@ -570,8 +570,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_AS_WAKSMAN_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_AS_WAKSMAN_HPP

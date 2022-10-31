@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_VARIABLE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_VARIABLE_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_HPP
 
 #include <vector>
 #include <type_traits>
@@ -43,7 +43,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
 
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
@@ -57,7 +57,7 @@ namespace nil {
                 // class blueprint_variable;
 
                 template<typename BlueprintFieldType>
-                class blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>> :
+                class blueprint_variable<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> :
                     public snark::variable<BlueprintFieldType, false> {
                 public:
                     blueprint_variable(const typename snark::variable<BlueprintFieldType>::index_type index = 0) :
@@ -77,8 +77,8 @@ namespace nil {
                 class blueprint_variable_vector;
 
                 template<typename BlueprintFieldType>
-                class blueprint_variable_vector<snark::r1cs_constraint_system<BlueprintFieldType>> : 
-                    private std::vector<blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>>> {
+                class blueprint_variable_vector<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> : 
+                    private std::vector<blueprint_variable<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
                     typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef typename BlueprintFieldType::value_type field_value_type;
@@ -187,8 +187,8 @@ namespace nil {
                     }
                 };
             }    // namespace detail
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_VARIABLE_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_HPP

@@ -31,8 +31,8 @@
 // - P is a valid authentication path for the value V2 as the A-th leaf in a Merkle tree with root R2.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/hashes/digest_selector_component.hpp>
@@ -42,7 +42,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename HashComponent = pedersen<>, typename FieldType = typename HashComponent::field_type,
@@ -210,8 +210,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_TREE_CHECK_UPDATE_COMPONENT_HPP

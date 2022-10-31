@@ -26,12 +26,12 @@
 // @file Declaration of available operation components over curve group elements.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_ELEMENT_OPS_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_ELEMENT_OPS_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_ELEMENT_OPS_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_ELEMENT_OPS_COMPONENT_HPP
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<typename Curve, typename Form, typename Coordinates>
                 struct element_g1_is_well_formed { };
@@ -48,8 +48,8 @@ namespace nil {
                 template<typename Curve, typename Form, typename Coordinates>
                 struct element_g1_to_bits { };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_ELEMENT_OPS_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_ELEMENT_OPS_COMPONENT_HPP

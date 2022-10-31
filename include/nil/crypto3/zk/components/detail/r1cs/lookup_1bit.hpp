@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_DETAIL_LOOKUP_1BIT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_DETAIL_LOOKUP_1BIT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_DETAIL_LOOKUP_1BIT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_DETAIL_LOOKUP_1BIT_HPP
 
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/blueprint.hpp>
@@ -33,7 +33,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 /**
                  * One-bit window lookup table using one constraint
@@ -84,8 +84,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_DETAIL_LOOKUP_1BIT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_DETAIL_LOOKUP_1BIT_HPP

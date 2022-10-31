@@ -1,11 +1,11 @@
-#ifndef CRYPTO3_ZK_BLUEPRINT_HMAC_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_HMAC_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_HMAC_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_HMAC_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<typename FieldType, typename Hash1, typename Hash2 = Hash1>
                 class hmac_component : component<FieldType> {
@@ -143,8 +143,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_HMAC_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_HMAC_COMPONENT_HPP

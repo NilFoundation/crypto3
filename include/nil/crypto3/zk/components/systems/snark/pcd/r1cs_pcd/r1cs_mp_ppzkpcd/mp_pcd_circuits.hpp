@@ -38,8 +38,8 @@
 // Alessandro Chiesa, Eran Tromer, Madars Virza
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MP_PCD_CIRCUITS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MP_PCD_CIRCUITS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_MP_PCD_CIRCUITS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_MP_PCD_CIRCUITS_HPP
 
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/component_from_r1cs.hpp>
@@ -50,7 +50,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace snark {
 
                 /**************************** Compliance step ********************************/
@@ -792,8 +792,8 @@ namespace nil {
                     return result;
                 }
             }    // namespace snark
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_MP_PCD_CIRCUITS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_MP_PCD_CIRCUITS_HPP

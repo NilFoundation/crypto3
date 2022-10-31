@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_SNARK_SET_COMMITMENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_SNARK_SET_COMMITMENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_SNARK_SET_COMMITMENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_SNARK_SET_COMMITMENT_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace snark {
 
                 typedef std::vector<bool> set_commitment;
@@ -106,8 +106,8 @@ namespace nil {
                 };
 
             }    // namespace snark
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_SNARK_SET_COMMITMENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_SNARK_SET_COMMITMENT_HPP

@@ -23,28 +23,26 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
-#define CRYPTO3_ZK_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
+#ifndef CRYPTO3_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
+#define CRYPTO3_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
 
 #include <typeinfo>
 
 namespace nil {
-    namespace crypto3 {
-        namespace blueprint {
-            namespace detail {
+    namespace blueprint {
+        namespace detail {
 
-                using blueprint_component_id_type = std::string;
+            using blueprint_component_id_type = std::string;
 
-                template <typename ComponentType>
-                blueprint_component_id_type get_component_id (ComponentType component){
-                    std::stringstream id;
+            template <typename ComponentType>
+            blueprint_component_id_type get_component_id (ComponentType component){
+                std::stringstream id;
 
-                    id << typeid(component).name() ;
-                    return id.str();
-                }
+                id << typeid(component).name() ;
+                return id.str();
+            }
 
-            }    // namespace detail
-        }    // namespace blueprint
-    }        // namespace crypto3
+        }    // namespace detail
+    }    // namespace blueprint
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
+#endif    // CRYPTO3_BLUEPRINT_DETAIL_COMPONENT_ID_HPP

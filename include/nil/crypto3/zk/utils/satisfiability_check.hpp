@@ -37,57 +37,55 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace blueprint {
+    namespace blueprint {
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
-            bool is_satisfied(circuit<zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                           ArithmetizationParams>> bp,
-                              zk::snark::plonk_assignment_table<BlueprintFieldType,
-                                                        ArithmetizationParams> assignments){
+        template<typename BlueprintFieldType,
+                 typename ArithmetizationParams>
+        bool is_satisfied(circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                       ArithmetizationParams>> bp,
+                          crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
+                                                    ArithmetizationParams> assignments){
 
-                const std::vector<zk::snark::plonk_gate<BlueprintFieldType, zk::snark::plonk_constraint<BlueprintFieldType>>> gates =
-                            bp.gates();
+            const std::vector<crypto3::zk::snark::plonk_gate<BlueprintFieldType, crypto3::zk::snark::plonk_constraint<BlueprintFieldType>>> gates =
+                        bp.gates();
 
-                const std::vector<zk::snark::plonk_copy_constraint<BlueprintFieldType>> copy_constraints =
-                            bp.copy_constraints();
+            const std::vector<crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType>> copy_constraints =
+                        bp.copy_constraints();
 
-                const std::vector<zk::snark::plonk_gate<BlueprintFieldType, zk::snark::plonk_lookup_constraint<BlueprintFieldType>>> lookup_gates =
-                            bp.lookup_gates();
+            const std::vector<crypto3::zk::snark::plonk_gate<BlueprintFieldType, crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>>> lookup_gates =
+                        bp.lookup_gates();
 
-                for (std::size_t i = 0; i < gates.size(); i++) {
-                    zk::snark::plonk_column<BlueprintFieldType> selector = assignments.selector(gates[i].selector_index);
+            for (std::size_t i = 0; i < gates.size(); i++) {
+                crypto3::zk::snark::plonk_column<BlueprintFieldType> selector = assignments.selector(gates[i].selector_index);
 
-                    for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
+                for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
 
-                        for (std::size_t selector_row = 0; selector_row < selector.size(); selector_row++){
-                            if (!selector[selector_row].is_zero()){
+                    for (std::size_t selector_row = 0; selector_row < selector.size(); selector_row++){
+                        if (!selector[selector_row].is_zero()){
 
-                                typename BlueprintFieldType::value_type constraint_result =
-                                    gates[i].constraints[j].evaluate(selector_row, assignments);
-                                    
-                                if (!constraint_result.is_zero()) {
-                                    std::cout << "Constraint " << j << " from gate " << i << "on row " << selector_row << " is not satisfied." << std::endl;
-                                    return false;
-                                }
+                            typename BlueprintFieldType::value_type constraint_result =
+                                gates[i].constraints[j].evaluate(selector_row, assignments);
+                                
+                            if (!constraint_result.is_zero()) {
+                                std::cout << "Constraint " << j << " from gate " << i << "on row " << selector_row << " is not satisfied." << std::endl;
+                                return false;
                             }
                         }
                     }
                 }
-
-                for (std::size_t i = 0; i < copy_constraints.size(); i++) {
-                    if (var_value(assignments, copy_constraints[i].first) !=
-                        var_value(assignments, copy_constraints[i].second)){
-                        std::cout << "Copy constraint number " << i << " is not satisfied." << std::endl;
-                        return false;
-                    }
-                }
-
-                return true;
             }
 
-        }    // namespace blueprint
-    }        // namespace crypto3
+            for (std::size_t i = 0; i < copy_constraints.size(); i++) {
+                if (var_value(assignments, copy_constraints[i].first) !=
+                    var_value(assignments, copy_constraints[i].second)){
+                    std::cout << "Copy constraint number " << i << " is not satisfied." << std::endl;
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+    }    // namespace blueprint
 }    // namespace nil
 #endif    // CRYPTO3_BLUEPRINT_UTILS_PLONK_SATISFIABILITY_CHECK_HPP

@@ -24,8 +24,8 @@
 // @file Declaration of interfaces for auxiliary components for the EDDSA25519 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_SIGNATURES_VERIFICATION_HPP
-#define CRYPTO3_ZK_BLUEPRINT_SIGNATURES_VERIFICATION_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_SIGNATURES_VERIFICATION_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_SIGNATURES_VERIFICATION_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -33,7 +33,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, typename Ed25519Type, std::size_t k,
@@ -54,7 +54,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class signatures_verification<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class signatures_verification<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
                                                        Ed25519Type,
                                                        k,
@@ -147,8 +147,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP

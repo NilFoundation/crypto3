@@ -29,14 +29,14 @@
 // is an elliptic curve over F in Montgomery form.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MONTGOMERY_G1_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MONTGOMERY_G1_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_MONTGOMERY_G1_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_MONTGOMERY_G1_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 /**
                  * @brief Component that creates constraints for the addition of two elements from G1. (if element from
@@ -183,8 +183,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_MONTGOMERY_G1_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_MONTGOMERY_G1_COMPONENT_HPP

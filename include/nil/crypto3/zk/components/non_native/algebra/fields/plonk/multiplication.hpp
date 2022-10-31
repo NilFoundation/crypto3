@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/components/non_native/algebra/fields/plonk/non_native_range.hpp>
@@ -37,7 +37,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType,
@@ -286,7 +286,7 @@ namespace nil {
                         p[2] = (minus_eddsa_p >> 132) & (mask);
                         p[3] = (minus_eddsa_p >> 198) & (mask);
 
-                        std::array<snark::plonk_constraint<BlueprintFieldType>, 5> t;
+                        std::array<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>, 5> t;
                         t[0] =  var(W0, -1)*var(W4, - 1)  + p[0] * var(W8, - 1);
                         t[1] = var(W1, - 1)*var(W4, - 1) + var(W0, -1)*var(W5, - 1) + p[0]*var(W0, 0) + p[1] * var(W8, - 1);
                         t[2] = var(W2, -1)*var(W4, - 1) + var(W0, -1)*var(W6, - 1) + var(W1, - 1)*var(W5, - 1) + p[2]*var(W8, - 1) + var(W1, 0) * p[0]
@@ -336,8 +336,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_FIELDS_EDDSA_MULTIPLICATION_COMPONENT_9_WIRES_HPP

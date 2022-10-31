@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFIER_INDEX_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFIER_INDEX_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_VERIFIER_INDEX_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_VERIFIER_INDEX_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -40,7 +40,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 typedef std::array<uint64_t, 2> kimchi_scalar_limbs;
 
@@ -96,8 +96,8 @@ namespace nil {
                     commitments_type comm;
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_KIMCHI_VERIFIER_INDEX_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_VERIFIER_INDEX_HPP

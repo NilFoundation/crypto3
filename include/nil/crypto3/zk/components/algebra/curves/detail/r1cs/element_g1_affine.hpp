@@ -26,8 +26,8 @@
 // @file Declaration of affine G1 element component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_G1_AFFINE_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_G1_AFFINE_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_G1_AFFINE_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_G1_AFFINE_COMPONENT_HPP
 
 #include <nil/crypto3/zk/components/component.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/element_fp.hpp>
@@ -39,7 +39,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<typename Curve, typename Form, typename Coordinates>
                 struct element_g1;
@@ -110,8 +110,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_G1_AFFINE_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_G1_AFFINE_COMPONENT_HPP

@@ -27,8 +27,8 @@
 // prover, then verifier) on a synthetic R1CS instance.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
 
 #include <nil/crypto3/container/merkle/proof.hpp>
 
@@ -38,7 +38,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 template<typename HashComponent = nil::crypto3::zk::components::pedersen<>,
                          typename FieldType = typename HashComponent::field_type, std::size_t Arity = 2>
@@ -117,8 +117,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP

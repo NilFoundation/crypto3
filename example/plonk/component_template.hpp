@@ -26,8 +26,8 @@
 // @file Declaration of interfaces for PLONK unified addition component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_COMPONENT_TEMPLATE_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_COMPONENT_TEMPLATE_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_COMPONENT_TEMPLATE_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_COMPONENT_TEMPLATE_HPP
 
 #include <cmath>
 
@@ -41,7 +41,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType,
@@ -149,8 +149,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_COMPONENT_TEMPLATE_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_COMPONENT_TEMPLATE_HPP

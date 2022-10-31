@@ -70,12 +70,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
     constexpr std::size_t Lambda = 5;
 
-    std::array<typename BlueprintFieldType::value_type, 3> public_input = {0, 1, 1};
-    std::array<var, 3> input_state_var = {var(0, 0, false, var::column_type::public_input),
+    std::array<typename BlueprintFieldType::value_type, component_type::state_size> public_input = {0, 1, 1};
+    std::array<var, component_type::state_size> input_state_var = {var(0, 0, false, var::column_type::public_input),
      var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)};
     typename component_type::input_type instance_input = {input_state_var};
 
-    std::array<typename BlueprintFieldType::value_type, 3> expected_res = {
+    std::array<typename BlueprintFieldType::value_type, component_type::state_size> expected_res = {
         0x294B71F8CF2C775369A3B0B8912E508790B0C64BDBE6A5C26F2C6B53767A47CB_cppui255,
         0x244E5FA0EE801AB3FCCAB47ED7F6EAB38126318F7BD2C414ADDBF62FCC30316A_cppui255,
         0x273C6EE50F9A2970162F5D4503596175C6D3FB4C0BF6C269BCD1DFEFB4F50D47_cppui255};

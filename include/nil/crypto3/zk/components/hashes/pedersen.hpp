@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_HASHES_PEDERSEN_HPP
-#define CRYPTO3_ZK_BLUEPRINT_HASHES_PEDERSEN_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_HASHES_PEDERSEN_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_HASHES_PEDERSEN_HPP
 
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/find_group_hash.hpp>
@@ -37,7 +37,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
                 /**
                  * Windowed hash function using elliptic curves point multiplication
@@ -492,7 +492,7 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_ZK_BLUEPRINT_HASHES_PEDERSEN_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_HASHES_PEDERSEN_HPP

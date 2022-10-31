@@ -24,8 +24,8 @@
 // @file Declaration of interfaces for auxiliary components for the BATCH_VERIFY_SCALAR_FIELD component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_SCALAR_FIELD_HPP
-#define CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_SCALAR_FIELD_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_BATCH_VERIFY_SCALAR_FIELD_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_BATCH_VERIFY_SCALAR_FIELD_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -47,7 +47,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 // batched polynomial commitment verification (scalar field)
@@ -84,7 +84,7 @@ namespace nil {
                          std::size_t W12,
                          std::size_t W13,
                          std::size_t W14>
-                class batch_verify_scalar_field<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class batch_verify_scalar_field<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
                                                        KimchiParamsType,
                                                        KimchiCommitmentParamsType,
@@ -684,8 +684,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_BATCH_VERIFY_SCALAR_FIELD_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_BATCH_VERIFY_SCALAR_FIELD_HPP

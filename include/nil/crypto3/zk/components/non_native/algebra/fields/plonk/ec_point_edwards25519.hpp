@@ -24,8 +24,8 @@
 // @file Declaration of interfaces for component to check if a point is on ed25519 curve.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_EC_POINT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_EC_POINT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_EC_POINT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_EC_POINT_HPP
 
 #include <nil/crypto3/zk/blueprint/plonk.hpp>
 #include <nil/crypto3/zk/assignment/plonk.hpp>
@@ -37,7 +37,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, typename Ed25519Type,
@@ -57,7 +57,7 @@ namespace nil {
                          std::size_t W6,
                          std::size_t W7,
                          std::size_t W8>
-                class ec_point<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class ec_point<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                                                        CurveType,
                                                         Ed25519Type,
                                                        W0,
@@ -239,8 +239,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP

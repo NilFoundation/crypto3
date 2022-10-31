@@ -41,7 +41,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             template<typename FieldType, typename ArithmetizationParams, typename Hash, std::size_t Lambda>
             struct profiling_plonk_circuit {
                 using placeholder_params =
@@ -221,7 +221,7 @@ namespace nil {
                     }
                 }
             };
-        }    // namespace zk
+        }    // namespace blueprint
     }        // namespace crypto3
 }    // namespace nil
 

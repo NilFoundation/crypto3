@@ -56,8 +56,8 @@
 // ECCC TR95-042
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP
-#define CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_KNAPSACK_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_KNAPSACK_COMPONENT_HPP
 
 #include <nil/crypto3/hash/sha2.hpp>
 
@@ -70,7 +70,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 /************************** Choice of dimension ******************************/
@@ -302,8 +302,8 @@ namespace nil {
                 template<typename FieldType>
                 std::size_t knapsack_crh_with_field_out_component<FieldType>::num_cached_coefficients;
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_KNAPSACK_COMPONENT_HPP

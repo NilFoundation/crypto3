@@ -28,8 +28,8 @@
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
-#define CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 
@@ -38,7 +38,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 using namespace nil::crypto3::algebra;
@@ -72,8 +72,8 @@ namespace nil {
                     typedef element_fp6_2over3_squared<fqk_type> Fqk_sqr_component_type;
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_MNT4_BASIC_CURVE_COMPONENT_POLICY_HPP

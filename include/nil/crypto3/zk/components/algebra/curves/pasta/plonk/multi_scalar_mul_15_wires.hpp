@@ -26,8 +26,8 @@
 // @file Declaration of interfaces for auxiliary components for the SHA256 component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_MULTI_SCALAR_MUL_COMPONENT_15_WIRES_HPP
-#define CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_MULTI_SCALAR_MUL_COMPONENT_15_WIRES_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_MULTI_SCALAR_MUL_COMPONENT_15_WIRES_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_MULTI_SCALAR_MUL_COMPONENT_15_WIRES_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -42,7 +42,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 template<typename ArithmetizationType, typename CurveType, std::size_t PointsAmount,
@@ -164,8 +164,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_MULTI_SCALAR_MUL_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_MULTI_SCALAR_MUL_COMPONENT_15_WIRES_HPP

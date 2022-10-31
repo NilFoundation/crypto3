@@ -27,8 +27,8 @@
 // The components verify computations of (single or multiple simultaneous) Miller loops.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_HPP
-#define CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_WEIERSTRASS_MILLER_LOOP_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_WEIERSTRASS_MILLER_LOOP_HPP
 
 #include <memory>
 
@@ -41,7 +41,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 using namespace nil::crypto3::algebra::pairing;
@@ -822,8 +822,8 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_WEIERSTRASS_MILLER_LOOP_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_WEIERSTRASS_MILLER_LOOP_HPP

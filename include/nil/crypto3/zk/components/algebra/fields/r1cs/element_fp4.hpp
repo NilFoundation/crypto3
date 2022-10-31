@@ -28,8 +28,8 @@
 // Fp2 = Fp[U]/(U^2-non_residue) and non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_FP4_COMPONENTS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_FP4_COMPONENTS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_FP4_COMPONENTS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_FP4_COMPONENTS_HPP
 
 #include <nil/crypto3/zk/component.hpp>
 #include <nil/crypto3/zk/components/algebra/fields/element_fp2.hpp>
@@ -37,7 +37,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace zk {
+        namespace blueprint {
             namespace components {
 
                 /******************************** element_fp4 ************************************/
@@ -639,8 +639,8 @@ namespace nil {
                     }
                 };
             }    // namespace components
-        }        // namespace zk
+        }        // namespace blueprint
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_FP4_COMPONENTS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_FP4_COMPONENTS_HPP
