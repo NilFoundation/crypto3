@@ -32,11 +32,11 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/padding.hpp>
 
 namespace nil {
+    namespace blueprint {
+        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        class assignment;
+    } // namespace blueprint
     namespace crypto3 {
-        namespace blueprint {
-            template<typename ArithmetizationType, std::size_t... BlueprintParams>
-            class assignment;
-        } // namespace blueprint
         namespace zk {
             namespace snark {
 
@@ -95,7 +95,7 @@ namespace nil {
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
 
-                    friend struct blueprint::assignment<zk::snark::plonk_constraint_system<FieldType,
+                    friend struct nil::blueprint::assignment<plonk_constraint_system<FieldType,
                         ArithmetizationParams>>;
                 };
 
@@ -196,7 +196,7 @@ namespace nil {
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
 
-                    friend struct blueprint::assignment<zk::snark::plonk_constraint_system<FieldType,
+                    friend struct nil::blueprint::assignment<plonk_constraint_system<FieldType,
                         ArithmetizationParams>>;
                 };
 
