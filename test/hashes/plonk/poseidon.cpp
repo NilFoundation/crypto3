@@ -44,13 +44,13 @@
 
 #include "../../test_plonk_component.hpp"
 
-using namespace nil::crypto3;
+using namespace nil;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_poseidon_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
 
-    using curve_type = algebra::curves::pallas;
+    using curve_type = crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using FieldType = BlueprintFieldType;
 
@@ -60,14 +60,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
     constexpr std::size_t SelectorColumns = 11;
 
     using ArithmetizationParams =
-        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     using component_type =
         blueprint::components::poseidon<ArithmetizationType, FieldType, 15>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     constexpr std::size_t Lambda = 5;
 
     std::array<typename BlueprintFieldType::value_type, component_type::state_size> public_input = {0, 1, 1};
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{},{});
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
 }
 
