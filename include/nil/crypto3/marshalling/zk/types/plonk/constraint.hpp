@@ -138,6 +138,9 @@ namespace nil {
                 /*********************** Plonk gates constraints  ****************************/
                 /*                 Universal interface for gates marshalling                 */
                 /*****************************************************************************/
+                
+                //TODO maybe it can be implemented in a better way
+
                 template <typename TTypeBase, typename Constraint, typename T=void > 
                 struct plonk_gate_constraint_base_type;
 

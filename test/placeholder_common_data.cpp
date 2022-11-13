@@ -1,30 +1,4 @@
-//---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
-//
-// MIT License
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//---------------------------------------------------------------------------//
-
-#define BOOST_TEST_MODULE crypto3_marshalling_placeholder_proof_test
+#define BOOST_TEST_MODULE crypto3_marshalling_placeholder_common_data_test
 
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -57,7 +31,7 @@
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
-#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
+#include <nil/crypto3/marshalling/zk/types/placeholder/common_data.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
@@ -73,101 +47,34 @@
 #include <../test/test_plonk_component.hpp>
 #include "./detail/circuits.hpp"
 
+
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
-template<typename TIter>
-void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
-    os << std::hex;
-    for (TIter it = iter_begin; it != iter_end; it++) {
-        os << std::setfill('0') << std::setw(2) << std::right << int(*it);
-    }
-    os << std::dec;
-    if (endl) {
-        os << std::endl;
-    }
-}
 
-template<typename ProofIterator>
-void print_placeholder_proof(ProofIterator proof_begin, ProofIterator proof_end, bool endl, const char *name) {
-    std::ofstream out;
-    out.open(name);
-    print_hex_byteblob(out, proof_begin, proof_end, endl);
-}
-
-template<typename FieldParams>
-void print_field_element(std::ostream &os,
-                         const typename nil::crypto3::algebra::fields::detail::element_fp<FieldParams> &e,
-                         bool endline = true) {
-    os << e.data;
-    if (endline) {
-        os << std::endl;
-    }
-}
-
-template<typename FieldParams>
-void print_field_element(std::ostream &os,
-                         const typename nil::crypto3::algebra::fields::detail::element_fp2<FieldParams> &e,
-                         bool endline = true) {
-    os << e.data[0].data << ", " << e.data[1].data;
-    if (endline) {
-        os << std::endl;
-    }
-}
-
-template<typename CurveParams, typename Form, typename Coordinates>
-typename std::enable_if<std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::affine>::value>::type
-    print_curve_point(std::ostream &os,
-                      const nil::crypto3::algebra::curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X, false);
-    os << "], Y: [";
-    print_field_element(os, p.Y, false);
-    os << "] )" << std::endl;
-}
-
-template<typename CurveParams, typename Form, typename Coordinates>
-typename std::enable_if<std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::projective>::value ||
-                        std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0>::value
-                        // || std::is_same<Coordinates, nil::crypto3::algebra::curves::coordinates::inverted>::value
-                        >::type
-    print_curve_point(std::ostream &os,
-                      const nil::crypto3::algebra::curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X, false);
-    os << "], Y: [";
-    print_field_element(os, p.Y, false);
-    os << "], Z:[";
-    print_field_element(os, p.Z, false);
-    os << "] )" << std::endl;
-}
-
-template<typename Endianness, typename Proof>
-void test_placeholder_proof_marshalling(const Proof &proof) {
-
-    using namespace nil::crypto3::marshalling;
-
+template<typename CommonDataType>
+void test_placeholder_common_data(CommonDataType common_data){
+    using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
-    using proof_marshalling_type = types::placeholder_proof<TTypeBase, Proof>;
+    using marshalling_type = nil::crypto3::marshalling::types::placeholder_common_data<TTypeBase, CommonDataType>;
 
-    auto filled_placeholder_proof = types::fill_placeholder_proof<Endianness, Proof>(proof);
-    Proof _proof = types::make_placeholder_proof<Endianness, Proof>(filled_placeholder_proof);
-    BOOST_CHECK(_proof == proof);
+    auto filled_common_data = nil::crypto3::marshalling::types::fill_placeholder_common_data<CommonDataType, Endianness>(common_data);
+    auto _common_data = nil::crypto3::marshalling::types::make_placeholder_common_data<CommonDataType, Endianness>(filled_common_data);
+    BOOST_CHECK(common_data == _common_data);
 
     std::vector<std::uint8_t> cv;
-    cv.resize(filled_placeholder_proof.length(), 0x00);
+    cv.resize(filled_common_data.length(), 0x00);
     auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
+    nil::marshalling::status_type status = filled_common_data.write(write_iter, cv.size());
 
-    print_placeholder_proof(cv.cbegin(), cv.cend(), false, "placeholder_proof.txt");
-
-    proof_marshalling_type test_val_read;
+    marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
-    auto constructed_val_read = types::make_placeholder_proof<Endianness, Proof>(test_val_read);
-    BOOST_CHECK(proof == constructed_val_read);
+    auto constructed_val_read = nil::crypto3::marshalling::types::make_placeholder_common_data<CommonDataType, Endianness>(test_val_read);
+    BOOST_CHECK(common_data == constructed_val_read);
 }
+
 BOOST_AUTO_TEST_SUITE(placeholder_marshalling_proof_test_suite)
 
 BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
@@ -193,9 +100,10 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10>;
+    using functor_result_check_type = curve_type::template g1_type<>; 
 
-    // auto P = curve_type::template g1_type<>::value_type::one().to_affine();
-    // auto Q = curve_type::template g1_type<>::value_type::one().to_affine();
+     //auto P = curve_type::template g1_type<>::value_type::one().to_affine();
+     //auto Q = curve_type::template g1_type<>::value_type::one().to_affine();
     auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
     auto Q = algebra::random_element<curve_type::template g1_type<>>().to_affine();
 
@@ -212,21 +120,20 @@ BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
         assert(expected_res.Y == assignment.var_value(real_res.Y));
     };
 
-    auto [proof, fri_params, public_preprocessed_data, bp] =
-        nil::crypto3::create_component_proof<component_type, BlueprintFieldType, ArithmetizationParams, hash_type,
-                                             Lambda>(params, public_input, result_check);
     using placeholder_params =
         zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
-//    nil::crypto3::zk::snark::placeholder_profiling<placeholder_params>::print_params(
-//        proof, fri_params, public_preprocessed_data.common_data);
-    test_placeholder_proof_marshalling<Endianness>(proof);
-//    test_placeholder_proof_marshalling_evm_optimized<Endianness>(proof);*/
+
+    auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
+    nil::crypto3::prepare_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check
+    );
+
+    test_placeholder_common_data(public_preprocessed_data.common_data);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(marshalling_real_proof)
 
-
+BOOST_AUTO_TEST_SUITE(marshalling_placeholder_common_data_test_2)
 // using curve_type = algebra::curves::bls12<381>;
 using curve_type = algebra::curves::pallas;
 using FieldType = typename curve_type::base_field_type;
@@ -283,9 +190,9 @@ typedef commitments::fri<FieldType, placeholder_test_params::merkle_hash_type,
 typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
 typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params>
     circuit_3_params;
-    
-BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_2_params_test) {
 
+
+BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_2_params){
     circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
         circuit_test_2<FieldType>();
 
@@ -314,27 +221,19 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_2_params_test) {
             constraint_system, assignments.public_table(), desc,
             fri_params, columns_with_copy_constraints.size());
 
-    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_private_data =
-        placeholder_private_preprocessor<FieldType, circuit_2_params>::process(constraint_system,
-                                                                               assignments.private_table(), desc, fri_params);
-
-    auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
-
-    using Endianness = nil::marshalling::option::big_endian;
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
-    test_placeholder_proof_marshalling<Endianness, placeholder_proof<FieldType, circuit_2_params>>(proof);
+    test_placeholder_common_data(preprocessed_public_data.common_data);
 }
 
-BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_3_params_test) {
-    circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit =
-        circuit_test_3<FieldType>();
+BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_3_params){
+    circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
+
+    constexpr std::size_t argument_size = 5;
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 0, false> lpc_type;
+//    typedef commitments::list_polynomial_commitment<FieldType,
+//        circuit_3_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 1, true> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -347,26 +246,11 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_3_params_test) {
                                                                    circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-
     typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
         preprocessed_public_data =
         placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
-            constraint_system, assignments.public_table(), desc,
-            fri_params, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), desc, fri_params, 0);
 
-    typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-        preprocessed_private_data =
-        placeholder_private_preprocessor<FieldType, circuit_3_params>::process(constraint_system,
-                                                                               assignments.private_table(), desc, fri_params);
-
-    auto proof = placeholder_prover<FieldType, circuit_3_params>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
-
-    using Endianness = nil::marshalling::option::big_endian;
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-    
-    test_placeholder_proof_marshalling<Endianness, placeholder_proof<FieldType, circuit_3_params>>(proof);
+    test_placeholder_common_data(preprocessed_public_data.common_data);
 }
-
 BOOST_AUTO_TEST_SUITE_END()
