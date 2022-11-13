@@ -49,7 +49,7 @@
 
 #include <chrono>
 
-using namespace nil::crypto3;
+using namespace nil;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
@@ -58,7 +58,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    using FieldType = typename curve_type::base_field_type;
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 5;
@@ -68,12 +67,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
     constexpr std::size_t Lambda = 1;
 
     using ArithmetizationParams =
-        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::sha512<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type = blueprint::components::sha512<ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     using ed25519_type = algebra::curves::ed25519;
 

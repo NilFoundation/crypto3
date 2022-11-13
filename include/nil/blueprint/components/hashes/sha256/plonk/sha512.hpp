@@ -39,13 +39,13 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+            template<typename ArithmetizationType, std::size_t... WireIndexes>
             class sha512;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+            template<typename BlueprintFieldType, typename ArithmetizationParams,
                      std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                      std::size_t W6, std::size_t W7, std::size_t W8>
-            class sha512<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, W0,
+            class sha512<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, W0,
                          W1, W2, W3, W4, W5, W6, W7, W8> {
 
                 typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
@@ -54,7 +54,7 @@ namespace nil {
                 using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                 using sha512_process_component = 
-                    sha512_process<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    sha512_process<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 //                   using decomposition_component = 
 //                       decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 

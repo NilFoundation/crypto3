@@ -43,7 +43,7 @@
 
 #include "../../test_plonk_component.hpp"
 
-using namespace nil::crypto3;
+using namespace nil;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
@@ -59,14 +59,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
+    using ArithmetizationParams = crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
-    using component_type = zk::components::sha512_process<ArithmetizationType, curve_type,
+    using component_type = blueprint::components::sha512_process<ArithmetizationType,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8>;
     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(59);
     std::array<typename ArithmetizationType::field_type::value_type, 24> public_input = {0x6a09e667f3bcc908_cppui64, 0xbb67ae8584caa73b_cppui64,
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
         & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)))
          ^ (message_schedule_array[i - 2] >> 6);
         message_schedule_array[i] = (message_schedule_array[i - 16] + s0 + s1 + message_schedule_array[i - 7])%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data);
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
     }
     typename ArithmetizationType::field_type::integral_type a = typename ArithmetizationType::field_type::integral_type(public_input[0].data);
     typename ArithmetizationType::field_type::integral_type b = typename ArithmetizationType::field_type::integral_type(public_input[1].data);
@@ -153,29 +153,29 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
         g = f;
         f = e;
         e = (d + tmp1)%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data);
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
         d = c;
         c = b;
         b = a;
         a = (tmp1 + tmp2)%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data);
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
     }
     std::array<typename BlueprintFieldType::integral_type, 8> result_state = {(a + typename ArithmetizationType::field_type::integral_type(public_input[0].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (b + typename ArithmetizationType::field_type::integral_type(public_input[1].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data), 
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data), 
     (c + typename ArithmetizationType::field_type::integral_type(public_input[2].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (d + typename ArithmetizationType::field_type::integral_type(public_input[3].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (e + typename ArithmetizationType::field_type::integral_type(public_input[4].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (f + typename ArithmetizationType::field_type::integral_type(public_input[5].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (g + typename ArithmetizationType::field_type::integral_type(public_input[6].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data),
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (h + typename ArithmetizationType::field_type::integral_type(public_input[7].data))%
-        typename curve_type::base_field_type::integral_type(typename curve_type::base_field_type::value_type(2).pow(64).data)};
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data)};
     auto result_check = [result_state](AssignmentType &assignment, 
         component_type::result_type &real_res) {
             for (std::size_t i = 0; i < 8; i++) {

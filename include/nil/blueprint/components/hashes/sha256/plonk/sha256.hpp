@@ -38,12 +38,11 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+            template<typename ArithmetizationType, std::size_t... WireIndexes>
             class sha256;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams,
-                     typename CurveType,
                      std::size_t W0,
                      std::size_t W1,
                      std::size_t W2,
@@ -54,7 +53,6 @@ namespace nil {
                      std::size_t W7,
                      std::size_t W8>
             class sha256<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                         CurveType,
                          W0,
                          W1,
                          W2,
@@ -71,7 +69,7 @@ namespace nil {
                 using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
                 using sha256_process_component =
-                    sha256_process<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                    sha256_process<ArithmetizationType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                 using decomposition_component =
                     decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 

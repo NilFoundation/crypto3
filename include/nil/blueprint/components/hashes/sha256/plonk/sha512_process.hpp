@@ -38,14 +38,14 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
+            template<typename ArithmetizationType, std::size_t... WireIndexes>
             class sha512_process;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+            template<typename BlueprintFieldType, typename ArithmetizationParams,
                      std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                      std::size_t W6, std::size_t W7, std::size_t W8>
             class sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                 CurveType, W0, W1, W2, W3, W4, W5, W6, W7, W8> {
+                                 W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
                 typedef zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                     ArithmetizationType;
@@ -158,11 +158,11 @@ namespace nil {
                     typename ArithmetizationType::field_type::value_type g = input_state[6];
                     typename ArithmetizationType::field_type::value_type h = input_state[7];
 
-                    std::array<typename CurveType::base_field_type::integral_type, 8> sparse_values {};
+                    std::array<typename BlueprintFieldType::integral_type, 8> sparse_values {};
                     for (std::size_t i = 0; i < 4; i++) {
                         assignment.witness(i)[row] = input_state[i];
-                        typename CurveType::base_field_type::integral_type integral_input_state_sparse =
-                            typename CurveType::base_field_type::integral_type(input_state[i].data);
+                        typename BlueprintFieldType::integral_type integral_input_state_sparse =
+                            typename BlueprintFieldType::integral_type(input_state[i].data);
                         std::vector<bool> input_state_sparse(64);
                         {
                             nil::marshalling::status_type status;
@@ -171,15 +171,15 @@ namespace nil {
                         }
 
                         std::vector<std::size_t> input_state_sparse_sizes = {64};
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> input_state_sparse_chunks =
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> input_state_sparse_chunks =
                             split_and_sparse(input_state_sparse, input_state_sparse_sizes, base4);
                         assignment.witness(i)[row + 1] = input_state_sparse_chunks[1][0];
                         sparse_values[i] = input_state_sparse_chunks[1][0];
                     }
                     for (std::size_t i = 4; i < 8; i++) {
                         assignment.witness(i)[row] = input_state[i];
-                        typename CurveType::base_field_type::integral_type integral_input_state_sparse =
-                            typename CurveType::base_field_type::integral_type(input_state[i].data);
+                        typename BlueprintFieldType::integral_type integral_input_state_sparse =
+                            typename BlueprintFieldType::integral_type(input_state[i].data);
                         std::vector<bool> input_state_sparse(64);
                         {
                             nil::marshalling::status_type status;
@@ -188,7 +188,7 @@ namespace nil {
                         }
 
                         std::vector<std::size_t> input_state_sparse_sizes = {64};
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> input_state_sparse_chunks =
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> input_state_sparse_chunks =
                             split_and_sparse(input_state_sparse, input_state_sparse_sizes, base7);
                         assignment.witness(i)[row + 1] = input_state_sparse_chunks[1][0];
                         sparse_values[i] = input_state_sparse_chunks[1][0];
@@ -196,11 +196,11 @@ namespace nil {
                     row = row + 2;
                     std::vector<std::size_t> sigma_sizes = {14, 14, 14, 14, 8};
                     std::vector<std::size_t> ch_and_maj_sizes = {16, 16, 16, 16};
-                    typename CurveType::base_field_type::value_type base4_value = base4;
-                    typename CurveType::base_field_type::value_type base7_value = base7;
+                    typename BlueprintFieldType::value_type base4_value = base4;
+                    typename BlueprintFieldType::value_type base7_value = base7;
                     for (std::size_t i = row; i < row + 379; i = i + 6) {
-                        typename CurveType::base_field_type::integral_type integral_a =
-                            typename CurveType::base_field_type::integral_type(
+                        typename BlueprintFieldType::integral_type integral_a =
+                            typename BlueprintFieldType::integral_type(
                                 message_scheduling_words[(i - row) / 6 + 1].data);
                         assignment.witness(W0)[i] = message_scheduling_words[(i - row) / 6 + 1];
                         std::vector<bool> a(64);
@@ -211,7 +211,7 @@ namespace nil {
                         }
 
                         std::vector<std::size_t> a_sizes = {1, 6, 1, 14, 14, 14, 14};
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> a_chunks = split_and_sparse(a, a_sizes, base4);
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> a_chunks = split_and_sparse(a, a_sizes, base4);
                         assignment.witness(W1)[i] = a_chunks[0][0];
                         assignment.witness(W2)[i] = a_chunks[0][1];
                         assignment.witness(W3)[i] = a_chunks[0][2];
@@ -226,7 +226,7 @@ namespace nil {
                         assignment.witness(W3)[i + 1] = a_chunks[1][4];
                         assignment.witness(W4)[i + 1] = a_chunks[1][5];
                         assignment.witness(W5)[i + 1] = a_chunks[1][6];
-                        typename CurveType::base_field_type::integral_type sparse_sigma0 =
+                        typename BlueprintFieldType::integral_type sparse_sigma0 =
                             a_chunks[1][0] * ((one << (63*2)) + (one << (56*2))) +
                             a_chunks[1][1] * (1 + (one << (57*2))) +
                             a_chunks[1][2] * ((one << (6*2)) + (one << (63*2)) + 1) + 
@@ -234,7 +234,7 @@ namespace nil {
                             a_chunks[1][4] * ((one << (21*2)) + (one << (14*2)) + (one << (15*2))) +
                             a_chunks[1][5] * ((one << (35*2)) + (one << (28*2)) + (one << (29*2))) +
                             a_chunks[1][6] * ((one << (49*2)) + (one << (42*2)) + (one << (43*2)));
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                             sigma0_chunks = reversed_sparse_and_split(sparse_sigma0, sigma_sizes, base4);
                         assignment.witness(W6)[i + 1] = sigma0_chunks[1][0];
                         assignment.witness(W7)[i + 1] = sigma0_chunks[1][1];
@@ -250,8 +250,8 @@ namespace nil {
                         assignment.witness(W7)[i + 2] = message_scheduling_words[(i - row) / 6 + 9];
                         assignment.witness(W8)[i + 2] = message_scheduling_words[(i - row) / 6];
 
-                        typename CurveType::base_field_type::integral_type integral_b =
-                            typename CurveType::base_field_type::integral_type(
+                        typename BlueprintFieldType::integral_type integral_b =
+                            typename BlueprintFieldType::integral_type(
                                 message_scheduling_words[(i - row) / 6 + 14].data);
                         std::vector<bool> b(64);
                         {
@@ -261,7 +261,7 @@ namespace nil {
                         }
 
                         std::vector<std::size_t> b_sizes = {6, 13, 14, 14, 14, 3};
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> b_chunks = split_and_sparse(b, b_sizes, base4);
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> b_chunks = split_and_sparse(b, b_sizes, base4);
                         assignment.witness(W0)[i + 5] = message_scheduling_words[(i - row) / 6 + 14];
                         assignment.witness(W1)[i + 5] = b_chunks[0][0];
                         assignment.witness(W2)[i + 5] = b_chunks[0][1];
@@ -277,7 +277,7 @@ namespace nil {
                         assignment.witness(W2)[i + 4] = b_chunks[1][4];
                         assignment.witness(W3)[i + 4] = b_chunks[1][5];
 
-                        typename CurveType::base_field_type::integral_type sparse_sigma1 =
+                        typename BlueprintFieldType::integral_type sparse_sigma1 =
                             b_chunks[1][0] * ((one << (2*45)) + (one << (2*3))) +
                             b_chunks[1][1] * ((one << (2*51)) + (one << (2*9)) + 1) +
                             b_chunks[1][2] * (1 + (one << (2*22)) + (one << (2*13))) +
@@ -285,7 +285,7 @@ namespace nil {
                             b_chunks[1][4] * ((one << (2*28)) + (one << (2*50)) + (one << (2*41))) +
                             b_chunks[1][5] * ((one << (2*42)) + 1 + (one << (2 * 55)));
 
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                             sigma1_chunks = reversed_sparse_and_split(sparse_sigma1, sigma_sizes, base4);
                         assignment.witness(W4)[i + 4] = sigma1_chunks[1][0];
                         assignment.witness(W5)[i + 4] = sigma1_chunks[1][1];
@@ -298,24 +298,24 @@ namespace nil {
                         assignment.witness(W2)[i + 3] = sigma1_chunks[0][2];
                         assignment.witness(W3)[i + 3] = sigma1_chunks[0][3];
                         assignment.witness(W4)[i + 3] = sigma1_chunks[0][4];
-                        typename CurveType::base_field_type::value_type sum = message_scheduling_words[(i - row) / 6 + 9] + message_scheduling_words[(i - row) / 6] +
+                        typename BlueprintFieldType::value_type sum = message_scheduling_words[(i - row) / 6 + 9] + message_scheduling_words[(i - row) / 6] +
                             sigma1_chunks[0][0] + sigma0_chunks[0][0] +
                             (one << 14) * (sigma1_chunks[0][1] + sigma0_chunks[0][1]) +
                             (one << 28) * (sigma1_chunks[0][2] + sigma0_chunks[0][2]) +
                             (one << 42) * (sigma1_chunks[0][3] + sigma0_chunks[0][3]) +
                             (one << 56) * (sigma1_chunks[0][4] + sigma0_chunks[0][4]) ;
                         message_scheduling_words[(i - row) / 6 + 16] =
-                            typename CurveType::base_field_type::integral_type(sum.data) % 
-                            typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                            typename BlueprintFieldType::integral_type(sum.data) % 
+                            typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                         assignment.witness(W5)[i + 3] = message_scheduling_words[(i - row) / 6 + 16];
                         assignment.witness(W6)[i + 3] = (sum - message_scheduling_words[(i - row) / 6 + 16]) / 
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data); 
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data); 
                     }
                     row = row + 384;
                     for (std::size_t i = row; i < row + 720; i = i + 9) {
                         assignment.witness(W0)[i] = e;
-                        typename CurveType::base_field_type::integral_type integral_e =
-                            typename CurveType::base_field_type::integral_type(e.data);
+                        typename BlueprintFieldType::integral_type integral_e =
+                            typename BlueprintFieldType::integral_type(e.data);
                         std::vector<bool> e_bits(64);
                         {
                             nil::marshalling::status_type status;
@@ -324,7 +324,7 @@ namespace nil {
                         }
 
                         std::vector<std::size_t> e_sizes = {14, 4, 14, 9, 14, 9};
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> e_chunks = split_and_sparse(e_bits, e_sizes, base7);
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> e_chunks = split_and_sparse(e_bits, e_sizes, base7);
                         assignment.witness(W1)[i] = e_chunks[0][0];
                         assignment.witness(W2)[i] = e_chunks[0][1];
                         assignment.witness(W3)[i] = e_chunks[0][2];
@@ -339,8 +339,8 @@ namespace nil {
                         assignment.witness(W2)[i + 1] = e_chunks[1][4];
                         assignment.witness(W3)[i + 1] = e_chunks[1][5];
 
-                        typename CurveType::base_field_type::integral_type sparse_Sigma1 =
-                            typename CurveType::base_field_type::integral_type((
+                        typename BlueprintFieldType::integral_type sparse_Sigma1 =
+                            typename BlueprintFieldType::integral_type((
                             e_chunks[1][0] * (base7_value.pow(50) + base7_value.pow(46) + base7_value.pow(23)) +
                             e_chunks[1][1] * (1 + base7_value.pow(60) + base7_value.pow(37)) +
                             e_chunks[1][2] * (base7_value.pow(4) + 1 + base7_value.pow(41)) +
@@ -348,7 +348,7 @@ namespace nil {
                             e_chunks[1][4] * (base7_value.pow(27) + base7_value.pow(23) + 1)+
                             e_chunks[1][5] * (base7_value.pow(41) + base7_value.pow(37) + base7_value.pow(14))
                             ).data);
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                             Sigma1_chunks = reversed_sparse_and_split(sparse_Sigma1, sigma_sizes, base7);
                         assignment.witness(W4)[i + 1] = Sigma1_chunks[1][0];
                         assignment.witness(W5)[i + 1] = Sigma1_chunks[1][1];
@@ -361,14 +361,14 @@ namespace nil {
                         assignment.witness(W2)[i + 2] = Sigma1_chunks[0][2];
                         assignment.witness(W3)[i + 2] = Sigma1_chunks[0][3];
                         assignment.witness(W4)[i + 2] = Sigma1_chunks[0][4];
-                        typename CurveType::base_field_type::integral_type Sigma1 =
+                        typename BlueprintFieldType::integral_type Sigma1 =
                             Sigma1_chunks[0][0] + Sigma1_chunks[0][1] * (1 << (sigma_sizes[0])) +
                             Sigma1_chunks[0][2] * (one << (sigma_sizes[0] + sigma_sizes[1])) +
                             Sigma1_chunks[0][3] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]))  +
                             Sigma1_chunks[0][4] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
 
 
-                        sparse_values[4] = typename CurveType::base_field_type::integral_type((e_chunks[1][0] + 
+                        sparse_values[4] = typename BlueprintFieldType::integral_type((e_chunks[1][0] + 
                                             e_chunks[1][1] * base7_value.pow(e_sizes[0]) +
                                            e_chunks[1][2] * base7_value.pow(e_sizes[0] + e_sizes[1]) +
                                            e_chunks[1][3] * base7_value.pow(e_sizes[0] + e_sizes[1] + e_sizes[2]) +
@@ -377,10 +377,10 @@ namespace nil {
                         assignment.witness(W5)[i + 2] = sparse_values[4];
                         assignment.witness(W6)[i + 2] = sparse_values[5];
                         
-                        typename CurveType::base_field_type::integral_type sparse_ch =
+                        typename BlueprintFieldType::integral_type sparse_ch =
                             sparse_values[4] + 2 * sparse_values[5] + 3 * sparse_values[6];                         
 
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                             ch_chunks = reversed_sparse_and_split_ch(sparse_ch, ch_and_maj_sizes, base7);
                         assignment.witness(W7)[i + 2] = ch_chunks[1][0];
                         assignment.witness(W8)[i + 2] = ch_chunks[1][1];
@@ -396,22 +396,22 @@ namespace nil {
                         assignment.witness(W7)[i + 3] = d;
                         assignment.witness(W8)[i + 3] = h;
                         assignment.witness(W0)[i + 4] = message_scheduling_words[(i - row) / 9];
-                        typename CurveType::base_field_type::integral_type ch =
+                        typename BlueprintFieldType::integral_type ch =
                             ch_chunks[0][0] + ch_chunks[0][1] * (1 << 16) + ch_chunks[0][2] * (one << 32) +
                             ch_chunks[0][3] * (one << 48);
 
-                        typename CurveType::base_field_type::value_type tmp1 = h + Sigma1 + ch + round_constant[(i - row) / 9] +
+                        typename BlueprintFieldType::value_type tmp1 = h + Sigma1 + ch + round_constant[(i - row) / 9] +
                                      message_scheduling_words[(i - row) / 9];
-                        typename CurveType::base_field_type::value_type sum = tmp1 + d;
-                        typename CurveType::base_field_type::value_type e_new = typename CurveType::base_field_type::integral_type(sum.data) % 
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                        typename BlueprintFieldType::value_type sum = tmp1 + d;
+                        typename BlueprintFieldType::value_type e_new = typename BlueprintFieldType::integral_type(sum.data) % 
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                         assignment.witness(W1)[i + 4] = tmp1;
                         assignment.witness(W2)[i + 4] = e_new;
-                        assignment.witness(W3)[i + 4] = (sum - e_new)/typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                        assignment.witness(W3)[i + 4] = (sum - e_new)/typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
 
                         assignment.witness(W0)[i + 8] = a;
-                        typename CurveType::base_field_type::integral_type integral_a =
-                            typename CurveType::base_field_type::integral_type(a.data);
+                        typename BlueprintFieldType::integral_type integral_a =
+                            typename BlueprintFieldType::integral_type(a.data);
                         std::vector<bool> a_bits(64);
                         {
                             nil::marshalling::status_type status;
@@ -420,7 +420,7 @@ namespace nil {
                         }
 
                         std::vector<std::size_t> a_sizes = {14, 14, 6, 5, 14, 11};
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> a_chunks =
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> a_chunks =
                             split_and_sparse(a_bits, a_sizes, base4);
                         assignment.witness(W1)[i + 8] = a_chunks[0][0];
                         assignment.witness(W2)[i + 8] = a_chunks[0][1];
@@ -436,14 +436,14 @@ namespace nil {
                         assignment.witness(W2)[i + 7] = a_chunks[1][4];
                         assignment.witness(W3)[i + 7] = a_chunks[1][5];
 
-                        typename CurveType::base_field_type::integral_type sparse_Sigma0 =
+                        typename BlueprintFieldType::integral_type sparse_Sigma0 =
                             (a_chunks[1][0] * ((one << (36 *2)) + (one << (30*2)) + (one << (25*2))) +
                              a_chunks[1][1] * ((one << (50 * 2)) + (one << (44*2)) + (one << (39*2))) +
                              a_chunks[1][2] * (1 + (one << (58*2)) + (one << (53*2))) +
                              a_chunks[1][3] * ((one << (6*2)) + 1 + (one << (59*2))) +
                              a_chunks[1][4] * ((one << (11*2)) + (one << (5*2)) + 1) +
                              a_chunks[1][5] * ((one << (25*2)) + (one << (19*2)) + (one << (14*2))));
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                             Sigma0_chunks = reversed_sparse_and_split(sparse_Sigma0, sigma_sizes, base4);
                         assignment.witness(W4)[i + 7] = Sigma0_chunks[1][0];
                         assignment.witness(W5)[i + 7] = Sigma0_chunks[1][1];
@@ -457,13 +457,13 @@ namespace nil {
                         assignment.witness(W3)[i + 6] = Sigma0_chunks[0][3];
                         assignment.witness(W4)[i + 6] = Sigma0_chunks[0][4];
 
-                        typename CurveType::base_field_type::integral_type Sigma0 =
+                        typename BlueprintFieldType::integral_type Sigma0 =
                             Sigma0_chunks[0][0] + Sigma0_chunks[0][1] * (1 << sigma_sizes[0]) +
                             Sigma0_chunks[0][2] * (one << (sigma_sizes[0] + sigma_sizes[1])) +
                             Sigma0_chunks[0][3] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2])) +
                             Sigma0_chunks[0][4] * (one << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2] + sigma_sizes[3]));
 
-                        sparse_values[0] = typename CurveType::base_field_type::integral_type((a_chunks[1][0] + a_chunks[1][1] * base4_value.pow(a_sizes[0]) +
+                        sparse_values[0] = typename BlueprintFieldType::integral_type((a_chunks[1][0] + a_chunks[1][1] * base4_value.pow(a_sizes[0]) +
                                            a_chunks[1][2] * base4_value.pow(a_sizes[0] + a_sizes[1]) +
                                            a_chunks[1][3] * base4_value.pow(a_sizes[0] + a_sizes[1] + a_sizes[2]) +
                                            a_chunks[1][4] * base4_value.pow(a_sizes[0] + a_sizes[1] + a_sizes[2] + a_sizes[3]) +
@@ -472,9 +472,9 @@ namespace nil {
                         assignment.witness(W5)[i + 6] = sparse_values[0];
                         assignment.witness(W6)[i + 6] = sparse_values[1];
 
-                        typename CurveType::base_field_type::integral_type sparse_maj =
+                        typename BlueprintFieldType::integral_type sparse_maj =
                             (sparse_values[0] + sparse_values[1] + sparse_values[2]);
-                        std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                             maj_chunks = reversed_sparse_and_split_maj(sparse_maj, ch_and_maj_sizes, base4);
                         assignment.witness(W7)[i + 6] = maj_chunks[1][0];
                         assignment.witness(W8)[i + 6] = maj_chunks[1][1];
@@ -485,15 +485,15 @@ namespace nil {
                         assignment.witness(W3)[i + 5] = maj_chunks[0][1];
                         assignment.witness(W4)[i + 5] = maj_chunks[0][2];
                         assignment.witness(W5)[i + 5] = maj_chunks[0][3];
-                        typename CurveType::base_field_type::integral_type maj =
+                        typename BlueprintFieldType::integral_type maj =
                             maj_chunks[0][0] + maj_chunks[0][1] * (1 << 16) + maj_chunks[0][2] * (one << 32) +
                             maj_chunks[0][3] * (one << 48);
                         assignment.witness(W6)[i + 5] = sparse_values[2];
-                        typename CurveType::base_field_type::value_type sum1 = tmp1 + Sigma0 + maj;
-                        typename CurveType::base_field_type::value_type a_new = typename CurveType::base_field_type::integral_type(sum1.data) % 
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                        typename BlueprintFieldType::value_type sum1 = tmp1 + Sigma0 + maj;
+                        typename BlueprintFieldType::value_type a_new = typename BlueprintFieldType::integral_type(sum1.data) % 
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                         assignment.witness(W7)[i + 5] = a_new;
-                        assignment.witness(W8)[i + 5] = (sum1 - a_new)/ typename CurveType::base_field_type::value_type(2).pow(64);
+                        assignment.witness(W8)[i + 5] = (sum1 - a_new)/ typename BlueprintFieldType::value_type(2).pow(64);
                         h = g;
                         sparse_values[7] = sparse_values[6];
                         g = f;
@@ -509,28 +509,28 @@ namespace nil {
                         sparse_values[1] = sparse_values[0];
                         a = a_new;
                     }
-                    std::array<typename CurveType::base_field_type::value_type, 8> output_state = {a, b, c, d, e, f, g, h};
+                    std::array<typename BlueprintFieldType::value_type, 8> output_state = {a, b, c, d, e, f, g, h};
                     row = row + 720;
                     for(std::size_t i = 0; i < 4; i ++){
                         assignment.witness(i)[row] = input_state[i];
-                        auto sum = typename CurveType::base_field_type::integral_type(input_state[i].data) + typename CurveType::base_field_type::integral_type(output_state[i].data); 
+                        auto sum = typename BlueprintFieldType::integral_type(input_state[i].data) + typename BlueprintFieldType::integral_type(output_state[i].data); 
                         assignment.witness(i)[row + 1] = sum % 
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                         assignment.witness(i + 4)[row] = output_state[i];
                         assignment.witness(i + 4)[row + 1] = (sum - sum % 
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data))/
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data))/
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                     }
                     row = row + 2;
                         for(std::size_t i = 0; i < 4; i ++){
                         assignment.witness(i)[row] = input_state[i + 4];
-                        auto sum = typename CurveType::base_field_type::integral_type(input_state[i + 4].data) + typename CurveType::base_field_type::integral_type(output_state[i + 4].data); 
+                        auto sum = typename BlueprintFieldType::integral_type(input_state[i + 4].data) + typename BlueprintFieldType::integral_type(output_state[i + 4].data); 
                         assignment.witness(i)[row + 1] = sum % 
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                         assignment.witness(i + 4)[row] = output_state[i + 4];
                         assignment.witness(i + 4)[row + 1] = (sum - sum % 
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data))/
-                        typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data))/
+                        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                     }
                     return result_type(start_row_index);
                 }
@@ -592,7 +592,7 @@ namespace nil {
                                                       const std::size_t &first_selector_index) {
                     generate_sigma0_gates(bp, assignment, first_selector_index);
                     typename ArithmetizationType::field_type::integral_type one = 1;
-                    typename CurveType::base_field_type::integral_type m = typename CurveType::base_field_type::integral_type(typename CurveType::base_field_type::value_type(2).pow(64).data);
+                    typename BlueprintFieldType::integral_type m = typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                     auto constraint_1 = bp.add_constraint(
                         (var(W5, 0) + m*var(W6, 0) - (var(W7, -1) + var(W8, -1) + var(W2, -1) + var(W3, -1) * (one << 14) +
                                        var(W4, -1) * (one << 28) + var(W5, -1) * (one << 42) + var(W6, -1) * (one << 56) +
@@ -608,7 +608,7 @@ namespace nil {
                                                   const std::size_t &first_selector_index) {
                     typename ArithmetizationType::field_type::integral_type one = 1;
                     std::vector<std::size_t> a_sizes = {14, 14, 6, 5, 14, 11};
-                    typename CurveType::base_field_type::value_type base4_value = base4;
+                    typename BlueprintFieldType::value_type base4_value = base4;
                     auto constraint_1 = bp.add_constraint(
                         var(W0, +1) - (var(W1, +1) + var(W2, 1) * (one << 14) + var(W3, +1) * (one << 28) +
                                        var(W4, +1) * (one << 34) + var(W5, 1) * (one << 39) + var(W6, 1) * (one << 53)));
@@ -634,7 +634,7 @@ namespace nil {
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const std::size_t &first_selector_index) {
                     typename ArithmetizationType::field_type::integral_type one = 1;
-                    typename CurveType::base_field_type::value_type base7_value = base7;
+                    typename BlueprintFieldType::value_type base7_value = base7;
                     auto constraint_1 =
                         bp.add_constraint(var(W0, -1) - (var(W1, -1) + var(W2, -1) * (one << 14) +
                                                          var(W3, -1) * (one << 18) + var(W4, -1) * (one << 32) +
@@ -686,8 +686,8 @@ namespace nil {
                                                        const std::size_t &first_selector_index) {
                     std::vector<std::size_t> sigma_sizes = {14, 14, 14, 14, 8};
                     typename ArithmetizationType::field_type::integral_type one = 1;
-                    typename CurveType::base_field_type::integral_type m = typename CurveType::base_field_type::integral_type(
-                        typename CurveType::base_field_type::value_type(2).pow(64).data);
+                    typename BlueprintFieldType::integral_type m = typename BlueprintFieldType::integral_type(
+                        typename BlueprintFieldType::value_type(2).pow(64).data);
                     generate_Sigma1_gates(bp, assignment, first_selector_index);
                     generate_Ch_gates(bp, assignment, first_selector_index + 2);
                     auto constraint_1 = bp.add_constraint(
@@ -732,12 +732,12 @@ namespace nil {
                     constraint_out_2, constraint_out_3, constraint_out_4});
                 }
 
-                static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> split_and_sparse(std::vector<bool> bits,
+                static std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> split_and_sparse(std::vector<bool> bits,
                                                                              const std::vector<size_t> &sizes,
                                                                              std::size_t base) {
                     std::size_t size = sizes.size() - 1;
-                    std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {std::vector<typename CurveType::base_field_type::integral_type>(size + 1),
-                                                                std::vector<typename CurveType::base_field_type::integral_type>(size + 1)};
+                    std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> res = {std::vector<typename BlueprintFieldType::integral_type>(size + 1),
+                                                                std::vector<typename BlueprintFieldType::integral_type>(size + 1)};
                     std::size_t k = 0;
                     for (int i = size; i > -1; i--) {
                         res[0][i] = int(bits[k]);
@@ -751,27 +751,27 @@ namespace nil {
                     return res;
                 }
 
-                static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
-                    reversed_sparse_and_split(typename CurveType::base_field_type::integral_type sparse_value,
+                static std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
+                    reversed_sparse_and_split(typename BlueprintFieldType::integral_type sparse_value,
                                               const std::vector<size_t> &sizes, std::size_t base) {
                     std::size_t size = sizes.size();
-                    std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {
-                        std::vector<typename CurveType::base_field_type::integral_type>(size),
-                        std::vector<typename CurveType::base_field_type::integral_type>(size)};
-                    typename CurveType::base_field_type::integral_type sparse_base = base;
-                    typename CurveType::base_field_type::value_type value_base = base;
+                    std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> res = {
+                        std::vector<typename BlueprintFieldType::integral_type>(size),
+                        std::vector<typename BlueprintFieldType::integral_type>(size)};
+                    typename BlueprintFieldType::integral_type sparse_base = base;
+                    typename BlueprintFieldType::value_type value_base = base;
                     std::size_t k = -1;
                     for (int i = sizes.size() - 1; i > -1; i--) {
                         k = k + sizes[i];
                     }
-                    typename CurveType::base_field_type::integral_type tmp = sparse_value;
+                    typename BlueprintFieldType::integral_type tmp = sparse_value;
                     for (int i = sizes.size() - 1; i > -1; i--) {
                         res[0][i] = 0;
                         res[1][i] = 0;
                         for (int j = sizes[i] - 1; j > -1; j--) {
-                            if (tmp > typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
-                                typename CurveType::base_field_type::integral_type r = (tmp - (tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data))) / 
-                                typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                            if (tmp > typename BlueprintFieldType::integral_type(value_base.pow(k).data) - 1) {
+                                typename BlueprintFieldType::integral_type r = (tmp - (tmp % typename BlueprintFieldType::integral_type(value_base.pow(k).data))) / 
+                                typename BlueprintFieldType::integral_type(value_base.pow(k).data);
                                 res[0][i] = res[0][i] * 2 + (r&1);
                                 res[1][i] = res[1][i] * sparse_base + r;
                             }
@@ -779,35 +779,35 @@ namespace nil {
                                 res[0][i] = res[0][i] * 2;
                                 res[1][i] = res[1][i] * sparse_base;
                             }
-                            tmp = tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                            tmp = tmp % typename BlueprintFieldType::integral_type(value_base.pow(k).data);
                             k--;
                         }
                     }
                     return res;
                 }
 
-                static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
-                    reversed_sparse_and_split_maj(typename CurveType::base_field_type::integral_type sparse_value,
+                static std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
+                    reversed_sparse_and_split_maj(typename BlueprintFieldType::integral_type sparse_value,
                                               const std::vector<size_t> &sizes, std::size_t base) {
                     std::size_t size = sizes.size();
-                    std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {
-                        std::vector<typename CurveType::base_field_type::integral_type>(size),
-                        std::vector<typename CurveType::base_field_type::integral_type>(size)};
-                    typename CurveType::base_field_type::integral_type sparse_base = base;
-                    typename CurveType::base_field_type::value_type value_base = base;
+                    std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> res = {
+                        std::vector<typename BlueprintFieldType::integral_type>(size),
+                        std::vector<typename BlueprintFieldType::integral_type>(size)};
+                    typename BlueprintFieldType::integral_type sparse_base = base;
+                    typename BlueprintFieldType::value_type value_base = base;
                     std::size_t k = -1;
                     for (int i = sizes.size() - 1; i > -1; i--) {
                         k = k + sizes[i];
                     }
                     std::array<std::size_t, 4> r_values = {0,0,1,1};
-                    typename CurveType::base_field_type::integral_type tmp = sparse_value;
+                    typename BlueprintFieldType::integral_type tmp = sparse_value;
                     for (int i = sizes.size() - 1; i > -1; i--) {
                         res[0][i] = 0;
                         res[1][i] = 0;
                         for (int j = sizes[i] - 1; j > -1; j--) {
-                            if (tmp > typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
-                                typename CurveType::base_field_type::integral_type r = (tmp - (tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data))) / 
-                                typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                            if (tmp > typename BlueprintFieldType::integral_type(value_base.pow(k).data) - 1) {
+                                typename BlueprintFieldType::integral_type r = (tmp - (tmp % typename BlueprintFieldType::integral_type(value_base.pow(k).data))) / 
+                                typename BlueprintFieldType::integral_type(value_base.pow(k).data);
                                 res[0][i] = res[0][i] * 2 + r_values[std::size_t(r)];
                                 res[1][i] = res[1][i] * sparse_base + r;
                             }
@@ -815,35 +815,35 @@ namespace nil {
                                 res[0][i] = res[0][i] * 2;
                                 res[1][i] = res[1][i] * sparse_base;
                             }
-                            tmp = tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                            tmp = tmp % typename BlueprintFieldType::integral_type(value_base.pow(k).data);
                             k--;
                         }
                     }
                     return res;
                 }
 
-                static std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2>
-                    reversed_sparse_and_split_ch(typename CurveType::base_field_type::integral_type sparse_value,
+                static std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
+                    reversed_sparse_and_split_ch(typename BlueprintFieldType::integral_type sparse_value,
                                               const std::vector<size_t> &sizes, std::size_t base) {
                     std::size_t size = sizes.size();
-                    std::array<std::vector<typename CurveType::base_field_type::integral_type>, 2> res = {
-                        std::vector<typename CurveType::base_field_type::integral_type>(size),
-                        std::vector<typename CurveType::base_field_type::integral_type>(size)};
-                    typename CurveType::base_field_type::integral_type sparse_base = base;
-                    typename CurveType::base_field_type::value_type value_base = base;
+                    std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> res = {
+                        std::vector<typename BlueprintFieldType::integral_type>(size),
+                        std::vector<typename BlueprintFieldType::integral_type>(size)};
+                    typename BlueprintFieldType::integral_type sparse_base = base;
+                    typename BlueprintFieldType::value_type value_base = base;
                     std::size_t k = -1;
                     for (int i = sizes.size() - 1; i > -1; i--) {
                         k = k + sizes[i];
                     }
                     std::array<std::size_t, 6> r_values = {0,0,1,0,1,1};
-                    typename CurveType::base_field_type::integral_type tmp = sparse_value;
+                    typename BlueprintFieldType::integral_type tmp = sparse_value;
                     for (int i = sizes.size() - 1; i > -1; i--) {
                         res[0][i] = 0;
                         res[1][i] = 0;
                         for (int j = sizes[i] - 1; j > -1; j--) {
-                            if (tmp > typename CurveType::base_field_type::integral_type(value_base.pow(k).data) - 1) {
-                                typename CurveType::base_field_type::integral_type r = (tmp - (tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data))) / 
-                                typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                            if (tmp > typename BlueprintFieldType::integral_type(value_base.pow(k).data) - 1) {
+                                typename BlueprintFieldType::integral_type r = (tmp - (tmp % typename BlueprintFieldType::integral_type(value_base.pow(k).data))) / 
+                                typename BlueprintFieldType::integral_type(value_base.pow(k).data);
                                 res[0][i] = res[0][i] * 2 + r_values[std::size_t(r) - 1];
                                 res[1][i] = res[1][i] * sparse_base + r;
                             }
@@ -851,7 +851,7 @@ namespace nil {
                                 res[0][i] = res[0][i] * 2;
                                 res[1][i] = res[1][i] * sparse_base;
                             }
-                            tmp = tmp % typename CurveType::base_field_type::integral_type(value_base.pow(k).data);
+                            tmp = tmp % typename BlueprintFieldType::integral_type(value_base.pow(k).data);
                             k--;
                         }
                     }
