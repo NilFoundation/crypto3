@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -34,11 +35,9 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
-
-#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
-
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
+
+#include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {

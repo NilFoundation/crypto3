@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -40,10 +41,9 @@
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
-#include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
-
 #include <nil/crypto3/marshalling/math/types/non_linear_term.hpp>
 #include <nil/crypto3/marshalling/math/types/non_linear_combination.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/gate.hpp>
 
