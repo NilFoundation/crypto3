@@ -45,7 +45,7 @@ namespace nil {
 
             // Input: x, y \in F_p
             // Output: z = x + y, z \in F_p
-            template<typename ArithmetizationType, std::int32_t WitnessAmount>
+            template<typename ArithmetizationType, std::uint32_t WitnessAmount>
             class addition;
 
             template<typename BlueprintFieldType,
@@ -54,7 +54,7 @@ namespace nil {
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     3,0,0> {
 
-                constexpr static const std::int32_t WitnessAmount = 3;
+                constexpr static const std::uint32_t WitnessAmount = 3;
             
                 using component_type = component<
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,

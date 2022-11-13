@@ -163,38 +163,38 @@ namespace nil {
                                                         std::size_t component_start_row) {
                     std::size_t row = component_start_row;
 
-                    std::array<typename ArithmetizationType::field_type::integral_type, 20> RAM = {
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[0]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[1]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[2]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.x[3]).data),
+                    std::array<typename BlueprintFieldType::integral_type, 20> RAM = {
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.x[0]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.x[1]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.x[2]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.x[3]).data),
 
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.y[0]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.y[1]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.y[2]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.R.y[3]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.y[0]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.y[1]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.y[2]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.R.y[3]).data),
                         
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.x[0]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.x[1]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.x[2]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.x[3]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.x[0]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.x[1]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.x[2]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.x[3]).data),
 
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.y[0]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.y[1]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.y[2]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.A.y[3]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.y[0]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.y[1]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.y[2]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.A.y[3]).data),
 
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.M[0]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.M[1]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.M[2]).data),
-                        typename ArithmetizationType::field_type::integral_type(assignment.var_value(params.M[3]).data)
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.M[0]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.M[1]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.M[2]).data),
+                        typename BlueprintFieldType::integral_type(assignment.var_value(params.M[3]).data)
                         };
 
 
 
-                    std::array<typename ArithmetizationType::field_type::integral_type, 32> input_words_values;
-                    typename ArithmetizationType::field_type::integral_type integral_one = 1;
-                    typename ArithmetizationType::field_type::integral_type mask = ((integral_one<<64) - 1);
+                    std::array<typename BlueprintFieldType::integral_type, 32> input_words_values;
+                    typename BlueprintFieldType::integral_type integral_one = 1;
+                    typename BlueprintFieldType::integral_type mask = ((integral_one<<64) - 1);
                     input_words_values[0] = (RAM[0]) & mask;
                     input_words_values[1] = ((RAM[0] >> 64) + (RAM[1] << 2)) & mask;
                     input_words_values[2] = ((RAM[1] >> 62) + (RAM[2] << 4)) & mask;
@@ -223,23 +223,23 @@ namespace nil {
                     input_words_values[31] = 1024 + 252; 
 
 
-                    std::array<typename ArithmetizationType::field_type::integral_type, 77> range_chunks;
+                    std::array<typename BlueprintFieldType::integral_type, 77> range_chunks;
 
-                    typename ArithmetizationType::field_type::integral_type mask22 = ((integral_one<<22) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask21 = ((integral_one<<21) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask20 = ((integral_one<<20) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask19 = ((integral_one<<19) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask18 = ((integral_one<<18) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask17 = ((integral_one<<17) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask16 = ((integral_one<<16) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask15 = ((integral_one<<15) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask14 = ((integral_one<<14) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask13 = ((integral_one<<13) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask12 = ((integral_one<<12) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask11 = ((integral_one<<11) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask10 = ((integral_one<<10) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask9 = ((integral_one<<9) - 1);
-                    typename ArithmetizationType::field_type::integral_type mask8 = ((integral_one<<8) - 1);
+                    typename BlueprintFieldType::integral_type mask22 = ((integral_one<<22) - 1);
+                    typename BlueprintFieldType::integral_type mask21 = ((integral_one<<21) - 1);
+                    typename BlueprintFieldType::integral_type mask20 = ((integral_one<<20) - 1);
+                    typename BlueprintFieldType::integral_type mask19 = ((integral_one<<19) - 1);
+                    typename BlueprintFieldType::integral_type mask18 = ((integral_one<<18) - 1);
+                    typename BlueprintFieldType::integral_type mask17 = ((integral_one<<17) - 1);
+                    typename BlueprintFieldType::integral_type mask16 = ((integral_one<<16) - 1);
+                    typename BlueprintFieldType::integral_type mask15 = ((integral_one<<15) - 1);
+                    typename BlueprintFieldType::integral_type mask14 = ((integral_one<<14) - 1);
+                    typename BlueprintFieldType::integral_type mask13 = ((integral_one<<13) - 1);
+                    typename BlueprintFieldType::integral_type mask12 = ((integral_one<<12) - 1);
+                    typename BlueprintFieldType::integral_type mask11 = ((integral_one<<11) - 1);
+                    typename BlueprintFieldType::integral_type mask10 = ((integral_one<<10) - 1);
+                    typename BlueprintFieldType::integral_type mask9 = ((integral_one<<9) - 1);
+                    typename BlueprintFieldType::integral_type mask8 = ((integral_one<<8) - 1);
 
                     auto row_witness = row + 1;
 
@@ -605,7 +605,7 @@ namespace nil {
                     row = component_start_row + rows_amount_creating_input_words_component;
 
 
-                    std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
+                    std::array<typename BlueprintFieldType::value_type, 8> constants = {
                         0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
                         0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179};
                     for (int i = 0; i < 8; i++) {
@@ -638,7 +638,7 @@ namespace nil {
 
 
 
-                   /*std::array<typename ArithmetizationType::field_type::value_type, 16> input_words2 = {
+                   /*std::array<typename BlueprintFieldType::value_type, 16> input_words2 = {
                         1 << 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 << 9};
                     for (int i = 0; i < 16; i++) {
                         assignment.constant(0)[component_start_row + 8 + i] = input_words2[i];
@@ -671,7 +671,7 @@ namespace nil {
                                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                            const std::size_t &first_selector_index) {
 
-                    typename ArithmetizationType::field_type::integral_type one = 1;
+                    typename BlueprintFieldType::integral_type one = 1;
 
 
                     auto constraint_ram_0 = bp.add_constraint(

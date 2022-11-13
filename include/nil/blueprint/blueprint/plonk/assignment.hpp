@@ -187,8 +187,8 @@ namespace nil {
                 return this->_private_table._witnesses[witness_index][row_index];
             }
 
-            typename BlueprintFieldType::value_type &public_input(std::size_t public_input_index,
-                std::uint32_t row_index) {
+            typename BlueprintFieldType::value_type &public_input(
+                std::uint32_t public_input_index, std::uint32_t row_index) {
 
                 BLUEPRINT_ASSERT(public_input_index < zk_type::public_inputs_amount());
 
@@ -207,8 +207,8 @@ namespace nil {
                 return zk_type::public_input(public_input_index)[row_index];
             }
 
-            typename BlueprintFieldType::value_type &constant(std::size_t constant_index,
-                std::uint32_t row_index) {
+            typename BlueprintFieldType::value_type &constant(
+                std::uint32_t constant_index, std::uint32_t row_index) {
 
                 assert(constant_index < zk_type::constants_amount());
 

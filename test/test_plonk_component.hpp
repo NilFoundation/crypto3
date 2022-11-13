@@ -41,6 +41,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/utils/table_profiling.hpp>
+#include <nil/blueprint/utils/satisfiability_check.hpp>
 
 #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
@@ -131,6 +132,8 @@ namespace nil {
 #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             profiling(assignment);
 #endif
+
+            assert(blueprint::is_satisfied(bp, assignment));
 
             using placeholder_params =
                 zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;

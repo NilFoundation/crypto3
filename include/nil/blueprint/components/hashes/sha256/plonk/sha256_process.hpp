@@ -131,24 +131,24 @@ namespace nil {
                                                         const params_type &params,
                                                         size_t start_row_index) {
                     std::size_t row = start_row_index;
-                    typename ArithmetizationType::field_type::integral_type one = 1;
-                    std::array<typename ArithmetizationType::field_type::value_type, 8> input_state = {
+                    typename BlueprintFieldType::integral_type one = 1;
+                    std::array<typename BlueprintFieldType::value_type, 8> input_state = {
                         assignment.var_value(params.input_state[0]), assignment.var_value(params.input_state[1]),
                         assignment.var_value(params.input_state[2]), assignment.var_value(params.input_state[3]),
                         assignment.var_value(params.input_state[4]), assignment.var_value(params.input_state[5]),
                         assignment.var_value(params.input_state[6]), assignment.var_value(params.input_state[7])};
-                    std::array<typename ArithmetizationType::field_type::value_type, 64> message_scheduling_words;
+                    std::array<typename BlueprintFieldType::value_type, 64> message_scheduling_words;
                     for (std::size_t i = 0; i < 16; i++) {
                         message_scheduling_words[i] = assignment.var_value(params.input_words[i]);
                     }
-                    typename ArithmetizationType::field_type::value_type a = input_state[0];
-                    typename ArithmetizationType::field_type::value_type b = input_state[1];
-                    typename ArithmetizationType::field_type::value_type c = input_state[2];
-                    typename ArithmetizationType::field_type::value_type d = input_state[3];
-                    typename ArithmetizationType::field_type::value_type e = input_state[4];
-                    typename ArithmetizationType::field_type::value_type f = input_state[5];
-                    typename ArithmetizationType::field_type::value_type g = input_state[6];
-                    typename ArithmetizationType::field_type::value_type h = input_state[7];
+                    typename BlueprintFieldType::value_type a = input_state[0];
+                    typename BlueprintFieldType::value_type b = input_state[1];
+                    typename BlueprintFieldType::value_type c = input_state[2];
+                    typename BlueprintFieldType::value_type d = input_state[3];
+                    typename BlueprintFieldType::value_type e = input_state[4];
+                    typename BlueprintFieldType::value_type f = input_state[5];
+                    typename BlueprintFieldType::value_type g = input_state[6];
+                    typename BlueprintFieldType::value_type h = input_state[7];
 
                     std::array<typename BlueprintFieldType::integral_type, 8> sparse_values {};
                     for (std::size_t i = 0; i < 4; i++) {
@@ -520,7 +520,7 @@ namespace nil {
                 static void generate_sigma0_gates(blueprint<ArithmetizationType> &bp,
                                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                            const std::size_t first_selector_index) {
-                    typename ArithmetizationType::field_type::integral_type one = 1;
+                    typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
                         bp.add_constraint(var(W0, -1) - (var(W1, -1) + var(W2, -1) * (one << 3) +
                                                          var(W3, -1) * (one << 7) + var(W4, -1) * (one << 18)));
@@ -578,7 +578,7 @@ namespace nil {
                                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                            const std::size_t first_selector_index) {
 
-                    typename ArithmetizationType::field_type::integral_type one = 1;
+                    typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
                         bp.add_constraint(var(W0, 0) - (var(W1, 0) + var(W2, 0) * (1 << 10) +
                                                         var(W3, 0) * (1 << 17) + var(W4, 0) * (1 << 19)));
@@ -640,7 +640,7 @@ namespace nil {
                                            const std::size_t first_selector_index) {
                     generate_sigma0_gates(bp, assignment, first_selector_index);
                     std::size_t selector_index_1 = first_selector_index + 1;
-                    typename ArithmetizationType::field_type::integral_type one = 1;
+                    typename BlueprintFieldType::integral_type one = 1;
                     typename BlueprintFieldType::integral_type m = typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data);
                     auto constraint_1 = bp.add_constraint(
                         var(W0, 0) + m*var(W0, +1) - (var(W0, -1) + var(W1, -1) + var(W1, 0) + var(W2, 0) * (one << 14) +
@@ -654,7 +654,7 @@ namespace nil {
                 static void generate_Sigma0_gates(blueprint<ArithmetizationType> &bp,
                                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                            const std::size_t first_selector_index) {
-                    typename ArithmetizationType::field_type::integral_type one = 1;
+                    typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
                         bp.add_constraint(var(W0, +1) - (var(W2, +1) + var(W3, +1) * (1 << 2) +
                                                          var(W4, +1) * (1 << 13) + var(W5, +1) * (1 << 22)));
@@ -716,7 +716,7 @@ namespace nil {
                 static void generate_Sigma1_gates(blueprint<ArithmetizationType> &bp,
                                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                            const std::size_t first_selector_index) {
-                    typename ArithmetizationType::field_type::integral_type one = 1;
+                    typename BlueprintFieldType::integral_type one = 1;
                     typename BlueprintFieldType::value_type base7_value = base7;
                     auto constraint_1 =
                         bp.add_constraint(var(W0, -1) - (var(W2, -1) + var(W3, -1) * (1 << 6) +
@@ -778,7 +778,7 @@ namespace nil {
                 static void generate_Maj_gates(blueprint<ArithmetizationType> &bp,
                                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                            const std::size_t first_selector_index) {
-                    typename ArithmetizationType::field_type::integral_type one = 1;
+                    typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
                         bp.add_constraint(var(W0, 0) + var(W1, 0) * (1 << 16) + var(W2, 0) * (one << 32) +
                                           var(W3, 0) * (one << 48) - (var(W0, +1) + var(W1, +1) + var(W4, +1)));
@@ -806,7 +806,7 @@ namespace nil {
                                            blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                            const std::size_t first_selector_index) {
 
-                    typename ArithmetizationType::field_type::value_type base7_value = base7;
+                    typename BlueprintFieldType::value_type base7_value = base7;
                     auto constraint_1 = bp.add_constraint(
                         var(W0, 0) + var(W1, 0) * base7_value.pow(8) + var(W2, 0) * base7_value.pow(16) +
                         var(W3, 0) * base7_value.pow(24) - (var(W0, -1) + 2 * var(W1, -1) + 3 * var(W0, +1)));

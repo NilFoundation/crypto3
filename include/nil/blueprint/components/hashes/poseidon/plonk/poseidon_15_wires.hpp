@@ -29,14 +29,13 @@
 
 #include <nil/crypto3/detail/literals.hpp>
 #include <nil/crypto3/algebra/matrix/matrix.hpp>
+#include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
+#include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
 
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/components/hashes/poseidon/plonk/poseidon_constants.hpp>
-
-#include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
-#include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
 
 namespace nil {
     namespace blueprint {

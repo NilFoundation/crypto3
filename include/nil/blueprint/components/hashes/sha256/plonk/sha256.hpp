@@ -165,7 +165,7 @@ namespace nil {
                         input_words[i] = sha_block_part_1.output[i];
                         input_words[8 + i] = sha_block_part_2.output[i];
                     }
-                    std::array<typename ArithmetizationType::field_type::value_type, 8> constants = {
+                    std::array<typename BlueprintFieldType::value_type, 8> constants = {
                         0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
                         0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
                     for (int i = 0; i < 8; i++) {
@@ -183,7 +183,7 @@ namespace nil {
                     auto sha_output = sha256_process_component::generate_assignments(assignment, sha_params, row);
                     row += sha256_process_component::rows_amount;
 
-                    std::array<typename ArithmetizationType::field_type::value_type, 16> input_words2 = {
+                    std::array<typename BlueprintFieldType::value_type, 16> input_words2 = {
                         1 << 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 << 9};
                     for (int i = 0; i < 16; i++) {
                         assignment.constant(0)[component_start_row + 8 + i] = input_words2[i];
