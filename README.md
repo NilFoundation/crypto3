@@ -19,7 +19,8 @@ library in a project it is required to:
 
 ### Internal
 
-* [Block Ciphers](https://github.com/nilfoundation/block.git)
+* [Algebra](https://github.com/nilfoundation/crypto3-algebra.git)
+* [Block Ciphers](https://github.com/nilfoundation/crypto3-block.git)
 
 ### External
 
