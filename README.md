@@ -18,6 +18,7 @@ library in a project it is required to:
 ### Internal
 
 * [Algebra](https://github.com/NilFoundation/crypto3-algebra)
+* [Multiprecision](https://github.com/NilFoundation/crypto3-multiprecision)
 
 ### External
 
