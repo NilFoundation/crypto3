@@ -1,6 +1,4 @@
-# Zero-Knowledge Cryptography Schemes for =nil; Foundation's Cryptography Suite
-
-[![Run tests](https://github.com/NilFoundation/crypto3-pubkey/actions/workflows/run_tests.yml/badge.svg)](https://github.com/NilFoundation/crypto3-pubkey/actions/workflows/run_tests.yml)
+# Public Key Cryptography Schemes for =nil; Foundation's Cryptography Suite
 
 ## Building
 
@@ -19,7 +17,6 @@ library in a project it is required to:
 
 * [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git)
 * [Algebra](https://github.com/nilfoundation/crypto3-algebra.git)
-* [FFT](https://github.com/nilfoundation/crypto3-fft.git)
 
 ### External
 
