@@ -69,14 +69,14 @@ BOOST_AUTO_TEST_CASE(sha256_component_test_bls12_381_case) {
 
     std::cout << "Starting SHA-256 component verification test for BLS12-381 ..." << std::endl;
     auto begin = std::chrono::high_resolution_clock::now();
-    blueprint<scalar_field_type> bp = 
-        sha2_two_to_one_bp<scalar_field_type>();
+    blueprint<scalar_field_type> bp = sha2_two_to_one_bp<scalar_field_type>();
 
     BOOST_CHECK(verify_component<curve_type>(bp));
 
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    std::cout << "SHA-256 component verification test for BLS12-381 finished, time: " << elapsed.count() * 1e-9 << std::endl;
+    std::cout << "SHA-256 component verification test for BLS12-381 finished, time: " << elapsed.count() * 1e-9
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(sha256_component_test_mnt4_case) {
@@ -85,14 +85,14 @@ BOOST_AUTO_TEST_CASE(sha256_component_test_mnt4_case) {
 
     std::cout << "Starting SHA-256 component verification test for MNT4-298 ..." << std::endl;
     auto begin = std::chrono::high_resolution_clock::now();
-    blueprint<scalar_field_type> bp = 
-        sha2_two_to_one_bp<scalar_field_type>();
+    blueprint<scalar_field_type> bp = sha2_two_to_one_bp<scalar_field_type>();
 
     BOOST_CHECK(verify_component<curve_type>(bp));
 
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    std::cout << "SHA-256 component verification test for MNT4-298 finished, time: " << elapsed.count() * 1e-9 << std::endl;
+    std::cout << "SHA-256 component verification test for MNT4-298 finished, time: " << elapsed.count() * 1e-9
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(sha256_component_test_mnt6_case) {
@@ -101,14 +101,14 @@ BOOST_AUTO_TEST_CASE(sha256_component_test_mnt6_case) {
 
     std::cout << "Starting SHA-256 component verification test for MNT6-298 ..." << std::endl;
     auto begin = std::chrono::high_resolution_clock::now();
-    blueprint<scalar_field_type> bp = 
-        sha2_two_to_one_bp<scalar_field_type>();
+    blueprint<scalar_field_type> bp = sha2_two_to_one_bp<scalar_field_type>();
 
     BOOST_CHECK(verify_component<curve_type>(bp));
 
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    std::cout << "SHA-256 component verification test for MNT6-298 finished, time: " << elapsed.count() * 1e-9 << std::endl;
+    std::cout << "SHA-256 component verification test for MNT6-298 finished, time: " << elapsed.count() * 1e-9
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(sha256_component_test_edwards_183_case) {
@@ -117,14 +117,14 @@ BOOST_AUTO_TEST_CASE(sha256_component_test_edwards_183_case) {
 
     std::cout << "Starting SHA-256 component verification test for Edwards-183 ..." << std::endl;
     auto begin = std::chrono::high_resolution_clock::now();
-    blueprint<scalar_field_type> bp = 
-        sha2_two_to_one_bp<scalar_field_type>();
+    blueprint<scalar_field_type> bp = sha2_two_to_one_bp<scalar_field_type>();
 
     BOOST_CHECK(verify_component<curve_type>(bp));
 
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    std::cout << "SHA-256 component verification test for Edwards-183 finished, time: " << elapsed.count() * 1e-9 << std::endl;
+    std::cout << "SHA-256 component verification test for Edwards-183 finished, time: " << elapsed.count() * 1e-9
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

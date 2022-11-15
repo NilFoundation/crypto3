@@ -68,8 +68,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::
-        fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type = zk::components::fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0,
+                                                                     1, 2, 3, 4, 5, 6, 7, 8>;
 
     var var_b = var(0, 0, false, var::column_type::public_input);
 
@@ -99,8 +99,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
 
     auto duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);

@@ -82,7 +82,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 

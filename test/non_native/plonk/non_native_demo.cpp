@@ -141,8 +141,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using mul_component_type = zk::components::variable_base_multiplication<ArithmetizationType, curve_type,
-                                                                            ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using mul_component_type = zk::components::
+        variable_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
     using sha256_component_type =
         zk::components::sha256_process<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(29);
@@ -249,8 +249,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     using params =
         zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
 
-    using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
-                                                   typename params::transcript_hash_type, 2, 1>;
+    using fri_type = typename zk::commitments::
+        fri<BlueprintFieldType, typename params::merkle_hash_type, typename params::transcript_hash_type, 2, 1>;
 
     std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
 

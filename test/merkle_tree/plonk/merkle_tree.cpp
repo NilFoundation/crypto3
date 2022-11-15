@@ -59,14 +59,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_merkle_tree) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
+    using ArithmetizationParams =
+        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::merkle_tree<ArithmetizationType, curve_type,
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type = zk::components::merkle_tree<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     std::array<typename ArithmetizationType::field_type::value_type, 2048> hash_input;
     std::array<var, 2048> input_state_var;
@@ -76,7 +74,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_merkle_tree) {
     }
 
     typename component_type::params_type params = {input_state_var};
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, hash_input);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, hash_input);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

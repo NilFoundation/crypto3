@@ -72,7 +72,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
 
     std::array<typename ArithmetizationType::field_type::value_type, 3> input_state = {0, 1, 1};
     std::array<var, 3> input_state_var = {var(0, 0, false, var::column_type::public_input),
-     var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)};
+                                          var(0, 1, false, var::column_type::public_input),
+                                          var(0, 2, false, var::column_type::public_input)};
     typename component_type::params_type params = {input_state_var};
     std::array<typename ArithmetizationType::field_type::value_type, 3> output_state = {
         0x294B71F8CF2C775369A3B0B8912E508790B0C64BDBE6A5C26F2C6B53767A47CB_cppui255,
@@ -80,12 +81,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
         0x273C6EE50F9A2970162F5D4503596175C6D3FB4C0BF6C269BCD1DFEFB4F50D47_cppui255};
     std::cout << "Expected result: " << output_state[0].data << " " << output_state[1].data << " "
               << output_state[2].data << std::endl;
-    
-    auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-    };
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params,
-                                                                                                 input_state, result_check);
+
+    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, input_state,
+                                                                                                 result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

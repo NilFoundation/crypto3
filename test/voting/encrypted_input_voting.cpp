@@ -35,6 +35,8 @@
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
@@ -136,7 +138,7 @@ void test_jubjub_pedersen_encrypted_input_voting_component() {
     components::block_variable<field_type> sk_block(bp, sk.size());
     components::digest_variable<field_type> sn_digest(bp, hash_component::digest_bits);
     components::digest_variable<field_type> root_digest(bp, merkle_hash_component::digest_bits);
-    merkle_proof_component path_var(bp, tree_depth);
+    merkle_hash_component path_var(bp, tree_depth);
     voting_component vote_var(bp, m_block, eid_block, sn_digest, root_digest, address_bits_va, path_var, sk_block,
                               nil::crypto3::zk::detail::blueprint_variable<field_type>(0));
 

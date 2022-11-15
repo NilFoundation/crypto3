@@ -40,22 +40,21 @@ namespace nil {
 
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
-                
+
             namespace detail {
 
                 template<typename ArithmetizationType>
                 class blueprint_linear_combination;
 
                 template<typename BlueprintFieldType>
-                class blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>> : 
-                    public math::linear_combination<BlueprintFieldType> {
+                class blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>>
+                    : public math::linear_combination<BlueprintFieldType> {
 
                     typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef BlueprintFieldType field_type;
                     typedef typename field_type::value_type field_value_type;
 
                 public:
-
                     using index_type = std::size_t;
                     bool is_variable;
                     index_type index;
@@ -123,7 +122,8 @@ namespace nil {
 
                 template<typename BlueprintFieldType>
                 class blueprint_linear_combination_vector<snark::r1cs_constraint_system<BlueprintFieldType>>
-                    : private std::vector<blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>>> {
+                    : private std::vector<
+                          blueprint_linear_combination<snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
                     typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef typename BlueprintFieldType::value_type field_value_type;
@@ -153,8 +153,9 @@ namespace nil {
                             this->emplace_back(blueprint_linear_combination<ArithmetizationType>(v));
                     };
                     blueprint_linear_combination_vector(std::size_t count) : contents(count) {};
-                    blueprint_linear_combination_vector(std::size_t count,
-                                                        const blueprint_linear_combination<ArithmetizationType> &value) :
+                    blueprint_linear_combination_vector(
+                        std::size_t count,
+                        const blueprint_linear_combination<ArithmetizationType> &value) :
                         contents(count, value) {};
                     blueprint_linear_combination_vector(typename contents::const_iterator first,
                                                         typename contents::const_iterator last) :
@@ -188,7 +189,8 @@ namespace nil {
                         this->fill_with_bits_of_field_element(bp, field_value_type(i));
                     }
 
-                    void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp, const field_value_type &r) const {
+                    void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp,
+                                                         const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             bp.lc_val((*this)[i]) = multiprecision::bit_test(r.data, i) ? field_value_type::one() :
                                                                                           field_value_type::zero();

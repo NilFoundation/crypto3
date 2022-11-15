@@ -38,7 +38,7 @@ using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldT, typename HashT>
-void test_set_commitment_component(){
+void test_set_commitment_component() {
 
     const std::size_t digest_len = HashT::digest_bits;
     const std::size_t max_set_size = 16;
@@ -47,7 +47,7 @@ void test_set_commitment_component(){
     set_commitment_accumulator<HashT> accumulator(max_set_size, value_size);
 
     std::vector<algebra::bit_vector> set_elems;
-    for (std::size_t i = 0; i < max_set_size; ++i){
+    for (std::size_t i = 0; i < max_set_size; ++i) {
         algebra::bit_vector elem(value_size);
         std::generate(elem.begin(), elem.end(), [&]() { return std::rand() % 2; });
         set_elems.emplace_back(elem);
@@ -69,7 +69,7 @@ void test_set_commitment_component(){
     sc.generate_r1cs_constraints();
 
     /* test all elements from set */
-    for (std::size_t i = 0; i < max_set_size; ++i){
+    for (std::size_t i = 0; i < max_set_size; ++i) {
         element_bits.fill_with_bits(bp, set_elems[i]);
         bp.val(check_succesful) = FieldT::one();
         proof.generate_r1cs_witness(accumulator.get_membership_proof(set_elems[i]));
@@ -80,7 +80,7 @@ void test_set_commitment_component(){
     std::cout << "membership tests OK" << std::endl;
 
     /* test an element not in set */
-    for (std::size_t i = 0; i < value_size; ++i){
+    for (std::size_t i = 0; i < value_size; ++i) {
         bp.val(element_bits[i]) = FieldT(std::rand() % 2);
     }
 

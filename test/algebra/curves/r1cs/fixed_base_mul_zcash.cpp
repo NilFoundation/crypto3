@@ -32,6 +32,8 @@
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+
 #include <nil/crypto3/zk/components/algebra/curves/montgomery/element_g1.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/twisted_edwards/element_g1.hpp>
 #include <nil/crypto3/zk/components/algebra/curves/fixed_base_mul_zcash.hpp>
@@ -47,9 +49,9 @@ void print_field_element(std::ostream &os, const typename fields::detail::elemen
 
 template<typename Curve, typename BasePoints>
 void test_curves_g1_fixed_base_mul_zcash_component(
-    components::blueprint<typename Curve::base_field_type> &bp,
+    blueprint<typename Curve::base_field_type> &bp,
     const BasePoints &all_basepoints,
-    components::blueprint_variable_vector<typename Curve::base_field_type> &in_bits,
+    nil::crypto3::zk::detail::blueprint_variable_vector<typename Curve::base_field_type> &in_bits,
     const typename Curve::template g1_type<curves::coordinates::affine, curves::forms::twisted_edwards>::value_type
         &expected) {
     using curve_type = Curve;
@@ -95,8 +97,8 @@ static void test_curves_g1_fixed_base_mul_zcash_component(
     using fixed_base_mul_zcash_component = components::fixed_base_mul_zcash<curve_type>;
     using field_type = typename fixed_base_mul_zcash_component::field_type;
 
-    components::blueprint<field_type> bp;
-    components::blueprint_variable_vector<field_type> scalar;
+    blueprint<field_type> bp;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> scalar;
     scalar.allocate(bp, bits.size());
     scalar.fill_with_bits(bp, bits);
 
@@ -116,8 +118,8 @@ static void test_curves_g1_fixed_base_mul_zcash_component(
     using fixed_base_mul_zcash_component = components::fixed_base_mul_zcash<curve_type>;
     using field_type = typename fixed_base_mul_zcash_component::field_type;
 
-    components::blueprint<field_type> bp;
-    components::blueprint_variable_vector<field_type> scalar;
+    blueprint<field_type> bp;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> scalar;
     scalar.allocate(bp, size);
     scalar.fill_with_bits_of_field_element(bp, s);
 

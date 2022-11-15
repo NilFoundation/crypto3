@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul) {
 		expected = {0, 0};
 	}
 	std::cout<<"Expected result: "<< expected.X.data <<" " << expected.Y.data<<std::endl;
-	auto result_check = [&expected, T, shift_base](AssignmentType &assignment, 
+	auto result_check = [&expected, T, shift_base](AssignmentType &assignment,
         component_type::result_type &real_res) {
 			curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type R;
 			R.X = assignment.var_value(real_res.X);

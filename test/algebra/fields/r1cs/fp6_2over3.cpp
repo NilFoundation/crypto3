@@ -31,7 +31,7 @@
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
 #include <nil/crypto3/zk/components/algebra/fields/element_fp6_2over3.hpp>
 

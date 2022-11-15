@@ -63,7 +63,7 @@
 
 #include <nil/crypto3/random/hash.hpp>
 
-#include <nil/crypto3/zk/merkle_tree.hpp>
+#include <nil/crypto3/container/merkle/tree.hpp>
 
 #include <nil/crypto3/zk/components/packing.hpp>
 #include <nil/crypto3/zk/components/hashes/hash_io.hpp>
@@ -91,18 +91,18 @@ namespace nil {
 
                 public:
                     typedef std::vector<typename FieldType::value_type> hash_value_type;
-                    typedef blueprint_linear_combination_vector<FieldType> hash_variable_type;
+                    typedef detail::blueprint_linear_combination_vector<FieldType> hash_variable_type;
                     std::size_t input_len;
                     std::size_t dimension;
 
                     block_variable<FieldType> input_block;
-                    blueprint_linear_combination_vector<FieldType> output;
+                    detail::blueprint_linear_combination_vector<FieldType> output;
 
                     knapsack_crh_with_field_out_component(
                         blueprint<FieldType> &bp,
                         std::size_t input_len,
                         const block_variable<FieldType> &input_block,
-                        const blueprint_linear_combination_vector<FieldType> &output) :
+                        const detail::blueprint_linear_combination_vector<FieldType> &output) :
                         component<FieldType>(bp),
                         input_len(input_len), dimension(knapsack_dimension<FieldType>::dimension),
                         input_block(input_block), output(output) {
@@ -116,7 +116,7 @@ namespace nil {
                         for (std::size_t i = 0; i < dimension; ++i) {
                             this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
                                 1,
-                                blueprint_coeff_sum<FieldType>(
+                                zk::detail::blueprint_coeff_sum<FieldType>(
                                     input_block.bits,
                                     std::vector<typename FieldType::value_type>(
                                         knapsack_coefficients.begin() + input_len * i,
@@ -199,7 +199,7 @@ namespace nil {
                     std::size_t input_len;
                     std::size_t dimension;
 
-                    blueprint_linear_combination_vector<FieldType> output;
+                    detail::blueprint_linear_combination_vector<FieldType> output;
 
                     std::shared_ptr<knapsack_crh_with_field_out_component<FieldType>> hasher;
 
@@ -219,9 +219,10 @@ namespace nil {
 
                         for (std::size_t i = 0; i < dimension; ++i) {
                             output[i].assign(bp,
-                                             blueprint_packing_sum<FieldType>(blueprint_variable_vector<FieldType>(
-                                                 output_digest.bits.begin() + i * FieldType::value_bits,
-                                                 output_digest.bits.begin() + (i + 1) * FieldType::value_bits)));
+                                             zk::detail::blueprint_packing_sum<FieldType>(
+                                                 zk::detail::blueprint_variable_vector<FieldType>(
+                                                     output_digest.bits.begin() + i * FieldType::value_bits,
+                                                     output_digest.bits.begin() + (i + 1) * FieldType::value_bits)));
                         }
 
                         hasher.reset(
@@ -244,7 +245,7 @@ namespace nil {
                         /* do unpacking in place */
                         const std::vector<bool> input = input_block.bits.bits(this->bp);
                         for (std::size_t i = 0; i < dimension; ++i) {
-                            blueprint_variable_vector<FieldType> va(
+                            zk::detail::blueprint_variable_vector<FieldType> va(
                                 output_digest.bits.begin() + i * FieldType::value_bits,
                                 output_digest.bits.begin() + (i + 1) * FieldType::value_bits);
                             va.fill_with_bits_of_field_element(this->bp, this->bp.lc_val(output[i]));
