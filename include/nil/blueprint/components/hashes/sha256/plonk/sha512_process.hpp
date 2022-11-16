@@ -41,7 +41,7 @@ namespace nil {
         namespace components {
 
             // Input: [x_0, x_1, x_2] \in Fp
-            // Output: [y_0, y_1, y_2] - Poseidon permutation of [x_0, x_1, x_2]
+            // Output: [y_0, y_1, y_2] - SHA512 permutation of [x_0, x_1, x_2]
             template<typename ArithmetizationType, std::uint32_t WitnessesAmount, std::uint32_t ConstantsAmount>
             class sha512_process;
 
@@ -103,13 +103,13 @@ namespace nil {
                     result_type(const sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                             WitnessesAmount, ConstantsAmount> &component, std::uint32_t start_row_index) {
                         output_state = {var(component.W(0), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(1), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(2), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(3), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(0), start_row_index + rows_amount - 1, false),
-                                                           var(component.W(1), start_row_index + rows_amount - 1, false),
-                                                           var(component.W(2), start_row_index + rows_amount - 1, false),
-                                                           var(component.W(3), start_row_index + rows_amount - 1, false)};
+                                        var(component.W(1), start_row_index + rows_amount - 3, false),
+                                        var(component.W(2), start_row_index + rows_amount - 3, false),
+                                        var(component.W(3), start_row_index + rows_amount - 3, false),
+                                        var(component.W(0), start_row_index + rows_amount - 1, false),
+                                        var(component.W(1), start_row_index + rows_amount - 1, false),
+                                        var(component.W(2), start_row_index + rows_amount - 1, false),
+                                        var(component.W(3), start_row_index + rows_amount - 1, false)};
                     }
                 };
 
@@ -153,7 +153,6 @@ namespace nil {
 
                         std::size_t row = start_row_index + 386 + 3;
                         for (std::size_t i = 0; i < 80; i ++){
-
                             assignment.constant(component.C(0), row + i*9) =
                                 plonk_sha512_process<BlueprintFieldType, ArithmetizationParams, 9, 1>::round_constant[i];
                         }
@@ -970,8 +969,7 @@ namespace nil {
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
             void generate_gates(
                 const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams, 9, 1> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
@@ -983,8 +981,7 @@ namespace nil {
                 detail::generate_compression_gates(component, bp, assignment, first_selector_index + 3);
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
             void generate_copy_constraints(
                 const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams, 9, 1> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,

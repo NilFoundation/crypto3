@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    using curve_type = algebra::curves::pallas;
+    using curve_type = crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -65,11 +65,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
-    using component_type = blueprint::components::sha256_process<ArithmetizationType,
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type = blueprint::components::sha256_process<ArithmetizationType, 9, 1>;
+
     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(29);
     std::array<typename ArithmetizationType::field_type::value_type, 24> public_input = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c,
      0x1f83d9ab, 0x5be0cd19, s - 5, s + 5, s - 6, s + 6, s - 7, s + 7, s - 8, s + 8, s - 9, s + 9, s + 10, s - 10, s + 11, s - 11, s + 12, s - 12};
@@ -191,11 +191,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     auto result_check = [result_state](AssignmentType &assignment, 
         component_type::result_type &real_res) {
             for (std::size_t i = 0; i < 8; i++) {
-                assert(result_state[i] == typename ArithmetizationType::field_type::integral_type(assignment.var_value(real_res.output_state[i]).data)); 
+                assert(result_state[i] == typename ArithmetizationType::field_type::integral_type(
+                    var_value(assignment, real_res.output_state[i]).data)); 
             }
     };
-    typename component_type::params_type params = {input_state_var, input_words_var};
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
+    typename component_type::input_type instance_input = {input_state_var, input_words_var};
+
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::high_resolution_clock::now() - start);
