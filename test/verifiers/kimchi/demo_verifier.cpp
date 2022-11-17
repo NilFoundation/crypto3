@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::blueprint<ArithmetizationType> bp(desc);
     zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
     zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
-    zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
+    blueprint::assignment<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
     std::size_t start_row = zk::components::allocate<component_type>(bp, complexity);
 

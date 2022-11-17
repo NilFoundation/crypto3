@@ -30,13 +30,8 @@
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
-
-#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
@@ -46,12 +41,10 @@
 
 using namespace nil;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_poseidon_test_suite)
+template <typename BlueprintFieldType>
+void test_poseidon(std::vector<typename BlueprintFieldType::value_type> public_input,
+    std::vector<typename BlueprintFieldType::value_type> expected_res){
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
-
-    using curve_type = crypto3::algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::base_field_type;
     using FieldType = BlueprintFieldType;
 
     constexpr std::size_t WitnessColumns = 15;
@@ -70,20 +63,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     constexpr std::size_t Lambda = 5;
 
-    std::array<typename BlueprintFieldType::value_type, component_type::state_size> public_input = {0, 1, 1};
     std::array<var, component_type::state_size> input_state_var = {var(0, 0, false, var::column_type::public_input),
      var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)};
     typename component_type::input_type instance_input = {input_state_var};
-
-    std::array<typename BlueprintFieldType::value_type, component_type::state_size> expected_res = {
-        0x294B71F8CF2C775369A3B0B8912E508790B0C64BDBE6A5C26F2C6B53767A47CB_cppui255,
-        0x244E5FA0EE801AB3FCCAB47ED7F6EAB38126318F7BD2C414ADDBF62FCC30316A_cppui255,
-        0x273C6EE50F9A2970162F5D4503596175C6D3FB4C0BF6C269BCD1DFEFB4F50D47_cppui255};
-    std::cout << "Expected result: " << expected_res[0].data << " " << expected_res[1].data << " "
-              << expected_res[2].data << std::endl;
     
     auto result_check = [&expected_res](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
+        typename component_type::result_type &real_res) {
 
         for (std::uint32_t i = 0; i < component_type::state_size; i++){
             assert(expected_res[i] == var_value(assignment, real_res.output_state[i]));
@@ -94,6 +79,16 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case1) {
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
+}
+
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_poseidon_test_suite)
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case0) {
+    test_poseidon<typename crypto3::algebra::curves::pallas::base_field_type>(
+        {0, 1, 1},
+        {0x294B71F8CF2C775369A3B0B8912E508790B0C64BDBE6A5C26F2C6B53767A47CB_cppui255,
+        0x244E5FA0EE801AB3FCCAB47ED7F6EAB38126318F7BD2C414ADDBF62FCC30316A_cppui255,
+        0x273C6EE50F9A2970162F5D4503596175C6D3FB4C0BF6C269BCD1DFEFB4F50D47_cppui255});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

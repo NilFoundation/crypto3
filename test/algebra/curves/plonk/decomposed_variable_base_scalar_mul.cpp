@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposed_variable_base_scalar_mul) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
     using component_type = zk::components::curve_element_decomposed_variable_base_scalar_mul<ArithmetizationType, curve_type, 

@@ -32,8 +32,6 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
@@ -47,14 +45,11 @@
 
 #include "../../test_plonk_component.hpp"
 
-#include <chrono>
-
 using namespace nil;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
-    auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
@@ -70,7 +65,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
         crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
     using component_type = blueprint::components::sha512<ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
@@ -135,9 +130,6 @@ ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

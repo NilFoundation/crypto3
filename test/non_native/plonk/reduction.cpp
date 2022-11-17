@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(blueprint_variable_base_decomposition_edward25519) {
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using component_type = zk::components::reduction<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {0,0,0,0,0,0,0,1};

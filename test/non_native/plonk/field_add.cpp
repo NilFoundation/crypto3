@@ -26,8 +26,6 @@
 
 #define BOOST_TEST_MODULE blueprint_plonk_non_native_field_test
 
-#include <chrono>
-
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -38,8 +36,6 @@
 
 #include <nil/crypto3/hash/keccak.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
-
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/components/non_native/algebra/fields/plonk/addition.hpp>
@@ -48,14 +44,10 @@
 
 using namespace nil;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
-
-BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    using curve_type = crypto3::algebra::curves::pallas;
+template <typename BlueprintFieldType>
+void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_input){
+    
     using ed25519_type = crypto3::algebra::curves::curve25519;
-    using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
@@ -79,20 +71,26 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
 
     typename component_type::input_type instance_input = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {45524, 52353, 68769, 5431, 3724, 342453, 5425, 54222};
-    //std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
-
     auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
+        typename component_type::result_type &real_res) {
     };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
+}
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_addition_test0) {
+    test_field_add<typename crypto3::algebra::curves::pallas::base_field_type>(
+        {45524, 52353, 68769, 5431, 3724, 342453, 5425, 54222});
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_addition_test1) {
+    test_field_add<typename crypto3::algebra::curves::pallas::base_field_type>(
+        {1, 0, 0, 0, 1, 0, 0, 0});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

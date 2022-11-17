@@ -30,7 +30,6 @@
 #include <assert.h>
 #include <boost/test/unit_test.hpp>
 #include <fstream>
-#include <chrono>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
@@ -119,7 +118,6 @@ void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_kimchi_demo_verifier_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
-    auto start = std::chrono::high_resolution_clock::now();
 
     constexpr std::size_t complexity = 1;
 
@@ -133,7 +131,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -182,7 +180,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::blueprint<ArithmetizationType> bp(desc);
     zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
     zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
-    zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
+    blueprint::assignment<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
     std::size_t start_row = 0;
     zk::components::allocate<sha256_component_type>(bp, 1);
@@ -234,9 +232,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, params>::process(
         public_preprocessed_data, placeholder_proof, bp, fri_params);
     std::cout << "Proof check: " << verifier_res << std::endl;
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Time_execution: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

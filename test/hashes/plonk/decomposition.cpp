@@ -23,16 +23,12 @@
 //---------------------------------------------------------------------------//
 
 #define BOOST_TEST_MODULE plonk_decomposition_test
-#include <fstream>
-#include <chrono>
+
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
@@ -49,7 +45,6 @@ using namespace nil::crypto3;
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition) {
-    auto start = std::chrono::high_resolution_clock::now();
     using curve_type = algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
 
@@ -65,7 +60,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition) {
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using component_type = zk::components::decomposition<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {0x8d741211e928fdd4d33a13970d0ce7f3_cppui255,
@@ -79,9 +74,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition) {
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         params, public_input, result_check);
-
-    auto prover_duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Time_execution: " << prover_duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
