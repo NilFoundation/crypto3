@@ -221,7 +221,7 @@ namespace nil {
 
                     std::size_t row = start_row_index;
                     auto k_chunks = scalar_non_native_range_component::generate_circuit(bp, assignment,
-                    typename scalar_non_native_range_component::params_type({params.k}), row).output;
+                        typename scalar_non_native_range_component::params_type({params.k}), row).output;
                     row+=scalar_non_native_range_component::rows_amount;
                     
                     std::array<var, 4>  P_x = {var(W0, row), var(W1, row),
