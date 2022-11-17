@@ -57,7 +57,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/var_base_mul_per_bit"
     "non_native/plonk/complete_addition"
     "non_native/plonk/doubling"
-    "non_native/plonk/non_native_range"
+    "non_native/plonk/range"
     "non_native/plonk/fixed_base_mul"
     "non_native/plonk/variable_base_multiplication"
     "non_native/plonk/non_native_demo"

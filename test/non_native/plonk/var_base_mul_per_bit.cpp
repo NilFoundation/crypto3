@@ -35,8 +35,6 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
@@ -47,15 +45,15 @@
 
 #include "../../test_plonk_component.hpp"
 
-using namespace nil::crypto3;
+using namespace nil;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_var_base_mul_per_bit) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    using curve_type = algebra::curves::pallas;
-    using ed25519_type = algebra::curves::ed25519;
+    using curve_type = crypto3::algebra::curves::pallas;
+    using ed25519_type = crypto3::algebra::curves::ed25519;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;

@@ -33,8 +33,6 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
@@ -45,15 +43,15 @@
 
 #include "../../test_plonk_component.hpp"
 
-using namespace nil::crypto3;
+using namespace nil;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
     auto start = std::chrono::high_resolution_clock::now();
 
-    using curve_type = algebra::curves::pallas;
-    using ed25519_type = algebra::curves::ed25519;
+    using curve_type = crypto3::algebra::curves::pallas;
+    using ed25519_type = crypto3::algebra::curves::ed25519;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -73,12 +71,12 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
 
     var var_b = var(0, 0, false, var::column_type::public_input);
 
-    ed25519_type::scalar_field_type::value_type b = algebra::random_element<ed25519_type::scalar_field_type>();
+    ed25519_type::scalar_field_type::value_type b = crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
 
     typename component_type::params_type params = {{var_b}};
 
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type B = ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type P = b*B;
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type B = ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::one();
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type P = b*B;
     ed25519_type::base_field_type::integral_type Px = ed25519_type::base_field_type::integral_type(P.X.data);
     ed25519_type::base_field_type::integral_type Py = ed25519_type::base_field_type::integral_type(P.Y.data);
     typename ed25519_type::base_field_type::integral_type base = 1;

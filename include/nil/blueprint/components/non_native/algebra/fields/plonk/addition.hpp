@@ -37,7 +37,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/non_native_range.hpp>
+#include <nil/blueprint/components/non_native/algebra/fields/plonk/range.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -62,7 +62,7 @@ namespace nil {
             class addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 typename crypto3::algebra::fields::curve25519_base_field, 9>:
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    9, 0> {
+                    9, 0, 0> {
 
                 constexpr static const std::uint32_t WitnessesAmount = 9;
             
@@ -74,13 +74,12 @@ namespace nil {
 
                 using var = typename component_type::var;
 
-                using non_native_range_component =
-                    zk::components::non_native_range<ArithmetizationType, CurveType, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
-
                 constexpr static const std::size_t T = 257;
 
-            public:
-                constexpr static const std::size_t rows_amount = 2 + non_native_range_component::rows_amount;
+                constexpr static const std::size_t rows_amount = 2 + range<
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    typename crypto3::algebra::fields::curve25519_base_field, 9>::rows_amount;
+
                 const std::size_t gates_amount = 1;
 
                 struct input_type {
@@ -92,10 +91,10 @@ namespace nil {
                     std::array<var, 4> output;
 
                     result_type(const addition &component, std::uint32_t start_row_index) {
-                    output = {var(component.W(0), component_start_row + 2, false),
-                              var(component.W(1), component_start_row + 2, false),
-                              var(component.W(2), component_start_row + 2, false),
-                              var(component.W(3), component_start_row + 2, false)};
+                    output = {var(component.W(0), start_row_index + 2, false),
+                              var(component.W(1), start_row_index + 2, false),
+                              var(component.W(2), start_row_index + 2, false),
+                              var(component.W(3), start_row_index + 2, false)};
                     }
                 };
 
@@ -121,12 +120,11 @@ namespace nil {
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams,
-                     std::int32_t WitnessesAmount,
-                     std::int32_t ConstantsAmount>
+                     std::int32_t WitnessesAmount>
             using plonk_ed25519_addition =
                 addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 typename crypto3::algebra::fields::curve25519_base_field,
-                WitnessesAmount, ConstantsAmount>;
+                WitnessesAmount>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::result_type
@@ -140,45 +138,47 @@ namespace nil {
                 using component_type = plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>;
                 using ed25519_field_type = typename crypto3::algebra::fields::curve25519_base_field;
 
+                using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::var;
+
                 std::size_t row = start_row_index;
 
-                typename ed25519_field_type::base_field_type::integral_type base = 1;
+                typename ed25519_field_type::integral_type base = 1;
                 typename BlueprintFieldType::integral_type pasta_base = 1;
-                typename ed25519_field_type::base_field_type::extended_integral_type extended_base = 1;
+                typename ed25519_field_type::extended_integral_type extended_base = 1;
                 std::array<typename BlueprintFieldType::value_type, 4> a = {
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[0]).data),
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[1]).data),
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[2]).data),
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[3]).data)};
-                typename ed25519_field_type::base_field_type::value_type eddsa_a =
-                    typename ed25519_field_type::base_field_type::integral_type(a[0].data) +
-                    typename ed25519_field_type::base_field_type::integral_type(a[1].data) * (base << 66) +
-                    typename ed25519_field_type::base_field_type::integral_type(a[2].data) * (base << 132) +
-                    typename ed25519_field_type::base_field_type::integral_type(a[3].data) * (base << 198);
+                typename ed25519_field_type::value_type eddsa_a =
+                    typename ed25519_field_type::integral_type(a[0].data) +
+                    typename ed25519_field_type::integral_type(a[1].data) * (base << 66) +
+                    typename ed25519_field_type::integral_type(a[2].data) * (base << 132) +
+                    typename ed25519_field_type::integral_type(a[3].data) * (base << 198);
 
                 std::array<typename BlueprintFieldType::value_type, 4> b = {
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[0]).data),
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[1]).data),
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[2]).data),
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[3]).data)};
-                typename ed25519_field_type::base_field_type::value_type eddsa_b =
-                    typename ed25519_field_type::base_field_type::integral_type(b[0].data) +
-                    typename ed25519_field_type::base_field_type::integral_type(b[1].data) * (base << 66) +
-                    typename ed25519_field_type::base_field_type::integral_type(b[2].data) * (base << 132) +
-                    typename ed25519_field_type::base_field_type::integral_type(b[3].data) * (base << 198);
+                typename ed25519_field_type::value_type eddsa_b =
+                    typename ed25519_field_type::integral_type(b[0].data) +
+                    typename ed25519_field_type::integral_type(b[1].data) * (base << 66) +
+                    typename ed25519_field_type::integral_type(b[2].data) * (base << 132) +
+                    typename ed25519_field_type::integral_type(b[3].data) * (base << 198);
 
-                typename ed25519_field_type::base_field_type::value_type eddsa_r = eddsa_a + eddsa_b;
-                typename ed25519_field_type::base_field_type::integral_type integral_eddsa_r =
-                    typename ed25519_field_type::base_field_type::integral_type(eddsa_r.data);
-                typename ed25519_field_type::base_field_type::extended_integral_type eddsa_p =
-                    ed25519_field_type::base_field_type::modulus;
-                typename ed25519_field_type::base_field_type::extended_integral_type integral_eddsa_q =
-                    (typename ed25519_field_type::base_field_type::extended_integral_type(eddsa_a.data) +
-                     typename ed25519_field_type::base_field_type::extended_integral_type(eddsa_b.data) -
-                     typename ed25519_field_type::base_field_type::extended_integral_type(eddsa_r.data)) /
+                typename ed25519_field_type::value_type eddsa_r = eddsa_a + eddsa_b;
+                typename ed25519_field_type::integral_type integral_eddsa_r =
+                    typename ed25519_field_type::integral_type(eddsa_r.data);
+                typename ed25519_field_type::extended_integral_type eddsa_p =
+                    ed25519_field_type::modulus;
+                typename ed25519_field_type::extended_integral_type integral_eddsa_q =
+                    (typename ed25519_field_type::extended_integral_type(eddsa_a.data) +
+                     typename ed25519_field_type::extended_integral_type(eddsa_b.data) -
+                     typename ed25519_field_type::extended_integral_type(eddsa_r.data)) /
                     eddsa_p;
-                typename ed25519_field_type::base_field_type::extended_integral_type pow = extended_base << 257;
-                typename ed25519_field_type::base_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
+                typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
+                typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
 
                 std::array<typename BlueprintFieldType::value_type, 4> r;
                 std::array<typename BlueprintFieldType::value_type, 4> q;
@@ -222,12 +222,22 @@ namespace nil {
                 assignment.witness(component.W(2), row + 2) = r[2];
                 assignment.witness(component.W(3), row + 2) = r[3];
 
-                typename non_native_range_component::input_type range_input_r = {
+                using ArithmetizationType =
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+
+                typename range<ArithmetizationType,
+                    typename crypto3::algebra::fields::curve25519_base_field, 9>::input_type range_input_r = {
                     var(0, row + 2, false), var(1, row + 2, false), var(2, row + 2, false),
                     var(3, row + 2, false)};
-                non_native_range_component::generate_assignments(assignment, range_input_r, row + 2);
 
-                return result_type(start_row_index);
+                range<ArithmetizationType,
+                    typename crypto3::algebra::fields::curve25519_base_field, 9> range_component_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{},{});
+                generate_assignments(range_component_instance, assignment, range_input_r, row + 2);
+
+                return typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::result_type(
+                    component, start_row_index);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -238,18 +248,21 @@ namespace nil {
                 const typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::input_type &instance_input,
                 const std::size_t first_selector_index) {
 
+                using ed25519_field_type = typename crypto3::algebra::fields::curve25519_base_field;
+                using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::var;
+
                 typename BlueprintFieldType::integral_type base = 1;
-                typename ed25519_field_type::base_field_type::extended_integral_type extended_base = 1;
-                typename ed25519_field_type::base_field_type::extended_integral_type eddsa_p =
-                    ed25519_field_type::base_field_type::modulus;
+                typename ed25519_field_type::extended_integral_type extended_base = 1;
+                typename ed25519_field_type::extended_integral_type eddsa_p =
+                    ed25519_field_type::modulus;
                 typename BlueprintFieldType::value_type pasta_eddsa_p = eddsa_p;
-                typename ed25519_field_type::base_field_type::extended_integral_type pow = extended_base << 257;
-                typename ed25519_field_type::base_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
+                typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
+                typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
                 std::array<typename BlueprintFieldType::value_type, 4> p;
                 typename BlueprintFieldType::integral_type mask = (base << 66) - 1;
                 p[0] = minus_eddsa_p & mask;
 
-                snark::plonk_constraint<BlueprintFieldType> t = var(component.W(0), 0) +
+                crypto3::zk::snark::plonk_constraint<BlueprintFieldType> t = var(component.W(0), 0) +
                     var(component.W(1), 0) + p[0] * var(component.W(2), 0);
                 auto constraint_1 = bp.add_constraint(var(component.W(7), -1) * (base << 66) - (t - var(component.W(0), +1)));
 
@@ -278,7 +291,9 @@ namespace nil {
                 const typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                std::size_t row = component_start_row;
+                using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::var;
+
+                std::size_t row = start_row_index;
 
                 bp.add_copy_constraint({var(component.W(0), row + 1, false), instance_input.A[0]});
                 bp.add_copy_constraint({var(component.W(1), row + 1, false), instance_input.B[0]});
@@ -302,7 +317,7 @@ namespace nil {
                 auto selector_iterator = assignment.find_selector(component);
                 std::size_t first_selector_index;
                 if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, gates_amount);
+                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
                     generate_gates(component, bp, assignment, instance_input, first_selector_index);
                 } else {
                     first_selector_index = selector_iterator->second;
@@ -310,13 +325,25 @@ namespace nil {
                 std::size_t j = start_row_index;
                 assignment.enable_selector(first_selector_index, j + 1);
 
-                generate_copy_constraints(component, bp, assignment, params, j);
+                generate_copy_constraints(component, bp, assignment, instance_input, j);
 
-                typename non_native_range_component::input_type non_range_input_r = {
+                using ArithmetizationType =
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+                using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::var;
+
+                typename range<ArithmetizationType,
+                    typename crypto3::algebra::fields::curve25519_base_field, 9>::input_type non_range_input_r = {
                     var(component.W(0), j + 2), var(component.W(1), j + 2), var(component.W(2), j + 2), var(component.W(3), j + 2)};
-                non_native_range_component::generate_circuit(bp, assignment, non_range_input_r, j + 2);
 
-                return result_type(start_row_index);
+                range<ArithmetizationType,
+                    typename crypto3::algebra::fields::curve25519_base_field, 9> range_component_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{},{});
+
+                generate_circuit(range_component_instance, bp, assignment, non_range_input_r, j + 2);
+
+                return typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::result_type(
+                    component, start_row_index);
             }
 
         }    // namespace components
