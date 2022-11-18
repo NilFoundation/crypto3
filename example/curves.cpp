@@ -20,8 +20,8 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/components/blueprint.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/edwards/element_g1.hpp>
+#include <nil/blueprint/components/blueprint.hpp>
+#include <nil/blueprint/components/algebra/curves/edwards/element_g1.hpp>
 
 #include <nil/crypto3/zk/snark/algorithms/generate.hpp>
 #include <nil/crypto3/zk/snark/algorithms/verify.hpp>
@@ -49,11 +49,11 @@ void verify_component(blueprint<typename CurveType::scalar_field_type> bp){
 
     const snark::r1cs_constraint_system<field_type> constraint_system = bp.get_constraint_system();
 
-    const typename snark::r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = snark::generate<snark::r1cs_gg_ppzksnark<curve_type>>(constraint_system);
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::keypair_type keypair = snark::generate<crypto3::zk::snark::r1cs_gg_ppzksnark<curve_type>>(constraint_system);
 
-    const typename snark::r1cs_gg_ppzksnark<curve_type>::proof_type proof = snark::prove<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
+    const typename snark::r1cs_gg_ppzksnark<curve_type>::proof_type proof = snark::prove<crypto3::zk::snark::r1cs_gg_ppzksnark<curve_type>>(keypair.first, bp.primary_input(), bp.auxiliary_input());
 
-    bool verified = snark::verify<snark::r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
+    bool verified = snark::verify<crypto3::zk::snark::r1cs_gg_ppzksnark<curve_type>>(keypair.second, bp.primary_input(), proof);
 
     std::cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << std::endl;
     std::cout << "Verification status: " << verified << std::endl;
@@ -111,11 +111,11 @@ blueprint<typename CurveType::scalar_field_type> addition_example(
     components::element_g1_is_well_formed<main_curve_type> 
         el_is_well_formed(bp, a, d, P1);
 
-    el_add.generate_r1cs_constraints();
-    el_is_well_formed.generate_r1cs_constraints();
+    el_add.generate_gates();
+    el_is_well_formed.generate_gates();
 
-    el_add.generate_r1cs_witness();
-    el_is_well_formed.generate_r1cs_witness();
+    el_add.generate_assignments();
+    el_is_well_formed.generate_assignments();
 
     std::cout << "blueprint size: " << bp.num_variables() << std::endl;
 

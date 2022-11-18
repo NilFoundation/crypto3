@@ -23,15 +23,15 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
-#define CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_CURVES_TEST_UTILS_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_CURVES_TEST_UTILS_HPP
 
 #include <vector>
 
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/element_g1_affine.hpp>
+#include <nil/blueprint/components/algebra/curves/element_g1_affine.hpp>
 
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
@@ -70,8 +70,8 @@ void check_addition_component_auto_allocation(const std::vector<typename Element
     element_component p1_plus_p2_component(bp, points[p1_plus_p2]);
     typename element_component::addition_component add_component(bp, p1_component, p2_component);
 
-    add_component.generate_r1cs_witness();
-    add_component.generate_r1cs_constraints();
+    add_component.generate_assignments();
+    add_component.generate_gates();
 
     bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>({points[p1_plus_p2].X}, {field_type::value_type::one()},
                                                               {add_component.result.X}));
@@ -105,8 +105,8 @@ void check_addition_component_manual_allocation(
     // element_component p1_plus_p2_component(bp, points[p1_plus_p2]);
     typename element_component::addition_component add_component(bp, p1_component, p2_component, result);
 
-    add_component.generate_r1cs_witness();
-    add_component.generate_r1cs_constraints();
+    add_component.generate_assignments();
+    add_component.generate_gates();
     BOOST_CHECK(bp.is_satisfied());
 
     bp.add_r1cs_constraint(
@@ -137,8 +137,8 @@ void check_is_well_formed_component(const std::vector<typename ElementComponent:
         components::blueprint<field_type> bp, bp_copy;
         element_component p_component(bp, p);
         typename element_component::is_well_formed_component is_well_component(bp, p_component);
-        is_well_component.generate_r1cs_witness();
-        is_well_component.generate_r1cs_constraints();
+        is_well_component.generate_assignments();
+        is_well_component.generate_gates();
         BOOST_CHECK(bp.is_satisfied());
 
         // point is not on the curve
@@ -147,8 +147,8 @@ void check_is_well_formed_component(const std::vector<typename ElementComponent:
         p_copy.X = field_type::value_type::zero();
         element_component p_component_copy(bp_copy, p_copy);
         typename element_component::is_well_formed_component is_well_component_copy(bp_copy, p_component_copy);
-        is_well_component_copy.generate_r1cs_witness();
-        is_well_component_copy.generate_r1cs_constraints();
+        is_well_component_copy.generate_assignments();
+        is_well_component_copy.generate_gates();
         BOOST_CHECK(!bp_copy.is_satisfied());
     }
 }
@@ -177,8 +177,8 @@ void check_montgomery_to_twisted_edwards_component_auto_allocation(
                       FromElementComponent p_component(bp, t.template get<0>());
                       typename FromElementComponent::to_twisted_edwards_component to_tw_edwards_component(bp,
                                                                                                           p_component);
-                      to_tw_edwards_component.generate_r1cs_witness();
-                      to_tw_edwards_component.generate_r1cs_constraints();
+                      to_tw_edwards_component.generate_assignments();
+                      to_tw_edwards_component.generate_gates();
 
                       bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(t.template get<1>().X, 1,
                                                                                 to_tw_edwards_component.result.X));
@@ -214,8 +214,8 @@ void check_montgomery_to_twisted_edwards_component_manual_allocation(
                       ToElementComponent result(bp);
                       typename FromElementComponent::to_twisted_edwards_component to_tw_edwards_component(
                           bp, p_component, result);
-                      to_tw_edwards_component.generate_r1cs_witness();
-                      to_tw_edwards_component.generate_r1cs_constraints();
+                      to_tw_edwards_component.generate_assignments();
+                      to_tw_edwards_component.generate_gates();
 
                       bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(t.template get<1>().X, 1, result.X));
                       bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(t.template get<1>().Y, 1, result.Y));
@@ -256,4 +256,4 @@ void check_affine_twisted_edwards_g1_operations(
     check_is_well_formed_component<Curve, ElementComponent>(points);
 }
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_CURVES_TEST_UTILS_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_CURVES_TEST_UTILS_HPP

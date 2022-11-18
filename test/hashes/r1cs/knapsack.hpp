@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
-#define CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_KNAPSACK_COMPONENT_TEST_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_KNAPSACK_COMPONENT_TEST_HPP
 
 #include <boost/test/unit_test.hpp>
 
@@ -33,8 +33,9 @@
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 
-#include <nil/crypto3/zk/components/hashes/knapsack/r1cs/knapsack_component.hpp>
-#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+#include <nil/blueprint/components/hashes/knapsack/r1cs/knapsack_component.hpp>
+#include <nil/blueprint/blueprint/r1cs/circuit.hpp>
+#include <nil/blueprint/blueprint/r1cs/assignment.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk;
@@ -59,9 +60,9 @@ blueprint<FieldType> test_knapsack_crh_with_bit_out_component_internal(std::size
         bp, components::knapsack_crh_with_bit_out_component<FieldType>::get_digest_len());
     components::knapsack_crh_with_bit_out_component<FieldType> H(bp, input_bits.size(), input_block, output_digest);
 
-    input_block.generate_r1cs_witness(input_bits);
-    H.generate_r1cs_constraints();
-    H.generate_r1cs_witness();
+    input_block.generate_assignments(input_bits);
+    H.generate_gates();
+    H.generate_assignments();
 
     BOOST_CHECK(output_digest.get_digest().size() == digest_bits.size());
     BOOST_CHECK(bp.is_satisfied());
@@ -297,4 +298,4 @@ blueprint<typename curves::mnt6<298>::scalar_field_type> test_knapsack_crh_with_
     return test_knapsack_crh_with_bit_out_component_internal<FieldType>(dimension, input_bits, digest_bits);
 }
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_KNAPSACK_COMPONENT_TEST_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_KNAPSACK_COMPONENT_TEST_HPP

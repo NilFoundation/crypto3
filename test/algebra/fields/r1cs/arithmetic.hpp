@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BLUEPRINT_ELEMENT_FP2_COMPONENT_TEST_HPP
-#define CRYPTO3_ZK_BLUEPRINT_ELEMENT_FP2_COMPONENT_TEST_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_ELEMENT_FP2_COMPONENT_TEST_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_ELEMENT_FP2_COMPONENT_TEST_HPP
 
 #include <boost/test/unit_test.hpp>
 
@@ -46,8 +46,8 @@ blueprint<typename FieldType::base_field_type> test_field_element_mul(typename F
     element_component result(bp);
 
     element_mul_component el_mul_instance(bp, A, B, result);
-    el_mul_instance.generate_r1cs_constraints();
-    el_mul_instance.generate_r1cs_witness();
+    el_mul_instance.generate_gates();
+    el_mul_instance.generate_assignments();
 
     const typename field_type::value_type res = result.get_element();
 
@@ -71,8 +71,8 @@ blueprint<typename FieldType::base_field_type> test_field_element_squared(typena
     element_component result(bp);
 
     element_squared_component el_squared_instance(bp, A, result);
-    el_squared_instance.generate_r1cs_constraints();
-    el_squared_instance.generate_r1cs_witness();
+    el_squared_instance.generate_gates();
+    el_squared_instance.generate_assignments();
 
     const typename field_type::value_type res = result.get_element();
 
@@ -82,4 +82,4 @@ blueprint<typename FieldType::base_field_type> test_field_element_squared(typena
     return bp;
 }
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_ELEMENT_FP2_COMPONENT_TEST_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_ELEMENT_FP2_COMPONENT_TEST_HPP

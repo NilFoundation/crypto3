@@ -31,12 +31,12 @@
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 
 // TODO: fix sha256 component
-// #include <nil/crypto3/zk/components/hashes/sha256/sha256_component.hpp>
-#include <nil/crypto3/zk/components/hashes/pedersen.hpp>
+// #include <nil/blueprint/components/hashes/sha256/sha256_component.hpp>
+#include <nil/blueprint/components/hashes/pedersen.hpp>
 
 // TODO: fix update component
-// #include <nil/crypto3/zk/components/merkle_tree/update.hpp>
-#include <nil/crypto3/zk/components/merkle_tree/validate.hpp>
+// #include <nil/blueprint/components/merkle_tree/update.hpp>
+#include <nil/blueprint/components/merkle_tree/validate.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
@@ -99,22 +99,22 @@ using namespace nil::crypto3::algebra;
 //         bp, tree_depth, address_bits_va, prev_leaf_digest, prev_root_digest, prev_path_var, next_leaf_digest,
 //         next_root_digest, next_path_var, components::blueprint_variable<FieldType>(0));
 //
-//     prev_path_var.generate_r1cs_constraints();
-//     mls.generate_r1cs_constraints();
+//     prev_path_var.generate_gates();
+//     mls.generate_gates();
 //
 //     address_bits_va.fill_with_bits(bp, address_bits);
 //     BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == address);
-//     prev_leaf_digest.generate_r1cs_witness(loaded_leaf);
-//     prev_path_var.generate_r1cs_witness(address, prev_path);
-//     next_leaf_digest.generate_r1cs_witness(stored_leaf);
+//     prev_leaf_digest.generate_assignments(loaded_leaf);
+//     prev_path_var.generate_assignments(address, prev_path);
+//     next_leaf_digest.generate_assignments(stored_leaf);
 //     address_bits_va.fill_with_bits(bp, address_bits);
-//     mls.generate_r1cs_witness();
+//     mls.generate_assignments();
 //
 //     /* make sure that update check will check for the right things */
-//     prev_leaf_digest.generate_r1cs_witness(loaded_leaf);
-//     next_leaf_digest.generate_r1cs_witness(stored_leaf);
-//     prev_root_digest.generate_r1cs_witness(load_root);
-//     next_root_digest.generate_r1cs_witness(store_root);
+//     prev_leaf_digest.generate_assignments(loaded_leaf);
+//     next_leaf_digest.generate_assignments(stored_leaf);
+//     prev_root_digest.generate_assignments(load_root);
+//     next_root_digest.generate_assignments(store_root);
 //     address_bits_va.fill_with_bits(bp, address_bits);
 //     BOOST_REQUIRE(bp.is_satisfied());
 //
@@ -166,19 +166,19 @@ using namespace nil::crypto3::algebra;
 //                                                                      root_digest, path_var,
 //                                                                      components::blueprint_variable<FieldType>(0));
 //
-//     path_var.generate_r1cs_constraints();
-//     ml.generate_r1cs_constraints();
+//     path_var.generate_gates();
+//     ml.generate_gates();
 //
 //     address_bits_va.fill_with_bits(bp, address_bits);
 //     BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == address);
-//     leaf_digest.generate_r1cs_witness(leaf);
-//     path_var.generate_r1cs_witness(address, path);
-//     ml.generate_r1cs_witness();
+//     leaf_digest.generate_assignments(leaf);
+//     path_var.generate_assignments(address, path);
+//     ml.generate_assignments();
 //
 //     /* make sure that read checker didn't accidentally overwrite anything */
 //     address_bits_va.fill_with_bits(bp, address_bits);
-//     leaf_digest.generate_r1cs_witness(leaf);
-//     root_digest.generate_r1cs_witness(root);
+//     leaf_digest.generate_assignments(leaf);
+//     root_digest.generate_assignments(root);
 //     BOOST_REQUIRE(bp.is_satisfied());
 //
 //     const std::size_t num_constraints = bp.num_constraints();
@@ -212,11 +212,11 @@ std::vector<bool> calculate_pedersen_via_component(const std::vector<bool> &in_b
 
     components::blueprint<field_type> bp_bits;
     components::block_variable<field_type> in_block(bp_bits, in_bits.size());
-    in_block.generate_r1cs_witness(in_bits);
+    in_block.generate_assignments(in_bits);
 
     hash_component hash_comp_bits(bp_bits, in_block);
-    hash_comp_bits.generate_r1cs_witness();
-    hash_comp_bits.generate_r1cs_constraints();
+    hash_comp_bits.generate_assignments();
+    hash_comp_bits.generate_gates();
     return hash_comp_bits.result.get_digest();
 }
 
@@ -264,45 +264,45 @@ void test_jubjub_pedersen_merkle_tree_container_check_validate_component() {
     merkle_validate_component ml(bp, tree_depth, address_bits_va, leaf_digest, root_digest, path_var,
                                  components::blueprint_variable<field_type>(0));
 
-    path_var.generate_r1cs_constraints();
-    ml.generate_r1cs_constraints();
+    path_var.generate_gates();
+    ml.generate_gates();
 
-    leaf_digest.generate_r1cs_witness(leafs_v[leaf_idx]);
-    path_var.generate_r1cs_witness(proof);
+    leaf_digest.generate_assignments(leafs_v[leaf_idx]);
+    path_var.generate_assignments(proof);
     address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
     BOOST_REQUIRE(address_bits_va.get_field_element_from_bits(bp) == path_var.address);
-    ml.generate_r1cs_witness();
+    ml.generate_assignments();
 
     /* make sure that read checker didn't accidentally overwrite anything */
     address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
-    leaf_digest.generate_r1cs_witness(leafs_v[leaf_idx]);
+    leaf_digest.generate_assignments(leafs_v[leaf_idx]);
     /// Very important step, hidden error could appear without it. merkle_validate_component use
     /// bit_vector_copy_component to copy computed root into root_digest, so without this step internal check of the
     /// computed step will always be positive
-    root_digest.generate_r1cs_witness(merkle_proof_component::root(proof));
+    root_digest.generate_assignments(merkle_proof_component::root(proof));
     BOOST_REQUIRE(bp.is_satisfied());
 
     auto root_wrong = merkle_proof_component::root(proof);
     root_wrong[0] = !root_wrong[0];
     // false negative test with wrong root
-    root_digest.generate_r1cs_witness(root_wrong);
+    root_digest.generate_assignments(root_wrong);
     BOOST_REQUIRE(!bp.is_satisfied());
 
     // reset blueprint in the correct state
-    root_digest.generate_r1cs_witness(merkle_proof_component::root(proof));
+    root_digest.generate_assignments(merkle_proof_component::root(proof));
     BOOST_REQUIRE(bp.is_satisfied());
     // false negative test with wrong leaf
     auto leaf_digest_wrong = leafs_v[leaf_idx];
     leaf_digest_wrong[0] = !leaf_digest_wrong[0];
-    leaf_digest.generate_r1cs_witness(leaf_digest_wrong);
+    leaf_digest.generate_assignments(leaf_digest_wrong);
     BOOST_REQUIRE(!bp.is_satisfied());
 
     // reset blueprint in the correct state
-    leaf_digest.generate_r1cs_witness(leafs_v[leaf_idx]);
+    leaf_digest.generate_assignments(leafs_v[leaf_idx]);
     BOOST_REQUIRE(bp.is_satisfied());
     // false negative test with wrong path
     typename merkle_proof_component::merkle_proof_container proof_wrong(tree, (leaf_idx + 1) % leafs_number);
-    path_var.generate_r1cs_witness(proof_wrong);
+    path_var.generate_assignments(proof_wrong);
     address_bits_va.fill_with_bits_of_ulong(bp, path_var.address);
     BOOST_REQUIRE(!bp.is_satisfied());
 }
@@ -364,44 +364,44 @@ void test_jubjub_pedersen_merkle_tree_check_validate_component() {
     merkle_validate_component ml(bp, tree_depth, address_bits_va, leaf_digest, root_digest, path_var,
                                  components::blueprint_variable<field_type>(0));
 
-    path_var.generate_r1cs_constraints();
-    ml.generate_r1cs_constraints();
+    path_var.generate_gates();
+    ml.generate_gates();
 
     address_bits_va.fill_with_bits(bp, address_bits);
     BOOST_REQUIRE(address_bits_va.field_element_from_bits(bp) == address);
-    leaf_digest.generate_r1cs_witness(leaf);
-    path_var.generate_r1cs_witness(address, path);
-    ml.generate_r1cs_witness();
+    leaf_digest.generate_assignments(leaf);
+    path_var.generate_assignments(address, path);
+    ml.generate_assignments();
 
     /* make sure that read checker didn't accidentally overwrite anything */
     address_bits_va.fill_with_bits(bp, address_bits);
-    leaf_digest.generate_r1cs_witness(leaf);
+    leaf_digest.generate_assignments(leaf);
     /// Very important step, hidden error could appear without it. merkle_validate_component use
     /// bit_vector_copy_component to copy computed root into root_digest, so without this step internal check of the
     /// computed step will always be positive
-    root_digest.generate_r1cs_witness(root);
+    root_digest.generate_assignments(root);
     BOOST_REQUIRE(bp.is_satisfied());
 
     // false negative test with wrong root
-    root_digest.generate_r1cs_witness(root_wrong);
+    root_digest.generate_assignments(root_wrong);
     BOOST_REQUIRE(!bp.is_satisfied());
 
     // reset blueprint in the correct state
-    root_digest.generate_r1cs_witness(root);
+    root_digest.generate_assignments(root);
     BOOST_REQUIRE(bp.is_satisfied());
     // false negative test with wrong leaf
-    leaf_digest.generate_r1cs_witness(leaf_wrong);
+    leaf_digest.generate_assignments(leaf_wrong);
     BOOST_REQUIRE(!bp.is_satisfied());
 
     // reset blueprint in the correct state
-    leaf_digest.generate_r1cs_witness(leaf);
+    leaf_digest.generate_assignments(leaf);
     BOOST_REQUIRE(bp.is_satisfied());
     // false negative test with wrong path
-    path_var.generate_r1cs_witness(address, path_wrong);
+    path_var.generate_assignments(address, path_wrong);
     BOOST_REQUIRE(!bp.is_satisfied());
 
     // reset blueprint in the correct state
-    path_var.generate_r1cs_witness(address, path);
+    path_var.generate_assignments(address, path);
     BOOST_REQUIRE(bp.is_satisfied());
     // false negative test with wrong address
     address_bits_va.fill_with_bits(bp, address_bits_wrong);

@@ -48,12 +48,12 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/crypto3/zk/algorithms/allocate.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 
 #include "proof_data.hpp"
 
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     zk::blueprint<ArithmetizationType> bp(desc);
     zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
     zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
-    zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
+    blueprint::assignment<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
 
     std::size_t start_row = zk::components::allocate<component_type>(bp, complexity);
 

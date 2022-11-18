@@ -57,7 +57,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/var_base_mul_per_bit"
     "non_native/plonk/complete_addition"
     "non_native/plonk/doubling"
-    "non_native/plonk/non_native_range"
+    "non_native/plonk/range"
     "non_native/plonk/fixed_base_mul"
     "non_native/plonk/variable_base_multiplication"
     "non_native/plonk/non_native_demo"
@@ -155,13 +155,13 @@ set(HASHES_TESTS_FILES
     "hashes/r1cs/pedersen")
 
 set(PAIRING_TESTS_FILES
-    "algebra/pairing/weierstrass/miller_loop"
-    "algebra/pairing/weierstrass/precomputation")
+    "algebra/pairing/weierstrass/r1cs/miller_loop"
+    "algebra/pairing/weierstrass/r1cs/precomputation")
 
 set(ROUTING_TESTS_FILES
     "routing_algorithms/routing_algorithms"
-    "routing/as_waksman"
-    "routing/benes")
+    "routing/r1cs/as_waksman"
+    "routing/r1cs/benes")
 
 set(SCHEMES_TESTS_FILES
     "verifiers/r1cs_ppzksnark"
@@ -171,7 +171,7 @@ set(MERKLE_TREE_TESTS_FILES
     "merkle_tree_components")
 
 set(VOTING_TESTS_FILES
-    "voting/encrypted_input_voting")
+    "voting/r1cs/encrypted_input_voting")
 
 set(BASIC_COMPONENTS_TESTS_FILES
     "basic_components"

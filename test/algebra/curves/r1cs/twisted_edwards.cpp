@@ -32,7 +32,7 @@
 #include <nil/crypto3/algebra/curves/babyjubjub.hpp>
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/twisted_edwards/element_g1.hpp>
+#include <nil/blueprint/components/algebra/curves/twisted_edwards/element_g1.hpp>
 
 #include "test_utils.hpp"
 

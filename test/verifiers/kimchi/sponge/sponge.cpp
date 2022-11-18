@@ -36,8 +36,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <../test/verifiers/kimchi/sponge/aux_sponge.hpp>
 
 #include "test_plonk_component.hpp"
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_0) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_squeezes = 1;
     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_1) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_squeezes = 1;
     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_2) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_squeezes = 1;
     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_3) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_squeezes = 1;
     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_4) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_squeezes = 1;
     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_5) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_squeezes = 1;
     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_double_squeeze) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr static const size_t num_squeezes = 2;
     using component_type = zk::components::aux<num_squeezes, ArithmetizationType, curve_type,
