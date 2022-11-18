@@ -38,20 +38,20 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verify_scalar.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/types/binding.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/verify_scalar.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/kimchi_params.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/binding.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/inner_constants.hpp>
 
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/types.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/types.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/verifier_base_field.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>
 
-#include <nil/crypto3/zk/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+#include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
 #include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 
 #include "test_plonk_component.hpp"
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
         zk::snark::plonk_arithmetization_params<WitnessColumnsScalar, PublicInputColumnsScalar, ConstantColumnsScalar,
                                                 SelectorColumnsScalar>;
     using ArithmetizationTypeScalar = zk::snark::plonk_constraint_system<ScalarFieldType, ArithmetizationParamsScalar>;
-    using AssignmentTypeScalar = zk::blueprint_assignment_table<ArithmetizationTypeScalar>;
+    using AssignmentTypeScalar = blueprint::assignment<ArithmetizationTypeScalar>;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<AssignmentTypeScalar>;
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumnsBase, PublicInputColumnsBase,
                                                                           ConstantColumnsBase, SelectorColumnsBase>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BaseFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     using var_ec_point = typename zk::components::var_ec_point<BaseFieldType>;
 

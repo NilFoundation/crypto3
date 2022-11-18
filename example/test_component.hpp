@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_BLUEPRINT_EXAMPLE_TEST_COMPONENT_HPP
 #define CRYPTO3_BLUEPRINT_EXAMPLE_TEST_COMPONENT_HPP
 
-#include <nil/crypto3/zk/component.hpp>
+#include <nil/blueprint/component.hpp>
 
 #include <nil/crypto3/zk/blueprint/r1cs.hpp>
 
@@ -57,7 +57,7 @@ public:
       sym_2.allocate(this->bp);
     }
 
-    void generate_r1cs_constraints() {
+    void generate_gates() {
       // x*x = sym_1
       this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(x, x, sym_1));
 
@@ -71,7 +71,7 @@ public:
       this->bp.add_r1cs_constraint(snark::r1cs_constraint<field_type>(sym_2 + 5, 1, out));
     }
 
-    void generate_r1cs_witness() {
+    void generate_assignments() {
       this->bp.val(sym_1) = this->bp.val(x) * this->bp.val(x);
       this->bp.val(y) = this->bp.val(sym_1) * this->bp.val(x);
       this->bp.val(sym_2) = this->bp.val(y) + this->bp.val(x);

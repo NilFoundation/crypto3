@@ -31,7 +31,7 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/crypto3/zk/components/hashes/sha256/sha256_component.hpp>
+#include <nil/blueprint/components/hashes/sha256/sha256_component.hpp>
 #include <nil/crypto3/zk/snark/components/set_commitment/set_commitment_component.hpp>
 
 using namespace nil::crypto3::zk;
@@ -66,15 +66,15 @@ void test_set_commitment_component() {
     set_membership_proof_variable<FieldT, HashT> proof(bp, max_set_size);
 
     set_commitment_component<FieldT, HashT> sc(bp, max_set_size, element_bits, root_digest, proof, check_succesful);
-    sc.generate_r1cs_constraints();
+    sc.generate_gates();
 
     /* test all elements from set */
     for (std::size_t i = 0; i < max_set_size; ++i) {
         element_bits.fill_with_bits(bp, set_elems[i]);
         bp.val(check_succesful) = FieldT::one();
-        proof.generate_r1cs_witness(accumulator.get_membership_proof(set_elems[i]));
-        sc.generate_r1cs_witness();
-        root_digest.generate_r1cs_witness(accumulator.get_commitment());
+        proof.generate_assignments(accumulator.get_membership_proof(set_elems[i]));
+        sc.generate_assignments();
+        root_digest.generate_assignments(accumulator.get_commitment());
         BOOST_CHECK(bp.is_satisfied());
     }
     std::cout << "membership tests OK" << std::endl;
@@ -85,15 +85,15 @@ void test_set_commitment_component() {
     }
 
     bp.val(check_succesful) = FieldT::zero(); /* do not require the check result to be successful */
-    proof.generate_r1cs_witness(accumulator.get_membership_proof(set_elems[0])); /* try it with invalid proof */
-    sc.generate_r1cs_witness();
-    root_digest.generate_r1cs_witness(accumulator.get_commitment());
+    proof.generate_assignments(accumulator.get_membership_proof(set_elems[0])); /* try it with invalid proof */
+    sc.generate_assignments();
+    root_digest.generate_assignments(accumulator.get_commitment());
     BOOST_CHECK(bp.is_satisfied());
 
     bp.val(check_succesful) = FieldT::one(); /* now require the check result to be succesful */
-    proof.generate_r1cs_witness(accumulator.get_membership_proof(set_elems[0])); /* try it with invalid proof */
-    sc.generate_r1cs_witness();
-    root_digest.generate_r1cs_witness(accumulator.get_commitment());
+    proof.generate_assignments(accumulator.get_membership_proof(set_elems[0])); /* try it with invalid proof */
+    sc.generate_assignments();
+    root_digest.generate_assignments(accumulator.get_commitment());
     BOOST_CHECK(!bp.is_satisfied()); /* the blueprint should be unsatisfied */
     std::cout << "non-membership test OK" << std::endl;
 }

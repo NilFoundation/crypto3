@@ -42,9 +42,10 @@
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+#include <nil/blueprint/blueprint/r1cs/circuit.hpp>
+#include <nil/blueprint/blueprint/r1cs/assignment.hpp>
 
-#include <nil/crypto3/zk/components/algebra/fields/element_fp2.hpp>
+#include <nil/blueprint/components/algebra/fields/element_fp2.hpp>
 
 #include "arithmetic.hpp"
 

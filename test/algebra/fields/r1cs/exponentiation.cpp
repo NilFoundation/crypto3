@@ -42,9 +42,9 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/components/algebra/fields/exponentiation.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/element_fp4.hpp>
-#include <nil/crypto3/zk/components/algebra/fields/element_fp6_2over3.hpp>
+#include <nil/blueprint/components/algebra/fields/exponentiation.hpp>
+#include <nil/blueprint/components/algebra/fields/element_fp4.hpp>
+#include <nil/blueprint/components/algebra/fields/element_fp6_2over3.hpp>
 
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
@@ -60,12 +60,12 @@ void test_exponentiation_component(const typename FpkT::integral_type &power) {
     components::exponentiation_component<FpkT, Fpk_variableT, Fpk_mul_componentT, Fpk_sqr_componentT,
                              typename FpkT::integral_type>
         exp_component(bp, x, power, x_to_power);
-    exp_component.generate_r1cs_constraints();
+    exp_component.generate_gates();
 
     for (std::size_t i = 0; i < 10; ++i) {
         const typename FpkT::value_type x_val = random_element<FpkT>();
-        x.generate_r1cs_witness(x_val);
-        exp_component.generate_r1cs_witness();
+        x.generate_assignments(x_val);
+        exp_component.generate_assignments();
         const typename FpkT::value_type res = x_to_power.get_element();
         BOOST_CHECK(bp.is_satisfied());
         BOOST_CHECK(res == (x_val.pow(power)));

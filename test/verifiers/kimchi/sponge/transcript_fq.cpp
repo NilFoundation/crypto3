@@ -38,8 +38,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <../test/verifiers/kimchi/sponge/aux_transcript_fq.hpp>
 
 #include "test_plonk_component.hpp"
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_absorb = 15; 
     constexpr size_t num_challenges = 1;        //works
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_1) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_absorb = 0; 
     constexpr size_t num_challenges = 0;        //works
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_2) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_absorb = 0; 
     constexpr size_t num_challenges = 3;        //works
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_3) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     constexpr size_t num_absorb = 1; 
     constexpr size_t num_challenges = 1;        //works

@@ -32,11 +32,9 @@
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/zk/blueprint/r1cs.hpp>
-
-#include <nil/crypto3/zk/components/algebra/curves/montgomery/element_g1.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/twisted_edwards/element_g1.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/fixed_base_mul_zcash.hpp>
+#include <nil/blueprint/components/algebra/curves/montgomery/element_g1.hpp>
+#include <nil/blueprint/components/algebra/curves/twisted_edwards/element_g1.hpp>
+#include <nil/blueprint/components/algebra/curves/fixed_base_mul_zcash.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
@@ -79,8 +77,8 @@ void test_curves_g1_fixed_base_mul_zcash_component(
     typename fixed_base_mul_zcash_component::twisted_edwards_element_component result(bp);
     fixed_base_mul_zcash_component fixed_base_mul_instance(bp, basepoints, in_bits, result);
 
-    fixed_base_mul_instance.generate_r1cs_witness();
-    fixed_base_mul_instance.generate_r1cs_constraints();
+    fixed_base_mul_instance.generate_assignments();
+    fixed_base_mul_instance.generate_gates();
 
     BOOST_CHECK(expected.X == bp.lc_val(result.X));
     BOOST_CHECK(expected.Y == bp.lc_val(result.Y));
@@ -88,7 +86,7 @@ void test_curves_g1_fixed_base_mul_zcash_component(
 }
 
 template<typename Curve, typename BasePoints>
-static void test_curves_g1_fixed_base_mul_zcash_component(
+void test_curves_g1_fixed_base_mul_zcash_component(
     const BasePoints &all_basepoints,
     const std::vector<bool> &bits,
     const typename Curve::template g1_type<curves::coordinates::affine, curves::forms::twisted_edwards>::value_type
@@ -106,7 +104,7 @@ static void test_curves_g1_fixed_base_mul_zcash_component(
 }
 
 template<typename Curve, typename BasePoints>
-static void test_curves_g1_fixed_base_mul_zcash_component(
+void test_curves_g1_fixed_base_mul_zcash_component(
     const BasePoints &all_basepoints,
     const typename Curve::base_field_type::value_type &s,
     std::size_t size,
