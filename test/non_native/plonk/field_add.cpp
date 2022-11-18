@@ -31,8 +31,9 @@
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 
-#include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/keccak.hpp>
 
@@ -91,8 +92,20 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition_test0) {
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_addition_test1) {
+
+    using ed25519_type = crypto3::algebra::curves::curve25519;
+
+    ed25519_type::base_field_type::integral_type a = 
+        ed25519_type::base_field_type::integral_type(algebra::random_element<ed25519_type::base_field_type>().data);
+    ed25519_type::base_field_type::integral_type b = 
+        ed25519_type::base_field_type::integral_type(algebra::random_element<ed25519_type::base_field_type>().data);
+
+    ed25519_type::base_field_type::integral_type base = 1;
+    ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
+
     test_field_add<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {1, 0, 0, 0, 1, 0, 0, 0});
+        {a & mask, (a >> 66) & mask, (a >> 132) & mask, (a >> 198) & mask,
+        b & mask, (b >> 66) & mask, (b >> 132) & mask, (b >> 198) & mask});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -48,7 +48,7 @@ void test_sha256(std::vector<typename BlueprintFieldType::value_type> public_inp
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 5;
     constexpr std::size_t ConstantColumns = 2;
-    constexpr std::size_t SelectorColumns = 800;
+    constexpr std::size_t SelectorColumns = 12;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -76,8 +76,12 @@ void test_sha256(std::vector<typename BlueprintFieldType::value_type> public_inp
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_test0) {
-    test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {0, 0, 0, 0});
+
+    using BlueprintFieldType = typename crypto3::algebra::curves::pallas::base_field_type;
+
+    typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(126);
+
+    test_sha256<BlueprintFieldType>({s, s + 1, s + 2, s + 3});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
