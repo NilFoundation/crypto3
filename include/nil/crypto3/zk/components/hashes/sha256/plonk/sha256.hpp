@@ -59,9 +59,8 @@ namespace nil {
                         decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 8000;
+                    constexpr static const std::size_t rows_amount = sha256_process_component::rows_amount*2 + decomposition_component::rows_amount*2;
                     constexpr static const std::size_t selector_seed = 0x0f19;
-                    //        constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 0;
                     struct params_type {
                         std::array<var, 4> block_data;
@@ -93,7 +92,7 @@ namespace nil {
                         auto sha_block_part_2 =
                             decomposition_component::generate_circuit(bp, assignment, decomposition_params, row);
                         row += decomposition_component::rows_amount;
-                        std::vector<var> input_words(16);
+                        std::array<var, 16> input_words;
                         for (int i = 0; i < 8; i++) {
                             input_words[i] = sha_block_part_1.output[i];
                             input_words[8 + i] = sha_block_part_2.output[i];
@@ -109,7 +108,7 @@ namespace nil {
                         typename sha256_process_component::params_type sha_params = {constants_var, input_words};
                         auto sha_output = sha256_process_component::generate_circuit(bp, assignment, sha_params, row);
                         row += sha256_process_component::rows_amount;
-                        std::vector<var> input_words2_var = {var(0, row + 8, false, var::column_type::constant),
+                        std::array<var, 16> input_words2_var = {var(0, row + 8, false, var::column_type::constant),
                                                              var(0, row + 9, false, var::column_type::constant),
                                                              var(0, row + 10, false, var::column_type::constant),
                                                              var(0, row + 11, false, var::column_type::constant),
@@ -145,7 +144,7 @@ namespace nil {
                         auto sha_block_part_2 =
                             decomposition_component::generate_assignments(assignment, decomposition_params, row);
                         row += decomposition_component::rows_amount;
-                        std::vector<var> input_words(16);
+                        std::array<var, 16> input_words;
                         for (int i = 0; i < 8; i++) {
                             input_words[i] = sha_block_part_1.output[i];
                             input_words[8 + i] = sha_block_part_2.output[i];
@@ -173,7 +172,7 @@ namespace nil {
                         for (int i = 0; i < 16; i++) {
                             assignment.constant(0)[component_start_row + 8 + i] = input_words2[i];
                         }
-                        std::vector<var> input_words2_var = {var(0, row + 8, false, var::column_type::constant),
+                        std::array<var, 16> input_words2_var = {var(0, row + 8, false, var::column_type::constant),
                                                              var(0, row + 9, false, var::column_type::constant),
                                                              var(0, row + 10, false, var::column_type::constant),
                                                              var(0, row + 11, false, var::column_type::constant),
@@ -191,7 +190,6 @@ namespace nil {
                                                              var(0, row + 23, false, var::column_type::constant)};
                         typename sha256_process_component::params_type sha_params2 = {sha_output.output_state,
                                                                                       input_words2_var};
-                        row = row + 25;
                         sha256_process_component::generate_assignments(assignment, sha_params2, row);
                         return result_type(component_start_row);
                     }

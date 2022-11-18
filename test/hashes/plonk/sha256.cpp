@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 5;
     constexpr std::size_t ConstantColumns = 2;
-    constexpr std::size_t SelectorColumns = 800;
+    constexpr std::size_t SelectorColumns = 11;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -72,7 +72,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256) {
 
     using component_type = zk::components::sha256<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    std::array<typename ArithmetizationType::field_type::value_type, 4> public_input = {0, 0, 0, 0};
+     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(126);
+
+    std::array<typename ArithmetizationType::field_type::value_type, 4> public_input = {s, s + 1, s + 2, s + 3};
     std::array<var, 4> input_state_var = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};

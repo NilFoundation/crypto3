@@ -33,8 +33,9 @@
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 
-#include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -56,7 +57,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
     auto start = std::chrono::high_resolution_clock::now();
 
     using curve_type = algebra::curves::pallas;
-    using ed25519_type = algebra::curves::curve25519;
+    using ed25519_type = algebra::curves::ed25519;
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -82,10 +83,14 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition) {
         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {input_var_a, input_var_b};
-
-    std::vector<typename BlueprintFieldType::value_type> public_input = {45524, 52353,  68769, 5431,
-                                                                         3724,  342453, 5425,  54222};
-    // std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
+    ed25519_type::base_field_type::integral_type a = 
+        ed25519_type::base_field_type::integral_type(algebra::random_element<ed25519_type::base_field_type>().data);
+    ed25519_type::base_field_type::integral_type b = 
+        ed25519_type::base_field_type::integral_type(algebra::random_element<ed25519_type::base_field_type>().data);
+    ed25519_type::base_field_type::integral_type base = 1;
+    ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
+    std::vector<typename BlueprintFieldType::value_type> public_input = {a & mask, (a >> 66) & mask, (a >> 132) & mask, (a >> 198) & mask,
+        b & mask, (b >> 66) & mask, (b >> 132) & mask, (b >> 198) & mask};
 
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
