@@ -1,8 +1,6 @@
-# Circuit Definition Library (Blueprint) for =nil; Foundation's Cryptography Suite
+# Circuit components Definition Library (Blueprint) for =nil; Foundation's zkLLVM circuit compiler
 
-Circuit definition library for =nil; Foundation's cryptography suite.
-
-[![Run tests](https://github.com/NilFoundation/crypto3-blueprint/actions/workflows/run_tests.yml/badge.svg)](https://github.com/NilFoundation/crypto3-blueprint/actions/workflows/run_tests.yml)
+[![Run tests](https://github.com/NilFoundation/zkllvm-blueprint/actions/workflows/run_tests.yml/badge.svg)](https://github.com/NilFoundation/zkllvm-blueprint/actions/workflows/run_tests.yml)
 
 ## Building
 
