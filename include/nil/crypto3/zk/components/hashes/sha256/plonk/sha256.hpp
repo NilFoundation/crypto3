@@ -59,9 +59,9 @@ namespace nil {
                         decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
                 public:
-                    constexpr static const std::size_t rows_amount = sha256_process_component::rows_amount*2 + decomposition_component::rows_amount*2;
+                    constexpr static const std::size_t rows_amount = sha256_process_component::rows_amount*2 + decomposition_component::rows_amount*2 + 2;
                     constexpr static const std::size_t selector_seed = 0x0f19;
-                    constexpr static const std::size_t gates_amount = 0;
+                    constexpr static const std::size_t gates_amount = 1;
                     struct params_type {
                         std::array<var, 4> block_data;
                     };
@@ -127,6 +127,17 @@ namespace nil {
                         typename sha256_process_component::params_type sha_params2 = {sha_output.output_state,
                                                                                       input_words2_var};
                         sha256_process_component::generate_circuit(bp, assignment, sha_params, row);
+                        row = row + sha256_process_component::rows_amount;
+                        auto selector_iterator = assignment.find_selector(selector_seed);
+                        std::size_t first_selector_index;
+
+                        if (selector_iterator == assignment.selectors_end()) {
+                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
+                            generate_gates(bp, assignment, first_selector_index);
+                        } else {
+                            first_selector_index = selector_iterator->second;
+                        }
+                        assignment.enable_selector(first_selector_index, row);
                         return result_type(component_start_row);
                     }
 
@@ -190,16 +201,32 @@ namespace nil {
                                                              var(0, row + 23, false, var::column_type::constant)};
                         typename sha256_process_component::params_type sha_params2 = {sha_output.output_state,
                                                                                       input_words2_var};
-                        sha256_process_component::generate_assignments(assignment, sha_params2, row);
+                        auto sha256_output2 = sha256_process_component::generate_assignments(assignment, sha_params2, row).output_state;
+                        row = row + sha256_process_component::rows_amount;
+                        typename ArithmetizationType::field_type::integral_type one = 1;
+                        for (std::size_t i = 0; i < 8; i ++){
+                            assignment.witness(i)[row] = assignment.var_value(sha256_output2[i]);
+                        }
+                        row++;
+                        assignment.witness(W0)[row] = assignment.var_value(sha256_output2[0]) + assignment.var_value(sha256_output2[1]) * (one << 32)
+                         + assignment.var_value(sha256_output2[2]) * (one << 64) +
+                        assignment.var_value(sha256_output2[3]) * (one << 96);
+                        assignment.witness(W1)[row] = assignment.var_value(sha256_output2[4]) + assignment.var_value(sha256_output2[5]) * (one << 32)
+                         + assignment.var_value(sha256_output2[6]) * (one << 64) +
+                        assignment.var_value(sha256_output2[7]) * (one << 96);
                         return result_type(component_start_row);
                     }
 
                 private:
                     static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               std::size_t component_start_row) {
-                        std::size_t row = component_start_row;
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const std::size_t first_selector_index) {
+                        typename ArithmetizationType::field_type::integral_type one = 1;
+                        auto constraint_1 = bp.add_constraint(var(W0, + 1) - (var(W0, 0)+ var(W1, 0) * (one << 32) + var(W2, 0) * (one << 64) +
+                        var(W3, 0) * (one << 96)));
+                        auto constraint_2 = bp.add_constraint(var(W1, + 1) - (var(W4, 0)+ var(W5, 0) * (one << 32) + var(W6, 0) * (one << 64) +
+                        var(W7, 0) * (one << 96)));
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2});
                     }
 
                     static void
