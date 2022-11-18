@@ -28,8 +28,6 @@
 #ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_FIELDS_EDDSA_ADDITION_COMPONENT_9_WIRES_HPP
 #define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_FIELDS_EDDSA_ADDITION_COMPONENT_9_WIRES_HPP
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-
 #include <nil/crypto3/algebra/fields/curve25519/base_field.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
