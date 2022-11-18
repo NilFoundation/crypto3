@@ -50,6 +50,7 @@
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/types/proof.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+
 #include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 #include "verifiers/kimchi/index_terms_instances/lookup_test.hpp"
 

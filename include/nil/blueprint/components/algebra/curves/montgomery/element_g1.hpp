@@ -69,7 +69,7 @@ namespace nil {
                                         const element_component &in_p2) :
                         component<field_type>(bp),
                         p1(in_p1), p2(in_p2), result(bp) {
-                        blueprint_variable<field_type> lambda_var;
+                        detail::blueprint_variable<field_type> lambda_var;
                         lambda_var.allocate(this->bp);
                         this->lambda = lambda_var;
                     }
@@ -81,7 +81,7 @@ namespace nil {
                                         const result_type &in_result) :
                         component<field_type>(bp),
                         p1(in_p1), p2(in_p2), result(in_result) {
-                        blueprint_variable<field_type> lambda_var;
+                        detail::blueprint_variable<field_type> lambda_var;
                         lambda_var.allocate(this->bp);
                         this->lambda = lambda_var;
                     }

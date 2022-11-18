@@ -37,6 +37,8 @@
 #include <nil/blueprint/components/inner_product.hpp>
 #include <nil/blueprint/components/loose_multiplexing.hpp>
 
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
@@ -44,10 +46,10 @@ using namespace nil::crypto3::algebra;
 template<typename FieldType>
 void test_disjunction_component(size_t n) {
     blueprint<FieldType> bp;
-    components::blueprint_variable_vector<FieldType> inputs;
+    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
-    components::blueprint_variable<FieldType> output;
+    nil::crypto3::zk::detail::blueprint_variable<FieldType> output;
     output.allocate(bp);
 
     components::disjunction<FieldType> d(bp, inputs, output);
@@ -71,10 +73,10 @@ void test_disjunction_component(size_t n) {
 template<typename FieldType>
 void test_conjunction_component(size_t n) {
     blueprint<FieldType> bp;
-    components::blueprint_variable_vector<FieldType> inputs;
+    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
-    components::blueprint_variable<FieldType> output;
+    nil::crypto3::zk::detail::blueprint_variable<FieldType> output;
     output.allocate(bp);
 
     components::conjunction<FieldType> c(bp, inputs, output);
@@ -100,7 +102,7 @@ template<typename FieldType>
 void test_comparison_component(size_t n) {
     blueprint<FieldType> bp;
 
-    components::blueprint_variable<FieldType> A, B, less, less_or_eq;
+    nil::crypto3::zk::detail::blueprint_variable<FieldType> A, B, less, less_or_eq;
     A.allocate(bp);
     B.allocate(bp);
     less.allocate(bp);
@@ -126,12 +128,12 @@ void test_comparison_component(size_t n) {
 template<typename FieldType>
 void test_inner_product_component(size_t n) {
     blueprint<FieldType> bp;
-    components::blueprint_variable_vector<FieldType> A;
+    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> A;
     A.allocate(bp, n);
-    components::blueprint_variable_vector<FieldType> B;
+    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> B;
     B.allocate(bp, n);
 
-    components::blueprint_variable<FieldType> result;
+    nil::crypto3::zk::detail::blueprint_variable<FieldType> result;
     result.allocate(bp);
 
     components::inner_product<FieldType> g(bp, A, B, result);
@@ -161,9 +163,9 @@ template<typename FieldType>
 void test_loose_multiplexing_component(size_t n) {
     blueprint<FieldType> bp;
 
-    components::blueprint_variable_vector<FieldType> arr;
+    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> arr;
     arr.allocate(bp, 1ul << n);
-    components::blueprint_variable<FieldType> index, result, success_flag;
+    nil::crypto3::zk::detail::blueprint_variable<FieldType> index, result, success_flag;
     index.allocate(bp);
     result.allocate(bp);
     success_flag.allocate(bp);
@@ -179,7 +181,6 @@ void test_loose_multiplexing_component(size_t n) {
 
         bp.val(index) = typename FieldType::value_type(idx);
         g.generate_assignments();
-
 
         if (0 <= idx && idx <= (int)(1ul << n) - 1) {
             BOOST_CHECK(bp.val(result) == typename FieldType::value_type((19 * idx) % (1ul << n)));

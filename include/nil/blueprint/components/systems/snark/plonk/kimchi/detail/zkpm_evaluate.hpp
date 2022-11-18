@@ -49,44 +49,17 @@ namespace nil {
                 //        domain size (n),
                 //        evaluation point (x)
                 // Output: (x - w^{n - 3}) * (x - w^{n - 2}) * (x - w^{n - 1})
-                template<typename ArithmetizationType, 
-                    std::size_t... WireIndexes>
+                template<typename ArithmetizationType, std::size_t... WireIndexes>
                 class zkpm_evaluate;
 
-                template<typename BlueprintFieldType, 
+                template<typename BlueprintFieldType,
                          typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class zkpm_evaluate<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
+                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
+                         std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11,
+                         std::size_t W12, std::size_t W13, std::size_t W14>
+                class zkpm_evaluate<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                    W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -94,8 +67,9 @@ namespace nil {
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
                     using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-                    using exp_component = zk::components::exponentiation<ArithmetizationType, 60, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
-                                                       W10, W11, W12, W13, W14>;
+                    using exp_component = zk::components::exponentiation<ArithmetizationType, 60, W0, W1,
+                                                                         W2, W3, W4, W5, W6, W7, W8, W9,
+                                                                         W10, W11, W12, W13, W14>;
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
 
                     constexpr static const std::size_t selector_seed = 0x0f25;
@@ -103,8 +77,9 @@ namespace nil {
                     constexpr static const std::size_t zk_rows = 3;
 
                 public:
-                    constexpr static const std::size_t rows_amount = 1 + exp_component::rows_amount 
-                        + 4 * mul_component::rows_amount + 3 * sub_component::rows_amount;
+                    constexpr static const std::size_t rows_amount = 1 + exp_component::rows_amount +
+                                                                     4 * mul_component::rows_amount +
+                                                                     3 * sub_component::rows_amount;
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -121,7 +96,8 @@ namespace nil {
                         }
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -129,29 +105,39 @@ namespace nil {
                         generate_assignments_constants(bp, assignment, params, start_row_index);
 
                         var domain_size = var(0, start_row_index, false, var::column_type::constant);
-                        
+
                         std::size_t row = start_row_index;
-                        row++; // skip row for constants in exp_component
+                        row++;    // skip row for constants in exp_component
 
                         result_type result(row);
 
-                        var w1 = exp_component::generate_circuit(bp, assignment, {params.group_gen, domain_size}, row).output;
+                        var w1 = exp_component::generate_circuit(bp, assignment, {params.group_gen, domain_size}, row)
+                                     .output;
                         row += exp_component::rows_amount;
-                        var w2 = zk::components::generate_circuit<mul_component>(bp, assignment, {w1, params.group_gen}, row).output;
+                        var w2 =
+                            zk::components::generate_circuit<mul_component>(bp, assignment, {w1, params.group_gen}, row)
+                                .output;
                         row += mul_component::rows_amount;
-                        var w3 = zk::components::generate_circuit<mul_component>(bp, assignment, {w2, params.group_gen}, row).output;
+                        var w3 =
+                            zk::components::generate_circuit<mul_component>(bp, assignment, {w2, params.group_gen}, row)
+                                .output;
                         row += mul_component::rows_amount;
 
-                        var a1 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w1}, row).output;
+                        var a1 =
+                            zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w1}, row).output;
                         row += sub_component::rows_amount;
-                        var a2 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w2}, row).output;
+                        var a2 =
+                            zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w2}, row).output;
                         row += sub_component::rows_amount;
-                        var a3 = zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w3}, row).output;
+                        var a3 =
+                            zk::components::generate_circuit<sub_component>(bp, assignment, {params.x, w3}, row).output;
                         row += sub_component::rows_amount;
 
-                        var ans1 = zk::components::generate_circuit<mul_component>(bp, assignment, {a1, a2}, row).output;
+                        var ans1 =
+                            zk::components::generate_circuit<mul_component>(bp, assignment, {a1, a2}, row).output;
                         row += mul_component::rows_amount;
-                        result.output = zk::components::generate_circuit<mul_component>(bp, assignment, {ans1, a3}, row).output;
+                        result.output =
+                            zk::components::generate_circuit<mul_component>(bp, assignment, {ans1, a3}, row).output;
                         row += mul_component::rows_amount;
 
                         return result;
@@ -164,11 +150,12 @@ namespace nil {
                         var domain_size = var(0, start_row_index, false, var::column_type::constant);
 
                         std::size_t row = start_row_index;
-                        row++; // skip row for constants in exp_component
+                        row++;    // skip row for constants in exp_component
 
                         result_type result(row);
 
-                        var w1 = exp_component::generate_assignments(assignment, {params.group_gen, domain_size}, row).output;
+                        var w1 = exp_component::generate_assignments(assignment, {params.group_gen, domain_size}, row)
+                                     .output;
                         row += exp_component::rows_amount;
                         var w2 = mul_component::generate_assignments(assignment, {w1, params.group_gen}, row).output;
                         row += mul_component::rows_amount;
@@ -195,19 +182,20 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                     }
 
-                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
+                    static void generate_assignments_constants(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                         assignment.constant(0)[row] = params.domain_size - zk_rows;
                     }

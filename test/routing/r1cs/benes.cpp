@@ -65,8 +65,7 @@ void test_benes_routing_component(const std::size_t num_packets, const std::size
     assert(bp.is_satisfied());
     for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
         for (std::size_t bit_idx = 0; bit_idx < packet_size; ++bit_idx) {
-            assert(bp.val(outbits[permutation.get(packet_idx)][bit_idx]) ==
-                   bp.val(randbits[packet_idx][bit_idx]));
+            assert(bp.val(outbits[permutation.get(packet_idx)][bit_idx]) == bp.val(randbits[packet_idx][bit_idx]));
         }
     }
 

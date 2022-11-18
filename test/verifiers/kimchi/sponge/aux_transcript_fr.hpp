@@ -105,7 +105,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
                     using transcript_type =
-                        zk::components::kimchi_transcript<ArithmetizationType, CurveType, kimchi_params, W0, W1, W2, W3, W4, W5, W6, 
+                        zk::components::kimchi_transcript_fr<ArithmetizationType, CurveType, kimchi_params, W0, W1, W2, W3, W4, W5, W6, 
                                                                             W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:

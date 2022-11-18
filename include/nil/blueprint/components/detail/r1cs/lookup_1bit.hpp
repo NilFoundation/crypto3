@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
@@ -42,17 +42,17 @@ namespace nil {
                 struct lookup_1bit : public component<Field> {
                     using field_type = Field;
                     using field_value_type = typename Field::value_type;
-                    using result_type = blueprint_variable<Field>;
+                    using result_type = detail::blueprint_variable<Field>;
 
                     const std::vector<field_value_type> constants;
-                    const blueprint_variable<Field> bit;
+                    const detail::blueprint_variable<Field> bit;
                     result_type result;
 
                     /// Auto allocation of the result
                     template<typename Constants>
                     lookup_1bit(blueprint<Field> &bp,
                                 const Constants &in_constants,
-                                const blueprint_variable<Field> &in_bit) :
+                                const detail::blueprint_variable<Field> &in_bit) :
                         component<Field>(bp),
                         constants(std::cbegin(in_constants), std::cend(in_constants)), bit(in_bit) {
                         assert(this->constants.size() == 2);
@@ -63,7 +63,7 @@ namespace nil {
                     template<typename Constants>
                     lookup_1bit(blueprint<Field> &bp,
                                 const Constants &in_constants,
-                                const blueprint_variable<Field> &in_bit,
+                                const detail::blueprint_variable<Field> &in_bit,
                                 const result_type &in_result) :
                         component<Field>(bp),
                         constants(std::cbegin(in_constants), std::cend(in_constants)), bit(in_bit), result(in_result) {

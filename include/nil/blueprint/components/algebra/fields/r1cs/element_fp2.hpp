@@ -63,10 +63,10 @@ namespace nil {
 
                     data_type data;
 
-                    blueprint_linear_combination_vector<base_field_type> all_vars;
+                    detail::blueprint_linear_combination_vector<base_field_type> all_vars;
 
                     element_fp2(blueprint<base_field_type> &bp) : component<base_field_type>(bp) {
-                        blueprint_variable<base_field_type> c0_var, c1_var;
+                        detail::blueprint_variable<base_field_type> c0_var, c1_var;
 
                         c0_var.allocate(bp);
                         c1_var.allocate(bp);
@@ -99,7 +99,7 @@ namespace nil {
 
                     element_fp2(blueprint<base_field_type> &bp,
                                 const typename field_type::value_type &el,
-                                const blueprint_linear_combination<base_field_type> &coeff) :
+                                const detail::blueprint_linear_combination<base_field_type> &coeff) :
                         component<base_field_type>(bp) {
 
                         underlying_element_type c0_lc;
@@ -204,7 +204,7 @@ namespace nil {
                     element_fp2<Fp2T> result;
 
                 private:
-                    blueprint_variable<base_field_type> v1;
+                    detail::blueprint_variable<base_field_type> v1;
 
                 public:
                     element_fp2_mul(blueprint<base_field_type> &bp,
@@ -267,12 +267,12 @@ namespace nil {
                     using base_field_type = typename Fp2T::underlying_field_type;
 
                     element_fp2<Fp2T> A;
-                    blueprint_linear_combination<base_field_type> lc;
+                    detail::blueprint_linear_combination<base_field_type> lc;
                     element_fp2<Fp2T> result;
 
                     element_fp2_mul_by_lc(blueprint<base_field_type> &bp,
                                           const element_fp2<Fp2T> &A,
-                                          const blueprint_linear_combination<base_field_type> &lc,
+                                          const detail::blueprint_linear_combination<base_field_type> &lc,
                                           const element_fp2<Fp2T> &result) :
                         component<base_field_type>(bp),
                         A(A), lc(lc), result(result) {

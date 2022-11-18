@@ -41,52 +41,19 @@ namespace nil {
             namespace components {
 
                 // shift scalars for scalar multiplication input
-                // f(X) = X -> X - 2^255 when the scalar field is larger than the base field and // TODO: "larger scalar field is depricated case"
-                // f(X) = X -> (X - 2^255 - 1) / 2 otherwise
-                // Input: [x_0, ..., x_InputSize]
+                // f(X) = X -> X - 2^255 when the scalar field is larger than the base field and // TODO: "larger scalar
+                // field is depricated case" f(X) = X -> (X - 2^255 - 1) / 2 otherwise Input: [x_0, ..., x_InputSize]
                 // Output: [f(x_0), ..., f(x_InputSize)]
-                template<typename ArithmetizationType, typename CurveType, std::size_t InputSize,
-                    std::size_t... WireIndexes>
+                template<typename ArithmetizationType, typename CurveType, std::size_t InputSize, std::size_t... WireIndexes>
                 class prepare_scalars;
 
-                template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         typename CurveType,
-                         std::size_t InputSize,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
+                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                         std::size_t InputSize, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
+                         std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8,
+                         std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13,
                          std::size_t W14>
-                class prepare_scalars<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    CurveType,
-                    InputSize,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                class prepare_scalars<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                      CurveType, InputSize, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -109,7 +76,8 @@ namespace nil {
                     }
 
                 public:
-                    constexpr static const std::size_t rows_amount = InputSize * (add_component::rows_amount + mul_component::rows_amount);
+                    constexpr static const std::size_t rows_amount =
+                        InputSize * (add_component::rows_amount + mul_component::rows_amount);
                     constexpr static const std::size_t gates_amount = 0;
 
                     struct params_type {
@@ -120,7 +88,8 @@ namespace nil {
                         std::array<var, InputSize> output;
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -136,14 +105,18 @@ namespace nil {
                         result_type result;
 
                         for (std::size_t i = 0; i < InputSize; ++i) {
-                            shifted[i] = zk::components::generate_circuit<add_component>(bp, assignment, {params.scalars[i], shift}, row).output;
+                            shifted[i] = zk::components::generate_circuit<add_component>(
+                                             bp, assignment, {params.scalars[i], shift}, row)
+                                             .output;
                             row += add_component::rows_amount;
-                            result.output[i] = zk::components::generate_circuit<mul_component>(bp, assignment, {shifted[i], coef}, row).output;
+                            result.output[i] =
+                                zk::components::generate_circuit<mul_component>(bp, assignment, {shifted[i], coef}, row)
+                                    .output;
                             row += mul_component::rows_amount;
                         }
 
                         generate_copy_constraints(bp, assignment, params, start_row_index);
-                        
+
                         return result;
                     }
 
@@ -160,9 +133,11 @@ namespace nil {
                         result_type result;
 
                         for (std::size_t i = 0; i < InputSize; ++i) {
-                            shifted[i] = add_component::generate_assignments(assignment, {params.scalars[i], shift}, row).output;
+                            shifted[i] =
+                                add_component::generate_assignments(assignment, {params.scalars[i], shift}, row).output;
                             row += add_component::rows_amount;
-                            result.output[i] = mul_component::generate_assignments(assignment, {shifted[i], coef}, row).output;
+                            result.output[i] =
+                                mul_component::generate_assignments(assignment, {shifted[i], coef}, row).output;
                             row += mul_component::rows_amount;
                         }
 
@@ -174,19 +149,20 @@ namespace nil {
                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                const params_type &params,
                                                const std::size_t first_selector_index) {
-
                     }
 
-                    static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
+                    static void
+                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
                                                   blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                                   const params_type &params,
                                                   const std::size_t start_row_index) {
                     }
 
-                    static void generate_assignments_constants(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  const std::size_t start_row_index) {
+                    static void generate_assignments_constants(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        const std::size_t start_row_index) {
                         std::size_t row = start_row_index;
                         typename BlueprintFieldType::value_type base = 2;
                         if (scalar_larger()) {

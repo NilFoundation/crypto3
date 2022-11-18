@@ -35,24 +35,35 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
+#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
+
 using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_allocat_rows_test_case) {
 
-	using curve_type = algebra::curves::bls12<381>;
-	using BlueprintFieldType = typename curve_type::base_field_type;
-	constexpr std::size_t WitnessColumns = 5;
-	using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using curve_type = algebra::curves::bls12<381>;
+    using BlueprintFieldType = typename curve_type::base_field_type;
+    constexpr static const std::size_t witness_columns = 3;
+    constexpr static const std::size_t public_input_columns = 0;
+    constexpr static const std::size_t constant_columns = 3;
+    constexpr static const std::size_t selector_columns = 1;
 
-	zk::blueprint<ArithmetizationType> bp;
-	zk::blueprint_private_assignment_table<ArithmetizationType, WitnessColumns> private_assignment;
-	zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment;
+    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<witness_columns, public_input_columns,
+                                                                           constant_columns, selector_columns>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
 
-	BOOST_CHECK_EQUAL(0, bp.allocate_rows());
-	BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
-	BOOST_CHECK_EQUAL(6, bp.allocate_row());
+    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
+
+    zk::blueprint<ArithmetizationType> bp(desc);
+    zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
+    zk::blueprint_public_assignment_table<ArithmetizationType> public_assignment(desc);
+    zk::blueprint_assignment_table<ArithmetizationType> assignment_bp(private_assignment, public_assignment);
+
+    BOOST_CHECK_EQUAL(0, bp.allocate_rows());
+    BOOST_CHECK_EQUAL(1, bp.allocate_rows(5));
+    BOOST_CHECK_EQUAL(6, bp.allocate_row());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

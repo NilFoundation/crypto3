@@ -44,18 +44,22 @@ namespace nil {
         namespace blueprint {
             namespace components {
 
-                // Input: scalar, base \in Fp
-                // Output: base**scalar
+                // Input: exponent, base \in Fp
+                // Output: base**exponent
                 template<typename ArithmetizationType, std::size_t ExponentSize, std::size_t... WireIndexes>
                 class exponentiation;
 
-                // res = base.pow(scalar)
-                // W0     | W1            | W2            | W3                   | W4  | W5  | W6  | W7  | W8  | W9  |
-                // W10 | W11 | W12 | W13  | W14  | base   | n = [b0...b8] | base^[b0b1b2] | W1^8 + base^[b3b4b5] | ... |
-                // - | - | b_8 | b_7 | b_6 | b_5 | b_4 | b_3 | b_2 | b_1 |
-                // ...    | ...           | ...           | ...                  | ... | - | - | ... | ... | ...
-                // base   | n = scalar    | res           | ...                  | ... | - | - | ...
-                // ....
+                // clang-format off
+                // res = base.pow(exponent)
+                // _____________________________________________________________________________________________________________________________________________________________________
+                // | W0     | W1             | W2             | W3             | W4                 | W5                    | W6  | W7  | W8  | W9  | W10 | W11       | W12 | W13 | W14 | 
+                // | base   | n = [b0...b7]  | base^[b0b1]    | base^[b0b1b2b3]| base^[b0b1b2b3b4b5]|base^[b0b1b2b3b4b5b6b7]| -   | b7  | b6  | b5  | b4  | b3        | b2  | b1  | b0  |
+                // | base   | n = [b8...b15] | base^[b0...b9] | base^[b0...b11]| ...                | ...                   | -   | b15 | b14 | b13 | b12 | b11       | b10 | b9  | b8  |
+                // | ...                                                                                                                                                                |
+                // | ...    | ...            | ...            | ...            | ...                | ...                   | res | ... | ... | ... | ... | ...       | ... | ... | ... |
+                // ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+                // clang-format on
+
                 template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize,
                          std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                          std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
@@ -81,12 +85,8 @@ namespace nil {
                         (witness_amount - reserved_witnesses) / (bits_per_intermediate_result + 1);
                     constexpr static const std::size_t bits_per_row =
                         intermediate_results_per_row * bits_per_intermediate_result;
-                    constexpr static const std::size_t padded_exponent_size =
-                        ExponentSize + ((bits_per_row - ExponentSize % bits_per_row) %
-                                        bits_per_row);    // for ExponentSize % bits_per_row = 0
-                    constexpr static const std::size_t main_rows = (ExponentSize % bits_per_row == 0) ?
-                                                                       (ExponentSize / bits_per_row) :
-                                                                       (ExponentSize / bits_per_row) + 1;
+                    constexpr static const std::size_t main_rows = (ExponentSize + bits_per_row - 1) / bits_per_row;
+                    constexpr static const std::size_t padded_exponent_size = main_rows * bits_per_row;
 
                 public:
                     constexpr static const std::size_t rows_amount = 1 + main_rows;
@@ -147,10 +147,24 @@ namespace nil {
                             typename BlueprintFieldType::integral_type(exponent.data);
 
                         std::array<bool, padded_exponent_size> bits = {false};
+                        // {
+                        //     nil::marshalling::status_type status;
+                        //     std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
+                        //     std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
+                        // }
                         {
-                            nil::marshalling::status_type status;
-                            std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
-                            std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
+                            std::vector<bool> bbb;
+                            auto data = exponent.data;
+                            while (data != 0) {
+                                bbb.push_back((data - (data >> 1 << 1)) != 0);
+                                data = data >> 1;
+                            }
+                            for (int i = 1; i < padded_exponent_size - bbb.size(); ++i) {
+                                bits[i] = false;
+                            }
+                            for (int i = 0; i < bbb.size(); ++i) {
+                                bits[padded_exponent_size - 1 - i] = bbb[i];
+                            }
                         }
 
                         typename ArithmetizationType::field_type::value_type accumulated_n = 0;
@@ -170,7 +184,9 @@ namespace nil {
                                 for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result;
                                      bit_column++) {
                                     std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
-                                    assignment.witness(column_idx)[row] = bits[current_bit];
+                                    assignment.witness(column_idx)[row] = bits[current_bit] ? 1 : 0;
+                                    // wierd stuff is here for oracles scalar
+                                    // std::cout<<"column_idx "<<column_idx<<" row "<<row<<" value "<<bits[current_bit]<<std::endl;
 
                                     intermediate_exponent = 2 * intermediate_exponent + bits[current_bit];
 
@@ -211,7 +227,7 @@ namespace nil {
                             for (std::size_t bit_column = 0; bit_column < bits_per_intermediate_result; bit_column++) {
                                 std::size_t column_idx = W14 - j * (bits_per_intermediate_result)-bit_column;
                                 snark::plonk_constraint<BlueprintFieldType> bit_check_constraint = bp.add_bit_check(var(column_idx, 0));
-                                constraints.push_back(bit_check_constraint);
+                                constraints.push_back(bit_check_constraint); // fail on oracles scalar 
 
                                 snark::plonk_constraint<BlueprintFieldType> bit_res = var(W0, 0) * var(column_idx, 0);
                                 if (j == 0 && bit_column == 0) {
@@ -226,7 +242,7 @@ namespace nil {
 
                             intermediate_result_constraint =
                                 intermediate_result_constraint - var(intermediate_start + j, 0);
-                            constraints.push_back(intermediate_result_constraint);
+                            constraints.push_back(intermediate_result_constraint); // fail on oracles scalar 
                         }
 
                         accumulated_n_constraint = accumulated_n_constraint + exponent_shift * var(W1, -1) - var(W1, 0);
@@ -256,7 +272,7 @@ namespace nil {
                                                 one});
                         // check that the recalculated n is equal to the input challenge
                         bp.add_copy_constraint(
-                           {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent});
+                           {{W1, static_cast<int>(component_start_row + rows_amount - 1), false}, params.exponent}); // fail on oracles scalar 
                     }
 
                     static void generate_assignments_constants(

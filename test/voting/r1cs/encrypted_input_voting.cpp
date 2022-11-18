@@ -35,6 +35,8 @@
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
+#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::algebra;
@@ -43,7 +45,7 @@ template<typename HashComponent>
 std::vector<bool> calculate_hash_via_component(const std::vector<bool> &in_bits) {
     using field_type = typename HashComponent::field_type;
 
-    components::blueprint<field_type> bp_bits;
+    blueprint<field_type> bp_bits;
     components::block_variable<field_type> in_block(bp_bits, in_bits.size());
     in_block.generate_assignments(in_bits);
 
@@ -128,17 +130,17 @@ void test_jubjub_pedersen_encrypted_input_voting_component() {
     sn_wrong[0] = !sn_wrong[0];
 
     /* execute test */
-    components::blueprint<field_type> bp;
-    components::blueprint_variable_vector<field_type> address_bits_va;
+    blueprint<field_type> bp;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> address_bits_va;
     address_bits_va.allocate(bp, tree_depth);
     components::block_variable<field_type> m_block(bp, m.size());
     components::block_variable<field_type> eid_block(bp, eid.size());
     components::block_variable<field_type> sk_block(bp, sk.size());
     components::digest_variable<field_type> sn_digest(bp, hash_component::digest_bits);
     components::digest_variable<field_type> root_digest(bp, merkle_hash_component::digest_bits);
-    merkle_proof_component path_var(bp, tree_depth);
+    merkle_hash_component path_var(bp, tree_depth);
     voting_component vote_var(bp, m_block, eid_block, sn_digest, root_digest, address_bits_va, path_var, sk_block,
-                              components::blueprint_variable<field_type>(0));
+                              nil::crypto3::zk::detail::blueprint_variable<field_type>(0));
 
     path_var.generate_gates();
     vote_var.generate_gates();
@@ -279,8 +281,8 @@ void test_jubjub_merkle_container_pedersen_encrypted_input_voting_component() {
     sn_wrong[0] = !sn_wrong[0];
 
     /* execute test */
-    components::blueprint<field_type> bp;
-    components::blueprint_variable_vector<field_type> address_bits_va;
+    blueprint<field_type> bp;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> address_bits_va;
     address_bits_va.allocate(bp, tree_depth);
     components::block_variable<field_type> m_block(bp, m.size());
     components::block_variable<field_type> eid_block(bp, eid.size());
@@ -289,7 +291,7 @@ void test_jubjub_merkle_container_pedersen_encrypted_input_voting_component() {
     components::digest_variable<field_type> root_digest(bp, merkle_hash_component::digest_bits);
     merkle_proof_component path_var(bp, tree_depth);
     voting_component vote_var(bp, m_block, eid_block, sn_digest, root_digest, address_bits_va, path_var, sk_block,
-                              components::blueprint_variable<field_type>(0));
+                              nil::crypto3::zk::detail::blueprint_variable<field_type>(0));
 
     path_var.generate_gates();
     vote_var.generate_gates();

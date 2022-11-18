@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(blueprint_variable_base_decomposition_edward25519) {
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 3; 
+    constexpr std::size_t SelectorColumns = 3;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
@@ -65,24 +65,21 @@ BOOST_AUTO_TEST_CASE(blueprint_variable_base_decomposition_edward25519) {
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using component_type = zk::components::reduction<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0,0,0,0,0,0,0,1};
-    std::array<var, 8> input_state_var = {var(0, 0, false, var::column_type::public_input),
-                                          var(0, 1, false, var::column_type::public_input),
-                                          var(0, 2, false, var::column_type::public_input),
-                                          var(0, 3, false, var::column_type::public_input),
-                                          var(0, 4, false, var::column_type::public_input),
-                                          var(0, 5, false, var::column_type::public_input),
-                                          var(0, 6, false, var::column_type::public_input),
-                                          var(0, 7, false, var::column_type::public_input)};
+    std::vector<typename BlueprintFieldType::value_type> public_input = {0, 0, 0, 0, 0, 0, 0, 1};
+    std::array<var, 8> input_state_var = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+        var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input),
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+        var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
     typename component_type::params_type params = {input_state_var};
 
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {
-        std::cout<<assignment.var_value(real_res.output).data<<std::endl;
+        std::cout << assignment.var_value(real_res.output).data << std::endl;
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

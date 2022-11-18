@@ -89,11 +89,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<BlueprintFieldType>;
 
-                    using multiplication_component =
-                        zk::components::multiplication<ArithmetizationType,
-                                                                       0,
-                                                                       1,
-                                                                       2>;
+                    using multiplication_component = zk::components::multiplication<ArithmetizationType, 0, 1, 2>;
 
                     using unified_addition_component =
                         zk::components::curve_element_unified_addition<ArithmetizationType,
@@ -119,7 +115,8 @@ namespace nil {
                                  (typename BlueprintFieldType::value_type(3)).inversed())
                                     .data));
                     constexpr static const std::size_t selector_seed = 0x0f02;
-                    constexpr static const std::size_t rows_amount = 33 + multiplication_component::rows_amount + unified_addition_component::rows_amount * 2;
+                    constexpr static const std::size_t rows_amount =
+                        33 + multiplication_component::rows_amount + unified_addition_component::rows_amount * 2;
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct params_type {
@@ -148,7 +145,8 @@ namespace nil {
                         std::size_t j = start_row_index;
                         typename multiplication_component::params_type multiplication_params = {
                             params.T.x, var(W0, j + 1, false, var::column_type::constant)};
-                        auto mul_res = multiplication_component::generate_assignments(assignment, multiplication_params, j);
+                        auto mul_res =
+                            multiplication_component::generate_assignments(assignment, multiplication_params, j);
                         j++;
 
                         typename unified_addition_component::params_type addition_params = {
@@ -156,8 +154,8 @@ namespace nil {
                         auto add_res = unified_addition_component::generate_assignments(assignment, addition_params, j);
                         j++;
 
-                        typename unified_addition_component::params_type double_params = {
-                            {add_res.X, add_res.Y}, {add_res.X, add_res.Y}};
+                        typename unified_addition_component::params_type double_params = {{add_res.X, add_res.Y},
+                                                                                          {add_res.X, add_res.Y}};
                         unified_addition_component::generate_assignments(assignment, double_params, j);
                         j++;
 
@@ -177,10 +175,11 @@ namespace nil {
                         std::array<bool, 128> bits = {false};
                         {
                             nil::marshalling::status_type status;
-                            std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                            std::array<bool, 255> bits_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
                             std::copy(bits_all.end() - 128, bits_all.end(), bits.begin());
-                        }                        
-                        
+                        }
+
                         typename ArithmetizationType::field_type::value_type n = 0;
                         typename ArithmetizationType::field_type::value_type n_next = 0;
                         typename ArithmetizationType::field_type::value_type s1 = 0;
@@ -272,10 +271,9 @@ namespace nil {
                         typename unified_addition_component::result_type add_res(addition_params, j);
                         j++;
 
-                        typename unified_addition_component::params_type double_params = {
-                            {add_res.X, add_res.Y}, {add_res.X, add_res.Y}};
-                        zk::components::generate_circuit<unified_addition_component>(
-                            bp, assignment, double_params, j);
+                        typename unified_addition_component::params_type double_params = {{add_res.X, add_res.Y},
+                                                                                          {add_res.X, add_res.Y}};
+                        zk::components::generate_circuit<unified_addition_component>(bp, assignment, double_params, j);
                         j++;
 
                         assignment.enable_selector(first_selector_index, j, j + 31);
@@ -343,16 +341,14 @@ namespace nil {
                         typename unified_addition_component::result_type add_res(addition_params, j);
                         j++;
 
-                        typename unified_addition_component::params_type double_params = {
-                            {add_res.X, add_res.Y}, {add_res.X, add_res.Y}};
+                        typename unified_addition_component::params_type double_params = {{add_res.X, add_res.Y},
+                                                                                          {add_res.X, add_res.Y}};
                         typename unified_addition_component::result_type double_res(double_params, j);
                         j++;
-
 
                         bp.add_copy_constraint({{W4, (std::int32_t)(j), false}, double_res.X});
                         bp.add_copy_constraint({{W5, (std::int32_t)(j), false}, double_res.Y});
 
- 
                         for (int z = 0; z < 31; z++) {
                             bp.add_copy_constraint(
                                 {{W0, (std::int32_t)(j + z), false}, {W0, (std::int32_t)(j + z + 1), false}});
@@ -360,18 +356,19 @@ namespace nil {
                                 {{W1, (std::int32_t)(j + z), false}, {W1, (std::int32_t)(j + z + 1), false}});
                         }
                         bp.add_copy_constraint(
-                            {{W6, (std::int32_t)(j + 0), false}, {0, (std::int32_t)(start_row_index + 1), false, var::column_type::constant}});
+                            {{W6, (std::int32_t)(j + 0), false},
+                             {0, (std::int32_t)(start_row_index + 1), false, var::column_type::constant}});
 
                         // TODO link to params.b
 
                         bp.add_copy_constraint({{W6, (std::int32_t)(j + 32), false}, params.b});
                     }
 
-                    static void
-                    generate_assignments_constant(blueprint<ArithmetizationType> &bp,
-                                                blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                const params_type &params,
-                                                std::size_t component_start_row) {
+                    static void generate_assignments_constant(
+                        blueprint<ArithmetizationType> &bp,
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
+                        const params_type &params,
+                        std::size_t component_start_row) {
                         std::size_t row = component_start_row;
 
                         assignment.constant(0)[row] = ArithmetizationType::field_type::value_type::zero();

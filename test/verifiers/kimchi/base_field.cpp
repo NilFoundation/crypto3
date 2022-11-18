@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         {witness_comm}, lookup_runtime_comm,   table_comm, {lookup_sorted_comm}, lookup_agg_comm, z_comm,
         t_comm,         {oracles_poly_comm[0]}    // to-do: get in the component from oracles
     };
-    /*zk::components::kimchi_transcript<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    /*zk::components::kimchi_transcript_fq<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                         11, 12, 13, 14> transcript;*/
     proof_type proof_var = {/*transcript, */ commitments, o_var, {scalars_var}};
     verifier_index_type verifier_index = {
@@ -298,6 +298,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         {lagrange_bases_var},
         {{sigma_comm}, {coefficient_comm}, generic_comm, psm_comm, {selectors_comm}, {lookup_selectors_comm},
         psm_comm, // runtime_tables_selector 
+        {psm_comm}, // table
         psm_comm, // complete_add
         psm_comm, // var_base_mmul
         psm_comm, // endo_mul

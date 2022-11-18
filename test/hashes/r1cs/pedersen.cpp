@@ -35,6 +35,8 @@
 #include <nil/blueprint/components/algebra/curves/montgomery/element_g1.hpp>
 #include <nil/blueprint/components/algebra/curves/twisted_edwards/element_g1.hpp>
 #include <nil/blueprint/components/hashes/pedersen.hpp>
+#include <nil/blueprint/blueprint/r1cs/circuit.hpp>
+#include <nil/blueprint/blueprint/r1cs/assignment.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
@@ -52,8 +54,8 @@ void test_blueprint_variable_vector_component_constructor(const std::vector<bool
     using field_type = typename HashComponent::field_type;
 
     // input as blueprint_variable_vector
-    components::blueprint<field_type> bp, bp_manual;
-    components::blueprint_variable_vector<field_type> scalar, scalar_manual;
+    blueprint<field_type> bp, bp_manual;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> scalar, scalar_manual;
     scalar.allocate(bp, in_bits.size());
     scalar.fill_with_bits(bp, in_bits);
     scalar_manual.allocate(bp_manual, in_bits.size());
@@ -86,7 +88,7 @@ void test_block_variable_component_constructor(const std::vector<bool> &in_bits,
     using field_type = typename HashComponent::field_type;
 
     // input as block_variable
-    components::blueprint<field_type> bp, bp_manual;
+    blueprint<field_type> bp, bp_manual;
     components::block_variable<field_type> in_block(bp, in_bits.size()), in_block_manual(bp_manual, in_bits.size());
     in_block.generate_assignments(in_bits);
     in_block_manual.generate_assignments(in_bits);
@@ -115,7 +117,7 @@ void test_block_variables_component_constructor(const std::vector<bool> &in_bits
     using field_type = typename HashComponent::field_type;
 
     // input as container of block_variable
-    components::blueprint<field_type> bp, bp_manual;
+    blueprint<field_type> bp, bp_manual;
     std::size_t half_size = in_bits.size() / 2;
     components::block_variable<field_type> in_block_left(bp, half_size), in_block_right(bp, in_bits.size() - half_size),
         in_block_manual_left(bp_manual, half_size), in_block_manual_right(bp_manual, in_bits.size() - half_size);
@@ -160,8 +162,8 @@ void test_blueprint_variable_vector_component_constructor(const std::vector<bool
     using field_type = typename HashComponent::field_type;
 
     // input as blueprint_variable_vector
-    components::blueprint<field_type> bp_bits, bp_bits_manual;
-    components::blueprint_variable_vector<field_type> scalar_bits, scalar_bits_manual;
+    blueprint<field_type> bp_bits, bp_bits_manual;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> scalar_bits, scalar_bits_manual;
     scalar_bits.allocate(bp_bits, in_bits.size());
     scalar_bits.fill_with_bits(bp_bits, in_bits);
     scalar_bits_manual.allocate(bp_bits_manual, in_bits.size());
@@ -193,7 +195,7 @@ void test_digest_variable_component_constructor(const std::vector<bool> &in_bits
     using field_type = typename HashComponent::field_type;
 
     // input as digest_variable
-    components::blueprint<field_type> bp_bits, bp_bits_manual;
+    blueprint<field_type> bp_bits, bp_bits_manual;
     components::digest_variable<field_type> in_block(bp_bits, in_bits.size()),
         in_block_manual(bp_bits_manual, in_bits.size());
     in_block.generate_assignments(in_bits);
@@ -222,7 +224,7 @@ void test_digest_variables_component_constructor(const std::vector<bool> &in_bit
     using field_type = typename HashComponent::field_type;
 
     // input as container of block_variable
-    components::blueprint<field_type> bp_bits, bp_bits_manual;
+    blueprint<field_type> bp_bits, bp_bits_manual;
     std::size_t half_size = in_bits.size() / 2;
     components::digest_variable<field_type> in_block_left(bp_bits, half_size),
         in_block_right(bp_bits, in_bits.size() - half_size), in_block_manual_left(bp_bits_manual, half_size),

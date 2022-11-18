@@ -56,15 +56,13 @@ namespace nil {
                     var omega;
                 };
 
-                template<typename CurveType,
-                    typename KimchiParamsType>
+                template<typename CurveType, typename KimchiParamsType>
                 struct kimchi_verifier_index_base {
                     using FieldType = typename CurveType::base_field_type;
                     using commitment_params_type = typename KimchiParamsType::commitment_params_type;
 
-                    using commitment_type = typename 
-                        zk::components::kimchi_commitment_type<FieldType, 
-                            commitment_params_type::shifted_commitment_split>;
+                    using commitment_type = typename zk::components::kimchi_commitment_type<
+                        FieldType, commitment_params_type::shifted_commitment_split>;
 
                     using var = snark::plonk_variable<FieldType>;
                     using var_ec_point = typename zk::components::var_ec_point<FieldType>;
@@ -73,15 +71,14 @@ namespace nil {
                     static constexpr const std::size_t range_check_size = 2;
 
                     struct commitments_type {
-                        std::array<commitment_type,
-                            KimchiParamsType::permut_size> sigma;
-                        std::array<commitment_type,
-                            KimchiParamsType::witness_columns> coefficient;
+                        std::array<commitment_type, KimchiParamsType::permut_size> sigma;
+                        std::array<commitment_type, KimchiParamsType::witness_columns> coefficient;
                         commitment_type generic;
                         commitment_type psm;
                         std::vector<commitment_type> selectors;
                         std::vector<commitment_type> lookup_selectors;
                         commitment_type runtime_tables_selector;
+                        std::vector<commitment_type> lookup_table;
                         commitment_type complete_add;
                         commitment_type var_base_mul;
                         commitment_type endo_mul;

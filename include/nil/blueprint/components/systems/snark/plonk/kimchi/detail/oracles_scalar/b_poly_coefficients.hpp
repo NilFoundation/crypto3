@@ -45,47 +45,17 @@ namespace nil {
                 // Coefficients of univariate polynomial
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/poly-commitment/src/commitment.rs#L251
                 // Input: challenges
-                // Output: f = [c0, c1, ...], where f = (1 + challenges[-1] * X)(1 + challenges[-2] * X^2)(1 + challenges[-3] * X^4)...
-                template<typename ArithmetizationType, std::size_t EvalRounds, 
-                    std::size_t... WireIndexes>
+                // Output: f = [c0, c1, ...], where f = (1 + challenges[-1] * X)(1 + challenges[-2] * X^2)(1 +
+                // challenges[-3] * X^4)...
+                template<typename ArithmetizationType, std::size_t EvalRounds, std::size_t... WireIndexes>
                 class b_poly_coefficients;
 
-                template<typename BlueprintFieldType, 
-                         typename ArithmetizationParams,
-                         std::size_t EvalRounds,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2,
-                         std::size_t W3,
-                         std::size_t W4,
-                         std::size_t W5,
-                         std::size_t W6,
-                         std::size_t W7,
-                         std::size_t W8,
-                         std::size_t W9,
-                         std::size_t W10,
-                         std::size_t W11,
-                         std::size_t W12,
-                         std::size_t W13,
-                         std::size_t W14>
-                class b_poly_coefficients<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    EvalRounds,
-                    W0,
-                    W1,
-                    W2,
-                    W3,
-                    W4,
-                    W5,
-                    W6,
-                    W7,
-                    W8,
-                    W9,
-                    W10,
-                    W11,
-                    W12,
-                    W13,
-                    W14> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t EvalRounds,
+                         std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
+                         std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
+                         std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
+                class b_poly_coefficients<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                                          EvalRounds, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
@@ -111,7 +81,8 @@ namespace nil {
                         std::array<var, polynomial_len> output;
                     };
 
-                    static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
+                    static result_type
+                        generate_circuit(blueprint<ArithmetizationType> &bp,
                                          blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                          const params_type &params,
                                          const std::size_t start_row_index) {
@@ -125,13 +96,13 @@ namespace nil {
 
                         for (std::size_t i = 1; i < polynomial_len; i++) {
                             std::size_t shift = i == pow ? 1 : 0;
-                            k  += shift;
+                            k += shift;
                             pow <<= shift;
                             output[i] = zk::components::generate_circuit<mul_component>(
-                                bp, assignment, 
-                                {output[i - (pow >> 1)], params.challenges[EvalRounds - 1 - (k - 1)]}, 
-                                row).output;
-                            row += mul_component::rows_amount;                 
+                                            bp, assignment,
+                                            {output[i - (pow >> 1)], params.challenges[EvalRounds - 1 - (k - 1)]}, row)
+                                            .output;
+                            row += mul_component::rows_amount;
                         }
 
                         result_type res;
@@ -152,13 +123,14 @@ namespace nil {
 
                         for (std::size_t i = 1; i < polynomial_len; i++) {
                             std::size_t shift = i == pow ? 1 : 0;
-                            k  += shift;
+                            k += shift;
                             pow <<= shift;
                             output[i] = mul_component::generate_assignments(
-                                assignment, 
-                                {output[i - (pow >> 1)], params.challenges[EvalRounds - 1 - (k - 1)]}, 
-                                row).output;
-                            row += mul_component::rows_amount;                 
+                                            assignment,
+                                            {output[i - (pow >> 1)], params.challenges[EvalRounds - 1 - (k - 1)]},
+                                            row)
+                                            .output;
+                            row += mul_component::rows_amount;
                         }
 
                         result_type res;

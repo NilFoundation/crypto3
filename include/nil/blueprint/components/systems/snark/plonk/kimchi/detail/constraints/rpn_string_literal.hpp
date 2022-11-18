@@ -25,8 +25,6 @@
 #ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_DETAIL_CONSTRAINTS_RPN_STRING_LITERAL_HPP
 #define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_KIMCHI_DETAIL_CONSTRAINTS_RPN_STRING_LITERAL_HPP
 
-#include <boost/test/unit_test.hpp>
-
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>

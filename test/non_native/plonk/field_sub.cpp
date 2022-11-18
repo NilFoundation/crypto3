@@ -65,9 +65,11 @@ void test_field_sub(std::vector<typename BlueprintFieldType::value_type> public_
     using component_type = blueprint::components::subtraction<ArithmetizationType,
         typename crypto3::algebra::fields::curve25519_base_field, 9>;
 
-    std::array<var, 4> input_var_a = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> input_var_a = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
-    std::array<var, 4> input_var_b = {var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+    std::array<var, 4> input_var_b = {
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
     typename component_type::input_type instance_input = {input_var_a, input_var_b};

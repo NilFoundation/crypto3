@@ -47,9 +47,9 @@ void print_field_element(std::ostream &os, const typename fields::detail::elemen
 
 template<typename Curve, typename BasePoints>
 void test_curves_g1_fixed_base_mul_zcash_component(
-    components::blueprint<typename Curve::base_field_type> &bp,
+    blueprint<typename Curve::base_field_type> &bp,
     const BasePoints &all_basepoints,
-    components::blueprint_variable_vector<typename Curve::base_field_type> &in_bits,
+    nil::crypto3::zk::detail::blueprint_variable_vector<typename Curve::base_field_type> &in_bits,
     const typename Curve::template g1_type<curves::coordinates::affine, curves::forms::twisted_edwards>::value_type
         &expected) {
     using curve_type = Curve;
@@ -86,7 +86,7 @@ void test_curves_g1_fixed_base_mul_zcash_component(
 }
 
 template<typename Curve, typename BasePoints>
-static void test_curves_g1_fixed_base_mul_zcash_component(
+void test_curves_g1_fixed_base_mul_zcash_component(
     const BasePoints &all_basepoints,
     const std::vector<bool> &bits,
     const typename Curve::template g1_type<curves::coordinates::affine, curves::forms::twisted_edwards>::value_type
@@ -95,8 +95,8 @@ static void test_curves_g1_fixed_base_mul_zcash_component(
     using fixed_base_mul_zcash_component = components::fixed_base_mul_zcash<curve_type>;
     using field_type = typename fixed_base_mul_zcash_component::field_type;
 
-    components::blueprint<field_type> bp;
-    components::blueprint_variable_vector<field_type> scalar;
+    blueprint<field_type> bp;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> scalar;
     scalar.allocate(bp, bits.size());
     scalar.fill_with_bits(bp, bits);
 
@@ -104,7 +104,7 @@ static void test_curves_g1_fixed_base_mul_zcash_component(
 }
 
 template<typename Curve, typename BasePoints>
-static void test_curves_g1_fixed_base_mul_zcash_component(
+void test_curves_g1_fixed_base_mul_zcash_component(
     const BasePoints &all_basepoints,
     const typename Curve::base_field_type::value_type &s,
     std::size_t size,
@@ -116,8 +116,8 @@ static void test_curves_g1_fixed_base_mul_zcash_component(
     using fixed_base_mul_zcash_component = components::fixed_base_mul_zcash<curve_type>;
     using field_type = typename fixed_base_mul_zcash_component::field_type;
 
-    components::blueprint<field_type> bp;
-    components::blueprint_variable_vector<field_type> scalar;
+    blueprint<field_type> bp;
+    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> scalar;
     scalar.allocate(bp, size);
     scalar.fill_with_bits_of_field_element(bp, s);
 

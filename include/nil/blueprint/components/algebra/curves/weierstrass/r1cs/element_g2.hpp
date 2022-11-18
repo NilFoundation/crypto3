@@ -62,7 +62,7 @@ namespace nil {
                     std::shared_ptr<typename component_policy::Fqe_variable_type> X;
                     std::shared_ptr<typename component_policy::Fqe_variable_type> Y;
 
-                    blueprint_linear_combination_vector<field_type> all_vars;
+                    ::nil::crypto3::zk::detail::blueprint_linear_combination_vector<field_type> all_vars;
 
                     element_g2(blueprint<field_type> &bp) : component<field_type>(bp) {
                         X.reset(new typename component_policy::Fqe_variable_type(bp));

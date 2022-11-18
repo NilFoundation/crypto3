@@ -100,8 +100,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multi_scalar_mul) {
 
     auto result_check = [&sum](AssignmentType &assignment, 
         component_type::result_type &real_res) {
-        assert(sum.X == assignment.var_value(real_res.sum.X));
-        assert(sum.Y == assignment.var_value(real_res.sum.Y));
+        assert(sum.X == assignment.var_value(real_res.output.X));
+        assert(sum.Y == assignment.var_value(real_res.output.Y));
     };
 
     test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, 

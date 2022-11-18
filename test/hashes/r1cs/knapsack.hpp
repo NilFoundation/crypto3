@@ -33,7 +33,9 @@
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 
-#include <nil/blueprint/components/hashes/knapsack/knapsack_component.hpp>
+#include <nil/blueprint/components/hashes/knapsack/r1cs/knapsack_component.hpp>
+#include <nil/blueprint/blueprint/r1cs/circuit.hpp>
+#include <nil/blueprint/blueprint/r1cs/assignment.hpp>
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::zk;

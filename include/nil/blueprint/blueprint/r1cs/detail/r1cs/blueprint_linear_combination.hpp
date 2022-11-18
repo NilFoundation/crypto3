@@ -32,8 +32,7 @@
 #include <nil/crypto3/multiprecision/integer.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/variable.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/linear_combination.hpp>
+#include <nil/crypto3/zk/math/linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -41,7 +40,7 @@ namespace nil {
 
             template<typename ArithmetizationType, std::size_t... BlueprintParams>
             class blueprint;
-                
+
             namespace detail {
 
                 template<typename ArithmetizationType>
@@ -56,7 +55,6 @@ namespace nil {
                     typedef typename field_type::value_type field_value_type;
 
                 public:
-
                     using index_type = std::size_t;
                     bool is_variable;
                     index_type index;
@@ -68,10 +66,10 @@ namespace nil {
                     blueprint_linear_combination(const blueprint_variable<ArithmetizationType> &var) {
                         this->is_variable = true;
                         this->index = var.index;
-                        this->terms.emplace_back(snark::linear_term<field_type>(var));
+                        this->terms.emplace_back(math::linear_term<field_type>(var));
                     }
 
-                    void assign(blueprint<ArithmetizationType> &bp, const snark::linear_combination<field_type> &lc) {
+                    void assign(blueprint<ArithmetizationType> &bp, const math::linear_combination<field_type> &lc) {
                         assert(this->is_variable == false);
                         this->index = bp.allocate_lc_index();
                         this->terms = lc.terms;
@@ -154,8 +152,9 @@ namespace nil {
                             this->emplace_back(blueprint_linear_combination<ArithmetizationType>(v));
                     };
                     blueprint_linear_combination_vector(std::size_t count) : contents(count) {};
-                    blueprint_linear_combination_vector(std::size_t count,
-                                                        const blueprint_linear_combination<ArithmetizationType> &value) :
+                    blueprint_linear_combination_vector(
+                        std::size_t count,
+                        const blueprint_linear_combination<ArithmetizationType> &value) :
                         contents(count, value) {};
                     blueprint_linear_combination_vector(typename contents::const_iterator first,
                                                         typename contents::const_iterator last) :
@@ -189,7 +188,8 @@ namespace nil {
                         this->fill_with_bits_of_field_element(bp, field_value_type(i));
                     }
 
-                    void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp, const field_value_type &r) const {
+                    void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp,
+                                                         const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             bp.lc_val((*this)[i]) = multiprecision::bit_test(r.data, i) ? field_value_type::one() :
                                                                                           field_value_type::zero();
@@ -229,10 +229,10 @@ namespace nil {
                 };
 
                 template<typename ArithmetizationType, typename FieldType>
-                snark::linear_combination<FieldType>
+                math::linear_combination<FieldType>
                     blueprint_sum(const blueprint_linear_combination_vector<ArithmetizationType> &v) {
 
-                    snark::linear_combination<FieldType> result;
+                    math::linear_combination<FieldType> result;
                     for (auto &term : v) {
                         result = result + term;
                     }
@@ -241,12 +241,12 @@ namespace nil {
                 }
 
                 template<typename ArithmetizationType, typename FieldType>
-                snark::linear_combination<FieldType>
+                math::linear_combination<FieldType>
                     blueprint_packing_sum(const blueprint_linear_combination_vector<ArithmetizationType> &v) {
 
                     typename FieldType::value_type twoi =
                         FieldType::value_type::one();    // will hold 2^i entering each iteration
-                    std::vector<crypto3::zk::snark::linear_term<FieldType>> all_terms;
+                    std::vector<math::linear_term<FieldType>> all_terms;
                     for (auto &lc : v) {
                         for (auto &term : lc.terms) {
                             all_terms.emplace_back(twoi * term);
@@ -254,16 +254,16 @@ namespace nil {
                         twoi += twoi;
                     }
 
-                    return snark::linear_combination<FieldType>(all_terms);
+                    return math::linear_combination<FieldType>(all_terms);
                 }
 
                 template<typename ArithmetizationType, typename FieldType>
-                snark::linear_combination<FieldType>
+                math::linear_combination<FieldType>
                     blueprint_coeff_sum(const blueprint_linear_combination_vector<ArithmetizationType> &v,
                                         const std::vector<typename FieldType::value_type> &coeffs) {
 
                     assert(v.size() == coeffs.size());
-                    std::vector<crypto3::zk::snark::linear_term<FieldType>> all_terms;
+                    std::vector<math::linear_term<FieldType>> all_terms;
 
                     auto coeff_it = coeffs.begin();
                     for (auto &lc : v) {
@@ -273,7 +273,7 @@ namespace nil {
                         ++coeff_it;
                     }
 
-                    return snark::linear_combination<FieldType>(all_terms);
+                    return math::linear_combination<FieldType>(all_terms);
                 }
             }    // namespace detail
         }        // namespace blueprint

@@ -77,7 +77,8 @@ namespace nil {
 
                     /// Auto allocation of the result.
                     /// Take in_bits as blueprint_variable_vector.
-                    pedersen_to_point(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits) :
+                    pedersen_to_point(blueprint<field_type> &bp,
+                                      const detail::blueprint_variable_vector<field_type> &in_bits) :
                         component<field_type>(bp),
                         m_commitment(bp, get_base_points(commitment_component::basepoints_required(in_bits.size())),
                                      in_bits),
@@ -106,7 +107,7 @@ namespace nil {
                             bool>::type = true>
                     pedersen_to_point(blueprint<field_type> &bp, const Blocks &in_blocks) :
                         pedersen_to_point(bp, [&]() {
-                            blueprint_variable_vector<field_type> in_bits;
+                            detail::blueprint_variable_vector<field_type> in_bits;
                             for (const auto &in_block : in_blocks) {
                                 in_bits.insert(std::end(in_bits), std::cbegin(in_block.bits), std::cend(in_block.bits));
                             }
@@ -124,7 +125,7 @@ namespace nil {
                             bool>::type = true>
                     pedersen_to_point(blueprint<field_type> &bp, const Digests &in_digests) :
                         pedersen_to_point(bp, [&]() {
-                            blueprint_variable_vector<field_type> in_bits;
+                            detail::blueprint_variable_vector<field_type> in_bits;
                             for (const auto &in_digest : in_digests) {
                                 in_bits.insert(std::end(in_bits), std::cbegin(in_digest.bits),
                                                std::cend(in_digest.bits));
@@ -135,7 +136,8 @@ namespace nil {
 
                     /// Manual allocation of the result
                     /// Take in_bits as blueprint_variable_vector.
-                    pedersen_to_point(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits,
+                    pedersen_to_point(blueprint<field_type> &bp,
+                                      const detail::blueprint_variable_vector<field_type> &in_bits,
                                       const result_type &in_result) :
                         component<field_type>(bp),
                         m_commitment(bp, get_base_points(commitment_component::basepoints_required(in_bits.size())),
@@ -170,7 +172,7 @@ namespace nil {
                         pedersen_to_point(
                             bp,
                             [&]() {
-                                blueprint_variable_vector<field_type> in_bits;
+                                detail::blueprint_variable_vector<field_type> in_bits;
                                 for (const auto &in_block : in_blocks) {
                                     in_bits.insert(std::end(in_bits), std::cbegin(in_block.bits),
                                                    std::cend(in_block.bits));
@@ -193,7 +195,7 @@ namespace nil {
                         pedersen_to_point(
                             bp,
                             [&]() {
-                                blueprint_variable_vector<field_type> in_bits;
+                                detail::blueprint_variable_vector<field_type> in_bits;
                                 for (const auto &in_digest : in_digests) {
                                     in_bits.insert(std::end(in_bits), std::cbegin(in_digest.bits),
                                                    std::cend(in_digest.bits));
@@ -237,7 +239,7 @@ namespace nil {
 
                     /// Auto allocation of the result.
                     /// Take in_bits as blueprint_variable_vector.
-                    pedersen(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits) :
+                    pedersen(blueprint<field_type> &bp, const detail::blueprint_variable_vector<field_type> &in_bits) :
                         component<field_type>(bp), hasher(bp, in_bits), to_bits_converter(bp, hasher.result),
                         result(bp, digest_bits, to_bits_converter.result, 0) {
                         assert(this->result.digest_size == digest_bits);
@@ -265,7 +267,7 @@ namespace nil {
                             bool>::type = true>
                     pedersen(blueprint<field_type> &bp, const Blocks &in_blocks) :
                         pedersen(bp, [&]() {
-                            blueprint_variable_vector<field_type> in_bits;
+                            detail::blueprint_variable_vector<field_type> in_bits;
                             for (const auto &in_block : in_blocks) {
                                 in_bits.insert(std::end(in_bits), std::cbegin(in_block.bits), std::cend(in_block.bits));
                             }
@@ -283,7 +285,7 @@ namespace nil {
                             bool>::type = true>
                     pedersen(blueprint<field_type> &bp, const Digests &in_digests) :
                         pedersen(bp, [&]() {
-                            blueprint_variable_vector<field_type> in_bits;
+                            detail::blueprint_variable_vector<field_type> in_bits;
                             for (const auto &in_digest : in_digests) {
                                 in_bits.insert(std::end(in_bits), std::cbegin(in_digest.bits),
                                                std::cend(in_digest.bits));
@@ -294,7 +296,7 @@ namespace nil {
 
                     /// Manual allocation of the result.
                     /// Take in_bits as blueprint_variable_vector.
-                    pedersen(blueprint<field_type> &bp, const blueprint_variable_vector<field_type> &in_bits,
+                    pedersen(blueprint<field_type> &bp, const detail::blueprint_variable_vector<field_type> &in_bits,
                              const result_type &in_result) :
                         component<field_type>(bp),
                         hasher(bp, in_bits), to_bits_converter(bp, hasher.result, in_result.bits), result(in_result) {
@@ -327,7 +329,7 @@ namespace nil {
                         pedersen(
                             bp,
                             [&]() {
-                                blueprint_variable_vector<field_type> in_bits;
+                                detail::blueprint_variable_vector<field_type> in_bits;
                                 for (const auto &in_block : in_blocks) {
                                     in_bits.insert(std::end(in_bits), std::cbegin(in_block.bits),
                                                    std::cend(in_block.bits));
@@ -349,7 +351,7 @@ namespace nil {
                         pedersen(
                             bp,
                             [&]() {
-                                blueprint_variable_vector<field_type> in_bits;
+                                detail::blueprint_variable_vector<field_type> in_bits;
                                 for (const auto &in_digest : in_digests) {
                                     in_bits.insert(std::end(in_bits), std::cbegin(in_digest.bits),
                                                    std::cend(in_digest.bits));
@@ -400,7 +402,7 @@ namespace nil {
                     /// Auto allocation of the result
                     /// Take in_bits as blueprint_variable_vector.
                     pedersen_commitment_to_point(blueprint<field_type> &bp,
-                                                 const blueprint_variable_vector<field_type> &in_bits) :
+                                                 const detail::blueprint_variable_vector<field_type> &in_bits) :
                         component<field_type>(bp),
                         // public field
                         result(bp),
@@ -411,7 +413,7 @@ namespace nil {
                     /// Manual allocation of the result
                     /// Take in_bits as blueprint_variable_vector.
                     pedersen_commitment_to_point(blueprint<field_type> &bp,
-                                                 const blueprint_variable_vector<field_type> &in_bits,
+                                                 const detail::blueprint_variable_vector<field_type> &in_bits,
                                                  const result_type &result) :
                         component<field_type>(bp),
                         // public field
@@ -459,7 +461,7 @@ namespace nil {
                     /// Auto allocation of the result
                     /// Take in_bits as blueprint_variable_vector.
                     pedersen_commitment(blueprint<field_type> &bp,
-                                        const blueprint_variable_vector<field_type> &in_bits) :
+                                        const detail::blueprint_variable_vector<field_type> &in_bits) :
                         component<field_type>(bp),
                         // private fields
                         commiter(bp, in_bits), to_bits_converter(bp, commiter.result),
@@ -470,7 +472,7 @@ namespace nil {
                     /// Manual allocation of the result
                     /// Take in_bits as blueprint_variable_vector.
                     pedersen_commitment(blueprint<field_type> &bp,
-                                        const blueprint_variable_vector<field_type> &in_bits,
+                                        const detail::blueprint_variable_vector<field_type> &in_bits,
                                         const result_type &result) :
                         component<field_type>(bp),
                         // private fields

@@ -43,6 +43,7 @@
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/kimchi_commitment_params.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/binding.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/proof_system/circuit_description.hpp>
+
 #include "verifiers/kimchi/index_terms_instances/ec_index_terms.hpp"
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/types/verifier_index.hpp>
 

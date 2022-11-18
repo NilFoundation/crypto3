@@ -61,7 +61,8 @@ void test_field_range(std::vector<typename BlueprintFieldType::value_type> publi
     using component_type = blueprint::components::range<ArithmetizationType,
         typename crypto3::algebra::fields::curve25519_base_field, 9>;
 
-    std::array<var, 4> input_var = {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+    std::array<var, 4> input_var = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
 
     typename component_type::input_type instance_input = {input_var};
