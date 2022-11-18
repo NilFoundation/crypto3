@@ -46,12 +46,13 @@ namespace nil {
 
             // Input: x, y \in Fp
             // Output: z = x / y, if y != 0, else 0 z \in F_p
-            template<typename ArithmetizationType, std::int32_t WitnessAmount>
+            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount>
             class division_or_zero;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            class division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 4>:
+            class division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, 4>:
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     4,0,0> {
 
@@ -75,8 +76,7 @@ namespace nil {
                 struct result_type {
                     var output = var(0, 0, false);
                     result_type(
-                        const division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                            WitnessAmount> &component, std::uint32_t start_row_index) {
+                        const division_or_zero &component, std::uint32_t start_row_index) {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 
@@ -108,7 +108,8 @@ namespace nil {
                      typename ArithmetizationParams,
                      std::int32_t WitnessAmount>
             using plonk_division_or_zero =
-                division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
+                division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, WitnessAmount>;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>

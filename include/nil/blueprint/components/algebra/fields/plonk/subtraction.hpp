@@ -45,12 +45,13 @@ namespace nil {
 
             // Input: x, y \in F_p
             // Output: z = x - y, z \in F_p
-            template<typename ArithmetizationType, std::int32_t WitnessAmount>
+            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount>
             class subtraction;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            class subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>:
+            class subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, 3>:
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     3,0,0> {
 
@@ -74,8 +75,7 @@ namespace nil {
                 struct result_type {
                     var output = var(0, 0, false);
                     result_type(
-                        const subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                            WitnessAmount> &component, std::uint32_t start_row_index) {
+                        const subtraction &component, std::uint32_t start_row_index) {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 
@@ -107,7 +107,8 @@ namespace nil {
                      typename ArithmetizationParams,
                      std::int32_t WitnessAmount>
             using plonk_subtraction =
-                subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
+                subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, WitnessAmount>;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>

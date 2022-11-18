@@ -74,8 +74,7 @@ namespace nil {
                 struct result_type {
                     var output = var(0, 0, false);
                     result_type(
-                        const addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                            WitnessAmount> &component, std::uint32_t start_row_index) {
+                        const addition &component, std::uint32_t start_row_index) {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 
@@ -107,7 +106,8 @@ namespace nil {
                      typename ArithmetizationParams,
                      std::int32_t WitnessAmount>
             using plonk_native_addition =
-                addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
+                addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, WitnessAmount>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type

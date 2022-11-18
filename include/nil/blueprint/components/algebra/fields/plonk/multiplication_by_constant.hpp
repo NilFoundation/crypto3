@@ -45,12 +45,13 @@ namespace nil {
 
             // Input: x, c \in F_p, c is fixed public parameter
             // Output: z = c * y, z \in F_p
-            template<typename ArithmetizationType, std::int32_t WitnessAmount>
+            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount>
             class mul_by_constant;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            class mul_by_constant<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 2>:
+            class mul_by_constant<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, 2>:
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     2,0,0> {
 
@@ -74,8 +75,7 @@ namespace nil {
                 struct result_type {
                     var output = var(0, 0, false);
                     result_type(
-                        const mul_by_constant<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                            WitnessAmount> &component, std::uint32_t start_row_index) {
+                        const mul_by_constant &component, std::uint32_t start_row_index) {
                         output = var(component.W(1), start_row_index, false, var::column_type::witness);
                     }
 
@@ -107,7 +107,8 @@ namespace nil {
                      typename ArithmetizationParams,
                      std::int32_t WitnessAmount>
             using plonk_mul_by_constant =
-                mul_by_constant<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
+                mul_by_constant<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, WitnessAmount>;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>

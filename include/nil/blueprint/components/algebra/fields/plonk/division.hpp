@@ -45,12 +45,13 @@ namespace nil {
 
             // Input: x, y \in F_p, y != 0
             // Output: z = x / y, z \in F_p
-            template<typename ArithmetizationType, std::int32_t WitnessAmount>
+            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount>
             class division;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            class division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 4>:
+            class division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, 4>:
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     4,0,0> {
 
@@ -74,8 +75,7 @@ namespace nil {
                 struct result_type {
                     var output = var(0, 0, false);
                     result_type(
-                        const division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                            WitnessAmount> &component, std::uint32_t start_row_index) {
+                        const division &component, std::uint32_t start_row_index) {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 
@@ -107,7 +107,8 @@ namespace nil {
                      typename ArithmetizationParams,
                      std::int32_t WitnessAmount>
             using plonk_division =
-                division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount>;
+                division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                BlueprintFieldType, WitnessAmount>;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
