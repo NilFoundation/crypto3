@@ -44,31 +44,26 @@
 
 #include "../../test_plonk_component.hpp"
 
-using namespace nil::crypto3;
+using namespace nil;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
-
-BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
-
-    using curve_type = crypto3::algebra::curves::pallas;
+template <typename BlueprintFieldType>
+void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_input){
     using ed25519_type = crypto3::algebra::curves::curve25519;
-    using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams =
-        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
-    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type =
-        zk::components::non_native_field_element_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2,
-                                                                3, 4, 5, 6, 7, 8>;
+    using component_type = blueprint::components::multiplication<ArithmetizationType,
+        typename crypto3::algebra::fields::curve25519_base_field, 9>;
 
     std::array<var, 4> input_var_a = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
@@ -77,23 +72,24 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication) {
         var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
         var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
 
-    typename component_type::params_type params = {input_var_a, input_var_b};
+    typename component_type::input_type instance_input = {input_var_a, input_var_b};
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {
-        0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255,
-        0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255};
-    // std::vector<typename BlueprintFieldType::value_type> public_input = {1, 0, 0, 0, 1, 0, 0, 0};
-
-    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {
-        std::cout << "multiplication ress : " << assignment.var_value(real_res.output[0]).data << " "
-                  << assignment.var_value(real_res.output[1]).data << " "
-                  << assignment.var_value(real_res.output[2]).data << " "
-                  << assignment.var_value(real_res.output[3]).data << " " << std::endl;
+    auto result_check = [](AssignmentType &assignment, 
+        typename component_type::result_type &real_res) {
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
-                                                                                                 result_check);
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
+}
+
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_multiplication_test0) {
+    test_field_mul<typename crypto3::algebra::curves::pallas::base_field_type>(
+        {0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255,
+        0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
