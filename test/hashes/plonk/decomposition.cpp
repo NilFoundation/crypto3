@@ -40,40 +40,47 @@
 
 #include "test_plonk_component.hpp"
 
-using namespace nil::crypto3;
+using namespace nil;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition) {
-    using curve_type = algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::scalar_field_type;
+template <typename BlueprintFieldType>
+void test_decomposition(std::vector<typename BlueprintFieldType::value_type> public_input){
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
     using ArithmetizationParams =
-        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
-    using component_type = zk::components::decomposition<ArithmetizationType, curve_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type = blueprint::components::decomposition<ArithmetizationType,
+        BlueprintFieldType, 9>;
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {0x8d741211e928fdd4d33a13970d0ce7f3_cppui255,
-                                                                         0x92f209334030f9ec8fa8a025e987a5dd_cppui255};
     std::array<var, 2> input_state_var = {var(0, 0, false, var::column_type::public_input),
                                           var(0, 1, false, var::column_type::public_input)};
 
-    typename component_type::params_type params = {input_state_var};
+    typename component_type::input_type instance_input = {input_state_var};
 
-    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
+    auto result_check = [](AssignmentType &assignment, 
+        typename component_type::result_type &real_res) {
+    };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        params, public_input, result_check);
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
+
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
+}
+
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_test0) {
+    test_decomposition<typename crypto3::algebra::curves::pallas::base_field_type>(
+        {0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

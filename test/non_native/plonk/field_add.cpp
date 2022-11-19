@@ -63,7 +63,7 @@ void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
     using component_type = blueprint::components::addition<ArithmetizationType,
-        typename crypto3::algebra::fields::curve25519_base_field, 9>;
+        BlueprintFieldType, 9>;
 
     std::array<var, 4> input_var_a = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),

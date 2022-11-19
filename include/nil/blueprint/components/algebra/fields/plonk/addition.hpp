@@ -62,9 +62,9 @@ namespace nil {
 
             public:
 
-                const std::size_t gates_amount = 1;
-
                 using var = typename component_type::var;
+
+                const std::size_t gates_amount = 1;
 
                 struct input_type {
                     var x = var(0, 0, false);
@@ -73,13 +73,12 @@ namespace nil {
 
                 struct result_type {
                     var output = var(0, 0, false);
-                    result_type(
-                        const addition &component, std::uint32_t start_row_index) {
+                    result_type(const addition &component, std::uint32_t start_row_index) {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 
                     result_type(std::size_t start_row_index) {
-                        output = var(this->W(2), start_row_index, false, var::column_type::witness);
+                        output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
                 };
 
