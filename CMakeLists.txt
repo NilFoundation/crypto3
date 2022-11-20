@@ -59,27 +59,48 @@ if(UNIX AND BUILD_WITH_CCACHE)
     endif(CCACHE_FOUND)
 endif()
 
-option(CRYPTO3_BLOCK_AES "Build with AES block encryption support" TRUE)
-option(CRYPTO3_BLOCK_ARIA "Build with ARIA block encryption support" TRUE)
-option(CRYPTO3_BLOCK_BLOWFISH "Build with Blowfish block encryption support" TRUE)
-option(CRYPTO3_BLOCK_CAMELLIA "Build with Camellia block encryption support" TRUE)
-option(CRYPTO3_BLOCK_CAST "Build with Cast block encryption support" TRUE)
-option(CRYPTO3_BLOCK_DES "Build with DES block encryption support" TRUE)
-option(CRYPTO3_BLOCK_GOST_28147_89 "Build with GOST.28147.89 block encryption support" TRUE)
-option(CRYPTO3_BLOCK_IDEA "Build with IDEA block encryption support" TRUE)
-option(CRYPTO3_BLOCK_KASUMI "Build with Kasumi block encryption support" TRUE)
-option(CRYPTO3_BLOCK_MD4 "Build with MD4 block encryption support" TRUE)
-option(CRYPTO3_BLOCK_MD5 "Build with MD5 block encryption support" TRUE)
-option(CRYPTO3_BLOCK_MISTY1 "Build with Misty1 block encryption support" TRUE)
-option(CRYPTO3_BLOCK_NOEKEON "Build with Noekeon block encryption support" TRUE)
-option(CRYPTO3_BLOCK_NOEKEON_SIMD "Build with Noekeon block encryption throught SMID instruction set support" TRUE)
-option(CRYPTO3_BLOCK_SEED "Build with Seed block encryption support" TRUE)
-option(CRYPTO3_BLOCK_SERPENT "Build with Serpent block encryption support" TRUE)
-option(CRYPTO3_BLOCK_SHACAL2 "Build with Shacal2 block encryption support" TRUE)
-option(CRYPTO3_BLOCK_SM4 "Build with SM4 block encryption support" TRUE)
-option(CRYPTO3_BLOCK_TWOFISH "Build with Twofish block encryption support" TRUE)
-option(CRYPTO3_BLOCK_THREEFISH "Build with Threefish block encryption support" TRUE)
-option(CRYPTO3_BLOCK_XTEA "Build with XTEA block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_AES
+       "Build with AES block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_ARIA
+       "Build with ARIA block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_BLOWFISH
+       "Build with Blowfish block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_CAMELLIA
+       "Build with Camellia block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_CAST
+       "Build with Cast block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_DES
+       "Build with DES block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_GOST_28147_89
+       "Build with GOST.28147.89 block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_IDEA
+       "Build with IDEA block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_KASUMI
+       "Build with Kasumi block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MD4
+       "Build with MD4 block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MD5
+       "Build with MD5 block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MISTY1
+       "Build with Misty1 block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_NOEKEON
+       "Build with Noekeon block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_NOEKEON_SIMD
+       "Build with Noekeon block encryption through SMID instruction set support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SEED
+       "Build with Seed block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SERPENT
+       "Build with Serpent block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SHACAL2
+       "Build with Shacal2 block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SM4
+       "Build with SM4 block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_TWOFISH
+       "Build with Twofish block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_THREEFISH
+       "Build with Threefish block encryption support" TRUE)
+option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_XTEA
+       "Build with XTEA block encryption support" TRUE)
 
 set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
 
@@ -119,7 +140,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
-if(CRYPTO3_BLOCK_AES)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_AES)
     list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
          include/nil/crypto3/block/rijndael.hpp
          include/nil/crypto3/block/detail/rijndael/rijndael_functions.hpp
@@ -153,7 +174,7 @@ if(CRYPTO3_BLOCK_AES)
          ${${CURRENT_PROJECT_NAME}_RIJNDAEL_SOURCES})
 endif()
 
-if(CRYPTO3_BLOCK_ARIA)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_ARIA)
     list(APPEND ${CURRENT_PROJECT_NAME}_ARIA_HEADERS
          include/nil/crypto3/block/aria.hpp
          include/nil/crypto3/block/detail/aria/aria_functions.hpp
@@ -172,7 +193,7 @@ if(CRYPTO3_BLOCK_ARIA)
          )
 endif()
 
-if(CRYPTO3_BLOCK_BLOWFISH)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_BLOWFISH)
     list(APPEND ${CURRENT_PROJECT_NAME}_BLOWFISH_HEADERS
          include/nil/crypto3/block/blowfish.hpp
          include/nil/crypto3/block/detail/blowfish/blowfish_functions.hpp
@@ -189,7 +210,7 @@ if(CRYPTO3_BLOCK_BLOWFISH)
          )
 endif()
 
-if(CRYPTO3_BLOCK_CAMELLIA)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_CAMELLIA)
     list(APPEND ${CURRENT_PROJECT_NAME}_CAMELLIA_HEADERS
          include/nil/crypto3/block/camellia.hpp
          include/nil/crypto3/block/detail/camellia/camellia_functions.hpp
@@ -206,7 +227,7 @@ if(CRYPTO3_BLOCK_CAMELLIA)
          )
 endif()
 
-if(CRYPTO3_BLOCK_CAST128)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_CAST128)
     list(APPEND ${CURRENT_PROJECT_NAME}_CAST_PUBLIC_HEADERS
          include/nil/crypto3/block/cast.hpp
          include/nil/crypto3/block/detail/cast/cast_functions.hpp
@@ -228,7 +249,7 @@ if(CRYPTO3_BLOCK_CAST128)
          )
 endif()
 
-if(CRYPTO3_BLOCK_DES)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_DES)
     list(APPEND ${CURRENT_PROJECT_NAME}_DES_HEADERS
          include/nil/crypto3/block/des.hpp
          include/nil/crypto3/block/detail/des/des_functions.hpp
@@ -245,7 +266,7 @@ if(CRYPTO3_BLOCK_DES)
          )
 endif()
 
-if(CRYPTO3_BLOCK_GOST_28147_89)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_GOST_28147_89)
     list(APPEND ${CURRENT_PROJECT_NAME}_GOST_28147_89_HEADERS
          include/nil/crypto3/block/gost28147.hpp
          include/nil/crypto3/block/detail/gost_28147_89/gost_28147_89_functions.hpp
@@ -262,7 +283,7 @@ if(CRYPTO3_BLOCK_GOST_28147_89)
          )
 endif()
 
-if(CRYPTO3_BLOCK_IDEA)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_IDEA)
     list(APPEND ${CURRENT_PROJECT_NAME}_IDEA_HEADERS
          include/nil/crypto3/block/idea.hpp
          include/nil/crypto3/block/detail/idea/idea_functions.hpp
@@ -278,7 +299,7 @@ if(CRYPTO3_BLOCK_IDEA)
          )
 endif()
 
-if(CRYPTO3_BLOCK_KASUMI)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_KASUMI)
     list(APPEND ${CURRENT_PROJECT_NAME}_KASUMI_HEADERS
          include/nil/crypto3/block/kasumi.hpp
          include/nil/crypto3/block/detail/kasumi/kasumi_functions.hpp
@@ -294,7 +315,7 @@ if(CRYPTO3_BLOCK_KASUMI)
          )
 endif()
 
-if(CRYPTO3_BLOCK_MISTY1)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MISTY1)
     list(APPEND ${CURRENT_PROJECT_NAME}_MISTY1_HEADERS
          include/nil/crypto3/block/misty1.hpp
          include/nil/crypto3/block/detail/misty1/misty1_functions.hpp
@@ -310,7 +331,7 @@ if(CRYPTO3_BLOCK_MISTY1)
          )
 endif()
 
-if(CRYPTO3_BLOCK_MD4)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MD4)
     list(APPEND ${CURRENT_PROJECT_NAME}_MD4_HEADERS
          include/nil/crypto3/block/md4.hpp
          )
@@ -321,7 +342,7 @@ if(CRYPTO3_BLOCK_MD4)
          )
 endif()
 
-if(CRYPTO3_BLOCK_MD5)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MD5)
     list(APPEND ${CURRENT_PROJECT_NAME}_MD5_HEADERS
          include/nil/crypto3/block/md5.hpp
          )
@@ -332,7 +353,7 @@ if(CRYPTO3_BLOCK_MD5)
          )
 endif()
 
-if(CRYPTO3_BLOCK_NOEKEON)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_NOEKEON)
     list(APPEND ${CURRENT_PROJECT_NAME}_NOEKEON_HEADERS
          include/nil/crypto3/block/noekeon.hpp
          include/nil/crypto3/block/detail/noekeon/noekeon_functions.hpp
@@ -348,7 +369,7 @@ if(CRYPTO3_BLOCK_NOEKEON)
          )
 endif()
 
-if(CRYPTO3_BLOCK_SEED)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SEED)
     list(APPEND ${CURRENT_PROJECT_NAME}_SEED_HEADERS
          include/nil/crypto3/block/seed.hpp
          include/nil/crypto3/block/detail/seed/seed_functions.hpp
@@ -364,7 +385,7 @@ if(CRYPTO3_BLOCK_SEED)
          )
 endif()
 
-if(CRYPTO3_BLOCK_SERPENT)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SERPENT)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_SERPENT_HEADERS
          include/nil/crypto3/block/serpent.hpp
          include/nil/crypto3/block/detail/serpent/serpent_policy.hpp
@@ -383,7 +404,7 @@ if(CRYPTO3_BLOCK_SERPENT)
          ${${CURRENT_PROJECT_NAME}_SERPENT_SOURCES})
 endif()
 
-if(CRYPTO3_BLOCK_SHACAL2)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SHACAL2)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_SHACAL2_HEADERS
          include/nil/crypto3/block/basic_shacal.hpp
          include/nil/crypto3/block/shacal.hpp
@@ -404,7 +425,7 @@ if(CRYPTO3_BLOCK_SHACAL2)
          ${${CURRENT_PROJECT_NAME}_SHACAL2_SOURCES})
 endif()
 
-if(CRYPTO3_BLOCK_SM4)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SM4)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_SM4_HEADERS
          include/nil/crypto3/block/detail/sm4/sm4_functions.hpp
          include/nil/crypto3/block/detail/sm4/sm4_policy.hpp
@@ -418,7 +439,7 @@ if(CRYPTO3_BLOCK_SM4)
          ${${CURRENT_PROJECT_NAME}_SM4_SOURCES})
 endif()
 
-if(CRYPTO3_BLOCK_THREEFISH)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_THREEFISH)
     list(APPEND ${CURRENT_PROJECT_NAME}_THREEFISH_HEADERS
          include/nil/crypto3/block/threefish.hpp
          include/nil/crypto3/block/detail/threefish/threefish_policy.hpp)
@@ -432,7 +453,7 @@ if(CRYPTO3_BLOCK_THREEFISH)
          ${${CURRENT_PROJECT_NAME}_THREEFISH_SOURCES})
 endif()
 
-if(CRYPTO3_BLOCK_TWOFISH)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_TWOFISH)
     list(APPEND ${CURRENT_PROJECT_NAME}_TWOFISH_HEADERS
          include/nil/crypto3/block/twofish.hpp
          include/nil/crypto3/block/detail/twofish/basic_twofish_policy.hpp
@@ -446,7 +467,7 @@ if(CRYPTO3_BLOCK_TWOFISH)
          ${${CURRENT_PROJECT_NAME}_TWOFISH_SOURCES})
 endif()
 
-if(CRYPTO3_BLOCK_XTEA)
+if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_XTEA)
     list(APPEND ${CURRENT_PROJECT_NAME}_XTEA_HEADERS
          include/nil/crypto3/block/xtea.hpp
          include/nil/crypto3/block/detail/xtea/xtea_functions.hpp
