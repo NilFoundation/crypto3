@@ -65,9 +65,11 @@ void test_sha256(std::vector<typename BlueprintFieldType::value_type> public_inp
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
 
     typename component_type::input_type instance_input = {input_state_var};
-    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
+    auto result_check = [](AssignmentType &assignment, 
+        typename component_type::result_type &real_res) {
+    };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);

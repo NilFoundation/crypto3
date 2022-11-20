@@ -62,7 +62,7 @@ namespace nil {
                 using var = typename component_type::var;
 
                 constexpr static const std::size_t rows_amount = 3;
-                const std::size_t gates_amount = 3;
+                const std::size_t gates_amount = 1;
 
                 struct input_type {
                     std::array<var, 2> data;
