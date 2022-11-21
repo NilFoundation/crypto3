@@ -49,8 +49,8 @@
 
 using namespace nil::crypto3;
 
-template <typename CurveType>
-void test_fold_polynomial(){
+template<typename CurveType>
+void test_fold_polynomial() {
 
     using FieldType = typename CurveType::base_field_type;
 
@@ -59,7 +59,7 @@ void test_fold_polynomial(){
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
     std::size_t d_log = boost::static_log2<d>::value;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = 
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(d_log, 1);
 
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
@@ -69,7 +69,8 @@ void test_fold_polynomial(){
     typename FieldType::value_type x_next = q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
 
-    math::polynomial<typename FieldType::value_type> f_next = zk::commitments::detail::fold_polynomial<FieldType>(f, alpha);
+    math::polynomial<typename FieldType::value_type> f_next =
+        zk::commitments::detail::fold_polynomial<FieldType>(f, alpha);
 
     BOOST_CHECK_EQUAL(f_next.degree(), f.degree() / 2);
     std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
@@ -83,8 +84,8 @@ void test_fold_polynomial(){
     BOOST_CHECK(x1 == x2);
 }
 
-template <typename CurveType>
-void test_fold_polynomial_dfs(){
+template<typename CurveType>
+void test_fold_polynomial_dfs() {
     using FieldType = typename CurveType::base_field_type;
 
     constexpr static const std::size_t d = 4;
@@ -92,7 +93,7 @@ void test_fold_polynomial_dfs(){
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
     std::size_t d_log = boost::static_log2<d>::value;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D = 
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(d_log, 2);
 
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};

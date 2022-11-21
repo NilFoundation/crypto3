@@ -35,8 +35,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType,
-                         typename ArithmetizationParams,
+                template<typename FieldType, typename ArithmetizationParams,
                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
                          typename TranscriptHashType = hashes::keccak_1600<512>, std::size_t Lambda = 40,
                          std::size_t R = 1, std::size_t M = 2>
@@ -45,29 +44,31 @@ namespace nil {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
 
-                    constexpr static const std::size_t witness_columns =
-                        ArithmetizationParams::WitnessColumns;
-                    constexpr static const std::size_t public_input_columns =
-                        ArithmetizationParams::PublicInputColumns;
-                    constexpr static const std::size_t constant_columns =
-                        ArithmetizationParams::ConstantColumns;
-                    constexpr static const std::size_t selector_columns =
-                        ArithmetizationParams::SelectorColumns;
+                    constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
+                    constexpr static const std::size_t public_input_columns = ArithmetizationParams::public_input_columns;
+                    constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
+                    constexpr static const std::size_t selector_columns = ArithmetizationParams::selector_columns;
 
                     using arithmetization_params = ArithmetizationParams;
 
                     constexpr static const typename FieldType::value_type delta =
                         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
-                    typedef typename commitments::fri<FieldType, MerkleTreeHashType,
-                        TranscriptHashType, M, 1>::params_type commitment_params_type;
-                    
-                    typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, 
-                            TranscriptHashType, Lambda, R, M>
-                            batched_commitment_params_type;
+                    typedef
+                        typename commitments::fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, 1>::params_type
+                            commitment_params_type;
 
+                    typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType,
+                                                                           Lambda, R, M>
+                        batched_commitment_params_type;
+
+                    using fixed_values_commitment_scheme_type =
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, constant_columns + selector_columns + 2, false>;
+                
                     using runtime_size_commitment_scheme_type =
                         commitments::batched_lpc<FieldType, batched_commitment_params_type, 0, false>;
+                    using variable_values_commitment_scheme_type =
+                        commitments::batched_lpc<FieldType, batched_commitment_params_type, witness_columns + public_input_columns, false>;
                     using witness_commitment_scheme_type =
                         commitments::batched_lpc<FieldType, batched_commitment_params_type, witness_columns, true>;
                     using public_input_commitment_scheme_type =

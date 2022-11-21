@@ -38,12 +38,12 @@ namespace nil {
 
                         field_value_type tau;
                         field_value_type alpha;
-                        field_value_type beta;                    
+                        field_value_type beta;
                     };
-                } // detail
-            }   // commitments
-        }   // zk
-    }   // crypto3
-}   // nil
+                }    // namespace detail
+            }        // namespace commitments
+        }            // namespace zk
+    }                // namespace crypto3
+}    // namespace nil
 
-#endif  // CRYPTO3_ZK_POWERS_OF_TAU_PRIVATE_KEY_HPP
+#endif    // CRYPTO3_ZK_POWERS_OF_TAU_PRIVATE_KEY_HPP

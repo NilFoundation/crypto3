@@ -31,26 +31,24 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<std::size_t _WitnessColumns, std::size_t _PublicInputColumns,
-                    std::size_t _ConstantColumns, std::size_t _SelectorColumns>
+                template<std::size_t WitnessColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns,
+                         std::size_t SelectorColumns>
                 struct plonk_arithmetization_params {
-                    constexpr static const std::size_t WitnessColumns = _WitnessColumns;
-                    constexpr static const std::size_t PublicInputColumns = _PublicInputColumns;
-                    constexpr static const std::size_t ConstantColumns = _ConstantColumns;
-                    constexpr static const std::size_t SelectorColumns = _SelectorColumns;
+                    constexpr static const std::size_t witness_columns = WitnessColumns;
+                    constexpr static const std::size_t public_input_columns = PublicInputColumns;
+                    constexpr static const std::size_t constant_columns = ConstantColumns;
+                    constexpr static const std::size_t selector_columns = SelectorColumns;
 
-                    constexpr static const std::size_t PrivateColumns = WitnessColumns;
-                    constexpr static const std::size_t PublicColumns = PublicInputColumns +
-                        ConstantColumns + SelectorColumns;
+                    constexpr static const std::size_t private_columns = witness_columns;
+                    constexpr static const std::size_t public_columns =
+                        public_input_columns + constant_columns + selector_columns;
 
-                    constexpr static const std::size_t TotalColumns = PrivateColumns +
-                        PublicColumns;
+                    constexpr static const std::size_t total_columns = private_columns + public_columns;
                 };
 
 #ifdef ZK_RUNTIME_CIRCUIT_DEFINITION
 
-                struct plonk_arithmetization_params {
-                };
+                struct plonk_arithmetization_params { };
 #endif
             }    // namespace snark
         }        // namespace zk

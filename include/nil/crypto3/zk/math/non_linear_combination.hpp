@@ -73,6 +73,9 @@ namespace nil {
                 non_linear_term(std::vector<VariableType> vars) : vars(vars), coeff(assignment_type::one()) {
                 }
 
+                non_linear_term(std::vector<VariableType> vars, assignment_type coeff) : vars(vars), coeff(coeff) {
+                }
+
                 non_linear_term operator*(const assignment_type &field_coeff) const {
                     non_linear_term result(this->vars);
                     result.coeff = field_coeff * this->coeff;

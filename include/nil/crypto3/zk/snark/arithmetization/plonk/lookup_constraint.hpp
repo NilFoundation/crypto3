@@ -41,7 +41,7 @@ namespace nil {
                     using field_type = FieldType;
                     using variable_type = VariableType;
                     using non_linear_term = math::non_linear_term<VariableType>;
-                    
+
                     std::vector<math::non_linear_term<VariableType>> lookup_input;
                     std::vector<VariableType> lookup_value;
                 };
