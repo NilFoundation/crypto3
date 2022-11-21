@@ -36,7 +36,6 @@
       * [ciphers](modules/cpp/block/manual/ciphers.md)
     * [implementation](modules/cpp/block/implementation.md)
     * [concepts](modules/cpp/block/concepts.md)
-    *
     * [usage](modules/cpp/block/usage.md)
   * [Blueprint](modules/cpp/blueprint/README.md)
     * [concepts](modules/cpp/blueprint/concepts.md)
@@ -112,7 +111,7 @@
 ## ZK
 
 * [zkLLVM](zk/zkllvm.md)
-* [Proof Market Pipeline](zkllvm/proof-pipeline.md)
+* [Proof Market Pipeline](zk/proof-market-pipeline.md)
 
 ## Misc
 

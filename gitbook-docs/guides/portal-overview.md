@@ -4,11 +4,11 @@ description: Navigating crypto3 documentation portal
 
 # Portal Overview
 
-## Guides
+## [Guides](portal-overview.md#guides)
 
 Under guides users can find step by step walk-through of setting up environment, scaffold projects or integrate Crypto3 library in the projects.
 
-## Modules
+## [Modules](portal-overview.md#modules)
 
 {% hint style="info" %}
 Crypto3 is written in C++. Bindings for other languages will be supported in the future.
@@ -16,7 +16,7 @@ Crypto3 is written in C++. Bindings for other languages will be supported in the
 
 Module descriptions/manuals are compartmentalised by programming language
 
-### C++
+### [C++](portal-overview.md#c++)
 
 Under the language , user can find the modules which are implemented by the library. Under each , the user can expect to find the following pages.
 
@@ -24,17 +24,17 @@ Under the language , user can find the modules which are implemented by the libr
 * **Concepts :** Describes in abstract terms the traits and policies which types are using.
 * **References :** doxygen generated documentation.
 
-Optional guides:&#x20;
+Optional guides:
 
 * **Implementation**: Describes the architecture of the underlying implementation.
 * **Extension** : Describes how to extend the library
 
 This guide is not designed to use in isolation and should be used in conjunction with the doxygen generated documentation. The aim of this guide is to introduce the user to major concepts and examples of the usage of the library.
 
-## Examples
+## [Examples](portal-overview.md#examples)
 
 This section will present some working examples of code combining different modules of the crypto3 suite.
 
-## Misc
+## [Misc](portal-overview.md#misc)
 
 This section covers other miscellaneous guidelines/information regarding contributing to the suite, code of conduct , feedback and contact details for collaboration.
