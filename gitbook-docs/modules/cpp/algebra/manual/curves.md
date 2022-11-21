@@ -44,43 +44,54 @@ using curve_bls_381 = curves::bls12_381; // As an existing typedef
 using curve_bls_377 = curves::bls12<377> // Explicityly passing variant
 ```
 
-Curves encompass one or more `field` types definitions (via `typedef` )which respect the curve specific constants and domain. Curves are generally used along with the [pubkey](https://github.com/NilFoundation/crypto3-pubkey) library which enables a user to create public/private keys and perform cryptographic operations.
+Curves encompass one or more `field elements` types definitions (via `typedef` )which respect the curve specific constants and domain. Curves are generally used along with the [pubkey](https://github.com/NilFoundation/crypto3-pubkey) library which enables a user to create public/private keys and perform cryptographic operations.
 
 ### Example #1&#x20;
 
-The class below describes a BLS curve which accepts a template parameter for variants. &#x20;
+Some curves support additional transformations for co-ordinates ex : babyjubjub supports transformation from `twisted_edwards` to `montgomery`
 
 ```cpp
-template<std::size_t Version>
-class bls12 {
+#include <nil/crypto3/algebra/curves/babyjubjub.hpp>
 
-	typedef detail::bls12_types<Version> policy_type;
+using namespace nil::crypto3::algebra;
+using namespace nil::crypto3::algebra::fields;
+using namespace nil::crypto3::multiprecision;
 
-public:
-	typedef typename policy_type::base_field_type base_field_type;
-	typedef typename policy_type::scalar_field_type scalar_field_type;
+//Define curve policy - type & co-ordinates
+using policy_type = curves::babyjubjub::g1_type<curves::coordinates::affine, curves::forms::montgomery>;
 
-	template<typename Coordinates = coordinates::jacobian_with_a4_0,
-			 typename Form = forms::short_weierstrass>
-	using g1_type = typename detail::bls12_g1<Version, Form, Coordinates>;
+// Get underlying representation types from policy
+typedef typename policy_type::field_type::value_type field_value_type;
+typedef typename policy_type::value_type curve_element_type;
 
-	template<typename Coordinates = coordinates::jacobian_with_a4_0,
-			 typename Form = forms::short_weierstrass>
-	using g2_type = typename detail::bls12_g2<Version, Form, Coordinates>;
+int main() {
 
-	constexpr static const bool has_affine_pairing = false;
+    auto x_ = field_value_type(0x1);
+    auto y_ = field_value_type(0x2);
 
-	typedef typename policy_type::gt_field_type gt_type;
-};
+    auto p = curve_element_type (x_,y_);
 
-typedef bls12<381> bls12_381;
-typedef bls12<377> bls12_377;
+    p.to_affine();
 
+    //Convert to twisted edwards from montgomery
+    auto p_ed = p.to_twisted_edwards();
+
+    //Convert to montgomery from twisted edwards
+    auto p_mt = p_ed.to_montgomery();
+
+    return 0;
+}
 ```
 
 ### Example#2
+
+This example shows how a curve can be used in a cryptographic scheme , based on which a user can create public/private keys & sign message (see `pubkey`)
 
 ```cpp
 using curve_type = curves::bls12_381;
 using scheme_type = bls<bls_default_public_params<>, bls_mss_ro_version, bls_basic_scheme, curve_type>;
 ```
+
+
+
+Also see examples in [field elements ](field.md)section.

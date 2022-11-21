@@ -1,22 +1,32 @@
-# field
+---
+description: Crypto3.Field manual
+---
 
-`field` type is a generic type which is an extension of `boost::multiprecision` . It is optimised for arithmetic in the finite field.
+# field elements
+
+## Field
+
+`field` type is a generic type which is an extension of `boost::multiprecision`.&#x20;
 
 All fields implemented in algebra library conform to the concept of a field type. A field must conform to the field traits defined in `algebra/include/nil/crypto3/algebra/type_traits.hpp`
 
-Field is generally specialised per curve and it holds the domain and other curve specific constants.
+Field consists of a set of stateless policies and with the extension of `modular_adaptor` allows for finite field arithmetic. Field is generally extended per curve and it holds the domain and other curve specific constants.&#x20;
 
-## Usage
+If you wish to use elliptic curve related arithmetic , use __ `element_fp.`
 
-Fields are defined under the namespace `nil::crypto3::algebra::fields` and header need to be included ex: `nil/crypto3/algebra/fields/<curve>/scalar_field.hpp`
+If you wish to perform multiprecision airthmetic unrelated to curves see `crypto3::multiprecision`
 
-A field can be instantiated as
+### Usage
+
+Fields are defined under the namespace `nil::crypto3::algebra::fields` and header need to be included ex: `nil/crypto3/algebra/fields/field.hpp`
+
+A field can be instantiated as:
 
 ```cpp
 field<254> //254 - is the modulus Bits
 ```
 
-Specialised for curves as base fields and scalar fields are usually defined as
+Specialised for curves as `base` fields and `scalar` fields are usually defined as
 
 ```cpp
 //fields/secp/secp_k1
@@ -24,41 +34,56 @@ struct secp_k1_base_field<256> : public field<256>
 struct secp_k1_scalar_field<256> : public field<256>
 ```
 
-### Example#1
+#### Example#1
 
-Below we see a specialisation of a field type to a bls12\_base\_field.
+In this example , we see finite field element arithmetic performed on filed elements over`BLS12-381` curve.&#x20;
 
 ```cpp
-template<std::size_t Version>
-struct bls12_base_field;
+#include <iostream>
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 
-template<>
-struct bls12_base_field<381> : public field<381> {
-	typedef field<381> policy_type;
+using namespace nil::crypto3::algebra::fields;
+using namespace nil::crypto3::multiprecision;
 
-	constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-	typedef typename policy_type::integral_type integral_type;
+int main() {
+    auto f1 = bls12_fq<381>::value_type(0x1);
+    auto f2 = bls12_fq<381>::value_type(0x2);
 
-	typedef typename policy_type::extended_integral_type extended_integral_type;
+    //Addition
+    auto add  = f1 + f2;
 
-	constexpr static const std::size_t number_bits = policy_type::number_bits;
+    //Subtraction
+    auto sub = f1 - f2;
 
-	constexpr static const integral_type modulus =
-		0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAB_cppui381;
+    //Multiplication
+    auto mul  = f1 * f2;
 
-	typedef typename policy_type::modular_backend modular_backend;
-	constexpr static const modular_params_type modulus_params = modulus;
-	typedef nil::crypto3::multiprecision::number<
-		nil::crypto3::multiprecision::backends::modular_adaptor<
-			modular_backend,
-			nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
-		modular_type;
+    //Equality
+    if (f1 == f2){
+        std::cout<<"Equal field elements\n";
+    } else
+    {
+        std::cout<<"Inequality of field elements\n";
+    }
 
-	typedef typename detail::element_fp<params<bls12_base_field<381>>> value_type;
+    //Inverse
+    auto inv = f1.inversed();
 
-	constexpr static const std::size_t value_bits = modulus_bits;
-	constexpr static const std::size_t arity = 1;
-};
+    //negative
+    auto f1neg = -f1;
+
+    // Power
+    auto f1pow3 = f1.pow(3);
+
+    //Square (& square root)
+    auto f1sq = f1.squared().sqrt();
+
+    if (f1 == f1sq){
+        std::cout <<"Matching field elements\n";
+    }
+
+    return 0;
+}
 ```
 
 ## Field Extensions
@@ -74,7 +99,9 @@ Following field extensions are already built in and are used in the suite.
 
 Each of the above define a type trait which is then exhibited by specialisations.
 
-### Example#1
+### Usage
+
+#### Example#1
 
 ```cpp
 template<typename BaseField>
@@ -107,3 +134,4 @@ In the above BLS base field example we can see an `element_fp` type used which a
 ```cpp
 typedef typename detail::element_fp<params<bls12_base_field<381>>> value_type;
 ```
+

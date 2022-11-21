@@ -20,7 +20,7 @@
   * [Algebra](modules/cpp/algebra/README.md)
     * [manual](modules/cpp/algebra/manual/README.md)
       * [curves](modules/cpp/algebra/manual/curves.md)
-      * [field](modules/cpp/algebra/manual/field.md)
+      * [field elements](modules/cpp/algebra/manual/field.md)
       * [matrix/vectors](modules/cpp/algebra/manual/matrix.md)
       * [multi-exponentiation](modules/cpp/algebra/manual/multi-exponentiation.md)
       * [pairings](modules/cpp/algebra/manual/pairings.md)
@@ -32,10 +32,10 @@
       * [field](modules/cpp/algebra/concept/field.md)
       * [curves](modules/cpp/algebra/concept/curves.md)
   * [Block](modules/cpp/block/README.md)
-    * [manual](modules/cpp/block/manual.md)
+    * [manual](modules/cpp/block/manual/README.md)
+      * [ciphers](modules/cpp/block/manual/ciphers.md)
     * [implementation](modules/cpp/block/implementation.md)
     * [concepts](modules/cpp/block/concepts.md)
-    * [extension](modules/cpp/block/extension.md)
     *
     * [usage](modules/cpp/block/usage.md)
   * [Blueprint](modules/cpp/blueprint/README.md)
@@ -108,6 +108,11 @@
   * [BLS Signature](examples/examples/bls-signature.md)
   * [BLS Weighted Threshold signature](examples/examples/bls-weighted-threshold-signature.md)
   * [First zk Component](examples/examples/first-zk-component.md)
+
+## ZK
+
+* [zkLLVM](zk/zkllvm.md)
+* [Proof Market Pipeline](zkllvm/proof-pipeline.md)
 
 ## Misc
 

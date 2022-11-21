@@ -1,6 +1,6 @@
 # curves
 
-## Elliptic Curves Architecture <a href="#curves_architecture" id="curves_architecture"></a>
+## Elliptic Curves Architecture  <a href="#curves_architecture" id="curves_architecture"></a>
 
 Curves were build upon the `fields`. So it basically consist of several parts listed below:
 
@@ -8,9 +8,7 @@ Curves were build upon the `fields`. So it basically consist of several parts li
 2. Curve g1, g2 group element arithmetic
 3. Basic curve policies
 
-### ![](<../../../../.gitbook/assets/image (2).png>) <a href="#curve_policies" id="curve_policies"></a>
-
-### &#x20;<a href="#curve_policies" id="curve_policies"></a>
+![](<../../../../.gitbook/assets/image (3) (1).png>)
 
 ### Curve Policies <a href="#curve_policies" id="curve_policies"></a>
 
@@ -20,6 +18,6 @@ A curve policy describes its parameters such as base field modulus `p`, scalar f
 
 Curve element corresponds an point of the curve and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms are based on the underlying field algorithms are also defined here.
 
-### Basic Curve Policies <a href="#basic_curve_policies" id="basic_curve_policies"></a>
+### Basic Curve Policies  <a href="#basic_curve_policies" id="basic_curve_policies"></a>
 
 Main reason for existence of basic policy is is that we need some of it params using in group element and pairing arithmetic. So it contains such parameters that are needed by group element arithmetic e.g. coeffs `a` and `b` or generator coordinates `x`, `y`. It also contains all needed information about the underlying fields.
