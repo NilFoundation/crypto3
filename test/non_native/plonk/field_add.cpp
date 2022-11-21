@@ -48,7 +48,7 @@ using namespace nil;
 template <typename BlueprintFieldType>
 void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_input){
     
-    using ed25519_type = crypto3::algebra::curves::curve25519;
+    using ed25519_type = crypto3::algebra::curves::ed25519;
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
@@ -63,7 +63,7 @@ void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
     using component_type = blueprint::components::addition<ArithmetizationType,
-        BlueprintFieldType, 9>;
+        typename ed25519_type::base_field_type, 9>;
 
     std::array<var, 4> input_var_a = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
@@ -93,15 +93,17 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_addition_test0) {
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_addition_test1) {
 
-    using ed25519_type = crypto3::algebra::curves::curve25519;
+    using ed25519_type = crypto3::algebra::curves::ed25519;
 
-    ed25519_type::base_field_type::integral_type a = 
-        ed25519_type::base_field_type::integral_type(algebra::random_element<ed25519_type::base_field_type>().data);
-    ed25519_type::base_field_type::integral_type b = 
-        ed25519_type::base_field_type::integral_type(algebra::random_element<ed25519_type::base_field_type>().data);
+    typename ed25519_type::base_field_type::integral_type a = 
+        ed25519_type::base_field_type::integral_type(
+            crypto3::algebra::random_element<ed25519_type::base_field_type>().data);
+    typename ed25519_type::base_field_type::integral_type b = 
+        ed25519_type::base_field_type::integral_type(
+            crypto3::algebra::random_element<ed25519_type::base_field_type>().data);
 
-    ed25519_type::base_field_type::integral_type base = 1;
-    ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
+    typename ed25519_type::base_field_type::integral_type base = 1;
+    typename ed25519_type::base_field_type::integral_type mask = (base << 66) - 1;
 
     test_field_add<typename crypto3::algebra::curves::pallas::base_field_type>(
         {a & mask, (a >> 66) & mask, (a >> 132) & mask, (a >> 198) & mask,
