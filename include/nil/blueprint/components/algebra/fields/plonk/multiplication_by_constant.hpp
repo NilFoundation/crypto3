@@ -74,13 +74,12 @@ namespace nil {
 
                 struct result_type {
                     var output = var(0, 0, false);
-                    result_type(
-                        const mul_by_constant &component, std::uint32_t start_row_index) {
+                    result_type(const mul_by_constant &component, std::uint32_t start_row_index) {
                         output = var(component.W(1), start_row_index, false, var::column_type::witness);
                     }
 
-                    result_type(std::size_t start_row_index) {
-                        output = var(this->W(1), start_row_index, false, var::column_type::witness);
+                    result_type(const mul_by_constant &component, std::size_t start_row_index) {
+                        output = var(component.W(1), start_row_index, false, var::column_type::witness);
                     }
                 };
 

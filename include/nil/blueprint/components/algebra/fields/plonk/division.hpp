@@ -79,8 +79,8 @@ namespace nil {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 
-                    result_type(std::size_t start_row_index) {
-                        output = var(this->W(2), start_row_index, false, var::column_type::witness);
+                    result_type(const division &component, std::size_t start_row_index) {
+                        output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
                 };
 
