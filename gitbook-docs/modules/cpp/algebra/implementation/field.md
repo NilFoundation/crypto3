@@ -1,6 +1,6 @@
-# Field
+# field
 
-## Field Architecture  <a href="#fields_architecture" id="fields_architecture"></a>
+## Field Architecture <a href="#fields_architecture" id="fields_architecture"></a>
 
 Fields are a wrapper over `multiprecision` module and concept of `modular_adaptor` number. So it basically consist of several parts listed below:
 
@@ -9,9 +9,9 @@ Fields are a wrapper over `multiprecision` module and concept of `modular_adapto
 3. Field Parameters
 4. Field Element Algorithms, which are actually wrappers over the `multiprecision` operations.
 
-![](<../../../../.gitbook/assets/image (1) (1).png>)
+### ![](<../../../../.gitbook/assets/image (4).png>) <a href="#field_policies" id="field_policies"></a>
 
-### Field Policies  <a href="#field_policies" id="field_policies"></a>
+### Field Policies <a href="#field_policies" id="field_policies"></a>
 
 A field policy describes its essential parameters such as `modulus`, `arity` or `mul_generator` - multiply generator.
 
@@ -23,19 +23,19 @@ For example, this is the tower used for `bn128` and `bls12_381` operations and p
 
 Fp -> Fp2 -> Fp6 -> Fp12;
 
-![](<../../../../.gitbook/assets/image (5).png>)
+![](<../../../../.gitbook/assets/image (3).png>)
 
 There are also the following towers implemented:
 
 Fp -> Fp3 -> Fp6 -> Fp12;
 
-![](<../../../../.gitbook/assets/image (1).png>)
+![](../../../../.gitbook/assets/image.png)
 
 Fp -> Fp2 -> Fp4 -> Fp12;
 
-![](<../../../../.gitbook/assets/image (1) (2).png>)
+![](<../../../../.gitbook/assets/image (1).png>)
 
-### Field Parameters  <a href="#field_parameters" id="field_parameters"></a>
+### Field Parameters <a href="#field_parameters" id="field_parameters"></a>
 
 Other field parameters are kept in the specific structures. All this structures inherit from basic `params` structure, containing all the basic parameters.
 

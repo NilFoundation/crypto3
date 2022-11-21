@@ -8,9 +8,7 @@ Curves were build upon the `fields`. So it basically consist of several parts li
 2. Curve g1, g2 group element arithmetic
 3. Basic curve policies
 
-![](../../../../.gitbook/assets/image%20\(3\).png)
-
-### ![](../../../../.gitbook/assets/image.png) <a href="#curve_policies" id="curve_policies"></a>
+### ![](<../../../../.gitbook/assets/image (2).png>) <a href="#curve_policies" id="curve_policies"></a>
 
 ### &#x20;<a href="#curve_policies" id="curve_policies"></a>
 
