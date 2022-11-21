@@ -108,11 +108,6 @@
   * [BLS Weighted Threshold signature](examples/examples/bls-weighted-threshold-signature.md)
   * [First zk Component](examples/examples/first-zk-component.md)
 
-## ZK
-
-* [zkLLVM](zk/zkllvm.md)
-* [Proof Market Pipeline](zk/proof-market-pipeline.md)
-
 ## Misc
 
 * [Glossary](misc/glossary.md)
