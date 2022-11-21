@@ -66,10 +66,15 @@ jobs:
       fail-fast: false
       matrix:
         target: [
+            blueprint_hashes_plonk_sha256_test,
+            blueprint_hashes_plonk_decomposition_test,
             blueprint_hashes_plonk_sha256_process_test,
             blueprint_hashes_plonk_sha512_process_test,
-            blueprint_non_native_plonk_non_native_demo_test,
-            blueprint_non_native_plonk_non_native_range_test,
+            blueprint_hashes_plonk_poseidon_test,
+            blueprint_non_native_plonk_range_test,
+            blueprint_non_native_plonk_field_add_test,
+            blueprint_non_native_plonk_field_sub_test,
+            blueprint_non_native_plonk_field_mul_test,
             blueprint_non_native_plonk_fixed_base_mul_test,
             blueprint_non_native_plonk_complete_addition_test,
             blueprint_non_native_plonk_var_base_mul_per_bit_test,
@@ -82,7 +87,6 @@ jobs:
             blueprint_algebra_curves_plonk_unified_addition_test,
             blueprint_algebra_curves_plonk_endo_scalar_test,
             blueprint_algebra_curves_plonk_multi_scalar_multiplication_test,
-            blueprint_hashes_plonk_poseidon_test,
             blueprint_verifiers_kimchi_base_field_test,
             blueprint_verifiers_kimchi_prepare_batch_scalar_test,
             blueprint_verifiers_kimchi_verify_scalar_test,
