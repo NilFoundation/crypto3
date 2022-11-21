@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
 //
 // MIT License
@@ -37,6 +38,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/zk/math/non_linear_combination.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
