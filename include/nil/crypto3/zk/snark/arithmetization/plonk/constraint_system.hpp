@@ -52,18 +52,14 @@ namespace nil {
 
                 template<typename FieldType, typename ArithmetizationParams>
                 struct plonk_constraint_system {
-                    typedef plonk_gate<FieldType, plonk_constraint<FieldType>> gate_type;
-                    typedef plonk_copy_constraint<FieldType> copy_constraint_type;
-                    typedef plonk_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate_type;
-
-                    typedef std::vector<gate_type> gates_type;
-                    typedef std::vector<copy_constraint_type> copy_constraints_type;
-                    typedef std::vector<lookup_gate_type> lookup_gates_type;
+                    typedef std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates_container_type;
+                    typedef std::vector<plonk_copy_constraint<FieldType>> copy_constraints_container_type;
+                    typedef std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates_container_type;
 
                 protected:
-                    gates_type _gates;
-                    copy_constraints_type _copy_constraints;
-                    lookup_gates_type _lookup_gates;
+                    gates_container_type _gates;
+                    copy_constraints_container_type _copy_constraints;
+                    lookup_gates_container_type _lookup_gates;
 
                 public:
                     typedef FieldType field_type;
@@ -71,9 +67,9 @@ namespace nil {
                     plonk_constraint_system() {
                     }
 
-                    plonk_constraint_system(const gates_type &gates,
-                                            const copy_constraints_type &copy_constraints,
-                                            const lookup_gates_type &lookup_gates) :
+                    plonk_constraint_system(const gates_container_type &gates,
+                                            const copy_constraints_container_type &copy_constraints,
+                                            const lookup_gates_container_type &lookup_gates) :
                         _gates(gates),
                         _copy_constraints(copy_constraints), _lookup_gates(lookup_gates) {
                     }
@@ -95,15 +91,15 @@ namespace nil {
                     //     return true;
                     // }
 
-                    const gates_type &gates() const {
+                    const gates_container_type &gates() const {
                         return _gates;
                     }
 
-                    const copy_constraints_type &copy_constraints() const {
+                    const copy_constraints_container_type &copy_constraints() const {
                         return _copy_constraints;
                     }
 
-                    const lookup_gates_type &lookup_gates() const {
+                    const lookup_gates_container_type &lookup_gates() const {
                         return _lookup_gates;
                     }
                 };
