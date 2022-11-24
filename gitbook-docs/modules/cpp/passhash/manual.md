@@ -1,3 +1,2 @@
-# Manual # {#passhash_manual}
+# manual
 
-@tableofcontents

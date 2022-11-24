@@ -1,3 +1,3 @@
-# extension
+# Extension {#blueprint_extension_manual}
 
-Coming Soon!
+@tableofcontents

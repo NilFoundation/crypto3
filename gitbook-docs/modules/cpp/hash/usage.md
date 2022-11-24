@@ -1,12 +1,14 @@
-# usage
+# Usage {#hashes_usage_manual}
 
-
+@tableofcontents
 
 ## Quick Start
 
-The easiest way to use Crypto3.Hash library is to use an algorithm with implicit state usage. Following example hash byte sequence with MD5 hashes:
+The easiest way to use Crypto3.Hash library is to use an algorithm with implicit state usage. Following example hash
+byte sequence with MD5 hashes:
 
 ```cpp
+
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
@@ -23,6 +25,7 @@ int main(int argc, char *argv[]) {
 Similar technique is available for ranges:
 
 ```cpp
+
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
@@ -38,7 +41,8 @@ int main(int argc, char *argv[]) {
 
 ## Stateful hashing
 
-In case of accumulative hashes requirement is present, following example demonstrates \[accumulator]\(@ref accumulator\_set) usage:
+In case of accumulative hashes requirement is present, following example demonstrates
+[accumulator](@ref accumulator_set) usage:
 
 ```cpp
 #include <nil/crypto3/hash/md5.hpp>

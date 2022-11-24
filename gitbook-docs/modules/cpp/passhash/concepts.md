@@ -1,5 +1,5 @@
-# Concepts {#passhash_concepts}
+# concepts
 
-@tableofcontents
 
-## Password Hash Concept {#passhash_concept} 
+
+## Password Hash Concept <a href="#passhash_concept" id="passhash_concept"></a>

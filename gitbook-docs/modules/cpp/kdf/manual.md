@@ -1,3 +1,2 @@
-# Manual {#kdf_manual}
+# manual
 
-@tableofcontents

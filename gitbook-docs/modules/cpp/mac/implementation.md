@@ -1,3 +1,2 @@
-# Implementation {#mac_impl}
+# implementation
 
-@tableofcontents

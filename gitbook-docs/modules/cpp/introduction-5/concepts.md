@@ -1,3 +1,2 @@
-# Concepts # {#fft_concepts}
+# concepts
 
-@tableofcontents
