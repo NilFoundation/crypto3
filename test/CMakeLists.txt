@@ -66,6 +66,7 @@ set(NON_NATIVE_TESTS_FILES
     "non_native/plonk/signatures_verification"
     "non_native/plonk/ec_point"
     "non_native/plonk/bit_decomposition"
+    "non_native/plonk/scalar_non_native_range"
     )
 
 set(BLUEPRINT_TESTS_FILES
