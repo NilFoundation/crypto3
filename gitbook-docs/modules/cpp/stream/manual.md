@@ -1,3 +1,2 @@
-# Manual # {#stream_ciphers_manual}
+# manual
 
-@tableofcontents

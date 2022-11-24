@@ -1,5 +1,5 @@
-# Concepts # {#vdf_concepts}
+# concepts
 
-@tableofcontents
 
-## Verifiable Delay Function Concept ## {#vdf_concept}
+
+## Verifiable Delay Function Concept  <a href="#vdf_concept" id="vdf_concept"></a>

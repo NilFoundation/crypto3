@@ -1,2 +1,3 @@
-# manual
+# Manual # {#modes_manual}
 
+@tableofcontents

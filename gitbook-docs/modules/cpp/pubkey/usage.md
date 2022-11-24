@@ -1,14 +1,12 @@
-# Usage {#pubkey_usage_manual}
+# usage
 
-@tableofcontents
+
 
 ## Quick Start
 
-The easiest way to use Crypto3.Pubkey library is to use an algorithm with implicit state usage. Following example pubkey
-with BLS:
+The easiest way to use Crypto3.Pubkey library is to use an algorithm with implicit state usage. Following example pubkey with BLS:
 
 ```cpp
-
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
 #include <nil/crypto3/pubkey/algorithm/aggregate.hpp>
@@ -47,8 +45,7 @@ int main(int argc, const char * argv[]) {
 
 ## Stateful Processing
 
-In case of public-key scheme source data accumulation necessity is present, following example demonstrates
-[accumulator](@ref accumulator_set) usage:
+In case of public-key scheme source data accumulation necessity is present, following example demonstrates accumulator usage:
 
 ```cpp
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>

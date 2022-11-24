@@ -1,3 +1,2 @@
-# Implementation # {#zk_impl}
+# implementation
 
-@tableofcontents

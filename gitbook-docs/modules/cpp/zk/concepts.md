@@ -1,3 +1,2 @@
-# Concepts # {#zk_concepts}
+# concepts
 
-@tableofcontents

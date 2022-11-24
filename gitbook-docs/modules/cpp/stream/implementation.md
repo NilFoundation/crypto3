@@ -1,3 +1,2 @@
-# Implementation # {#stream_ciphers_impl}
+# implementation
 
-@tableofcontents

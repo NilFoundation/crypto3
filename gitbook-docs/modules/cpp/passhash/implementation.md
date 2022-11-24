@@ -1,2 +1,3 @@
-# implementation
+# Implementation {#passhash_impl}
 
+@tableofcontents

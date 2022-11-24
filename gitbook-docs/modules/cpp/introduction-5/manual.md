@@ -1,2 +1,3 @@
-# manual
+# Manual # {#fft_manual}
 
+@tableofcontents

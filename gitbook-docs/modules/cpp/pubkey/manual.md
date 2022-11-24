@@ -1,5 +1,2 @@
-# Manual # {#pubkey_manual}
+# manual
 
-@tableofcontents
-
-@subpage pubkey_usage_manual

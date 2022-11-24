@@ -1,4 +1,4 @@
-# Introduction # {#zk_introduction}
+# Zk
 
 This module contains followings.
 
@@ -14,11 +14,10 @@ Relations:
 
 zk-SNARKS (Zero-Knowledge Succinct Non-interactive ARgument of Knowledge):
 
-* bacs_ppzksnark- - BACS PreProcessing zk-SNARK
-* r1cs_gg_ppzksnark - R1CS Generic Group PreProcessing zk-SNARK (Groth16)
-* r1cs_ppzksnark - R1CS PreProcessing zk-SNARK
-* r1cs_se_ppzksnark - R1CS Simulation-Extractable PreProcessing zk-SNARK
-* tbcs_ppzksnark - TBCS PreProcessing zk-SNARK
-* uscs_ppzksnark - USCS PreProcessing zk-SNARK
+* bacs\_ppzksnark- - BACS PreProcessing zk-SNARK
+* r1cs\_gg\_ppzksnark - R1CS Generic Group PreProcessing zk-SNARK (Groth16)
+* r1cs\_ppzksnark - R1CS PreProcessing zk-SNARK
+* r1cs\_se\_ppzksnark - R1CS Simulation-Extractable PreProcessing zk-SNARK
+* tbcs\_ppzksnark - TBCS PreProcessing zk-SNARK
+* uscs\_ppzksnark - USCS PreProcessing zk-SNARK
 
-@tableofcontents

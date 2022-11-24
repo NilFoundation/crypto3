@@ -1,2 +1,4 @@
-# implementation
+# Implementation {#pkmodes_impl}
+
+@tableofcontents
 

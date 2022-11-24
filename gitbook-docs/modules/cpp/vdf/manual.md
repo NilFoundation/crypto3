@@ -1,3 +1,2 @@
-# Manual # {#vdf_manual}
+# manual
 
-@tableofcontents

@@ -1,2 +1,3 @@
-# manual
+# Manual # {#pbkdf_manual}
 
+@tableofcontents
