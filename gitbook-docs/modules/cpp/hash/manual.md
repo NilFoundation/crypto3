@@ -1,5 +1,2 @@
-# Manual # {#hashes_manual}
+# manual
 
-@tableofcontents
-
-@subpage hashes_usage_manual

@@ -1,3 +1,2 @@
-# Blueprint (Circuit Definition Library) {#blueprint_index}
+# Blueprint
 
-@subpage blueprint_manual
