@@ -140,7 +140,8 @@ namespace nil {
                     word_type x = crc_.checksum();
                     digest_type d;
                     // TODO: Justify bit order
-                    pack_n<stream_endian::big_bit, digest_bits, octet_bits>(&x, 1, d.data(), digest_bits / octet_bits);
+                    pack_n<stream_endian::big_bit, stream_endian::big_bit, digest_bits, octet_bits>(
+                        &x, 1, d.data(), digest_bits / octet_bits);
                     return d;
                 }
 
