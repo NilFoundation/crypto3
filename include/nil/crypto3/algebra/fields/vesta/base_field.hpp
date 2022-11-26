@@ -44,11 +44,15 @@ namespace nil {
                     typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::integral_type integral_type;
-
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
-
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+
+#ifdef ZKLLVM_INLINES_ENABLED
+                    typedef field_pallasb value_type;
+#else
+                    typedef typename policy_type::integral_type integral_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
                     0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255;
@@ -60,16 +64,17 @@ namespace nil {
                         modular_type;
 
                     typedef typename detail::element_fp<params<vesta_base_field>> value_type;
-
-                    constexpr static const std::size_t value_bits = modulus_bits;
-                    constexpr static const std::size_t arity = 1;
+#endif
                 };
 
                 constexpr typename std::size_t const vesta_base_field::modulus_bits;
                 constexpr typename std::size_t const vesta_base_field::number_bits;
                 constexpr typename std::size_t const vesta_base_field::value_bits;
+                
+#ifdef ZKLLVM_INLINES_ENABLED
+#else
                 constexpr typename vesta_base_field::integral_type const vesta_base_field::modulus;
-
+#endif
                 using vesta_fq = vesta_base_field;
             }    // namespace fields
         }        // namespace algebra

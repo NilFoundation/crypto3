@@ -52,8 +52,10 @@ namespace nil {
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
-
+#ifdef ZKLLVM_INLINES_ENABLED
+#else
                         using value_type = curve_element<params_type, Form, Coordinates>;
+#endif
                     };
 
                 }    // namespace detail
