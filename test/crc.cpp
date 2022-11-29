@@ -24,7 +24,8 @@
 #include <cassert>
 #include <unordered_map>
 
-using namespace nil::crypto3::hash;
+using namespace nil::crypto3;
+using namespace nil::crypto3::hashes;
 using namespace nil::crypto3::accumulators;
 using nil::crypto3::detail::largest_prime;
 
@@ -62,57 +63,57 @@ BOOST_AUTO_TEST_SUITE(crc_hash_test_suite)
 
 BOOST_DATA_TEST_CASE(crc_range_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
     std::vector<uint8_t> out;
-    hash<crc32_png>(array_element.first, std::back_inserter(out));
+    hash<hashes::crc32_png>(array_element.first, std::back_inserter(out));
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(crc_various_range_value_hash, boost::unit_test::data::make(byte_data), array_element) {
-    std::vector<uint8_t> out = hash<crc32_png>(array_element.first);
+    std::vector<uint8_t> out = hash<hashes::crc32_png>(array_element.first);
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(crc_various_itr_value_hash, boost::unit_test::data::make(byte_data), array_element) {
-    std::vector<uint8_t> out = hash<crc32_png>(array_element.first.begin(), array_element.first.end());
+    std::vector<uint8_t> out = hash<hashes::crc32_png>(array_element.first.begin(), array_element.first.end());
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(crc_iterator_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
     std::vector<uint8_t> out;
-    hash<crc32_png>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
+    hash<hashes::crc32_png>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(crc_string_various_range_value_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<crc32_png>(array_element.first);
+    std::string out = hash<hashes::crc32_png>(array_element.first);
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(crc_string_various_itr_value_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<crc32_png>(array_element.first.begin(), array_element.first.end());
+    std::string out = hash<hashes::crc32_png>(array_element.first.begin(), array_element.first.end());
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_AUTO_TEST_CASE(crc_stateful_hash1) {
-    accumulator_set<crc32_png> acc;
+    accumulator_set<hashes::crc32_png> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
-    crc32_png::digest_type d = extract::hash<crc32_png>(acc);
+    typename hashes::crc32_png::digest_type d = extract::hash<hashes::crc32_png>(acc);
     std::cout << d << "\n";
     BOOST_CHECK_EQUAL(d, "dc25bfbc");
 }
 
 BOOST_AUTO_TEST_CASE(crc_stateful_hash2) {
-    accumulator_set<crc32_png> acc;
+    accumulator_set<hashes::crc32_png> acc;
     std::string s(1000, 'a');
     for (unsigned i = 0; i < 1000000; ++i) {
-        hash<crc32_png>(s, acc);
+        hash<hashes::crc32_png>(s, acc);
     }
     crc32_png::digest_type d = extract::hash<crc32_png>(acc);
     std::cout << d << "\n";
@@ -120,11 +121,11 @@ BOOST_AUTO_TEST_CASE(crc_stateful_hash2) {
 }
 
 BOOST_AUTO_TEST_CASE(crc_stateful_hash3) {
-    accumulator_set<crc32_png> acc;
+    accumulator_set<hashes::crc32_png> acc;
     for (unsigned i = 0; i < 1000000000; ++i) {
         acc('a');
     }
-    crc32_png::digest_type d = extract::hash<crc32_png>(acc);
+    crc32_png::digest_type d = extract::hash<hashes::crc32_png>(acc);
     std::cout << d << "\n";
     BOOST_CHECK_EQUAL(d, "a7943e77");
 }

@@ -23,7 +23,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             // Boost.CRC undefs this, so re-define it
 #if !(defined(BOOST_NO_DEPENDENT_TYPES_IN_TEMPLATE_VALUE_PARAMETERS) || (defined(BOOST_MSVC) && (BOOST_MSVC <= 1300)))
 #define BOOST_CRC_PARM_TYPE typename ::boost::uint_t<DigestBits>::fast
@@ -258,7 +258,7 @@ namespace nil {
             // http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html#CRC-algorithm
             typedef crc<32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, true, true> crc32_png;
 
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 
