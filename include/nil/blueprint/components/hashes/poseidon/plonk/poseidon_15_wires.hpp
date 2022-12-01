@@ -46,18 +46,14 @@ namespace nil {
             template<typename ArithmetizationType, typename FieldType, std::int32_t WitnessAmount>
             class poseidon;
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename FieldType>
-            class poseidon<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, FieldType, 15>:
-                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    15,0,0> {
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename FieldType>
+            class poseidon<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                           FieldType, 15>
+                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 0, 0> {
 
                 constexpr static const std::int32_t WitnessAmount = 15;
-            
-                using component_type = component<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    WitnessAmount,0,0>;
+
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessAmount, 0, 0>;
 
             public:
                 constexpr static const std::uint32_t state_size = 3;
@@ -67,10 +63,10 @@ namespace nil {
 
                 constexpr static const std::size_t sbox_alpha = 7;
 
-                constexpr static const std::array<std::array<typename FieldType::value_type, state_size>,
-                                                  state_size> mds = detail::poseidon_constants<FieldType, state_size, rounds_amount>::mds;
-                constexpr static const std::array<std::array<typename FieldType::value_type, state_size>,
-                                                  rounds_amount> round_constant = detail::poseidon_constants<FieldType, state_size, rounds_amount>::round_constant;
+                constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, state_size>
+                    mds = detail::poseidon_constants<FieldType, state_size, rounds_amount>::mds;
+                constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, rounds_amount>
+                    round_constant = detail::poseidon_constants<FieldType, state_size, rounds_amount>::round_constant;
 
                 constexpr static const std::size_t rate = 2;
                 constexpr static const std::size_t gates_amount = 11;
@@ -83,60 +79,55 @@ namespace nil {
                 };
 
                 struct result_type {
-                    std::array<var, state_size> output_state = {var(0, 0, false), var(0, 0, false),
-                                                                var(0, 0, false)};
+                    std::array<var, state_size> output_state = {var(0, 0, false), var(0, 0, false), var(0, 0, false)};
 
-                    result_type(const poseidon<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                            FieldType,
-                            WitnessAmount> &component, std::uint32_t start_row_index) {
+                    result_type(const poseidon<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                           ArithmetizationParams>,
+                                               FieldType, WitnessAmount> &component,
+                                std::uint32_t start_row_index) {
 
-                        output_state = {
-                            var(component.W(0), start_row_index + component.rows_amount - 1, false),
-                            var(component.W(1), start_row_index + component.rows_amount - 1, false),
-                            var(component.W(2), start_row_index + component.rows_amount - 1, false)};
+                        output_state = {var(component.W(0), start_row_index + component.rows_amount - 1, false),
+                                        var(component.W(1), start_row_index + component.rows_amount - 1, false),
+                                        var(component.W(2), start_row_index + component.rows_amount - 1, false)};
                     }
                 };
 
-                constexpr static std::array<std::array<typename FieldType::value_type, state_size>,
-                                state_size> mds_constants() {
-                            return mds;
+                constexpr static std::array<std::array<typename FieldType::value_type, state_size>, state_size>
+                    mds_constants() {
+                    return mds;
                 }
 
-                template <typename ContainerType>
-                poseidon(ContainerType witness):
-                    component_type(witness, {}, {}){};
+                template<typename ContainerType>
+                poseidon(ContainerType witness) : component_type(witness, {}, {}) {};
 
-                template <typename WitnessContainerType, typename ConstantContainerType,
-                    typename PublicInputContainerType>
+                template<typename WitnessContainerType, typename ConstantContainerType,
+                         typename PublicInputContainerType>
                 poseidon(WitnessContainerType witness, ConstantContainerType constant,
-                        PublicInputContainerType public_input):
-                    component_type(witness, constant, public_input){};
+                         PublicInputContainerType public_input) :
+                    component_type(witness, constant, public_input) {};
 
-                poseidon(std::initializer_list<
-                        typename component_type::witness_container_type::value_type> witnesses,
-                               std::initializer_list<
-                        typename component_type::constant_container_type::value_type> constants,
-                               std::initializer_list<
-                        typename component_type::public_input_container_type::value_type> public_inputs):
-                    component_type(witnesses, constants, public_inputs){};
+                poseidon(std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
+                         std::initializer_list<typename component_type::constant_container_type::value_type>
+                             constants,
+                         std::initializer_list<typename component_type::public_input_container_type::value_type>
+                             public_inputs) :
+                    component_type(witnesses, constants, public_inputs) {};
             };
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename FieldType,
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename FieldType,
                      std::int32_t WitnessAmount>
             using plonk_poseidon =
-                poseidon<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, FieldType, WitnessAmount>;
+                poseidon<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                         FieldType, WitnessAmount>;
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename FieldType>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename FieldType>
             typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::result_type
                 generate_assignments(
                     const plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_poseidon<BlueprintFieldType,
-                        ArithmetizationParams, FieldType, 15>::input_type instance_input,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::input_type
+                        instance_input,
                     const std::uint32_t start_row_index) {
 
                 using component_type = plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>;
@@ -167,64 +158,59 @@ namespace nil {
                     assignment.witness(component.W(5), i) = next_state[2];
                     state = next_state;
                     for (int j = 0; j < state_size; j++) {
-                        next_state[j] =
-                            state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
-                            state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
-                            state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
-                            component_type::round_constant[(i - row) * 5 + 1][j];
+                        next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                        state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                        state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                        component_type::round_constant[(i - row) * 5 + 1][j];
                     }
                     assignment.witness(component.W(6), i) = next_state[0];
                     assignment.witness(component.W(7), i) = next_state[1];
                     assignment.witness(component.W(8), i) = next_state[2];
                     state = next_state;
                     for (int j = 0; j < state_size; j++) {
-                        next_state[j] =
-                            state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
-                            state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
-                            state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
-                            component_type::round_constant[(i - row) * 5 + 2][j];
+                        next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                        state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                        state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                        component_type::round_constant[(i - row) * 5 + 2][j];
                     }
                     assignment.witness(component.W(9), i) = next_state[0];
                     assignment.witness(component.W(10), i) = next_state[1];
                     assignment.witness(component.W(11), i) = next_state[2];
                     state = next_state;
                     for (int j = 0; j < state_size; j++) {
-                        next_state[j] =
-                            state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
-                            state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
-                            state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
-                            component_type::round_constant[(i - row) * 5 + 3][j];
+                        next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                        state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                        state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                        component_type::round_constant[(i - row) * 5 + 3][j];
                     }
                     assignment.witness(component.W(12), i) = next_state[0];
                     assignment.witness(component.W(13), i) = next_state[1];
                     assignment.witness(component.W(14), i) = next_state[2];
                     state = next_state;
                     for (int j = 0; j < state_size; j++) {
-                        next_state[j] =
-                            state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
-                            state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
-                            state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
-                            component_type::round_constant[(i - row) * 5 + 4][j];
+                        next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
+                                        state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
+                                        state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
+                                        component_type::round_constant[(i - row) * 5 + 4][j];
                     }
                     assignment.witness(component.W(0), i + 1) = next_state[0];
                     assignment.witness(component.W(1), i + 1) = next_state[1];
                     assignment.witness(component.W(2), i + 1) = next_state[2];
                     state = next_state;
                 }
-                
+
                 return typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename FieldType>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename FieldType>
             void generate_gates(
                 const plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_poseidon<BlueprintFieldType,
-                    ArithmetizationParams, FieldType, 15>::input_type &instance_input,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::input_type
+                    &instance_input,
                 const std::size_t first_selector_index) {
 
                 using component_type = plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>;
@@ -329,45 +315,43 @@ namespace nil {
                          var(component.W(14), 0).pow(component_type::sbox_alpha) * component_type::mds[2][2] +
                          component_type::round_constant[z + 4][2]));
                     bp.add_gate(j + first_selector_index,
-                                {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5,
-                                 constraint_6, constraint_7, constraint_8, constraint_9, constraint_10,
-                                 constraint_11, constraint_12, constraint_13, constraint_14, constraint_15});
+                                {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                                 constraint_7, constraint_8, constraint_9, constraint_10, constraint_11, constraint_12,
+                                 constraint_13, constraint_14, constraint_15});
                     j++;
                 }
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename FieldType>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename FieldType>
             void generate_copy_constraints(
                 const plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_poseidon<BlueprintFieldType,
-                    ArithmetizationParams, FieldType, 15>::input_type &instance_input,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::input_type
+                    &instance_input,
                 const std::size_t start_row_index) {
 
                 using var = typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::var;
-
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename FieldType>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename FieldType>
             typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::result_type
                 generate_circuit(
                     const plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_poseidon<BlueprintFieldType,
-                        ArithmetizationParams, FieldType, 15>::input_type &instance_input,
-                    const std::size_t start_row_index){
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::input_type
+                        &instance_input,
+                    const std::size_t start_row_index) {
 
                 auto selector_iterator = assignment.find_selector(component);
                 std::size_t first_selector_index;
 
                 if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component,
+                    first_selector_index = assignment.allocate_selector(
+                        component,
                         plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::gates_amount);
                     generate_gates(component, bp, assignment, instance_input, first_selector_index);
                 } else {
@@ -375,9 +359,9 @@ namespace nil {
                 }
 
                 std::size_t i = 0;
-                for (std::size_t z = 0; z <
-                    plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::rounds_amount;
-                    z += plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::rounds_per_row) {
+                for (std::size_t z = 0;
+                     z < plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::rounds_amount;
+                     z += plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::rounds_per_row) {
                     assignment.enable_selector(first_selector_index + i, start_row_index + i);
                     ++i;
                 }
@@ -385,7 +369,6 @@ namespace nil {
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
                 return typename plonk_poseidon<BlueprintFieldType, ArithmetizationParams, FieldType, 15>::result_type(
                     component, start_row_index);
-
             }
         }    // namespace components
     }        // namespace blueprint
