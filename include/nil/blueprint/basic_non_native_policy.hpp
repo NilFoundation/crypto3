@@ -33,45 +33,48 @@
 
 namespace nil {
     namespace blueprint {
-
-        template<typename BlueprintFieldType>
-        class basic_non_native_policy;
-
-        template<>
-        class basic_non_native_policy<
-            typename crypto3::algebra::curves::pallas::base_field_type>{
-
-            using BlueprintFieldType = typename crypto3::algebra::curves::pallas::base_field_type;
-
-        public:
-            using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
-
-            template<typename OperatingFieldType>
-            struct field;
+        namespace detail {
+            template<typename BlueprintFieldType, typename OperatingFieldType>
+            struct basic_non_native_policy_field_type;
 
             template<>
-            struct field<
-                typename crypto3::algebra::curves::ed25519::base_field_type>{
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::curves::pallas::base_field_type,
+                                                      typename crypto3::algebra::curves::ed25519::base_field_type> {
 
                 constexpr static const std::uint32_t ratio = 4;    // 66,66,66,66 bits
 
-                typedef std::array<var, ratio> value_type;
+                typedef std::array<
+                    crypto3::zk::snark::plonk_variable<typename crypto3::algebra::curves::pallas::base_field_type>,
+                    ratio>
+                    value_type;
             };
 
             /*
              * Native element type.
              */
-            template<>
-            struct field<
-                BlueprintFieldType>{
+            template<typename BlueprintFieldType>
+            struct basic_non_native_policy_field_type<BlueprintFieldType, BlueprintFieldType> {
 
                 constexpr static const std::uint32_t ratio = 1;
 
-                typedef var value_type;
+                typedef crypto3::zk::snark::plonk_variable<BlueprintFieldType> value_type;
             };
+        }    // namespace detail
+
+        template<typename BlueprintFieldType>
+        class basic_non_native_policy;
+
+        template<>
+        class basic_non_native_policy<typename crypto3::algebra::curves::pallas::base_field_type> {
+
+            using BlueprintFieldType = typename crypto3::algebra::curves::pallas::base_field_type;
+
+        public:
+            template<typename OperatingFieldType>
+            using field = typename detail::basic_non_native_policy_field_type<BlueprintFieldType, OperatingFieldType>;
         };
 
-    }        // namespace blueprint
+    }    // namespace blueprint
 }    // namespace nil
 
 #endif    // CRYPTO3_BLUEPRINT_BASIC_NON_NATIVE_POLICY_HPP
