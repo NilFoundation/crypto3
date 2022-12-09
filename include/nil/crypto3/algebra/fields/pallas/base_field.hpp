@@ -49,7 +49,7 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
 
 #ifdef ZKLLVM_INLINES_ENABLED
-                    typedef field_pallasb value_type;
+                    typedef __zkllvm_field_pallas_base value_type;
 #else
 
                     typedef typename policy_type::integral_type integral_type;

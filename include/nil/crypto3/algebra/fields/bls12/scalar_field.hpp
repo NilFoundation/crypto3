@@ -50,11 +50,15 @@ namespace nil {
                     typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::integral_type integral_type;
-
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
-
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+
+#ifdef ZKLLVM_INLINES_ENABLED
+                    typedef __zkllvm_field_bls381_scalar value_type;
+#else
+                    typedef typename policy_type::integral_type integral_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
                         0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001_cppui255;
@@ -68,9 +72,7 @@ namespace nil {
                         modular_type;
 
                     typedef typename detail::element_fp<params<bls12_scalar_field<381>>> value_type;
-
-                    constexpr static const std::size_t value_bits = modulus_bits;
-                    constexpr static const std::size_t arity = 1;
+#endif
                 };
 
                 template<>
@@ -78,11 +80,15 @@ namespace nil {
                     typedef field<253> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::integral_type integral_type;
-
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
-
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
+
+#ifdef ZKLLVM_INLINES_ENABLED
+                    typedef __zkllvm_field_bls377_scalar value_type;
+#else
+                    typedef typename policy_type::integral_type integral_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
                         0x12AB655E9A2CA55660B44D1E5C37B00159AA76FED00000010A11800000000001_cppui253;
@@ -96,9 +102,7 @@ namespace nil {
                         modular_type;
 
                     typedef typename detail::element_fp<params<bls12_scalar_field<377>>> value_type;
-
-                    constexpr static const std::size_t value_bits = modulus_bits;
-                    constexpr static const std::size_t arity = 1;
+#endif
                 };
 
                 constexpr typename std::size_t const bls12_scalar_field<381>::modulus_bits;
@@ -110,9 +114,11 @@ namespace nil {
                 constexpr typename std::size_t const bls12_scalar_field<381>::value_bits;
                 constexpr typename std::size_t const bls12_scalar_field<377>::value_bits;
 
+#ifdef ZKLLVM_INLINES_ENABLED
+#else
                 constexpr typename bls12_scalar_field<381>::integral_type const bls12_scalar_field<381>::modulus;
                 constexpr typename bls12_scalar_field<377>::integral_type const bls12_scalar_field<377>::modulus;
-
+#endif
                 constexpr
                     typename bls12_scalar_field<381>::modular_params_type const bls12_scalar_field<381>::modulus_params;
                 constexpr
