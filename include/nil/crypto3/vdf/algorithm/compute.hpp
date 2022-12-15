@@ -72,8 +72,8 @@ namespace nil {
                          Integer difficulty) {
             }
 
-            template<typename Vdf, typename Backend1, expression_template_option ExpressionTemplates1, typename Integer>
-            void compute(const number<Backend1, ExpressionTemplates1> &challenge, Integer difficulty) {
+            template<typename Vdf, typename Backend, expression_template_option ExpressionTemplates1, typename Integer>
+            void compute(const number<Backend, ExpressionTemplates1> &challenge, Integer difficulty) {
                 Vdf::compute(challenge, difficulty);
             }
 #endif

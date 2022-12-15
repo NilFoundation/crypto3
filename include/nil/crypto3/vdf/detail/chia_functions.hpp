@@ -817,7 +817,7 @@ namespace nil {
 
                     template<typename T>
                     inline static void normalize(state_type<T> &state) {
-                        bool bleqa = (state.form.b <= state.forma.a);
+                        bool bleqa = (state.form.b <= state.form.a);
                         state.form.a = -state.form.a;
                         if (state.form.b > state.form.a && bleqa) {
                             // Already normalized
@@ -1006,15 +1006,15 @@ namespace nil {
                     template<typename Backend, expression_template_option ExpressionTemplates>
                     inline static int64_t mpz_get_si_2exp(signed long int *exp,
                                                           const number<Backend, ExpressionTemplates> &op) {
-                        uint64_t size = mpz_size(op);
-                        uint64_t last = mpz_getlimbn(op, size - 1);
+                        uint64_t size = op.backend().size();
+                        uint64_t last = op.backend().limbs()[size - 1];
                         uint64_t ret;
                         int lg2 = LOG2(last) + 1;
                         *exp = lg2;
                         ret = signed_shift(last, 63 - *exp);
                         if (size > 1) {
                             *exp += (size - 1) * 64;
-                            uint64_t prev = mpz_getlimbn(op, size - 2);
+                            uint64_t prev = op.backend().limbs()[size - 2];
                             ret += signed_shift(prev, -1 - lg2);
                         }
                         if (op < 0) {

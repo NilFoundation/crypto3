@@ -37,7 +37,9 @@
 #ifdef CRYPTO3_VDF_BOOST
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+#ifdef CRYPTO3_VDF_BOOST_GMP
 #include <nil/crypto3/multiprecision/gmp.hpp>
+#endif
 #ifdef CRYPTO3_VDF_BOOST_TOMMATH
 #include <nil/crypto3/multiprecision/tommath.hpp>
 #endif
@@ -211,14 +213,21 @@ BOOST_DATA_TEST_CASE(chia_vdf_test, boost::unit_test::data::make(valid_data), ar
 }
 
 #else
+
+#ifdef CRYPTO3_VDF_BOOST_GMP
 BOOST_DATA_TEST_CASE(chia_vdf_compute_gmp_int_test, boost::unit_test::data::make(valid_data), array_element) {
     vdf::compute<vdf::chia>(vdf::discriminant_input<vdf::chia>(gmp_int(array_element.first.first)),
                             array_element.first.second);
 }
+#endif
 
 BOOST_DATA_TEST_CASE(chia_vdf_compute_cpp_int, boost::unit_test::data::make(valid_data), array_element) {
-    vdf::compute<vdf::chia>(vdf::discriminant_input<vdf::chia>(cpp_int(array_element.first.first)),
-                            array_element.first.second);
+    typename vdf::chia::state_type<cpp_int> state;
+    vdf::chia::make_state(state, cpp_int(array_element.first.first));
+    vdf::compute<vdf::chia>(state, cpp_int(array_element.first.second));
+
+    BOOST_CHECK_EQUAL(cpp_int(array_element.second.first), state.form.a);
+    BOOST_CHECK_EQUAL(cpp_int(array_element.second.second), state.form.b);
 }
 
 #ifdef CRYPTO3_VDF_BOOST_TOMMATH

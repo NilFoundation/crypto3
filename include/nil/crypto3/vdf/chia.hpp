@@ -176,7 +176,7 @@ namespace nil {
                     state.form.b = b;
                     state.form.c = (b * b - discriminant) / (a * 4);
                     state.form.d = discriminant;
-                    fast_reduce(state);
+                    policy_type::fast_reduce(state);
                 }
 
                 template<typename Backend, expression_template_option ExpressionTemplates>
