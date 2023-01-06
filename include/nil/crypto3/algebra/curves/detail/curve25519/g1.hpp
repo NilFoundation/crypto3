@@ -47,15 +47,19 @@ namespace nil {
                     struct curve25519_g1 {
                         using params_type = curve25519_g1_params<Form>;
 
-                        using curve_type = typename std::conditional<
-                            std::is_same<Form, forms::twisted_edwards>::value, ed25519, curve25519>::type;
+                        using curve_type = typename std::conditional<std::is_same<Form, forms::twisted_edwards>::value,
+                                                                     ed25519, curve25519>::type;
 
                         using field_type = typename params_type::field_type;
 
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
+#ifdef ZKLLVM_INLINES_ENABLED
+                        typedef __zkllvm_curve_curve25519 value_type;
+#else
                         using value_type = curve_element<params_type, Form, Coordinates>;
+#endif
                     };
 
                 }    // namespace detail

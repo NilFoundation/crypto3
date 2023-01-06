@@ -105,7 +105,7 @@ namespace nil {
                         modular_type;
 
                     typedef typename detail::element_fp<params<bls12_base_field<377>>> value_type;
-#endif              
+#endif
                 };
 
                 constexpr typename std::size_t const bls12_base_field<381>::modulus_bits;

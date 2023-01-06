@@ -55,7 +55,7 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
 
 #ifdef ZKLLVM_INLINES_ENABLED
-                    typedef __zkllvm_field_bls381_scalar value_type;
+                    typedef __zkllvm_field__bls381_scalar value_type;
 #else
                     typedef typename policy_type::integral_type integral_type;
                     typedef typename policy_type::extended_integral_type extended_integral_type;
@@ -85,7 +85,7 @@ namespace nil {
                     constexpr static const std::size_t arity = 1;
 
 #ifdef ZKLLVM_INLINES_ENABLED
-                    typedef __zkllvm_field_bls377_scalar value_type;
+                    typedef __zkllvm_field__bls377_scalar value_type;
 #else
                     typedef typename policy_type::integral_type integral_type;
                     typedef typename policy_type::extended_integral_type extended_integral_type;
