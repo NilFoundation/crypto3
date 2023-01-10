@@ -40,10 +40,9 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 
-#include <nil/crypto3/zk/components/algebra/fields/plonk/range_check.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/range_check.hpp>
 
 namespace nil {
-    namespace crypto3 {
         namespace blueprint {
             namespace components {
 
@@ -53,114 +52,138 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L87
                 // Input: x1 = [a_0, ..., a_63], x2 = [b_0, ..., b_63]
                 // Output: y = [a_0, ...., a_63, b_0, ..., b_63]
-                template<typename ArithmetizationType, std::size_t... WireIndexes>
+                template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
                 class from_limbs;
 
-                template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
-                         std::size_t W0,
-                         std::size_t W1,
-                         std::size_t W2>
-                class from_limbs<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                 W0,
-                                 W1,
-                                 W2> {
+                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                class from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>:
+                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                        3, 0, 0> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
-                        ArithmetizationType;
-
-                    using var = snark::plonk_variable<BlueprintFieldType>;
-
-                    constexpr static const std::size_t selector_seed = 0x0ff0;
+                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3, 0, 0>;
 
                 public:
+
+                    using var = typename component_type::var;
+
                     constexpr static const std::size_t rows_amount = 1;
                     constexpr static const std::size_t gates_amount = 1;
 
-                    struct params_type {
+                    struct input_type {
                         var first_limb = var(0, 0, false);
                         var second_limb = var(0, 0, false);
-                        params_type(std::array<var, 2> input) : first_limb(input[0]), second_limb(input[1]) {
+                        input_type(std::array<var, 2> input) : first_limb(input[0]), second_limb(input[1]) {
                         }
-                        params_type(var first, var second) : first_limb(first), second_limb(second) {
+                        input_type(var first, var second) : first_limb(first), second_limb(second) {
                         }
                     };
 
                     struct result_type {
                         var result = var(0, 0);
 
-                        result_type(std::size_t component_start_row) {
-                            result = var(W2, static_cast<int>(component_start_row), false, var::column_type::witness);
+                        result_type(const from_limbs &component, std::size_t start_row_index) {
+                            result = var(component.W(2), static_cast<int>(start_row_index), false, var::column_type::witness);
                         }
                     };
 
-                    static result_type
-                        generate_circuit(blueprint<ArithmetizationType> &bp,
-                                         blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                         const params_type &params,
-                                         const std::size_t component_start_row) {
+                    template <typename ContainerType>
+                        from_limbs(ContainerType witness):
+                            component_type(witness, {}, {}){};
 
-                        auto selector_iterator = assignment.find_selector(selector_seed);
+                    template <typename WitnessContainerType, typename ConstantContainerType, typename PublicInputContainerType>
+                        from_limbs(WitnessContainerType witness, ConstantContainerType constant, PublicInputContainerType public_input):
+                            component_type(witness, constant, public_input){};
+
+                    from_limbs(
+                        std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
+                        std::initializer_list<typename component_type::constant_container_type::value_type> constants,
+                        std::initializer_list<typename component_type::public_input_container_type::value_type> public_inputs):
+                            component_type(witnesses, constants, public_inputs){};
+
+                };
+
+                    template<typename BlueprintFieldType, typename ArithmetizationParams>
+                    using plonk_from_limbs = from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>;
+
+                    template<typename BlueprintFieldType, typename ArithmetizationParams>
+                    typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type 
+                        generate_circuit(
+                        const plonk_from_limbs<BlueprintFieldType, ArithmetizationParams> &component,
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                        const typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                        const std::uint32_t start_row_index) {
+
+                        auto selector_iterator = assignment.find_selector(component);
                         std::size_t first_selector_index;
 
                         if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(selector_seed, gates_amount);
-                            generate_gates(bp, assignment, params, first_selector_index);
+                            first_selector_index = assignment.allocate_selector(component, component.gates_amount);
+                            generate_gates(component, bp, assignment, instance_input, first_selector_index);
                         } else {
                             first_selector_index = selector_iterator->second;
                         }
 
-                        assignment.enable_selector(first_selector_index, component_start_row);
+                        assignment.enable_selector(first_selector_index, start_row_index);
 
-                        generate_copy_constraints(bp, assignment, params, component_start_row);
+                        generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                        return result_type(component_start_row);
+                        return typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
                     }
 
-                    static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                            const params_type &params,
-                                                            const std::size_t component_start_row) {
+                    template<typename BlueprintFieldType, typename ArithmetizationParams>
+                    typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type 
+                        generate_assignments(
+                        const plonk_from_limbs<BlueprintFieldType, ArithmetizationParams> &component,
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                        const typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                        const std::uint32_t start_row_index) {
 
-                        std::size_t row = component_start_row;
-                        typename BlueprintFieldType::value_type first_limb = assignment.var_value(params.first_limb);
-                        typename BlueprintFieldType::value_type second_limb = assignment.var_value(params.second_limb);
-                        assignment.witness(W0)[row] = first_limb;
-                        assignment.witness(W1)[row] = second_limb;
+                        std::size_t row = start_row_index;
+                        typename BlueprintFieldType::value_type first_limb =  var_value(assignment, instance_input.first_limb);
+                        typename BlueprintFieldType::value_type second_limb = var_value(assignment, instance_input.second_limb);
+                        assignment.witness(component.W(0), row) = first_limb;
+                        assignment.witness(component.W(1), row) = second_limb;
                         typename BlueprintFieldType::value_type scalar = 2;
                         scalar = scalar.pow(64) * second_limb + first_limb;
-                        assignment.witness(W2)[row] = scalar;
+                        assignment.witness(component.W(2), row) = scalar;
 
-                        return result_type(component_start_row);
+                        return typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
                     }
 
-                private:
-                    static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                               const params_type &params,
-                                               const std::size_t first_selector_index) {
+                    template<typename BlueprintFieldType, typename ArithmetizationParams>
+                        void generate_gates(
+                        const plonk_from_limbs<BlueprintFieldType, ArithmetizationParams> &component,
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                        const typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                        const std::size_t first_selector_index) {
+
+                        using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
                         typename BlueprintFieldType::value_type scalar = 2;
-                        auto constraint_1 = bp.add_constraint(var(W0, 0) + var(W1, 0) * scalar.pow(64) - var(W2, 0));
+                        auto constraint_1 = bp.add_constraint(var(component.W(0), 0) + var(component.W(1), 0) * scalar.pow(64) - var(component.W(2), 0));
 
                         bp.add_gate(first_selector_index, {constraint_1});
                     }
 
-                    static void
-                        generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                                  blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                  const params_type &params,
-                                                  std::size_t component_start_row = 0) {
+                    template<typename BlueprintFieldType, typename ArithmetizationParams>
+                        void generate_copy_constraints(
+                        const plonk_from_limbs<BlueprintFieldType, ArithmetizationParams> &component,
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                        const typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                        const std::uint32_t start_row_index) {
 
                         bp.add_copy_constraint(
-                            {{W0, static_cast<int>(component_start_row), false},
-                             {params.first_limb.index, params.first_limb.rotation, false, params.first_limb.type}});
+                            {{component.W(0), static_cast<int>(start_row_index), false},
+                             {instance_input.first_limb.index, instance_input.first_limb.rotation, false, instance_input.first_limb.type}});
                         bp.add_copy_constraint(
-                            {{W1, static_cast<int>(component_start_row), false},
-                             {params.second_limb.index, params.second_limb.rotation, false, params.second_limb.type}});
+                            {{component.W(1), static_cast<int>(start_row_index), false},
+                             {instance_input.second_limb.index, instance_input.second_limb.rotation, false, instance_input.second_limb.type}});
                     }
-                };
 
-                ///////////////// To Limbs ////////////////////////////////
+                /////////////// To Limbs ////////////////////////////////
                 // Split field element into four 64-bit chunks
                 // It's a part of transcript functionality
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L110
@@ -369,8 +392,7 @@ namespace nil {
                 };
 
             }    // namespace components
-        }        // namespace blueprint
-    }            // namespace crypto3
+        }    // namespace blueprint
 }    // namespace nil
 
 #endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_ORACLES_DETAIL_COMPONENT_15_WIRES_HPP
