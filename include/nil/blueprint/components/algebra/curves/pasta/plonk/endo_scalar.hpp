@@ -38,7 +38,6 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-// #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
         namespace blueprint {
@@ -49,6 +48,10 @@ namespace nil {
                          std::size_t ScalarSize,
                          std::uint32_t WitnessesAmount>
                 class endo_scalar;
+                // Input: x
+                // Output: y
+                // Such as:
+                // mul(x, G) = endomul(y, G), for G \in E(F)
 
                 template<typename CurveType>
                 struct endo_scalar_params;
@@ -236,8 +239,7 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType, std::size_t ScalarSize>
-                    typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType, ScalarSize>::result_type 
-                        generate_gates(
+                        void generate_gates(
                         const plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType, ScalarSize> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
@@ -299,8 +301,7 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType, std::size_t ScalarSize>
-                    typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType, ScalarSize>::result_type 
-                        generate_copy_constraints(
+                        void generate_copy_constraints(
                         const plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType, ScalarSize> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
