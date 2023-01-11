@@ -58,19 +58,14 @@ namespace nil {
                         typename FieldType::value_type challenge;
                         typename FieldType::value_type lagrange_0;
 
-                        typename fixed_values_commitment_scheme_type::proof_type fixed_values;
-                        typename variable_values_commitment_scheme_type::proof_type variable_values;
-                        typename permutation_commitment_scheme_type::proof_type permutation;
-                        typename runtime_size_commitment_scheme_type::proof_type quotient;
+                        typename fixed_values_commitment_scheme_type::proof_type combined_value;
                         std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
 
 
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && lagrange_0 == rhs.lagrange_0 &&
-                                    permutation == rhs.permutation &&
-                                   quotient == rhs.quotient && lookups == rhs.lookups
-                                   && variable_values == rhs.variable_values
-                                   && fixed_values == rhs.fixed_values;
+                                    combined_value == rhs.combined_value &&
+                                   lookups == rhs.lookups;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);

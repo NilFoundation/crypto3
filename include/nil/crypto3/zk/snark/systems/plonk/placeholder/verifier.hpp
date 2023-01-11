@@ -90,7 +90,7 @@ namespace nil {
                         transcript(proof.variable_values_commitment);
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
-                        std::size_t permutation_size = (proof.eval_proof.fixed_values.z.size() - 2 - constant_columns - selector_columns) / 2;
+                        std::size_t permutation_size = (proof.eval_proof.combined_value.z[0].size() - 2 - constant_columns - selector_columns) / 2;
                         std::vector<typename FieldType::value_type> f(permutation_size);
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
@@ -104,10 +104,10 @@ namespace nil {
                                 }
                             }
                             if (i < witness_columns + public_input_columns) {
-                                f[i] = proof.eval_proof.variable_values.z[i][zero_index];
+                                f[i] = proof.eval_proof.combined_value.z[0][i][zero_index];
                             } else if (i < witness_columns + public_input_columns + constant_columns) {
                                 std::size_t idx = i - witness_columns - public_input_columns + permutation_size*2;
-                                f[i] = proof.eval_proof.fixed_values.z[idx][zero_index];
+                                f[i] = proof.eval_proof.combined_value.z[3][idx][zero_index];
                             }
                         }
 
@@ -119,7 +119,7 @@ namespace nil {
                         std::array<typename FieldType::value_type, permutation_parts> permutation_argument =
                             placeholder_permutation_argument<FieldType, ParamsType>::verify_eval(
                                 preprocessed_public_data, proof.eval_proof.challenge, f,
-                                proof.eval_proof.permutation.z[0][0], proof.eval_proof.permutation.z[0][1],
+                                proof.eval_proof.combined_value.z[1][0][0], proof.eval_proof.combined_value.z[1][0][1],
                                 proof.v_perm_commitment, transcript);
 
                         typename policy_type::evaluation_map columns_at_y;
@@ -135,7 +135,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::witness);
-                                columns_at_y[key] = proof.eval_proof.variable_values.z[i][j];
+                                columns_at_y[key] = proof.eval_proof.combined_value.z[0][i][j];
                             }
                         }
                         for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
@@ -149,7 +149,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::public_input);
-                                columns_at_y[key] = proof.eval_proof.variable_values.z[witness_columns + i][j];
+                                columns_at_y[key] = proof.eval_proof.combined_value.z[0][witness_columns + i][j];
                             }
                         }
                         for (std::size_t i = 0; i < 0 + constant_columns; i++) {
@@ -162,7 +162,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::constant);
-                                columns_at_y[key] = proof.eval_proof.fixed_values.z[i + permutation_size*2][j];
+                                columns_at_y[key] = proof.eval_proof.combined_value.z[3][i + permutation_size*2][j];
                             }
                         }
 
@@ -177,7 +177,7 @@ namespace nil {
                                     i,
                                     preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
                                     plonk_variable<FieldType>::column_type::selector);
-                                columns_at_y[key] = proof.eval_proof.fixed_values.z[i + permutation_size*2 + constant_columns][j];
+                                columns_at_y[key] = proof.eval_proof.combined_value.z[3][i + permutation_size*2 + constant_columns][j];
                             }
                         }
 
@@ -185,17 +185,17 @@ namespace nil {
                         bool use_lookup = constraint_system.lookup_gates().size() > 0;
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument;
                         if (use_lookup) {
-                            lookup_argument = placeholder_lookup_argument<
-                                FieldType, permutation_commitment_scheme_type,
-                                ParamsType>::verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
-                                                         proof.eval_proof.challenge, columns_at_y,
-                                                         proof.eval_proof.lookups[1].z[0][0],
-                                                         proof.eval_proof.lookups[1].z[0][1],
-                                                         proof.eval_proof.lookups[2].z[0][0],
-                                                         proof.eval_proof.lookups[0].z[0][0],
-                                                         proof.eval_proof.lookups[0].z[0][1],
-                                                         proof.input_perm_commitment, proof.value_perm_commitment,
-                                                         proof.v_l_perm_commitment, transcript);
+                            // lookup_argument = placeholder_lookup_argument<
+                            //     FieldType, permutation_commitment_scheme_type,
+                            //     ParamsType>::verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
+                            //                              proof.eval_proof.challenge, columns_at_y,
+                            //                              proof.eval_proof.lookups[1].z[0][0],
+                            //                              proof.eval_proof.lookups[1].z[0][1],
+                            //                              proof.eval_proof.lookups[2].z[0][0],
+                            //                              proof.eval_proof.lookups[0].z[0][0],
+                            //                              proof.eval_proof.lookups[0].z[0][1],
+                            //                              proof.input_perm_commitment, proof.value_perm_commitment,
+                            //                              proof.v_l_perm_commitment, transcript);
                         } else {
                             for (std::size_t i = 0; i < lookup_parts; i++) {
                                 lookup_argument[i] = 0;
@@ -241,80 +241,62 @@ namespace nil {
                         for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i ++) {
                             variable_values_evaluation_points[i].push_back(challenge);
                         }
-                        if (!algorithms::verify_eval<variable_values_commitment_scheme_type>(
-                                variable_values_evaluation_points, proof.eval_proof.variable_values, proof.variable_values_commitment,
-                                fri_params, transcript)) {
-                            return false;
-                        }
 
                         // permutation
                         std::vector<typename FieldType::value_type> evaluation_points_permutation = {challenge,
                                                                                                      challenge * omega};
-                        if (!algorithms::verify_eval<permutation_commitment_scheme_type>(evaluation_points_permutation,
-                                                                                         proof.eval_proof.permutation,
-                                                                                         proof.v_perm_commitment,
-                                                                                         fri_params,
-                                                                                         transcript)) {
-                            return false;
-                        }
                         // lookup
                         if (use_lookup) {
                             // TODO: Check if commitments roots are used correctly.
                             //      test crypto3_zk_systems_plonk_placeholder_placeholder_test calls it only with
                             //      use_lookup == false
-                            std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
-                                                                                                 challenge * omega};
-                            if (!algorithms::verify_eval<permutation_commitment_scheme_type>(
-                                    evaluation_points_v_l,
-                                    proof.eval_proof.lookups[0],
-                                    proof.v_l_perm_commitment,
-                                    fri_params,
-                                    transcript)) {
-                                return false;
-                            }
+                            // std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
+                            //                                                                      challenge * omega};
+                            // if (!algorithms::verify_eval<permutation_commitment_scheme_type>(
+                            //         evaluation_points_v_l,
+                            //         proof.eval_proof.lookups[0],
+                            //         proof.v_l_perm_commitment,
+                            //         fri_params,
+                            //         transcript)) {
+                            //     return false;
+                            // }
 
-                            std::vector<typename FieldType::value_type> evaluation_points_input = {
-                                challenge, challenge * omega.inversed()};
-                            if (!algorithms::verify_eval<permutation_commitment_scheme_type>(
-                                    evaluation_points_input,
-                                    proof.eval_proof.lookups[1],
-                                    proof.input_perm_commitment,
-                                    fri_params,
-                                    transcript)) {
-                                return false;
-                            }
+                            // std::vector<typename FieldType::value_type> evaluation_points_input = {
+                            //     challenge, challenge * omega.inversed()};
+                            // if (!algorithms::verify_eval<permutation_commitment_scheme_type>(
+                            //         evaluation_points_input,
+                            //         proof.eval_proof.lookups[1],
+                            //         proof.input_perm_commitment,
+                            //         fri_params,
+                            //         transcript)) {
+                            //     return false;
+                            // }
 
-                            std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
-                            if (!algorithms::verify_eval<permutation_commitment_scheme_type>(
-                                    evaluation_points_value,
-                                    proof.eval_proof.lookups[2],
-                                    proof.value_perm_commitment,
-                                    fri_params,
-                                    transcript)) {
-                                return false;
-                            }
+                            // std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
+                            // if (!algorithms::verify_eval<permutation_commitment_scheme_type>(
+                            //         evaluation_points_value,
+                            //         proof.eval_proof.lookups[2],
+                            //         proof.value_perm_commitment,
+                            //         fri_params,
+                            //         transcript)) {
+                            //     return false;
+                            // }
                         }
 
                         // quotient
                         std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
-                        if (!algorithms::verify_eval<runtime_size_commitment_scheme_type>(evaluation_points_quotient,
-                                                                                          proof.eval_proof.quotient,
-                                                                                          proof.T_commitment,
-                                                                                          fri_params,
-                                                                                          transcript)) {
-                            return false;
-                        }
+
 
                         // public data
                         std::vector<typename FieldType::value_type> &evaluation_points_public =
                             evaluation_points_quotient;
 
-                        if (!algorithms::verify_eval<fixed_values_commitment_scheme_type>(
-                                evaluation_points_public,
-                                proof.eval_proof.fixed_values,
-                                preprocessed_public_data.common_data.commitments.fixed_values,
-                                fri_params,
-                                transcript)) {
+                        if (!algorithms::verify_eval<runtime_size_commitment_scheme_type>(
+                                {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public},
+                                proof.eval_proof.combined_value,
+                                                    {proof.variable_values_commitment, proof.v_perm_commitment,
+                                                    proof.T_commitment, preprocessed_public_data.common_data.commitments.fixed_values},
+                                                    fri_params, transcript)) {
                             return false;
                         }
 
@@ -336,8 +318,8 @@ namespace nil {
                         }
 
                         typename FieldType::value_type T_consolidated = FieldType::value_type::zero();
-                        for (std::size_t i = 0; i < proof.eval_proof.quotient.z.size(); i++) {
-                            T_consolidated = T_consolidated + proof.eval_proof.quotient.z[i][0] *
+                        for (std::size_t i = 0; i < proof.eval_proof.combined_value.z[2].size(); i++) {
+                            T_consolidated = T_consolidated + proof.eval_proof.combined_value.z[2][i][0] *
                                                                   challenge.pow((fri_params.max_degree + 1) * i);
                         }
 

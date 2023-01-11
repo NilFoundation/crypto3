@@ -539,13 +539,12 @@ namespace nil {
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                      typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
-                                 FRI>::value &&
+                                    FRI>::value &&
                                  (!std::is_same<typename ContainerType::value_type,
                                                 typename FRI::field_type::value_type>::value),
                              bool>::type = true>
                 static typename FRI::proof_type
                     proof_eval(ContainerType f,
-                               ContainerType g,
                                const typename FRI::precommitment_type &T,
                                const typename FRI::params_type &fri_params,
                                typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
@@ -559,13 +558,8 @@ namespace nil {
                             if (f[i].size() != fri_params.D[0]->size()) {
                                 f[i].resize(fri_params.D[0]->size());
                             }
-                            if (g[i].size() != fri_params.D[0]->size()) {
-                                g[i].resize(fri_params.D[0]->size());
-                            }
                         }
                     }
-
-                    BOOST_ASSERT(f.size() == g.size());
                     std::size_t leaf_size = f.size();
 
                     transcript(commit<FRI>(T));
@@ -606,23 +600,6 @@ namespace nil {
                         std::size_t coset_size = 1 << fri_params.step_list[i];
                         BOOST_ASSERT(coset_size / FRI::m == s.size());
                         BOOST_ASSERT(coset_size / FRI::m == s_indices.size());
-                        if (basis_index == 0) {
-                            for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                                y[polynom_index].resize(coset_size / FRI::m);
-                                for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
-                                    if constexpr (std::is_same<
-                                                      math::polynomial_dfs<typename FRI::field_type::value_type>,
-                                                      typename ContainerType::value_type>::value) {
-                                        y[polynom_index][j][0] = g[polynom_index][s_indices[j][0]];
-                                        y[polynom_index][j][1] = g[polynom_index][s_indices[j][1]];
-                                    } else {
-                                        y[polynom_index][j][0] = g[polynom_index].evaluate(s[j][0]);
-                                        y[polynom_index][j][1] = g[polynom_index].evaluate(s[j][1]);
-                                    }
-                                }
-                            }
-                            values.push_back(y);    // y for first round
-                        }
 
                         // TODO: check if leaf index calculation is correct
                         auto p = make_proof_specialized<FRI>(
@@ -720,14 +697,12 @@ namespace nil {
                              bool>::type = true>
                 static typename FRI::proof_type
                     proof_eval(PolynomType f,
-                               const PolynomType &g,
                                const typename FRI::precommitment_type &T,
                                const typename FRI::params_type &fri_params,
                                typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
                     std::array<PolynomType, 1> f_new = {f};
-                    std::array<PolynomType, 1> g_new = {g};
 
-                    return proof_eval<FRI>(f_new, g_new, T, fri_params, transcript);
+                    return proof_eval<FRI>(f_new, T, fri_params, transcript);
                 }
 
                 template<typename FRI, typename ContainerType,
@@ -742,13 +717,12 @@ namespace nil {
                              bool>::type = true>
                 static typename FRI::proof_type
                     proof_eval(ContainerType f,
-                               ContainerType g,
                                const typename FRI::params_type &fri_params,
                                typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
                     // TODO: f or g should be commited first
-                    typename FRI::precommitment_type T = precommit<FRI>(g, fri_params.D[0], fri_params.step_list[0]);
+                    typename FRI::precommitment_type T = precommit<FRI>(f, fri_params.D[0], fri_params.step_list[0]);
 
-                    return proof_eval<FRI>(f, g, T, fri_params, transcript);
+                    return proof_eval<FRI>(f, T, fri_params, transcript);
                 }
 
                 template<typename FRI, typename PolynomType,
@@ -763,17 +737,15 @@ namespace nil {
                              bool>::type = true>
                 static typename FRI::proof_type
                     proof_eval(PolynomType f,
-                               const PolynomType &g,
                                const typename FRI::params_type &fri_params,
                                typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
                     std::array<PolynomType, 1> f_new = {f};
-                    std::array<PolynomType, 1> g_new = {g};
 
                     // TODO: f or g should be commited first
                     typename FRI::precommitment_type T =
-                        precommit<FRI>(g_new, fri_params.D[0], fri_params.step_list[0]);
+                        precommit<FRI>(f_new, fri_params.D[0], fri_params.step_list[0]);
 
-                    return proof_eval<FRI>(f_new, g_new, fri_params, transcript);
+                    return proof_eval<FRI>(f_new, fri_params, transcript);
                 }
 
                 template<typename FRI, typename ContainerType,
@@ -789,8 +761,7 @@ namespace nil {
                 static bool verify_eval(typename FRI::proof_type &proof,
                                         typename FRI::params_type &fri_params,
                                         const typename FRI::commitment_type &t_polynomials,
-                                        const ContainerType &U,
-                                        const ContainerType &V,
+                                        const ContainerType &combined_poly,
                                         typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
                     BOOST_ASSERT(U.size() == V.size());
@@ -814,41 +785,6 @@ namespace nil {
 
                     std::vector<std::array<typename FRI::field_type::value_type, FRI::m>> s;
                     std::vector<std::array<std::size_t, FRI::m>> s_indices;
-
-                    if constexpr (FRI::m == 2) {
-                        std::tie(s, s_indices) = calculate_s<FRI>(x, x_index, fri_params.step_list[0], fri_params.D[0]);
-                    } else {
-                        return false;
-                    }
-
-                    typename FRI::polynomials_values_type y_0;
-                    if constexpr (!FRI::is_const_size) {
-                        y_0.resize(leaf_size);
-                    }
-
-                    if (U.size() == 1) {
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                            y_0[polynom_index].resize(proof.get_y(0)[polynom_index].size());
-                            for (std::size_t y_i = 0; y_i < y_0[polynom_index].size(); y_i++) {
-                                for (std::size_t j = 0; j < FRI::m; j++) {
-                                    y_0[polynom_index][y_i][j] =
-                                        (proof.get_y(0)[polynom_index][y_i][j] - U[0].evaluate(s[y_i][j])) /
-                                        V[0].evaluate(s[y_i][j]);
-                                }
-                            }
-                        }
-                    } else {
-                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                            y_0[polynom_index].resize(proof.get_y(0)[polynom_index].size());
-                            for (std::size_t y_i = 0; y_i < y_0[polynom_index].size(); y_i++) {
-                                for (std::size_t j = 0; j < FRI::m; j++) {
-                                    y_0[polynom_index][y_i][j] =
-                                        (proof.get_y(0)[polynom_index][y_i][j] - U[polynom_index].evaluate(s[y_i][j])) /
-                                        V[polynom_index].evaluate(s[y_i][j]);
-                                }
-                            }
-                        }
-                    }
 
                     std::size_t basis_index = 0;
                     for (std::size_t i = 0; i < fri_params.step_list.size() - 1; i++) {
@@ -899,7 +835,7 @@ namespace nil {
                             y.resize(leaf_size);
                         }
                         if (basis_index == 0) {
-                            y = y_0;
+                            y = combined_poly;
                         } else {
                             for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
                                 y[polynom_index].resize(proof.get_y(i)[polynom_index].size());
