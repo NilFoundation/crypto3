@@ -185,6 +185,9 @@ namespace nil {
                         bool use_lookup = constraint_system.lookup_gates().size() > 0;
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument;
                         if (use_lookup) {
+                            for (std::size_t i = 0; i < lookup_parts; i++) {
+                                lookup_argument[i] = 0;
+                            }
                             // lookup_argument = placeholder_lookup_argument<
                             //     FieldType, permutation_commitment_scheme_type,
                             //     ParamsType>::verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
@@ -223,8 +226,8 @@ namespace nil {
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
-                        std::array<std::vector<typename FieldType::value_type>, witness_columns + public_input_columns>
-                            variable_values_evaluation_points;
+                        std::vector<std::vector<typename FieldType::value_type>>
+                            variable_values_evaluation_points(witness_columns + public_input_columns);
 
                         // variable_values polynomials (table columns)
                         for (std::size_t variable_values_index = 0; variable_values_index < witness_columns; variable_values_index++) {
@@ -243,8 +246,8 @@ namespace nil {
                         }
 
                         // permutation
-                        std::vector<typename FieldType::value_type> evaluation_points_permutation = {challenge,
-                                                                                                     challenge * omega};
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_permutation = {{challenge,
+                                                                                                     challenge * omega}};
                         // lookup
                         if (use_lookup) {
                             // TODO: Check if commitments roots are used correctly.
@@ -284,18 +287,21 @@ namespace nil {
                         }
 
                         // quotient
-                        std::vector<typename FieldType::value_type> evaluation_points_quotient = {challenge};
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {{challenge}};
 
 
                         // public data
-                        std::vector<typename FieldType::value_type> &evaluation_points_public =
+                        std::vector<std::vector<typename FieldType::value_type>> &evaluation_points_public =
                             evaluation_points_quotient;
-
+                        std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
+                        {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public};
+                        std::array<typename runtime_size_commitment_scheme_type::commitment_type, 4> commitments = 
+                        {proof.variable_values_commitment, proof.v_perm_commitment,
+                                                    proof.T_commitment, preprocessed_public_data.common_data.commitments.fixed_values};
                         if (!algorithms::verify_eval<runtime_size_commitment_scheme_type>(
-                                {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public},
+                                evaluations_points,
                                 proof.eval_proof.combined_value,
-                                                    {proof.variable_values_commitment, proof.v_perm_commitment,
-                                                    proof.T_commitment, preprocessed_public_data.common_data.commitments.fixed_values},
+                                                    commitments,
                                                     fri_params, transcript)) {
                             return false;
                         }

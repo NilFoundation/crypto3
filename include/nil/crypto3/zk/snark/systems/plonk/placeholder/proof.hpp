@@ -58,7 +58,7 @@ namespace nil {
                         typename FieldType::value_type challenge;
                         typename FieldType::value_type lagrange_0;
 
-                        typename fixed_values_commitment_scheme_type::proof_type combined_value;
+                        typename runtime_size_commitment_scheme_type::proof_type combined_value;
                         std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
 
 

@@ -601,6 +601,24 @@ namespace nil {
                         BOOST_ASSERT(coset_size / FRI::m == s.size());
                         BOOST_ASSERT(coset_size / FRI::m == s_indices.size());
 
+                        if (basis_index == 0) {
+                            for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                                y[polynom_index].resize(coset_size / FRI::m);
+                                for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
+                                    if constexpr (std::is_same<
+                                                      math::polynomial_dfs<typename FRI::field_type::value_type>,
+                                                      typename ContainerType::value_type>::value) {
+                                        y[polynom_index][j][0] = f[polynom_index][s_indices[j][0]];
+                                        y[polynom_index][j][1] = f[polynom_index][s_indices[j][1]];
+                                    } else {
+                                        y[polynom_index][j][0] = f[polynom_index].evaluate(s[j][0]);
+                                        y[polynom_index][j][1] = f[polynom_index].evaluate(s[j][1]);
+                                    }
+                                }
+                            }
+                            values.push_back(y);    // y for first round
+                        }
+
                         // TODO: check if leaf index calculation is correct
                         auto p = make_proof_specialized<FRI>(
                             get_folded_index<FRI>(x_index, domain_size, fri_params.step_list[i]), domain_size, *p_tree);
@@ -662,7 +680,7 @@ namespace nil {
                             fri_params.D[basis_index]->size(), T_next);
 
                         round_proofs.push_back(typename FRI::round_proof_type({p, p_tree->root(), colinear_path}));
-
+                        
                         p_tree = std::make_unique<typename FRI::merkle_tree_type>(T_next);
                     }
 
@@ -755,7 +773,8 @@ namespace nil {
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                      typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
                                  FRI>::value &&
-                                 !std::is_same<typename ContainerType::value_type,
+                                 !std::is_same<typename ContainerType::value_type
+                                 ,
                                                typename FRI::field_type::value_type>::value,
                              bool>::type = true>
                 static bool verify_eval(typename FRI::proof_type &proof,
@@ -764,7 +783,6 @@ namespace nil {
                                         const ContainerType &combined_poly,
                                         typename FRI::transcript_type &transcript = typename FRI::transcript_type()) {
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
-                    BOOST_ASSERT(U.size() == V.size());
 
                     std::size_t leaf_size;
                     if constexpr (!FRI::is_const_size) {
@@ -785,6 +803,11 @@ namespace nil {
 
                     std::vector<std::array<typename FRI::field_type::value_type, FRI::m>> s;
                     std::vector<std::array<std::size_t, FRI::m>> s_indices;
+                    if constexpr (FRI::m == 2) {
+                        std::tie(s, s_indices) = calculate_s<FRI>(x, x_index, fri_params.step_list[0], fri_params.D[0]);
+                    } else {
+                        return false;
+                    }
 
                     std::size_t basis_index = 0;
                     for (std::size_t i = 0; i < fri_params.step_list.size() - 1; i++) {
@@ -834,15 +857,11 @@ namespace nil {
                         if constexpr (!FRI::is_const_size) {
                             y.resize(leaf_size);
                         }
-                        if (basis_index == 0) {
-                            y = combined_poly;
-                        } else {
-                            for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
-                                y[polynom_index].resize(proof.get_y(i)[polynom_index].size());
-                                for (std::size_t y_i = 0; y_i < y[polynom_index].size(); y_i++) {
-                                    for (std::size_t j = 0; j < FRI::m; j++) {
-                                        y[polynom_index][y_i][j] = proof.get_y(i)[polynom_index][y_i][j];
-                                    }
+                        for (std::size_t polynom_index = 0; polynom_index < leaf_size; polynom_index++) {
+                            y[polynom_index].resize(proof.get_y(i)[polynom_index].size());
+                            for (std::size_t y_i = 0; y_i < y[polynom_index].size(); y_i++) {
+                                for (std::size_t j = 0; j < FRI::m; j++) {
+                                    y[polynom_index][y_i][j] = proof.get_y(i)[polynom_index][y_i][j];
                                 }
                             }
                         }
@@ -910,7 +929,7 @@ namespace nil {
                                 math::lagrange_interpolation(interpolation_points);
 
                             if (interpolant.evaluate(alpha) !=
-                                proof.get_colinear_value(i)[polynom_index][0][0]) {    // colinear value
+                                proof.get_colinear_value(i)[polynom_index][0][0] && (i !=0)) {    // colinear value
                                 return false;
                             }
 
