@@ -80,16 +80,16 @@ namespace nil {
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType, std::size_t ScalarSize>
                 class endo_scalar<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, ScalarSize, 15>:
-                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15, 0, 0> {
+                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15, 0, 1> {
                     using component_type = component<
                         crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 0, 0>;
+                        15, 0, 1>;
 
-                    using var = typename component_type::var;
 
                     using endo_params = endo_scalar_params<CurveType>;
 
                 public:
+                    using var = typename component_type::var;
                     constexpr static const std::size_t rows_amount = 8;
                     constexpr static const std::size_t gates_amount = 2;
 
@@ -247,7 +247,7 @@ namespace nil {
                         const std::size_t first_selector_index) {
 
                         using F = typename BlueprintFieldType::value_type;
-                        using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                        using var = typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType, ScalarSize>::var;
 
                         std::size_t selector_index_1 = first_selector_index;
                         std::size_t selector_index_2 = first_selector_index + 1;

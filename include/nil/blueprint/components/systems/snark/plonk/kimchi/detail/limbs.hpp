@@ -58,9 +58,9 @@ namespace nil {
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
                 class from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>:
                     public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        3, 0, 0> {
+                        3, 0, 1> {
 
-                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3, 0, 0>;
+                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3, 0, 1>;
 
                 public:
 
@@ -159,7 +159,7 @@ namespace nil {
                         const typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
                         const std::size_t first_selector_index) {
 
-                        using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                        using var = typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::var;
 
                         typename BlueprintFieldType::value_type scalar = 2;
                         auto constraint_1 = bp.add_constraint(var(component.W(0), 0) + var(component.W(1), 0) * scalar.pow(64) - var(component.W(2), 0));

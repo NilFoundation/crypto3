@@ -72,7 +72,7 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
             assert(expected_res == var_value(assignment, real_res.result));
     };
 
-    component_type component_instance({0, 1, 2}, {}, {});
+    component_type component_instance({0, 1, 2}, {}, {0});
 
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);

@@ -72,7 +72,7 @@ void test_exponentiation(std::vector<typename CurveType::base_field_type::value_
             assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{},{});
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{0});
 	
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation) {
 	test_exponentiation<curve_type, 11>(public_input, expected_result);
 	
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "base_scalar_mul: " << duration.count() << "ms" << std::endl;
+    std::cout << "exponentiation_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_2) {
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_2) {
 	test_exponentiation<curve_type, 255>(public_input, expected_result);
 	
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "base_scalar_mul: " << duration.count() << "ms" << std::endl;
+    std::cout << "exponentiation_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

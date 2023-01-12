@@ -67,16 +67,16 @@ namespace nil {
                     15
                 >:
                     public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 0, 0> {
+                        15, 1, 1> {
                     using component_type = component<
                         crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 0, 0>;
+                        15, 1, 1>;
 
-                    using var = typename component_type::var;
 
                     constexpr static const std::size_t witness_amount = 15;
                     constexpr static const std::size_t reserved_witnesses = 2;    // base, accumulated_n
                 public:
+                    using var = typename component_type::var;
                     constexpr static const std::size_t intermediate_start = 0 + reserved_witnesses;
                     constexpr static const std::size_t bits_per_intermediate_result =
                         2;    // defines
@@ -246,8 +246,7 @@ namespace nil {
                         const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::input_type instance_input,
                         const std::size_t first_selector_index) {
 
-                    	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
-                        
+                    	using var = typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::var;
 
                         typename BlueprintFieldType::value_type exponent_shift = 2;
                         exponent_shift = power(exponent_shift, component.bits_per_row);
@@ -297,7 +296,7 @@ namespace nil {
                         const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::input_type instance_input,
                         const std::uint32_t start_row_index) {
 
-                       	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                       	using var = typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::var;
 
                         var zero(component.W(0), start_row_index, false, var::column_type::constant);
                         var one(component.W(0), start_row_index + 1, false, var::column_type::constant);

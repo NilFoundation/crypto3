@@ -58,14 +58,13 @@ namespace nil {
                 // The last sum = x
                 template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t R>
                 class range_check<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, R, 15>:
-                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,15,0,0> {
+                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,15,1,1> {
 
-                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15, 0, 0>;
-
-                    using var = typename component_type::var;
+                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15, 1, 1>;
 
                     constexpr static const std::size_t witness_amount = 15;
                 public:
+                    using var = typename component_type::var;
                     constexpr static const std::size_t chunk_size = 2;
                     constexpr static const std::size_t reserved_columns = 1;
                     constexpr static const std::size_t chunks_per_row = witness_amount - reserved_columns;
@@ -205,9 +204,9 @@ namespace nil {
                         const typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::input_type &instance_input,
                         const std::size_t first_selector_index) {
 
-                        using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                        using var = typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::var;
 
-                        typename BlueprintFieldType::value_type base_two = 2; //TODO
+                        typename BlueprintFieldType::value_type base_two = 2;
 
                         std::vector<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> constraints;
 
@@ -248,7 +247,7 @@ namespace nil {
                         const typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::input_type &instance_input,
                         const std::uint32_t start_row_index) {
 
-                        using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                        using var = typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::var;
 
                         var zero(0, start_row_index, false, var::column_type::constant);
                         bp.add_copy_constraint({zero, var(component.W(0), start_row_index, false)});
@@ -267,10 +266,10 @@ namespace nil {
                         const typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::input_type &instance_input,
                         const std::uint32_t start_row_index) {
 
-                        using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                        using var = typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::var;
 
                         std::size_t row = start_row_index;
-                        assignment.constant(component.W(0), row) = 0;
+                        assignment.constant(component.C(0), row) = 0;
                     }
 
             }    // namespace components
