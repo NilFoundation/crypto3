@@ -51,13 +51,13 @@ namespace nil {
                      typename FieldType>
             class poseidon<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, FieldType, 15>:
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    15,0,0> {
+                    15,0,1> {
 
                 constexpr static const std::int32_t WitnessAmount = 15;
             
                 using component_type = component<
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    WitnessAmount,0,0>;
+                    WitnessAmount,0,1>;
 
             public:
                 constexpr static const std::uint32_t state_size = 3;
@@ -74,7 +74,7 @@ namespace nil {
 
                 constexpr static const std::size_t rate = 2;
                 constexpr static const std::size_t gates_amount = 11;
-                constexpr static const std::size_t rows_amount = 12;
+                constexpr static const std::size_t rows_amount = rounds_amount / rounds_per_row + 1;;
 
                 using var = typename component_type::var;
 
@@ -153,6 +153,8 @@ namespace nil {
                 assignment.witness(component.W(0), row) = state[0];
                 assignment.witness(component.W(1), row) = state[1];
                 assignment.witness(component.W(2), row) = state[2];
+
+                assert(state_size == 3);
 
                 for (std::size_t i = row; i < row + component_type::rows_amount - 1; i++) {
                     for (int j = 0; j < state_size; j++) {

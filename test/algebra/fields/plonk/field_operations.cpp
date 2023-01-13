@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2},{},{});
+    component_type component_instance({0, 1, 2},{},{0});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_addition) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2},{},{});
+    component_type component_instance({0, 1, 2},{},{0});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_division) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2, 3},{},{});
+    component_type component_instance({0, 1, 2, 3},{},{0});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_subtraction) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2},{},{});
+    component_type component_instance({0, 1, 2},{},{0});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_mul_by_constant) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1},{},{});
+    component_type component_instance({0, 1},{0},{0});
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
 }
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::division_or_zero<ArithmetizationType, BlueprintFieldType, 4>;
+    using component_type = blueprint::components::division_or_zero<ArithmetizationType, BlueprintFieldType, 5>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 0;
@@ -267,7 +267,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2, 3},{},{});
+    component_type component_instance({0, 1, 2, 3, 4},{0},{0});
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
 }
