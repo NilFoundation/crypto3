@@ -104,7 +104,7 @@ namespace nil {
                 public:
                     using var = typename component_type::var;
                     constexpr static const std::size_t mul_rows_amount = 102;
-                    constexpr static const std::size_t add_component_rows_amount = unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, 11>::rows_amount;
+                    constexpr static const std::size_t add_component_rows_amount = add_component::rows_amount;
                     constexpr static const std::size_t rows_amount = add_component_rows_amount + mul_rows_amount + 1;
                     constexpr static const std::size_t gates_amount = 2;
 
@@ -318,13 +318,12 @@ namespace nil {
                         typename unified_addition<ArithmetizationType, CurveType, 11>::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
                                                                                {instance_input.T.x, instance_input.T.y}};
 
-                        using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                         unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
                                         component.W(10)},{},{component.PI(0)});
 
-                        generate_circuit(unified_addition_instance, bp, assignment, addition_input, start_row_index); // TODO
+                        generate_circuit(unified_addition_instance, bp, assignment, addition_input, start_row_index);
 
                         generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
                         return typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
