@@ -47,12 +47,9 @@
 
 using namespace nil;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
-
-    using curve_type = algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::base_field_type;
+////////////////////////////////////////
+template <typename BlueprintFieldType>
+void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_input){
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 5;
@@ -65,17 +62,53 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
         crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
+
+    using component_type = blueprint::components::sha512<ArithmetizationType, 9>;
+    
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::sha512<ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    using ed25519_type = algebra::curves::ed25519;
+    std::array<var, 4> e_R_x = {
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
+        var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
+    std::array<var, 4> e_R_y = {
+        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
+        var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
+    std::array<var, 4> pk_x = {
+        var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input),
+        var(0, 10, false, var::column_type::public_input), var(0, 11, false, var::column_type::public_input)};
+    std::array<var, 4> pk_y = {
+        var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input),
+        var(0, 14, false, var::column_type::public_input), var(0, 15, false, var::column_type::public_input)};
+    std::array<var, 4> M = {
+        var(0, 16, false, var::column_type::public_input), var(0, 17, false, var::column_type::public_input),
+        var(0, 18, false, var::column_type::public_input), var(0, 19, false, var::column_type::public_input)};
+    typename component_type::input_type instance_input = {{e_R_x, e_R_y}, {pk_x, pk_y}, M};
 
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type B =
-        ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type R = 2 * B;
-    ed25519_type::scalar_field_type::value_type b = algebra::random_element<ed25519_type::scalar_field_type>();
-    ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = b * R;
+
+    auto result_check = [](AssignmentType &assignment, 
+	    typename component_type::result_type &real_res) {};
+
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0, 1},{0, 1, 2, 3, 4});
+	
+    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+}
+
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
+    auto start = std::chrono::high_resolution_clock::now();
+
+    using curve_type = crypto3::algebra::curves::pallas;
+    using BlueprintFieldType = typename curve_type::base_field_type;
+
+    using ed25519_type = crypto3::algebra::curves::ed25519;
+
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type B =
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::one();
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type R = 2 * B;
+    ed25519_type::scalar_field_type::value_type b = crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T = b * R;
 
     ed25519_type::base_field_type::integral_type Tx = ed25519_type::base_field_type::integral_type(T.X.data);
     ed25519_type::base_field_type::integral_type Ty = ed25519_type::base_field_type::integral_type(T.Y.data);
@@ -103,26 +136,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
                                                                          mask,
                                                                          mask,
                                                                          (mask >> 8)};
-    std::array<var, 4> e_R_x = {
-        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
-        var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
-    std::array<var, 4> e_R_y = {
-        var(0, 4, false, var::column_type::public_input), var(0, 5, false, var::column_type::public_input),
-        var(0, 6, false, var::column_type::public_input), var(0, 7, false, var::column_type::public_input)};
-    std::array<var, 4> pk_x = {
-        var(0, 8, false, var::column_type::public_input), var(0, 9, false, var::column_type::public_input),
-        var(0, 10, false, var::column_type::public_input), var(0, 11, false, var::column_type::public_input)};
-    std::array<var, 4> pk_y = {
-        var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input),
-        var(0, 14, false, var::column_type::public_input), var(0, 15, false, var::column_type::public_input)};
-    std::array<var, 4> M = {
-        var(0, 16, false, var::column_type::public_input), var(0, 17, false, var::column_type::public_input),
-        var(0, 18, false, var::column_type::public_input), var(0, 19, false, var::column_type::public_input)};
-    typename component_type::params_type params = {{e_R_x, e_R_y}, {pk_x, pk_y}, M};
+    
 
-    auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
-                                                                                                 result_check);
+    test_sha512<BlueprintFieldType>(public_input);
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "sha512_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
