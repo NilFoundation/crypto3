@@ -90,7 +90,7 @@ namespace nil {
                         transcript(proof.variable_values_commitment);
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
-                        std::size_t permutation_size = (proof.eval_proof.combined_value.z[0].size() - 2 - constant_columns - selector_columns) / 2;
+                        std::size_t permutation_size = (proof.eval_proof.combined_value.z[3].size() - 2 - constant_columns - selector_columns) / 2;
                         std::vector<typename FieldType::value_type> f(permutation_size);
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
@@ -330,8 +330,7 @@ namespace nil {
                         }
 
                         // Z is polynomial -1, 0 ...., 0, 1
-                        typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);
-                        
+                        typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);                     
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
                             return false;
                         }

@@ -487,7 +487,6 @@ namespace nil {
                         std::cout << "Placeholder prover, total time: " << std::fixed << std::setprecision(3)
                                   << elapsed.count() * 1e-6 << "ms" << std::endl;
 #endif
-
                         return proof;
                     }
                 };
