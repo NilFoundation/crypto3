@@ -78,7 +78,8 @@ namespace nil {
 
                 constexpr static const std::size_t rows_amount =
                     2 + range<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                              typename crypto3::algebra::fields::curve25519_base_field, 9>::rows_amount;
+                              typename crypto3::algebra::fields::curve25519_base_field, 9,
+                              non_native_policy_type>::rows_amount;
 
                 const std::size_t gates_amount = 1;
 
@@ -220,11 +221,12 @@ namespace nil {
                 using ArithmetizationType =
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
 
-                typename range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field,
-                               9>::input_type range_input_r = {var(0, row + 2, false), var(1, row + 2, false),
-                                                               var(2, row + 2, false), var(3, row + 2, false)};
+                typename range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field, 9,
+                               basic_non_native_policy<BlueprintFieldType>>::input_type range_input_r = {
+                    var(0, row + 2, false), var(1, row + 2, false), var(2, row + 2, false), var(3, row + 2, false)};
 
-                range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field, 9>
+                range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field, 9,
+                      basic_non_native_policy<BlueprintFieldType>>
                     range_component_instance({component.W(0), component.W(1), component.W(2), component.W(3),
                                               component.W(4), component.W(5), component.W(6), component.W(7),
                                               component.W(8)},
@@ -333,12 +335,13 @@ namespace nil {
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::var;
 
-                typename range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field,
-                               9>::input_type non_range_input_r = {
+                typename range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field, 9,
+                               basic_non_native_policy<BlueprintFieldType>>::input_type non_range_input_r = {
                     var(component.W(0), j + 2), var(component.W(1), j + 2), var(component.W(2), j + 2),
                     var(component.W(3), j + 2)};
 
-                range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field, 9>
+                range<ArithmetizationType, typename crypto3::algebra::fields::curve25519_base_field, 9,
+                      basic_non_native_policy<BlueprintFieldType>>
                     range_component_instance({component.W(0), component.W(1), component.W(2), component.W(3),
                                               component.W(4), component.W(5), component.W(6), component.W(7),
                                               component.W(8)},
