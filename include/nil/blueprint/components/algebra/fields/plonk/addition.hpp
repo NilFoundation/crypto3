@@ -38,6 +38,7 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/basic_non_native_policy.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -45,21 +46,20 @@ namespace nil {
 
             // Input: x, y \in F_p
             // Output: z = x + y, z \in F_p
-            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount,
+                     typename NonNativePolicyType>
             class addition;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename NonNativePolicyType>
             class addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                BlueprintFieldType, 3>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 3,0,0> {
+                           BlueprintFieldType, 3, NonNativePolicyType>
+                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 3, 0, 0> {
 
                 constexpr static const std::uint32_t WitnessAmount = 3;
-            
-                using component_type = plonk_component<
-                    BlueprintFieldType, ArithmetizationParams, WitnessAmount,0,0>;
+
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessAmount, 0, 0>;
 
             public:
-
                 using var = typename component_type::var;
 
                 const std::size_t gates_amount = 1;
@@ -80,61 +80,62 @@ namespace nil {
                     }
                 };
 
-                template <typename ContainerType>
-                addition(ContainerType witness):
-                    component_type(witness, {}, {}){};
+                template<typename ContainerType>
+                addition(ContainerType witness) : component_type(witness, {}, {}) {};
 
-                template <typename WitnessContainerType, typename ConstantContainerType,
-                    typename PublicInputContainerType>
+                template<typename WitnessContainerType, typename ConstantContainerType,
+                         typename PublicInputContainerType>
                 addition(WitnessContainerType witness, ConstantContainerType constant,
-                        PublicInputContainerType public_input):
-                    component_type(witness, constant, public_input){};
+                         PublicInputContainerType public_input) :
+                    component_type(witness, constant, public_input) {};
 
-                addition(std::initializer_list<
-                        typename component_type::witness_container_type::value_type> witnesses,
-                               std::initializer_list<
-                        typename component_type::constant_container_type::value_type> constants,
-                               std::initializer_list<
-                        typename component_type::public_input_container_type::value_type> public_inputs):
-                    component_type(witnesses, constants, public_inputs){};
+                addition(std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
+                         std::initializer_list<typename component_type::constant_container_type::value_type>
+                             constants,
+                         std::initializer_list<typename component_type::public_input_container_type::value_type>
+                             public_inputs) :
+                    component_type(witnesses, constants, public_inputs) {};
             };
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     std::int32_t WitnessAmount>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, std::int32_t WitnessAmount>
             using plonk_native_addition =
                 addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                BlueprintFieldType, WitnessAmount>;
+                         BlueprintFieldType, WitnessAmount, basic_non_native_policy<BlueprintFieldType>>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type
                 generate_assignments(
                     const plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type instance_input,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type
+                        instance_input,
                     const std::uint32_t start_row_index) {
 
                 const std::size_t j = start_row_index;
 
                 assignment.witness(component.W(0), j) = var_value(assignment, instance_input.x);
                 assignment.witness(component.W(1), j) = var_value(assignment, instance_input.y);
-                assignment.witness(component.W(2), j) = var_value(assignment, instance_input.x) +
-                    var_value(assignment, instance_input.y);
-                return typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type(component, start_row_index);
+                assignment.witness(component.W(2), j) =
+                    var_value(assignment, instance_input.x) + var_value(assignment, instance_input.y);
+                return typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type(
+                    component, start_row_index);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             void generate_gates(
                 const plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type
+                    &instance_input,
                 const std::size_t first_selector_index) {
 
                 using var = typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::var;
 
-                auto constraint_1 = bp.add_constraint(
-                    var(component.W(0), 0) + var(component.W(1), 0) - var(component.W(2), 0));
+                auto constraint_1 =
+                    bp.add_constraint(var(component.W(0), 0) + var(component.W(1), 0) - var(component.W(2), 0));
 
                 bp.add_gate(first_selector_index, {constraint_1});
             }
@@ -143,8 +144,10 @@ namespace nil {
             void generate_copy_constraints(
                 const plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type
+                    &instance_input,
                 const std::size_t start_row_index) {
 
                 using var = typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::var;
@@ -157,20 +160,20 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type
-                generate_circuit(
-                    const plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input,
-                    const std::size_t start_row_index){
+            typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type generate_circuit(
+                const plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::input_type
+                    &instance_input,
+                const std::size_t start_row_index) {
 
                 auto selector_iterator = assignment.find_selector(component);
                 std::size_t first_selector_index;
 
-                if (selector_iterator == assignment.selectors_end()){
-                    first_selector_index = assignment.allocate_selector(component,
-                        component.gates_amount);
+                if (selector_iterator == assignment.selectors_end()) {
+                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
                     generate_gates(component, bp, assignment, instance_input, first_selector_index);
                 } else {
                     first_selector_index = selector_iterator->second;
@@ -180,7 +183,8 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type(component, start_row_index);
+                return typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams, 3>::result_type(
+                    component, start_row_index);
             }
         }    // namespace components
     }        // namespace blueprint

@@ -51,21 +51,21 @@ macro(define_blueprint_test test)
 endmacro()
 
 set(NON_NATIVE_TESTS_FILES
-    "non_native/plonk/field_mul"
-    "non_native/plonk/field_add"
-    "non_native/plonk/field_sub"
+    "algebra/fields/plonk/non_native/multiplication"
+    "algebra/fields/plonk/non_native/addition"
+    "algebra/fields/plonk/non_native/subtraction"
+    "algebra/fields/plonk/non_native/range"
+    "algebra/fields/plonk/non_native/reduction"
+    "algebra/fields/plonk/non_native/bit_decomposition"
     "non_native/plonk/var_base_mul_per_bit"
     "non_native/plonk/complete_addition"
     "non_native/plonk/doubling"
-    "non_native/plonk/range"
     "non_native/plonk/fixed_base_mul"
     "non_native/plonk/variable_base_multiplication"
     "non_native/plonk/non_native_demo"
-    "non_native/plonk/reduction"
     "non_native/plonk/ed25519"
     "non_native/plonk/signatures_verification"
     "non_native/plonk/ec_point"
-    "non_native/plonk/bit_decomposition"
     "non_native/plonk/bool_scalar_multiplication"
     "non_native/plonk/scalar_non_native_range"
     )
