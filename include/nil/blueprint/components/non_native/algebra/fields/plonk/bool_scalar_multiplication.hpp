@@ -80,12 +80,16 @@ namespace nil {
                     var_ec_point output;
 
                     result_type(const bool_scalar_multiplication &component, std::uint32_t start_row_index) {
-                        output.y = {var(component.W(5), start_row_index, false), var(component.W(6), start_row_index, false),
-                         var(component.W(7), start_row_index, false), var(component.W(8), start_row_index, false)};
-                        output.x = {var(component.W(5), start_row_index + 1, false),
-                         var(component.W(6), start_row_index + 1, false),
-                         var(component.W(7), start_row_index + 1, false),
-                          var(component.W(8), start_row_index + 1, false)};
+                        output.y = {
+                            var(component.W(5), start_row_index, false),
+                            var(component.W(6), start_row_index, false),
+                            var(component.W(7), start_row_index, false),
+                            var(component.W(8), start_row_index, false)};
+                        output.x = {
+                            var(component.W(5), start_row_index + 1, false),
+                            var(component.W(6), start_row_index + 1, false),
+                            var(component.W(7), start_row_index + 1, false),
+                            var(component.W(8), start_row_index + 1, false)};
                     }
                 };
 
@@ -172,6 +176,10 @@ namespace nil {
                 const std::size_t first_selector_index) {
                 using var = typename plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams, 9>::var;
 
+                auto constraint_9 = bp.add_constraint(
+                    var(component.W(4), 0)*( var(component.W(4), 0) - 1));
+                auto constraint_10 = bp.add_constraint(
+                    var(component.W(4), 0) - var(component.W(4), +1));
                 auto constraint_1 = bp.add_constraint(
                     var(component.W(5), 0) - (var(component.W(0), 0) * var(component.W(4), 0) + (1 - var(component.W(4), 0))));
                 auto constraint_2 = bp.add_constraint(
@@ -188,16 +196,11 @@ namespace nil {
                     var(component.W(7), +1) - var(component.W(2), +1) * var(component.W(4), +1));
                 auto constraint_8 = bp.add_constraint(
                     var(component.W(8), +1) - var(component.W(3), +1) * var(component.W(4), +1));
-                auto constraint_9 = bp.add_constraint(
-                        var(component.W(4), 0)*( var(component.W(4), 0) - 1));
-                auto constraint_10 = bp.add_constraint(
-                        var(component.W(4), 0) - var(component.W(4), +1));
 
                 bp.add_gate(first_selector_index, 
-                    { constraint_1, constraint_2, constraint_3, constraint_4,
-                    constraint_5, constraint_6, constraint_7, constraint_8
-                    
-                });
+                    {constraint_9, constraint_10, 
+                    constraint_1, constraint_2, constraint_3, constraint_4,
+                    constraint_5, constraint_6, constraint_7, constraint_8});
                 
             }
 
