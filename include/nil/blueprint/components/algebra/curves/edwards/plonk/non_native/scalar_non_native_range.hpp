@@ -33,6 +33,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -66,19 +67,10 @@ namespace nil {
                 struct result_type {
                     std::array<var, 12> output;
                     result_type(const scalar_non_native_range &component, std::uint32_t start_row_index) {
-                        output = { 
-                            var(component.W(1), start_row_index, false), 
-                            var(component.W(2), start_row_index, false), 
-                            var(component.W(3), start_row_index, false),
-                            var(component.W(4), start_row_index, false), 
-                            var(component.W(5), start_row_index, false), 
-                            var(component.W(6), start_row_index, false),
-                            var(component.W(7), start_row_index, false), 
-                            var(component.W(8), start_row_index, false), 
-                            var(component.W(0), start_row_index + 1, false),
-                            var(component.W(1), start_row_index + 1, false), 
-                            var(component.W(2), start_row_index + 1, false), 
-                            var(component.W(3), start_row_index + 1, false)
+                        output = { var(component.W(1), start_row_index, false), var(component.W(2), start_row_index, false), var(component.W(3), start_row_index, false),
+                        var(component.W(4), start_row_index, false), var(component.W(5), start_row_index, false), var(component.W(6), start_row_index, false),
+                        var(component.W(7), start_row_index, false), var(component.W(8), start_row_index, false), var(component.W(0), start_row_index + 1, false),
+                        var(component.W(1), start_row_index + 1, false), var(component.W(2), start_row_index + 1, false), var(component.W(3), start_row_index + 1, false)
                         };
                     }
                 };

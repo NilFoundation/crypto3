@@ -39,13 +39,13 @@ namespace nil {
 
         namespace components {
 
-            template<typename ArithmetizationType, std::uint32_t... ComponentTemplateParams>
-            class component;
+            template<typename ArithmetizationType>
+            class component{};
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
                 std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
-            class component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
-                ConstantAmount, PublicInputAmount> {
+            class plonk_component:
+                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> {
             protected:
 
                 using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
@@ -103,7 +103,7 @@ namespace nil {
                  */
                 template <typename WitnessContainerType, typename ConstantContainerType,
                     typename PublicInputContainerType>
-                component(WitnessContainerType witness, ConstantContainerType constant,
+                plonk_component(WitnessContainerType witness, ConstantContainerType constant,
                         PublicInputContainerType public_input) {
                     std::copy_n(std::make_move_iterator(witness.begin()), WitnessAmount, _W.begin());
                     std::copy_n(std::make_move_iterator(constant.begin()), ConstantAmount, _C.begin());
@@ -143,7 +143,8 @@ namespace nil {
 
 
             template<typename BlueprintFieldType>
-            class component<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
+            class r1cs_component:
+                public component<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
             protected:
 
                 typedef crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>
@@ -152,7 +153,7 @@ namespace nil {
                 blueprint<ArithmetizationType> &bp;
 
             public:
-                component(blueprint<ArithmetizationType> &bp) : bp(bp) {
+                r1cs_component(blueprint<ArithmetizationType> &bp) : bp(bp) {
                 }
             };
 
