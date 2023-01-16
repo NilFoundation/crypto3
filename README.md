@@ -24,9 +24,7 @@ Crypto3 suite:
 
 zkLLVM compiler ecosystem:
 
-* [zkLLVM Assigner](https://github.com/NilFoundation/zkllvm-assigner.git).
 * [zkLLVM Blueprint](https://github.com/NilFoundation/zkllvm-blueprint.git).
-* [zkLLVM Compiler](https://github.com/NilFoundation/zkllvm-circifier.git).
 
 ### External
 * [Boost](https://boost.org) (>= 1.76)

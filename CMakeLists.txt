@@ -74,9 +74,6 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
                            ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      LLVMIRReader
-                      LLVMCore
-                      LLVMSupport
                       crypto3::algebra
                       crypto3::block
                       crypto3::blueprint
@@ -87,8 +84,6 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       crypto3::pubkey
                       crypto3::random
                       crypto3::zk
-
-                      crypto3::assigner
 
                       marshalling::core
                       marshalling::crypto3_algebra
