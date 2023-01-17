@@ -47,15 +47,12 @@ namespace nil {
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             class sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 9, 1>:
-                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    9, 1, 0> {
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 1, 0> {
 
                 constexpr static const std::uint32_t WitnessesAmount = 9;
                 constexpr static const std::uint32_t ConstantsAmount = 1;
             
-                using component_type = component<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    WitnessesAmount, ConstantsAmount, 0>;
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, ConstantsAmount, 0>;
 
             public:
 

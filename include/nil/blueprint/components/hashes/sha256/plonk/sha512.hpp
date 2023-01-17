@@ -44,11 +44,10 @@ namespace nil {
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             class sha512<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 9>:
-                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        9, 2, 5> {
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 1, 0> {
 
                 using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                using component_type = component<ArithmetizationType, 9, 2, 5>;
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 1, 0>;
 
                 using sha512_process_component =  sha512_process<ArithmetizationType, 9, 1>;
 //                   using decomposition_component = 

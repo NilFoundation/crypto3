@@ -37,9 +37,9 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/bit_decomposition.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/bit_decomposition.hpp>
 
-#include "../../test_plonk_component.hpp"
+#include "../../../../test_plonk_component.hpp"
 
 using namespace nil;
 

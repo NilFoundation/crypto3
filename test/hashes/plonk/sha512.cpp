@@ -52,9 +52,9 @@ template <typename BlueprintFieldType>
 void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_input){
 
     constexpr std::size_t WitnessColumns = 9;
-    constexpr std::size_t PublicInputColumns = 5;
-    constexpr std::size_t ConstantColumns = 2;
-    constexpr std::size_t SelectorColumns = 15;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 5;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -89,7 +89,7 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
     auto result_check = [](AssignmentType &assignment, 
 	    typename component_type::result_type &real_res) {};
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0, 1},{0, 1, 2, 3, 4});
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
 	
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
 }

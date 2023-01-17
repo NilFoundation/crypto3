@@ -37,7 +37,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/reduction.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/reduction.hpp>
 
 #include "test_plonk_component.hpp"
 

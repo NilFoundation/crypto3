@@ -36,9 +36,9 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/range.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/range.hpp>
 
-#include "../../test_plonk_component.hpp"
+#include "../../../../test_plonk_component.hpp"
 
 using namespace nil;
 
@@ -59,7 +59,7 @@ void test_field_range(std::vector<typename BlueprintFieldType::value_type> publi
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
     using component_type = blueprint::components::range<ArithmetizationType,
-        typename crypto3::algebra::fields::curve25519_base_field, 9>;
+        typename crypto3::algebra::fields::curve25519_base_field, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),

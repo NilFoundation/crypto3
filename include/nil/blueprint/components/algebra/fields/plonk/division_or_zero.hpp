@@ -53,14 +53,11 @@ namespace nil {
                      typename ArithmetizationParams>
             class division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 BlueprintFieldType, 5>:
-                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    5,1,1> {
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 5, 0, 0> {
 
                 constexpr static const std::int32_t WitnessAmount = 5;
             
-                using component_type = component<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    WitnessAmount,1,1>;
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessAmount, 0, 0>;
 
             public:
 
