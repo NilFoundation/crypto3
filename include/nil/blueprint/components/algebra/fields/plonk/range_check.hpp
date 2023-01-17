@@ -58,9 +58,9 @@ namespace nil {
                 // The last sum = x
                 template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t R>
                 class range_check<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, R, 15>:
-                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,15,1,1> {
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0> {
 
-                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15, 1, 1>;
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0>;
 
                     constexpr static const std::size_t witness_amount = 15;
                 public:

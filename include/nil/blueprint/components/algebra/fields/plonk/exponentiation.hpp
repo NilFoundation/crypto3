@@ -66,11 +66,8 @@ namespace nil {
                     ExponentSize,
                     15
                 >:
-                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 1, 1> {
-                    using component_type = component<
-                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 1, 1>;
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0> {
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0>;
 
 
                     constexpr static const std::size_t witness_amount = 15;

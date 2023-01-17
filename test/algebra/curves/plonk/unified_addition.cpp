@@ -76,7 +76,7 @@ void test_unified_addition(std::vector<typename CurveType::base_field_type::valu
         assert(expected_res.Y == var_value(assignment, real_res.Y));
     };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},{},{0});
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},{},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);

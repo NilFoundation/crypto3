@@ -57,10 +57,9 @@ namespace nil {
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
                 class from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>:
-                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        3, 0, 1> {
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 3, 0, 0> {
 
-                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3, 0, 1>;
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 3, 0, 0>;
 
                 public:
 
@@ -195,10 +194,9 @@ namespace nil {
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
                 class to_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15>:
-                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 1, 1> {
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0> {
 
-                    using component_type = component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15, 1, 1>;
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0>;
 
                     constexpr static const std::size_t chunk_size = 64;
                     using range_check_component = nil::blueprint::components::range_check<
@@ -265,7 +263,7 @@ namespace nil {
                         range_check<ArithmetizationType, component.chunk_size_public, 15> range_check_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
-                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{component.PI(0)});
+                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{});
 
                         auto selector_iterator = assignment.find_selector(component);
                         std::size_t first_selector_index;
@@ -322,7 +320,7 @@ namespace nil {
                         range_check<ArithmetizationType, component.chunk_size_public, 15> range_check_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
-                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{component.PI(0)});
+                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{});
 
                         std::size_t row = start_row_index;
                         typename BlueprintFieldType::value_type value = var_value(assignment, instance_input.param);

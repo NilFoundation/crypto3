@@ -80,10 +80,8 @@ namespace nil {
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType, std::size_t ScalarSize>
                 class endo_scalar<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, ScalarSize, 15>:
-                    public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15, 0, 1> {
-                    using component_type = component<
-                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 0, 1>;
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 0, 0> {
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 0, 0>;
 
 
                     using endo_params = endo_scalar_params<CurveType>;

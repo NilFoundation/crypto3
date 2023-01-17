@@ -71,7 +71,7 @@ typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates:
     var T_Y_var = {0, 1, false, var::column_type::public_input};
     typename component_type::input_type instance_input = {{T_X_var, T_Y_var},scalar_var};
 
-	component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{0});
+	component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{});
 	
 	auto result_check = [&expected](AssignmentType &assignment,
         typename component_type::result_type &real_res) {

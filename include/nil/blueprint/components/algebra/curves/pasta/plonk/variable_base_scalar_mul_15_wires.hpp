@@ -91,15 +91,12 @@ namespace nil {
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     CurveType,
                     15
-                >: public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 1, 1> {
+                >: public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0> {
 
                     using add_component =
                         nil::blueprint::components::unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, 11>;
 
-                    using component_type = component<
-                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15, 1, 1>;
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0>;
 
                 public:
                     using var = typename component_type::var;
@@ -190,7 +187,7 @@ namespace nil {
                         unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
-                                        component.W(10)},{},{component.PI(0)});
+                                        component.W(10)},{},{});
 
                         typename unified_addition<ArithmetizationType, CurveType, 11>::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
                                                                                {instance_input.T.x, instance_input.T.y}};
@@ -321,7 +318,7 @@ namespace nil {
                         unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
-                                        component.W(10)},{},{component.PI(0)});
+                                        component.W(10)},{},{});
 
                         generate_circuit(unified_addition_instance, bp, assignment, addition_input, start_row_index);
 
@@ -548,7 +545,7 @@ namespace nil {
                         unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
-                                        component.W(10)},{},{component.PI(0)});
+                                        component.W(10)},{},{});
 
                         typename unified_addition<ArithmetizationType, CurveType, 11>::result_type addition_res(unified_addition_instance, start_row_index);
 
