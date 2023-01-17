@@ -61,6 +61,7 @@ namespace nil {
 
             public:
                 const std::size_t gates_amount = 1;
+                constexpr static const std::size_t rows_amount = 1;
 
                 using var = typename component_type::var;
 
