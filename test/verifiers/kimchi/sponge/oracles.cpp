@@ -44,7 +44,6 @@
 
 #include "test_plonk_component.hpp"
 
-//////////
 template <typename BlueprintFieldType>
 void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public_input,
     typename BlueprintFieldType::value_type expected_res){

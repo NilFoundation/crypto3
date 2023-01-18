@@ -145,7 +145,7 @@ namespace nil {
                 assignment.witness(component.W(1), row) = state[1];
                 assignment.witness(component.W(2), row) = state[2];
 
-                assert(state_size == 3);
+                static_assert(state_size == 3);
 
                 for (std::size_t i = row; i < row + component_type::rows_amount - 1; i++) {
                     for (int j = 0; j < state_size; j++) {

@@ -47,7 +47,6 @@
 
 using namespace nil;
 
-////////////////////////////////////////
 template <typename BlueprintFieldType>
 void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_input){
 
