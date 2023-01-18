@@ -97,8 +97,6 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
 
@@ -139,9 +137,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
     
 
     test_sha512<BlueprintFieldType>(public_input);
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "sha512_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

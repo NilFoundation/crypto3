@@ -87,8 +87,6 @@ typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates:
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pallas) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -111,14 +109,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pall
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_one_pallas) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -141,14 +134,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_one_pallas)
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_zero_pallas) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -171,14 +159,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_zero_pallas
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_minus_one_pallas) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -201,14 +184,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_minus_one_p
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_vesta) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -231,14 +209,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_vest
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_one_vesta) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -261,14 +234,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_one_vesta) 
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_zero_vesta) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -291,14 +259,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_zero_vesta)
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_minus_one_vesta) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -321,9 +284,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_scalar_minus_one_v
 	}
 
 	test_variable_base_scalar_mul<curve_type>(public_input, expected);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "variable_base_scalar_mul_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

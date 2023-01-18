@@ -75,8 +75,6 @@ void test_range_check(std::vector<typename BlueprintFieldType::value_type> publi
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_fields_range_check_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
 
@@ -85,16 +83,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {x_value};
 
 	test_range_check<BlueprintFieldType>(public_input);
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "range_check_test: " << duration.count() << "ms" << std::endl;
 }
 
 // TODO: we need to check that component fails on the wrong input. Now our tests only can check thet component works correctly with correct data 
 /*
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_false_result) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
 
@@ -104,9 +97,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_false_result) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {x_value};
 
 	test_range_check<BlueprintFieldType>(public_input);
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "range_check_test: " << duration.count() << "ms" << std::endl;
 }
 */
 BOOST_AUTO_TEST_SUITE_END()

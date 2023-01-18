@@ -117,8 +117,6 @@ void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_i
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
 
@@ -129,14 +127,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
 
 	test_from_limbs<BlueprintFieldType>(public_input, expected_res);
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "from_limbs_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_1) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
 
@@ -150,13 +143,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_1) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {input};
 
 	test_to_limbs<BlueprintFieldType>(public_input, expected_res);
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "to_limbs_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_2) {
-    auto start = std::chrono::high_resolution_clock::now();
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
 
@@ -170,9 +159,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_2) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {input};
 
 	test_to_limbs<BlueprintFieldType>(public_input, expected_res);
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "to_limbs_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

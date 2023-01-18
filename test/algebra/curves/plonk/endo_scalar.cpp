@@ -83,8 +83,6 @@ void test_endo_scalar(std::vector<typename CurveType::scalar_field_type::value_t
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_endo_scalar_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::scalar_field_type;
     
@@ -94,9 +92,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unified_addition_addition) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {challenge};
     
 	test_endo_scalar<curve_type>(public_input, result);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "endo_scalar: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

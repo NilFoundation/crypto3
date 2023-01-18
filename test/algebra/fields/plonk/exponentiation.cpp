@@ -84,8 +84,6 @@ void test_exponentiation(std::vector<typename CurveType::base_field_type::value_
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -97,14 +95,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation) {
     typename BlueprintFieldType::value_type expected_result = power(base_value, exponent_value_integral);
 
 	test_exponentiation<curve_type, 11>(public_input, expected_result);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "exponentiation_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_2) {
-    auto start = std::chrono::high_resolution_clock::now();
-
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -116,9 +109,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_2) {
     typename BlueprintFieldType::value_type expected_result = power(base_value, exponent_value_integral);
 
 	test_exponentiation<curve_type, 255>(public_input, expected_result);
-	
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "exponentiation_test: " << duration.count() << "ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
