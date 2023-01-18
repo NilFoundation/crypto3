@@ -45,69 +45,77 @@
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/decomposed_variable_base_scalar_mul_15_wires.hpp>
 #include "test_plonk_component.hpp"
 
-#include "../../../profiling.hpp"
+#include "../../zk/include/nil/crypto3/zk/snark/systems/plonk/placeholder/profiling.hpp"
 
 using namespace nil::crypto3;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposed_variable_base_scalar_mul) {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    using curve_type = algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::base_field_type;
-    using BlueprintScalarType = typename curve_type::scalar_field_type;
+template <typename CurveType>
+void test_decomposed_variable_base_scalar_mul (std::vector<typename CurveType::base_field_type::value_type> public_input,
+typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type expected){
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 5;
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumns,
+    constexpr std::size_t SelectorColumns = 4;
+	using BlueprintFieldType = typename CurveType::base_field_type;
+    using BlueprintScalarType = typename CurveType::scalar_field_type;
+    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
-    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
-    using component_type = zk::components::curve_element_decomposed_variable_base_scalar_mul<ArithmetizationType, curve_type, 
-                                                            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
-	using var = zk::snark::plonk_variable<BlueprintFieldType>;
-    typename BlueprintScalarType::value_type b_scalar = algebra::random_element<BlueprintScalarType>();
+	using component_type = nil::blueprint::components::curve_element_decomposed_variable_base_scalar_mul<ArithmetizationType, CurveType, 15>;
 
-	typename curve_type::scalar_field_type::value_type shift_base = 2;
-    typename curve_type::scalar_field_type::integral_type base = 1;
-	auto shift = shift_base.pow(255) + 1;
-	typename BlueprintScalarType::value_type x = (b_scalar - shift)/2;
-	typename BlueprintScalarType::integral_type integral_x = typename BlueprintScalarType::integral_type(x.data);
-	BlueprintFieldType::value_type x_scalar =  integral_x;
+	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-
-    curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type T = algebra::random_element<curve_type::template g1_type<algebra::curves::coordinates::affine>>();
 	var scalar_var1 = {0, 2, false, var::column_type::public_input};
 	var scalar_var2 = {0, 3, false, var::column_type::public_input};
     var T_X_var = {0, 0, false, var::column_type::public_input};
     var T_Y_var = {0, 1, false, var::column_type::public_input};
-    typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var1, scalar_var2};
-	std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, integral_x & ((base << 254) - 1), integral_x >> 254};
-	curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type expected;
+    typename component_type::input_type instance_input = {{T_X_var, T_Y_var},scalar_var1, scalar_var2};
+	
+
+	component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{});
+	
+	auto result_check = [&expected](AssignmentType &assignment,
+        typename component_type::result_type &real_res) {
+			typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type R;
+			R.X = var_value(assignment, real_res.X);
+			R.Y = var_value(assignment, real_res.Y);
+			assert(expected.X == var_value(assignment, real_res.X));
+			assert(expected.Y == var_value(assignment, real_res.Y));
+    };
+    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+}
+
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposed_variable_base_scalar_mul_random_scalar_pallas) {
+    using curve_type = nil::crypto3::algebra::curves::pallas;
+    using BlueprintFieldType = typename curve_type::base_field_type;
+    using BlueprintScalarType = typename curve_type::scalar_field_type;
+
+    typename BlueprintScalarType::value_type b_scalar = nil::crypto3::algebra::random_element<BlueprintScalarType>();
+
+	typename curve_type::scalar_field_type::value_type shift_base = 2;
+	typename curve_type::scalar_field_type::integral_type base = 1;
+	auto shift = shift_base.pow(255) + 1;
+	typename BlueprintScalarType::value_type x = (b_scalar - shift)/2;
+	typename BlueprintScalarType::integral_type integral_x = typename BlueprintScalarType::integral_type(x.data);
+	typename BlueprintFieldType::value_type x_scalar =  integral_x;
+	// typename BlueprintScalarType::integral_type integral_x = typename BlueprintScalarType::integral_type(x.data);
+
+
+	curve_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type T = nil::crypto3::algebra::random_element<curve_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>>();
+	std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, integral_x & ((base << 254) - 1), (integral_x >> 254)};
+	curve_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type expected;
 	if (b_scalar != 0) {
 	 	expected = b_scalar * T;
 	} else {
 		expected = {0, 0};
 	}
-	std::cout<<"Expected result: "<< expected.X.data <<" " << expected.Y.data<<std::endl;
-	auto result_check = [&expected, T, shift_base](AssignmentType &assignment, 
-        component_type::result_type &real_res) {
-			curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type R;
-			R.X = assignment.var_value(real_res.X);
-			R.Y = assignment.var_value(real_res.Y);
-			std::cout<<"Component result: "<< assignment.var_value(real_res.X).data <<" " << assignment.var_value(real_res.Y).data<<std::endl;
-			assert(expected.X == assignment.var_value(real_res.X));
-			assert(expected.Y == assignment.var_value(real_res.Y));
-    };
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input, result_check);
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "base_scalar_mul: " << duration.count() << "ms" << std::endl;
+	test_decomposed_variable_base_scalar_mul<curve_type>(public_input, expected);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -37,7 +37,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/bool_scalar_multiplication.hpp>
+#include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/bool_scalar_multiplication.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -87,9 +87,20 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test0) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     std::vector<typename field_type::value_type> input(9);
-    for (int i = 0; i < 9; ++i) {
+    for (int i = 0; i < 8; ++i) {
         input[i] = crypto3::algebra::random_element<field_type>();
     }
+    input[8] = 0;
+    test_bool_scalar_multiplication<field_type>(input);
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test1) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    std::vector<typename field_type::value_type> input(9);
+    for (int i = 0; i < 8; ++i) {
+        input[i] = crypto3::algebra::random_element<field_type>();
+    }
+    input[8] = 1;
     test_bool_scalar_multiplication<field_type>(input);
 }
 

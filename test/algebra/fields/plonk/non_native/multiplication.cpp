@@ -40,9 +40,9 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/multiplication.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/multiplication.hpp>
 
-#include "../../test_plonk_component.hpp"
+#include "../../../../test_plonk_component.hpp"
 
 using namespace nil;
 
@@ -64,7 +64,7 @@ void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
     using component_type = blueprint::components::multiplication<ArithmetizationType,
-        typename ed25519_type::base_field_type, 9>;
+        typename ed25519_type::base_field_type, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_a = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),

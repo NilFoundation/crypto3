@@ -46,16 +46,13 @@ namespace nil {
             template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
             class unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 CurveType, 11>:
-                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    11,0,0> {
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 11, 0, 0> {
 
                 static_assert(std::is_same<typename CurveType::base_field_type, BlueprintFieldType>::value);
 
                 constexpr static const std::uint32_t WitnessAmount = 11;
             
-                using component_type = component<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    WitnessAmount,0,0>;
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessAmount, 0, 0>;
 
             public:
 

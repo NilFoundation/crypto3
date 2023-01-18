@@ -52,14 +52,11 @@ namespace nil {
                      typename ArithmetizationParams>
             class mul_by_constant<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 BlueprintFieldType, 2>:
-                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    2,0,0> {
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 2, 1, 0> {
 
                 constexpr static const std::int32_t WitnessAmount = 2;
             
-                using component_type = component<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    WitnessAmount,0,0>;
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessAmount, 1, 0>;
 
             public:
 

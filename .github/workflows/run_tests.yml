@@ -74,21 +74,19 @@ jobs:
             blueprint_hashes_plonk_poseidon_test,
             blueprint_algebra_curves_plonk_endo_scalar_test,
             blueprint_algebra_fields_plonk_range_check_test,
-
             blueprint_algebra_fields_plonk_non_native_addition_test,
             blueprint_algebra_fields_plonk_non_native_subtraction_test,
             blueprint_algebra_fields_plonk_non_native_multiplication_test,
             blueprint_algebra_fields_plonk_non_native_range_test,
-            blueprint_algebra_fields_plonk_non_native_reduction_test
-            blueprint_algebra_fields_plonk_non_native_bit_decomposition_test
+            blueprint_algebra_fields_plonk_non_native_reduction_test,
+            blueprint_algebra_fields_plonk_non_native_bit_decomposition_test,
             blueprint_non_native_plonk_scalar_non_native_range_test,
-            blueprint_non_native_plonk_bool_scalar_multiplication_test
-            blueprint_hashes_plonk_decomposition_test
+            blueprint_non_native_plonk_bool_scalar_multiplication_test,
+            blueprint_hashes_plonk_decomposition_test,
             blueprint_hashes_plonk_sha256_process_test,
             blueprint_hashes_plonk_sha512_process_test,
             blueprint_hashes_plonk_sha256_test,
             blueprint_hashes_plonk_sha512_test,
-
             blueprint_non_native_plonk_fixed_base_mul_test,
             blueprint_non_native_plonk_complete_addition_test,
             blueprint_non_native_plonk_var_base_mul_per_bit_test,

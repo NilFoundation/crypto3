@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_multiplication) {
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::multiplication<ArithmetizationType, BlueprintFieldType, 3>;
+    using component_type = blueprint::components::multiplication<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 12;
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_addition) {
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::addition<ArithmetizationType, BlueprintFieldType, 3>;
+    using component_type = blueprint::components::addition<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 22;
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_division) {
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::division<ArithmetizationType, BlueprintFieldType, 4>;
+    using component_type = blueprint::components::division<ArithmetizationType, BlueprintFieldType, 4, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename BlueprintFieldType::value_type x = 16;
     typename BlueprintFieldType::value_type y = 2;
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_subtraction) {
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::subtraction<ArithmetizationType, BlueprintFieldType, 3>;
+    using component_type = blueprint::components::subtraction<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename BlueprintFieldType::value_type x = 0x56BC8334B5713726A_cppui256;
     typename BlueprintFieldType::value_type y = 101;
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_mul_by_constant) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1},{},{});
+    component_type component_instance({0, 1},{0},{});
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
 }
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
     using BlueprintFieldType = typename curve_type::base_field_type;
     constexpr std::size_t WitnessColumns = 5;
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
     using ArithmetizationParams =
         crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::division_or_zero<ArithmetizationType, BlueprintFieldType, 4>;
+    using component_type = blueprint::components::division_or_zero<ArithmetizationType, BlueprintFieldType, 5>;
 
     typename BlueprintFieldType::value_type x = 2;
     typename BlueprintFieldType::value_type y = 0;
@@ -267,7 +267,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_div_or_zero) {
         assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2, 3},{},{});
+    component_type component_instance({0, 1, 2, 3, 4},{},{});
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
 }

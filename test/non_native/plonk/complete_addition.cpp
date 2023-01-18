@@ -39,7 +39,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/complete_addition_edwards25519.hpp>
+#include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/complete_addition.hpp>
 
 #include "../../test_plonk_component.hpp"
 

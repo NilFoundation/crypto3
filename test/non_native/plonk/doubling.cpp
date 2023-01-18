@@ -39,7 +39,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/doubling_edwards25519.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/doubling_edwards25519.hpp>
 
 #include "../../test_plonk_component.hpp"
 
