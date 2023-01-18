@@ -30,7 +30,7 @@
 
 #include <algorithm>
 #include <vector>
-#include <queue>
+#include <stack>
 
 #include <boost/variant.hpp>
 
@@ -187,8 +187,9 @@ namespace nil {
             template<typename T, std::size_t Arity>
             std::vector<detail::merkle_proof_impl<detail::merkle_tree_node<T>, Arity>> 
                 generate_compressed_proofs(const containers::merkle_tree<typename detail::merkle_tree_node<T>::hash_type, Arity> &tree, 
-                                            const std::vector<std::size_t> leaf_idxs) {
-                std::cout << "proofs size: " << leaf_idxs.size() << std::endl;
+                                            std::vector<std::size_t> leaf_idxs) {
+                assert(leaf_idxs.size() > 0);
+                std::sort(leaf_idxs.begin(), leaf_idxs.end());
                 typedef typename detail::merkle_tree_node<T> NodeType;
                 typedef typename detail::merkle_proof_impl<NodeType, Arity>::path_element_type path_element_type;
                 typedef std::array<path_element_type, Arity - 1> layer_type;
@@ -196,50 +197,51 @@ namespace nil {
                 proofs.reserve(leaf_idxs.size());
                 std::size_t row_len = tree.leaves();
                 std::vector<bool> known(2 * row_len, false);
-                // for (std::size_t i = 0; i < row_len; ++i) {
-                //     known[i] = true;   // leaves are known
-                // }
                 for (auto leaf_idx : leaf_idxs) {
-                    // proof.leaf_index() = leaf_idx;
-                    // proof.root() = tree.root();
                     std::vector<layer_type> path(tree.row_count() - 1);
-
                     typename std::vector<layer_type>::iterator v_itr = path.begin();
                     std::size_t cur_leaf = leaf_idx;
-                    std::cout << "cur_leaf: " << cur_leaf << std::endl;
                     std::size_t row_len = tree.leaves();
                     std::size_t row_begin_idx = 0;
-                    while (cur_leaf != tree.size() - 1) {    // while it's not _root
+                    bool finish_path = false;
+                    bool all_known = true;
+                    while (cur_leaf != tree.size() - 1) {
                         std::size_t cur_leaf_pos = cur_leaf % Arity;
                         std::size_t cur_leaf_arity_pos = (cur_leaf - row_begin_idx) / Arity;
                         std::size_t begin_this_arity = cur_leaf - cur_leaf_pos;
                         typename layer_type::iterator a_itr = v_itr->begin();
-                        bool increment_v_itr = false;
                         for (size_t i = 0; i < cur_leaf_pos; ++i, ++begin_this_arity) {
                             if (!known[begin_this_arity + i]) {
-                                *a_itr = path_element_type(tree[begin_this_arity], i);
-                                std::cout << "a_itr: " << a_itr->_hash << std::endl;
                                 known[begin_this_arity + i] = true;
-                                ++a_itr;
-                                increment_v_itr = true;
+                                all_known = false;
+                            } else {
+                                finish_path = true;
                             }
+                            *a_itr = path_element_type(tree[begin_this_arity], i);
+                            ++a_itr;
                         }
                         for (size_t i = cur_leaf_pos + 1; i < Arity; ++i, ++begin_this_arity) {
-                            if (!known[begin_this_arity + i]) {
-                                *a_itr = path_element_type(tree[begin_this_arity + 1], i);
-                                std::cout << "a_itr: " << a_itr->_hash << std::endl;
-                                known[begin_this_arity + i] = true;
-                                ++a_itr;
-                                increment_v_itr = true;
+                            if (!known[begin_this_arity + 1]) {
+                                known[begin_this_arity + 1] = true;
+                                all_known = false;
+                            } else {
+                                finish_path = true;
                             }
+                            *a_itr = path_element_type(tree[begin_this_arity + 1], i);
+                            ++a_itr;
                         }
-                        if (increment_v_itr) v_itr++;
+                        if (all_known == true && v_itr - path.begin() > 0) {
+                            break;
+                        }
+                        v_itr++;
+                        if (finish_path) {
+                            break;
+                        }
                         cur_leaf = row_len + row_begin_idx + cur_leaf_arity_pos;
                         row_begin_idx += row_len;
                         row_len /= Arity;
                     }
                     path.resize(v_itr - path.begin());
-                    std::cout << "path size: " << path.size() << std::endl;
                     proofs.push_back(detail::merkle_proof_impl<NodeType, Arity>(leaf_idx, tree.root(), path));
                 }
                 return proofs;
@@ -249,42 +251,20 @@ namespace nil {
             bool validate_compressed_proofs(const std::vector<detail::merkle_proof_impl<detail::merkle_tree_node<T>, Arity>> &proofs,
                                             const std::vector<Hashable> &a) {
                 assert(proofs.size() == a.size());
+                assert(proofs.size() > 0);
                 typedef typename detail::merkle_tree_node<T>::hash_type hash_type;
                 typedef typename detail::merkle_tree_node<T>::value_type value_type;
-                std::queue<std::pair<value_type, std::size_t>> que;
+                std::stack<std::pair<value_type, std::size_t>> st;
                 auto root = proofs[0].root();
-                auto row_count = proofs[0].path().size() + 1;
-                std::cout << "root: " << root << '\n';
+                auto full_proof_size = proofs[0].path().size();
                 for (int j = proofs.size() - 1; j >= 0; --j) {
                     auto path = proofs[j].path();
-                    while (!que.empty()) {
-                        std::cout << "j: " << j << '\n';
-                        std::cout << "front.second: " << que.front().second << ' ' << path.size() << '\n';
-                        auto front = que.front();
-                        if (front.second == row_count) {
-                            que.pop();
-                            if (front.first != root) {
-                                return false;
-                            } else {
-                                break;
-                            }
-                        }
-                        if (front.second >= path.size()) {
-                            break;
-                        }
-                        std::cout << "hash: " << path[front.second][0].hash() << ' ' << front.first << '\n';
-                        if (path[front.second][0].hash() != front.first) {
-                            que.pop();
-                            return false;
-                        }
-                    }
-                    if (path.size() == 0) {
-                        continue;
-                    }
+                    assert(path.size() != 0);
                     value_type d = crypto3::hash<hash_type>(a[j]);
+                    std::vector<value_type> hashes = {d};
                     for (auto &it : path) {
                         accumulator_set<hash_type> acc;
-                        size_t i = 0;
+                        std::size_t i = 0;
                         for (; (i < Arity - 1) && i == it[i].position(); ++i) {
                             crypto3::hash<hash_type>(it[i].hash().begin(), it[i].hash().end(), acc);
                         }
@@ -293,16 +273,22 @@ namespace nil {
                             crypto3::hash<hash_type>(it[i].hash().begin(), it[i].hash().end(), acc);
                         }
                         d = accumulators::extract::hash<hash_type>(acc);
+                        hashes.push_back(d);
                     }
-                    std::cout << "d_" << j << ": " << d << std::endl;
-                    que.push(std::make_pair(d, path.size()));
-                }
-                std::cout << que.size() << std::endl;
-                while (!que.empty()) {
-                    auto front = que.front();
-                    que.pop();
-                    if (front.first != root) {
-                        std::cout << "front.first: " << front.first << std::endl;
+                    while (!st.empty()) {
+                        auto top = st.top();
+                        if (top.second >= hashes.size()) {
+                            break;
+                        }
+                        if (hashes[top.second] == top.first) {
+                            st.pop();
+                        } else {
+                            return false;
+                        }
+                    }
+                    if (path.size() < full_proof_size) {
+                        st.push(std::make_pair(d, path.size()));
+                    } else if (d != root) {
                         return false;
                     }
                 }

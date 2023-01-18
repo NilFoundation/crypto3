@@ -93,6 +93,96 @@ void testing_validate_template(std::vector<Element> data) {
     BOOST_CHECK(false == wrong_data_validate);
 }
 
+template<typename Hash, size_t Arity, typename ValueType, std::size_t N>
+void testing_validate_template_random_data_compressed_proofs(std::size_t leaf_number) {
+    std::array<ValueType, N> data_not_in_tree = {0};
+    auto data = generate_random_data<ValueType, N>(leaf_number);
+    auto tree = make_merkle_tree<Hash, Arity>(data.begin(), data.end());
+
+    std::size_t num_idxs = std::rand() % leaf_number;
+    while (num_idxs == 0) {
+        num_idxs = std::rand() % leaf_number;
+    }
+    std::vector<std::size_t> proof_idxs;
+    std::vector<std::array<ValueType, N>> data_for_validation;
+    for (std::size_t i = 0; i < num_idxs; ++i) {
+        proof_idxs.emplace_back(std::rand() % leaf_number);
+    }
+    std::sort(proof_idxs.begin(), proof_idxs.end());
+    for (auto idx : proof_idxs) {
+        data_for_validation.emplace_back(data[idx]);
+    }
+    std::size_t leaf_idx = 0;
+    for (auto idx : proof_idxs) {
+        if (idx == leaf_idx) {
+            leaf_idx++;
+        } else {
+            break;
+        }
+    }
+    auto data_wrong_leaf = data_for_validation;
+    data_wrong_leaf[std::rand() % num_idxs] = data[leaf_idx];
+    assert(data_wrong_leaf != data_for_validation);
+    std::size_t data_idx = std::rand() % num_idxs;
+    data_idx = std::rand() % num_idxs;
+    auto data_wrong_data = data_for_validation;
+    data_wrong_data[data_idx] = data_not_in_tree;
+    assert(data_wrong_data[data_idx] != data_for_validation[data_idx]);
+
+    std::vector<merkle_proof<Hash, Arity>> compressed_proofs = containers::generate_compressed_proofs<Hash, Arity>(tree, proof_idxs);
+    bool validate_compressed = containers::validate_compressed_proofs<std::array<ValueType, N>, Hash, Arity>(compressed_proofs, data_for_validation);
+    bool wrong_leaf_validate_compressed = containers::validate_compressed_proofs<std::array<ValueType, N>, Hash, Arity>(compressed_proofs, data_wrong_leaf);
+    bool wrong_data_validate_compressed = containers::validate_compressed_proofs<std::array<ValueType, N>, Hash, Arity>(compressed_proofs, data_wrong_data);
+    BOOST_CHECK(validate_compressed);
+    BOOST_CHECK(!wrong_leaf_validate_compressed);
+    BOOST_CHECK(!wrong_data_validate_compressed);
+}
+
+template<typename Hash, size_t Arity, typename Element>
+void testing_validate_template_compressed_proofs(std::vector<Element> data) {
+    std::array<uint8_t, 7> data_not_in_tree = {'\x6d', '\x65', '\x73', '\x73', '\x61', '\x67', '\x65'};
+    merkle_tree<Hash, Arity> tree = make_merkle_tree<Hash, Arity>(data.begin(), data.end());
+
+    std::size_t leaf_number = data.size();
+    std::size_t num_idxs = std::rand() % leaf_number;
+    while (num_idxs == 0) {
+        num_idxs = std::rand() % leaf_number;
+    }
+    std::vector<std::size_t> proof_idxs;
+    std::vector<Element> data_for_validation;
+    for (std::size_t i = 0; i < num_idxs; ++i) {
+        proof_idxs.emplace_back(std::rand() % leaf_number);
+    }
+    std::sort(proof_idxs.begin(), proof_idxs.end());
+    for (auto idx : proof_idxs) {
+        data_for_validation.emplace_back(data[idx]);
+    }
+    std::size_t leaf_idx = 0;
+    for (auto idx : proof_idxs) {
+        if (idx == leaf_idx) {
+            leaf_idx++;
+        } else {
+            break;
+        }
+    }
+    auto data_wrong_leaf = data_for_validation;
+    data_wrong_leaf[std::rand() % num_idxs] = data[leaf_idx];
+    assert(data_wrong_leaf != data_for_validation);
+    std::size_t data_idx = std::rand() % num_idxs;
+    data_idx = std::rand() % num_idxs;
+    auto data_wrong_data = data_for_validation;
+    data_wrong_data[data_idx] = {'9'};
+    assert(data_wrong_data[data_idx] != data_for_validation[data_idx]);
+
+    std::vector<merkle_proof<Hash, Arity>> compressed_proofs = containers::generate_compressed_proofs<Hash, Arity>(tree, proof_idxs);
+    bool validate_compressed = containers::validate_compressed_proofs<Element, Hash, Arity>(compressed_proofs, data_for_validation);
+    bool wrong_leaf_validate_compressed = containers::validate_compressed_proofs<Element, Hash, Arity>(compressed_proofs, data_wrong_leaf);
+    bool wrong_data_validate_compressed = containers::validate_compressed_proofs<Element, Hash, Arity>(compressed_proofs, data_wrong_data);
+    BOOST_CHECK(validate_compressed);
+    BOOST_CHECK(!wrong_leaf_validate_compressed);
+    BOOST_CHECK(!wrong_data_validate_compressed);
+}
+
 template<typename Hash, size_t Arity, typename Element>
 void testing_hash_template(std::vector<Element> data, std::string result) {
     merkle_tree<Hash, Arity> tree = make_merkle_tree<Hash, Arity>(data.begin(), data.end());
@@ -151,6 +241,28 @@ BOOST_AUTO_TEST_CASE(merkletree_validate_test_3) {
                                                   nil::crypto3::algebra::curves::forms::twisted_edwards>>;
     std::size_t leaf_number = 8;
     testing_validate_template_random_data<hash_type, 2, bool, hash_type::digest_bits>(leaf_number);
+}
+
+BOOST_AUTO_TEST_CASE(merkletree_validate_test_4) {
+    using hash_type = hashes::pedersen<
+        hashes::find_group_hash_default_params, hashes::sha2<256>,
+        algebra::curves::jubjub::template g1_type<nil::crypto3::algebra::curves::coordinates::affine,
+                                                  nil::crypto3::algebra::curves::forms::twisted_edwards>>;
+    testing_validate_template_random_data_compressed_proofs<hash_type, 2, bool, hash_type::digest_bits>(8);
+    testing_validate_template_random_data_compressed_proofs<hash_type, 3, bool, hash_type::digest_bits>(9);
+    testing_validate_template_random_data_compressed_proofs<hash_type, 4, bool, hash_type::digest_bits>(16);
+}
+
+BOOST_AUTO_TEST_CASE(merkletree_validate_test_5) {
+    std::vector<std::array<char, 1>> v = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}, {'8'}};
+    testing_validate_template_compressed_proofs<hashes::sha2<256>, 3>(v);
+    testing_validate_template_compressed_proofs<hashes::md5, 3>(v);
+    testing_validate_template_compressed_proofs<hashes::blake2b<224>, 3>(v);
+
+    std::size_t leaf_number = 9;
+    testing_validate_template_random_data_compressed_proofs<hashes::sha2<256>, 3, std::uint8_t, 1>(leaf_number);
+    testing_validate_template_random_data_compressed_proofs<hashes::md5, 3, std::uint8_t, 1>(leaf_number);
+    testing_validate_template_random_data_compressed_proofs<hashes::blake2b<224>, 3, std::uint8_t, 1>(leaf_number);
 }
 
 BOOST_AUTO_TEST_CASE(merkletree_hash_test_1) {
