@@ -539,8 +539,6 @@ namespace nil {
                         using var = typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                        // typename unified_addition<ArithmetizationType, CurveType, 11>::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
-                        //                                                        {instance_input.T.x, instance_input.T.y}};
                         
                         unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
