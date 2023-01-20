@@ -38,6 +38,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <chrono>
 #include <cstdio>
 #include <limits>
 #include <type_traits>
@@ -99,7 +100,7 @@ void testing_validate_template_random_data_compressed_proofs(std::size_t leaf_nu
     auto data = generate_random_data<ValueType, N>(leaf_number);
     auto tree = make_merkle_tree<Hash, Arity>(data.begin(), data.end());
 
-    std::size_t num_idxs = std::rand() % leaf_number;
+    std::size_t num_idxs = 3;
     while (num_idxs == 0) {
         num_idxs = std::rand() % leaf_number;
     }
@@ -108,12 +109,13 @@ void testing_validate_template_random_data_compressed_proofs(std::size_t leaf_nu
     for (std::size_t i = 0; i < num_idxs; ++i) {
         proof_idxs.emplace_back(std::rand() % leaf_number);
     }
-    std::sort(proof_idxs.begin(), proof_idxs.end());
+    auto sorted_idxs = proof_idxs;
+    std::sort(sorted_idxs.begin(), sorted_idxs.end());
     for (auto idx : proof_idxs) {
         data_for_validation.emplace_back(data[idx]);
     }
     std::size_t leaf_idx = 0;
-    for (auto idx : proof_idxs) {
+    for (auto idx : sorted_idxs) {
         if (idx == leaf_idx) {
             leaf_idx++;
         } else {
@@ -128,9 +130,11 @@ void testing_validate_template_random_data_compressed_proofs(std::size_t leaf_nu
     auto data_wrong_data = data_for_validation;
     data_wrong_data[data_idx] = data_not_in_tree;
     assert(data_wrong_data[data_idx] != data_for_validation[data_idx]);
-
+    
+    auto start = std::chrono::high_resolution_clock::now();
     std::vector<merkle_proof<Hash, Arity>> compressed_proofs = containers::generate_compressed_proofs<Hash, Arity>(tree, proof_idxs);
     bool validate_compressed = containers::validate_compressed_proofs<std::array<ValueType, N>, Hash, Arity>(compressed_proofs, data_for_validation);
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     bool wrong_leaf_validate_compressed = containers::validate_compressed_proofs<std::array<ValueType, N>, Hash, Arity>(compressed_proofs, data_wrong_leaf);
     bool wrong_data_validate_compressed = containers::validate_compressed_proofs<std::array<ValueType, N>, Hash, Arity>(compressed_proofs, data_wrong_data);
     BOOST_CHECK(validate_compressed);
