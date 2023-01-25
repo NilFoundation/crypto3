@@ -211,14 +211,19 @@ typename LPCScheme::proof_type generate_random_lpc_proof(
         nil::crypto3::hash<typename FRIScheme::transcript_hash_type>(generate_random_data<std::uint8_t, 32>(1).at(0));
 
     if constexpr(!LPCScheme::is_const_size){
-        proof.z.resize(polynomials);
+        proof.z[0].resize(polynomials);
+        proof.z[1].resize(polynomials);
+        proof.z[2].resize(polynomials);
+        proof.z[3].resize(polynomials);
     }
 
     nil::crypto3::random::algebraic_random_device<typename LPCScheme::field_type> d;
-    for( size_t poly = 0; poly < polynomials; poly++){
-        proof.z[poly].resize(k);
-        for( size_t i = 0; i < k; i++ )
-            proof.z[poly][i] = d();
+    for(size_t j = 0; j < 4; j++){
+        for( size_t poly = 0; poly < polynomials; poly++){
+            proof.z[j][poly].resize(k);
+            for( size_t i = 0; i < k; i++ )
+                proof.z[j][poly][i] = d();
+        }
     }
 
     return proof;
@@ -255,7 +260,7 @@ void test_lpc_proof(typename LPCScheme::proof_type &proof){
     nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
 
     nil::crypto3::marshalling::types::lpc_proof<TTypeBase, LPCScheme> test_val_read;
-   auto read_iter = cv.begin();
+    auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     typename LPCScheme::proof_type constructed_val_read =
         nil::crypto3::marshalling::types::make_lpc_proof<Endianness, LPCScheme>(test_val_read);
@@ -263,22 +268,6 @@ void test_lpc_proof(typename LPCScheme::proof_type &proof){
 }
 
 BOOST_AUTO_TEST_SUITE(lpc_marshalling_test_suite)
-
-/*
-We have to do good test
-BOOST_AUTO_TEST_CASE(lpc_bls12_381_be) {
-    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
-    using field_type = typename curve_type::scalar_field_type;
-    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-
-    constexpr static const std::size_t lambda = 40;
-    constexpr static const std::size_t k = 1;
-    constexpr static const std::size_t d = 16;
-    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
-    constexpr static const std::size_t m = 2;
-
-//    test_lpc<field_type, hash_type, lambda, r, m, nil::marshalling::option::big_endian>(5, 6, 7, 3);
-}*/
 
 BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_test) {
     // setup
