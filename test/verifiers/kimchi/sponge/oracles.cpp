@@ -26,6 +26,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -66,8 +67,13 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
 
     typename component_type::input_type instance_input = {x, y};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
 	    typename component_type::result_type &real_res) {
+            #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+            std::cout << "from_limbs input: " << std::hex << public_input[0].data << " " << public_input[1].data << std::endl;
+            std::cout << "expected_res: " << std::hex << expected_res.data << std::endl;
+            std::cout << "real     res: " << std::hex << var_value(assignment, real_res.result).data << "\n" << std::endl;
+            #endif 
             assert(expected_res == var_value(assignment, real_res.result));
     };
 
@@ -99,8 +105,14 @@ void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_i
 
     typename component_type::input_type instance_input = {x};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
 	    typename component_type::result_type &real_res) {
+            #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+            std::cout << "to_limbs input: " << std::hex << public_input[0].data << std::endl;
+            std::cout << "expexted: " << std::hex << expected_res[3].data << " " << expected_res[2].data << " " << expected_res[1].data << " " << expected_res[0].data << std::endl;
+            std::cout << "real    : " << std::hex << var_value(assignment, real_res.result[3]).data << " " << var_value(assignment, real_res.result[2]).data << " " << var_value(assignment, real_res.result[1]).data << " " << var_value(assignment, real_res.result[0]).data << "\n" <<std::endl;
+            #endif
+
      	    assert(expected_res[0] == var_value(assignment, real_res.result[0]));
 	        assert(expected_res[1] == var_value(assignment, real_res.result[1]));
 	        assert(expected_res[2] == var_value(assignment, real_res.result[2]));
@@ -115,49 +127,65 @@ void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_i
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs) {
-    using curve_type = nil::crypto3::algebra::curves::vesta;
-    using BlueprintFieldType = typename curve_type::scalar_field_type;
-
-    typename BlueprintFieldType::value_type x = 5;
-    typename BlueprintFieldType::value_type y = 12;
-    typename BlueprintFieldType::value_type expected_res = 0xC0000000000000005_cppui256;
-
-    std::vector<typename BlueprintFieldType::value_type> public_input = {x, y};
-
-	test_from_limbs<BlueprintFieldType>(public_input, expected_res);
+template<typename FieldType>
+void test_from_limbs_specific_data(){
+    test_from_limbs<FieldType>({0, 0}, 0);
+    test_from_limbs<FieldType>({5, 12}, 0xC0000000000000005_cppui255);
+    test_from_limbs<FieldType>({0, 0xFFFFFFFFFFFFFFFF_cppui255}, 0xFFFFFFFFFFFFFFFF0000000000000000_cppui255);
+    test_from_limbs<FieldType>({0xFFFFFFFFFFFFFFFF_cppui255, 0}, 0xFFFFFFFFFFFFFFFF_cppui255);
+    test_from_limbs<FieldType>({0xFFFFFFFFFFFFFFFF_cppui255, 0xFFFFFFFFFFFFFFFF_cppui255}, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255);
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_1) {
-    using curve_type = nil::crypto3::algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::scalar_field_type;
-
-    typename BlueprintFieldType::value_type input = 0x1D42ED837696F2A777E7C1FF0436D46E96878B624ECDE039732E37AFCD409C88_cppui256;
-    typename BlueprintFieldType::value_type x0 = 0x732E37AFCD409C88_cppui256;
-    typename BlueprintFieldType::value_type x1 = 0x96878B624ECDE039_cppui256;
-    typename BlueprintFieldType::value_type x2 = 0x77E7C1FF0436D46E_cppui256;
-    typename BlueprintFieldType::value_type x3 = 0x1D42ED837696F2A7_cppui256;
-    
-    std::vector<typename BlueprintFieldType::value_type> expected_res = {x0, x1, x2, x3};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {input};
-
-	test_to_limbs<BlueprintFieldType>(public_input, expected_res);
+BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs_vesta) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_from_limbs_specific_data<field_type>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_2) {
-    using curve_type = nil::crypto3::algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::scalar_field_type;
+BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs_bls12) {
+    using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
+    test_from_limbs_specific_data<field_type>();
+}
 
-    typename BlueprintFieldType::value_type input = 0xE826DABA538B6DF0000000000000000FB812F513D0FCC04106CB4BD3F32FAD3_cppui256;
-    typename BlueprintFieldType::value_type x0 = 0x106CB4BD3F32FAD3_cppui256;
-    typename BlueprintFieldType::value_type x1 = 0xFB812F513D0FCC04_cppui256;
-    typename BlueprintFieldType::value_type x2 = 0x0_cppui256;
-    typename BlueprintFieldType::value_type x3 = 0xE826DABA538B6DF_cppui256;
+BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs_pallas) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_from_limbs_specific_data<field_type>();
+}
 
-    std::vector<typename BlueprintFieldType::value_type> expected_res = {x0, x1, x2, x3};
-    std::vector<typename BlueprintFieldType::value_type> public_input = {input};
+template<typename FieldType>
+void test_to_limbs_specific_data(){
+    test_to_limbs<FieldType>({0x1D42ED837696F2A777E7C1FF0436D46E96878B624ECDE039732E37AFCD409C88_cppui256}, 
+    {0x732E37AFCD409C88_cppui256, 0x96878B624ECDE039_cppui256, 0x77E7C1FF0436D46E_cppui256, 0x1D42ED837696F2A7_cppui256});
 
-	test_to_limbs<BlueprintFieldType>(public_input, expected_res);
+    test_to_limbs<FieldType>({0xE826DABA538B6DF0000000000000000FB812F513D0FCC04106CB4BD3F32FAD3_cppui256}, 
+    {0x106CB4BD3F32FAD3_cppui256, 0xFB812F513D0FCC04_cppui256, 0x0_cppui256, 0xE826DABA538B6DF_cppui256});
+
+    test_to_limbs<FieldType>({0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui256}, 
+    {0xFFFFFFFFFFFFFFFF_cppui256, 0xFFFFFFFFFFFFFFFF_cppui256, 0xFFFFFFFFFFFFFFFF_cppui256, 0x3FFFFFFFFFFFFFFF_cppui256});
+
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_vesta) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_to_limbs_specific_data<field_type>();
+
+    test_to_limbs<field_type>({0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui255}, //-1 vesta
+    {0x992d30ed00000000_cppui256, 0x224698fc094cf91b_cppui256, 0x0000000000000000_cppui256, 0x4000000000000000_cppui256});
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_pallas) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_to_limbs_specific_data<field_type>();
+
+    test_to_limbs<field_type>({0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000000_cppui256}, //-1 pallas
+    {0x8c46eb2100000000_cppui256, 0x224698fc0994a8dd_cppui256, 0x0000000000000000_cppui256, 0x4000000000000000_cppui256});
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_bls12) {
+    using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
+    test_to_limbs_specific_data<field_type>();
+
+    test_to_limbs<field_type>({0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000_cppui256}, //-1 bls12<381>
+    {0xffffffff00000000_cppui256, 0x53bda402fffe5bfe_cppui256, 0x3339d80809a1d805_cppui256, 0x73eda753299d7d48_cppui256});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
