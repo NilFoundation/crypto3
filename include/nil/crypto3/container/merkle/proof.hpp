@@ -213,8 +213,8 @@ namespace nil {
                         std::size_t begin_this_arity = cur_leaf - cur_leaf_pos;
                         typename layer_type::iterator a_itr = v_itr->begin();
                         for (size_t i = 0; i < cur_leaf_pos; ++i, ++begin_this_arity) {
-                            if (!known[begin_this_arity + i]) {
-                                known[begin_this_arity + i] = true;
+                            if (!known[begin_this_arity]) {
+                                known[begin_this_arity] = true;
                             } else {
                                 finish_path = true;
                             }
@@ -239,7 +239,7 @@ namespace nil {
                         row_len /= Arity;
                     }
                     path.resize(v_itr - path.begin());
-                    result_proofs[idx] = std::move(detail::merkle_proof_impl<NodeType, Arity>(leaf_idx, tree.root(), path));
+                    result_proofs[idx] = detail::merkle_proof_impl<NodeType, Arity>(leaf_idx, tree.root(), path);
                 }
                 return result_proofs;
             }
