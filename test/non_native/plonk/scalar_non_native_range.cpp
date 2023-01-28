@@ -31,7 +31,7 @@
 
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include <nil/crypto3/hash/keccak.hpp>
 
@@ -44,7 +44,7 @@
 using namespace nil;
 
 template <typename BlueprintFieldType>
-void test_scalar_non_native_range_add(std::vector<typename BlueprintFieldType::value_type> public_input){
+void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value_type> public_input){
     
     using ed25519_type = crypto3::algebra::curves::ed25519;
     constexpr std::size_t WitnessColumns = 9;
@@ -65,8 +65,11 @@ void test_scalar_non_native_range_add(std::vector<typename BlueprintFieldType::v
 
     typename component_type::input_type instance_input = {var(0, 0, false, var::column_type::public_input)};
 
-    auto result_check = [](AssignmentType &assignment, 
+    auto result_check = [public_input](AssignmentType &assignment, 
         typename component_type::result_type &real_res) {
+            #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+            std::cout << std::hex << "________________________________________________________________________________________\ninput: " << public_input[0].data << std::endl;
+            #endif
     };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
@@ -75,11 +78,67 @@ void test_scalar_non_native_range_add(std::vector<typename BlueprintFieldType::v
         component_instance, public_input, result_check, instance_input);
 }
 
+constexpr static const std::size_t random_tests_amount = 10;
+
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test0) {
-    test_scalar_non_native_range_add<typename crypto3::algebra::curves::pallas::base_field_type>(
+    test_scalar_non_native_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         {45524});
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test1) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+
+    
+    typename field_type::integral_type ed25519_scalar_modulus = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui255;
+    typename field_type::value_type ones =                      0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui255;
+
+    test_scalar_non_native_range<field_type>(
+        {typename field_type::value_type(ed25519_scalar_modulus-1)});
+
+    test_scalar_non_native_range<field_type>(
+        {typename field_type::value_type(ones)});
+
+    test_scalar_non_native_range<field_type>({1});
+
+    test_scalar_non_native_range<field_type>({0});
+
+    nil::crypto3::random::algebraic_engine<field_type> rand;
+    boost::random::mt19937 seed_seq;
+    rand.seed(seed_seq);
+
+
+    typename field_type::value_type r;
+    typename field_type::integral_type r_integral;
+
+    for (std::size_t i = 0; i < random_tests_amount; i++) {
+        r = rand();
+        r_integral = typename field_type::integral_type(r.data);
+        r_integral = r_integral % ed25519_scalar_modulus;
+        r = typename field_type::value_type(r_integral);
+        test_scalar_non_native_range<field_type>({r});
+    }
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test_must_fail) {
+    using field_type = crypto3::algebra::curves::pallas::base_field_type;
+
+    nil::crypto3::random::algebraic_engine<field_type> rand;
+    boost::random::mt19937 seed_seq;
+    rand.seed(seed_seq);
+
+    typename field_type::integral_type ed25519_scalar_modulus = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui255;
+    typename field_type::integral_type zero = 0;
+    typename field_type::integral_type ed25519_scalar_overage = zero - ed25519_scalar_modulus - 1;
+    
+    typename field_type::integral_type overage;
+
+    for (std::size_t i = 0; i < random_tests_amount; i++) {
+        overage = (typename field_type::integral_type(rand().data)) % ed25519_scalar_overage;
+        test_scalar_non_native_range<field_type>({typename field_type::value_type(ed25519_scalar_modulus + overage)});
+    }
+    test_scalar_non_native_range<field_type>({-1});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

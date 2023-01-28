@@ -48,3 +48,12 @@ std::vector<typename FieldType::value_type> create_public_input(std::array<typen
     }
     return public_input;
 }
+
+template <typename FieldType, typename NonNativeFieldType>
+std::vector<typename FieldType::value_type> create_public_input_1_value(std::array<typename FieldType::value_type, 4> b) {
+    std::vector<typename FieldType::value_type> public_input;
+    for (std::size_t i = 0; i < b.size(); i++){
+        public_input.push_back(b[i]);
+    }
+    return public_input;
+}
