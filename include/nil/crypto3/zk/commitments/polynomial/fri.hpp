@@ -111,24 +111,6 @@ namespace nil {
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
                     const PolynomialType &g,
-                    const typename FRI::basic_fri::params_type &fri_params,
-                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
-
-                    return proof_eval<typename FRI::basic_fri>(g, g, fri_params, transcript);
-                }
-
-                template<typename FRI,
-                         typename PolynomialType,
-                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
-                                                                                  typename FRI::merkle_tree_hash_type,
-                                                                                  typename FRI::transcript_hash_type,
-                                                                                  FRI::m,
-                                                                                  FRI::leaf_size,
-                                                                                  FRI::is_const_size>,
-                                                                 FRI>::value,
-                                                 bool>::type = true>
-                static typename FRI::basic_fri::proof_type proof_eval(
-                    const PolynomialType &g,
                     typename FRI::precommitment_type &T,
                     const typename FRI::basic_fri::params_type &fri_params,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
@@ -152,11 +134,9 @@ namespace nil {
                     const typename FRI::commitment_type &t_polynomials,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
 
-                    std::array<math::polynomial<typename FRI::field_type::value_type>, 1> U;
-                    std::array<math::polynomial<typename FRI::field_type::value_type>, 1> V;
-                    U[0] = {0};
-                    V[0] = {1};
-                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, t_polynomials, U, V, transcript);
+                    typename FRI::polynomials_values_type combined_poly;
+
+                    return verify_eval<typename FRI::basic_fri>(proof, fri_params, t_polynomials, combined_poly, transcript);
                 }
             }    // namespace algorithms
         }        // namespace zk
