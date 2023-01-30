@@ -14,9 +14,9 @@ To actually include this library in a project it is required to:
 ## Dependencies
 
 ### Internal
-* [Block Ciphers](https://github.com/nilfoundation/block.git)
-* [Codec](https://github.com/nilfoundation/codec.git)
-* [Stream Ciphers](https://github.com/nilfoundaton/stream.git)
+* [Block Ciphers](https://github.com/NilFoundation/crypto3-block.git)
+* [Codec](https://github.com/NilFoundation/crypto3-codec.git)
+* [Stream Ciphers](https://github.com/NilFoundation/crypto3-stream.git)
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
