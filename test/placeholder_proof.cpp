@@ -171,12 +171,16 @@ void test_placeholder_proof_marshalling(const Proof &proof, bool print_proof = f
 
 BOOST_AUTO_TEST_SUITE(placeholder_marshalling_proof_test_suite)
 // This is test template for printing blueprint components proofs
-BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {    
+BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) { 
     // Add code from component test there
     using curve_type = crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
 
-    auto P = crypto3::algebra::random_element<curve_type::template g1_type<>>().to_affine();
+    // We need this to derandomize test. It's convenient to check test with constant seed.
+    // You can change randomgen(0) to randomgen(seed) to generate a new test
+    boost::random::mt11213b randomgen(0);
+
+    auto P = crypto3::algebra::random_element<curve_type::template g1_type<>>(randomgen).to_affine();
     auto Q(P);
 
     std::vector<typename curve_type::base_field_type::value_type> public_input = {P.X, P.Y, Q.X, Q.Y};
