@@ -128,4 +128,10 @@ BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(4314)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(6144)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(8192)
 
+#ifdef ZKLLVM_INLINES_ENABLED
+inline constexpr const char *operator"" _cpui255(const char *val) {
+    return val;
+}
+#endif
+
 #endif    // CRYPTO3_ALGEBRA_MP_DEFINES_HPP
