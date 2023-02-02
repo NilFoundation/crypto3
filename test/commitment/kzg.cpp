@@ -43,7 +43,6 @@
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::zk::snark;
 using namespace nil::crypto3::math;
 
 BOOST_AUTO_TEST_SUITE(kzg_test_suite)
@@ -51,19 +50,33 @@ BOOST_AUTO_TEST_SUITE(kzg_test_suite)
 BOOST_AUTO_TEST_CASE(kzg_basic_test) {
 
     typedef algebra::curves::mnt4<298> curve_type;
-    typedef typename curve_type::base_field_type::value_type base_field_value_type;
-    typedef zk::snark::kzg_commitment<curve_type> kzg_type;
+    typedef typename curve_type::base_field_type::value_type base_value_type;
+    typedef typename curve_type::base_field_type base_field_type;
+    typedef typename curve_type::scalar_field_type scalar_field_type;
+    typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+    typedef zk::commitments::kzg_commitment<curve_type> kzg_type;
 
-    typename kzg_type::params_type kzg_params;
-    kzg_params.a = 2;
+    scalar_value_type alpha = 10;
+    scalar_value_type i = 2;
+    std::size_t n = 16;
+    const polynomial<scalar_value_type> f = {-1, 1, 2, 3};
 
-    const polynomial<base_field_value_type> f = {1, 1};
+    auto srs = kzg_type::setup({alpha, n});
+    BOOST_CHECK(curve_type::template g1_type<>::value_type::one() == srs.commitment_key[0]);
+    BOOST_CHECK(10 * curve_type::template g1_type<>::value_type::one() == srs.commitment_key[1]);
+    BOOST_CHECK(100 * curve_type::template g1_type<>::value_type::one() == srs.commitment_key[2]);
+    BOOST_CHECK(1000 * curve_type::template g1_type<>::value_type::one() == srs.commitment_key[3]);
+    BOOST_CHECK(alpha * curve_type::template g2_type<>::value_type::one() == srs.verification_key);
 
-    auto kzg_keys = kzg_type::setup(298, kzg_params);
-    auto commit = kzg_type::commit(std::get<0>(kzg_keys), f);
-    auto proof = kzg_type::proof_eval(std::get<0>(kzg_keys), 1, 2, f);
+    auto commit = kzg_type::commit(srs, f);
+    BOOST_CHECK(3209 * curve_type::template g1_type<>::value_type::one() == commit);
 
-    BOOST_CHECK(kzg_type::verify_eval(std::get<1>(kzg_keys), commit, 1, 2, proof));
+    auto eval = f.evaluate(i);
+    auto proof = kzg_type::proof_eval(srs, i, f);
+    BOOST_CHECK(33 * scalar_value_type::one() == eval);
+    BOOST_CHECK(397 * curve_type::template g1_type<>::value_type::one() == proof);
+
+    BOOST_CHECK(kzg_type::verify_eval(srs, commit, i, eval, proof));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

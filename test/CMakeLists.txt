@@ -61,6 +61,7 @@ endmacro()
 set(TESTS_NAMES
     "commitment/lpc"
     "commitment/fri"
+    "commitment/kzg"
     "commitment/fold_polynomial"
     "commitment/lpc_performance"
     "commitment/pedersen"

@@ -39,6 +39,8 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/algebra/type_traits.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/pairing/pairing_policy.hpp>
 
 using namespace nil::crypto3::math;
@@ -50,78 +52,90 @@ namespace nil {
         namespace zk {
             namespace commitments {
                 template<typename CurveType>
-                struct kzg {
+                struct kzg_commitment {
 
                     typedef CurveType curve_type;
-                    typedef algebra::pairing::pairing_policy<curve_type> pairing;
+                    typedef algebra::pairing::pairing_policy<curve_type> pairing_policy;
                     typedef typename curve_type::gt_type::value_type gt_value_type;
 
-                    using base_field_value_type = typename curve_type::base_field_type::value_type;
+                    using multiexp_method = typename algebra::policies::multiexp_method_BDLO12;
+                    using scalar_value_type = typename curve_type::scalar_field_type::value_type;
                     using commitment_key_type = std::vector<typename curve_type::template g1_type<>::value_type>;
                     using verification_key_type = typename curve_type::template g2_type<>::value_type;
                     using commitment_type = typename curve_type::template g1_type<>::value_type;
                     using proof_type = commitment_type;
 
-                    struct params_type {
-                        std::size_t a;
+                    struct kzg_params_type {
+                        scalar_value_type alpha;  //secret key
+                        std::size_t n;                 //max polynomial degree
                     };
 
-                    static std::pair<commitment_key_type, verification_key_type> setup(const std::size_t n,
-                                                                                       params_type params) {
+                    struct srs_type {
+                        commitment_key_type commitment_key;
+                        verification_key_type verification_key;
+                        srs_type(commitment_key_type ck, verification_key_type vk) :
+                            commitment_key(ck), verification_key(vk) {}
+                    };
 
-                        size_t a_scaled = params.a;
+                    static srs_type setup(kzg_params_type params) {
+                        scalar_value_type alpha_scaled = params.alpha;
                         commitment_key_type commitment_key = {curve_type::template g1_type<>::value_type::one()};
                         verification_key_type verification_key =
-                            curve_type::template g2_type<>::value_type::one() * params.a;
+                            curve_type::template g2_type<>::value_type::one() * params.alpha;
 
-                        for (std::size_t i = 0; i < n; i++) {
-                            commitment_key.emplace_back(a_scaled * (curve_type::template g1_type<>::value_type::one()));
-                            a_scaled = a_scaled * params.a;
+                        for (std::size_t i = 0; i < params.n; i++) {
+                            commitment_key.emplace_back(alpha_scaled * (curve_type::template g1_type<>::value_type::one()));
+                            alpha_scaled = alpha_scaled * params.alpha;
                         }
 
-                        return std::make_pair(commitment_key, verification_key);
+                        return srs_type(std::move(commitment_key), verification_key);
                     }
 
-                    static commitment_type commit(const commitment_key_type &commitment_key,
-                                                  const polynomial<base_field_value_type> &f) {
-
-                        commitment_type commitment = f[0] * commitment_key[0];
-
-                        for (std::size_t i = 0; i < f.size(); i++) {
-                            commitment = commitment + commitment_key[i] * f[i];
-                        }
-
-                        return commitment;
+                    static commitment_type commit(const srs_type &srs,
+                                                  const polynomial<scalar_value_type> &f) {
+                        BOOST_ASSERT(f.size() <= srs.commitment_key.size());
+                        return algebra::multiexp<multiexp_method>(srs.commitment_key.begin(),
+                                                srs.commitment_key.begin() + f.size(), f.begin(), f.end(), 1);
                     }
 
-                    static proof_type proof_eval(commitment_key_type commitment_key,
-                                                 typename curve_type::base_field_type::value_type x,
-                                                 typename curve_type::base_field_type::value_type y,
-                                                 const polynomial<base_field_value_type> &f) {
+                    static bool verify_poly(const srs_type &srs,
+                                            const polynomial<scalar_value_type> &f,
+                                            const commitment_type &C_f) {
+                        return C_f == commit(srs, f);
+                    }
 
-                        const polynomial<base_field_value_type> denominator_polynom = {-x, 1};
+                    static proof_type proof_eval(srs_type srs,
+                                                 scalar_value_type i,
+                                                 const polynomial<scalar_value_type> &f) {
 
-                        const polynomial<base_field_value_type> q =
-                            (f + polynomial<base_field_value_type> {-y}) / denominator_polynom;
+                        const polynomial<scalar_value_type> denominator_polynom = {-i, 1};
+                        const polynomial<scalar_value_type> q =
+                            (f - polynomial<scalar_value_type>{f.evaluate(i)}) / denominator_polynom;
 
-                        proof_type p = kzg_commitment::commit(commitment_key, q);
+                        proof_type p = commit(srs, q);
                         return p;
                     }
 
-                    static bool verify_eval(verification_key_type verification_key,
+                    static bool verify_eval(srs_type srs,
                                             commitment_type C_f,
-                                            base_field_value_type x,
-                                            base_field_value_type y,
+                                            scalar_value_type i,
+                                            scalar_value_type eval,
                                             proof_type p) {
+                        
+                        using g1_precomp_type = typename pairing_policy::g1_precomputed_type;
+                        using g2_precomp_type = typename pairing_policy::g2_precomputed_type;
 
-                        typename curve_type::gt_type::value_type gt1 =
-                            algebra::pair<curve_type>(C_f - curve_type::template g1_type<>::value_type::one() * y,
-                                                      curve_type::template g2_type<>::value_type::one());
+                        g1_precomp_type A_1 = algebra::precompute_g1<curve_type>(p);
+                        g2_precomp_type A_2 = algebra::precompute_g2<curve_type>(srs.verification_key -
+                                                                        i * curve_type::template g2_type<>::value_type::one());
+                        g1_precomp_type B_1 = algebra::precompute_g1<curve_type>(eval * curve_type::template g1_type<>::value_type::one() -
+                                                                        C_f);
+                        g2_precomp_type B_2 = algebra::precompute_g2<curve_type>(curve_type::template g2_type<>::value_type::one());
 
-                        typename curve_type::gt_type::value_type gt2 = algebra::pair<curve_type>(
-                            p, verification_key - curve_type::template g2_type<>::value_type::one() * x);
+                        gt_value_type gt3 = algebra::double_miller_loop<curve_type>(A_1, A_2, B_1, B_2);
+                        gt_value_type gt_4 = algebra::final_exponentiation<curve_type>(gt3);
 
-                        return gt1 == gt2;
+                        return gt_4 == gt_value_type::one();
                     }
                 };
             };    // namespace commitments
