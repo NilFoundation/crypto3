@@ -141,17 +141,21 @@ void test_field_mul_all_cases(){
 
     typename NonNativeFieldType::value_type f = 0xf;
     typename NonNativeFieldType::integral_type f_integral;
-    for (std::size_t i = 0; i < 63; i++) {
+    for (std::size_t i = 0; i < 256; i++) {
         f_integral = typename NonNativeFieldType::integral_type(f.data);
-        f_integral = (f_integral << 4) + 0xf;
+        f_integral = (f_integral << 1) + 1;
         f = typename NonNativeFieldType::value_type(f_integral);
-        test_field_mul_useable<FieldType, NonNativeFieldType>(f, f);
+        test_field_mul_useable<FieldType, NonNativeFieldType>(f, lalala);
     }
+
+    test_field_mul_useable<FieldType, NonNativeFieldType>(
+        glue_non_native<FieldType, NonNativeFieldType>({0,0,0x3ffffffffffffffff_cppui255,0}),
+        glue_non_native<FieldType, NonNativeFieldType>({0,0,0x3ffffffffffffffff_cppui255,0}));
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(0, 0);
     test_field_mul_useable<FieldType, NonNativeFieldType>(1, 1);
-    test_field_mul_useable<FieldType, NonNativeFieldType>(-1, -1);
     test_field_mul_useable<FieldType, NonNativeFieldType>(1, -1);
+    test_field_mul_useable<FieldType, NonNativeFieldType>(-1, -1);
     test_field_mul_useable<FieldType, NonNativeFieldType>(-1, 0);
     test_field_mul_useable<FieldType, NonNativeFieldType>(1000, -1000);
     test_field_mul_useable<FieldType, NonNativeFieldType>(
