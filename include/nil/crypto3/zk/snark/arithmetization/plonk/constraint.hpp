@@ -152,10 +152,10 @@ namespace nil {
                                  std::shared_ptr<math::evaluation_domain<FieldType>>
                                      domain) const {
                         math::polynomial_dfs<typename VariableType::assignment_type> acc(
-                            0, domain->m, FieldType::value_type::zero());
+                            0, assignments.rows_amount(), FieldType::value_type::zero());
                         for (const math::non_linear_term<VariableType> &nlt : this->terms) {
                             math::polynomial_dfs<typename VariableType::assignment_type> term_value(
-                                0, domain->m, nlt.coeff);
+                                0, assignments.rows_amount(), nlt.coeff);
 
                             for (const VariableType &var : nlt.vars) {
 
