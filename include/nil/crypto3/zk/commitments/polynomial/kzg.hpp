@@ -121,16 +121,13 @@ namespace nil {
                                             scalar_value_type i,
                                             scalar_value_type eval,
                                             proof_type p) {
-                        
-                        using g1_precomp_type = typename pairing_policy::g1_precomputed_type;
-                        using g2_precomp_type = typename pairing_policy::g2_precomputed_type;
 
-                        g1_precomp_type A_1 = algebra::precompute_g1<curve_type>(p);
-                        g2_precomp_type A_2 = algebra::precompute_g2<curve_type>(srs.verification_key -
+                        auto A_1 = algebra::precompute_g1<curve_type>(p);
+                        auto A_2 = algebra::precompute_g2<curve_type>(srs.verification_key -
                                                                         i * curve_type::template g2_type<>::value_type::one());
-                        g1_precomp_type B_1 = algebra::precompute_g1<curve_type>(eval * curve_type::template g1_type<>::value_type::one() -
+                        auto B_1 = algebra::precompute_g1<curve_type>(eval * curve_type::template g1_type<>::value_type::one() -
                                                                         C_f);
-                        g2_precomp_type B_2 = algebra::precompute_g2<curve_type>(curve_type::template g2_type<>::value_type::one());
+                        auto B_2 = algebra::precompute_g2<curve_type>(curve_type::template g2_type<>::value_type::one());
 
                         gt_value_type gt3 = algebra::double_miller_loop<curve_type>(A_1, A_2, B_1, B_2);
                         gt_value_type gt_4 = algebra::final_exponentiation<curve_type>(gt3);

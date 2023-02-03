@@ -79,4 +79,26 @@ BOOST_AUTO_TEST_CASE(kzg_basic_test) {
     BOOST_CHECK(kzg_type::verify_eval(srs, commit, i, eval, proof));
 }
 
+BOOST_AUTO_TEST_CASE(kzg_random_test) {
+
+    typedef algebra::curves::mnt4<298> curve_type;
+    typedef typename curve_type::base_field_type::value_type base_value_type;
+    typedef typename curve_type::base_field_type base_field_type;
+    typedef typename curve_type::scalar_field_type scalar_field_type;
+    typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+    typedef zk::commitments::kzg_commitment<curve_type> kzg_type;
+
+    scalar_value_type alpha = algebra::random_element<scalar_field_type>();
+    scalar_value_type i = algebra::random_element<scalar_field_type>();
+    std::size_t n = 298;
+    const polynomial<scalar_value_type> f = {-1, 1, 2, 3, 5, -15};
+
+    auto srs = kzg_type::setup({alpha, n});
+    auto commit = kzg_type::commit(srs, f);
+    auto eval = f.evaluate(i);
+    auto proof = kzg_type::proof_eval(srs, i, f);
+
+    BOOST_CHECK(kzg_type::verify_eval(srs, commit, i, eval, proof));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
