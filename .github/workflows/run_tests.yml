@@ -70,6 +70,7 @@ jobs:
             blueprint_algebra_fields_plonk_exponentiation_test,
             blueprint_algebra_curves_plonk_unified_addition_test,
             blueprint_algebra_curves_plonk_variable_base_scalar_mul_test,
+            blueprint_algebra_curves_plonk_decomposed_variable_base_scalar_mul_test,
             blueprint_verifiers_kimchi_sponge_oracles_test,
             blueprint_hashes_plonk_poseidon_test,
             blueprint_algebra_curves_plonk_endo_scalar_test,
