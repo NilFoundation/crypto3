@@ -92,7 +92,7 @@ namespace nil {
                             curve_type::template g2_type<>::value_type::one() * params.alpha;
 
                         for (std::size_t i = 0; i < params.n; i++) {
-                            commitment_key.emplace_back(alpha_scaled * (curve_type::template g1_type<>::value_type::one()));
+                            commitment_key.push_back(alpha_scaled * (curve_type::template g1_type<>::value_type::one()));
                             alpha_scaled = alpha_scaled * params.alpha;
                         }
 
@@ -156,23 +156,13 @@ namespace nil {
                     using commitment_key_type = std::vector<typename curve_type::template g1_type<>::value_type>;
                     using verification_key_type = typename curve_type::template g2_type<>::value_type;
                     using commitment_type = typename curve_type::template g1_type<>::value_type;
+                    using batched_proof_type = std::vector<commitment_type>;
+                    using evals_type = std::vector<std::vector<scalar_value_type>>;
+                    using batch_of_batches_of_polynomials_type = std::vector<std::vector<polynomial<scalar_value_type>>>;
 
                     using kzg = kzg_commitment<CurveType>;
                     using kzg_params_type = typename kzg::kzg_params_type;  
                     using srs_type = typename kzg::srs_type;
-
-                    struct evals_type {
-                        std::vector<scalar_value_type> evals_at_z0;
-                        std::vector<scalar_value_type> evals_at_z1;
-                        evals_type(const std::vector<scalar_value_type> &e1, const std::vector<scalar_value_type> &e2) 
-                                    : evals_at_z0(e1), evals_at_z1(e2) {}
-                    };
-
-                    struct batched_proof_type {
-                        commitment_type commit0;
-                        commitment_type commit1;
-                        batched_proof_type(commitment_type c0, commitment_type c1) : commit0(c0), commit1(c1) {}
-                    };
 
                     static polynomial<scalar_value_type> accumulate(const std::vector<polynomial<scalar_value_type>> &polys,
                                                                     const scalar_value_type &factor) {
@@ -186,78 +176,78 @@ namespace nil {
                         return result;
                     }
 
-                    static evals_type evaluate_polynomials(const std::vector<polynomial<scalar_value_type>> &polys0,
-                                                            const std::vector<polynomial<scalar_value_type>> &polys1,
-                                                            scalar_value_type z0, scalar_value_type z1) {
-                        std::vector<scalar_value_type> evals_at_z0;
-                        for (const auto &poly : polys0) {
-                            evals_at_z0.emplace_back(poly.evaluate(z0));
+                    static evals_type evaluate_polynomials(const batch_of_batches_of_polynomials_type &polys,
+                                                            const std::vector<scalar_value_type> zs) {
+
+                        assert(polys.size() == zs.size());
+
+                        std::vector<std::vector<scalar_value_type>> evals;
+                        for (std::size_t i = 0; i < polys.size(); ++i) {
+                            std::vector<scalar_value_type> evals_at_z_i;
+                            for (const auto &poly : polys[i]) {
+                                evals_at_z_i.push_back(poly.evaluate(zs[i]));
+                            }
+                            evals.push_back(evals_at_z_i);
                         }
 
-                        std::vector<scalar_value_type> evals_at_z1;
-                        for (const auto &poly : polys1) {
-                            evals_at_z1.emplace_back(poly.evaluate(z1));
-                        }
-
-                        return evals_type(evals_at_z0, evals_at_z1);
+                        return evals;
                     }
 
                     static std::vector<commitment_type> commit(const srs_type &srs, 
                                                                 const std::vector<polynomial<scalar_value_type>> &polys) {
                         std::vector<commitment_type> commitments;
                         for (const auto &poly : polys) {
-                            commitments.emplace_back(kzg::commit(srs, poly));
+                            commitments.push_back(kzg::commit(srs, poly));
                         }
                         return commitments;
                     }
 
                     static batched_proof_type proof_eval(const srs_type &srs, 
-                                                        const std::vector<polynomial<scalar_value_type>> &polys0,
-                                                        const std::vector<polynomial<scalar_value_type>> &polys1,
+                                                        const batch_of_batches_of_polynomials_type &polys,
                                                         const evals_type &evals,
-                                                        scalar_value_type z0, scalar_value_type z1,
-                                                        scalar_value_type gamma0, scalar_value_type gamma1) {
-
-                        auto accum0 = accumulate(polys0, gamma0);
-                        auto accum_eval0 = polynomial<scalar_value_type>{evals.evals_at_z0}.evaluate(gamma0);
-                        typename kzg::proof_type proof0 = kzg::proof_eval(srs, accum0, z0, accum_eval0);
-
-                        auto accum1 = accumulate(polys1, gamma1);
-                        auto accum_eval1 = polynomial<scalar_value_type>{evals.evals_at_z1}.evaluate(gamma1);
-                        typename kzg::proof_type proof1 = kzg::proof_eval(srs, accum1, z1, accum_eval1);
+                                                        const std::vector<scalar_value_type> zs,
+                                                        const std::vector<scalar_value_type> gammas) {
                         
-                        return batched_proof_type(proof0, proof1);
+                        std::vector<commitment_type> proofs;
+
+                        for (std::size_t i = 0; i < polys.size(); ++i) {
+                            auto accum = accumulate(polys[i], gammas[i]);
+                            auto accum_eval = polynomial<scalar_value_type>{evals[i]}.evaluate(gammas[i]);
+                            typename kzg::proof_type proof = kzg::proof_eval(srs, accum, zs[i], accum_eval);
+                            proofs.push_back(proof);
+                        }
+                        
+                        return proofs;
                     }
 
                     static bool verify_eval(srs_type srs,
                                             const batched_proof_type &proof,
                                             const evals_type &evals,
-                                            const std::vector<commitment_type> &commits0,
-                                            const std::vector<commitment_type> &commits1,
-                                            scalar_value_type z0, scalar_value_type z1,
-                                            scalar_value_type gamma0, scalar_value_type gamma1,
+                                            const std::vector<std::vector<commitment_type>> &commits,
+                                            std::vector<scalar_value_type> zs,
+                                            std::vector<scalar_value_type> gammas,
                                             scalar_value_type r) {
                         
-                        auto eval0_accum = evals.evals_at_z0.back();
-                        auto comm0_accum = commits0.back();
-                        for (int i = commits0.size() - 2; i >= 0; --i) {
-                            comm0_accum = (gamma0 * comm0_accum) + commits0[i];
-                            eval0_accum = (eval0_accum * gamma0) + evals.evals_at_z0[i];
+                        auto F = curve_type::template g1_type<>::value_type::zero();
+                        auto z_r_proofs = curve_type::template g1_type<>::value_type::zero();
+                        auto r_proofs = curve_type::template g1_type<>::value_type::zero();
+                        auto cur_r = scalar_value_type::one();
+                        for (std::size_t i = 0; i < proof.size(); ++i) {
+                            auto eval_accum = evals[i].back();
+                            auto comm_accum = commits[i].back();
+                            for (int j = commits[i].size() - 2; j >= 0; --j) {
+                                comm_accum = (gammas[i] * comm_accum) + commits[i][j];
+                                eval_accum = (eval_accum * gammas[i]) + evals[i][j];
+                            }
+                            F = F + cur_r * (comm_accum - eval_accum * curve_type::template g1_type<>::value_type::one());
+                            z_r_proofs = z_r_proofs + cur_r * zs[i] * proof[i];
+                            r_proofs = r_proofs - cur_r * proof[i];
+                            cur_r = cur_r * r;
                         }
 
-                        auto eval1_accum = evals.evals_at_z1.back();
-                        auto comm1_accum = commits1.back();
-                        for (int i = commits1.size() - 2; i >= 0; --i) {
-                            comm1_accum = (gamma1 * comm1_accum) + commits1[i];
-                            eval1_accum = (eval1_accum * gamma1) + evals.evals_at_z1[i];
-                        }
-
-                        auto F = (comm0_accum - eval0_accum * curve_type::template g1_type<>::value_type::one()) +
-                                r * (comm1_accum - eval1_accum * curve_type::template g1_type<>::value_type::one());
-
-                        auto A_1 = algebra::precompute_g1<curve_type>(F + z0 * proof.commit0 + z1 * r * proof.commit1);
+                        auto A_1 = algebra::precompute_g1<curve_type>(F + z_r_proofs);
                         auto A_2 = algebra::precompute_g2<curve_type>(curve_type::template g2_type<>::value_type::one());
-                        auto B_1 = algebra::precompute_g1<curve_type>(-proof.commit0 - r * proof.commit1);
+                        auto B_1 = algebra::precompute_g1<curve_type>(r_proofs);
                         auto B_2 = algebra::precompute_g2<curve_type>(srs.verification_key);
 
                         gt_value_type gt3 = algebra::double_miller_loop<curve_type>(A_1, A_2, B_1, B_2);

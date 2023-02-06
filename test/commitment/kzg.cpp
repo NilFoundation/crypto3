@@ -190,48 +190,37 @@ BOOST_AUTO_TEST_CASE(kzg_batched_basic_test) {
         {{21, 22, 23, 24, 25, 26, 27, 28}},
         {{31, 32, 33, 34, 35, 36, 37, 38}},
     }};
-
     const std::vector<polynomial<scalar_value_type>> gs{{
         {{71, 72, 73, 74, 75, 76, 77, 78}},
         {{81, 82, 83, 84, 85, 86, 87, 88}},
         {{91, 92, 93, 94, 95, 96, 97, 98}},
     }};
+    typename kzg_type::batch_of_batches_of_polynomials_type polys = {fs, gs};
     
-    scalar_value_type z0 = 123;
-    scalar_value_type z1 = 456;
-    auto evals = kzg_type::evaluate_polynomials(fs, gs, z0, z1);
+    std::vector<scalar_value_type> zs = {123, 456};
+    auto evals = kzg_type::evaluate_polynomials(polys, zs);
 
     auto srs = kzg_type::setup({n, alpha});
     
-    scalar_value_type gamma0 = 54321;
-    scalar_value_type gamma1 = 98760;
+    std::vector<scalar_value_type> gammas = {54321, 98760};
 
-    auto proof = kzg_type::proof_eval(srs, fs, gs, evals, z0, z1, gamma0, gamma1);
+    auto proof = kzg_type::proof_eval(srs, polys, evals, zs, gammas);
 
-    {
+    for (size_t j = 0; j < proof.size(); ++j) {
         scalar_value_type h0_x = scalar_value_type::zero();
-        for (size_t i = 0; i < fs.size(); ++i) {
-            const polynomial<scalar_value_type> &f_i = fs[i];
-            const scalar_value_type f_x_minus_f_z0 = f_i.evaluate(alpha) - f_i.evaluate(z0);
-            const scalar_value_type gamma_power = gamma0.pow(i);
-            h0_x += gamma_power * f_x_minus_f_z0 * ((alpha - z0).inversed());
+        for (size_t i = 0; i < polys[j].size(); ++i) {
+            const polynomial<scalar_value_type> &f_i = polys[j][i];
+            const scalar_value_type f_x_minus_f_z0 = f_i.evaluate(alpha) - f_i.evaluate(zs[j]);
+            const scalar_value_type gamma_power = gammas[j].pow(i);
+            h0_x += gamma_power * f_x_minus_f_z0 * ((alpha - zs[j]).inversed());
         }
-        BOOST_CHECK(h0_x * curve_type::template g1_type<>::value_type::one() == proof.commit0);
-
-        scalar_value_type h1_x = scalar_value_type::zero();
-        for (size_t i = 0; i < gs.size(); ++i) {
-            const polynomial<scalar_value_type> &g_i = gs[i];
-            const scalar_value_type g_x_minus_g_z1 = g_i.evaluate(alpha) - g_i.evaluate(z1);
-            const scalar_value_type gamma_power = gamma1.pow(i);
-            h1_x += gamma_power * g_x_minus_g_z1 * ((alpha - z1).inversed());
-        }
-        BOOST_CHECK(h1_x * curve_type::template g1_type<>::value_type::one() == proof.commit1);
+        BOOST_CHECK(h0_x * curve_type::template g1_type<>::value_type::one() == proof[j]);
     }
 
     scalar_value_type r = 23546;
     auto c0 = kzg_type::commit(srs, fs);
     auto c1 = kzg_type::commit(srs, gs);
-    BOOST_CHECK(kzg_type::verify_eval(srs, proof, evals, c0, c1, z0, z1, gamma0, gamma1, r));
+    BOOST_CHECK(kzg_type::verify_eval(srs, proof, evals, {c0, c1}, zs, gammas, r));
 }
 
 BOOST_AUTO_TEST_CASE(kzg_batched_random_test) {
@@ -245,54 +234,57 @@ BOOST_AUTO_TEST_CASE(kzg_batched_random_test) {
 
     scalar_value_type alpha = algebra::random_element<scalar_field_type>();
     std::size_t n = 298;
-    const std::vector<polynomial<scalar_value_type>> fs{{
+    const std::vector<polynomial<scalar_value_type>> f0{{
         {{1, 2, 3, 4, 5, 6, 7, 8}},
         {{11, 12, 13, 14, 15, 16, 17}},
         {{21, 22, 23, 24, 25, 26, 27, 28}},
         {{31, 32, 33, 34, 35, 36, 37, 38, 39}},
     }};
-
-    const std::vector<polynomial<scalar_value_type>> gs{{
+    const std::vector<polynomial<scalar_value_type>> f1{{
         {{71, 72}},
         {{81, 82, 83, 85, 86, 87, 88}},
         {{91, 92, 93, 94, 95, 96, 97, 98, 99, 100}},
     }};
-    
-    scalar_value_type z0 = algebra::random_element<scalar_field_type>();
-    scalar_value_type z1 = algebra::random_element<scalar_field_type>();
-    auto evals = kzg_type::evaluate_polynomials(fs, gs, z0, z1);
+    const std::vector<polynomial<scalar_value_type>> f2{{
+        {{73, 74, 25}},
+        {{87}},
+        {{91, 92, 93, 94, 95, 96, 97, 100, 1, 2, 3}},
+    }};
+    const kzg_type::batch_of_batches_of_polynomials_type polys = {f0, f1, f2};
+    std::size_t num_polys = polys.size();
+
+    std::vector<scalar_value_type> zs;
+    for (std::size_t i = 0; i < num_polys; ++i) {
+        zs.push_back(algebra::random_element<scalar_field_type>());
+    }
+    auto evals = kzg_type::evaluate_polynomials(polys, zs);
 
     auto srs = kzg_type::setup({n, alpha});
     
-    scalar_value_type gamma0 = algebra::random_element<scalar_field_type>();
-    scalar_value_type gamma1 = algebra::random_element<scalar_field_type>();
+    std::vector<scalar_value_type> gammas;
+    for (std::size_t i = 0; i < num_polys; ++i) {
+        gammas.push_back(algebra::random_element<scalar_field_type>());
+    }
 
-    auto proof = kzg_type::proof_eval(srs, fs, gs, evals, z0, z1, gamma0, gamma1);
+    auto proof = kzg_type::proof_eval(srs, polys, evals, zs, gammas);
 
-    {
+    for (std::size_t j = 0; j < proof.size(); ++j) {
         scalar_value_type h0_x = scalar_value_type::zero();
-        for (size_t i = 0; i < fs.size(); ++i) {
-            const polynomial<scalar_value_type> &f_i = fs[i];
-            const scalar_value_type f_x_minus_f_z0 = f_i.evaluate(alpha) - f_i.evaluate(z0);
-            const scalar_value_type gamma_power = gamma0.pow(i);
-            h0_x += gamma_power * f_x_minus_f_z0 * ((alpha - z0).inversed());
+        for (std::size_t i = 0; i < polys[j].size(); ++i) {
+            const polynomial<scalar_value_type> &f_i = polys[j][i];
+            const scalar_value_type f_x_minus_f_z0 = f_i.evaluate(alpha) - f_i.evaluate(zs[j]);
+            const scalar_value_type gamma_power = gammas[j].pow(i);
+            h0_x += gamma_power * f_x_minus_f_z0 * ((alpha - zs[j]).inversed());
         }
-        BOOST_CHECK(h0_x * curve_type::template g1_type<>::value_type::one() == proof.commit0);
-
-        scalar_value_type h1_x = scalar_value_type::zero();
-        for (size_t i = 0; i < gs.size(); ++i) {
-            const polynomial<scalar_value_type> &g_i = gs[i];
-            const scalar_value_type g_x_minus_g_z1 = g_i.evaluate(alpha) - g_i.evaluate(z1);
-            const scalar_value_type gamma_power = gamma1.pow(i);
-            h1_x += gamma_power * g_x_minus_g_z1 * ((alpha - z1).inversed());
-        }
-        BOOST_CHECK(h1_x * curve_type::template g1_type<>::value_type::one() == proof.commit1);
+        BOOST_CHECK(h0_x * curve_type::template g1_type<>::value_type::one() == proof[j]);
     }
 
     scalar_value_type r = algebra::random_element<scalar_field_type>();
-    auto c0 = kzg_type::commit(srs, fs);
-    auto c1 = kzg_type::commit(srs, gs);
-    BOOST_CHECK(kzg_type::verify_eval(srs, proof, evals, c0, c1, z0, z1, gamma0, gamma1, r));
+    std::vector<std::vector<kzg_type::commitment_type>> cs;
+    for (std::size_t j = 0; j < num_polys; ++j) {
+        cs.push_back(kzg_type::commit(srs, polys[j]));
+    }
+    BOOST_CHECK(kzg_type::verify_eval(srs, proof, evals, cs, zs, gammas, r));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
