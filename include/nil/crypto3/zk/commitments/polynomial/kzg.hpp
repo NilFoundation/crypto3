@@ -43,9 +43,10 @@
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
 #include <nil/crypto3/algebra/pairing/pairing_policy.hpp>
 
-using namespace nil::crypto3::math;
-
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+
+using namespace nil::crypto3;
+using namespace nil::crypto3::math;
 
 namespace nil {
     namespace crypto3 {
@@ -73,7 +74,7 @@ namespace nil {
                         scalar_value_type alpha;  //secret key
                         kzg_params_type(std::size_t _n, scalar_value_type _alpha) : n(_n), alpha(_alpha) {}
                         kzg_params_type(std::size_t _n) {
-                            alpha = scalar_value_type::random_element();
+                            alpha = algebra::random_element<typename curve_type::scalar_field_type>();
                             n = _n;
                         }
                     };
@@ -101,7 +102,7 @@ namespace nil {
 
                     static commitment_type commit(const srs_type &srs,
                                                   const polynomial<scalar_value_type> &f) {
-                        // assert(f.size() <= srs.commitment_key.size());
+                        assert(f.size() <= srs.commitment_key.size());
                         return algebra::multiexp<multiexp_method>(srs.commitment_key.begin(),
                                                 srs.commitment_key.begin() + f.size(), f.begin(), f.end(), 1);
                     }

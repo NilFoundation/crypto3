@@ -97,12 +97,12 @@ BOOST_AUTO_TEST_CASE(kzg_random_test) {
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
     typedef zk::commitments::kzg_commitment<curve_type> kzg_type;
 
-    scalar_value_type alpha = algebra::random_element<scalar_field_type>();
     scalar_value_type i = algebra::random_element<scalar_field_type>();
     std::size_t n = 298;
     const polynomial<scalar_value_type> f = {-1, 1, 2, 3, 5, -15};
 
-    auto srs = kzg_type::setup({n, alpha});
+    auto kzg_params = kzg_type::kzg_params_type(n);
+    auto srs = kzg_type::setup(kzg_params);
     auto commit = kzg_type::commit(srs, f);
     auto eval = f.evaluate(i);
     auto proof = kzg_type::proof_eval(srs, f, i, eval);
@@ -232,7 +232,6 @@ BOOST_AUTO_TEST_CASE(kzg_batched_random_test) {
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
     typedef zk::commitments::kzg_batched_commitment<curve_type> kzg_type;
 
-    scalar_value_type alpha = algebra::random_element<scalar_field_type>();
     std::size_t n = 298;
     const std::vector<polynomial<scalar_value_type>> f0{{
         {{1, 2, 3, 4, 5, 6, 7, 8}},
@@ -259,7 +258,9 @@ BOOST_AUTO_TEST_CASE(kzg_batched_random_test) {
     }
     auto evals = kzg_type::evaluate_polynomials(polys, zs);
 
-    auto srs = kzg_type::setup({n, alpha});
+    auto kzg_params = kzg_type::kzg_params_type(n);
+    auto alpha = kzg_params.alpha;
+    auto srs = kzg_type::setup(kzg_params);
     
     std::vector<scalar_value_type> gammas;
     for (std::size_t i = 0; i < num_polys; ++i) {
