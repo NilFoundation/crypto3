@@ -97,12 +97,12 @@ namespace nil {
                             alpha_scaled = alpha_scaled * params.alpha;
                         }
 
-                        return srs_type(std::move(commitment_key), verification_key);
+                        return srs_type(commitment_key, verification_key);
                     }
 
                     static commitment_type commit(const srs_type &srs,
                                                   const polynomial<scalar_value_type> &f) {
-                        assert(f.size() <= srs.commitment_key.size());
+                        BOOST_ASSERT(f.size() <= srs.commitment_key.size());
                         return algebra::multiexp<multiexp_method>(srs.commitment_key.begin(),
                                                 srs.commitment_key.begin() + f.size(), f.begin(), f.end(), 1);
                     }
@@ -119,8 +119,14 @@ namespace nil {
                                                  scalar_value_type eval) {
 
                         const polynomial<scalar_value_type> denominator_polynom = {-i, 1};
-                        const polynomial<scalar_value_type> q =
-                            (f - polynomial<scalar_value_type>{eval}) / denominator_polynom;
+
+                        polynomial<scalar_value_type> q = f;
+                        q[0] -= eval;
+                        auto r = q % denominator_polynom;
+                        if (r != scalar_value_type(0)) {
+                            throw std::runtime_error("incorrect eval or point i");
+                        }
+                        q = q / denominator_polynom;
 
                         return commit(srs, q);
                     }
@@ -130,7 +136,6 @@ namespace nil {
                                             commitment_type C_f,
                                             scalar_value_type i,
                                             scalar_value_type eval) {
-
                         auto A_1 = algebra::precompute_g1<curve_type>(p);
                         auto A_2 = algebra::precompute_g2<curve_type>(srs.verification_key -
                                                                         i * curve_type::template g2_type<>::value_type::one());
@@ -180,7 +185,7 @@ namespace nil {
                     static evals_type evaluate_polynomials(const batch_of_batches_of_polynomials_type &polys,
                                                             const std::vector<scalar_value_type> zs) {
 
-                        assert(polys.size() == zs.size());
+                        BOOST_ASSERT(polys.size() == zs.size());
 
                         std::vector<std::vector<scalar_value_type>> evals;
                         for (std::size_t i = 0; i < polys.size(); ++i) {
@@ -209,6 +214,8 @@ namespace nil {
                                                         const std::vector<scalar_value_type> zs,
                                                         const std::vector<scalar_value_type> gammas) {
                         
+                        BOOST_ASSERT(polys.size() == evals.size());
+                        BOOST_ASSERT(polys.size() == gammas.size());
                         std::vector<commitment_type> proofs;
 
                         for (std::size_t i = 0; i < polys.size(); ++i) {

@@ -110,6 +110,81 @@ BOOST_AUTO_TEST_CASE(kzg_random_test) {
     BOOST_CHECK(kzg_type::verify_eval(srs, proof, commit, i, eval));
 }
 
+BOOST_AUTO_TEST_CASE(kzg_false_test) {
+
+    typedef algebra::curves::mnt4<298> curve_type;
+    typedef typename curve_type::base_field_type::value_type base_value_type;
+    typedef typename curve_type::base_field_type base_field_type;
+    typedef typename curve_type::scalar_field_type scalar_field_type;
+    typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+    typedef zk::commitments::kzg_commitment<curve_type> kzg_type;
+
+    scalar_value_type alpha = 10;
+    scalar_value_type i = 2;
+    std::size_t n = 16;
+    const polynomial<scalar_value_type> f = {100, 1, 2, 3};
+
+    auto srs = kzg_type::setup({n, alpha});
+
+    auto commit = kzg_type::commit(srs, f);
+
+    auto eval = f.evaluate(i);
+    auto proof = kzg_type::proof_eval(srs, f, i, eval);
+
+    BOOST_CHECK(kzg_type::verify_eval(srs, proof, commit, i, eval));
+
+    // wrong srs
+    auto ck2 = srs.commitment_key;
+    ck2[0] = ck2[0] * 2;
+    auto srs2 = kzg_type::srs_type(ck2, srs.verification_key * 2);
+    BOOST_CHECK(!kzg_type::verify_eval(srs2, proof, commit, i, eval));
+
+    // wrong commit
+    auto commit2 = commit * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof, commit2, i, eval));
+
+    // wrong i
+    auto i2 = i * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof, commit, i2, eval));
+
+    // wrong eval
+    auto eval2 = eval * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof, commit, i, eval2));
+
+    // wrong proof
+    {
+        // wrong srs
+        typename kzg_type::proof_type proof2;
+        bool exception = false;
+        try {proof2 = kzg_type::proof_eval(srs2, f, i, eval);}
+        catch (std::runtime_error& e) {exception = true;}
+        if (!exception) {
+            BOOST_CHECK(proof2 != proof);
+            BOOST_CHECK_MESSAGE(!kzg_type::verify_eval(srs, proof2, commit, i, eval), "wrong srs");
+        }
+
+        // wrong i
+        exception = false;
+        try {proof2 = kzg_type::proof_eval(srs, f, i2, eval);}
+        catch (std::runtime_error& e) {exception = true;}
+        if (!exception) {
+            BOOST_CHECK(proof2 != proof);
+            BOOST_CHECK_MESSAGE(!kzg_type::verify_eval(srs, proof2, commit, i, eval), "wrong i");
+        }
+
+        // wrong eval
+        exception = false;
+        try {proof2 = kzg_type::proof_eval(srs, f, i, eval2);}
+        catch (std::runtime_error& e) {exception = true;}
+        if (!exception) {
+            BOOST_CHECK(proof2 != proof);
+            BOOST_CHECK_MESSAGE(!kzg_type::verify_eval(srs, proof2, commit, i, eval), "wrong eval");
+        }
+    }
+    auto proof2 = proof * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof2, commit, i, eval));
+}
+
 BOOST_AUTO_TEST_CASE(kzg_batched_accumulate_test) {
 
     typedef algebra::curves::mnt4<298> curve_type;
@@ -286,6 +361,123 @@ BOOST_AUTO_TEST_CASE(kzg_batched_random_test) {
         cs.push_back(kzg_type::commit(srs, polys[j]));
     }
     BOOST_CHECK(kzg_type::verify_eval(srs, proof, evals, cs, zs, gammas, r));
+}
+
+BOOST_AUTO_TEST_CASE(kzg_batched_false_test) {
+
+    typedef algebra::curves::bls12<381> curve_type;
+    typedef typename curve_type::base_field_type::value_type base_value_type;
+    typedef typename curve_type::base_field_type base_field_type;
+    typedef typename curve_type::scalar_field_type scalar_field_type;
+    typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+    typedef zk::commitments::kzg_batched_commitment<curve_type> kzg_type;
+
+    scalar_value_type alpha = 7;
+    std::size_t n = 298;
+    const std::vector<polynomial<scalar_value_type>> fs{{
+        {{1, 2, 3, 4, 5, 6, 7, 8}},
+        {{11, 12, 13, 14, 15, 16, 17, 18}},
+        {{21, 22, 23, 24, 25, 26, 27, 28}},
+        {{31, 32, 33, 34, 35, 36, 37, 38}},
+    }};
+    const std::vector<polynomial<scalar_value_type>> gs{{
+        {{71, 72, 73, 74, 75, 76, 77, 78}},
+        {{81, 82, 83, 84, 85, 86, 87, 88}},
+        {{91, 92, 93, 94, 95, 96, 97, 98}},
+    }};
+    const std::vector<polynomial<scalar_value_type>> hs{{
+        {{71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81}},
+    }};
+    typename kzg_type::batch_of_batches_of_polynomials_type polys = {fs, gs, hs};
+    std::size_t num_polys = polys.size();
+    
+    std::vector<scalar_value_type> zs = {123, 456, 789};
+    auto evals = kzg_type::evaluate_polynomials(polys, zs);
+
+    auto srs = kzg_type::setup({n, alpha});
+    
+    std::vector<scalar_value_type> gammas = {54321, 98760, 12345};
+
+    auto proof = kzg_type::proof_eval(srs, polys, evals, zs, gammas);
+
+    scalar_value_type r = 23546;
+    std::vector<std::vector<kzg_type::commitment_type>> cs;
+    for (std::size_t j = 0; j < num_polys; ++j) {
+        cs.push_back(kzg_type::commit(srs, polys[j]));
+    }
+    BOOST_CHECK(kzg_type::verify_eval(srs, proof, evals, cs, zs, gammas, r));
+
+    // wrong verification key
+    auto ck2 = srs.commitment_key;
+    ck2[0] = ck2[0] * 2;
+    auto srs2 = kzg_type::srs_type(ck2, srs.verification_key * 2);
+    BOOST_CHECK(!kzg_type::verify_eval(srs2, proof, evals, cs, zs, gammas, r));
+
+    // wrong evals
+    auto evals2 = evals;
+    evals2[evals.size() / 2][0] = evals2[evals.size() / 2][0] * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof, evals2, cs, zs, gammas, r));
+
+    // wrong commitments
+    auto cs2 = cs;
+    cs2[0].back() = cs2[0].back() * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof, evals, cs2, zs, gammas, r));
+
+    // wrong zs
+    auto zs2 = zs;
+    zs2[zs2.size() / 2] = zs2[zs2.size() / 2] * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof, evals, cs, zs2, gammas, r));
+
+    // wrong gammas
+    auto gammas2 = gammas;
+    gammas2[gammas2.size() / 2] = gammas2[gammas2.size() / 2] * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof, evals, cs, zs, gammas2, r));
+
+    // wrong proof
+    {
+        // wrong srs
+        typename kzg_type::batched_proof_type proof2;
+        bool exception = false;
+        try {proof2 = kzg_type::proof_eval(srs2, polys, evals, zs, gammas);}
+        catch (std::runtime_error& e) {exception = true;}
+        if (!exception) {
+            BOOST_CHECK(proof2 != proof);
+            BOOST_CHECK_MESSAGE(!kzg_type::verify_eval(srs, proof2, evals, cs, zs, gammas, r), "wrong srs");
+        }
+        
+        // wrong evals
+        exception = false;
+        try {proof2 = kzg_type::proof_eval(srs, polys, evals2, zs, gammas);}
+        catch (std::runtime_error& e) {exception = true;}
+        if (!exception) {
+            BOOST_CHECK(proof2 != proof);
+            BOOST_CHECK_MESSAGE(!kzg_type::verify_eval(srs, proof2, evals, cs, zs, gammas, r), "wrong evals");
+        }
+
+        // wrong zs
+        exception = false;
+        try {proof2 = kzg_type::proof_eval(srs, polys, evals, zs2, gammas);}
+        catch (std::runtime_error& e) {exception = true;}
+        if (!exception) {
+            BOOST_CHECK(proof2 != proof);
+            BOOST_CHECK_MESSAGE(!kzg_type::verify_eval(srs, proof2, evals, cs, zs, gammas, r), "wrong zs");
+        }
+
+        // wrong gammas
+        exception = false;
+        try {proof2 = kzg_type::proof_eval(srs, polys, evals, zs, gammas2);}
+        catch (std::runtime_error& e) {exception = true;}
+        if (!exception) {
+            BOOST_CHECK(proof2 != proof);
+            BOOST_CHECK_MESSAGE(!kzg_type::verify_eval(srs, proof2, evals, cs, zs, gammas, r), "wrong gammas");
+        }
+    }
+    auto proof2 = proof;
+    proof2.back() = proof2.back() * 2;
+    BOOST_CHECK(!kzg_type::verify_eval(srs, proof2, evals, cs, zs, gammas, r));
+
+    // wrong combination of all
+    BOOST_CHECK(!kzg_type::verify_eval(srs2, proof2, evals2, cs2, zs2, gammas2, r));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
