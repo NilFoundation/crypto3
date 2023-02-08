@@ -403,7 +403,7 @@ namespace nil {
                         }
                     }
 
-                    math::polynomial_dfs combined_Q;
+                    math::polynomial_dfs<typename LPC::field_type::value_type> combined_Q;
                     combined_Q.from_coefficients(combined_Q_normal);
 
                     std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
