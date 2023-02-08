@@ -30,6 +30,7 @@
 
 #include <string>
 #include <random>
+#include <regex>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -51,13 +52,13 @@
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
 using namespace nil::crypto3;
 
-inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
-    using dist_type = std::uniform_int_distribution<int>;
-    static std::random_device random_engine;
+using dist_type = std::uniform_int_distribution<int>;
 
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step, boost::random::mt11213b random_engine = boost::random::mt11213b(0)) {
     std::vector<std::size_t> step_list;
     std::size_t steps_sum = 0;
     while (steps_sum != r) {
@@ -76,17 +77,68 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
     return step_list;
 }
 
-BOOST_AUTO_TEST_SUITE(lpc_test_suite)
+template <typename FieldType>
+inline math::polynomial<typename FieldType::value_type> generate_random_polynomial(
+    std::size_t degree,
+    nil::crypto3::random::algebraic_engine<FieldType> rnd = nil::crypto3::random::algebraic_engine<FieldType>(0)
+){
+    math::polynomial<typename FieldType::value_type> result(degree);
+    std::generate(std::begin(result), std::end(result), [&rnd]() { return rnd(); });
+    return result;
+}
 
+template <typename FieldType>
+inline std::vector<math::polynomial<typename FieldType::value_type>> generate_random_polynomial_batch(
+    std::size_t batch_size,
+    std::size_t degree,
+    nil::crypto3::random::algebraic_engine<FieldType> rnd = nil::crypto3::random::algebraic_engine<FieldType>(0)
+){
+    std::vector<math::polynomial<typename FieldType::value_type>> result;
+
+    for( uint i = 0; i < batch_size; i++ ){
+        result.push_back(generate_random_polynomial(degree, rnd));
+    }
+    return result;
+}
+
+std::size_t test_global_seed = 0;
+
+struct test_initializer {
+    test_initializer(){
+        test_global_seed = 0;
+
+        for( std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++){
+            if(std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed"){
+                if(std::string(boost::unit_test::framework::master_test_suite().argv[i+1]) == "random"){
+                    std::random_device rd;
+                    test_global_seed = rd();
+                    break;
+                }
+                if(std::regex_match( boost::unit_test::framework::master_test_suite().argv[i+1], std::regex( ( "((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?" ) ) ) ){
+                    test_global_seed = atoi(boost::unit_test::framework::master_test_suite().argv[i+1]);
+                    break;
+                }
+            }
+        }
+        BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
+    }
+    void setup(){
+    }
+    void teardown(){
+    }
+    ~test_initializer(){}
+};
+
+BOOST_TEST_GLOBAL_FIXTURE(test_initializer);
+
+BOOST_AUTO_TEST_SUITE(lpc_math_polynomial_suite);
+  
 BOOST_AUTO_TEST_CASE(lpc_basic_test) {
-
-    // setup
+    // Setup types.
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::scalar_field_type FieldType;
-
     typedef hashes::sha2<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
-
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
     constexpr static const std::size_t lambda = 40;
@@ -119,26 +171,34 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     typename fri_type::params_type fri_params;
 
+    // Setup randomness.
+    boost::random::mt11213b random_engine(test_global_seed);
+    nil::crypto3::random::algebraic_engine<FieldType> alg_rnd(test_global_seed);
+
+    // Setup params
     fri_params.r = r;
     fri_params.D = D;
     fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 1);
+    fri_params.step_list = generate_random_step_list(r, 1, random_engine);
 
-    // commit
-
+    // Generate polynomials
     std::array<std::vector<math::polynomial<typename FieldType::value_type>>,4> f;
     f[0].push_back({1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
     f[1].push_back({0, 1});
+    f[1].push_back({0, 1, 2});
+    f[1].push_back({0, 1, 3});
     f[2].push_back({0});
-    f[3].push_back({0});
+    f[3].push_back(generate_random_polynomial(4, alg_rnd));
+    f[3].push_back(generate_random_polynomial(9, alg_rnd));
 
+    // Commit
     std::array<merkle_tree_type,4> tree;
     tree[0] = zk::algorithms::precommit<lpc_type>(f[0], D[0], fri_params.step_list.front());
     tree[1] = zk::algorithms::precommit<lpc_type>(f[1], D[0], fri_params.step_list.front());
     tree[2] = zk::algorithms::precommit<lpc_type>(f[2], D[0], fri_params.step_list.front());
     tree[3] = zk::algorithms::precommit<lpc_type>(f[3], D[0], fri_params.step_list.front());
 
-    // TODO: take a point outside of the basic domain
+    // Generate evaluation points. Generate points outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_point;
     evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
     std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluation_points;
@@ -148,28 +208,31 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     evaluation_points[3].push_back(evaluation_point);
 
     std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
+    // Prove
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
     auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
-    // verify
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
-    
     std::array<typename lpc_type::commitment_type, 4> commitment;
-
     commitment[0] = zk::algorithms::commit<lpc_type>(tree[0]);
     commitment[1] = zk::algorithms::commit<lpc_type>(tree[1]);
     commitment[2] = zk::algorithms::commit<lpc_type>(tree[2]);
     commitment[3] = zk::algorithms::commit<lpc_type>(tree[3]);
-
+    
+    // Verify
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
     BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
         evaluation_points, proof, commitment, fri_params, transcript_verifier
     ));
-}
-/*
-BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
 
-    // setup
+    // Check transcript state
+    typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+}
+
+BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
+    // Setup types
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::scalar_field_type FieldType;
 
@@ -208,36 +271,63 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
 
     typename fri_type::params_type fri_params;
 
+    // Setup randomness.
+    boost::random::mt11213b random_engine(test_global_seed);
+    nil::crypto3::random::algebraic_engine<FieldType> alg_rnd_engine(test_global_seed);
+
+    // Setup params
     fri_params.r = r;
     fri_params.D = D;
     fri_params.max_degree = d - 1;
     fri_params.step_list = generate_random_step_list(r, 5);
 
-    // commit
+    // Generate polynomials
+    std::array<std::vector<math::polynomial<typename FieldType::value_type>>,4> f;
+    f[0] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
+    f[1] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
+    f[2] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
+    f[3] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
 
-    nil::crypto3::random::algebraic_random_device<FieldType> rnd;
-    math::polynomial<typename FieldType::value_type> f(d);
-    std::generate(std::begin(f), std::end(f), [&rnd]() { return rnd(); });
-    f.back() = FieldType::value_type::one();
+    // Commit
+    std::array<merkle_tree_type,4> tree;
+    tree[0] = zk::algorithms::precommit<lpc_type>(f[0], D[0], fri_params.step_list.front());
+    tree[1] = zk::algorithms::precommit<lpc_type>(f[1], D[0], fri_params.step_list.front());
+    tree[2] = zk::algorithms::precommit<lpc_type>(f[2], D[0], fri_params.step_list.front());
+    tree[3] = zk::algorithms::precommit<lpc_type>(f[3], D[0], fri_params.step_list.front());
 
-    merkle_tree_type tree = zk::algorithms::precommit<lpc_type>(f, D[0], fri_params.step_list.front());
+    // Generate evaluation points. Choose poin1ts outside the domain
+    std::vector<typename FieldType::value_type> evaluation_point;
+    evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+    std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluation_points;
+    evaluation_points[0].push_back(evaluation_point);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[2].push_back(evaluation_point);
+    evaluation_points[3].push_back(evaluation_point);
 
-    // TODO: take a point outside of the basic domain
-    std::vector<typename FieldType::value_type> evaluation_points = {
-        algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
+    std::array<typename lpc_type::commitment_type, 4> commitment;
+    commitment[0] = zk::algorithms::commit<lpc_type>(tree[0]);
+    commitment[1] = zk::algorithms::commit<lpc_type>(tree[1]);
+    commitment[2] = zk::algorithms::commit<lpc_type>(tree[2]);
+    commitment[3] = zk::algorithms::commit<lpc_type>(tree[3]);
 
     std::array<std::uint8_t, 96> x_data {};
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
+    // Prove
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
     auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
 
-    // verify
+    // Verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
-
     BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
-        evaluation_points, proof, zk::algorithms::commit<lpc_type>(tree), fri_params, transcript_verifier));
-}
+        evaluation_points, proof, commitment, fri_params, transcript_verifier
+    ));
 
+    // Check transcript state
+    typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+}
+/*
 BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
 
     // setup
