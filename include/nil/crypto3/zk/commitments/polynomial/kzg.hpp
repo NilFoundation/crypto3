@@ -83,7 +83,12 @@ namespace nil {
             } // namespace commitments
 
             namespace algorithms {
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::kzg<typename KZG::curve_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static typename KZG::params_type setup(std::size_t max_degree, typename KZG::scalar_value_type alpha) {
                     typename KZG::scalar_value_type alpha_scaled = alpha;
                     typename KZG::commitment_key_type commitment_key = {KZG::curve_type::template g1_type<>::value_type::one()};
@@ -98,7 +103,12 @@ namespace nil {
                     return typename KZG::params_type(commitment_key, verification_key);
                 }
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::kzg<typename KZG::curve_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static typename KZG::commitment_type commit(const typename KZG::params_type &params,
                                                 const typename math::polynomial<typename KZG::scalar_value_type> &f) {
                     BOOST_ASSERT(f.size() <= params.commitment_key.size());
@@ -106,7 +116,12 @@ namespace nil {
                                             params.commitment_key.begin() + f.size(), f.begin(), f.end(), 1);
                 }
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::kzg<typename KZG::curve_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static typename KZG::proof_type proof_eval(typename KZG::params_type params,
                                             const typename math::polynomial<typename KZG::scalar_value_type> &f,
                                             typename KZG::scalar_value_type i,
@@ -125,7 +140,12 @@ namespace nil {
                     return commit<KZG>(params, q);
                 }
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::kzg<typename KZG::curve_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static bool verify_eval(typename KZG::params_type params,
                                         typename KZG::proof_type p,
                                         typename KZG::commitment_type C_f,
@@ -165,6 +185,7 @@ namespace nil {
                 struct batched_kzg : public kzg<CurveType> {
 
                     typedef CurveType curve_type;
+                    typedef KZGParams kzg_type;
                     constexpr static const std::size_t batch_size = KZGParams::batch_size;
                     typedef typename curve_type::gt_type::value_type gt_value_type;
 
@@ -184,7 +205,12 @@ namespace nil {
 
             namespace algorithms {
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static typename math::polynomial<typename KZG::scalar_value_type> accumulate(const std::vector<typename math::polynomial<typename KZG::scalar_value_type>> &polys,
                                                                 const typename KZG::scalar_value_type &factor) {
                     std::size_t num = polys.size();
@@ -197,7 +223,12 @@ namespace nil {
                     return result;
                 }
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static typename KZG::evals_type evaluate_polynomials(const typename KZG::batch_of_batches_of_polynomials_type &polys,
                                                         const std::vector<typename KZG::scalar_value_type> zs) {
 
@@ -215,7 +246,12 @@ namespace nil {
                     return evals;
                 }
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static std::vector<typename KZG::commitment_type> commit(const typename KZG::params_type &params, 
                                                             const std::vector<typename math::polynomial<typename KZG::scalar_value_type>> &polys) {
                     std::vector<typename KZG::commitment_type> commitments;
@@ -225,7 +261,12 @@ namespace nil {
                     return commitments;
                 }
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static typename KZG::batched_proof_type proof_eval(const typename KZG::params_type &params, 
                                                     const typename KZG::batch_of_batches_of_polynomials_type &polys,
                                                     const typename KZG::evals_type &evals,
@@ -246,7 +287,12 @@ namespace nil {
                     return proofs;
                 }
 
-                template<typename KZG>
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 KZG>::value,
+                             bool>::type = true>
                 static bool verify_eval(typename KZG::params_type params,
                                         const typename KZG::batched_proof_type &proof,
                                         const typename KZG::evals_type &evals,
