@@ -305,22 +305,20 @@ namespace nil {
                                  FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<
-                    (std::is_same<typename ContainerType::value_type,
-                                  math::polynomial_dfs<typename FRI::field_type::value_type>>::value),
+                    (std::is_same<typename ContainerType::value_type, math::polynomial_dfs<typename FRI::field_type::value_type>>::value),
                     typename FRI::precommitment_type>::type
                     precommit(ContainerType poly,
-                              std::shared_ptr<math::evaluation_domain<typename FRI::field_type>>
-                                  D,
-                              const std::size_t fri_step) {
+                        std::shared_ptr<math::evaluation_domain<typename FRI::field_type>>
+                        D,
+                        const std::size_t fri_step
+                    ) {
 
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                     auto begin = std::chrono::high_resolution_clock::now();
                     auto last = begin;
-                    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::high_resolution_clock::now() - last);
+                    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - last);
 #endif
                     for (int i = 0; i < poly.size(); ++i) {
-                        // BOOST_ASSERT (poly[i].size() == D->size());
                         if (poly[i].size() != D->size()) {
                             poly[i].resize(D->size());
                         }
@@ -383,11 +381,11 @@ namespace nil {
                     (std::is_same<typename ContainerType::value_type,
                                   math::polynomial<typename FRI::field_type::value_type>>::value),
                     typename FRI::precommitment_type>::type
-                    precommit(const ContainerType &poly,
-                              std::shared_ptr<math::evaluation_domain<typename FRI::field_type>>
-                                  D,
-                              const std::size_t fri_step) {
-
+                precommit(const ContainerType &poly,
+                    std::shared_ptr<math::evaluation_domain<typename FRI::field_type>>
+                    D,
+                    const std::size_t fri_step
+                ) {
                     std::size_t list_size = poly.size();
                     std::vector<math::polynomial_dfs<typename FRI::field_type::value_type>> poly_dfs(list_size);
                     for (std::size_t i = 0; i < list_size; i++) {
@@ -554,7 +552,6 @@ namespace nil {
                     if constexpr (std::is_same<math::polynomial_dfs<typename FRI::field_type::value_type>,
                                                typename ContainerType::value_type>::value) {
                         for (int i = 0; i < f.size(); ++i) {
-                            // BOOST_ASSERT(g[i].size() == fri_params.D[0]->size());
                             if (f[i].size() != fri_params.D[0]->size()) {
                                 f[i].resize(fri_params.D[0]->size());
                             }
@@ -744,15 +741,14 @@ namespace nil {
                 }
 
                 template<typename FRI, typename PolynomType,
-                         typename std::enable_if<
-                             std::is_base_of<
-                                 commitments::detail::basic_batched_fri<
-                                     typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
-                                 FRI>::value &&
-                                 (std::is_same<typename PolynomType::value_type,
-                                               typename FRI::field_type::value_type>::value),
-                             bool>::type = true>
+                typename std::enable_if<
+                    std::is_base_of<
+                        commitments::detail::basic_batched_fri<
+                            typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                            typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                        FRI>::value &&
+                        (std::is_same<typename PolynomType::value_type, typename FRI::field_type::value_type>::value),
+                bool>::type = true>
                 static typename FRI::proof_type
                     proof_eval(PolynomType f,
                                const typename FRI::params_type &fri_params,
@@ -767,16 +763,14 @@ namespace nil {
                 }
 
                 template<typename FRI, typename ContainerType,
-                         typename std::enable_if<
-                             std::is_base_of<
-                                 commitments::detail::basic_batched_fri<
-                                     typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
-                                 FRI>::value &&
-                                 !std::is_same<typename ContainerType::value_type
-                                 ,
-                                               typename FRI::field_type::value_type>::value,
-                             bool>::type = true>
+                    typename std::enable_if<
+                    std::is_base_of<
+                        commitments::detail::basic_batched_fri<
+                            typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                            typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                        FRI>::value &&
+                        !std::is_same<typename ContainerType::value_type, typename FRI::field_type::value_type>::value,
+                    bool>::type = true>
                 static bool verify_eval(typename FRI::proof_type &proof,
                                         typename FRI::params_type &fri_params,
                                         const typename FRI::commitment_type &t_polynomials,

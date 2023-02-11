@@ -372,11 +372,13 @@ namespace nil {
 
                             for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
                                 z[k][polynom_index][point_index] = g_normal[polynom_index].evaluate(
-                                    evaluation_point[point_index]);    // transform to point-representation
+                                    evaluation_point[point_index]
+                                );    // transform to point-representation
 
                                 U_interpolation_points[point_index] =
                                     std::make_pair(evaluation_point[point_index],
-                                                z[k][polynom_index][point_index]);    // prepare points for interpolation
+                                                z[k][polynom_index][point_index]
+                                );    // prepare points for interpolation
                             }
 
                             math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
@@ -393,7 +395,7 @@ namespace nil {
                             if constexpr (!LPC::is_const_size) {
                                 Q_normal.resize(leaf_size);
                             }
-                            Q_normal = (g_normal[k][polynom_index] - U);
+                            Q_normal = (g_normal[polynom_index] - U);
                             Q_normal = Q_normal / denominator_polynom;
                             if (k == 0 && polynom_index == 0) {
                                 combined_Q_normal = Q_normal;
