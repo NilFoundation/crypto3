@@ -159,10 +159,10 @@ namespace nil {
                 //                }
 
                 bool operator==(const polynomial_dfs& rhs) const {
-                    return val == rhs.val && _d == rhs.d;
+                    return val == rhs.val && _d == rhs._d;
                 }
                 bool operator!=(const polynomial_dfs& rhs) const {
-                    return !(rhs == *this && _d == rhs.d);
+                    return !(rhs == *this && _d == rhs._d);
                 }
 
                 //                template<typename InputIterator>
