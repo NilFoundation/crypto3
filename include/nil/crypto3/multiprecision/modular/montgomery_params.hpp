@@ -57,7 +57,7 @@ namespace nil {
                     */
                     limb_type monty_inverse(limb_type a) {
                         if (a % 2 == 0) {
-                            throw std::invalid_argument("Monty_inverse only valid for odd integers");
+                            NIL_THROW(std::invalid_argument("Monty_inverse only valid for odd integers"));
                         }
 
                         limb_type b = 1;

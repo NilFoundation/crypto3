@@ -12,6 +12,12 @@
 #include <boost/math/tools/complex.hpp>
 #include <nil/crypto3/multiprecision/traits/transcendental_reduction_type.hpp>
 #include <nil/crypto3/multiprecision/traits/std_integer_traits.hpp>
+
+#ifdef __EVM__
+#undef BOOST_THROW_EXCEPTION
+#define BOOST_THROW_EXCEPTION(...) std::abort()
+#endif
+
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4307)
