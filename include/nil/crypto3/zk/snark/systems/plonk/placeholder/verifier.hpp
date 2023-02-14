@@ -80,7 +80,7 @@ namespace nil {
                         plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename ParamsType::commitment_params_type &fri_params) {
-
+                        
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
                         std::vector<std::uint8_t> transcript_init {};
@@ -124,9 +124,7 @@ namespace nil {
 
                         typename policy_type::evaluation_map columns_at_y;
                         for (std::size_t i = 0; i < witness_columns; i++) {
-
                             std::size_t i_global_index = i;
-
                             for (std::size_t j = 0;
                                  j < preprocessed_public_data.common_data.columns_rotations[i_global_index].size();
                                  j++) {
@@ -138,6 +136,7 @@ namespace nil {
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[0][i][j];
                             }
                         }
+                        
                         for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
                             std::size_t i_global_index = witness_columns + i;
 
@@ -152,6 +151,7 @@ namespace nil {
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[0][witness_columns + i][j];
                             }
                         }
+
                         for (std::size_t i = 0; i < 0 + constant_columns; i++) {
                             std::size_t i_global_index = witness_columns + public_input_columns + i;
                             for (std::size_t j = 0;
@@ -288,7 +288,6 @@ namespace nil {
 
                         // quotient
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {{challenge}};
-
 
                         // public data
                         std::vector<std::vector<typename FieldType::value_type>> &evaluation_points_public =

@@ -156,8 +156,8 @@ namespace nil {
                     typename LPC::field_type::value_type combined_alpha = transcript.template challenge<typename LPC::field_type>();
                     math::polynomial<typename LPC::field_type::value_type> combined_Q;
                     std::array<typename LPC::proof_type::z_type, 4> z;
-                    for (std::size_t k = 0; k < 4; k++) {
 
+                    for (std::size_t k = 0; k < 4; k++) {
                         typename select_container<LPC::is_const_size,
                                               std::vector<std::pair<typename LPC::field_type::value_type,
                                                                     typename LPC::field_type::value_type>>,
@@ -333,26 +333,46 @@ namespace nil {
                 ) {
                     // Prepare z-s and combined_Q;
                     typename LPC::field_type::value_type combined_alpha = transcript.template challenge<typename LPC::field_type>();
-                    math::polynomial<typename LPC::field_type::value_type> combined_Q_normal;
+                    math::polynomial_dfs<typename LPC::field_type::value_type> combined_Q_dfs;
+                    math::polynomial<typename LPC::field_type::value_type> combined_Q;
+
+
                     std::array<typename LPC::proof_type::z_type, 4> z;
+                    std::map<typename LPC::field_type::value_type, math::polynomial_dfs<typename LPC::field_type::value_type>> denominators_dfs;
+                    std::map<typename LPC::field_type::value_type, math::polynomial<typename LPC::field_type::value_type>> denominators;
+                    std::size_t max_points_length = 0;
+                    std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>> x_degrees;
+
+                    x_degrees.resize(2);
+                    x_degrees[0] = math::polynomial_dfs<typename LPC::field_type::value_type>(0, fri_params.D[0]->size(), LPC::field_type::value_type::one());
+                    x_degrees[1] = math::polynomial_dfs<typename LPC::field_type::value_type>(0, fri_params.D[0]->size());
+                    x_degrees[1].from_coefficients(math::polynomial<typename LPC::field_type::value_type>({0,1}));
+
+                    for(std::size_t k = 0; k < 4; k++ ){
+                        for(std::size_t i = 0; i < evaluation_points[k].size(); i++ ){
+                            if( evaluation_points[k][i].size() > max_points_length )
+                                max_points_length = evaluation_points[k][i].size();
+                            for( std::size_t j = 0; j < evaluation_points[k][i].size(); j++){
+                                if( denominators_dfs.find(evaluation_points[k][i][j]) == std::end(denominators_dfs)){
+                                    denominators[evaluation_points[k][i][j]] = math::polynomial<typename LPC::field_type::value_type>({-evaluation_points[k][i][j], 1});
+                                    denominators[evaluation_points[k][i][j]] = math::polynomial<typename LPC::field_type::value_type>({1}) / denominators[evaluation_points[k][i][j]];
+                                    denominators_dfs[evaluation_points[k][i][j]] = math::polynomial_dfs<typename LPC::field_type::value_type>(0, fri_params.D[0]->size());
+                                    denominators_dfs[evaluation_points[k][i][j]].from_coefficients(denominators[evaluation_points[k][i][j]]);
+                                }
+                            }
+                        }
+                    }
+    
+                    x_degrees.resize(max_points_length);
+                    for( std::size_t i = 2; i < max_points_length; i++){
+                        x_degrees[i] = x_degrees[i - 1] * x_degrees[1];
+                    }
 
                     for (std::size_t k = 0; k < 4; k++) {
                         std::size_t leaf_size = g[k].size();
 
-                        // There was g_normal in math::polynomial. Is it really only for FRI calling? Prepare g_normal.
-                        typename select_container<LPC::is_const_size,
-                            math::polynomial<typename LPC::field_type::value_type>,
-                            LPC::leaf_size
-                        >::type g_normal;
-
                         if constexpr (!LPC::is_const_size) {
                             z[k].resize(leaf_size);
-                            g_normal.resize(leaf_size);
-                        }
-
-                        for (int polynom_index = 0; polynom_index < g_normal.size(); ++polynom_index) {
-                            g_normal[polynom_index] =
-                                math::polynomial<typename LPC::field_type::value_type>(g[k][polynom_index].coefficients());
                         }
 
                         // Prepare U_interpolation_points and denominator_polynom
@@ -370,54 +390,51 @@ namespace nil {
                             U_interpolation_points.resize(evaluation_point.size());
                             z[k][polynom_index].resize(evaluation_point.size());
 
-                            for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
-                                z[k][polynom_index][point_index] = g_normal[polynom_index].evaluate(
-                                    evaluation_point[point_index]
-                                );    // transform to point-representation
+                            math::polynomial<typename LPC::field_type::value_type> g_normal(g[k][polynom_index].coefficients());
 
+                            for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
+                                z[k][polynom_index][point_index] = g_normal.evaluate(evaluation_point[point_index]);
                                 U_interpolation_points[point_index] =
                                     std::make_pair(evaluation_point[point_index],
-                                                z[k][polynom_index][point_index]
+                                        z[k][polynom_index][point_index]
                                 );    // prepare points for interpolation
-                            }
-
-                            math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
-                            for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
-                                denominator_polynom =
-                                    denominator_polynom *
-                                    math::polynomial<typename LPC::field_type::value_type> {-evaluation_point[point_index], 1};
                             }
 
                             math::polynomial<typename LPC::field_type::value_type> U =
                                 math::lagrange_interpolation(U_interpolation_points);
 
-                            math::polynomial<typename LPC::field_type::value_type> Q_normal;
-                            if constexpr (!LPC::is_const_size) {
-                                Q_normal.resize(leaf_size);
+                            math::polynomial_dfs<typename LPC::field_type::value_type> U_dfs(0, fri_params.D[0]->size(), U[0]);
+                            for( std::size_t point_index = 1; point_index < evaluation_point.size(); point_index++){
+                                U_dfs += (x_degrees[point_index] * U[point_index]);
                             }
-                            Q_normal = (g_normal[polynom_index] - U);
-                            Q_normal = Q_normal / denominator_polynom;
+
+                            math::polynomial_dfs<typename LPC::field_type::value_type> denominator_polynom_dfs = denominators_dfs[evaluation_point[0]];
+                            for (std::size_t point_index = 1; point_index < evaluation_point.size(); point_index++) {
+                                denominator_polynom_dfs *= denominators_dfs[evaluation_point[point_index]];
+                            }
+
+                            math::polynomial_dfs<typename LPC::field_type::value_type> Q_dfs;
+
+                            Q_dfs = g[k][polynom_index] - U_dfs;
+                            Q_dfs *= denominator_polynom_dfs;
+
                             if (k == 0 && polynom_index == 0) {
-                                combined_Q_normal = Q_normal;
+                                combined_Q_dfs = Q_dfs;
                             } else {
-                                combined_Q_normal = combined_Q_normal * combined_alpha + Q_normal;
+                                combined_Q_dfs *= combined_alpha;
+                                combined_Q_dfs += Q_dfs;
                             }
                         }
                     }
 
-                    math::polynomial_dfs<typename LPC::field_type::value_type> combined_Q;
-                    combined_Q.from_coefficients(combined_Q_normal);
-
                     std::array<typename LPC::basic_fri::proof_type, LPC::lambda> fri_proof;
                     typename LPC::precommitment_type combined_Q_precommitment = precommit<typename LPC::basic_fri>(
-                        combined_Q, 
+                        combined_Q_dfs, 
                         fri_params.D[0], 
                         fri_params.step_list.front()
                     );
                     for (std::size_t round_id = 0; round_id <= LPC::lambda - 1; round_id++) {
-                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(combined_Q, combined_Q_precommitment, fri_params, transcript);
-                        //TODO this check
-                        //  BOOST_ASSERT(fri_proof[round_id].round_proofs[0].T_root == commit<typename LPC::basic_fri>(T));
+                        fri_proof[round_id] = proof_eval<typename LPC::basic_fri>(combined_Q_dfs, combined_Q_precommitment, fri_params, transcript);
                     }  
 
                     return typename LPC::proof_type({z, commit<typename LPC::basic_fri>(combined_Q_precommitment), fri_proof});

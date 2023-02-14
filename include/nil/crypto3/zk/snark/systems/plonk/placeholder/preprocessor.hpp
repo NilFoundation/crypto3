@@ -107,7 +107,7 @@ namespace nil {
                                 Z[0] = -FieldType::value_type::one();
                                 Z[Z.size()-1] = FieldType::value_type::one();
 
-                                // lagrange_0:  0,0,...,1,0,0,...,0
+                                // lagrange_0(in dfs form):  0,0,...,1,0,0,...,0
                                 lagrange_0[usable_rows] = FieldType::value_type::one();
                             }
 

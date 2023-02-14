@@ -61,7 +61,7 @@ namespace nil {
 
                     constexpr static const std::size_t argument_size = 1;
 
-                    static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
+                    static inline std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size>
                         prove_eval(
                             typename policy_type::constraint_system_type &constraint_system,
                             const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
@@ -72,8 +72,8 @@ namespace nil {
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
-                        std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
-                        F[0] = {0};
+                        std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size> F;
+                        F[0] = math::polynomial_dfs<typename FieldType::value_type>(0, domain->size(), FieldType::value_type::zero());
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
@@ -92,7 +92,7 @@ namespace nil {
 
                             gate_result = gate_result * column_polynomials.selector(gates[i].selector_index);
 
-                            F[0] = F[0] + math::polynomial<typename FieldType::value_type>(gate_result.coefficients());
+                            F[0] = F[0] + gate_result;
                         }
 
                         return F;
