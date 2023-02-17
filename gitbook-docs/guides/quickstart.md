@@ -4,19 +4,19 @@ description: Scaffold project using crypto3 library
 
 # Quickstart (Scaffold)
 
-In this guide we will set up a project scaffold using crypto3 and  run an example.This will enable you to test ideas quickly and further explore the API’s of the suite. This guide will use a generic setup.
+In this guide, we will set up a project scaffold using crypto3 and run an example. This will enable you to test ideas quickly and further explore the API’s of the suite. This guide will use a generic setup.
 
 ## Pre-requisites
 
-Please ensure you have setup your environment by following the guide [here](environment-setup.md).
+Please ensure you have set up your environment by following the guide [here](environment-setup.md).
 
 ## Scaffold Setup
 
 #### Get crypto3 scaffold
 
 ```shell
-git clone https://github.com/NilFoundation/crypto3-scaffold.git
-cd crypto3-scaffold
+git clone git@github.com:NilFoundation/crypto3-template.git
+cd crypto3-template
 ```
 
 #### Project structure
@@ -55,4 +55,4 @@ You should see the output `Verified signature successfully` on your console.
 
 ## Conclusion
 
-Congratulations! You now have the environment to start experimenting with the crypto3 suite. You can now explore  [modules](broken-reference) in the suite.Modules also have examples/tests in their repositories ex : [algebra example](https://github.com/NilFoundation/crypto3-algebra/tree/master/example).
+Congratulations! You now have the environment to start experimenting with the crypto3 suite. You can now explore [modules](broken-reference/) in the suite. Modules also have examples/tests in their repositories ex : [algebra example](https://github.com/NilFoundation/crypto3-algebra/tree/master/example).
