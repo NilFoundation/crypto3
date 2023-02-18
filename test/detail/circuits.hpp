@@ -199,8 +199,8 @@ namespace nil {
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
-                    add_constraint.add_term(w0 * w1);
-                    add_constraint.add_term(-w2);
+                    mul_constraint.add_term(w0 * w1);
+                    mul_constraint.add_term(-w2);
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
                     plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
