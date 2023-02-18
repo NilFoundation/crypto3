@@ -45,7 +45,8 @@ namespace nil {
                     struct vesta_params<forms::short_weierstrass> {
                         using base_field_type = typename vesta_types::base_field_type;
                         using scalar_field_type = typename vesta_types::scalar_field_type;
-
+#ifdef ZKLLVM_INLINES_ENABLED
+#else
                         constexpr static typename vesta_types::integral_type a = typename vesta_types::integral_type(0)  ; ///< coefficient
                                                                                                              ///< Short
                                                                                                              ///< Weierstrass
@@ -57,6 +58,7 @@ namespace nil {
                                                                                                              ///< Weierstrass
                                                                                                              ///< curves
                                                                                                              ///< y^2=x^3+a*x+b
+#endif
                     };
 
                     template<>
@@ -66,7 +68,8 @@ namespace nil {
 
                         template<typename Coordinates>
                         using group_type = vesta_types::g1_type<forms::short_weierstrass, Coordinates>;
-
+#ifdef ZKLLVM_INLINES_ENABLED
+#else
                         constexpr static std::array<typename field_type::value_type,2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
 
@@ -75,8 +78,11 @@ namespace nil {
                                 //0x7706c37b5a84128a3884a5d71811f1b55da3230ffb17a8ab0b32e48d31a6685c_cppui255),
                             typename field_type::value_type(2)};
                                 //0x0f60480c7a5c0e1140340adc79d6a2bf0cb57ad049d025dc38d80c77985f0329_cppui255)};
+#endif
                     };
 
+#ifdef ZKLLVM_INLINES_ENABLED
+#else
                     constexpr typename vesta_types::integral_type vesta_params<forms::short_weierstrass>::a;
                     constexpr typename vesta_types::integral_type vesta_params<forms::short_weierstrass>::b;
 
@@ -84,6 +90,7 @@ namespace nil {
                         vesta_g1_params<forms::short_weierstrass>::zero_fill;
                     constexpr std::array<typename vesta_g1_params<forms::short_weierstrass>::field_type::value_type, 2>
                         vesta_g1_params<forms::short_weierstrass>::one_fill;
+#endif
 
                 }    // namespace detail
             }        // namespace curves
