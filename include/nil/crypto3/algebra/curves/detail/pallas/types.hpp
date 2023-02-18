@@ -51,7 +51,7 @@ namespace nil {
                         using scalar_field_type = fields::pallas_scalar_field;
 
                         using g1_field_type = base_field_type;
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
 #else
                         using integral_type = typename base_field_type::integral_type;
 #endif

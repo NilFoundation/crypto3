@@ -45,7 +45,7 @@ namespace nil {
                     struct vesta_params<forms::short_weierstrass> {
                         using base_field_type = typename vesta_types::base_field_type;
                         using scalar_field_type = typename vesta_types::scalar_field_type;
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
 #else
                         constexpr static typename vesta_types::integral_type a = typename vesta_types::integral_type(0)  ; ///< coefficient
                                                                                                              ///< Short
@@ -68,7 +68,7 @@ namespace nil {
 
                         template<typename Coordinates>
                         using group_type = vesta_types::g1_type<forms::short_weierstrass, Coordinates>;
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
 #else
                         constexpr static std::array<typename field_type::value_type,2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
@@ -81,7 +81,7 @@ namespace nil {
 #endif
                     };
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
 #else
                     constexpr typename vesta_types::integral_type vesta_params<forms::short_weierstrass>::a;
                     constexpr typename vesta_types::integral_type vesta_params<forms::short_weierstrass>::b;

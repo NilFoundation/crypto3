@@ -48,7 +48,7 @@ namespace nil {
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
                     typedef __zkllvm_field_vesta_base value_type;
 #else
                     typedef typename policy_type::integral_type integral_type;
@@ -73,7 +73,7 @@ namespace nil {
                 constexpr typename std::size_t const vesta_base_field::number_bits;
                 constexpr typename std::size_t const vesta_base_field::value_bits;
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
 #else
                 constexpr typename vesta_base_field::integral_type const vesta_base_field::modulus;
 #endif

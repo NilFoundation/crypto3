@@ -55,7 +55,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits =
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
                         typedef __zkllvm_curve_curve25519 value_type;
 #else
                         using value_type = curve_element<params_type, Form, Coordinates>;

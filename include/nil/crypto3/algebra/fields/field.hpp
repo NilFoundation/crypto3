@@ -49,7 +49,7 @@ namespace nil {
                     constexpr static const std::size_t modulus_bits = ModulusBits;
                     constexpr static const std::size_t number_bits = ModulusBits;
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
 #else
                     typedef nil::crypto3::multiprecision::number<
                         nil::crypto3::multiprecision::backends::cpp_int_backend<

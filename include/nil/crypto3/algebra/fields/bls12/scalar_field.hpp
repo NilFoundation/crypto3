@@ -54,7 +54,7 @@ namespace nil {
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
                     typedef __zkllvm_field__bls381_scalar value_type;
 #else
                     typedef typename policy_type::integral_type integral_type;
@@ -84,7 +84,7 @@ namespace nil {
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
                     typedef __zkllvm_field__bls377_scalar value_type;
 #else
                     typedef typename policy_type::integral_type integral_type;
@@ -114,7 +114,7 @@ namespace nil {
                 constexpr typename std::size_t const bls12_scalar_field<381>::value_bits;
                 constexpr typename std::size_t const bls12_scalar_field<377>::value_bits;
 
-#ifdef ZKLLVM_INLINES_ENABLED
+#ifdef __ZKLLVM__
 #else
                 constexpr typename bls12_scalar_field<381>::integral_type const bls12_scalar_field<381>::modulus;
                 constexpr typename bls12_scalar_field<377>::integral_type const bls12_scalar_field<377>::modulus;
