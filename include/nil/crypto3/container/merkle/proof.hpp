@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <stack>
 
 #include <boost/variant.hpp>
 
@@ -142,6 +143,118 @@ namespace nil {
                         return (d == _root);
                     }
 
+                    static std::vector<merkle_proof_impl> 
+                        generate_compressed_proofs(const containers::merkle_tree<NodeType, Arity> &tree, 
+                                                    std::vector<std::size_t> leaf_idxs) {
+                        assert(leaf_idxs.size() > 0);
+                        std::vector<std::size_t> sorted_idx(leaf_idxs.size());
+                        std::iota(sorted_idx.begin(), sorted_idx.end(), 0);
+                        std::sort(sorted_idx.begin(), sorted_idx.end(), [&leaf_idxs](std::size_t i, std::size_t j) {
+                                                                        return leaf_idxs[i] < leaf_idxs[j]; });
+                        std::vector<merkle_proof_impl> result_proofs(leaf_idxs.size());
+                        std::size_t row_len = tree.leaves();
+                        std::vector<bool> known(2 * row_len, false);
+                        std::size_t prev_leaf_idx = leaf_idxs[sorted_idx[0]] + 1;
+                        for (auto idx : sorted_idx) {
+                            auto leaf_idx = leaf_idxs[idx];
+                            if (leaf_idx == prev_leaf_idx) {
+                                result_proofs[idx] = merkle_proof_impl(leaf_idx, tree.root(), path_type());
+                                assert(result_proofs[idx].path().size() == 0);
+                                continue;
+                            }
+                            path_type path(tree.row_count() - 1);
+                            typename path_type::iterator path_itr = path.begin();
+                            std::size_t cur_leaf = leaf_idx;
+                            std::size_t row_len = tree.leaves();
+                            std::size_t row_begin_idx = 0;
+                            bool finish_path = false;
+                            while (cur_leaf != tree.size() - 1) {
+                                std::size_t cur_leaf_pos = cur_leaf % Arity;
+                                std::size_t cur_leaf_arity_pos = (cur_leaf - row_begin_idx) / Arity;
+                                std::size_t begin_this_arity = cur_leaf - cur_leaf_pos;
+                                typename layer_type::iterator layer_itr = path_itr->begin();
+                                for (size_t i = 0; i < cur_leaf_pos; ++i, ++begin_this_arity) {
+                                    if (!known[begin_this_arity]) {
+                                        known[begin_this_arity] = true;
+                                    } else {
+                                        finish_path = true;
+                                    }
+                                    *layer_itr = path_element_type(tree[begin_this_arity], i);
+                                    ++layer_itr;
+                                }
+                                for (size_t i = cur_leaf_pos + 1; i < Arity; ++i, ++begin_this_arity) {
+                                    if (!known[begin_this_arity + 1]) {
+                                        known[begin_this_arity + 1] = true;
+                                    } else {
+                                        finish_path = true;
+                                    }
+                                    *layer_itr = path_element_type(tree[begin_this_arity + 1], i);
+                                    ++layer_itr;
+                                }
+                                path_itr++;
+                                if (finish_path) {
+                                    break;
+                                }
+                                cur_leaf = row_len + row_begin_idx + cur_leaf_arity_pos;
+                                row_begin_idx += row_len;
+                                row_len /= Arity;
+                            }
+                            path.resize(path_itr - path.begin());
+                            result_proofs[idx] = merkle_proof_impl(leaf_idx, tree.root(), path);
+                            prev_leaf_idx = leaf_idx;
+                        }
+                        return result_proofs;
+                    }
+
+                    template<typename Hashable>
+                    static bool validate_compressed_proofs(const std::vector<merkle_proof_impl> &proofs,
+                                                            const std::vector<Hashable> &a) {
+                        assert(proofs.size() == a.size());
+                        assert(proofs.size() > 0);
+                        std::vector<std::size_t> sorted_idx(proofs.size());
+                        std::iota(sorted_idx.begin(), sorted_idx.end(), 0);
+                        std::sort(sorted_idx.begin(), sorted_idx.end(), [&proofs](std::size_t i, std::size_t j) {
+                                                                        return proofs[i].leaf_index() >= proofs[j].leaf_index(); });
+                        std::stack<std::pair<value_type, std::size_t>> st;
+                        auto root = proofs[sorted_idx.back()].root();
+                        auto full_proof_size = proofs[sorted_idx.back()].path().size();
+                        for (auto idx : sorted_idx) {
+                            auto path = proofs[idx].path();
+                            value_type d = crypto3::hash<hash_type>(a[idx]);
+                            std::vector<value_type> hashes = {d};
+                            for (auto &it : path) {
+                                accumulator_set<hash_type> acc;
+                                std::size_t i = 0;
+                                for (; (i < Arity - 1) && i == it[i].position(); ++i) {
+                                    crypto3::hash<hash_type>(it[i].hash().begin(), it[i].hash().end(), acc);
+                                }
+                                crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                                for (; i < Arity - 1; ++i) {
+                                    crypto3::hash<hash_type>(it[i].hash().begin(), it[i].hash().end(), acc);
+                                }
+                                d = accumulators::extract::hash<hash_type>(acc);
+                                hashes.push_back(d);
+                            }
+                            while (!st.empty()) {
+                                auto top = st.top();
+                                if (top.second >= hashes.size()) {
+                                    break;
+                                }
+                                if (hashes[top.second] == top.first) {
+                                    st.pop();
+                                } else {
+                                    return false;
+                                }
+                            }
+                            if (path.size() < full_proof_size) {
+                                st.push(std::make_pair(d, path.size()));
+                            } else if (d != root) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+
                     std::size_t leaf_index() const {
                         return _li;
                     }
@@ -179,6 +292,7 @@ namespace nil {
                 typename std::conditional<nil::crypto3::detail::is_hash<T>::value,
                                           detail::merkle_proof_impl<detail::merkle_tree_node<T>, Arity>,
                                           detail::merkle_proof_impl<T, Arity>>::type;
+            
         }    // namespace containers
     }        // namespace crypto3
 }    // namespace nil
