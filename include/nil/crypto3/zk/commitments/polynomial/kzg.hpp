@@ -41,6 +41,9 @@
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 #include <nil/crypto3/algebra/multiexp/policies.hpp>
+#include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
+
+#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
@@ -52,7 +55,7 @@ namespace nil {
             namespace commitments {
 
                 /**
-                 * @brief The KZG Polynomial Commitment..
+                 * @brief The KZG Polynomial Commitment with Fiat-Shamir heuristic.
                  *
                  * References:
                  * "Constant-Size Commitments to Polynomials and
@@ -60,24 +63,40 @@ namespace nil {
                  * Aniket Kate, Gregory M. Zaverucha, and Ian Goldberg,
                  * <https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf>
                  */
-                template<typename CurveType>
+                template<typename CurveType, typename TranscriptHashType>
                 struct kzg {
 
                     typedef CurveType curve_type;
+                    typedef TranscriptHashType transcript_hash_type;
                     typedef typename curve_type::gt_type::value_type gt_value_type;
 
                     using multiexp_method = typename algebra::policies::multiexp_method_BDLO12;
+                    using field_type = typename curve_type::scalar_field_type;
                     using scalar_value_type = typename curve_type::scalar_field_type::value_type;
                     using commitment_key_type = std::vector<typename curve_type::template g1_type<>::value_type>;
                     using verification_key_type = typename curve_type::template g2_type<>::value_type;
                     using commitment_type = typename curve_type::template g1_type<>::value_type;
                     using proof_type = commitment_type;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
+
+                    using serializer = typename nil::marshalling::curve_element_serializer<curve_type>;
 
                     struct params_type {
                         commitment_key_type commitment_key;
                         verification_key_type verification_key;
                         params_type(commitment_key_type ck, verification_key_type vk) :
                             commitment_key(ck), verification_key(vk) {}
+                    };
+                    struct public_key_type {
+                        scalar_value_type eval;
+                        commitment_type commit;
+                        public_key_type() {}
+                        public_key_type(scalar_value_type e, commitment_type c) : eval(e), commit(c) {}
+                        public_key_type operator=(const public_key_type &other) {
+                            eval = other.eval;
+                            commit = other.commit;
+                            return *this;
+                        }
                     };
                 };
             } // namespace commitments
@@ -86,7 +105,7 @@ namespace nil {
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::kzg<typename KZG::curve_type>,
+                                 commitments::kzg<typename KZG::curve_type, typename KZG::transcript_hash_type>,
                                  KZG>::value,
                              bool>::type = true>
                 static typename KZG::params_type setup(std::size_t max_degree, typename KZG::scalar_value_type alpha) {
@@ -102,11 +121,26 @@ namespace nil {
 
                     return typename KZG::params_type(commitment_key, verification_key);
                 }
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::kzg<typename KZG::curve_type, typename KZG::transcript_hash_type>,
+                                 KZG>::value,
+                             bool>::type = true>
+                static typename KZG::transcript_type setup_transcript(const typename KZG::params_type &params) {
+                    typename KZG::transcript_type transcript = typename KZG::transcript_type();
+                    for (auto g1_elem : params.commitment_key) {
+                        transcript(KZG::serializer::point_to_octets(g1_elem));
+                    }
+                    transcript(KZG::serializer::point_to_octets(params.verification_key));
+
+                    return transcript;
+                }
 
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::kzg<typename KZG::curve_type>,
+                                 commitments::kzg<typename KZG::curve_type, typename KZG::transcript_hash_type>,
                                  KZG>::value,
                              bool>::type = true>
                 static typename KZG::commitment_type commit(const typename KZG::params_type &params,
@@ -119,21 +153,21 @@ namespace nil {
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::kzg<typename KZG::curve_type>,
+                                 commitments::kzg<typename KZG::curve_type, typename KZG::transcript_hash_type>,
                                  KZG>::value,
                              bool>::type = true>
                 static typename KZG::proof_type proof_eval(typename KZG::params_type params,
                                             const typename math::polynomial<typename KZG::scalar_value_type> &f,
-                                            typename KZG::scalar_value_type i,
+                                            typename KZG::scalar_value_type z,
                                             typename KZG::scalar_value_type eval) {
 
-                    const typename math::polynomial<typename KZG::scalar_value_type> denominator_polynom = {-i, 1};
+                    const typename math::polynomial<typename KZG::scalar_value_type> denominator_polynom = {-z, 1};
 
                     typename math::polynomial<typename KZG::scalar_value_type> q = f;
                     q[0] -= eval;
                     auto r = q % denominator_polynom;
                     if (r != typename KZG::scalar_value_type(0)) {
-                        throw std::runtime_error("incorrect eval or point i");
+                        throw std::runtime_error("incorrect eval or point z");
                     }
                     q = q / denominator_polynom;
 
@@ -143,19 +177,39 @@ namespace nil {
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::kzg<typename KZG::curve_type>,
+                                 commitments::kzg<typename KZG::curve_type, typename KZG::transcript_hash_type>,
+                                 KZG>::value,
+                             bool>::type = true>
+                static std::pair<typename KZG::proof_type, typename KZG::public_key_type>
+                    proof_eval(typename KZG::params_type params,
+                                const typename math::polynomial<typename KZG::scalar_value_type> &f,
+                                typename KZG::transcript_type &transcript) {
+                    auto commitment = commit<KZG>(params, f);
+                    transcript(KZG::serializer::point_to_octets(commitment));
+                    auto z = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
+                    auto eval = f.evaluate(z);
+                    return {proof_eval<KZG>(params, f, z, eval), {eval, commitment}};
+                }
+
+                template<typename KZG,
+                         typename std::enable_if<
+                             std::is_base_of<
+                                 commitments::kzg<typename KZG::curve_type, typename KZG::transcript_hash_type>,
                                  KZG>::value,
                              bool>::type = true>
                 static bool verify_eval(typename KZG::params_type params,
-                                        typename KZG::proof_type p,
-                                        typename KZG::commitment_type C_f,
-                                        typename KZG::scalar_value_type i,
-                                        typename KZG::scalar_value_type eval) {
-                    auto A_1 = algebra::precompute_g1<typename KZG::curve_type>(p);
+                                        typename KZG::proof_type proof,
+                                        typename KZG::public_key_type pk,
+                                        typename KZG::transcript_type &transcript) {
+                    transcript(KZG::serializer::point_to_octets(pk.commit));
+                    
+                    auto i = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
+
+                    auto A_1 = algebra::precompute_g1<typename KZG::curve_type>(proof);
                     auto A_2 = algebra::precompute_g2<typename KZG::curve_type>(params.verification_key -
                                                                     i * KZG::curve_type::template g2_type<>::value_type::one());
-                    auto B_1 = algebra::precompute_g1<typename KZG::curve_type>(eval * KZG::curve_type::template g1_type<>::value_type::one() -
-                                                                    C_f);
+                    auto B_1 = algebra::precompute_g1<typename KZG::curve_type>(pk.eval * KZG::curve_type::template g1_type<>::value_type::one() -
+                                                                    pk.commit);
                     auto B_2 = algebra::precompute_g2<typename KZG::curve_type>(KZG::curve_type::template g2_type<>::value_type::one());
 
                     typename KZG::gt_value_type gt3 = algebra::double_miller_loop<typename KZG::curve_type>(A_1, A_2, B_1, B_2);
@@ -167,11 +221,6 @@ namespace nil {
 
             namespace commitments {
 
-                template<std::size_t BatchSize>
-                struct batched_kzg_params {
-                    constexpr static const std::size_t batch_size = BatchSize;
-                };
-
                 /**
                  * @brief Based on the KZG Commitment.
                  *
@@ -181,12 +230,12 @@ namespace nil {
                  * Ariel Gabizon, Zachary J. Williamson, Oana Ciobotaru,
                  * <https://eprint.iacr.org/2019/953.pdf>
                  */
-                template<typename CurveType, typename KZGParams>
-                struct batched_kzg : public kzg<CurveType> {
+                template<typename CurveType, typename TranscriptHashType, std::size_t BatchSize>
+                struct batched_kzg : public kzg<CurveType, TranscriptHashType> {
 
                     typedef CurveType curve_type;
-                    typedef KZGParams kzg_type;
-                    constexpr static const std::size_t batch_size = KZGParams::batch_size;
+                    typedef TranscriptHashType transcript_hash_type;
+                    constexpr static const std::size_t batch_size = BatchSize;
                     typedef typename curve_type::gt_type::value_type gt_value_type;
 
                     using multiexp_method = typename algebra::policies::multiexp_method_BDLO12;
@@ -194,12 +243,25 @@ namespace nil {
                     using commitment_key_type = std::vector<typename curve_type::template g1_type<>::value_type>;
                     using verification_key_type = typename curve_type::template g2_type<>::value_type;
                     using commitment_type = typename curve_type::template g1_type<>::value_type;
-                    using batched_proof_type = std::vector<commitment_type>;
-                    using evals_type = std::vector<std::vector<scalar_value_type>>;
-                    using batch_of_batches_of_polynomials_type = std::vector<std::vector<typename math::polynomial<scalar_value_type>>>;
+                    using batch_of_batches_of_polynomials_type = std::array<std::vector<typename math::polynomial<scalar_value_type>>, batch_size>;
+                    using evals_type = std::array<std::vector<scalar_value_type>, batch_size>;
+                    using batched_proof_type = std::array<commitment_type, batch_size>;
 
-                    using basic_kzg = kzg<CurveType>;  
+                    using basic_kzg = kzg<CurveType, TranscriptHashType>;  
                     using params_type = typename basic_kzg::params_type;
+
+                    struct batched_public_key_type {
+                        std::array<std::vector<commitment_type>, batch_size> commits;
+                        evals_type evals;
+                        batched_public_key_type() {};
+                        batched_public_key_type(std::array<commitment_type, batch_size> commitments, evals_type evals)
+                                : commits(commitments), evals(evals) {};
+                        batched_public_key_type operator=(const batched_public_key_type &other) {
+                            commits = other.commits;
+                            evals = other.evals;
+                            return *this;
+                        }
+                    };
                 };
             } // namespace commitments
 
@@ -208,11 +270,13 @@ namespace nil {
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 commitments::batched_kzg<typename KZG::curve_type,
+                                 typename KZG::transcript_hash_type, KZG::batch_size>,
                                  KZG>::value,
                              bool>::type = true>
-                static typename math::polynomial<typename KZG::scalar_value_type> accumulate(const std::vector<typename math::polynomial<typename KZG::scalar_value_type>> &polys,
-                                                                const typename KZG::scalar_value_type &factor) {
+                static typename math::polynomial<typename KZG::scalar_value_type>
+                    accumulate(const std::vector<typename math::polynomial<typename KZG::scalar_value_type>> &polys,
+                                typename KZG::scalar_value_type factor) {
                     std::size_t num = polys.size();
                     if (num == 1) return polys[0];
 
@@ -226,21 +290,20 @@ namespace nil {
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 commitments::batched_kzg<typename KZG::curve_type,
+                                 typename KZG::transcript_hash_type, KZG::batch_size>,
                                  KZG>::value,
                              bool>::type = true>
                 static typename KZG::evals_type evaluate_polynomials(const typename KZG::batch_of_batches_of_polynomials_type &polys,
-                                                        const std::vector<typename KZG::scalar_value_type> zs) {
+                                                        const std::array<typename KZG::scalar_value_type, KZG::batch_size> zs) {
 
-                    BOOST_ASSERT(polys.size() == zs.size());
-
-                    std::vector<std::vector<typename KZG::scalar_value_type>> evals;
-                    for (std::size_t i = 0; i < polys.size(); ++i) {
+                    typename KZG::evals_type evals;
+                    for (std::size_t i = 0; i < KZG::batch_size; ++i) {
                         std::vector<typename KZG::scalar_value_type> evals_at_z_i;
                         for (const auto &poly : polys[i]) {
                             evals_at_z_i.push_back(poly.evaluate(zs[i]));
                         }
-                        evals.push_back(evals_at_z_i);
+                        evals[i] = evals_at_z_i;
                     }
 
                     return evals;
@@ -249,14 +312,16 @@ namespace nil {
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 commitments::batched_kzg<typename KZG::curve_type,
+                                 typename KZG::transcript_hash_type, KZG::batch_size>,
                                  KZG>::value,
                              bool>::type = true>
-                static std::vector<typename KZG::commitment_type> commit(const typename KZG::params_type &params, 
-                                                            const std::vector<typename math::polynomial<typename KZG::scalar_value_type>> &polys) {
+                static std::vector<typename KZG::commitment_type>
+                    commit(const typename KZG::params_type &params, 
+                            const std::vector<typename math::polynomial<typename KZG::scalar_value_type>> &polys) {
                     std::vector<typename KZG::commitment_type> commitments;
                     for (const auto &poly : polys) {
-                        commitments.push_back(commit<typename KZG::basic_kzg>(params, poly));
+                        commitments.push_back(commit<KZG>(params, poly));
                     }
                     return commitments;
                 }
@@ -264,53 +329,68 @@ namespace nil {
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 commitments::batched_kzg<typename KZG::curve_type,
+                                 typename KZG::transcript_hash_type, KZG::batch_size>,
                                  KZG>::value,
                              bool>::type = true>
-                static typename KZG::batched_proof_type proof_eval(const typename KZG::params_type &params, 
-                                                    const typename KZG::batch_of_batches_of_polynomials_type &polys,
-                                                    const typename KZG::evals_type &evals,
-                                                    const std::vector<typename KZG::scalar_value_type> zs,
-                                                    const std::vector<typename KZG::scalar_value_type> gammas) {
-                    
-                    BOOST_ASSERT(polys.size() == evals.size());
-                    BOOST_ASSERT(polys.size() == gammas.size());
-                    std::vector<typename KZG::commitment_type> proofs;
+                static std::pair<typename KZG::batched_proof_type, typename KZG::batched_public_key_type>
+                    proof_eval(const typename KZG::params_type &params, 
+                                const typename KZG::batch_of_batches_of_polynomials_type &polys,
+                                typename KZG::transcript_type &transcript) {
+            
+                    typename KZG::batched_proof_type proof;
+                    typename KZG::batched_public_key_type public_key;
+                    std::array<typename KZG::scalar_value_type, KZG::batch_size> zs;
 
-                    for (std::size_t i = 0; i < polys.size(); ++i) {
-                        auto accum = accumulate<KZG>(polys[i], gammas[i]);
-                        auto accum_eval = typename math::polynomial<typename KZG::scalar_value_type>{evals[i]}.evaluate(gammas[i]);
-                        typename KZG::basic_kzg::proof_type proof = proof_eval<typename KZG::basic_kzg>(params, accum, zs[i], accum_eval);
-                        proofs.push_back(proof);
+                    for (std::size_t i = 0; i < KZG::batch_size; ++i) {
+                        auto commits = commit<KZG>(params, polys[i]);
+                        for (const auto &commit : commits) {
+                            transcript(KZG::serializer::point_to_octets(commit));
+                        }
+                        auto gamma = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
+                        zs[i] = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
+                        auto accum = accumulate<KZG>(polys[i], gamma);
+                        proof[i] = proof_eval<KZG>(params, accum, zs[i], accum.evaluate(zs[i]));
+                        public_key.commits[i] = commits;
                     }
+                    public_key.evals = evaluate_polynomials<KZG>(polys, zs);
                     
-                    return proofs;
+                    return {proof, public_key};
                 }
 
                 template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
-                                 commitments::batched_kzg<typename KZG::curve_type, typename KZG::kzg_type>,
+                                 commitments::batched_kzg<typename KZG::curve_type,
+                                 typename KZG::transcript_hash_type, KZG::batch_size>,
                                  KZG>::value,
                              bool>::type = true>
                 static bool verify_eval(typename KZG::params_type params,
                                         const typename KZG::batched_proof_type &proof,
-                                        const typename KZG::evals_type &evals,
-                                        const std::vector<std::vector<typename KZG::commitment_type>> &commits,
-                                        std::vector<typename KZG::scalar_value_type> zs,
-                                        std::vector<typename KZG::scalar_value_type> gammas,
-                                        typename KZG::scalar_value_type r) {
+                                        const typename KZG::batched_public_key_type &pk,
+                                        typename KZG::transcript_type &transcript) {
+
+                    std::array<typename KZG::scalar_value_type, KZG::batch_size> zs;
+                    std::array<typename KZG::scalar_value_type, KZG::batch_size> gammas;
+                    for (std::size_t i = 0; i < KZG::batch_size; ++i) {
+                        for (const auto &commit : pk.commits[i]) {
+                            transcript(KZG::serializer::point_to_octets(commit));
+                        }
+                        gammas[i] = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
+                        zs[i] = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
+                    }
+                    typename KZG::scalar_value_type r = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
                     
                     auto F = KZG::curve_type::template g1_type<>::value_type::zero();
                     auto z_r_proofs = KZG::curve_type::template g1_type<>::value_type::zero();
                     auto r_proofs = KZG::curve_type::template g1_type<>::value_type::zero();
                     auto cur_r = KZG::scalar_value_type::one();
-                    for (std::size_t i = 0; i < proof.size(); ++i) {
-                        auto eval_accum = evals[i].back();
-                        auto comm_accum = commits[i].back();
-                        for (int j = commits[i].size() - 2; j >= 0; --j) {
-                            comm_accum = (gammas[i] * comm_accum) + commits[i][j];
-                            eval_accum = (eval_accum * gammas[i]) + evals[i][j];
+                    for (std::size_t i = 0; i < KZG::batch_size; ++i) {
+                        auto eval_accum = pk.evals[i].back();
+                        auto comm_accum = pk.commits[i].back();
+                        for (int j = pk.commits[i].size() - 2; j >= 0; --j) {
+                            comm_accum = (gammas[i] * comm_accum) + pk.commits[i][j];
+                            eval_accum = (eval_accum * gammas[i]) + pk.evals[i][j];
                         }
                         F = F + cur_r * (comm_accum - eval_accum * KZG::curve_type::template g1_type<>::value_type::one());
                         z_r_proofs = z_r_proofs + cur_r * zs[i] * proof[i];
@@ -328,7 +408,7 @@ namespace nil {
 
                     return gt_4 == KZG::gt_value_type::one();
                 }
-            }     // namespace algorithms
+            } // namespace algorithms
         }         // namespace zk
     }             // namespace crypto3
 }    // namespace nil
