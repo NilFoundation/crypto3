@@ -167,13 +167,16 @@ namespace nil {
                 private:
                     typedef typename preprocessed_data_type::public_precommitments_type public_precommitments_type;
 
-                    static math::polynomial_dfs<typename FieldType::value_type>
-                        lagrange_polynomial(std::shared_ptr<math::evaluation_domain<FieldType>> domain,
-                                            std::size_t number,
-                                            const typename ParamsType::commitment_params_type &commitment_params) {
-
-                        math::polynomial_dfs<typename FieldType::value_type> f(domain->size() - 1, domain->size(),
-                                                                               FieldType::value_type::zero());
+                    static math::polynomial_dfs<typename FieldType::value_type> lagrange_polynomial(
+                        std::shared_ptr<math::evaluation_domain<FieldType>> domain,
+                        std::size_t number,
+                        const typename ParamsType::commitment_params_type &commitment_params
+                    ) {
+                        math::polynomial_dfs<typename FieldType::value_type> f(
+                            domain->size() - 1, 
+                            domain->size(),
+                            FieldType::value_type::zero()
+                        );
 
                         if (number < domain->size()) {
                             f[number] = FieldType::value_type::one();

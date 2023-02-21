@@ -61,27 +61,26 @@ namespace nil {
                  * <https://eprint.iacr.org/2019/1400.pdf>
                  */
                 template<typename FieldType,
-                         typename MerkleTreeHashType,
-                         typename TranscriptHashType,
-                         std::size_t M,
-                         std::size_t BatchedSize = 0,
-                         bool IsConstSize = (bool)BatchedSize>
+                        typename MerkleTreeHashType,
+                        typename TranscriptHashType,
+                        std::size_t M,
+                        std::size_t BatchesNum = 4
+                    >
                 struct fri : public detail::basic_batched_fri<FieldType,
                                                               MerkleTreeHashType,
                                                               TranscriptHashType,
                                                               M,
-                                                              BatchedSize,
-                                                              IsConstSize> {
+                                                              BatchesNum
+                                                            > {
 
                     using basic_fri = detail::basic_batched_fri<FieldType,
                                                                 MerkleTreeHashType,
                                                                 TranscriptHashType,
                                                                 M,
-                                                                BatchedSize,
-                                                                IsConstSize>;
+                                                                BatchesNum
+                                                            >;
                     constexpr static const std::size_t m = basic_fri::m;
-                    constexpr static const std::size_t leaf_size = basic_fri::leaf_size;
-                    constexpr static const bool is_const_size = IsConstSize;
+                    constexpr static const std::size_t batches_num = basic_fri::batches_num;
 
                     using field_type = typename basic_fri::field_type;
                     using merkle_tree_hash_type = typename basic_fri::merkle_tree_hash_type;
@@ -105,8 +104,8 @@ namespace nil {
                                                                                   typename FRI::merkle_tree_hash_type,
                                                                                   typename FRI::transcript_hash_type,
                                                                                   FRI::m,
-                                                                                  FRI::leaf_size,
-                                                                                  FRI::is_const_size>,
+                                                                                  FRI::batches_num
+                                                                                >,
                                                                  FRI>::value,
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
@@ -126,8 +125,8 @@ namespace nil {
                                                                                     typename FRI::merkle_tree_hash_type,
                                                                                     typename FRI::transcript_hash_type,
                                                                                     FRI::m,
-                                                                                    FRI::leaf_size,
-                                                                                    FRI::is_const_size>,
+                                                                                    FRI::batches_num
+                                            >,
                                              FRI>::value,
                              bool>::type = true>
                 static bool verify_eval(

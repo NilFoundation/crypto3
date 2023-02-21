@@ -46,7 +46,7 @@ namespace nil {
             namespace commitments {
                 
                 template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda = 40,
-                         std::size_t R = 1, std::size_t M = 2, std::size_t BatchSize = 0, bool IsConstSize = false>
+                         std::size_t R = 1, std::size_t M = 2, std::size_t BatchesNum = 4>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -54,8 +54,7 @@ namespace nil {
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t r = R;
                     constexpr static const std::size_t m = M;
-                    constexpr static const std::size_t leaf_size = BatchSize;
-                    constexpr static const bool is_const_size = IsConstSize;
+                    constexpr static const std::size_t batches_num = BatchesNum;
                 };
                 /**
                  * @brief Based on the FRI Commitment description from \[RedShift].
@@ -77,14 +76,14 @@ namespace nil {
                 struct batched_list_polynomial_commitment
                     : public detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
                                                        typename LPCParams::transcript_hash_type, LPCParams::m,
-                                                       LPCParams::leaf_size, LPCParams::is_const_size> {
+                                                       LPCParams::batches_num> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
                     constexpr static const std::size_t lambda = LPCParams::lambda;
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
-                    constexpr static const std::size_t leaf_size = LPCParams::leaf_size;
+                    constexpr static const std::size_t batches_num = LPCParams::batches_num;
                     constexpr static const bool is_const_size = LPCParams::is_const_size;
 
                     typedef LPCParams lpc_params;
@@ -92,13 +91,14 @@ namespace nil {
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
                     using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
-                                                                typename LPCParams::transcript_hash_type, m, leaf_size,
-                                                                is_const_size>;
+                                                                typename LPCParams::transcript_hash_type, m, batches_num
+                                                                >;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
                     using field_type = FieldType;
                     using polynomials_values_type = typename basic_fri::polynomials_values_type;
+                    using params_type = typename basic_fri::params_type;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
@@ -107,9 +107,7 @@ namespace nil {
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
-                        typedef typename std::conditional<
-                            is_const_size, std::array<std::vector<typename FieldType::value_type>, leaf_size>,
-                            std::vector<std::vector<typename FieldType::value_type>>>::type z_type;
+                        typedef std::vector<std::vector<typename FieldType::value_type>> z_type;
 
                         std::array<z_type, 4> z;
                         commitment_type combined_Q_root;
@@ -118,16 +116,16 @@ namespace nil {
                     };
                 };
 
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
+                template<typename FieldType, typename LPCParams>
                 using batched_lpc = batched_list_polynomial_commitment<
                     FieldType, commitments::list_polynomial_commitment_params<
                                    typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                   LPCParams::lambda, LPCParams::r, LPCParams::m, BatchSize, IsConstSize>>;
-                template<typename FieldType, typename LPCParams, std::size_t BatchSize, bool IsConstSize>
+                                   LPCParams::lambda, LPCParams::r, LPCParams::m, LPCParams::batches_num>>;
+                template<typename FieldType, typename LPCParams>
                 using lpc = batched_list_polynomial_commitment<
                     FieldType, list_polynomial_commitment_params<
                                    typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                   LPCParams::lambda, LPCParams::r, LPCParams::m, BatchSize, IsConstSize>>;
+                                   LPCParams::lambda, LPCParams::r, LPCParams::m, LPCParams::batches_num>>;
 
                 template<typename FieldType, typename LPCParams>
                 using list_polynomial_commitment = batched_list_polynomial_commitment<FieldType, LPCParams>;
@@ -244,9 +242,7 @@ namespace nil {
                     std::array<typename LPC::proof_type::z_type, 4> z;
                     
                     for (std::size_t k = 0; k < 4; k++) {
-                        if constexpr (!LPC::is_const_size) {
-                            z[k].resize(g[k].size());
-                        }
+                        z[k].resize(g[k].size());
 
                         // Prepare U_interpolation_points and denominator_polynom
                         for (std::size_t polynom_index = 0; polynom_index < g[k].size(); polynom_index++) {

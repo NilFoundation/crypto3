@@ -67,14 +67,12 @@ namespace nil {
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
                     template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                             std::size_t M, std::size_t BatchSize, bool IsConstSize>
+                             std::size_t M, std::size_t BatchesNum>
                     struct basic_batched_fri {
                         BOOST_STATIC_ASSERT_MSG(M == 2, "unsupported m value!");
 
                         constexpr static const std::size_t m = M;
-                        constexpr static const std::size_t leaf_size = BatchSize;
-                        constexpr static const std::size_t batches_num = 4;
-                        constexpr static const bool is_const_size = IsConstSize;
+                        constexpr static const std::size_t batches_num = BatchesNum;
 
                         typedef FieldType field_type;
                         typedef MerkleTreeHashType merkle_tree_hash_type;
@@ -84,8 +82,7 @@ namespace nil {
                         typedef std::vector<polynomial_value_type> polynomial_values_type;
 
                         // For initial proof only
-                        typedef typename select_container<is_const_size, polynomial_values_type, leaf_size>::type
-                            polynomials_values_type;
+                        typedef typename std::vector<polynomial_values_type> polynomials_values_type;
 
                         // For other rounds
                         typedef std::vector<polynomial_values_type> rounds_polynomial_values_type;
@@ -113,26 +110,18 @@ namespace nil {
 
                             // TODO: Better if we can construct params_type from any batch size to another
                             params_type(
-                                const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M,
-                                                                 1, false>::params_type &obj) {
+                                const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchesNum>::params_type &obj) {
                                 r = obj.r;
                                 max_degree = obj.max_degree;
                                 D = obj.D;
                                 step_list = obj.step_list;
-                            }
-
-                            params_type(
-                                const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, M,
-                                                                 1, true>::params_type &obj) {
-                                r = obj.r;
-                                max_degree = obj.max_degree;
-                                D = obj.D;
-                                step_list = obj.step_list;
+                                batches_num = obj.batches_num;
                             }
 
                             params_type() {};
 
                             std::size_t r;
+                            std::size_t batches_num;
                             std::size_t max_degree;
                             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
                             std::vector<std::size_t> step_list;
@@ -180,7 +169,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                                     typename FRI::transcript_hash_type, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename FRI::commitment_type commit(const typename FRI::precommitment_type &P) {
@@ -192,7 +181,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                                     typename FRI::transcript_hash_type, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static std::array<typename FRI::commitment_type, list_size>
@@ -215,7 +204,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                                     typename FRI::transcript_hash_type, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename FRI::precommitment_type
@@ -272,7 +261,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                                     typename FRI::transcript_hash_type, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename FRI::precommitment_type
@@ -292,7 +281,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                                     typename FRI::transcript_hash_type, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<
@@ -364,7 +353,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::m, FRI::leaf_size, FRI::is_const_size>,
+                                     typename FRI::transcript_hash_type, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<
@@ -595,7 +584,6 @@ namespace nil {
                     std::vector<typename FRI::round_proof_type> round_proofs;
                     std::unique_ptr<typename FRI::merkle_tree_type> p_tree = std::make_unique<typename FRI::merkle_tree_type>(combined_Q_precommitment);
                     typename FRI::merkle_tree_type T_next = combined_Q_precommitment;
-                    typename FRI::rounds_polynomial_values_type values;
 
                     PolynomialType f = combined_Q;
                     for (std::size_t i = 0; i < fri_params.step_list.size() - 1; i++) {
