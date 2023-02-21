@@ -435,7 +435,7 @@ namespace nil {
                         typename fixed_values_commitment_scheme_type::precommitment_type fixed_values_precommitment =
                             algorithms::precommit<fixed_values_commitment_scheme_type>(
                                 fixed_polys, commitment_params.D[0],
-                                commitment_params.step_list.front());
+                                commitment_params.step_list[0]);
 
                         return typename preprocessed_data_type::public_precommitments_type {
                             fixed_values_precommitment};

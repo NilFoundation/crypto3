@@ -110,12 +110,14 @@ namespace nil {
                                                                  FRI>::value,
                                                  bool>::type = true>
                 static typename FRI::basic_fri::proof_type proof_eval(
-                    const PolynomialType &g,
-                    typename FRI::precommitment_type &T,
-                    const typename FRI::basic_fri::params_type &fri_params,
-                    typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()) {
-
-                    return proof_eval<typename FRI::basic_fri>(g, g, T, fri_params, transcript);
+                    std::array<std::vector<PolynomialType>, FRI::batches_num> &g,
+                    const PolynomialType combined_Q,
+                    const std::array<typename FRI::precommitment_type, FRI::batches_num> &precommitments,
+                    const typename FRI::precommitment_type combined_Q_precommitment,
+                    const typename FRI::params_type &fri_params,
+                    typename FRI::transcript_type &transcript = typename FRI::transcript_type()
+                ){
+                    return proof_eval<FRI>(g, combined_Q, precommitments, combined_Q_precommitment, fri_params, transcript);
                 }
 
                 template<typename FRI,

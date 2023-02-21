@@ -320,8 +320,8 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
         f_at_y[i] = polynomial_table[i].evaluate(y);
     }
 
-    typename FieldType::value_type v_p_at_y = prover_res.permutation_polynomial.evaluate(y);
-    typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(circuit.omega * y);
+    typename FieldType::value_type v_p_at_y = prover_res.permutation_polynomial_dfs.evaluate(y);
+    typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial_dfs.evaluate(circuit.omega * y);
 
     std::array<typename FieldType::value_type, 3> verifier_res =
         placeholder_permutation_argument<FieldType, circuit_2_params>::verify_eval(
@@ -333,9 +333,9 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
     for (int i = 0; i < argument_size; i++) {
-        BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
+        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);
         for (std::size_t j = 0; j < desc.rows_amount; j++) {
-            BOOST_CHECK(prover_res.F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
+            BOOST_CHECK(prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
                             j)) == FieldType::value_type::zero());
         }
     }
@@ -490,7 +490,7 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
         init_blob);
 
-    std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
+    std::array<math::polynomial_dfs<typename FieldType::value_type>, 1> prover_res =
         placeholder_gates_argument<FieldType, circuit_2_params>::prove_eval(
             constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, prover_transcript);
 
