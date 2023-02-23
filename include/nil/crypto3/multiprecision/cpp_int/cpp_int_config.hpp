@@ -14,6 +14,12 @@
 #include <mask_int/mask_int.hpp>
 #endif
 
+#ifdef __EVM__
+#define NIL_THROW(...) std::abort()
+#else
+#define NIL_THROW(...) throw __VA_ARGS__
+#endif
+
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
@@ -49,7 +55,44 @@ namespace nil {
                 };
 
             }    // namespace detail
-#ifdef TVM
+#ifdef __EVM__
+            using limb_type = __uint128_t;
+            using signed_limb_type = __int128_t;
+            using double_limb_type = __uint256_t;
+            using signed_double_limb_type = __int256_t;
+
+            constexpr const unsigned bits_per_limb = 128;
+            constexpr const unsigned limb_size = sizeof(double_limb_type);
+
+            constexpr const limb_type limb_value_max = ~static_cast<limb_type>(0u);
+
+            constexpr const limb_type max_block_10 = 1000000000000000000uLL;
+            constexpr const limb_type digits_per_block_10 = 18;
+
+            inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count) {
+                constexpr const limb_type values[digits_per_block_10] = {10,
+                                                                         100,
+                                                                         1000,
+                                                                         10000,
+                                                                         100000,
+                                                                         1000000,
+                                                                         10000000,
+                                                                         100000000,
+                                                                         1000000000,
+                                                                         10000000000,
+                                                                         100000000000,
+                                                                         1000000000000,
+                                                                         10000000000000,
+                                                                         100000000000000,
+                                                                         1000000000000000,
+                                                                         10000000000000000,
+                                                                         100000000000000000,
+                                                                         1000000000000000000};
+
+                BOOST_ASSERT(count < digits_per_block_10);
+                return values[count];
+            }
+#elif defined(TVM)
             using namespace mask_int;
             using limb_type = mask_uint128;
             using signed_limb_type = mask_int128;
@@ -59,6 +102,7 @@ namespace nil {
 
             constexpr const unsigned bits_per_limb = 128;
             constexpr const limb_type limb_value_max = limb_type(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
+            constexpr const unsigned limb_size = sizeof(limb_type);
 
 
             constexpr const limb_type max_block_10 = limb_type(100000000000000000000000000000000000000);
@@ -80,6 +124,7 @@ namespace nil {
             constexpr const limb_type digits_per_block_10 = 18;
 
             constexpr const unsigned bits_per_limb = 64;
+            constexpr const unsigned limb_size = sizeof(limb_type);
             constexpr const limb_type limb_value_max = ~static_cast<limb_type>(0u);
 
             inline BOOST_MP_CXX14_CONSTEXPR limb_type block_multiplier(unsigned count) {

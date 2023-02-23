@@ -28,6 +28,13 @@
 #include <nil/crypto3/multiprecision/detail/constexpr.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/value_pack.hpp>
 
+#ifdef __EVM__
+// EVM doesn't support exceptions, moreover it always should be compiled with flag `-fno-exceptions`. Therefore,
+// keywords `throw`, etc. cannot appear.
+#undef BOOST_THROW_EXCEPTION
+#define BOOST_THROW_EXCEPTION(...) std::abort()
+#endif
+
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
@@ -462,7 +469,7 @@ namespace nil {
                             // Allocate a new buffer and copy everything over:
                             cap = (std::min)((std::max)(cap * 4, new_size), max_limbs);
                             limb_pointer pl = allocator().allocate(cap);
-                            std::memcpy(pl, limbs(), size() * sizeof(limbs()[0]));
+                            std::memcpy(pl, limbs(), size() * limb_size);
                             if (!m_internal && !m_alias)
                                 allocator().deallocate(limbs(), capacity());
                             else
@@ -489,7 +496,7 @@ namespace nil {
                             m_data.ld = o.m_data.ld;
                         } else {
                             resize(o.size(), o.size());
-                            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+                            std::memcpy(limbs(), o.limbs(), o.size() * limb_size);
                         }
                     }
                     // rvalue copy:
@@ -497,7 +504,7 @@ namespace nil {
                         base_type(static_cast<base_type&&>(o)), m_limbs(o.m_limbs), m_sign(o.m_sign),
                         m_internal(o.m_internal), m_alias(o.m_alias) {
                         if (m_internal) {
-                            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+                            std::memcpy(limbs(), o.limbs(), o.size() * limb_size);
                         } else {
                             m_data.ld = o.m_data.ld;
                             o.m_limbs = 0;
@@ -513,7 +520,7 @@ namespace nil {
                         m_internal = o.m_internal;
                         m_alias = o.m_alias;
                         if (m_internal) {
-                            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+                            std::memcpy(limbs(), o.limbs(), o.size() * limb_size);
                         } else {
                             m_data.ld = o.m_data.ld;
                             o.m_limbs = 0;
@@ -554,7 +561,7 @@ namespace nil {
                             static_cast<base_type&>(*this) = static_cast<const base_type&>(o);
                             m_limbs = 0;
                             resize(o.size(), o.size());
-                            std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+                            std::memcpy(limbs(), o.limbs(), o.size() * limb_size);
                             m_sign = o.m_sign;
                         }
                     }
@@ -653,6 +660,9 @@ namespace nil {
                         constexpr data_type(limb_type i, limb_type j) : m_data {i, j} {
                         }
 #endif
+// double_limb_type(__uint256_t) and limb_type(__uint128_t) have the same conversion for integer literals, thus,
+// if we left both constructors, 'ambiguous overloading' error occurs.
+#ifndef __EVM__
                         constexpr data_type(double_limb_type i) : m_double_first_limb(i) {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                             if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb)) {
@@ -662,6 +672,7 @@ namespace nil {
                             }
 #endif
                         }
+#endif // __EVM__
                         template<limb_type... VALUES>
                         constexpr data_type(literals::detail::value_pack<VALUES...>) : m_data {VALUES...} {
                         }
@@ -774,7 +785,7 @@ namespace nil {
                                     limbs()[i] = o.limbs()[i];
                             } else
 #endif
-                                std::memcpy(limbs(), o.limbs(), o.size() * sizeof(o.limbs()[0]));
+                                std::memcpy(limbs(), o.limbs(), o.size() * limb_size);
                             m_sign = o.m_sign;
 #ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
                         }
@@ -860,7 +871,7 @@ namespace nil {
                         constexpr data_type(limb_type i, limb_type j) : m_data {i, j} {
                         }
 #endif
-#ifndef TVM
+#if !defined(TVM) && !defined(EVM)
                         constexpr data_type(double_limb_type i) : m_double_first_limb(i) {
 #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                             if (BOOST_MP_IS_CONST_EVALUATED(m_double_first_limb)) {
@@ -986,7 +997,7 @@ namespace nil {
                                     limbs()[i] = o.limbs()[i];
                             } else
 #endif
-                                std::memcpy(limbs(), o.limbs(), o.size() * sizeof(limbs()[0]));
+                                std::memcpy(limbs(), o.limbs(), o.size() * limb_size);
                         }
                     }
 
@@ -1044,7 +1055,12 @@ namespace nil {
                 // because some platforms have native integer types longer than boost::long_long_type, "really
                 // boost::long_long_type" anyone??
                 //
-#ifndef TVM
+#ifdef __EVM__
+                template<unsigned N>
+                struct trivial_limb_type {
+                    using type = double_limb_type;
+                };
+#elif !defined(TVM)
                 template<unsigned N, bool s>
                 struct trivial_limb_type_imp {
                     using type = double_limb_type;
@@ -1651,6 +1667,30 @@ namespace nil {
                     //
                     // Direct construction from arithmetic type:
                     //
+#ifdef __EVM__
+                    // For EVM backend we need to distingwish signed and unsigned integral types, otherwise frontend
+                    // cannot decide which version(__int128_t or __uint128_t) of cpp_int_base's constructor to use.
+                    // Separating constructors via of `std::is_signed`, we help frontend to handle that.
+                    template<class Arg>
+                    BOOST_MP_FORCEINLINE constexpr cpp_int_backend(
+                        Arg i,
+                        typename std::enable_if<!std::is_integral<Arg>::value &&
+                                                is_allowed_cpp_int_base_conversion<Arg, base_type>::value>::
+                            type const* = 0) : base_type(i) {
+                    }
+
+                    template<class Arg, typename std::enable_if_t<std::is_integral<Arg>::value &&
+                                                                  std::is_convertible<Arg, signed_limb_type>::value &&
+                                                                  std::is_signed<Arg>::value> const * = nullptr>
+                    BOOST_MP_FORCEINLINE constexpr cpp_int_backend(Arg i) : base_type((signed_limb_type)i) {
+                    }
+
+                    template<class Arg, typename std::enable_if_t<std::is_integral<Arg>::value &&
+                                                                  std::is_convertible<Arg, limb_type>::value &&
+                                                                  !std::is_signed<Arg>::value> const * = nullptr>
+                    BOOST_MP_FORCEINLINE constexpr cpp_int_backend(Arg i) : base_type((limb_type)i) {
+                    }
+#else
                     template<class Arg>
                     BOOST_MP_FORCEINLINE constexpr cpp_int_backend(
                         Arg i,
@@ -1658,6 +1698,7 @@ namespace nil {
                             type const* = 0) noexcept(noexcept(base_type(std::declval<Arg>()))) :
                         base_type(i) {
                     }
+#endif  // __EVM__
                     //
                     // Aliasing constructor: the result will alias the memory referenced, unless
                     // we have fixed precision and storage, in which case we copy the memory:
@@ -1758,7 +1799,7 @@ namespace nil {
 #endif
                             std::memcpy(this->limbs(),
                                         other.limbs(),
-                                        (std::min)(other.size(), this->size()) * sizeof(this->limbs()[0]));
+                                        (std::min)(other.size(), this->size()) * limb_size);
 #endif
                         this->sign(other.sign());
                         this->normalize();

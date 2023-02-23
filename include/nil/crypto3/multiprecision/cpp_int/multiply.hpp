@@ -273,7 +273,7 @@ namespace nil {
                         multiply_karatsuba(result, a, b, storage);
                     }
                 }
-#ifndef TVM
+#if !defined(TVM) // && !defined(__EVM__)
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3,
@@ -355,7 +355,7 @@ namespace nil {
                     typename variable_precision_type::scoped_shared_storage storage(t.allocator(), storage_size);
                     multiply_karatsuba(t, a_t, b_t, storage);
                 }
-#endif
+#endif  // !defined(TVM) && !defined(__EVM__)
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3,
@@ -609,7 +609,7 @@ namespace nil {
                     eval_multiply(result, result, val);
                 }
 
-#ifndef TVM
+#if !defined(TVM) && !defined(__EVM__)
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2>
@@ -664,7 +664,7 @@ namespace nil {
                                                                    std::declval<const double_limb_type &>())))) {
                     eval_multiply(result, result, val);
                 }
-#endif // T
+#endif // !defined(TVM) && !defined(__EVM__)
 
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
@@ -710,7 +710,7 @@ namespace nil {
                     eval_multiply(result, result, val);
                 }
 
-#ifndef TVM
+#if !defined(TVM) && !defined(__EVM__)
                 template<unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1,
                          class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2,
                          cpp_int_check_type Checked2, class Allocator2>
@@ -779,7 +779,7 @@ namespace nil {
                                                                                   Checked1, Allocator1> &>())))) {
                     eval_multiply(result, result, val);
                 }
-#endif //TVM
+#endif // !defined(TVM) && !defined(__EVM__)
                 //
                 // Now over again for trivial cpp_int's:
                 //
