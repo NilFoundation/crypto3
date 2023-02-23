@@ -228,6 +228,18 @@ namespace nil {
                                 unsigned_cpp_int_literal_result_type<(sizeof...(STR)) - 2>::backend_type>::value;
                 }
 
+#ifdef __ZKLLVM__
+#define BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(Bits)                                                                   \
+    inline constexpr const char *                                                                                     \
+    operator"" BOOST_JOIN(_cppui, Bits)(const char *val) {                                                            \
+        return val;                                                                                                   \
+    }
+
+    inline constexpr const char *                                                                                     \
+    operator"" BOOST_JOIN(_cppi, Bits)(const char *val) {                                                            \
+        return val;                                                                                                   \
+    }
+#else
 #define BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(Bits)                                                                   \
     template<char... STR>                                                                                             \
     constexpr nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<           \
@@ -249,6 +261,7 @@ namespace nil {
                     Bits, Bits, nil::crypto3::multiprecision::unsigned_magnitude,                                     \
                     nil::crypto3::multiprecision::unchecked, void>>::value;                                           \
     }
+#endif
 
                 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(128)
                 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
