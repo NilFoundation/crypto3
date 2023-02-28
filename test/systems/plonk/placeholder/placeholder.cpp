@@ -492,7 +492,8 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
     std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
         placeholder_gates_argument<FieldType, circuit_2_params>::prove_eval(
-            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, prover_transcript);
+            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
+            preprocessed_public_data.common_data.max_gates_degree, prover_transcript);
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();

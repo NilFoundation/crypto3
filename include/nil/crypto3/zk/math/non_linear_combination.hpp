@@ -264,6 +264,14 @@ namespace nil {
 
                     return (this->terms == other.terms);
                 }
+
+                std::size_t max_degree() const {
+                    std::size_t max_degree = 0;
+                    for (const term_type &nlt : this->terms) {
+                        max_degree = std::max(max_degree, nlt.vars.size());
+                    }
+                    return max_degree;
+                }
             };
 
             template<typename VariableType>

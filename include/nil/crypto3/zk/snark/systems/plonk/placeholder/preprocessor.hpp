@@ -88,6 +88,7 @@ namespace nil {
                             math::polynomial_dfs<typename FieldType::value_type> lagrange_0;
                             math::polynomial<typename FieldType::value_type> Z;
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
+                            std::uint32_t max_gates_degree;
 
 
                             // Constructor with pregenerated domain
@@ -96,12 +97,14 @@ namespace nil {
                                 public_commitments_type commts, 
                                 std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
-                                std::size_t usable_rows
+                                std::size_t usable_rows, 
+                                std::uint32_t max_gates_degree
                             ):  basic_domain(D),
                                 lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()), 
                                 commitments(commts), 
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
-                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())
+                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
+                                max_gates_degree(max_gates_degree
                             ) {
                                 // Z is polynomial -1, 0,..., 0, 1
                                 Z[0] = -FieldType::value_type::one();
@@ -116,11 +119,13 @@ namespace nil {
                                 public_commitments_type commts, 
                                 std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
-                                std::size_t usable_rows
+                                std::size_t usable_rows, 
+                                std::uint32_t max_gates_degree
                             ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()), 
                                 commitments(commts), 
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
-                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())
+                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
+                                max_gates_degree(max_gates_degree
                             ) {
                                 // Z is polynomial -1, 0,..., 0, 1
                                 Z[0] = -FieldType::value_type::one();
@@ -142,6 +147,7 @@ namespace nil {
                                 basic_domain->size() == rhs.basic_domain->size() &&
                                 lagrange_0 == rhs.lagrange_0 &&
                                 Z == rhs.Z;
+                                max_gates_degree == rhs.max_gates_degree;
                             }
                             bool operator!=(const common_data_type &rhs) const {
                                 return !(rhs == *this);
@@ -470,6 +476,20 @@ namespace nil {
                         std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = table_description.usable_rows_amount;
 
+                        std::uint32_t max_gates_degree = 1;
+                        for (auto gate : constraint_system.gates()) {
+                            for (auto constr : gate.constraints) {
+                                max_gates_degree = std::max(max_gates_degree, (std::uint32_t)constr.max_degree());
+                            }
+                        }
+                        for (auto gate : constraint_system.lookup_gates()) {
+                            for (auto constr : gate.constraints) {
+                                for (auto li : constr.lookup_input) {
+                                    max_gates_degree = std::max(max_gates_degree, (std::uint32_t)li.vars.size());
+                                }
+                            }
+                        }
+
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
@@ -514,8 +534,8 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data (
-                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount
-                        );
+                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount,
+                            max_gates_degree);
 
                         preprocessed_data_type preprocessed_data({public_polynomial_table, sigma_perm_polys,
                                                                   id_perm_polys, q_last_q_blind[0], q_last_q_blind[1],

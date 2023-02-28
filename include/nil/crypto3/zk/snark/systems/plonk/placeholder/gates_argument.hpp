@@ -106,7 +106,6 @@ namespace nil {
                     typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
                     constexpr static const std::size_t argument_size = 1;
-                    constexpr static const std::uint32_t extended_domain_size_ratio_log = 2;
 
                     static inline std::array<math::polynomial<typename FieldType::value_type>, argument_size>
                         prove_eval(
@@ -115,9 +114,10 @@ namespace nil {
                                 &column_polynomials,
                             std::shared_ptr<math::evaluation_domain<FieldType>>
                                 original_domain,
+                            std::uint32_t max_gates_degree,
                             transcript_type &transcript = transcript_type()) {
 
-                        std::uint32_t extended_domain_size = original_domain->m * std::pow(2, extended_domain_size_ratio_log);
+                        std::uint32_t extended_domain_size = original_domain->m * std::pow(2, max_gates_degree);
 
                         const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             extended_column_polynomials = resize(column_polynomials, extended_domain_size);
