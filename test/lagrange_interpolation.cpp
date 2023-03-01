@@ -34,6 +34,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
@@ -63,6 +64,34 @@ BOOST_AUTO_TEST_CASE(polynomial_lagrange_interpolation_manual_test) {
     BOOST_CHECK_EQUAL(ans.size(), ans_expected.size());
     for (std::size_t i = 0; i < ans.size(); ++i) {
         BOOST_CHECK(ans[i] == ans_expected[i]);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_lagrange_interpolation_random_test) {
+    using field_type = fields::bls12_fr<381>;
+    using integral_type = typename field_type::integral_type;
+    auto one = field_type::value_type::one();    
+
+    std::size_t n = std::rand() % 50 + 1;
+    std::vector<typename field_type::value_type> p_coeffs(2 * n);
+    std::vector<typename field_type::value_type> pts(n);
+    std::vector<typename field_type::value_type> evals(n);
+    for (std::size_t i = 0; i < n; ++i) {
+        p_coeffs[i] = nil::crypto3::algebra::random_element<field_type>();
+        p_coeffs[n + i] = nil::crypto3::algebra::random_element<field_type>();
+        pts[i] = i * one;
+    }
+    polynomial<typename field_type::value_type> p = {p_coeffs.begin(), p_coeffs.end()};
+    std::vector<std::pair<typename field_type::value_type, typename field_type::value_type>> points;
+    for (std::size_t i = 0; i < n; ++i) {
+        evals[i] = p.evaluate(pts[i]);
+        points.push_back(std::make_pair(pts[i], evals[i]));
+    }
+
+    polynomial<typename field_type::value_type> ans = lagrange_interpolation(points);
+
+    for (std::size_t i = 0; i < ans.size(); ++i) {
+        BOOST_CHECK(ans.evaluate(points[i].first) == points[i].second);
     }
 }
 
