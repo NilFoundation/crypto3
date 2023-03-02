@@ -68,7 +68,7 @@ namespace nil {
 
                 using component_type =
                     plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0>;
-                using operating_field_type = typename crypto3::algebra::fields::curve25519_base_field;
+                using operating_field_type = crypto3::algebra::fields::curve25519_base_field;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
             public:
@@ -133,7 +133,7 @@ namespace nil {
                     const std::uint32_t start_row_index) {
 
                 using component_type = plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>;
-                using ed25519_field_type = typename crypto3::algebra::fields::curve25519_base_field;
+                using ed25519_field_type = crypto3::algebra::fields::curve25519_base_field;
 
                 using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::var;
 
@@ -247,7 +247,7 @@ namespace nil {
                     &instance_input,
                 const std::size_t first_selector_index) {
 
-                using ed25519_field_type = typename crypto3::algebra::fields::curve25519_base_field;
+                using ed25519_field_type = crypto3::algebra::fields::curve25519_base_field;
                 using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams, 9>::var;
 
                 typename BlueprintFieldType::integral_type base = 1;
