@@ -64,12 +64,13 @@ void test_sha256(std::vector<typename BlueprintFieldType::value_type> public_inp
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
 
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
+
     typename component_type::input_type instance_input = {input_state_var};
     auto result_check = [](AssignmentType &assignment, 
         typename component_type::result_type &real_res) {
+            std::cout << std::hex << "real_res: " << var_value(assignment, real_res.output[0]).data << " " << var_value(assignment, real_res.output[1]).data << std::endl;
     };
-
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
@@ -84,6 +85,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_test0) {
     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(126);
 
     test_sha256<BlueprintFieldType>({s, s + 1, s + 2, s + 3});
+    test_sha256<BlueprintFieldType>({0, 0, 0, 0});
+    test_sha256<BlueprintFieldType>({0xffffffffffffffff_cppui64, 0xffffffffffffffff_cppui64, 0xffffffffffffffff_cppui64, 0xffffffffffffffff_cppui64});
+    test_sha256<BlueprintFieldType>({1, 1, 1, 1});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

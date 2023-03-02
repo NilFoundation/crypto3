@@ -77,8 +77,8 @@ namespace nil {
                     std::array<var, 2> output;
 
                     result_type(const sha256 &component, std::uint32_t start_row_index) {
-                        std::array<var, 2> output = {var(component.W(0), start_row_index + rows_amount - 1, false),
-                                                     var(component.W(1), start_row_index + rows_amount - 1, false)};
+                        output = {var(component.W(0), start_row_index + rows_amount - 1, false),
+                                  var(component.W(1), start_row_index + rows_amount - 1, false)};
                     }
                 };
 

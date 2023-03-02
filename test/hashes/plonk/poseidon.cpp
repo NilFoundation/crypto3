@@ -28,6 +28,9 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 
@@ -36,6 +39,11 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+
+#include <nil/crypto3/hash/poseidon.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
+
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -66,11 +74,21 @@ void test_poseidon(std::vector<typename BlueprintFieldType::value_type> public_i
     std::array<var, component_type::state_size> input_state_var = {var(0, 0, false, var::column_type::public_input),
      var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input)};
     typename component_type::input_type instance_input = {input_state_var};
+
+    #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+    for (std::uint32_t i = 0; i < component_type::state_size; i++){
+        std::cout << "input[" << i << "]   : " << public_input[i].data << "\n";
+    }
+    #endif
     
     auto result_check = [&expected_res](AssignmentType &assignment, 
         typename component_type::result_type &real_res) {
 
         for (std::uint32_t i = 0; i < component_type::state_size; i++){
+            #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+            std::cout << "expected[" << i << "]: " << expected_res[i].data << "\n";
+            std::cout << "real[" << i << "]    : " << var_value(assignment, real_res.output_state[i]).data << "\n"; 
+            #endif
             assert(expected_res[i] == var_value(assignment, real_res.output_state[i]));
         }
     };
@@ -81,14 +99,70 @@ void test_poseidon(std::vector<typename BlueprintFieldType::value_type> public_i
         component_instance, public_input, result_check, instance_input);
 }
 
+template<typename FieldType>
+std::vector<typename FieldType::value_type> calculate_expected_poseidon(typename std::vector<typename FieldType::value_type> a) {
+    using poseidon_policy = crypto3::hashes::detail::base_poseidon_policy<FieldType, 2, 1, 7, 55, 0, true>;
+    using poseidon_functions_t = crypto3::hashes::detail::poseidon_functions<poseidon_policy>;
+    typename poseidon_functions_t::state_type poseidon_state({a[0], a[1], a[2]});
+    poseidon_functions_t::permute(poseidon_state);
+
+    std::vector<typename FieldType::value_type> expected = {poseidon_state[0], poseidon_state[1], poseidon_state[2]};
+    return expected;
+}
+
+template<typename FieldType>
+void test_poseidon_specfic_data(){
+    std::vector<typename FieldType::value_type> input = {0,1,1};
+    test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
+
+    input = {0,0,0};
+    test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
+
+    input = {1,2,3};
+    test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
+
+    input = {-1,-1,-1};
+    test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
+
+    typename FieldType::value_type threeFFF = 0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui256;
+    input = {threeFFF, threeFFF, threeFFF};
+    test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
+}
+
+template<typename FieldType, std::size_t RandomDataTestsAmount>
+void test_poseidon_random_data(){
+    using generator_type = nil::crypto3::random::algebraic_engine<FieldType>;
+    generator_type g;
+    boost::random::mt19937 seed_seq;
+    g.seed(seed_seq);
+    std::vector<typename FieldType::value_type> input;
+
+    for (std::size_t i = 0; i < RandomDataTestsAmount; i++) {
+        input = {g(), g(), g()};
+        test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
+    }
+}
+
+constexpr static const std::size_t random_data_tests_amount = 10;
+
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_poseidon_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_case0) {
-    test_poseidon<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {0, 1, 1},
-        {0x294B71F8CF2C775369A3B0B8912E508790B0C64BDBE6A5C26F2C6B53767A47CB_cppui255,
-        0x244E5FA0EE801AB3FCCAB47ED7F6EAB38126318F7BD2C414ADDBF62FCC30316A_cppui255,
-        0x273C6EE50F9A2970162F5D4503596175C6D3FB4C0BF6C269BCD1DFEFB4F50D47_cppui255});
+BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_vesta) {
+    using field_type = typename crypto3::algebra::curves::vesta::base_field_type;
+    test_poseidon_specfic_data<field_type>();
+    test_poseidon_random_data<field_type, random_data_tests_amount>();
 }
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_pallas) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_poseidon_specfic_data<field_type>();
+    test_poseidon_random_data<field_type, random_data_tests_amount>();
+}
+
+// BOOST_AUTO_TEST_CASE(blueprint_plonk_poseidon_test_bls12) {
+//     using field_type = typename crypto3::algebra::fields::bls12_fr<381>;
+//     test_poseidon_specfic_data<field_type>();
+//     test_poseidon_random_data<field_type, random_data_tests_amount>();
+// }
 
 BOOST_AUTO_TEST_SUITE_END()

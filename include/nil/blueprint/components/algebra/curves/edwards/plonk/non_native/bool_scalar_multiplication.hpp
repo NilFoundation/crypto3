@@ -34,22 +34,26 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/basic_non_native_policy.hpp>
 
 namespace nil {
     namespace blueprint {
         namespace components {
 
-            template<typename ArithmetizationType, typename Ed25519Type, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType, typename Ed25519Type, std::uint32_t WitnessesAmount,
+                    typename NonNativePolicyType>
             class bool_scalar_multiplication;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             class bool_scalar_multiplication<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                typename crypto3::algebra::curves::ed25519, 9>:
+                typename crypto3::algebra::curves::ed25519, 9, basic_non_native_policy<BlueprintFieldType>>:
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 0, 0> {
 
                 constexpr static const std::uint32_t WitnessesAmount = 9;
             
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0>;
+                using operating_field_type = typename crypto3::algebra::fields::curve25519_base_field;
+                using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
             public:
 
@@ -61,8 +65,8 @@ namespace nil {
 
                 struct input_type {
                     struct var_ec_point {
-                        std::array<var, 4> x;
-                        std::array<var, 4> y;
+                        typename non_native_policy_type::template field<operating_field_type>::value_type x;
+                        typename non_native_policy_type::template field<operating_field_type>::value_type y;
                     };
 
                     var_ec_point T;
@@ -71,8 +75,8 @@ namespace nil {
 
                 struct result_type {
                     struct var_ec_point {
-                        std::array<var, 4> x;
-                        std::array<var, 4> y;
+                        typename non_native_policy_type::template field<operating_field_type>::value_type x;
+                        typename non_native_policy_type::template field<operating_field_type>::value_type y;
                     };
                     var_ec_point output;
 
@@ -116,7 +120,8 @@ namespace nil {
             using plonk_bool_scalar_multiplication =
                 bool_scalar_multiplication<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 typename crypto3::algebra::curves::ed25519,
-                WitnessesAmount>;
+                WitnessesAmount,
+                basic_non_native_policy<BlueprintFieldType>>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             typename plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams, 9>::result_type

@@ -124,7 +124,7 @@ namespace nil {
 
                 };
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize, std::int32_t WitnessesAmount>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize, std::uint32_t WitnessesAmount>
                 using plonk_exponentiation =
                     exponentiation<
                         crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,

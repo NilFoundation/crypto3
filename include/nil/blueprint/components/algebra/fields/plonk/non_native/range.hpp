@@ -61,7 +61,7 @@ namespace nil {
 
                 using component_type =
                     plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0>;
-                using operating_field_type = typename crypto3::algebra::fields::curve25519_base_field;
+                using operating_field_type = crypto3::algebra::fields::curve25519_base_field;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
             public:
