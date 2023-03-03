@@ -12,7 +12,7 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/algebra/vector/vector.hpp>
 
-#include <nil/crypto3/hash/detail/poseidon/kimchi_constants.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_constants.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -20,59 +20,97 @@ namespace nil {
             namespace detail {
                 using namespace nil::crypto3::multiprecision;
 
+                // Uses Grain-LFSR stream cipher for constants generation.
                 template<typename poseidon_policy_type>
-                struct poseidon_lfsr {
+                class poseidon_constants_generator {
+                public:
+
+                    BOOST_STATIC_ASSERT_MSG(
+                        !poseidon_policy_type::mina_version,
+                        "Constants generation can only be used with the original version, not Mina version.");
+
                     typedef poseidon_policy_type policy_type;
                     typedef typename policy_type::field_type field_type;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     constexpr static const std::size_t full_rounds = policy_type::full_rounds;
+                    constexpr static const std::size_t half_full_rounds = policy_type::half_full_rounds;
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
                     typedef typename field_type::value_type element_type;
                     typedef typename field_type::integral_type integral_type;
                     constexpr static const integral_type modulus = field_type::modulus;
 
+                    typedef poseidon_constants<poseidon_policy_type> poseidon_constants_type;
+                    typedef typename poseidon_constants_type::mds_matrix_type mds_matrix_type;
+                    typedef typename poseidon_constants_type::state_vector_type state_vector_type;
+
                     constexpr static const std::size_t lfsr_state_bits = 80;
                     typedef number<backends::cpp_int_backend<
                         lfsr_state_bits, lfsr_state_bits, cpp_integer_type::unsigned_magnitude,
                         cpp_int_check_type::unchecked, void>>
                         lfsr_state_type;
+    
+                    typedef typename poseidon_constants_type::round_constants_type round_constants_type;
 
-                    constexpr static const std::size_t constants_number = (full_rounds + part_rounds) * state_words;
-                    typedef algebra::vector<element_type, constants_number> round_constants_type;
+                    /*! 
+                     * @brief Randomly generates all the constants required, using the correct generation rules.
+                     * If called multiple times, will return DIFFERENT constants.
+                     */
 
-                    constexpr void generate_round_constants() {
-                        if (policy_type::full_rounds == 55) { //TODO: kimchi constants
-                            for (std::size_t i = 0; i < (full_rounds + part_rounds) * state_words; i++) {
-                                std::size_t idx1 = i / state_words;
-                                std::size_t idx2 = i % state_words;
-                                round_constants[i] = poseidon_constants_kimchi<field_type>::round_constant[idx1][idx2];
-                            }
-
-                            return;
-                        }
-                        integral_type constant = 0;
-                        lfsr_state_type lfsr_state = get_lfsr_init_state();
-
-                        for (std::size_t i = 0; i < (full_rounds + part_rounds) * state_words; i++) {
-                            while (true) {
-                                constant = 0;
-                                for (std::size_t j = 0; j < word_bits; j++) {
-                                    lfsr_state = update_lfsr_state(lfsr_state);
-                                    constant = set_new_bit<integral_type>(
-                                        constant, get_lfsr_state_bit(lfsr_state, lfsr_state_bits - 1));
-                                }
-                                if (constant < modulus) {
-                                    round_constants[i] = element_type(constant);
-                                    break;
-                                }
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                    constexpr
+#endif
+                    static const poseidon_constants_type generate_constants() {
+                        return {generate_mds_matrix(),
+                                generate_round_constants()};
+                    }
+                    
+                private:
+                    
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                    constexpr
+#endif
+                    static inline mds_matrix_type generate_mds_matrix() {
+                        mds_matrix_type new_mds_matrix;
+                        // TODO(martun): Check this implementation, looks strange.
+                        for (std::size_t i = 0; i < state_words; i++) {
+                            for (std::size_t j = 0; j < state_words; j++) {
+                                new_mds_matrix[i][j] = element_type(i + j + state_words).inversed();
                             }
                         }
                     }
 
-                    constexpr lfsr_state_type get_lfsr_init_state() {
+#ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
+                   constexpr
+#endif
+                   static const round_constants_type generate_round_constants() {
+                        round_constants_type round_constants;
+
+                        integral_type constant = 0;
+                        lfsr_state_type lfsr_state = get_lfsr_init_state();
+
+                        for (std::size_t r = 0; r < full_rounds + part_rounds; r++) {
+                            for (std::size_t i = 0; i < state_words; i++) {
+                                while (true) {
+                                    constant = 0;
+                                    for (std::size_t j = 0; j < word_bits; j++) {
+                                        lfsr_state = update_lfsr_state(lfsr_state);
+                                        constant = set_new_bit<integral_type>(
+                                            constant, get_lfsr_state_bit(lfsr_state, lfsr_state_bits - 1));
+                                    }
+                                    if (constant < modulus) {
+                                        round_constants[r][i] = element_type(constant);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        return round_constants;
+                    }
+
+                    static constexpr lfsr_state_type get_lfsr_init_state() {
                         lfsr_state_type state = 0;
                         int i = 0;
                         for (i = 1; i >= 0; i--)
@@ -95,7 +133,7 @@ namespace nil {
                         return state;
                     }
 
-                    constexpr lfsr_state_type update_lfsr_state(lfsr_state_type state) {
+                    static constexpr lfsr_state_type update_lfsr_state(lfsr_state_type state) {
                         while (true) {
                             state = update_lfsr_state_raw(state);
                             if (get_lfsr_state_bit(state, lfsr_state_bits - 1))
@@ -106,27 +144,21 @@ namespace nil {
                         return update_lfsr_state_raw(state);
                     }
 
-                    constexpr inline lfsr_state_type update_lfsr_state_raw(lfsr_state_type state) {
+                    static constexpr inline lfsr_state_type update_lfsr_state_raw(lfsr_state_type state) {
                         bool new_bit = get_lfsr_state_bit(state, 0) != get_lfsr_state_bit(state, 13) !=
                                        get_lfsr_state_bit(state, 23) != get_lfsr_state_bit(state, 38) !=
                                        get_lfsr_state_bit(state, 51) != get_lfsr_state_bit(state, 62);
                         return set_new_bit(state, new_bit);
                     }
 
-                    constexpr inline bool get_lfsr_state_bit(lfsr_state_type state, std::size_t pos) {
+                    static constexpr inline bool get_lfsr_state_bit(lfsr_state_type state, std::size_t pos) {
                         return bit_test(state, lfsr_state_bits - 1 - pos);
                     }
 
                     template<typename T>
-                    constexpr inline T set_new_bit(T var, bool new_bit) {
+                    static constexpr inline T set_new_bit(T var, bool new_bit) {
                         return (var << 1) | (new_bit ? 1 : 0);
                     }
-
-                    constexpr poseidon_lfsr() : round_constants() {
-                        generate_round_constants();
-                    }
-
-                    round_constants_type round_constants;
                 };
             }    // namespace detail
         }        // namespace hashes

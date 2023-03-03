@@ -10,18 +10,17 @@
 #ifndef CRYPTO3_HASH_POSEIDON_HPP
 #define CRYPTO3_HASH_POSEIDON_HPP
 
-#include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hashes {
-            template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t FullFounds, std::size_t PartRounds>
+            template<typename policy_type>
             class poseidon_compressor {
             protected:
-                typedef detail::poseidon_policy<FieldType, Rate, Capacity, SBoxPower, FullFounds, PartRounds> policy_type;
-                typedef detail::poseidon_functions<policy_type> poseidon_functions;
+                typedef detail::poseidon_permutation<policy_type> poseidon_permutation;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -43,17 +42,17 @@ namespace nil {
                     // for (std::size_t i = 0; i != state_words; ++i)
                     //     boost::endian::endian_reverse_inplace(state[i]);
 
-                    poseidon_functions::permute(state);
+                    poseidon_permutation::permute(state);
 
                     // for (std::size_t i = 0; i != state_words; ++i)
                     //     boost::endian::endian_reverse_inplace(state[i]);
                 }
             };
 
-            template<typename FieldType, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t FullFounds, std::size_t PartRounds>
+            template<typename policy_type>
             struct poseidon {
             protected:
-                typedef detail::poseidon_policy<FieldType, Rate, Capacity, SBoxPower, FullFounds, PartRounds> policy_type;
+                // typedef policy_type policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;

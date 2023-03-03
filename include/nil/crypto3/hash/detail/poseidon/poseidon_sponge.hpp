@@ -10,9 +10,7 @@
 #define CRYPTO3_HASH_POSEIDON_SPONGE_HPP
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_mds_matrix.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_constants_operator.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -20,11 +18,9 @@ namespace nil {
             namespace detail {
                 template<typename poseidon_policy>
                 struct poseidon_sponge_construction {
-
                     private:
                         // typedef detail::field_type field_type
-                        typedef poseidon_functions<poseidon_policy> poseidon_functions_permutation;
-                        // typedef poseidon_policy<
+                        typedef poseidon_permutation<poseidon_policy> permutation_type;
                         std::size_t state_count = 0;
                         bool state_absorbed = true;
 
@@ -50,7 +46,7 @@ namespace nil {
                     void absorb(typename poseidon_policy::element_type &input){
                         if (this->state_absorbed) {
                             if (this->state_count == poseidon_policy::rate) {
-                                poseidon_functions_permutation::permute(this->state);
+                                permutation_type::permute(this->state);
 
                                 this->state[0] += input;
 
@@ -71,7 +67,7 @@ namespace nil {
                     typename poseidon_policy::element_type squeeze() {
                         if (!this->state_absorbed) { // state = squeezed
                             if (this->state_count == poseidon_policy::rate) {
-                                poseidon_functions_permutation::permute(this->state);
+                                permutation_type::permute(this->state);
                                 this->state_count = 1;
 
                                 return this->state[0];
@@ -79,7 +75,7 @@ namespace nil {
                                 return this->state[this->state_count++];
                             }
                         } else {
-                            poseidon_functions_permutation::permute(this->state);
+                            permutation_type::permute(this->state);
 
                             this->state_absorbed = false;
                             this->state_count = 1;

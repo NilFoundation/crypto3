@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_HASH_POSEIDON_KIMCHI_CONSTANTS_HPP
 #define CRYPTO3_HASH_POSEIDON_KIMCHI_CONSTANTS_HPP
 
+#include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
+
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
 #include <nil/crypto3/algebra/fields/vesta/base_field.hpp>
 
@@ -17,17 +19,21 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType>
-                struct poseidon_constants_kimchi;
+
+                template<typename poseidon_policy_type>
+                struct poseidon_kimchi_constants_data;
+
+                template<typename FieldType, std::size_t Rate>
+                struct poseidon_kimchi_constants_data_base;
 
                 template<>
-                struct poseidon_constants_kimchi<typename nil::crypto3::algebra::fields::pallas_base_field> {
+                struct poseidon_kimchi_constants_data_base<typename nil::crypto3::algebra::fields::pallas_base_field, 2> {
                     using FieldType = nil::crypto3::algebra::fields::pallas_base_field;
 
-                    constexpr static const std::size_t state_size = 3;
-                    constexpr static const std::size_t rounds_amount = 55;
+                    constexpr static const std::size_t state_words = 3;
+                    constexpr static const std::size_t round_count = 55;
 
-                    constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, state_size> mds =
+                    constexpr static const std::array<std::array<typename FieldType::value_type, state_words>, state_words> mds_matrix =
                         {{
                             {{
                             0x1a9bd250757e29ef4959b9bef59b4e60e20a56307d6491e7b7ea1fac679c7903_cppui253,
@@ -47,7 +53,7 @@ namespace nil {
                         }};
 
 
-                    constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, rounds_amount> round_constant =
+                    constexpr static const std::array<std::array<typename FieldType::value_type, state_words>, round_count> round_constants =
                         {{
                             {{
                             0x2ec559cd1a1f2f6889fc8ae5f07757f202b364429677c8ff6603fd6d93659b47_cppui253,
@@ -328,13 +334,13 @@ namespace nil {
                 };
 
                 template<>
-                struct poseidon_constants_kimchi<typename nil::crypto3::algebra::fields::vesta_base_field> {
+                struct poseidon_kimchi_constants_data_base<typename nil::crypto3::algebra::fields::vesta_base_field, 2> {
                     using FieldType = nil::crypto3::algebra::fields::vesta_base_field;
 
-                    constexpr static const std::size_t state_size = 3;
-                    constexpr static const std::size_t rounds_amount = 55;
+                    constexpr static const std::size_t state_words = 3;
+                    constexpr static const std::size_t round_count = 55;
 
-                    constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, state_size> mds =
+                    constexpr static const std::array<std::array<typename FieldType::value_type, state_words>, state_words> mds_matrix =
                         {{
                             {{
                             0x3e28f7dd17f47a7e304a54d377dd7aeead6b92027d60baf300246cf023dd594e_cppui255,
@@ -354,7 +360,7 @@ namespace nil {
                         }};
 
 
-                    constexpr static const std::array<std::array<typename FieldType::value_type, state_size>, rounds_amount> round_constant =
+                    constexpr static const std::array<std::array<typename FieldType::value_type, state_words>, round_count> round_constant =
                         {{
                             {{
                             0x590ef2a14ba3cef7e8f93a6dde4d481057d5d0547f6f09341b6b8be19c00ee6_cppui255,
@@ -633,6 +639,14 @@ namespace nil {
                             }},
                         }};
                 };
+
+                template<typename poseidon_policy_type>
+                struct poseidon_kimchi_constants_data
+                    : poseidon_kimchi_constants_data_base<
+                        typename poseidon_policy_type::field_type,
+                        poseidon_policy_type::block_words> {
+                };
+
             }    // namespace detail
         }        // namespace hashes
     }            // namespace crypto3

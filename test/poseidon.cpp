@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(poseidon_manual_tests)
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_0) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input;
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_0) {
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_1) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input = {0x36FB00AD544E073B92B4E700D9C49DE6FC93536CAE0C612C18FBE5F6D8E8EEF2_cppui256};
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_1) {
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_2) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input = {0x3793E30AC691700012BAF26BB813D6D70BD379BEED8050A1DEEE3C188F1C3FBD_cppui256,
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_2) {
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_3) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input = {0x0024FB5773CAC987CF3A17DDD6134BA12D3E1CA4F6C43D3695347747CE61EAF5_cppui256,
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_3) {
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_4) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input = {0x2059462D60621F70620EA697FA1382EC5553A3DADB3CF9072201E09871B8284C_cppui256,
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_4) {
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_5) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input = {0x3CF70C3A89749A45DB5236B8DE167A37762526C45270138A9FCDF2352B1899DA_cppui256,
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_5) {
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_6) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128, 2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input = {0x1A3FBD7D8C00BD0C3D4BC1DD41BF7FAA5903518DA636955D98712F9AC6D6DDFA_cppui256,
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_6) {
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_7) {
     using field_type = fields::pallas_base_field;
-    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 2, 1, 7, 55, 0, true>;
+    using poseidon_policy = hashes::detail::base_poseidon_policy<field_type, 128,  2, 1, 7, 55, 0, true>;
     using sponge_construction_type = hashes::detail::poseidon_sponge_construction<poseidon_policy>;
 
     std::vector<field_type::value_type> input = {0x3CF70C3A89749A45DB5236B8DE167A37762526C45270138A9FCDF2352B1899DA_cppui256,
