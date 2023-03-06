@@ -23,6 +23,7 @@ namespace nil {
                 template<typename poseidon_policy_type>
                 struct poseidon_kimchi_constants_data;
 
+                // All kimchi constants are taken from the Mina implementation(https://github.com/o1-labs/proof-systems/blob/a36c088b3e81d17f5720abfff82a49cf9cb1ad5b/poseidon/src/pasta/) and converted from dec to hex.
                 template<typename FieldType, std::size_t Rate>
                 struct poseidon_kimchi_constants_data_base;
 
