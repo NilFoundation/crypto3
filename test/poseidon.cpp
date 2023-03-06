@@ -60,6 +60,7 @@ namespace boost {
 
 // This test data was taken from https://github.com/o1-labs/proof-systems/blob/a36c088b3e81d17f5720abfff82a49cf9cb1ad5b/poseidon/src/tests/test_vectors/kimchi.json.
 // For some reason bytes in their test data are in Big Endian, while we need in Small Endian, I.E. you need to reverse the order of bytes to create our test data.
+// We have NO TESTS for Vesta Field so far, since Mina code doesn't have tests and test vectors for it either.
 
 template<typename field_type>
 void test_poseidon(std::vector<typename field_type::value_type> input, 
@@ -76,11 +77,6 @@ void test_poseidon(std::vector<typename field_type::value_type> input,
 }
 
 BOOST_AUTO_TEST_SUITE(poseidon_manual_tests)
-
-BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_0) {
-    test_poseidon<fields::pallas_base_field>(
-        {}, 0x2FADBE2852044D028597455BC2ABBD1BC873AF205DFABB8A304600F3E09EEBA8_cppui256);
-}
 
 BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_0) {
     test_poseidon<fields::pallas_base_field>(
@@ -176,11 +172,6 @@ BOOST_AUTO_TEST_CASE(poseidon_kimchi_test_7) {
     typename poseidon_policy::element_type challenge = pallas_sponge.squeeze();
 
     BOOST_CHECK(challenge == expected_challenge);
-}
-
-BOOST_AUTO_TEST_CASE(poseidon_kimchi_vesta_test_0) {
-    test_poseidon<fields::vesta_base_field>(
-        {}, 0x2FADBE2852044D028597455BC2ABBD1BC873AF205DFABB8A304600F3E09EEBA8_cppui256);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

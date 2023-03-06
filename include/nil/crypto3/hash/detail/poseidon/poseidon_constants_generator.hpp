@@ -12,6 +12,7 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/algebra/vector/vector.hpp>
 
+#include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_constants.hpp>
 
 namespace nil {
@@ -74,12 +75,39 @@ namespace nil {
 #endif
                     static inline mds_matrix_type generate_mds_matrix() {
                         mds_matrix_type new_mds_matrix;
-                        // TODO(martun): Check this implementation, looks strange.
-                        for (std::size_t i = 0; i < state_words; i++) {
-                            for (std::size_t j = 0; j < state_words; j++) {
-                                new_mds_matrix[i][j] = element_type(i + j + state_words).inversed();
+
+                        state_vector_type x;
+                        state_vector_type y;
+                        bool secure_MDS_found = false;
+                        while (!secure_MDS_found) {
+                            secure_MDS_found = true;
+                            for (std::size_t i = 0; i < state_words; i++) {
+                                x[i] = random_element<field_type>(); 
+                                y[i] = random_element<field_type>(); 
                             }
+
+                            for (std::size_t i = 0; i < state_words; i++) {
+                                for (std::size_t j = 0; j < state_words; j++) {
+                                    if ((i != j && x[i] == x[j]) || 
+                                            (i != j && y[i] == y[j]) || 
+                                            (x[i] == y[j])) {
+                                        secure_MDS_found = false; 
+                                        break;
+                                    }
+                                    // We use minus in the next line, as is done in Mina implementation.
+                                    // Original implementation uses + instead, but it doesn't matter,
+                                    // since X and Y are random elements.
+                                    new_mds_matrix[i][j] = (x[i] - y[i]).inversed();
+                                }
+                                if (!secure_MDS_found)
+                                    break;
+                            }
+                            // Sanity check: check the determinant of the matrix, to check for security.
+                            if (mds.det() == 0)
+                                secure_MDS_found = false;
+                            // TODO(martun): check that eignevalues exist for this matrix. 
                         }
+                        return new_mds_matrix;
                     }
 
 #ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME

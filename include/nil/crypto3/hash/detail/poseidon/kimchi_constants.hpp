@@ -361,7 +361,7 @@ namespace nil {
                         }};
 
 
-                    constexpr static const std::array<std::array<typename FieldType::value_type, state_words>, round_count> round_constant =
+                    constexpr static const std::array<std::array<typename FieldType::value_type, state_words>, round_count> round_constants =
                         {{
                             {{
                             0x590ef2a14ba3cef7e8f93a6dde4d481057d5d0547f6f09341b6b8be19c00ee6_cppui255,
