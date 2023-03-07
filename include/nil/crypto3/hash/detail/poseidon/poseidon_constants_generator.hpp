@@ -102,10 +102,14 @@ namespace nil {
                                 if (!secure_MDS_found)
                                     break;
                             }
-                            // Sanity check: check the determinant of the matrix, to check for security.
+                            // Determinant of the matrix must not be 0.
                             if (mds.det() == 0)
                                 secure_MDS_found = false;
-                            // TODO(martun): check that eignevalues exist for this matrix. 
+
+                            // TODO(martun): check that mds has NO eignevalues. 
+                            // if len(new_mds_matrix.characteristic_polynomial().roots()) == 0:
+                                // return new_mds_matrix
+                            // The original matrix security check is here: https://extgit.iaik.tugraz.at/krypto/hadeshash/-/blob/master/code/generate_params_poseidon.sage
                         }
                         return new_mds_matrix;
                     }

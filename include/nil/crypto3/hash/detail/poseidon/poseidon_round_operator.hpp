@@ -47,33 +47,35 @@ namespace nil {
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
                     constexpr static const std::size_t sbox_power = policy_type::sbox_power;
 
-                    void full_round(state_vector_type &A, std::size_t round_number) {
+                    static void full_round(state_vector_type &A, std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number < half_full_rounds ||
                                              round_number >= half_full_rounds + part_rounds,
                                          "Wrong usage of the full round function of original Poseidon.");
                         for (std::size_t i = 0; i < state_words; i++) {
-                            A[i] += constants.get_round_constant(round_number, i);
+                            A[i] += get_constants().get_round_constant(round_number, i);
                             A[i] = A[i].pow(sbox_power);
                         }
-                        constants.product_with_mds_matrix(A);
+                        get_constants().product_with_mds_matrix(A);
                     }
 
-                    void part_round(state_vector_type &A, std::size_t round_number) {
+                    static void part_round(state_vector_type &A, std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                              round_number < half_full_rounds + part_rounds,
                                          "Wrong usage of the part round function of original Poseidon.");
                         for (std::size_t i = 0; i < state_words; i++) {
-                            A[i] += constants.get_round_constant(round_number, i);
+                            A[i] += get_constants().get_round_constant(round_number, i);
                         }
                         A[0] = A[0].pow(sbox_power);
-                        constants.product_with_mds_matrix(A);
+                        get_constants().product_with_mds_matrix(A);
                     }
 
                 private:
                     // Contains all the constants: mds matrix and round constants.
                     // Default constructor selects the right ones.
-                    const poseidon_constants<poseidon_policy_type> constants;
-
+                    static const poseidon_constants<poseidon_policy_type> get_constants() {
+                        static const poseidon_constants<poseidon_policy_type> constants;
+                        return constants;
+                    }
                 };
 
                 /// Rounds for Mina version have SBOX-MDS-ARC order.

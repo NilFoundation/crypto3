@@ -19,7 +19,6 @@ namespace nil {
                 template<typename poseidon_policy>
                 struct poseidon_sponge_construction {
                     private:
-                        // typedef detail::field_type field_type
                         typedef poseidon_permutation<poseidon_policy> permutation_type;
                         std::size_t state_count = 0;
                         bool state_absorbed = true;
@@ -38,6 +37,8 @@ namespace nil {
                     }
 
                     void absorb(std::vector<typename poseidon_policy::element_type>& inputs) {
+                        // TODO(martun): this code assumes capacity == 1.
+                        // We don't actually need other cases, so not touching this for now.
                         for (auto &input : inputs) {
                             absorb(input);
                         }
