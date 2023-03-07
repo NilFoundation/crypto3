@@ -28,6 +28,7 @@
 #include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 
+#include <nil/crypto3/algebra/fields/alt_bn128/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
 
@@ -223,6 +224,19 @@ BOOST_AUTO_TEST_CASE(poseidon_original_test_254_4) {
          0x0eb08f6d809668a981c186beaf6110060707059576406b248e5d9cf6e78b3d3e_cppui254,
          0x07748bc6877c9b82c8b98666ee9d0626ec7f5be4205f79ee8528ef1c4a376fc7_cppui254
          }
+    );
+}
+
+BOOST_AUTO_TEST_CASE(poseidon_original_test_255_2) {
+    test_original_poseidon<fields::bls12_scalar_field<381>, 2>(
+        {0x0000000000000000000000000000000000000000000000000000000000000000_cppui255,
+         0x0000000000000000000000000000000000000000000000000000000000000001_cppui255,
+         0x0000000000000000000000000000000000000000000000000000000000000002_cppui255
+         },
+         {0x28ce19420fc246a05553ad1e8c98f5c9d67166be2c18e9e4cb4b4e317dd2a78a_cppui255,
+          0x51f3e312c95343a896cfd8945ea82ba956c1118ce9b9859b6ea56637b4b1ddc4_cppui255,
+          0x3b2b69139b235626a0bfb56c9527ae66a7bf486ad8c11c14d1da0c69bbe0f79a_cppui255
+        }
     );
 }
 
