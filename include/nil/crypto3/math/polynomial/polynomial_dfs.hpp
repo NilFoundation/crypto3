@@ -365,7 +365,6 @@ namespace nil {
                 }
 
                 FieldValueType evaluate(const FieldValueType& value) const {
-
                     std::vector<FieldValueType> tmp = this->coefficients();
                     FieldValueType result = 0;
                     auto end = tmp.end();
@@ -393,8 +392,8 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in
-                 * polynomial C.
+                 * Computes the standard polynomial addition, polynomial A + polynomial B,
+                 * and stores result in polynomial C.
                  */
                 polynomial_dfs operator+(const polynomial_dfs& other) const {
                     polynomial_dfs result(std::max(this->_d, other._d), this->begin(), this->end());
@@ -414,8 +413,8 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial addition, polynomial A += polynomial B, and stores result in
-                 * polynomial C.
+                 * Computes the standard polynomial addition, polynomial A + polynomial B, 
+                 * and stores result in polynomial A.
                  */
                 polynomial_dfs operator+=(const polynomial_dfs& other) {
                     this->_d = std::max(this->_d, other._d);
@@ -433,11 +432,19 @@ namespace nil {
                     return *this;
                 }
 
+                /**
+                 * Computes polynomial A + constant c, 
+                 * and stores result in polynomial A.
+                 */
                 polynomial_dfs operator+=(const FieldValueType& c) {
                     for( auto it = this->begin(); it!=this->end(); it++) *it += c;
                     return *this;
                 }
                 
+                /**
+                 * Computes polynomial A - constant c, 
+                 * and stores result in polynomial A.
+                 */
                 polynomial_dfs operator-() const {
                     polynomial_dfs result(this->_d, this->begin(), this->end());
                     std::transform(this->begin(), this->end(), result.begin(), std::negate<FieldValueType>());
@@ -445,8 +452,8 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial subtraction, polynomial A - polynomial B, and stores result in
-                 * polynomial C.
+                 * Computes the standard polynomial subtraction, polynomial A - polynomial B, 
+                 * and stores result in polynomial C.
                  */
                 polynomial_dfs operator-(const polynomial_dfs& other) const {
                     polynomial_dfs result(std::max(_d, other._d), this->begin(), this->end());
@@ -466,8 +473,8 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial addition, polynomial A -= polynomial B, and stores result in
-                 * polynomial C.
+                 * Computes the standard polynomial subtraction, polynomial A - polynomial B, 
+                 * and stores result in polynomial A.
                  */
                 polynomial_dfs operator-=(const polynomial_dfs& other) {
                     this->_d = std::max(this->_d, other._d);
@@ -485,13 +492,18 @@ namespace nil {
                     return *this;
                 }
 
+                /**
+                 * Computes tpolynomial A - constant c 
+                 * and stores result in polynomial A.
+                 */
                 polynomial_dfs operator-=(const FieldValueType& c) {
                     for( auto it = this->begin(); it!=this->end(); it++) *it -= c;
                     return *this;
                 }
+
                 /**
-                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in
-                 * polynomial C.
+                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, 
+                 * and stores result in polynomial C.
                  */
                 polynomial_dfs operator*(const polynomial_dfs& other) const {
                     polynomial_dfs result(this->degree() + other.degree(), this->begin(), this->end());
@@ -512,6 +524,10 @@ namespace nil {
                     return result;
                 }
 
+                /**
+                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, 
+                 * and stores result in polynomial A.
+                 */
                 polynomial_dfs operator*=(const polynomial_dfs& other) {
                     this->_d += other._d;
                     size_t polynomial_s =
@@ -531,10 +547,15 @@ namespace nil {
                     return *this;
                 }
                 
+                /**
+                 * Perform the multiplication of two polynomials, polynomial A * constant alpha, 
+                 * and stores result in polynomial A.
+                 */
                 polynomial_dfs operator*=(const FieldValueType& alpha) {
                     for( auto it = this->begin(); it!=this->end(); it++) *it *= alpha;
                     return *this;
                 }
+                
                 /**
                  * Perform the standard Euclidean Division algorithm.
                  * Input: Polynomial A, Polynomial B, where A / B
@@ -611,7 +632,6 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator+(const polynomial_dfs<FieldValueType, Allocator>& A,
                                                             const FieldValueType& B) {
-//                return A + polynomial_dfs<FieldValueType>(0, A.size(), B);
                 polynomial_dfs<FieldValueType> result(A);
                 for( auto it = result.begin(); it != result.end(); it++ ){
                     *it += B;
@@ -623,19 +643,18 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator+(const FieldValueType& A,
                                                             const polynomial_dfs<FieldValueType, Allocator>& B) {
-//                return polynomial_dfs<FieldValueType>(0, B.size(), A) + B;
                 polynomial_dfs<FieldValueType> result(B);
                 for( auto it = result.begin(); it != result.end(); it++ ){
                     *it += A;
                 }
                 return result;
             }
+            
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator-(const polynomial_dfs<FieldValueType, Allocator>& A,
                                                             const FieldValueType& B) {
-//                return A - polynomial_dfs<FieldValueType>(0, A.size(), B);
                 polynomial_dfs<FieldValueType> result(A);
                 for( auto it = result.begin(); it != result.end(); it++ ){
                     *it -=  B;
@@ -647,8 +666,6 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator-(const FieldValueType& A,
                                                             const polynomial_dfs<FieldValueType, Allocator>& B) {
-
-//                return polynomial_dfs<FieldValueType>(0, B.size(), A) - B;
                 polynomial_dfs<FieldValueType> result(B);
                 for( auto it = result.begin(); it != result.end(); it++ ){
                     *it = A - *it;
@@ -660,7 +677,6 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator*(const polynomial_dfs<FieldValueType, Allocator>& A,
                                                             const FieldValueType& B) {
-//                return A * polynomial_dfs<FieldValueType>(0, A.size(), B);
                 polynomial_dfs<FieldValueType> result(A);
                 for( auto it = result.begin(); it != result.end(); it++ ){
                     *it *= B;
@@ -672,7 +688,6 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator*(const FieldValueType& A,
                                                             const polynomial_dfs<FieldValueType, Allocator>& B) {
-//                return polynomial_dfs<FieldValueType>(0, B.size(), A) * B;
                 polynomial_dfs<FieldValueType> result(B);
                 for( auto it = result.begin(); it != result.end(); it++ ){
                     *it *= A;
@@ -684,7 +699,6 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator/(const polynomial_dfs<FieldValueType, Allocator>& A,
                                                             const FieldValueType& B) {
-
                 return A / polynomial_dfs<FieldValueType>(0, A.size(), B);
             }
 
