@@ -481,7 +481,7 @@ namespace nil {
                         std::transform(tmp.begin(), tmp.end(), this->begin(), this->begin(), std::minus<FieldValueType>());
                         return *this;
                     }
-                    std::transform(other.begin(), other.end(), this->begin(), this->begin(), std::minus<FieldValueType>());
+                    std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::minus<FieldValueType>());
                     return *this;
                 }
 
@@ -513,18 +513,21 @@ namespace nil {
                 }
 
                 polynomial_dfs operator*=(const polynomial_dfs& other) {
-                    this->_d = std::max(this->_d, other._d);
-                    if (other.size() > this->size()) {
-                        this->resize(other.size());
+                    this->_d += other._d;
+                    size_t polynomial_s =
+                        detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
+
+                    if (this->size() < polynomial_s) {
+                        this->resize(polynomial_s);
                     }
-                    if (this->size() > other.size()) {
+                    if (other.size() < polynomial_s) {
                         polynomial_dfs tmp(other);
-                        tmp.resize(this->size());
+                        tmp.resize(polynomial_s);
 
                         std::transform(tmp.begin(), tmp.end(), this->begin(), this->begin(), std::multiplies<FieldValueType>());
                         return *this;
                     }
-                    std::transform(other.begin(), other.end(), this->begin(), this->begin(), std::multiplies<FieldValueType>());
+                    std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::multiplies<FieldValueType>());
                     return *this;
                 }
                 
