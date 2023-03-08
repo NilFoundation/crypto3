@@ -476,7 +476,7 @@ namespace nil {
                         std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = table_description.usable_rows_amount;
 
-                        std::uint32_t max_gates_degree = 1;
+                        std::uint32_t max_gates_degree = 0;
                         for (auto gate : constraint_system.gates()) {
                             for (auto constr : gate.constraints) {
                                 max_gates_degree = std::max(max_gates_degree, (std::uint32_t)constr.max_degree());
@@ -489,6 +489,7 @@ namespace nil {
                                 }
                             }
                         }
+                        assert(max_gates_degree > 0);
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
