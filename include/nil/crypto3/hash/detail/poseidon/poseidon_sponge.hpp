@@ -37,8 +37,6 @@ namespace nil {
                     }
 
                     void absorb(std::vector<typename poseidon_policy::element_type>& inputs) {
-                        // TODO(martun): this code assumes capacity == 1.
-                        // We don't actually need other cases, so not touching this for now.
                         for (auto &input : inputs) {
                             absorb(input);
                         }
