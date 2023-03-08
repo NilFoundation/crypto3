@@ -52,8 +52,8 @@ namespace nil {
                     polynomial<FieldValueType> term({points[j].second});
                     for (std::size_t m = 0; m < k; ++m) {
                         if (m != j) {
-                            term = term * (polynomial<FieldValueType>({-points[m].first, FieldValueType::one()}) /
-                                           polynomial<FieldValueType>({points[j].first - points[m].first}));
+                            term = term * (polynomial<FieldValueType>({-points[m].first, FieldValueType::one()}) *
+                                           (points[j].first - points[m].first).inversed());
                         }
                     }
                     result = result + term;
