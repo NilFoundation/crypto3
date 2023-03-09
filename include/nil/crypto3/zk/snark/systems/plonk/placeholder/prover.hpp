@@ -254,7 +254,7 @@ namespace nil {
 #endif
                         F_dfs[8] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
                             constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
-                            transcript)[0];
+                            preprocessed_public_data.common_data.max_gates_degree, transcript)[0];
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
                             std::chrono::high_resolution_clock::now() - last);
