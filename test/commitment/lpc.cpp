@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     typedef hashes::sha2<256> transcript_hash_type;
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
-    constexpr static const std::size_t lambda = 2;
+    constexpr static const std::size_t lambda = 10;
     constexpr static const std::size_t k = 1;
 
     constexpr static const std::size_t d = 16;
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        math::calculate_domain_set<FieldType>(extended_log, r);
+        math::calculate_domain_set<FieldType>(extended_log, r+1);
 
     typename fri_type::params_type fri_params;
 
