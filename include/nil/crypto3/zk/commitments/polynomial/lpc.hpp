@@ -46,7 +46,7 @@ namespace nil {
             namespace commitments {
                 
                 template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda = 40,
-                         std::size_t R = 1, std::size_t BatchesNum = 4, std::size_t M = 2>
+                         std::size_t R = 1, std::size_t M = 2, std::size_t BatchesNum = 4>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;

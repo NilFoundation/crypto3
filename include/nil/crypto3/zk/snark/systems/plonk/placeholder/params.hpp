@@ -30,6 +30,7 @@
 
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -57,7 +58,7 @@ namespace nil {
                         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
                     typedef
-                        typename commitments::fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchesNum>::params_type
+                        typename commitments::fri<FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, BatchesNum, M>::params_type
                             commitment_params_type;
 
                     typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType,

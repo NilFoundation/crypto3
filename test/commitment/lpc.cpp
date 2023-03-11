@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 4, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, 4, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 4>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 4, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, 4, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 4>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 4, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, 4, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 4>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -478,7 +478,7 @@ BOOST_AUTO_TEST_CASE(lpc_batches_num_3_test){
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 3, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, 3, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 3>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
