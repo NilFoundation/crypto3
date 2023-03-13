@@ -54,7 +54,7 @@ namespace nil {
 
                     static constexpr std::size_t argument_size = 3;
 
-                    using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
+                    using permutation_commitment_scheme_type = typename ParamsType::runtime_size_commitment_scheme_type;
 
                 public:
                     struct prover_result_type {

@@ -58,14 +58,7 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    using fixed_values_commitment_scheme_type =
-                        typename ParamsType::fixed_values_commitment_scheme_type;
-                    using variable_values_commitment_scheme_type = typename ParamsType::variable_values_commitment_scheme_type;
-                    using runtime_size_commitment_scheme_type = typename ParamsType::runtime_size_commitment_scheme_type;
-                    
-                    using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
-                    using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
-
+                    using commitment_scheme_type = typename ParamsType::runtime_size_commitment_scheme_type;
                     using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
 
                     constexpr static const std::size_t gate_parts = 1;
@@ -294,10 +287,10 @@ namespace nil {
                             evaluation_points_quotient;
                         std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
                         {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public};
-                        std::array<typename runtime_size_commitment_scheme_type::commitment_type, 4> commitments = 
+                        std::array<typename commitment_scheme_type::commitment_type, 4> commitments = 
                         {proof.variable_values_commitment, proof.v_perm_commitment,
                                                     proof.T_commitment, preprocessed_public_data.common_data.commitments.fixed_values};
-                        if (!algorithms::verify_eval<runtime_size_commitment_scheme_type>(
+                        if (!algorithms::verify_eval<commitment_scheme_type>(
                                 evaluations_points,
                                 proof.eval_proof.combined_value,
                                                     commitments,

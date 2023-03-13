@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 4, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 4> fri_type;
 
     typedef zk::commitments::
         list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 4>
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 4, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 4> fri_type;
 
     typedef zk::commitments::
         list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 4>
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 4, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 4> fri_type;
     typename fri_type::params_type fri_params;
 
     // Setup randomness.
@@ -376,7 +376,7 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 4, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 4> fri_type;
 
     typedef zk::commitments::
         list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 4>
@@ -475,7 +475,7 @@ BOOST_AUTO_TEST_CASE(lpc_batches_num_3_test){
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, 3, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 3> fri_type;
 
     typedef zk::commitments::
         list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 3>

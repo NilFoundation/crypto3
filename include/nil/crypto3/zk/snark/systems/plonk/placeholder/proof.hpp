@@ -45,21 +45,15 @@ namespace nil {
                     typedef FieldType field_type;
                     typedef ParamsType params_type;
 
-                    using fixed_values_commitment_scheme_type =
-                        typename ParamsType::fixed_values_commitment_scheme_type;
-                    using variable_values_commitment_scheme_type =
-                        typename ParamsType::variable_values_commitment_scheme_type;
-                    using runtime_size_commitment_scheme_type =
+                    using commitment_scheme_type =
                         typename ParamsType::runtime_size_commitment_scheme_type;
-                    using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
-                    using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
                         typename FieldType::value_type lagrange_0;
 
-                        typename runtime_size_commitment_scheme_type::proof_type combined_value;
-                        std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
+                        typename commitment_scheme_type::proof_type combined_value;
+                        std::vector<typename commitment_scheme_type::proof_type> lookups;
 
 
                         bool operator==(const evaluation_proof &rhs) const {
@@ -75,17 +69,12 @@ namespace nil {
                     placeholder_proof() {
                     }
 
-                    typename variable_values_commitment_scheme_type::commitment_type variable_values_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type v_perm_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type input_perm_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type value_perm_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type v_l_perm_commitment;
-
-                    typename runtime_size_commitment_scheme_type::commitment_type T_commitment;
+                    typename commitment_scheme_type::commitment_type variable_values_commitment;
+                    typename commitment_scheme_type::commitment_type v_perm_commitment;
+                    typename commitment_scheme_type::commitment_type input_perm_commitment;
+                    typename commitment_scheme_type::commitment_type value_perm_commitment;
+                    typename commitment_scheme_type::commitment_type v_l_perm_commitment;
+                    typename commitment_scheme_type::commitment_type T_commitment;
 
                     evaluation_proof eval_proof;
 

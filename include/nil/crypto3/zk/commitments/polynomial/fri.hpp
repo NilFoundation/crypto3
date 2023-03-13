@@ -63,19 +63,19 @@ namespace nil {
                 template<typename FieldType,
                         typename MerkleTreeHashType,
                         typename TranscriptHashType,
-                        std::size_t Lambda=40,
-                        std::size_t BatchesNum = 4,
-                        std::size_t M = 2
+                        std::size_t Lambda,
+                        std::size_t M,
+                        std::size_t BatchesNum
                     >
                 struct fri : public detail::basic_batched_fri<FieldType,
                     MerkleTreeHashType,
                     TranscriptHashType,
-                    Lambda, BatchesNum, M
+                    Lambda, M, BatchesNum
                 > {
                     using basic_fri = detail::basic_batched_fri<FieldType,
                         MerkleTreeHashType,
                         TranscriptHashType,
-                        Lambda, BatchesNum, M
+                        Lambda, M, BatchesNum
                     >;
                     constexpr static const std::size_t m = basic_fri::m;
                     constexpr static const std::size_t batches_num = basic_fri::batches_num;
@@ -101,7 +101,7 @@ namespace nil {
                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
                                 typename FRI::merkle_tree_hash_type,
                                 typename FRI::transcript_hash_type,
-                                FRI::lambda, FRI::batches_num, FRI::m
+                                FRI::lambda, FRI::m, FRI::batches_num
                             >,
                             FRI>::value,
                         bool>::type = true>
@@ -122,7 +122,7 @@ namespace nil {
                             typename FRI::field_type,
                             typename FRI::merkle_tree_hash_type,
                             typename FRI::transcript_hash_type,
-                            FRI::lambda, FRI::batches_num, FRI::m
+                            FRI::lambda, FRI::m, FRI::batches_num
                         >,
                         FRI>::value,
                         bool>::type = true>

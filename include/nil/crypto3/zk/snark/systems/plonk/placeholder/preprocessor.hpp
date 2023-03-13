@@ -50,7 +50,7 @@ namespace nil {
                     typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
                     using fixed_values_commitment_scheme_type =
-                        typename ParamsType::fixed_values_commitment_scheme_type;
+                        typename ParamsType::runtime_size_commitment_scheme_type;
                 public:
                     struct preprocessed_data_type {
 

@@ -67,7 +67,7 @@ namespace nil {
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
                     template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                           std::size_t Lambda=40, std::size_t BatchesNum = 4, std::size_t M = 2>
+                           std::size_t Lambda, std::size_t M, std::size_t BatchesNum>
                     struct basic_batched_fri {
                         BOOST_STATIC_ASSERT_MSG(M == 2, "unsupported m value!");
 
@@ -112,7 +112,7 @@ namespace nil {
                             // TODO: Better if we can construct params_type from any batch size to another
                             params_type(
                                 const typename basic_batched_fri<
-                                    FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, BatchesNum, M>::params_type &obj
+                                    FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, M, BatchesNum>::params_type &obj
                             ) {
                                 r = obj.r;
                                 max_degree = obj.max_degree;
@@ -191,7 +191,7 @@ namespace nil {
                              std::is_base_of<
                                 commitments::detail::basic_batched_fri<
                                     typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                    typename FRI::transcript_hash_type, FRI::lambda, FRI::batches_num, FRI::m>,
+                                    typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
                                 FRI>::value,
                              bool>::type = true>
                 static typename FRI::commitment_type commit(const typename FRI::precommitment_type &P) {
@@ -203,7 +203,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                      typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                     typename FRI::transcript_hash_type, FRI::lambda, FRI::batches_num, FRI::m>,
+                                     typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static std::array<typename FRI::commitment_type, list_size>
@@ -228,7 +228,7 @@ namespace nil {
                                     typename FRI::field_type, 
                                     typename FRI::merkle_tree_hash_type,
                                     typename FRI::transcript_hash_type,
-                                    FRI::lambda, FRI::batches_num, FRI::m>,
+                                    FRI::lambda, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename FRI::precommitment_type
@@ -286,7 +286,7 @@ namespace nil {
                                 commitments::detail::basic_batched_fri<
                                     typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                     typename FRI::transcript_hash_type, 
-                                    FRI::lambda, FRI::batches_num, FRI::m>,
+                                    FRI::lambda, FRI::m, FRI::batches_num>,
                                 FRI>::value,
                              bool>::type = true>
                 static typename FRI::precommitment_type
@@ -306,7 +306,7 @@ namespace nil {
                              std::is_base_of<
                                  commitments::detail::basic_batched_fri<
                                     typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                    typename FRI::transcript_hash_type, FRI::lambda, FRI::batches_num, FRI::m>,
+                                    typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<
@@ -379,7 +379,7 @@ namespace nil {
                                  commitments::detail::basic_batched_fri<
                                     typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                     typename FRI::transcript_hash_type, 
-                                    FRI::lambda, FRI::batches_num, FRI::m>,
+                                    FRI::lambda, FRI::m, FRI::batches_num>,
                                  FRI>::value,
                              bool>::type = true>
                 static typename std::enable_if<

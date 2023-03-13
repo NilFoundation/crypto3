@@ -45,8 +45,8 @@ namespace nil {
         namespace zk {
             namespace commitments {
                 
-                template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda = 40,
-                         std::size_t R = 1, std::size_t M = 2, std::size_t BatchesNum = 4>
+                template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda,
+                         std::size_t R, std::size_t M, std::size_t BatchesNum>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -77,7 +77,9 @@ namespace nil {
                         FieldType, 
                         typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda, LPCParams::batches_num, LPCParams::m
+                        LPCParams::lambda, 
+                        LPCParams::m,
+                        LPCParams::batches_num
                 > {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
@@ -94,7 +96,7 @@ namespace nil {
 
                     using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda, LPCParams::batches_num, LPCParams::m
+                        LPCParams::lambda, LPCParams::m, LPCParams::batches_num
                     >;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
@@ -120,12 +122,14 @@ namespace nil {
                 template<typename FieldType, typename LPCParams>
                 using batched_lpc = batched_list_polynomial_commitment<
                     FieldType, commitments::list_polynomial_commitment_params<
-                        typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type
+                        typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                        LPCParams::lambda, LPCParams::r,  LPCParams::m, LPCParams::batches_num
                     >>;
                 template<typename FieldType, typename LPCParams>
                 using lpc = batched_list_polynomial_commitment<
                     FieldType, list_polynomial_commitment_params<
-                        typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type
+                        typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                        LPCParams::lambda, LPCParams::r,  LPCParams::m, LPCParams::batches_num
                     >>;
 
                 template<typename FieldType, typename LPCParams>
