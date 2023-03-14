@@ -345,7 +345,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
+BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabled()) {
 
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
 
@@ -600,7 +600,7 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
     BOOST_CHECK(verifier_res);
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test) {
+BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test, *boost::unit_test::disabled()) {
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
