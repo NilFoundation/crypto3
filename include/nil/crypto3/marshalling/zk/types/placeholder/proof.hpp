@@ -62,13 +62,7 @@ namespace nil {
                         // typename FieldType::value_type lagrange_0
                         field_element<TTypeBase, typename Proof::field_type::value_type>,
 
-                        //typename fixed_values_commitment_scheme_type::proof_type fixed_values;
-                        lpc_proof<TTypeBase, typename Proof::fixed_values_commitment_scheme_type>,
-                        //typename variable_values_commitment_scheme_type::proof_type variable_values;
-                        lpc_proof<TTypeBase, typename Proof::variable_values_commitment_scheme_type>,
-                        // typename permutation_commitment_scheme_type::proof_type permutation;
-                        lpc_proof<TTypeBase, typename Proof::permutation_commitment_scheme_type>,
-                        // typename runtime_size_commitment_scheme_type::proof_type quotient
+                        //typename Proof::runtime_size_commitment_scheme_type::proof_type combined_value;
                         lpc_proof<TTypeBase, typename Proof::runtime_size_commitment_scheme_type>,
 
                         // std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
@@ -102,22 +96,9 @@ namespace nil {
                     // typename FieldType::value_type lagrange_0
                     field_marhsalling_type filled_lagrange_0 = field_marhsalling_type(proof.lagrange_0);
 
-                    // typename fixed_values_commitment_scheme_type::proof_type fixed_values
-                    auto filled_fixed_values =
-                        fill_lpc_proof<Endianness, typename Proof::fixed_values_commitment_scheme_type>(proof.fixed_values);
-
-                    // typename variable_values_commitment_scheme_type::proof_type variable_values
-                    auto filled_variable_values =
-                        fill_lpc_proof<Endianness, typename Proof::variable_values_commitment_scheme_type>(proof.variable_values);
-
-                    // typename permutation_commitment_scheme_type::proof_type permutation
-                    auto filled_permutation =
-                        fill_lpc_proof<Endianness, typename Proof::permutation_commitment_scheme_type>(
-                            proof.permutation);
-
-                    // typename runtime_size_commitment_scheme_type::proof_type quotient
-                    auto filled_quotient =
-                        fill_lpc_proof<Endianness, typename Proof::runtime_size_commitment_scheme_type>(proof.quotient);
+                    // typename runtime_size_commitment_scheme_type::proof_type fixed_values
+                    auto filled_combined_value =
+                        fill_lpc_proof<Endianness, typename Proof::runtime_size_commitment_scheme_type>(proof.combined_value);
 
                     // std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
                     lpc_quotient_proof_vector_marshalling_type filled_lookups;
@@ -128,8 +109,7 @@ namespace nil {
 
                     return placeholder_evaluation_proof<TTypeBase, Proof>(std::make_tuple(
                         filled_challenge, filled_lagrange_0, 
-                        filled_fixed_values, filled_variable_values,
-                        filled_permutation, filled_quotient, filled_lookups
+                        filled_combined_value, filled_lookups
                     ));
                 }
 
@@ -146,28 +126,16 @@ namespace nil {
                     // typename FieldType::value_type lagrange_0
                     proof.lagrange_0 = std::get<1>(filled_proof.value()).value();
 
-                    // typename witness_commitment_scheme_type::proof_type fixed_values
-                    proof.fixed_values = make_lpc_proof<Endianness, typename Proof::fixed_values_commitment_scheme_type>(
+                    // typename runtime_size_commitment_scheme_type::proof_type fixed_values
+                    proof.combined_value = make_lpc_proof<Endianness, typename Proof::runtime_size_commitment_scheme_type>(
                         std::get<2>(filled_proof.value()));
 
-                    // typename permutation_commitment_scheme_type::proof_type variables_values
-                    proof.variable_values = make_lpc_proof<Endianness, typename Proof::variable_values_commitment_scheme_type>(
-                        std::get<3>(filled_proof.value()));
-
-                    // typename permutation_commitment_scheme_type::proof_type permutation
-                    proof.permutation = make_lpc_proof<Endianness, typename Proof::permutation_commitment_scheme_type>(
-                        std::get<4>(filled_proof.value()));
-
-                    // typename runtime_size_commitment_scheme_type::proof_type quotient
-                    proof.quotient = make_lpc_proof<Endianness, typename Proof::runtime_size_commitment_scheme_type>(
-                        std::get<5>(filled_proof.value()));
-
                     //  std::vector<typename quotient_commitment_scheme_type::proof_type> lookups
-                    proof.lookups.reserve(std::get<6>(filled_proof.value()).value().size());
-                    for (std::size_t i = 0; i < std::get<6>(filled_proof.value()).value().size(); ++i) {
+                    proof.lookups.reserve(std::get<3>(filled_proof.value()).value().size());
+                    for (std::size_t i = 0; i < std::get<3>(filled_proof.value()).value().size(); ++i) {
                         proof.lookups.emplace_back(
                             make_lpc_proof<Endianness, typename Proof::quotient_commitment_scheme_type>(
-                                std::get<6>(filled_proof.value()).value().at(i)));
+                                std::get<3>(filled_proof.value()).value().at(i)));
                     }
                     
                     return proof;
