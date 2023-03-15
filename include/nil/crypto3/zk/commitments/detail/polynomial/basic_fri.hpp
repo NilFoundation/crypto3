@@ -130,12 +130,12 @@ namespace nil {
                             std::vector<std::size_t> step_list;
                         };
 
-                        struct query_proof_type {
-                            bool operator==(const query_proof_type &rhs) const {
+                        struct round_proof_type {
+                            bool operator==(const round_proof_type &rhs) const {
                                 return p == rhs.p && y == rhs.y;
                             }
 
-                            bool operator!=(const query_proof_type &rhs) const {
+                            bool operator!=(const round_proof_type &rhs) const {
                                 return !(rhs == *this);
                             }
 
@@ -155,21 +155,21 @@ namespace nil {
                             merkle_proof_type       p;
                         };
 
-                        struct round_proof_type{
-                            bool operator==(const round_proof_type &rhs) const {
-                                return initial_proof == rhs.initial_proof && query_proofs == rhs.query_proofs;
+                        struct query_proof_type{
+                            bool operator==(const query_proof_type &rhs) const {
+                                return initial_proof == rhs.initial_proof && round_proofs == rhs.round_proofs;
                             }
-                            bool operator!=(const round_proof_type &rhs) const {
+                            bool operator!=(const query_proof_type &rhs) const {
                                 return !(rhs == *this);
                             }
                             std::array<initial_proof_type, batches_num> initial_proof;
-                            std::vector<query_proof_type> query_proofs;
+                            std::vector<round_proof_type> round_proofs;
                         };
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
                                 return fri_roots == rhs.fri_roots &&
-                                    round_proofs == rhs.round_proofs &&
+                                    query_proofs == rhs.query_proofs &&
                                     final_polynomial == rhs.final_polynomial;
                             }
 
@@ -179,7 +179,7 @@ namespace nil {
 
                             std::vector<commitment_type>         fri_roots;        // 0,..step_list.size()
                             math::polynomial<typename field_type::value_type>  final_polynomial;
-                            std::array<round_proof_type, lambda>               round_proofs;     // 0...lambda - 1
+                            std::array<query_proof_type, lambda>               query_proofs;     // 0...lambda - 1
                         };
                     };
                 }    // namespace detail
@@ -603,8 +603,8 @@ namespace nil {
                     }
 
                     // Query phase
-                    std::array<typename FRI::round_proof_type, FRI::lambda> round_proofs;
-                    for( std::size_t round_id = 0; round_id < FRI::lambda; round_id++){
+                    std::array<typename FRI::query_proof_type, FRI::lambda> query_proofs;
+                    for( std::size_t query_id = 0; query_id < FRI::lambda; query_id++){
                         std::size_t domain_size = fri_params.D[0]->size();
                         std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
                         typename FRI::field_type::value_type x = fri_params.D[0]->get_domain_element(x_index);
@@ -648,14 +648,14 @@ namespace nil {
                         }
 
                         // Fill query proofs
-                        std::vector<typename FRI::query_proof_type> query_proofs;
+                        std::vector<typename FRI::round_proof_type> round_proofs;
                         t = 0;
-                        query_proofs.resize(fri_params.step_list.size());
+                        round_proofs.resize(fri_params.step_list.size());
                         for( std::size_t i = 0; i < fri_params.step_list.size(); i++ ){
                             domain_size = fri_params.D[t]->size();
                             x_index %= domain_size;
                             x = fri_params.D[t]->get_domain_element(x_index);
-                            query_proofs[i].p = make_proof_specialized<FRI>(
+                            round_proofs[i].p = make_proof_specialized<FRI>(
                                 get_folded_index<FRI>(x_index, domain_size, fri_params.step_list[i]), 
                                 domain_size, fri_trees[i]
                             );
@@ -670,31 +670,31 @@ namespace nil {
                                 BOOST_ASSERT(coset_size / FRI::m == s.size());
                                 BOOST_ASSERT(coset_size / FRI::m == s_indices.size());
 
-                                query_proofs[i].y.resize(coset_size / FRI::m);
+                                round_proofs[i].y.resize(coset_size / FRI::m);
                                 for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
                                     if constexpr (std::is_same<math::polynomial_dfs<typename FRI::field_type::value_type>,
                                                                 PolynomialType>::value) {
-                                        query_proofs[i].y[j][0] = fs[i+1][s_indices[j][0]];
-                                        query_proofs[i].y[j][1] = fs[i+1][s_indices[j][1]];
+                                        round_proofs[i].y[j][0] = fs[i+1][s_indices[j][0]];
+                                        round_proofs[i].y[j][1] = fs[i+1][s_indices[j][1]];
                                     } else {
-                                        query_proofs[i].y[j][0] = fs[i+1].evaluate(s[j][0]);
-                                        query_proofs[i].y[j][1] = fs[i+1].evaluate(s[j][1]);
+                                        round_proofs[i].y[j][0] = fs[i+1].evaluate(s[j][0]);
+                                        round_proofs[i].y[j][1] = fs[i+1].evaluate(s[j][1]);
                                     }
                                 }
                             } else {
                                 x_index %= fri_params.D[t-1]->size();
                                 x = fri_params.D[t-1]->get_domain_element(x_index);
                                 x = x * x;
-                                query_proofs[i].y.resize(1);
-                                query_proofs[i].y[0][0] = final_polynomial.evaluate(x);
-                                query_proofs[i].y[0][1] = final_polynomial.evaluate(-x);
+                                round_proofs[i].y.resize(1);
+                                round_proofs[i].y[0][0] = final_polynomial.evaluate(x);
+                                round_proofs[i].y[0][1] = final_polynomial.evaluate(-x);
                             }
                         }
-                        typename FRI::round_proof_type  round_proof= {initial_proof, query_proofs};
-                        round_proofs[round_id] = round_proof;
+                        typename FRI::query_proof_type  query_proof= {initial_proof, round_proofs};
+                        query_proofs[query_id] = query_proof;
                     }
 
-                    return typename FRI::proof_type{fri_roots, final_polynomial,round_proofs};
+                    return typename FRI::proof_type{fri_roots, final_polynomial,query_proofs};
                 }
 
                 template<typename FRI>
@@ -714,7 +714,7 @@ namespace nil {
                     // Parameters correctness checks
                     std::size_t polynomials_number = 0;
                     for(std::size_t k = 0; k < FRI::batches_num; k++ ){
-                        polynomials_number += proof.round_proofs[0].initial_proof[k].values.size();
+                        polynomials_number += proof.query_proofs[0].initial_proof[k].values.size();
                         transcript(commitments[k]);
                     }
                     BOOST_ASSERT(polynomials_number == evals_map.size());
@@ -737,8 +737,8 @@ namespace nil {
                         }
                     }
 
-                    for( std::size_t round_id = 0; round_id < FRI::lambda; round_id++){
-                        typename FRI::round_proof_type &round_proof = proof.round_proofs[round_id];
+                    for( std::size_t query_id = 0; query_id < FRI::lambda; query_id++){
+                        typename FRI::query_proof_type &query_proof = proof.query_proofs[query_id];
 
                         std::size_t domain_size = fri_params.D[0]->size();
                         std::size_t coset_size = 1 << fri_params.step_list[0];
@@ -753,27 +753,27 @@ namespace nil {
 
                         // Check initial proof.
                         for( std::size_t k = 0; k < FRI::batches_num; k++ ){
-                            if(round_proof.initial_proof[k].values.size() == 0) continue; // For the case when some of the batches is zero
-                            if (round_proof.initial_proof[k].p.root() != commitments[k] ) {
+                            if(query_proof.initial_proof[k].values.size() == 0) continue; // For the case when some of the batches is zero
+                            if (query_proof.initial_proof[k].p.root() != commitments[k] ) {
                                 return false;
                             }
 
-                            std::vector<std::uint8_t> leaf_data(coset_size * FRI::field_element_type::length() * round_proof.initial_proof[k].values.size());
+                            std::vector<std::uint8_t> leaf_data(coset_size * FRI::field_element_type::length() * query_proof.initial_proof[k].values.size());
                             auto write_iter = leaf_data.begin();
 
-                            for (std::size_t i = 0; i < round_proof.initial_proof[k].values.size(); i++) {
+                            for (std::size_t i = 0; i < query_proof.initial_proof[k].values.size(); i++) {
                                 for (auto [idx, pair_idx] : correct_order_idx) {
                                     typename FRI::field_element_type leaf_val0(
-                                        round_proof.initial_proof[k].values[i][idx][pair_idx]
+                                        query_proof.initial_proof[k].values[i][idx][pair_idx]
                                     );
                                     leaf_val0.write(write_iter, FRI::field_element_type::length());
                                     typename FRI::field_element_type leaf_val1(
-                                        round_proof.initial_proof[k].values[i][idx][1-pair_idx]
+                                        query_proof.initial_proof[k].values[i][idx][1-pair_idx]
                                     );
                                     leaf_val1.write(write_iter, FRI::field_element_type::length());
                                 }
                             }
-                            if (!round_proof.initial_proof[k].p.validate(leaf_data)) {
+                            if (!query_proof.initial_proof[k].p.validate(leaf_data)) {
                                 return false;
                             }                            
                         }
@@ -794,13 +794,13 @@ namespace nil {
                                 combined_eval_values[j][1] = FRI::field_type::value_type::zero();
                             }
                             for( size_t k = 0; k < FRI::batches_num; k++){
-                                for( size_t i = 0; i < round_proof.initial_proof[k].values.size(); i++, ind++ ){
+                                for( size_t i = 0; i < query_proof.initial_proof[k].values.size(); i++, ind++ ){
                                     for( size_t j = 0; j < coset_size / FRI::m; j++ ){
                                         combined_eval_values[j][0] *= theta;
                                         combined_eval_values[j][1] *= theta;
                                         if( evals_map[ind] == eval_ind ){
-                                            combined_eval_values[j][0] += round_proof.initial_proof[k].values[i][j][0];
-                                            combined_eval_values[j][1] += round_proof.initial_proof[k].values[i][j][1];
+                                            combined_eval_values[j][0] += query_proof.initial_proof[k].values[i][j][0];
+                                            combined_eval_values[j][1] += query_proof.initial_proof[k].values[i][j][1];
                                         }
                                     }
                                 }
@@ -822,7 +822,7 @@ namespace nil {
                         for (std::size_t i = 0; i < fri_params.step_list.size(); i++) {
                             coset_size = 1 << fri_params.step_list[i];
                             // check merkle proof p, polynomails' values y are already prepared
-                            if(round_proof.query_proofs[i].p.root() !=  proof.fri_roots[i] ) return false;
+                            if(query_proof.round_proofs[i].p.root() !=  proof.fri_roots[i] ) return false;
 
                             std::tie(s, s_indices) = calculate_s<FRI>(x, x_index, fri_params.step_list[i], fri_params.D[t]);
                             std::vector<std::uint8_t> leaf_data(coset_size * FRI::field_element_type::length());
@@ -835,7 +835,7 @@ namespace nil {
                                 typename FRI::field_element_type leaf_val1(y[idx][1 - pair_idx]);
                                 leaf_val1.write(write_iter, FRI::field_element_type::length());
                             }
-                            if ( !round_proof.query_proofs[i].p.validate(leaf_data)) {
+                            if ( !query_proof.round_proofs[i].p.validate(leaf_data)) {
                                 return false;
                             } else {
                             }
@@ -877,13 +877,13 @@ namespace nil {
                             math::polynomial<typename FRI::field_type::value_type> interpolant_poly =
                                 math::lagrange_interpolation(interpolation_points);
                             auto interpolant = interpolant_poly.evaluate(alphas[t]);
-                            if( interpolant !=  round_proof.query_proofs[i].y[0][0]){
+                            if( interpolant !=  query_proof.round_proofs[i].y[0][0]){
                                 return false;
                             }
 
                             // For the last round we check final polynomial nor colinear_check
                             t++;
-                            y = round_proof.query_proofs[i].y;
+                            y = query_proof.round_proofs[i].y;
                             if( i < fri_params.step_list.size() - 1){
                                 domain_size = fri_params.D[t]->size();
                                 x_index %= domain_size;

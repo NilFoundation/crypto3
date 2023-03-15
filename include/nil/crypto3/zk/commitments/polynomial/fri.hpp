@@ -85,7 +85,6 @@ namespace nil {
                     using transcript_hash_type = typename basic_fri::transcript_hash_type;
                     using merkle_tree_type = typename basic_fri::merkle_tree_type;
                     using merkle_proof_type = typename basic_fri::merkle_proof_type;
-                    using round_proof_type = typename basic_fri::round_proof_type;
                     using proof_type = typename basic_fri::proof_type;
                     using params_type = typename basic_fri::params_type;
                     using transcript_type = typename basic_fri::transcript_type;
@@ -95,8 +94,8 @@ namespace nil {
                 };
             }    // namespace commitments
 
-            // Proof and verify for one polynomial
             namespace algorithms {
+                // Proof and verify for one polynomial
                 template<typename FRI,
                         typename PolynomialType,
                         typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
