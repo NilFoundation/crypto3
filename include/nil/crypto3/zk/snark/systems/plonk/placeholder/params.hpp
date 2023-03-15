@@ -30,6 +30,7 @@
 
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,8 +38,11 @@ namespace nil {
             namespace snark {
                 template<typename FieldType, typename ArithmetizationParams,
                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
-                         typename TranscriptHashType = hashes::keccak_1600<512>, std::size_t Lambda = 40,
-                         std::size_t R = 1, std::size_t M = 2, std::size_t BatchesNum = 4>
+                         typename TranscriptHashType = hashes::keccak_1600<512>, 
+                         std::size_t Lambda = 40,
+                         std::size_t R = 1, 
+                         std::size_t M = 2, 
+                         std::size_t BatchesNum = 4>
                 struct placeholder_params {
 
                     typedef MerkleTreeHashType merkle_hash_type;
@@ -57,33 +61,15 @@ namespace nil {
                         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
 
                     typedef
-                        typename commitments::fri<FieldType, MerkleTreeHashType, TranscriptHashType, M, BatchesNum>::params_type
+                        typename commitments::fri<FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, M, BatchesNum>::params_type
                             commitment_params_type;
 
                     typedef commitments::list_polynomial_commitment_params<MerkleTreeHashType, TranscriptHashType,
                                                                            Lambda, R, M, BatchesNum>
                         batched_commitment_params_type;
 
-                    using fixed_values_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type>;
                     using runtime_size_commitment_scheme_type =
                         commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                    using variable_values_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                    using witness_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                    using public_input_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                    using constant_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                    using selector_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                    using special_commitment_scheme_type =
-                        commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                    using permutation_commitment_scheme_type =
-                        commitments::list_polynomial_commitment<FieldType, batched_commitment_params_type>;
-                    using quotient_commitment_scheme_type =
-                        commitments::list_polynomial_commitment<FieldType, batched_commitment_params_type>;
                 };
             }    // namespace snark
         }        // namespace zk

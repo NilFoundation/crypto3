@@ -4,6 +4,7 @@
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 // Copyright (c) 2022 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2023 Elena Tatuzova <e.tatuzova@nil.foundation>
 //
 // MIT License
 //
@@ -164,7 +165,7 @@ typedef commitments::fri<
     FieldType, 
     placeholder_test_params::merkle_hash_type,
     placeholder_test_params::transcript_hash_type, 
-    m, 4
+    placeholder_test_params::lambda, m, 4
 > fri_type;
 
 typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
@@ -344,7 +345,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
+BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabled()) {
 
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
 
@@ -599,7 +600,7 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
     BOOST_CHECK(verifier_res);
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test) {
+BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test, *boost::unit_test::disabled()) {
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;

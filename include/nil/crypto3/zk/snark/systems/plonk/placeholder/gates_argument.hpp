@@ -125,7 +125,7 @@ namespace nil {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size> F;
-                        F[0] = math::polynomial_dfs<typename FieldType::value_type>(0, domain->size(), FieldType::value_type::zero());
+                        F[0] = math::polynomial_dfs<typename FieldType::value_type>(0, extended_domain_size, FieldType::value_type::zero());
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
