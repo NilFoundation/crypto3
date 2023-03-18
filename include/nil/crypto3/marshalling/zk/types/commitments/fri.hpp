@@ -43,6 +43,7 @@
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 
 namespace nil {

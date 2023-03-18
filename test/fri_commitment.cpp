@@ -349,6 +349,9 @@ void test_fri_proof(typename FRI::proof_type &proof){
     BOOST_CHECK(proof == constructed_val_read);
 }
 
+/*******************************************************************************
+ * Randomness setup
+ *******************************************************************************/
 std::size_t test_global_seed = 0;
 boost::random::mt11213b test_global_rnd_engine;
 template <typename FieldType>
@@ -390,6 +393,8 @@ BOOST_TEST_GLOBAL_FIXTURE(test_initializer);
 
 BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
     static constexpr std::size_t lambda = 40;
+    static constexpr std::size_t m = 2;
+    static constexpr std::size_t batches_num = 4;
 
     using curve_type = nil::crypto3::algebra::curves::bls12<381>;
     using field_type = typename curve_type::scalar_field_type;
@@ -398,7 +403,7 @@ BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
-    using FRI = typename nil::crypto3::zk::commitments::detail::basic_batched_fri<field_type, hash_type, hash_type, 40, 2, 4>;
+    using FRI = typename nil::crypto3::zk::commitments::detail::basic_batched_fri<field_type, hash_type, hash_type, lambda, m, batches_num>;
 
 BOOST_AUTO_TEST_CASE(marshalling_fri_some_polynomial_marshalling_test) {
     math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
