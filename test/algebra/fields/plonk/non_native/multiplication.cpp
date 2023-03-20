@@ -145,7 +145,7 @@ void test_field_mul_all_cases(){
         f_integral = typename NonNativeFieldType::integral_type(f.data);
         f_integral = (f_integral << 1) + 1;
         f = typename NonNativeFieldType::value_type(f_integral);
-        test_field_mul_useable<FieldType, NonNativeFieldType>(f, lalala);
+        test_field_mul_useable<FieldType, NonNativeFieldType>(f, f);
     }
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(
