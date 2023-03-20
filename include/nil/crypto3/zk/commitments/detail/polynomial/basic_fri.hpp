@@ -82,11 +82,8 @@ namespace nil {
                         typedef std::array<typename field_type::value_type, m> polynomial_value_type;
                         typedef std::vector<polynomial_value_type> polynomial_values_type;
 
-                        // For initial proof only
-                        typedef typename std::vector<polynomial_values_type> polynomials_values_type;
-
-                        // For other rounds
-                        typedef std::vector<polynomial_values_type> rounds_polynomial_values_type;
+                        // For initial proof only, size of all values are similar
+                        typedef std::vector<polynomial_values_type> polynomials_values_type;
 
                         typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
                         typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
@@ -103,7 +100,8 @@ namespace nil {
 
                         struct params_type {
                             bool operator==(const params_type &rhs) const {
-                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D;
+                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D && 
+                                    batches_num == rhs.batches_num;
                             }
                             bool operator!=(const params_type &rhs) const {
                                 return !(rhs == *this);
@@ -123,8 +121,8 @@ namespace nil {
 
                             params_type() {};
 
-                            std::size_t r;
                             std::size_t batches_num;
+                            std::size_t r;
                             std::size_t max_degree;
                             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
                             std::vector<std::size_t> step_list;
@@ -139,8 +137,9 @@ namespace nil {
                                 return !(rhs == *this);
                             }
 
-                            merkle_proof_type p;                          // for proof(values[i], T_{i-})
-                            std::vector<std::array<typename field_type::value_type, m>> y;
+                            polynomial_values_type y;                   // Values for the next round.
+                                                                        // For the last round it's final_polynomial's values
+                            merkle_proof_type p;                        // Merkle proof(values[i-1], T_i)
                         };
 
                         struct initial_proof_type{
