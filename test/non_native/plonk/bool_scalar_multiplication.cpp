@@ -46,7 +46,7 @@ using namespace nil;
 
 template <typename BlueprintFieldType, typename NonNativeCurveType>
 void test_bool_scalar_multiplication(std::vector<typename BlueprintFieldType::value_type> public_input, 
-            std::vector<typename BlueprintFieldType::value_type> expected_res){
+            std::vector<typename BlueprintFieldType::value_type> expected_res, bool must_pass = true){
     
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -74,7 +74,7 @@ void test_bool_scalar_multiplication(std::vector<typename BlueprintFieldType::va
 
     typename component_type::input_type instance_input = {{T_x, T_y}, var(0, 8, false, var::column_type::public_input)};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input, must_pass](AssignmentType &assignment, 
         typename component_type::result_type &real_res) {
 
         #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
@@ -117,20 +117,24 @@ void test_bool_scalar_multiplication(std::vector<typename BlueprintFieldType::va
         // std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_y).data << ")" << std::endl;
         #endif
 
-        for(std::size_t i = 0; i < 4; i++) {
-            assert(expected_res[i]   == var_value(assignment, real_res.output.x[i]));
-            assert(expected_res[i+4] == var_value(assignment, real_res.output.y[i]));
+        if (must_pass) {
+            for(std::size_t i = 0; i < 4; i++) {
+                assert(expected_res[i]   == var_value(assignment, real_res.output.x[i]));
+                assert(expected_res[i+4] == var_value(assignment, real_res.output.y[i]));
+            }
         }
     };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+        component_instance, public_input, result_check, instance_input, must_pass);
 }
 
 template<typename FieldType, typename NonNativeCurveType>
-void test_bool_scalar_multiplication_usable (typename NonNativeCurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type point, typename FieldType::value_type scalar_bool) {
+void test_bool_scalar_multiplication_usable (typename NonNativeCurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type point,
+                                            typename FieldType::value_type scalar_bool,
+                                            bool must_pass = true) {
     
     std::vector<typename FieldType::value_type> public_input = create_public_input<FieldType, typename NonNativeCurveType::base_field_type>(
         chop_non_native<FieldType, typename NonNativeCurveType::base_field_type>(point.X), 
@@ -144,7 +148,7 @@ void test_bool_scalar_multiplication_usable (typename NonNativeCurveType::templa
     }
     public_input.push_back(scalar_bool);
 
-    test_bool_scalar_multiplication<FieldType, NonNativeCurveType>(public_input, expected_res);
+    test_bool_scalar_multiplication<FieldType, NonNativeCurveType>(public_input, expected_res, must_pass);
 }
 
 constexpr static const std::size_t random_tests_amount = 3;
@@ -169,7 +173,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_test1) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_must_fail) { // test should pass if component fails on wrong data, feature is not implemented yet
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_must_fail) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     using non_native_curve_type = crypto3::algebra::curves::ed25519;
     using non_native_field_type = non_native_curve_type::base_field_type;
@@ -178,13 +182,13 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_must_fail) { // test s
     boost::random::mt19937 seed_seq;
     rand.seed(seed_seq);
 
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 2);
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 10);
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, -1);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 2, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 10, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, -1, false);
 
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 2);
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 10);
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), -1);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 2, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 10, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), -1, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

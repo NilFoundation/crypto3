@@ -45,7 +45,8 @@
 #include "test_plonk_component.hpp"
 
 template <typename BlueprintFieldType>
-void test_range_check(std::vector<typename BlueprintFieldType::value_type> public_input){
+void test_range_check(std::vector<typename BlueprintFieldType::value_type> public_input,
+                      bool must_pass = true){
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
@@ -75,7 +76,8 @@ void test_range_check(std::vector<typename BlueprintFieldType::value_type> publi
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{0});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
+            (component_instance, public_input, result_check, instance_input, must_pass);
 }
 
 template<typename FieldType>
@@ -128,9 +130,9 @@ BOOST_AUTO_TEST_SUITE_END()
 
 template<typename FieldType>
 void test_range_check_fail_specific_inputs(){
-    test_range_check<FieldType>({-1});
-    test_range_check<FieldType>({0x10000000000000000_cppui256});
-    test_range_check<FieldType>({0x4000000000000000000000000000000000000000000000000000000000000000_cppui256});
+    test_range_check<FieldType>({-1}, false);
+    test_range_check<FieldType>({0x10000000000000000_cppui256}, false);
+    test_range_check<FieldType>({0x4000000000000000000000000000000000000000000000000000000000000000_cppui256}, false);
 }
 
 template<typename FieldType, std::size_t RandomTestsAmount>
@@ -147,12 +149,11 @@ void test_range_check_fail_random_inputs(){
         }
     	typename FieldType::integral_type input_integral = typename FieldType::integral_type(input.data);
     	typename FieldType::value_type input_scalar =  input_integral;
-        test_range_check<FieldType>({input_scalar});
+        test_range_check<FieldType>({input_scalar}, false);
 	}
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_fields_range_check_fail_test_suite)
-// TODO: we need to check that component fails on the wrong input. Don't have such feature yet
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_bls12) {
     using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;

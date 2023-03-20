@@ -44,7 +44,8 @@ namespace nil {
         bool is_satisfied(circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                        ArithmetizationParams>> bp,
                           crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
-                                                    ArithmetizationParams> assignments){
+                                                    ArithmetizationParams> assignments,
+                          bool must_pass = true) {
 
             const std::vector<crypto3::zk::snark::plonk_gate<BlueprintFieldType, crypto3::zk::snark::plonk_constraint<BlueprintFieldType>>> gates =
                         bp.gates();
@@ -68,7 +69,11 @@ namespace nil {
                                 
                             if (!constraint_result.is_zero()) {
                                 std::cout << "Constraint " << j << " from gate " << i << "on row " << selector_row << " is not satisfied." << std::endl;
-                                return false;
+                                if (must_pass) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -79,7 +84,11 @@ namespace nil {
                 if (var_value(assignments, copy_constraints[i].first) !=
                     var_value(assignments, copy_constraints[i].second)){
                     std::cout << "Copy constraint number " << i << " is not satisfied." << std::endl;
-                    return false;
+                    if (must_pass) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
 

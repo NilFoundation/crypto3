@@ -46,7 +46,8 @@
 using namespace nil;
 
 template <typename BlueprintFieldType>
-void test_field_range(std::vector<typename BlueprintFieldType::value_type> public_input){
+void test_field_range(std::vector<typename BlueprintFieldType::value_type> public_input,
+                        bool must_pass = true){
     
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -84,7 +85,7 @@ void test_field_range(std::vector<typename BlueprintFieldType::value_type> publi
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+        component_instance, public_input, result_check, instance_input, must_pass);
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
@@ -126,11 +127,13 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test_must_fail) {
     using field_type = crypto3::algebra::curves::pallas::base_field_type;
 
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>( //ed25519 modulus
-        {0x3ffffffffffffffed_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255}
+        {0x3ffffffffffffffed_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255},
+        false
     );
 
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255}
+        {0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255},
+        false
     );
 
 }

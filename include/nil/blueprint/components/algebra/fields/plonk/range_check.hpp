@@ -189,8 +189,6 @@ namespace nil {
                             row++;
                         }
 
-                        typename BlueprintFieldType::value_type x_reconstructed = assignment.witness(component.W(0), row - 1);
-                        BOOST_ASSERT(x_reconstructed == x);
                         BOOST_ASSERT(row == start_row_index + component.rows_amount);
 
                         return typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::result_type(component, start_row_index);

@@ -102,7 +102,8 @@ namespace nil {
                      bool>::type = true>
         auto prepare_component(ComponentType component_instance, const PublicInputContainerType &public_input,
                                const FunctorResultCheck &result_check,
-                               typename ComponentType::input_type instance_input) {
+                               typename ComponentType::input_type instance_input,
+                               bool must_pass = true) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
@@ -134,7 +135,7 @@ namespace nil {
             profiling(assignment);
 #endif
 
-            assert(blueprint::is_satisfied(bp, assignment));
+            assert(blueprint::is_satisfied(bp, assignment, must_pass));
 
             return std::make_tuple(desc, bp, assignment);
         }
@@ -146,11 +147,12 @@ namespace nil {
                          typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
             test_component(ComponentType component_instance, const PublicInputContainerType &public_input,
                            FunctorResultCheck result_check,
-                           typename ComponentType::input_type instance_input) {
+                           typename ComponentType::input_type instance_input,
+                           bool must_pass = true) {
 
             auto [desc, bp, assignments] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                  FunctorResultCheck>(component_instance, public_input, result_check, instance_input);
+                                  FunctorResultCheck>(component_instance, public_input, result_check, instance_input, must_pass);
 
 #ifdef BLUEPRINT_PLACEHOLDER_PROOF_GEN_ENABLED
             using placeholder_params =

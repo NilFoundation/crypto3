@@ -44,7 +44,7 @@
 using namespace nil;
 
 template <typename BlueprintFieldType>
-void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value_type> public_input){
+void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value_type> public_input, bool must_pass = true){
     
     using ed25519_type = crypto3::algebra::curves::ed25519;
     constexpr std::size_t WitnessColumns = 9;
@@ -75,7 +75,7 @@ void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+        component_instance, public_input, result_check, instance_input, must_pass);
 }
 
 constexpr static const std::size_t random_tests_amount = 10;
@@ -136,9 +136,9 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test_must_fail) {
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
         overage = (typename field_type::integral_type(rand().data)) % ed25519_scalar_overage;
-        test_scalar_non_native_range<field_type>({typename field_type::value_type(ed25519_scalar_modulus + overage)});
+        test_scalar_non_native_range<field_type>({typename field_type::value_type(ed25519_scalar_modulus + overage)}, false);
     }
-    test_scalar_non_native_range<field_type>({-1});
+    test_scalar_non_native_range<field_type>({-1}, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

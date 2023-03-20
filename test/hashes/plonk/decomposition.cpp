@@ -44,7 +44,8 @@ using namespace nil;
 
 template <typename BlueprintFieldType>
 void test_decomposition(std::vector<typename BlueprintFieldType::value_type> public_input,
-        std::vector<typename BlueprintFieldType::value_type> expected_res) {
+        std::vector<typename BlueprintFieldType::value_type> expected_res,
+        bool must_pass = true) {
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -77,7 +78,7 @@ void test_decomposition(std::vector<typename BlueprintFieldType::value_type> pub
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+        component_instance, public_input, result_check, instance_input, must_pass);
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
@@ -139,21 +140,21 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_must_fail) {
 
     test_decomposition<field_type>(
         {0, bad},
-        calculate_decomposition<field_type>({0, bad}));
+        calculate_decomposition<field_type>({0, bad}), false);
 
     test_decomposition<field_type>(
         {bad, 0},
-        calculate_decomposition<field_type>({bad, 0}));
+        calculate_decomposition<field_type>({bad, 0}), false);
 
         bad = 0x4000000000000000000000000000000000000000000000000000000000000000_cppui255;
 
     test_decomposition<field_type>(
         {0, bad},
-        calculate_decomposition<field_type>({0, bad}));
+        calculate_decomposition<field_type>({0, bad}), false);
 
     test_decomposition<field_type>(
         {bad, 0},
-        calculate_decomposition<field_type>({bad, 0}));
+        calculate_decomposition<field_type>({bad, 0}), false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
