@@ -40,7 +40,6 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
@@ -53,12 +52,13 @@
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 #include <nil/crypto3/random/algebraic_engine.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 using namespace nil::crypto3;
 
 using dist_type = std::uniform_int_distribution<int>;
 
-inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step, boost::random::mt11213b random_engine = boost::random::mt11213b(0)) {
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step, boost::random::mt11213b &rnd) {
     std::vector<std::size_t> step_list;
     std::size_t steps_sum = 0;
     while (steps_sum != r) {
@@ -70,7 +70,7 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
             step_list.emplace_back(1);
             steps_sum += step_list.back();
         } else {
-            step_list.emplace_back(dist_type(1, max_step)(random_engine));
+            step_list.emplace_back(dist_type(1, max_step)(rnd));
             steps_sum += step_list.back();
         }
     }
@@ -80,7 +80,7 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
 template <typename FieldType>
 inline math::polynomial<typename FieldType::value_type> generate_random_polynomial(
     std::size_t degree,
-    nil::crypto3::random::algebraic_engine<FieldType> rnd = nil::crypto3::random::algebraic_engine<FieldType>(0)
+    nil::crypto3::random::algebraic_engine<FieldType> &rnd
 ){
     math::polynomial<typename FieldType::value_type> result(degree);
     std::generate(std::begin(result), std::end(result), [&rnd]() { return rnd(); });
@@ -90,7 +90,7 @@ inline math::polynomial<typename FieldType::value_type> generate_random_polynomi
 template <typename FieldType>
 inline math::polynomial_dfs<typename FieldType::value_type> generate_random_polynomial_dfs(
     std::size_t degree,
-    nil::crypto3::random::algebraic_engine<FieldType> rnd = nil::crypto3::random::algebraic_engine<FieldType>(0)
+    nil::crypto3::random::algebraic_engine<FieldType> &rnd
 ){
     math::polynomial<typename FieldType::value_type> data = generate_random_polynomial(degree, rnd);
     math::polynomial_dfs<typename FieldType::value_type> result;
@@ -102,7 +102,7 @@ template <typename FieldType>
 inline std::vector<math::polynomial<typename FieldType::value_type>> generate_random_polynomial_batch(
     std::size_t batch_size,
     std::size_t degree,
-    nil::crypto3::random::algebraic_engine<FieldType> rnd = nil::crypto3::random::algebraic_engine<FieldType>(0)
+    nil::crypto3::random::algebraic_engine<FieldType> &rnd
 ){
     std::vector<math::polynomial<typename FieldType::value_type>> result;
 
@@ -116,7 +116,7 @@ template <typename FieldType>
 inline std::vector<math::polynomial_dfs<typename FieldType::value_type>> generate_random_polynomial_dfs_batch(
     std::size_t batch_size,
     std::size_t degree,
-    nil::crypto3::random::algebraic_engine<FieldType> rnd = nil::crypto3::random::algebraic_engine<FieldType>(0)
+    nil::crypto3::random::algebraic_engine<FieldType> &rnd
 ){
     auto data = generate_random_polynomial_batch(batch_size, degree, rnd);
     std::vector<math::polynomial_dfs<typename FieldType::value_type>> result;
@@ -130,8 +130,14 @@ inline std::vector<math::polynomial_dfs<typename FieldType::value_type>> generat
 }
 
 std::size_t test_global_seed = 0;
+boost::random::mt11213b test_global_rnd_engine;
+template <typename FieldType>
+nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
 
 struct test_initializer {
+    // Enumerate all fields used in tests;
+    using field1_type = algebra::curves::bls12<381>::scalar_field_type;
+
     test_initializer(){
         test_global_seed = 0;
 
@@ -148,7 +154,10 @@ struct test_initializer {
                 }
             }
         }
+
         BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
+        test_global_rnd_engine  = boost::random::mt11213b(test_global_seed);
+        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
     }
     void setup(){
     }
@@ -173,8 +182,8 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     constexpr static const std::size_t k = 1;
 
     constexpr static const std::size_t d = 16;
-
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+    
     constexpr static const std::size_t m = 2;
 
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 4> fri_type;
@@ -199,15 +208,11 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
 
     typename fri_type::params_type fri_params;
 
-    // Setup randomness.
-    boost::random::mt11213b random_engine(test_global_seed);
-    nil::crypto3::random::algebraic_engine<FieldType> alg_rnd(test_global_seed);
-
     // Setup params
     fri_params.r = r;
     fri_params.D = D;
     fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 1, random_engine);
+    fri_params.step_list = generate_random_step_list(r, 1, test_global_rnd_engine);
 
     // Generate polynomials
     std::array<std::vector<math::polynomial<typename FieldType::value_type>>,4> f;
@@ -216,8 +221,8 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test) {
     f[1].push_back({0, 1, 2});
     f[1].push_back({0, 1, 3});
     f[2].push_back({0});
-    f[3].push_back(generate_random_polynomial(4, alg_rnd));
-    f[3].push_back(generate_random_polynomial(9, alg_rnd));
+    f[3].push_back(generate_random_polynomial(4, test_global_alg_rnd_engine<FieldType>));
+    f[3].push_back(generate_random_polynomial(9, test_global_alg_rnd_engine<FieldType>));
 
     // Commit
     std::array<merkle_tree_type,4> tree;
@@ -300,22 +305,18 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 4> fri_type;
     typename fri_type::params_type fri_params;
 
-    // Setup randomness.
-    boost::random::mt11213b random_engine(test_global_seed);
-    nil::crypto3::random::algebraic_engine<FieldType> alg_rnd_engine(test_global_seed);
-
     // Setup params
     fri_params.r = r;
     fri_params.D = D;
     fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 5);
+    fri_params.step_list = generate_random_step_list(r, 5, test_global_rnd_engine);
 
     // Generate polynomials
     std::array<std::vector<math::polynomial<typename FieldType::value_type>>,4> f;
-    f[0] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
-    f[1] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
-    f[2] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
-    f[3] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
+    f[0] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
+    f[1] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
+    f[2] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
+    f[3] = generate_random_polynomial_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
 
     // Commit
     std::array<merkle_tree_type,4> tree;
@@ -391,10 +392,6 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
 
     typedef typename lpc_type::proof_type proof_type;
 
-    // Setup randomness.
-    boost::random::mt11213b random_engine(test_global_seed);
-    nil::crypto3::random::algebraic_engine<FieldType> alg_rnd_engine(test_global_seed);
-
     // Setup params
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
@@ -406,14 +403,14 @@ BOOST_AUTO_TEST_CASE(lpc_dfs_basic_test) {
     fri_params.r = r;
     fri_params.D = D;
     fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 1, random_engine);
+    fri_params.step_list = generate_random_step_list(r, 1, test_global_rnd_engine);
 
     // Generate polynomials
     std::array<std::vector<math::polynomial_dfs<typename FieldType::value_type>>,4> f;
-    f[0] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
-    f[1] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
-    f[2] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
-    f[3] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(random_engine), d, alg_rnd_engine);
+    f[0] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
+    f[1] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
+    f[2] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
+    f[3] = generate_random_polynomial_dfs_batch<FieldType>(dist_type(1, 10)(test_global_rnd_engine), d, test_global_alg_rnd_engine<FieldType>);
 
     // Commit
     std::array<merkle_tree_type,4> tree;
@@ -497,15 +494,11 @@ BOOST_AUTO_TEST_CASE(lpc_batches_num_3_test){
 
     typename fri_type::params_type fri_params;
 
-    // Setup randomness.
-    boost::random::mt11213b random_engine(test_global_seed);
-    nil::crypto3::random::algebraic_engine<FieldType> alg_rnd(test_global_seed);
-
     // Setup params
     fri_params.r = r;
     fri_params.D = D;
     fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 1, random_engine);
+    fri_params.step_list = generate_random_step_list(r, 1, test_global_rnd_engine);
 
     // Generate polynomials
     std::array<std::vector<math::polynomial<typename FieldType::value_type>>,3> f;
@@ -551,4 +544,5 @@ BOOST_AUTO_TEST_CASE(lpc_batches_num_3_test){
     typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
