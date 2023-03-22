@@ -39,7 +39,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/algebra/fields/plonk/non_native/doubling_edwards25519.hpp>
+#include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/doubling.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -102,7 +102,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_doubling) {
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

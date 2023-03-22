@@ -35,8 +35,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
-#include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_variable.hpp>
-#include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_linear_combination.hpp>
+#include <nil/blueprint/blueprint/r1cs/detail/r1cs/blueprint_variable.hpp>
+#include <nil/blueprint/blueprint/r1cs/detail/r1cs/blueprint_linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,9 +47,9 @@ namespace nil {
 
             template<typename BlueprintFieldType>
             class blueprint<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
-                typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
+                typedef zk::snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
 
-                snark::r1cs_variable_assignment<BlueprintFieldType>
+                zk::snark::r1cs_variable_assignment<BlueprintFieldType>
                     values; /* values[0] will hold the value of the first
                allocated variable of the blueprint, *NOT* constant 1 */
                 typename BlueprintFieldType::value_type constant_term;
@@ -57,7 +57,7 @@ namespace nil {
                 typename math::linear_variable<BlueprintFieldType>::index_type next_free_var;
                 typename detail::blueprint_linear_combination<ArithmetizationType>::index_type next_free_lc;
                 std::vector<typename BlueprintFieldType::value_type> lc_values;
-                snark::r1cs_constraint_system<BlueprintFieldType> constraint_system;
+                zk::snark::r1cs_constraint_system<BlueprintFieldType> constraint_system;
 
             public:
                 // typedef BlueprintFieldType field_type;
@@ -105,7 +105,7 @@ namespace nil {
                     }
                 }
 
-                void add_r1cs_constraint(const snark::r1cs_constraint<BlueprintFieldType> &constr) {
+                void add_r1cs_constraint(const zk::snark::r1cs_constraint<BlueprintFieldType> &constr) {
                     constraint_system.constraints.emplace_back(constr);
                 }
 
@@ -131,19 +131,19 @@ namespace nil {
                     constraint_system.auxiliary_input_size = num_variables() - primary_input_size;
                 }
 
-                snark::r1cs_variable_assignment<BlueprintFieldType> full_variable_assignment() const {
+                zk::snark::r1cs_variable_assignment<BlueprintFieldType> full_variable_assignment() const {
                     return values;
                 }
 
-                snark::r1cs_primary_input<BlueprintFieldType> primary_input() const {
-                    return snark::r1cs_primary_input<BlueprintFieldType>(values.begin(), values.begin() + num_inputs());
+                zk::snark::r1cs_primary_input<BlueprintFieldType> primary_input() const {
+                    return zk::snark::r1cs_primary_input<BlueprintFieldType>(values.begin(), values.begin() + num_inputs());
                 }
 
-                snark::r1cs_auxiliary_input<BlueprintFieldType> auxiliary_input() const {
-                    return snark::r1cs_auxiliary_input<BlueprintFieldType>(values.begin() + num_inputs(), values.end());
+                zk::snark::r1cs_auxiliary_input<BlueprintFieldType> auxiliary_input() const {
+                    return zk::snark::r1cs_auxiliary_input<BlueprintFieldType>(values.begin() + num_inputs(), values.end());
                 }
 
-                snark::r1cs_constraint_system<BlueprintFieldType> get_constraint_system() const {
+                zk::snark::r1cs_constraint_system<BlueprintFieldType> get_constraint_system() const {
                     return constraint_system;
                 }
 

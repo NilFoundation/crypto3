@@ -56,7 +56,7 @@ namespace nil {
                 // BlueprintFieldType> class blueprint_variable;
 
                 template<typename BlueprintFieldType>
-                class blueprint_variable<snark::r1cs_constraint_system<BlueprintFieldType>>
+                class blueprint_variable<zk::snark::r1cs_constraint_system<BlueprintFieldType>>
                     : public math::linear_variable<BlueprintFieldType> {
                 public:
                     blueprint_variable(const typename math::linear_variable<BlueprintFieldType>::index_type index = 0) :
@@ -79,7 +79,7 @@ namespace nil {
                 class blueprint_variable_vector<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> : 
                     private std::vector<blueprint_variable<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
-                    typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef zk::snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef typename BlueprintFieldType::value_type field_value_type;
                     typedef std::vector<blueprint_variable<ArithmetizationType>> contents;
 
