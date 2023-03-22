@@ -92,6 +92,10 @@ namespace nil {
                 }
             }
 
+            if (!must_pass) {
+                std::cout << "All constraints are satisfied." << std::endl;
+                return false;
+            }
             return true;
         }
 

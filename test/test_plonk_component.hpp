@@ -183,7 +183,11 @@ namespace nil {
             bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
               public_preprocessed_data, proof, bp, fri_params);
 
-            BOOST_CHECK(verifier_res);
+            if (must_pass) {
+                BOOST_CHECK(verifier_res);
+            } else {
+                BOOST_CHECK(!verifier_res);
+            }
 #endif
         }
     }    // namespace crypto3
