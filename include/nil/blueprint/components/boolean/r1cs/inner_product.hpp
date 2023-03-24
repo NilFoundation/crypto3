@@ -48,21 +48,21 @@ namespace nil {
                   if X != 0 then R = 1 and I = X^{-1}
                 */
                 template<typename FieldType>
-                class inner_product : public component<FieldType> {
+                class inner_product : public nil::blueprint::components::component<FieldType> {
                 private:
                     /* S_i = \sum_{k=0}^{i+1} A[i] * B[i] */
-                    blueprint_variable_vector<FieldType> S;
+                    detail::blueprint_variable_vector<FieldType> S;
 
                 public:
-                    const blueprint_linear_combination_vector<FieldType> A;
-                    const blueprint_linear_combination_vector<FieldType> B;
-                    const blueprint_variable<FieldType> result;
+                    const detail::blueprint_linear_combination_vector<FieldType> A;
+                    const detail::blueprint_linear_combination_vector<FieldType> B;
+                    const detail::blueprint_variable<FieldType> result;
 
                     inner_product(blueprint<FieldType> &bp,
-                                  const blueprint_linear_combination_vector<FieldType> &A,
-                                  const blueprint_linear_combination_vector<FieldType> &B,
-                                  const blueprint_variable<FieldType> &result) :
-                        component<FieldType>(bp),
+                                  const detail::blueprint_linear_combination_vector<FieldType> &A,
+                                  const detail::blueprint_linear_combination_vector<FieldType> &B,
+                                  const detail::blueprint_variable<FieldType> &result) :
+                        nil::blueprint::components::component<FieldType>(bp),
                         A(A), B(B), result(result) {
                         assert(A.size() >= 1);
                         assert(A.size() == B.size());
@@ -77,10 +77,10 @@ namespace nil {
                           S[i+1] - S[i] = A[i] * B[i]
                         */
                         for (std::size_t i = 0; i < A.size(); ++i) {
-                            this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
+                            this->bp.add_r1cs_constraint(zk::snark::r1cs_constraint<FieldType>(
                                 A[i], B[i],
                                 (i == A.size() - 1 ? result : S[i]) +
-                                    (i == 0 ? 0 * blueprint_variable<FieldType>(0) : -S[i - 1])));
+                                    (i == 0 ? 0 * detail::blueprint_variable<FieldType>(0) : -S[i - 1])));
                         }
                     }
 

@@ -136,11 +136,13 @@ namespace nil {
                 }
 
                 zk::snark::r1cs_primary_input<BlueprintFieldType> primary_input() const {
-                    return zk::snark::r1cs_primary_input<BlueprintFieldType>(values.begin(), values.begin() + num_inputs());
+                    return zk::snark::r1cs_primary_input<BlueprintFieldType>(values.begin(),
+                                                                             values.begin() + num_inputs());
                 }
 
                 zk::snark::r1cs_auxiliary_input<BlueprintFieldType> auxiliary_input() const {
-                    return zk::snark::r1cs_auxiliary_input<BlueprintFieldType>(values.begin() + num_inputs(), values.end());
+                    return zk::snark::r1cs_auxiliary_input<BlueprintFieldType>(values.begin() + num_inputs(),
+                                                                               values.end());
                 }
 
                 zk::snark::r1cs_constraint_system<BlueprintFieldType> get_constraint_system() const {
