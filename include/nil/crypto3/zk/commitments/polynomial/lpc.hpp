@@ -157,8 +157,6 @@ namespace nil {
                 ) {
                     for(std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
                         transcript(commit<typename LPC::basic_fri>(precommitments[i]));
-//                        std::cout << "commitment[" << i << "] = " << std::hex 
-//                            << commit<typename LPC::basic_fri>(precommitments[i]) << std::dec << std::endl;
                     }
                     typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
                     math::polynomial<typename LPC::field_type::value_type> combined_Q;
@@ -337,7 +335,6 @@ namespace nil {
                     typename std::vector<math::polynomial<typename LPC::field_type::value_type>> denominators;
                     typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
 
-//                    std::cout << "theta=" << theta.data << std::endl;
                     std::size_t batch_size = 0;
                     for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
                         BOOST_ASSERT( evaluation_points[k].size() == proof.z[k].size() || evaluation_points[k].size() == 1);
