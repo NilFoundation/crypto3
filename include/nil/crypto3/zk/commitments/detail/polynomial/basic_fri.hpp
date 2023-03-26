@@ -561,10 +561,6 @@ namespace nil {
                         }
                     }
 
-                    for( std::size_t i = 0; i < FRI::batches_num; i++ ){
-                        transcript(commit<FRI>(precommitments[i]));
-                    }
-
                     // Commit phase
                     auto f = combined_Q;
                     auto precommitment = combined_Q_precommitment;
@@ -714,7 +710,6 @@ namespace nil {
                     std::size_t polynomials_number = 0;
                     for(std::size_t k = 0; k < FRI::batches_num; k++ ){
                         polynomials_number += proof.query_proofs[0].initial_proof[k].values.size();
-                        transcript(commitments[k]);
                     }
                     BOOST_ASSERT(polynomials_number == evals_map.size());
                     if constexpr (FRI::m != 2) {
@@ -725,14 +720,16 @@ namespace nil {
                         std::pow(2, std::log2(fri_params.max_degree + 1) - fri_params.r + 1) - 1) {
                         return false;
                     }
-
                     
                     std::vector<typename FRI::field_type::value_type> alphas;
                     std::size_t t = 0;
                     for(std::size_t i = 0; i < fri_params.step_list.size(); i++){
                         transcript(proof.fri_roots[i]);
+//                        std::cout << "fri_roots[" << i << "]="<< std::hex << proof.fri_roots[i] << std::dec << std::endl;
                         for(std::size_t step_i = 0; step_i < fri_params.step_list[i]; step_i++, t++){
-                            alphas.push_back(transcript.template challenge<typename FRI::field_type>());
+                            auto alpha = transcript.template challenge<typename FRI::field_type>();
+//                            std::cout << "alpha=" << alpha.data << std::endl;
+                            alphas.push_back(alpha);
                         }
                     }
 
@@ -742,6 +739,7 @@ namespace nil {
                         std::size_t domain_size = fri_params.D[0]->size();
                         std::size_t coset_size = 1 << fri_params.step_list[0];
                         std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
+//                        std::cout << "x_index=" << x_index << std::endl;
                         typename FRI::field_type::value_type x = fri_params.D[0]->get_domain_element(x_index);
 
                         std::vector<std::array<typename FRI::field_type::value_type, FRI::m>> s;
@@ -762,9 +760,13 @@ namespace nil {
 
                             for (std::size_t i = 0; i < query_proof.initial_proof[k].values.size(); i++) {
                                 for (auto [idx, pair_idx] : correct_order_idx) {
+//                                    std::cout << "[" << k << "][" << i << "][" << idx << "][" << pair_idx << "]=" 
+//                                        << query_proof.initial_proof[k].values[i][idx][pair_idx].data << std::endl;
                                     typename FRI::field_element_type leaf_val0(
                                         query_proof.initial_proof[k].values[i][idx][pair_idx]
                                     );
+//                                    std::cout << "[" << k << "][" << i << "][" << idx << "][" << 1-pair_idx << "]=" 
+//                                        << query_proof.initial_proof[k].values[i][idx][1-pair_idx].data << std::endl;
                                     leaf_val0.write(write_iter, FRI::field_element_type::length());
                                     typename FRI::field_element_type leaf_val1(
                                         query_proof.initial_proof[k].values[i][idx][1-pair_idx]
@@ -787,6 +789,7 @@ namespace nil {
                             y[j][1] = FRI::field_type::value_type::zero();
                         }
                         for( size_t eval_ind = 0; eval_ind < evals_num; eval_ind++){
+//                            std::cout << "*******************eval_ind = " << eval_ind << "*******************" << std::endl;
                             std::size_t ind = 0;
                             for( size_t j = 0; j < coset_size / FRI::m; j++ ){
                                 combined_eval_values[j][0] = FRI::field_type::value_type::zero();
@@ -798,17 +801,39 @@ namespace nil {
                                         combined_eval_values[j][0] *= theta;
                                         combined_eval_values[j][1] *= theta;
                                         if( evals_map[ind] == eval_ind ){
+//                                            std::cout << "query_proof.initial_proof[" << k << "].values[" << i << "]["<< j<< "][0]" << std::hex << query_proof.initial_proof[k].values[i][j][0].data << std::dec << std::endl;
+//                                            std::cout << "query_proof.initial_proof[" << k << "].values[" << i << "]["<< j<< "][1]" << std::hex << query_proof.initial_proof[k].values[i][j][1].data << std::dec << std::endl;
                                             combined_eval_values[j][0] += query_proof.initial_proof[k].values[i][j][0];
                                             combined_eval_values[j][1] += query_proof.initial_proof[k].values[i][j][1];
                                         }
                                     }
                                 }
                             }
+                            //std::cout << "combined_U:" << std::endl;
+                            //for( size_t j = 0; j < combined_U[eval_ind].size(); j++){
+                            //    std::cout << "\t" << combined_U[eval_ind][j].data << std::endl;
+                            //}
+                            //std::cout << "denominator:" << std::endl;
+                            //for( size_t j = 0; j < denominators[eval_ind].size(); j++){
+                            //    std::cout << "\t" << denominators[eval_ind][j].data << std::endl;
+                            //}
                             for( size_t j = 0; j < coset_size / FRI::m; j++ ){
+                                //std::cout << "s["<<j<<"][0] = " << s[j][0].data << std::endl;
+                                //std::cout << "s["<<j<<"][1] = " << s[j][1].data << std::endl;
+                                //std::cout << "before combined_eval_values["<<j<<"][0] = " << combined_eval_values[j][0].data << std::endl;
+                                //std::cout << "before combined_eval_values["<<j<<"][1] = " << combined_eval_values[j][1].data << std::endl;
                                 combined_eval_values[j][0] -= combined_U[eval_ind].evaluate(s[j][0]);
                                 combined_eval_values[j][1] -= combined_U[eval_ind].evaluate(s[j][1]);
+                                //std::cout << "combined_U" << std::endl;
+                                //std::cout <<  "\t" << combined_U[eval_ind].evaluate(s[j][0]).data << std::endl;
+                                //std::cout <<  "\t" << combined_U[eval_ind].evaluate(s[j][1]).data << std::endl;
+                                //std::cout << "denominator" << std::endl;
+                                //std::cout <<  "\t" << denominators[eval_ind].evaluate(s[j][0]).data << std::endl;
+                                //std::cout <<  "\t" << denominators[eval_ind].evaluate(s[j][1]).data << std::endl;
                                 combined_eval_values[j][0] /= denominators[eval_ind].evaluate(s[j][0]);
                                 combined_eval_values[j][1] /= denominators[eval_ind].evaluate(s[j][1]);
+                                //std::cout << "after combined_eval_values["<<j<<"][0] = " << combined_eval_values[j][0].data << std::endl;
+                                //std::cout << "after combined_eval_values["<<j<<"][1] = " << combined_eval_values[j][1].data << std::endl;
 
                                 y[j][0] += combined_eval_values[j][0]; 
                                 y[j][1] += combined_eval_values[j][1]; 
@@ -819,6 +844,7 @@ namespace nil {
                         std::size_t t = 0;
                         typename FRI::polynomial_values_type y_next;
                         for (std::size_t i = 0; i < fri_params.step_list.size(); i++) {
+//                            std::cout << "Round " << i << std::endl;
                             coset_size = 1 << fri_params.step_list[i];
                             // check merkle proof p, polynomails' values y are already prepared
                             if(query_proof.round_proofs[i].p.root() !=  proof.fri_roots[i] ) return false;
@@ -828,19 +854,24 @@ namespace nil {
                             auto write_iter = leaf_data.begin();
                             auto correct_order_idx =
                                 get_correct_order<FRI>(x_index, domain_size, fri_params.step_list[i], s_indices);
+  //                          std::cout << "indices " << x_index << "," << get_folded_index<FRI>(x_index, domain_size, fri_params.step_list[i]) << std::endl;
                             for (auto [idx, pair_idx] : correct_order_idx) {
+ //                               std::cout << "y[" << idx << "][" << pair_idx << "] = " << y[idx][pair_idx].data << std::endl;
                                 typename FRI::field_element_type leaf_val0(y[idx][pair_idx]);
                                 leaf_val0.write(write_iter, FRI::field_element_type::length());
+//                                std::cout << "y[" << idx << "][" << 1-pair_idx << "] = " << y[idx][1 - pair_idx].data << std::endl;
                                 typename FRI::field_element_type leaf_val1(y[idx][1 - pair_idx]);
                                 leaf_val1.write(write_iter, FRI::field_element_type::length());
                             }
                             if ( !query_proof.round_proofs[i].p.validate(leaf_data)) {
+//                                std::cout << "Merkle proof is not correct" << std::endl;
                                 return false;
                             } else {
                             }
 
                             // colinear check
                             for( std::size_t step_i = 0; step_i < fri_params.step_list[i] - 1; step_i++, t++ ){
+//                                std:: cout << "Step" << t  << std::endl;
                                 y_next.resize( y.size() / FRI::m );
 
                                 domain_size = fri_params.D[t]->size();
@@ -855,6 +886,7 @@ namespace nil {
                                     math::polynomial<typename FRI::field_type::value_type> interpolant_l =
                                         math::lagrange_interpolation(interpolation_points_l);
                                     y_next[y_ind][0] = interpolant_l.evaluate(alphas[t]);
+//                                    std::cout << "y_next[" << y_ind << "][0] = " << y_next[y_ind][0].data << std::endl;
 
                                     std::vector<std::pair<typename FRI::field_type::value_type,typename FRI::field_type::value_type>> interpolation_points_r {
                                         std::make_pair(s[2 * y_ind + 1][0], y[2 * y_ind + 1][0]),
@@ -863,6 +895,7 @@ namespace nil {
                                     math::polynomial<typename FRI::field_type::value_type> interpolant_r =
                                         math::lagrange_interpolation(interpolation_points_r);
                                     y_next[y_ind][1] = interpolant_r.evaluate(alphas[t]);
+//                                    std::cout << "y_next[" << y_ind << "][1] = " << y_next[y_ind][1].data << std::endl;
                                 }
                                 x = x*x;
                                 y = y_next;
