@@ -50,12 +50,12 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
-#include <nil/crypto3/algebra/curves/pallas.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
@@ -96,31 +96,57 @@ void print_hex_byteblob_to_file(ProofIterator proof_begin, ProofIterator proof_e
 }
 
 template<typename FRI>
-void print_params(typename FRI::params_type &fri_params, std::string filename) {
+void print_params(
+    typename FRI::params_type &fri_params, 
+    std::array<std::vector<std::vector<typename FRI::field_type::value_type>>, FRI::batches_num> evaluation_points,
+    std::array<std::size_t, FRI::batches_num> batches_sizes,
+    std::string filename
+) {
     std::ofstream out;
 
     out.open(filename);
-    out << "\"modulus\":" << FRI::field_type::modulus << "," << std::endl;
-    out << "\"m\":" << FRI::m << "," << std::endl;
-    out << "\"batches_num\":" << FRI::batches_num << "," << std::endl;
-    out << "\"lambda\":" << FRI::lambda << "," << std::endl;
-    out << "\"r\":" << fri_params.r << "," << std::endl;
-    out << "\"step_list\":[";
+    out << "{" << std::endl;
+    out << "\t\"modulus\":" << FRI::field_type::modulus << "," << std::endl;
+    out << "\t\"m\":" << FRI::m << "," << std::endl;
+    out << "\t\"batches_num\":" << FRI::batches_num << "," << std::endl;
+    out << "\t\"lambda\":" << FRI::lambda << "," << std::endl;
+    out << "\t\"r\":" << fri_params.r << "," << std::endl;
+    out << "\t\"evaluation_points\":[";
+    for( std::size_t i = 0; i < evaluation_points.size(); i++){
+        if (i != 0)  out << ",";
+        out << "[";
+        for( std::size_t j = 0; j < evaluation_points[i].size(); j++){
+            if (j != 0)  out << ",";
+            out << "[";
+            for( std::size_t k = 0; k < evaluation_points[i][j].size(); k++){
+                if (k != 0)  out << ",";
+                out << evaluation_points[i][j][k].data;
+            }
+            out << "]";
+        }
+        out << "]";
+    }
+    out << "]," << std::endl;
+    out << "\t\"step_list\":[";
     for (size_t i = 0; i < fri_params.step_list.size(); i++) {
-        if (i != 0)
-            out << ",";
+        if (i != 0) out << ",";
         out << fri_params.step_list[i];
     }
     out << "]," << std::endl;
-    out << "\"D_omegas\":[" << std::endl;
+    out << "\t\"D_omegas\":[" << std::endl;
     for (size_t i = 0; i < fri_params.D.size(); i++) {
-        if (i != 0)
-            out << "," << std::endl;
-        out << fri_params.D[i]->get_domain_element(1).data;
+        if (i != 0) out << "," << std::endl;
+        out << "\t\t" << fri_params.D[i]->get_domain_element(1).data;
     }
-    out << "]," << std::endl;
-    out << "\"max_degree\":" << fri_params.max_degree << "," << std::endl;
-    out << "\"omega\":" << fri_params.D[0]->get_domain_element(1).data << std::endl;
+    out << std::endl << "\t]," << std::endl;
+    out << "\t\"batches_sizes\":[";
+    for (size_t i = 0; i < FRI::batches_num; i++) {
+        if (i != 0)  out << "," ;
+        out << batches_sizes[i];
+    }
+    out << "\t]," << std::endl;
+    out << "\t\"max_degree\":" << fri_params.max_degree << "," << std::endl;
+    out << "\t\"omega\":" << fri_params.D[0]->get_domain_element(1).data << std::endl;
     out << "}" << std::endl;
     out.close();
 }
@@ -401,11 +427,12 @@ boost::random::mt11213b test_global_rnd_engine;
 template <typename FieldType>
 nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
 
-struct test_initializer {
+struct test_fixture {
     // Enumerate all fields used in tests;
     using field1_type = algebra::curves::bls12<381>::scalar_field_type;
+    using field2_type = algebra::curves::vesta::scalar_field_type;
 
-    test_initializer(){
+    test_fixture(){
         test_global_seed = 0;
 
         for( std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++){
@@ -413,6 +440,7 @@ struct test_initializer {
                 if(std::string(boost::unit_test::framework::master_test_suite().argv[i+1]) == "random"){
                     std::random_device rd;
                     test_global_seed = rd();
+                    std::cout << "Random seed: " << test_global_seed << std::endl;
                     break;
                 }
                 if(std::regex_match( boost::unit_test::framework::master_test_suite().argv[i+1], std::regex( ( "((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?" ) ) ) ){
@@ -422,18 +450,15 @@ struct test_initializer {
             }
         }
 
-        BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
         test_global_rnd_engine  = boost::random::mt11213b(test_global_seed);
-        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
-    }
-    void setup(){
-    }
-    void teardown(){
-    }
-    ~test_initializer(){}
-};
 
-BOOST_TEST_GLOBAL_FIXTURE(test_initializer);
+        // Initialize algebraic engines for all fields
+        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
+        test_global_alg_rnd_engine<field2_type> = nil::crypto3::random::algebraic_engine<field2_type>(test_global_seed);
+    }
+    ~test_fixture(){
+    }
+};
 
 BOOST_AUTO_TEST_SUITE(marshalling_random_test_suite)
     // setup
@@ -458,7 +483,7 @@ BOOST_AUTO_TEST_SUITE(marshalling_random_test_suite)
     >;
     using LPC = typename nil::crypto3::zk::commitments::batched_list_polynomial_commitment<field_type, lpc_params_type>;
 
-BOOST_AUTO_TEST_CASE(marshalling_lpc_basic_test) {
+BOOST_FIXTURE_TEST_CASE(marshalling_lpc_random_test, test_fixture) {
     auto proof = generate_random_lpc_proof<LPC>(
         final_polynomial_degree, 5, 
         generate_random_step_list(r, 4, test_global_rnd_engine),
@@ -472,13 +497,13 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(marshalling_real_lpc_proofs)
     // Setup common types.
     using Endianness = nil::marshalling::option::big_endian;
-    using curve_type = nil::crypto3::algebra::curves::pallas;
+    using curve_type = nil::crypto3::algebra::curves::vesta;
     using FieldType = curve_type::scalar_field_type;
     using merkle_hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using transcript_hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using merkle_tree_type = typename containers::merkle_tree<merkle_hash_type, 2>;
 
-BOOST_AUTO_TEST_CASE(lpc_basic_test){
+BOOST_FIXTURE_TEST_CASE(lpc_basic_test, test_fixture) {
     // Setup types
     constexpr static const std::size_t lambda = 10;
     constexpr static const std::size_t k = 1;
@@ -537,22 +562,39 @@ BOOST_AUTO_TEST_CASE(lpc_basic_test){
     // Generate evaluation points. Generate points outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_point;
     evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
-    std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluation_points;
+    std::array<std::vector<std::vector<typename FieldType::value_type>>, batches_num> evaluation_points;
     evaluation_points[0].push_back(evaluation_point);
     evaluation_points[1].push_back(evaluation_point);
     evaluation_points[2].push_back(evaluation_point);
     evaluation_points[3].push_back(evaluation_point);
 
-    std::array<std::uint8_t, 96> x_data {};
+    std::vector<std::uint8_t> x_data {};
 
     // Prove
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
     auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
     test_lpc_proof<Endianness, lpc_type>(proof, "lpc_basic_test");
-    print_params<fri_type>(fri_params, "lpc_basic_test.json");
+
+    std::array<std::size_t, batches_num> batch_sizes;
+    for( std::size_t i = 0; i < batches_num; ++i ){
+        batch_sizes[i] = f[i].size();
+    }
+    print_params<fri_type>(fri_params, evaluation_points, batch_sizes, "lpc_basic_test.json");
+
+    std::array<typename lpc_type::commitment_type, 4> commitment;
+    commitment[0] = zk::algorithms::commit<lpc_type>(tree[0]);
+    commitment[1] = zk::algorithms::commit<lpc_type>(tree[1]);
+    commitment[2] = zk::algorithms::commit<lpc_type>(tree[2]);
+    commitment[3] = zk::algorithms::commit<lpc_type>(tree[3]);
+
+    // Verify
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
+        evaluation_points, proof, commitment, fri_params, transcript_verifier
+    ));
 }
 
-BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test){
+BOOST_FIXTURE_TEST_CASE(lpc_basic_skipping_layers_test, test_fixture){
     // Setup types
     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
@@ -616,19 +658,24 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test){
     // Generate evaluation points. Choose poin1ts outside the domain
     std::vector<typename FieldType::value_type> evaluation_point;
     evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
-    std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluation_points;
+    std::array<std::vector<std::vector<typename FieldType::value_type>>, batches_num> evaluation_points;
     evaluation_points[0].push_back(evaluation_point);
     evaluation_points[1].push_back(evaluation_point);
     evaluation_points[2].push_back(evaluation_point);
     evaluation_points[3].push_back(evaluation_point);
 
-    std::array<std::uint8_t, 96> x_data {};
+    std::vector<std::uint8_t> x_data {};
 
     // Prove
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
     auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
     test_lpc_proof<Endianness, lpc_type>(proof, "lpc_skipping_layers_test");
-    print_params<fri_type>(fri_params, "lpc_skipping_layers_test.json");
+
+    std::array<std::size_t, batches_num> batch_sizes;
+    for( std::size_t i = 0; i < batches_num; ++i ){
+        batch_sizes[i] = f[i].size();
+    }
+    print_params<fri_type>(fri_params, evaluation_points, batch_sizes, "lpc_skipping_layers_test.json");
 
     // Verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
@@ -637,9 +684,9 @@ BOOST_AUTO_TEST_CASE(lpc_basic_skipping_layers_test){
     ));
 }
 
-BOOST_AUTO_TEST_CASE(lpc_batches_num_3_test){
+BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_fixture){
     // Setup types.
-    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t lambda = 10;
     constexpr static const std::size_t k = 1;
 
     constexpr static const std::size_t d = 16;
@@ -693,24 +740,303 @@ BOOST_AUTO_TEST_CASE(lpc_batches_num_3_test){
     // Generate evaluation points. Generate points outside of the basic domain
     std::vector<typename FieldType::value_type> evaluation_point;
     evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
-    std::array<std::vector<std::vector<typename FieldType::value_type>>, 3> evaluation_points;
+    std::array<std::vector<std::vector<typename FieldType::value_type>>, batches_num> evaluation_points;
     evaluation_points[0].push_back(evaluation_point);
     evaluation_points[1].push_back(evaluation_point);
     evaluation_points[2].push_back(evaluation_point);
 
-    std::array<std::uint8_t, 96> x_data {};
+    std::vector<std::uint8_t> x_data {};
 
     // Prove
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+
     auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
-    test_lpc_proof<Endianness, lpc_type>(proof, "lpc_batches_num_3_test.data");
-    print_params<fri_type>(fri_params, "lpc_batches_num3_test.json");
+    test_lpc_proof<Endianness, lpc_type>(proof, "lpc_batches_num_3_test");
+    std::array<std::size_t, batches_num> batch_sizes;
+    for( std::size_t i = 0; i < batches_num; ++i ){
+        batch_sizes[i] = f[i].size();
+    }
+    print_params<fri_type>(fri_params, evaluation_points, batch_sizes, "lpc_batches_num_3_test.json");
 
     std::array<typename lpc_type::commitment_type, 3> commitment;
     commitment[0] = zk::algorithms::commit<lpc_type>(tree[0]);
     commitment[1] = zk::algorithms::commit<lpc_type>(tree[1]);
     commitment[2] = zk::algorithms::commit<lpc_type>(tree[2]);
     
+    // Verify
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
+        evaluation_points, proof, commitment, fri_params, transcript_verifier
+    ));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(lpc_eval_points)
+    // Setup common types.
+    using Endianness = nil::marshalling::option::big_endian;
+    using curve_type = nil::crypto3::algebra::curves::vesta;
+    using FieldType = curve_type::scalar_field_type;
+    using merkle_hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    using transcript_hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    using merkle_tree_type = typename containers::merkle_tree<merkle_hash_type, 2>;
+
+    constexpr static const std::size_t lambda = 10;
+    constexpr static const std::size_t k = 1;
+
+    constexpr static const std::size_t d = 16;
+    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+    
+    constexpr static const std::size_t m = 2;
+    constexpr static const std::size_t batches_num = 4;
+
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, batches_num> fri_type;
+
+    typedef zk::commitments::
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, batches_num>
+            lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
+
+    static_assert(zk::is_commitment<fri_type>::value);
+    static_assert(zk::is_commitment<lpc_type>::value);
+    static_assert(!zk::is_commitment<merkle_hash_type>::value);
+    static_assert(!zk::is_commitment<merkle_tree_type>::value);
+    static_assert(!zk::is_commitment<std::size_t>::value);
+
+    typedef typename lpc_type::proof_type proof_type;
+
+    constexpr static const std::size_t d_extended = d;
+    
+BOOST_FIXTURE_TEST_CASE(lpc_eval_point2_test, test_fixture){
+    // Setup types and constants
+
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    typename fri_type::params_type fri_params;
+
+    // Setup params
+    fri_params.r = r;
+    fri_params.D = D;
+    fri_params.max_degree = d - 1;
+    fri_params.step_list = generate_random_step_list(r, 1, test_global_rnd_engine);
+
+    // Generate polynomials
+    std::array<std::vector<math::polynomial<typename FieldType::value_type>>,batches_num> f;
+    f[0].push_back({1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
+    f[1].push_back({0, 1});
+    f[1].push_back({0, 1, 2});
+    f[1].push_back({0, 1, 3});
+    f[2].push_back({1, 2 ,3, 4});
+    f[3].push_back(generate_random_polynomial(4, test_global_alg_rnd_engine<FieldType>));
+    f[3].push_back(generate_random_polynomial(9, test_global_alg_rnd_engine<FieldType>));
+
+    // Commit
+    std::array<merkle_tree_type,4> tree;
+    tree[0] = zk::algorithms::precommit<lpc_type>(f[0], D[0], fri_params.step_list.front());
+    tree[1] = zk::algorithms::precommit<lpc_type>(f[1], D[0], fri_params.step_list.front());
+    tree[2] = zk::algorithms::precommit<lpc_type>(f[2], D[0], fri_params.step_list.front());
+    tree[3] = zk::algorithms::precommit<lpc_type>(f[3], D[0], fri_params.step_list.front());
+
+    // Generate evaluation points. Generate points outside of the basic domain
+    std::vector<typename FieldType::value_type> evaluation_point;
+    evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+
+    std::vector<typename FieldType::value_type> evaluation_point1;
+    evaluation_point1.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+    evaluation_point1.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator * fri_params.D[0]->get_domain_element(1));
+
+    std::vector<typename FieldType::value_type> evaluation_point2;
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator / fri_params.D[0]->get_domain_element(1));
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator * fri_params.D[0]->get_domain_element(1));
+
+    std::array<std::vector<std::vector<typename FieldType::value_type>>, batches_num> evaluation_points;
+    evaluation_points[0].push_back(evaluation_point1);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[2].push_back(evaluation_point);
+    evaluation_points[3].push_back(evaluation_point);
+
+    std::vector<std::uint8_t> x_data {};
+
+    // Prove
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+    auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
+    test_lpc_proof<Endianness, lpc_type>(proof, "lpc_eval_point2_test");
+
+    std::array<std::size_t, batches_num> batch_sizes;
+    for( std::size_t i = 0; i < batches_num; ++i ){
+        batch_sizes[i] = f[i].size();
+    }
+    print_params<fri_type>(fri_params, evaluation_points, batch_sizes, "lpc_eval_point2_test.json");
+
+    std::array<typename lpc_type::commitment_type, 4> commitment;
+    commitment[0] = zk::algorithms::commit<lpc_type>(tree[0]);
+    commitment[1] = zk::algorithms::commit<lpc_type>(tree[1]);
+    commitment[2] = zk::algorithms::commit<lpc_type>(tree[2]);
+    commitment[3] = zk::algorithms::commit<lpc_type>(tree[3]);
+
+    // Verify
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
+        evaluation_points, proof, commitment, fri_params, transcript_verifier
+    ));
+}
+
+BOOST_FIXTURE_TEST_CASE(lpc_eval_point3_test, test_fixture){
+    // Setup types and constants
+
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    typename fri_type::params_type fri_params;
+
+    // Setup params
+    fri_params.r = r;
+    fri_params.D = D;
+    fri_params.max_degree = d - 1;
+    fri_params.step_list = generate_random_step_list(r, 1, test_global_rnd_engine);
+
+    // Generate polynomials
+    std::array<std::vector<math::polynomial<typename FieldType::value_type>>,batches_num> f;
+    f[0].push_back({1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
+    f[1].push_back({0, 1});
+    f[1].push_back({0, 1, 2});
+    f[1].push_back({0, 1, 3});
+    f[2].push_back({1, 2 ,3, 4});
+    f[3].push_back(generate_random_polynomial(4, test_global_alg_rnd_engine<FieldType>));
+    f[3].push_back(generate_random_polynomial(9, test_global_alg_rnd_engine<FieldType>));
+
+    // Commit
+    std::array<merkle_tree_type,4> tree;
+    tree[0] = zk::algorithms::precommit<lpc_type>(f[0], D[0], fri_params.step_list.front());
+    tree[1] = zk::algorithms::precommit<lpc_type>(f[1], D[0], fri_params.step_list.front());
+    tree[2] = zk::algorithms::precommit<lpc_type>(f[2], D[0], fri_params.step_list.front());
+    tree[3] = zk::algorithms::precommit<lpc_type>(f[3], D[0], fri_params.step_list.front());
+
+    // Generate evaluation points. Generate points outside of the basic domain
+    std::vector<typename FieldType::value_type> evaluation_point;
+    evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+
+    std::vector<typename FieldType::value_type> evaluation_point1;
+    evaluation_point1.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+    evaluation_point1.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator * fri_params.D[0]->get_domain_element(1));
+
+    std::vector<typename FieldType::value_type> evaluation_point2;
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator / fri_params.D[0]->get_domain_element(1));
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator * fri_params.D[0]->get_domain_element(1));
+
+    std::array<std::vector<std::vector<typename FieldType::value_type>>, batches_num> evaluation_points;
+    evaluation_points[0].push_back(evaluation_point2);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[2].push_back(evaluation_point);
+    evaluation_points[3].push_back(evaluation_point);
+
+    std::vector<std::uint8_t> x_data {};
+
+    // Prove
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+    auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
+    test_lpc_proof<Endianness, lpc_type>(proof, "lpc_eval_point3_test");
+
+    std::array<std::size_t, batches_num> batch_sizes;
+    for( std::size_t i = 0; i < batches_num; ++i ){
+        batch_sizes[i] = f[i].size();
+    }
+    print_params<fri_type>(fri_params, evaluation_points, batch_sizes, "lpc_eval_point3_test.json");
+
+    std::array<typename lpc_type::commitment_type, 4> commitment;
+    commitment[0] = zk::algorithms::commit<lpc_type>(tree[0]);
+    commitment[1] = zk::algorithms::commit<lpc_type>(tree[1]);
+    commitment[2] = zk::algorithms::commit<lpc_type>(tree[2]);
+    commitment[3] = zk::algorithms::commit<lpc_type>(tree[3]);
+
+    // Verify
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+    BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
+        evaluation_points, proof, commitment, fri_params, transcript_verifier
+    ));
+}
+
+BOOST_FIXTURE_TEST_CASE(lpc_eval_points_test, test_fixture){
+    // Setup types and constants
+
+    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(extended_log, r);
+
+    typename fri_type::params_type fri_params;
+
+    // Setup params
+    fri_params.r = r;
+    fri_params.D = D;
+    fri_params.max_degree = d - 1;
+    fri_params.step_list = generate_random_step_list(r, 1, test_global_rnd_engine);
+
+    // Generate polynomials
+    std::array<std::vector<math::polynomial<typename FieldType::value_type>>,batches_num> f;
+    f[0].push_back({1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
+    f[1].push_back({0, 1});
+    f[1].push_back({0, 1, 2});
+    f[1].push_back({0, 1, 3});
+    f[2].push_back({1, 2 ,3, 4});
+    f[3].push_back(generate_random_polynomial(4, test_global_alg_rnd_engine<FieldType>));
+    f[3].push_back(generate_random_polynomial(9, test_global_alg_rnd_engine<FieldType>));
+
+    // Commit
+    std::array<merkle_tree_type,4> tree;
+    tree[0] = zk::algorithms::precommit<lpc_type>(f[0], D[0], fri_params.step_list.front());
+    tree[1] = zk::algorithms::precommit<lpc_type>(f[1], D[0], fri_params.step_list.front());
+    tree[2] = zk::algorithms::precommit<lpc_type>(f[2], D[0], fri_params.step_list.front());
+    tree[3] = zk::algorithms::precommit<lpc_type>(f[3], D[0], fri_params.step_list.front());
+
+    // Generate evaluation points. Generate points outside of the basic domain
+    std::vector<typename FieldType::value_type> evaluation_point;
+    evaluation_point.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+
+    std::vector<typename FieldType::value_type> evaluation_point1;
+    evaluation_point1.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+    evaluation_point1.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator * fri_params.D[0]->get_domain_element(1));
+
+    std::vector<typename FieldType::value_type> evaluation_point2;
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator / fri_params.D[0]->get_domain_element(1));
+    evaluation_point2.push_back(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator * fri_params.D[0]->get_domain_element(1));
+
+    std::array<std::vector<std::vector<typename FieldType::value_type>>, batches_num> evaluation_points;
+    evaluation_points[0].push_back(evaluation_point);
+    evaluation_points[1].push_back(evaluation_point);
+    evaluation_points[1].push_back(evaluation_point1);
+    evaluation_points[1].push_back(evaluation_point2);
+    evaluation_points[2].push_back(evaluation_point1);
+    evaluation_points[3].push_back(evaluation_point);
+
+    std::vector<std::uint8_t> x_data {};
+
+    // Prove
+    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+    auto proof = zk::algorithms::proof_eval<lpc_type>(evaluation_points, tree, f, fri_params, transcript);
+    test_lpc_proof<Endianness, lpc_type>(proof, "lpc_eval_points_test");
+
+    std::array<std::size_t, batches_num> batch_sizes;
+    for( std::size_t i = 0; i < batches_num; ++i ){
+        batch_sizes[i] = f[i].size();
+    }
+    print_params<fri_type>(fri_params, evaluation_points, batch_sizes, "lpc_eval_points_test.json");
+
+    std::array<typename lpc_type::commitment_type, 4> commitment;
+    commitment[0] = zk::algorithms::commit<lpc_type>(tree[0]);
+    commitment[1] = zk::algorithms::commit<lpc_type>(tree[1]);
+    commitment[2] = zk::algorithms::commit<lpc_type>(tree[2]);
+    commitment[3] = zk::algorithms::commit<lpc_type>(tree[3]);
+
     // Verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
     BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
