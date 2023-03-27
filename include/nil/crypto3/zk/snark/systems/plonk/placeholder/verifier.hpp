@@ -288,13 +288,21 @@ namespace nil {
                         std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
                         {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public};
                         std::array<typename commitment_scheme_type::commitment_type, 4> commitments = 
-                        {proof.variable_values_commitment, proof.v_perm_commitment,
-                                                    proof.T_commitment, preprocessed_public_data.common_data.commitments.fixed_values};
+                        {proof.variable_values_commitment, 
+                         proof.v_perm_commitment,
+                         proof.T_commitment, 
+                         preprocessed_public_data.common_data.commitments.fixed_values
+                        };
+                        
+                        if( proof.fixed_values_commitment != preprocessed_public_data.common_data.commitments.fixed_values )
+                            return false;
+
                         if (!algorithms::verify_eval<commitment_scheme_type>(
-                                evaluations_points,
-                                proof.eval_proof.combined_value,
-                                                    commitments,
-                                                    fri_params, transcript)) {
+                            evaluations_points,
+                            proof.eval_proof.combined_value,
+                            commitments,
+                            fri_params, transcript)
+                        ) {
                             return false;
                         }
 

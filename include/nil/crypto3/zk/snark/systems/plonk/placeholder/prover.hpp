@@ -465,6 +465,8 @@ namespace nil {
                             preprocessed_public_data.precommitments.fixed_values
                         };
 
+                        proof.fixed_values_commitment = preprocessed_public_data.common_data.commitments.fixed_values;
+
                         proof.eval_proof.combined_value = algorithms::proof_eval<commitment_scheme_type>(
                                                     evaluations_points,
                                                     precommitments,
