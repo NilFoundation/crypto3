@@ -135,7 +135,7 @@ namespace nil {
             profiling(assignment);
 #endif
 
-            assert(blueprint::is_satisfied(bp, assignment, must_pass));
+            assert(blueprint::is_satisfied(bp, assignment) == must_pass);
 
             return std::make_tuple(desc, bp, assignment);
         }
