@@ -47,7 +47,7 @@ using namespace nil;
 
 template <typename BlueprintFieldType>
 void test_field_range(std::vector<typename BlueprintFieldType::value_type> public_input,
-                        bool must_pass = true){
+                        bool expected_to_pass){
     
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -84,8 +84,13 @@ void test_field_range(std::vector<typename BlueprintFieldType::value_type> publi
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input, must_pass);
+    if (expected_to_pass) {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    } else {
+        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
@@ -95,20 +100,20 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test0) {
     using field_type = crypto3::algebra::curves::pallas::base_field_type;
 
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {455245345345345, 523553453454343, 68753453534534689, 54355345344544});
+        {455245345345345, 523553453454343, 68753453534534689, 54355345344544}, true);
 
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         create_public_input_1_value<field_type, non_native_field_type>(
             chop_non_native<field_type, non_native_field_type>(1)
-        ));
+        ), true);
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         create_public_input_1_value<field_type, non_native_field_type>(
             chop_non_native<field_type, non_native_field_type>(0)
-        ));
+        ), true);
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         create_public_input_1_value<field_type, non_native_field_type>(
             chop_non_native<field_type, non_native_field_type>(-1)
-        ));
+        ), true);
 
     nil::crypto3::random::algebraic_engine<non_native_field_type> rand;
     boost::random::mt19937 seed_seq;
@@ -118,7 +123,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test0) {
         test_field_range<field_type>(
             create_public_input_1_value<field_type, non_native_field_type>(
                 chop_non_native<field_type, non_native_field_type>(rand())
-            ));
+            ), true);
     }
 }
 

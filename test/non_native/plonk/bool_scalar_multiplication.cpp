@@ -46,7 +46,7 @@ using namespace nil;
 
 template <typename BlueprintFieldType, typename NonNativeCurveType>
 void test_bool_scalar_multiplication(std::vector<typename BlueprintFieldType::value_type> public_input, 
-            std::vector<typename BlueprintFieldType::value_type> expected_res, bool must_pass = true){
+            std::vector<typename BlueprintFieldType::value_type> expected_res, bool expected_to_pass){
     
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -74,7 +74,7 @@ void test_bool_scalar_multiplication(std::vector<typename BlueprintFieldType::va
 
     typename component_type::input_type instance_input = {{T_x, T_y}, var(0, 8, false, var::column_type::public_input)};
 
-    auto result_check = [&expected_res, public_input, must_pass](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input, expected_to_pass](AssignmentType &assignment, 
         typename component_type::result_type &real_res) {
 
         #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
@@ -117,7 +117,7 @@ void test_bool_scalar_multiplication(std::vector<typename BlueprintFieldType::va
         // std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_y).data << ")" << std::endl;
         #endif
 
-        if (must_pass) {
+        if (expected_to_pass) {
             for(std::size_t i = 0; i < 4; i++) {
                 assert(expected_res[i]   == var_value(assignment, real_res.output.x[i]));
                 assert(expected_res[i+4] == var_value(assignment, real_res.output.y[i]));
@@ -127,14 +127,18 @@ void test_bool_scalar_multiplication(std::vector<typename BlueprintFieldType::va
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input, must_pass);
+    if (expected_to_pass) {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    } else {
+        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    }
 }
 
 template<typename FieldType, typename NonNativeCurveType>
 void test_bool_scalar_multiplication_usable (typename NonNativeCurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type point,
-                                            typename FieldType::value_type scalar_bool,
-                                            bool must_pass = true) {
+                                            typename FieldType::value_type scalar_bool, bool expected_to_pass) {
     
     std::vector<typename FieldType::value_type> public_input = create_public_input<FieldType, typename NonNativeCurveType::base_field_type>(
         chop_non_native<FieldType, typename NonNativeCurveType::base_field_type>(point.X), 
@@ -148,7 +152,7 @@ void test_bool_scalar_multiplication_usable (typename NonNativeCurveType::templa
     }
     public_input.push_back(scalar_bool);
 
-    test_bool_scalar_multiplication<FieldType, NonNativeCurveType>(public_input, expected_res, must_pass);
+    test_bool_scalar_multiplication<FieldType, NonNativeCurveType>(public_input, expected_res, expected_to_pass);
 }
 
 constexpr static const std::size_t random_tests_amount = 3;
@@ -164,12 +168,12 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_test1) {
     boost::random::mt19937 seed_seq;
     rand.seed(seed_seq);
 
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 1);
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 0);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 1, true);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0,1}, 0, true);
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
-        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 1);
-        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 0);
+        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 1, true);
+        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 0, true);
     }
 }
 

@@ -103,7 +103,7 @@ namespace nil {
         auto prepare_component(ComponentType component_instance, const PublicInputContainerType &public_input,
                                const FunctorResultCheck &result_check,
                                typename ComponentType::input_type instance_input,
-                               bool must_pass = true) {
+                               bool expected_to_pass) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
             using component_type = ComponentType;
@@ -135,7 +135,7 @@ namespace nil {
             profiling(assignment);
 #endif
 
-            assert(blueprint::is_satisfied(bp, assignment) == must_pass);
+            assert(blueprint::is_satisfied(bp, assignment) == expected_to_pass);
 
             return std::make_tuple(desc, bp, assignment);
         }
@@ -145,14 +145,14 @@ namespace nil {
         typename std::enable_if<
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
-            test_component(ComponentType component_instance, const PublicInputContainerType &public_input,
+            test_component_inner(ComponentType component_instance, const PublicInputContainerType &public_input,
                            FunctorResultCheck result_check,
                            typename ComponentType::input_type instance_input,
-                           bool must_pass = true) {
+                           bool expected_to_pass) {
 
             auto [desc, bp, assignments] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                  FunctorResultCheck>(component_instance, public_input, result_check, instance_input, must_pass);
+                                  FunctorResultCheck>(component_instance, public_input, result_check, instance_input, expected_to_pass);
 
 #ifdef BLUEPRINT_PLACEHOLDER_PROOF_GEN_ENABLED
             using placeholder_params =
@@ -183,12 +183,40 @@ namespace nil {
             bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
               public_preprocessed_data, proof, bp, fri_params);
 
-            if (must_pass) {
+            if (expected_to_pass) {
                 BOOST_CHECK(verifier_res);
             } else {
                 BOOST_CHECK(!verifier_res);
             }
 #endif
+        }
+
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck>
+        typename std::enable_if<
+            std::is_same<typename BlueprintFieldType::value_type,
+                         typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
+            test_component(ComponentType component_instance, const PublicInputContainerType &public_input,
+                           FunctorResultCheck result_check,
+                           typename ComponentType::input_type instance_input) {
+            return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
+                                 PublicInputContainerType, FunctorResultCheck>(component_instance, public_input,
+                                                                               result_check, instance_input,
+                                                                               true);
+        }
+
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck>
+        typename std::enable_if<
+            std::is_same<typename BlueprintFieldType::value_type,
+                         typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
+            test_component_to_fail(ComponentType component_instance, const PublicInputContainerType &public_input,
+                           FunctorResultCheck result_check,
+                           typename ComponentType::input_type instance_input) {
+            return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
+                                 PublicInputContainerType, FunctorResultCheck>(component_instance, public_input,
+                                                                               result_check, instance_input,
+                                                                               false);
         }
     }    // namespace crypto3
 }    // namespace nil

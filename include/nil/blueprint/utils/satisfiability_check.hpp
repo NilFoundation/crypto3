@@ -44,7 +44,7 @@ namespace nil {
         bool is_satisfied(circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                        ArithmetizationParams>> bp,
                           crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
-                                                    ArithmetizationParams> assignments) {
+                                                    ArithmetizationParams> assignments){
 
             const std::vector<crypto3::zk::snark::plonk_gate<BlueprintFieldType, crypto3::zk::snark::plonk_constraint<BlueprintFieldType>>> gates =
                         bp.gates();

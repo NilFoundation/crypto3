@@ -46,7 +46,7 @@
 
 template <typename BlueprintFieldType>
 void test_range_check(std::vector<typename BlueprintFieldType::value_type> public_input,
-                      bool must_pass = true){
+                      bool expected_to_pass){
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
@@ -76,16 +76,21 @@ void test_range_check(std::vector<typename BlueprintFieldType::value_type> publi
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{0});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-            (component_instance, public_input, result_check, instance_input, must_pass);
+    if (expected_to_pass) {
+        nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
+            (component_instance, public_input, result_check, instance_input);
+    } else {
+        nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
+            (component_instance, public_input, result_check, instance_input);
+    }
 }
 
 template<typename FieldType>
 void test_range_check_specific_inputs(){
-    test_range_check<FieldType>({0});
-    test_range_check<FieldType>({1});
-    test_range_check<FieldType>({35000});
-    test_range_check<FieldType>({0xFFFFFFFFFFFFFFFF_cppui256});
+    test_range_check<FieldType>({0}, true);
+    test_range_check<FieldType>({1}, true);
+    test_range_check<FieldType>({35000}, true);
+    test_range_check<FieldType>({0xFFFFFFFFFFFFFFFF_cppui256}, true);
 }
 
 template<typename FieldType, std::size_t RandomTestsAmount>
@@ -100,7 +105,7 @@ void test_range_check_random_inputs(){
     	typename FieldType::integral_type input_integral = typename FieldType::integral_type(input.data);
         input_integral = input_integral & 0xFFFFFFFFFFFFFFFF_cppui255;
     	typename FieldType::value_type input_scalar =  input_integral;
-        test_range_check<FieldType>({input_scalar});
+        test_range_check<FieldType>({input_scalar}, true);
 	}
 }
 
