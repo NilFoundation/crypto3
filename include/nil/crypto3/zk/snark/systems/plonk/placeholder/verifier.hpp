@@ -223,7 +223,7 @@ namespace nil {
                             variable_values_evaluation_points(witness_columns + public_input_columns);
 
                         // variable_values polynomials (table columns)
-                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns; variable_values_index++) {
+                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns + public_input_columns; variable_values_index++) {
 
                             std::vector<int> variable_values_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[variable_values_index];
@@ -234,10 +234,6 @@ namespace nil {
                                     challenge * omega.pow(variable_values_rotation[rotation_index]));
                             }
                         }
-                        for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i ++) {
-                            variable_values_evaluation_points[i].push_back(challenge);
-                        }
-
                         // permutation
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_permutation = {{challenge,
                                                                                                      challenge * omega}};
