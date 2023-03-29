@@ -39,6 +39,8 @@ namespace nil {
                     std::uint32_t usable_rows_amount = table.rows_amount();
 
                     std::uint32_t padded_rows_amount = std::pow(2, std::ceil(std::log2(usable_rows_amount)));
+                    if (padded_rows_amount == usable_rows_amount)
+                        padded_rows_amount *= 2;
 
                     if (padded_rows_amount < 8)
                         padded_rows_amount = 8;
