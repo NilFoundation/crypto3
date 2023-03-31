@@ -43,9 +43,8 @@
 using namespace nil;
 
 template <typename BlueprintFieldType>
-void test_decomposition(std::vector<typename BlueprintFieldType::value_type> public_input,
-        std::vector<typename BlueprintFieldType::value_type> expected_res,
-        bool expected_to_pass) {
+auto test_decomposition_inner(std::vector<typename BlueprintFieldType::value_type> public_input,
+        std::vector<typename BlueprintFieldType::value_type> expected_res) {
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -68,6 +67,33 @@ void test_decomposition(std::vector<typename BlueprintFieldType::value_type> pub
 
     typename component_type::input_type instance_input = {input_state_var};
 
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
+
+    return std::make_tuple(component_instance, instance_input);
+}
+
+template <typename BlueprintFieldType>
+void test_decomposition(std::vector<typename BlueprintFieldType::value_type> public_input,
+        std::vector<typename BlueprintFieldType::value_type> expected_res) {
+
+    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 1;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
+
+    using ArithmetizationParams =
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using component_type = blueprint::components::decomposition<ArithmetizationType,
+        BlueprintFieldType, 9>;
+
+    auto [component_instance, instance_input] = test_decomposition_inner<BlueprintFieldType>(public_input, expected_res);
+
     auto result_check = [&expected_res](AssignmentType &assignment, 
         typename component_type::result_type &real_res) {
             for (std::size_t i = 0; i < real_res.output.size(); i++){
@@ -75,15 +101,37 @@ void test_decomposition(std::vector<typename BlueprintFieldType::value_type> pub
             }
     };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
+}
 
-    if (expected_to_pass) {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    } else {
-        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    }
+template <typename BlueprintFieldType>
+void test_decomposition_to_fail(std::vector<typename BlueprintFieldType::value_type> public_input,
+        std::vector<typename BlueprintFieldType::value_type> expected_res) {
+
+    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 1;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 40;
+
+    using ArithmetizationParams =
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using component_type = blueprint::components::decomposition<ArithmetizationType,
+        BlueprintFieldType, 9>;
+
+    auto [component_instance, instance_input] = test_decomposition_inner<BlueprintFieldType>(public_input, expected_res);
+
+    auto result_check = [&expected_res](AssignmentType &assignment, 
+        typename component_type::result_type &real_res) { };
+
+    crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
@@ -127,18 +175,15 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_test0) {
 
     test_decomposition<field_type>(
         {0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255},
-        calculate_decomposition<field_type>({0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255}),
-        true);
+        calculate_decomposition<field_type>({0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255}));
     
     test_decomposition<field_type>(
         {0, 0},
-        calculate_decomposition<field_type>({0, 0}),
-        true);
+        calculate_decomposition<field_type>({0, 0}));
 
     test_decomposition<field_type>(
         {0xffffffffffffffffffffffffffffffff_cppui255, 0xffffffffffffffffffffffffffffffff_cppui255},
-        calculate_decomposition<field_type>({0xffffffffffffffffffffffffffffffff_cppui255, 0xffffffffffffffffffffffffffffffff_cppui255}),
-        true);
+        calculate_decomposition<field_type>({0xffffffffffffffffffffffffffffffff_cppui255, 0xffffffffffffffffffffffffffffffff_cppui255}));
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_must_fail) {
@@ -146,27 +191,23 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_must_fail) {
 
     typename field_type::value_type bad = 0x100000000000000000000000000000000_cppui255; 
 
-    test_decomposition<field_type>(
+    test_decomposition_to_fail<field_type>(
         {0, bad},
-        calculate_decomposition<field_type>({0, bad}),
-        false);
+        calculate_decomposition<field_type>({0, bad}));
 
-    test_decomposition<field_type>(
+    test_decomposition_to_fail<field_type>(
         {bad, 0},
-        calculate_decomposition<field_type>({bad, 0}),
-        false);
+        calculate_decomposition<field_type>({bad, 0}));
 
         bad = 0x4000000000000000000000000000000000000000000000000000000000000000_cppui255;
 
-    test_decomposition<field_type>(
+    test_decomposition_to_fail<field_type>(
         {0, bad},
-        calculate_decomposition<field_type>({0, bad}),
-        false);
+        calculate_decomposition<field_type>({0, bad}));
 
-    test_decomposition<field_type>(
+    test_decomposition_to_fail<field_type>(
         {bad, 0},
-        calculate_decomposition<field_type>({bad, 0}),
-        false);
+        calculate_decomposition<field_type>({bad, 0}));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

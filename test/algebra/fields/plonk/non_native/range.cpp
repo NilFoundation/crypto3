@@ -46,8 +46,7 @@
 using namespace nil;
 
 template <typename BlueprintFieldType>
-void test_field_range(std::vector<typename BlueprintFieldType::value_type> public_input,
-                        bool expected_to_pass){
+auto test_field_range_inner(std::vector<typename BlueprintFieldType::value_type> public_input){
     
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -84,13 +83,51 @@ void test_field_range(std::vector<typename BlueprintFieldType::value_type> publi
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
-    if (expected_to_pass) {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    } else {
-        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    }
+    return std::tuple(component_instance, instance_input, result_check);
+}
+
+template <typename BlueprintFieldType>
+void test_field_range(std::vector<typename BlueprintFieldType::value_type> public_input){
+    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 1;
+    using ArithmetizationParams =
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 1;
+
+    using component_type = blueprint::components::range<ArithmetizationType,
+        typename crypto3::algebra::fields::curve25519_base_field, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;
+    
+    auto [component_instance, instance_input, result_check] = test_field_range_inner<BlueprintFieldType>(public_input);
+
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
+}
+
+template <typename BlueprintFieldType>
+void test_field_range_to_fail(std::vector<typename BlueprintFieldType::value_type> public_input){
+    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 1;
+    using ArithmetizationParams =
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 1;
+
+    using component_type = blueprint::components::range<ArithmetizationType,
+        typename crypto3::algebra::fields::curve25519_base_field, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;
+    
+    auto [component_instance, instance_input, result_check] = test_field_range_inner<BlueprintFieldType>(public_input);
+
+    crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
@@ -100,20 +137,20 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test0) {
     using field_type = crypto3::algebra::curves::pallas::base_field_type;
 
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {455245345345345, 523553453454343, 68753453534534689, 54355345344544}, true);
+        {455245345345345, 523553453454343, 68753453534534689, 54355345344544});
 
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         create_public_input_1_value<field_type, non_native_field_type>(
             chop_non_native<field_type, non_native_field_type>(1)
-        ), true);
+        ));
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         create_public_input_1_value<field_type, non_native_field_type>(
             chop_non_native<field_type, non_native_field_type>(0)
-        ), true);
+        ));
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         create_public_input_1_value<field_type, non_native_field_type>(
             chop_non_native<field_type, non_native_field_type>(-1)
-        ), true);
+        ));
 
     nil::crypto3::random::algebraic_engine<non_native_field_type> rand;
     boost::random::mt19937 seed_seq;
@@ -123,7 +160,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test0) {
         test_field_range<field_type>(
             create_public_input_1_value<field_type, non_native_field_type>(
                 chop_non_native<field_type, non_native_field_type>(rand())
-            ), true);
+            ));
     }
 }
 
@@ -131,14 +168,12 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test_must_fail) {
     using non_native_field_type = typename crypto3::algebra::fields::curve25519_base_field;
     using field_type = crypto3::algebra::curves::pallas::base_field_type;
 
-    test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>( //ed25519 modulus
-        {0x3ffffffffffffffed_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255},
-        false
+    test_field_range_to_fail<typename crypto3::algebra::curves::pallas::base_field_type>( //ed25519 modulus
+        {0x3ffffffffffffffed_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255}
     );
 
-    test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255},
-        false
+    test_field_range_to_fail<typename crypto3::algebra::curves::pallas::base_field_type>(
+        {0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255}
     );
 
 }

@@ -44,8 +44,7 @@
 using namespace nil;
 
 template <typename BlueprintFieldType>
-void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value_type> public_input,
-                                    bool expected_to_pass){
+auto test_scalar_non_native_range_inner(std::vector<typename BlueprintFieldType::value_type> public_input){
     
     using ed25519_type = crypto3::algebra::curves::ed25519;
     constexpr std::size_t WitnessColumns = 9;
@@ -75,13 +74,55 @@ void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
 
-    if (expected_to_pass) {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    } else {
-        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    }
+    return std::make_tuple(component_instance, instance_input, result_check);
+}
+
+template <typename BlueprintFieldType>
+void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value_type> public_input){
+    
+    using ed25519_type = crypto3::algebra::curves::ed25519;
+    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 2;
+    using ArithmetizationParams =
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 1;
+
+    using component_type = blueprint::components::scalar_non_native_range<ArithmetizationType,
+        ed25519_type, 9>;
+
+    auto [component_instance, instance_input, result_check] = test_scalar_non_native_range_inner<BlueprintFieldType>(public_input);
+
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
+}
+
+template <typename BlueprintFieldType>
+void test_scalar_non_native_range_to_fail(std::vector<typename BlueprintFieldType::value_type> public_input){
+    
+    using ed25519_type = crypto3::algebra::curves::ed25519;
+    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 2;
+    using ArithmetizationParams =
+        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 1;
+
+    using component_type = blueprint::components::scalar_non_native_range<ArithmetizationType,
+        ed25519_type, 9>;
+
+    auto [component_instance, instance_input, result_check] = test_scalar_non_native_range_inner<BlueprintFieldType>(public_input);
+
+    crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
 }
 
 constexpr static const std::size_t random_tests_amount = 10;
@@ -90,7 +131,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test0) {
     test_scalar_non_native_range<typename crypto3::algebra::curves::pallas::base_field_type>(
-        {45524}, true);
+        {45524});
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test1) {
@@ -101,14 +142,14 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test1) {
     typename field_type::value_type ones =                      0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui255;
 
     test_scalar_non_native_range<field_type>(
-        {typename field_type::value_type(ed25519_scalar_modulus-1)}, true);
+        {typename field_type::value_type(ed25519_scalar_modulus-1)});
 
     test_scalar_non_native_range<field_type>(
-        {typename field_type::value_type(ones)}, true);
+        {typename field_type::value_type(ones)});
 
-    test_scalar_non_native_range<field_type>({1}, true);
+    test_scalar_non_native_range<field_type>({1});
 
-    test_scalar_non_native_range<field_type>({0}, true);
+    test_scalar_non_native_range<field_type>({0});
 
     nil::crypto3::random::algebraic_engine<field_type> rand;
     boost::random::mt19937 seed_seq;
@@ -123,7 +164,7 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test1) {
         r_integral = typename field_type::integral_type(r.data);
         r_integral = r_integral % ed25519_scalar_modulus;
         r = typename field_type::value_type(r_integral);
-        test_scalar_non_native_range<field_type>({r}, true);
+        test_scalar_non_native_range<field_type>({r});
     }
 }
 
@@ -142,9 +183,9 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test_must_fail) {
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
         overage = (typename field_type::integral_type(rand().data)) % ed25519_scalar_overage;
-        test_scalar_non_native_range<field_type>({typename field_type::value_type(ed25519_scalar_modulus + overage)}, false); // false positive
+        test_scalar_non_native_range_to_fail<field_type>({typename field_type::value_type(ed25519_scalar_modulus + overage)}); // false positive
     }
-    test_scalar_non_native_range<field_type>({-1}, false);
+    test_scalar_non_native_range_to_fail<field_type>({-1});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
