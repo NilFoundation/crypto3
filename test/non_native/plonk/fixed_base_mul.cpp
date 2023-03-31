@@ -65,8 +65,9 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = zk::components::fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0,
-                                                                     1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type =
+        nil::crypto3::zk::components::fixed_base_multiplication<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2,
+                                                                3, 4, 5, 6, 7, 8>;
 
     var var_b = var(0, 0, false, var::column_type::public_input);
 
@@ -74,8 +75,9 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_fixed_base_mul) {
 
     typename component_type::params_type params = {{var_b}};
 
-    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type B = ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::one();
-    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type P = b*B;
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type B =
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::one();
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type P = b * B;
 
     ed25519_type::base_field_type::integral_type Px = ed25519_type::base_field_type::integral_type(P.X.data);
     ed25519_type::base_field_type::integral_type Py = ed25519_type::base_field_type::integral_type(P.Y.data);

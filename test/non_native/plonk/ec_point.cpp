@@ -102,18 +102,18 @@ BOOST_AUTO_TEST_CASE(blueprint_ec_point_to_work) {
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 5;
     using ArithmetizationParams =
-        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+        nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
     using component_type =
-        zk::components::ec_point<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+        nil::crypto3::zk::components::ec_point<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
-    auto value = ed25519_type::template g1_type<algebra::curves::coordinates::affine>::value_type::one();
+    auto value = ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type::one();
 
     typename ed25519_type::scalar_field_type::integral_type base = 1;
     typename ed25519_type::scalar_field_type::integral_type mask = (base << 66) - 1;

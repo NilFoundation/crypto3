@@ -165,7 +165,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     typename mul_component_type::params_type mul_params = {{input_var_Xa, input_var_Xb}, b_var};
 
-    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T = crypto3::algebra::random_element<ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>>();
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T =
+        crypto3::algebra::random_element<
+            ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>>();
     ed25519_type::scalar_field_type::value_type b = crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
 
     ed25519_type::base_field_type::integral_type integral_b = ed25519_type::base_field_type::integral_type(b.data);

@@ -102,7 +102,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_doubling) {
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+                                                                                                 result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
