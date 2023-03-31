@@ -275,12 +275,50 @@ namespace nil {
                             // }
                         }
 
+                        std::vector<typename FieldType::value_type> challenge_point = {challenge};
+
                         // quotient
-                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {{challenge}};
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {challenge_point};
 
                         // public data
-                        std::vector<std::vector<typename FieldType::value_type>> &evaluation_points_public =
-                            evaluation_points_quotient;
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_public;
+
+                        for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
+                            evaluation_points_public.push_back(challenge_point);
+                        }
+                        
+                        for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
+                            evaluation_points_public.push_back(challenge_point);
+                        }
+
+                        // constant columns may be rotated
+                        for (std::size_t k = 0; k < constant_columns; k ++){
+                            std::vector<int> rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
+                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            }
+                            evaluation_points_public.push_back(point);
+                        }
+                        
+                        // selector columns may be rotated
+                        for (std::size_t k = 0; k < selector_columns; k ++){
+                            std::vector<int> rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + constant_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
+                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            }
+                            evaluation_points_public.push_back(point);
+                        }
+
+                        // Evaluation points for special selectors q_last and q_blind
+                        evaluation_points_public.push_back(challenge_point); // for q_last
+                        evaluation_points_public.push_back(challenge_point); // for q_blind
+
                         std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
                         {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public};
                         std::array<typename commitment_scheme_type::commitment_type, 4> commitments = 
