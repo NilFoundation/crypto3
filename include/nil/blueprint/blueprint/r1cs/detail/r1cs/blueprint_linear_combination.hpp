@@ -47,10 +47,10 @@ namespace nil {
                 class blueprint_linear_combination;
 
                 template<typename BlueprintFieldType>
-                class blueprint_linear_combination<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> : 
-                    public snark::linear_combination<BlueprintFieldType> {
+                class blueprint_linear_combination<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>
+                    : public math::linear_combination<BlueprintFieldType> {
 
-                    typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef zk::snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef BlueprintFieldType field_type;
                     typedef typename field_type::value_type field_value_type;
 
@@ -121,10 +121,12 @@ namespace nil {
                 class blueprint_linear_combination_vector;
 
                 template<typename BlueprintFieldType>
-                class blueprint_linear_combination_vector<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>
-                    : private std::vector<blueprint_linear_combination<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>> {
+                class blueprint_linear_combination_vector<
+                    crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>
+                    : private std::vector<blueprint_linear_combination<
+                          crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>>> {
 
-                    typedef snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
+                    typedef zk::snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
                     typedef typename BlueprintFieldType::value_type field_value_type;
                     typedef std::vector<blueprint_linear_combination<ArithmetizationType>> contents;
 

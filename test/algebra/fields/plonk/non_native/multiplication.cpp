@@ -49,16 +49,17 @@
 
 using namespace nil;
 
-template <typename BlueprintFieldType, typename NonNativeFieldType>
-void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_input, 
-        std::array<typename BlueprintFieldType::value_type, 4> expected_res){
+template<typename BlueprintFieldType, typename NonNativeFieldType>
+void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_input,
+                    std::array<typename BlueprintFieldType::value_type, 4>
+                        expected_res) {
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationParams = crypto3::zk::snark::
+        plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
@@ -66,8 +67,11 @@ void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::multiplication<ArithmetizationType,
-        NonNativeFieldType, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;
+    using component_type =
+        blueprint::components::multiplication<ArithmetizationType,
+                                              NonNativeFieldType,
+                                              9,
+                                              blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_a = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
@@ -78,44 +82,53 @@ void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_
 
     typename component_type::input_type instance_input = {input_var_a, input_var_b};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
-        typename component_type::result_type &real_res) {
-        
-        #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
+                                                      typename component_type::result_type &real_res) {
+
+#ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
         std::array<typename BlueprintFieldType::value_type, 4> x, y, expected_chunks, real_chunks;
         for (std::size_t i = 0; i < 4; i++) {
             x[i] = public_input[i];
-            y[i] = public_input[i+4];
+            y[i] = public_input[i + 4];
             expected_chunks[i] = expected_res[i];
             real_chunks[i] = var_value(assignment, real_res.output[i]);
         }
 
         std::cout << std::hex;
 
-        std::cout << "_________________________________________________________________________________________________________________________________________________\n"; 
-        std::cout << "input   : "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << x[3-i].data << " ";}
+        std::cout << "_________________________________________________________________________________________________"
+                     "________________________________________________\n";
+        std::cout << "input   : ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << x[3 - i].data << " ";
+        }
         std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(x).data << ")\n";
 
-        std::cout << "          "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << y[3-i].data << " ";}
+        std::cout << "          ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << y[3 - i].data << " ";
+        }
         std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(y).data << ")\n";
 
-        std::cout << "expected: "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << expected_chunks[3-i].data << " ";}
+        std::cout << "expected: ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << expected_chunks[3 - i].data << " ";
+        }
         std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(expected_chunks).data << ")\n";
 
-        std::cout << "real    : "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << real_chunks[3-i].data << " ";}
+        std::cout << "real    : ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << real_chunks[3 - i].data << " ";
+        }
         std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_chunks).data << ")\n";
-        #endif
+#endif
 
         for (std::size_t i = 0; i < 4; i++) {
             assert(expected_res[i] == var_value(assignment, real_res.output[i]));
         }
     };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {}, {});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
@@ -123,18 +136,19 @@ void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-template <typename FieldType, typename NonNativeFieldType>
-void test_field_mul_useable(typename NonNativeFieldType::value_type a, typename NonNativeFieldType::value_type b){
+template<typename FieldType, typename NonNativeFieldType>
+void test_field_mul_useable(typename NonNativeFieldType::value_type a, typename NonNativeFieldType::value_type b) {
     using chunked_non_native_type = std::array<typename FieldType::value_type, 4>;
-    chunked_non_native_type first  = chop_non_native<FieldType, NonNativeFieldType>(a);
+    chunked_non_native_type first = chop_non_native<FieldType, NonNativeFieldType>(a);
     chunked_non_native_type second = chop_non_native<FieldType, NonNativeFieldType>(b);
     chunked_non_native_type expected_result = chop_non_native<FieldType, NonNativeFieldType>(a * b);
-    std::vector<typename FieldType::value_type> public_input = create_public_input<FieldType, NonNativeFieldType>(first, second);
+    std::vector<typename FieldType::value_type> public_input =
+        create_public_input<FieldType, NonNativeFieldType>(first, second);
     test_field_mul<FieldType, NonNativeFieldType>(public_input, expected_result);
 }
 
-template <typename FieldType, typename NonNativeFieldType>
-void test_field_mul_all_cases(){
+template<typename FieldType, typename NonNativeFieldType>
+void test_field_mul_all_cases() {
     nil::crypto3::random::algebraic_engine<NonNativeFieldType> rand;
     boost::random::mt19937 seed_seq;
     rand.seed(seed_seq);
@@ -149,8 +163,8 @@ void test_field_mul_all_cases(){
     }
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(
-        glue_non_native<FieldType, NonNativeFieldType>({0,0,0x3ffffffffffffffff_cppui255,0}),
-        glue_non_native<FieldType, NonNativeFieldType>({0,0,0x3ffffffffffffffff_cppui255,0}));
+        glue_non_native<FieldType, NonNativeFieldType>({0, 0, 0x3ffffffffffffffff_cppui255, 0}),
+        glue_non_native<FieldType, NonNativeFieldType>({0, 0, 0x3ffffffffffffffff_cppui255, 0}));
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(0, 0);
     test_field_mul_useable<FieldType, NonNativeFieldType>(1, 1);
@@ -162,21 +176,23 @@ void test_field_mul_all_cases(){
         glue_non_native<FieldType, NonNativeFieldType>({45524, 52353, 68769, 5431}),
         glue_non_native<FieldType, NonNativeFieldType>({3724, 342453, 5425, 54222}));
 
-    test_field_mul_useable<FieldType, NonNativeFieldType>(
-        glue_non_native<FieldType, NonNativeFieldType>({1,1,1,1}),
-        glue_non_native<FieldType, NonNativeFieldType>({1,1,1,1}));
+    test_field_mul_useable<FieldType, NonNativeFieldType>(glue_non_native<FieldType, NonNativeFieldType>({1, 1, 1, 1}),
+                                                          glue_non_native<FieldType, NonNativeFieldType>({1, 1, 1, 1}));
+
+    test_field_mul_useable<FieldType, NonNativeFieldType>(glue_non_native<FieldType, NonNativeFieldType>({1, 0, 0, 0}),
+                                                          glue_non_native<FieldType, NonNativeFieldType>({1, 0, 0, 0}));
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(
-        glue_non_native<FieldType, NonNativeFieldType>({1,0,0,0}),
-        glue_non_native<FieldType, NonNativeFieldType>({1,0,0,0}));
+        glue_non_native<FieldType, NonNativeFieldType>({0x2BCA8C5A0FDF3D53E_cppui253, 0x39840DDF4C421B2D5_cppui253,
+                                                        0x24FCE5728D26931CA_cppui253, 0xFBD6153B4CE63_cppui253}),
+        glue_non_native<FieldType, NonNativeFieldType>({0x3CD7BA9506A76AA1C_cppui253, 0x15C58810F101DDB2F_cppui253,
+                                                        0x1AA5750251F6DA658_cppui253, 0x1323F61B67242F_cppui253}));
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(
-        glue_non_native<FieldType, NonNativeFieldType>({0x2BCA8C5A0FDF3D53E_cppui253, 0x39840DDF4C421B2D5_cppui253, 0x24FCE5728D26931CA_cppui253, 0xFBD6153B4CE63_cppui253}),
-        glue_non_native<FieldType, NonNativeFieldType>({0x3CD7BA9506A76AA1C_cppui253, 0x15C58810F101DDB2F_cppui253, 0x1AA5750251F6DA658_cppui253, 0x1323F61B67242F_cppui253}));
-
-    test_field_mul_useable<FieldType, NonNativeFieldType>(
-        glue_non_native<FieldType, NonNativeFieldType>({0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255}),
-        glue_non_native<FieldType, NonNativeFieldType>({0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255}));
+        glue_non_native<FieldType, NonNativeFieldType>(
+            {0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255}),
+        glue_non_native<FieldType, NonNativeFieldType>(
+            {0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255}));
     for (std::size_t i = 0; i < 10; i++) {
         test_field_mul_useable<FieldType, NonNativeFieldType>(rand(), rand());
     }

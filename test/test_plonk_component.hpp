@@ -94,12 +94,13 @@ namespace nil {
             return params;
         }
 
-        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename FunctorResultCheck, typename PublicInputContainerType,
-                 typename std::enable_if<
-                     std::is_same<typename BlueprintFieldType::value_type,
-                                  typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value,
-                     bool>::type = true>
+        template<
+            typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+            std::size_t Lambda, typename FunctorResultCheck, typename PublicInputContainerType,
+            typename std::enable_if<std::is_same<typename BlueprintFieldType::value_type,
+                                                 typename std::iterator_traits<
+                                                     typename PublicInputContainerType::iterator>::value_type>::value,
+                                    bool>::type = true>
         auto prepare_component(ComponentType component_instance, const PublicInputContainerType &public_input,
                                const FunctorResultCheck &result_check,
                                typename ComponentType::input_type instance_input,
@@ -114,7 +115,7 @@ namespace nil {
             std::size_t start_row = 0;
 
             for (std::size_t i = 0; i < public_input.size(); i++) {
-                assignment.public_input(0, start_row +i) = (public_input[i]);
+                assignment.public_input(0, start_row + i) = (public_input[i]);
             }
 
             blueprint::components::generate_circuit<BlueprintFieldType, ArithmetizationParams>(
@@ -131,7 +132,7 @@ namespace nil {
 #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
             std::cout << "Padded rows: " << desc.rows_amount << std::endl;
-            
+
             profiling(assignment);
 #endif
 
@@ -149,7 +150,6 @@ namespace nil {
                            FunctorResultCheck result_check,
                            typename ComponentType::input_type instance_input,
                            bool expected_to_pass) {
-
             auto [desc, bp, assignments] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
                                   FunctorResultCheck>(component_instance, public_input, result_check, instance_input, expected_to_pass);
@@ -181,7 +181,7 @@ namespace nil {
                 public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
 
             bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
-              public_preprocessed_data, proof, bp, fri_params);
+                public_preprocessed_data, proof, bp, fri_params);
 
             if (expected_to_pass) {
                 BOOST_CHECK(verifier_res);

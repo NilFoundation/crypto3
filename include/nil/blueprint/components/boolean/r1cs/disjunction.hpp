@@ -49,18 +49,18 @@ namespace nil {
                 */
 
                 template<typename FieldType>
-                class disjunction : public component<FieldType> {
+                class disjunction : public nil::blueprint::components::component<FieldType> {
                 private:
-                    blueprint_variable<FieldType> inv;
+                    detail::blueprint_variable<FieldType> inv;
 
                 public:
-                    const blueprint_variable_vector<FieldType> inputs;
-                    const blueprint_variable<FieldType> output;
+                    const detail::blueprint_variable_vector<FieldType> inputs;
+                    const detail::blueprint_variable<FieldType> output;
 
                     disjunction(blueprint<FieldType> &bp,
-                                const blueprint_variable_vector<FieldType> &inputs,
-                                const blueprint_variable<FieldType> &output) :
-                        component<FieldType>(bp),
+                                const detail::blueprint_variable_vector<FieldType> &inputs,
+                                const detail::blueprint_variable<FieldType> &output) :
+                        nil::blueprint::components::component<FieldType>(bp),
                         inputs(inputs), output(output) {
                         assert(inputs.size() >= 1);
                         inv.allocate(bp);
@@ -68,25 +68,25 @@ namespace nil {
 
                     void generate_gates() {
                         /* inv * sum = output */
-                        blueprint_linear_combination<FieldType> a1, b1, c1;
+                        math::non_linear_combination<FieldType> a1, b1, c1;
                         a1.add_term(inv);
                         for (std::size_t i = 0; i < inputs.size(); ++i) {
                             b1.add_term(inputs[i]);
                         }
                         c1.add_term(output);
 
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(a1, b1, c1));
+                        this->bp.add_r1cs_constraint(zk::snark::r1cs_constraint<FieldType>(a1, b1, c1));
 
                         /* (1-output) * sum = 0 */
-                        blueprint_linear_combination<FieldType> a2, b2, c2;
-                        a2.add_term(blueprint_variable<FieldType>(0));
+                        math::non_linear_combination<FieldType> a2, b2, c2;
+                        a2.add_term(detail::blueprint_variable<FieldType>(0));
                         a2.add_term(output, -1);
                         for (std::size_t i = 0; i < inputs.size(); ++i) {
                             b2.add_term(inputs[i]);
                         }
-                        c2.add_term(blueprint_variable<FieldType>(0), 0);
+                        c2.add_term(detail::blueprint_variable<FieldType>(0), 0);
 
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(a2, b2, c2));
+                        this->bp.add_r1cs_constraint(zk::snark::r1cs_constraint<FieldType>(a2, b2, c2));
                     }
 
                     void generate_assignments() {

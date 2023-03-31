@@ -47,15 +47,19 @@
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/mnt6.hpp>
 
-#include <nil/blueprint/components/disjunction.hpp>
-#include <nil/blueprint/components/conjunction.hpp>
-#include <nil/blueprint/components/comparison.hpp>
-#include <nil/blueprint/components/inner_product.hpp>
-#include <nil/blueprint/components/loose_multiplexing.hpp>
+#include <nil/blueprint/blueprint/r1cs/detail/r1cs/blueprint_variable.hpp>
+
+#include <nil/blueprint/components/boolean/r1cs/disjunction.hpp>
+#include <nil/blueprint/components/boolean/r1cs/conjunction.hpp>
+#include <nil/blueprint/components/boolean/r1cs/comparison.hpp>
+#include <nil/blueprint/components/boolean/r1cs/inner_product.hpp>
+#include <nil/blueprint/components/detail/r1cs/loose_multiplexing.hpp>
 
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 
 #include "verify_r1cs_scheme.hpp"
+
+#include <nil/blueprint/blueprint/r1cs/circuit.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
@@ -69,16 +73,16 @@ void test_disjunction_component(std::size_t w) {
 
     std::size_t n = std::log2(w) + ((w > (1ul << std::size_t(std::log2(w)))) ? 1 : 0);
 
-    blueprint<field_type> bp;
-    nil::crypto3::zk::detail::blueprint_variable<field_type> output;
+    blueprint::blueprint<field_type> bp;
+    nil::crypto3::blueprint::detail::blueprint_variable<field_type> output;
     output.allocate(bp);
 
     bp.set_input_sizes(1);
 
-    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> inputs;
+    nil::crypto3::blueprint::detail::blueprint_variable_vector<field_type> inputs;
     inputs.allocate(bp, n);
 
-    components::disjunction<field_type> d(bp, inputs, output);
+    nil::crypto3::blueprint::components::disjunction<field_type> d(bp, inputs, output);
     d.generate_gates();
 
     for (std::size_t j = 0; j < n; ++j) {
@@ -101,17 +105,17 @@ void test_conjunction_component(std::size_t w) {
 
     std::size_t n = std::log2(w) + ((w > (1ul << std::size_t(std::log2(w)))) ? 1 : 0);
 
-    blueprint<field_type> bp;
+    blueprint::blueprint<field_type> bp;
 
-    nil::crypto3::zk::detail::blueprint_variable<field_type> output;
+    nil::crypto3::blueprint::detail::blueprint_variable<field_type> output;
     output.allocate(bp);
 
     bp.set_input_sizes(1);
 
-    nil::crypto3::zk::detail::blueprint_variable_vector<field_type> inputs;
+    nil::crypto3::blueprint::detail::blueprint_variable_vector<field_type> inputs;
     inputs.allocate(bp, n);
 
-    components::conjunction<field_type> c(bp, inputs, output);
+    nil::crypto3::blueprint::components::conjunction<field_type> c(bp, inputs, output);
     c.generate_gates();
 
     for (std::size_t j = 0; j < n; ++j) {
@@ -133,9 +137,9 @@ void test_comparison_component(std::size_t a, std::size_t b) {
     using field_type = typename CurveType::scalar_field_type;
     using curve_type = CurveType;
 
-    blueprint<field_type> bp;
+    blueprint::blueprint<field_type> bp;
 
-    nil::crypto3::zk::detail::blueprint_variable<field_type> A, B, less, less_or_eq;
+    nil::crypto3::blueprint::detail::blueprint_variable<field_type> A, B, less, less_or_eq;
     A.allocate(bp);
     B.allocate(bp);
     less.allocate(bp);
@@ -145,9 +149,9 @@ void test_comparison_component(std::size_t a, std::size_t b) {
     std::size_t n =
         std::log2(std::max(a, b)) + ((std::max(a, b) > (1ul << std::size_t(std::log2(std::max(a, b))))) ? 1 : 0);
 
-    components::comparison<field_type> cmp(bp, n, A, B, less, less_or_eq);
+    nil::crypto3::blueprint::components::comparison<field_type> cmp(bp, n, A, B, less, less_or_eq);
     cmp.generate_gates();
-    
+
     bp.val(A) = typename field_type::value_type(a);
     bp.val(B) = typename field_type::value_type(b);
 

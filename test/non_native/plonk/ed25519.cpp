@@ -39,7 +39,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/ed25519.hpp>
+#include <nil/blueprint/components/pubkey/eddsa/plonk/non_native/verification.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -65,14 +65,14 @@ BOOST_AUTO_TEST_CASE(blueprint_edwards) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type =
-        zk::components::eddsa25519<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
-    ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type B =
-        ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type::one();
-    ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type R = 2 * B;
-    ed25519_type::scalar_field_type::value_type b = nil::crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
-    ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type T = b * R;
-    ed25519_type::scalar_field_type::value_type s = 2 * b + 2;
+    using component_type = zk::components::signatures_verification<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3,
+                                                                          4, 5, 6, 7, 8>;
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type B =
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::one();
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type R = 2 * B;
+        ed25519_type::scalar_field_type::value_type b = crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T = b * R;
+        ed25519_type::scalar_field_type::value_type s = 2 * b + 2;
 
     ed25519_type::base_field_type::integral_type Tx = ed25519_type::base_field_type::integral_type(T.X.data);
     ed25519_type::base_field_type::integral_type Ty = ed25519_type::base_field_type::integral_type(T.Y.data);

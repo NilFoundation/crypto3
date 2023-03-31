@@ -31,13 +31,16 @@
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/blueprint/components/disjunction.hpp>
-#include <nil/blueprint/components/conjunction.hpp>
-#include <nil/blueprint/components/comparison.hpp>
-#include <nil/blueprint/components/inner_product.hpp>
-#include <nil/blueprint/components/loose_multiplexing.hpp>
+#include <nil/blueprint/components/boolean/r1cs/disjunction.hpp>
+#include <nil/blueprint/components/boolean/r1cs/conjunction.hpp>
+#include <nil/blueprint/components/boolean/r1cs/comparison.hpp>
+#include <nil/blueprint/components/boolean/r1cs/inner_product.hpp>
+#include <nil/blueprint/components/detail/r1cs/loose_multiplexing.hpp>
 
-#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+#include <nil/blueprint/blueprint/r1cs/detail/r1cs/blueprint_variable.hpp>
+#include <nil/blueprint/blueprint/r1cs/detail/r1cs/blueprint_linear_combination.hpp>
+
+#include <nil/blueprint/blueprint/r1cs/circuit.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
@@ -45,14 +48,14 @@ using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void test_disjunction_component(size_t n) {
-    blueprint<FieldType> bp;
-    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> inputs;
+    blueprint::blueprint<FieldType> bp;
+    blueprint::detail::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
-    nil::crypto3::zk::detail::blueprint_variable<FieldType> output;
+    blueprint::detail::blueprint_variable_vector<FieldType> output;
     output.allocate(bp);
 
-    components::disjunction<FieldType> d(bp, inputs, output);
+    nil::crypto3::blueprint::components::disjunction<FieldType> d(bp, inputs, output);
     d.generate_gates();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
@@ -72,14 +75,14 @@ void test_disjunction_component(size_t n) {
 
 template<typename FieldType>
 void test_conjunction_component(size_t n) {
-    blueprint<FieldType> bp;
-    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> inputs;
+    blueprint::blueprint<FieldType> bp;
+    blueprint::detail::blueprint_variable_vector<FieldType> inputs;
     inputs.allocate(bp, n);
 
-    nil::crypto3::zk::detail::blueprint_variable<FieldType> output;
+    blueprint::detail::blueprint_variable<FieldType> output;
     output.allocate(bp);
 
-    components::conjunction<FieldType> c(bp, inputs, output);
+    nil::crypto3::blueprint::components::conjunction<FieldType> c(bp, inputs, output);
     c.generate_gates();
 
     for (std::size_t w = 0; w < 1ul << n; ++w) {
@@ -100,15 +103,15 @@ void test_conjunction_component(size_t n) {
 
 template<typename FieldType>
 void test_comparison_component(size_t n) {
-    blueprint<FieldType> bp;
+    blueprint::blueprint<FieldType> bp;
 
-    nil::crypto3::zk::detail::blueprint_variable<FieldType> A, B, less, less_or_eq;
+    blueprint::detail::blueprint_variable<FieldType> A, B, less, less_or_eq;
     A.allocate(bp);
     B.allocate(bp);
     less.allocate(bp);
     less_or_eq.allocate(bp);
 
-    components::comparison<FieldType> cmp(bp, n, A, B, less, less_or_eq);
+    nil::crypto3::blueprint::components::comparison<FieldType> cmp(bp, n, A, B, less, less_or_eq);
     cmp.generate_gates();
 
     for (std::size_t a = 0; a < 1ul << n; ++a) {
@@ -127,16 +130,16 @@ void test_comparison_component(size_t n) {
 
 template<typename FieldType>
 void test_inner_product_component(size_t n) {
-    blueprint<FieldType> bp;
-    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> A;
+    blueprint::blueprint<FieldType> bp;
+    blueprint::detail::blueprint_variable_vector<FieldType> A;
     A.allocate(bp, n);
-    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> B;
+    blueprint::detail::blueprint_variable_vector<FieldType> B;
     B.allocate(bp, n);
 
-    nil::crypto3::zk::detail::blueprint_variable<FieldType> result;
+    blueprint::detail::blueprint_variable<FieldType> result;
     result.allocate(bp);
 
-    components::inner_product<FieldType> g(bp, A, B, result);
+    nil::crypto3::blueprint::components::inner_product<FieldType> g(bp, A, B, result);
     g.generate_gates();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {
@@ -161,16 +164,16 @@ void test_inner_product_component(size_t n) {
 
 template<typename FieldType>
 void test_loose_multiplexing_component(size_t n) {
-    blueprint<FieldType> bp;
+    blueprint::blueprint<FieldType> bp;
 
-    nil::crypto3::zk::detail::blueprint_variable_vector<FieldType> arr;
+    blueprint::detail::blueprint_variable_vector<FieldType> arr;
     arr.allocate(bp, 1ul << n);
-    nil::crypto3::zk::detail::blueprint_variable<FieldType> index, result, success_flag;
+    blueprint::detail::blueprint_variable<FieldType> index, result, success_flag;
     index.allocate(bp);
     result.allocate(bp);
     success_flag.allocate(bp);
 
-    components::loose_multiplexing<FieldType> g(bp, arr, index, result, success_flag);
+    nil::crypto3::blueprint::components::loose_multiplexing<FieldType> g(bp, arr, index, result, success_flag);
     g.generate_gates();
 
     for (std::size_t i = 0; i < 1ul << n; ++i) {

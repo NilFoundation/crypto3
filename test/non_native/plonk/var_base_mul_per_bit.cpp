@@ -40,7 +40,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/variable_base_multiplication_per_bit_edwards25519.hpp>
+#include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/variable_base_multiplication_per_bit.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -70,9 +70,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_var_base_mul_per_bit) {
 
     using var = zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type =
-        nil::crypto3::zk::components::variable_base_multiplication_per_bit<ArithmetizationType, curve_type,
-                                                                           ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
+    using component_type = blueprint::components::
+        variable_base_multiplication_per_bit<ArithmetizationType, curve_type, ed25519_type, 0, 1, 2, 3, 4, 5, 6, 7, 8>;
 
     std::array<var, 4> input_var_Xa = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
@@ -92,11 +91,12 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_var_base_mul_per_bit) {
 
     typename component_type::params_type params = {{input_var_Xa, input_var_Xb}, {input_var_Ya, input_var_Yb}, b};
 
-    ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type T =
-        nil::crypto3::algebra::random_element<ed25519_type::temnil::crypto3::algebra1_type<algebra::curves::coordinates::affine>>();
-    ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type R = 2 * T;
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T =
+        crypto3::algebra::random_element<
+            ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>>();
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type R = 2 * T;
     ed25519_type::scalar_field_type::value_type b_val = 1;
-    ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type P = 2 * R + b_val * T;
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type P = 2 * R + b_val * T;
 
     ed25519_type::base_field_type::integral_type Tx = ed25519_type::base_field_type::integral_type(T.X.data);
     ed25519_type::base_field_type::integral_type Ty = ed25519_type::base_field_type::integral_type(T.Y.data);
@@ -137,8 +137,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_var_base_mul_per_bit) {
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
-                                                                                                 result_check);
+    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        params, public_input, result_check);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

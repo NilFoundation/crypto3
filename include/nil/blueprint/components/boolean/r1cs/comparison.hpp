@@ -30,8 +30,8 @@
 #include <memory>
 
 #include <nil/blueprint/component.hpp>
-#include <nil/blueprint/components/packing.hpp>
-#include <nil/blueprint/components/disjunction.hpp>
+#include <nil/blueprint/components/detail/r1cs/packing.hpp>
+#include <nil/blueprint/components/boolean/r1cs/disjunction.hpp>
 
 #include <nil/crypto3/multiprecision/number.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
@@ -50,29 +50,29 @@ namespace nil {
                   if X != 0 then R = 1 and I = X^{-1}
                 */
                 template<typename FieldType>
-                class comparison : public component<FieldType> {
+                class comparison : public nil::blueprint::components::component<FieldType> {
                 private:
-                    blueprint_variable_vector<FieldType> alpha;
-                    blueprint_variable<FieldType> alpha_packed;
-                    std::shared_ptr<packing_component<FieldType>> pack_alpha;
+                    detail::blueprint_variable_vector<FieldType> alpha;
+                    detail::blueprint_variable<FieldType> alpha_packed;
+                    std::shared_ptr<packing<FieldType>> pack_alpha;
 
                     std::shared_ptr<disjunction<FieldType>> all_zeros_test;
-                    blueprint_variable<FieldType> not_all_zeros;
+                    detail::blueprint_variable<FieldType> not_all_zeros;
 
                 public:
                     const std::size_t n;
-                    const blueprint_linear_combination<FieldType> A;
-                    const blueprint_linear_combination<FieldType> B;
-                    const blueprint_variable<FieldType> less;
-                    const blueprint_variable<FieldType> less_or_eq;
+                    const detail::blueprint_linear_combination<FieldType> A;
+                    const detail::blueprint_linear_combination<FieldType> B;
+                    const detail::blueprint_variable<FieldType> less;
+                    const detail::blueprint_variable<FieldType> less_or_eq;
 
                     comparison(blueprint<FieldType> &bp,
                                std::size_t n,
-                               const blueprint_linear_combination<FieldType> &A,
-                               const blueprint_linear_combination<FieldType> &B,
-                               const blueprint_variable<FieldType> &less,
-                               const blueprint_variable<FieldType> &less_or_eq) :
-                        component<FieldType>(bp),
+                               const detail::blueprint_linear_combination<FieldType> &A,
+                               const detail::blueprint_linear_combination<FieldType> &B,
+                               const detail::blueprint_variable<FieldType> &less,
+                               const detail::blueprint_variable<FieldType> &less_or_eq) :
+                        nil::blueprint::components::component<FieldType>(bp),
                         n(n), A(A), B(B), less(less), less_or_eq(less_or_eq) {
                         alpha.allocate(bp, n);
                         alpha.emplace_back(less_or_eq);    // alpha[n] is less_or_eq
@@ -80,10 +80,10 @@ namespace nil {
                         alpha_packed.allocate(bp);
                         not_all_zeros.allocate(bp);
 
-                        pack_alpha.reset(new packing_component<FieldType>(bp, alpha, alpha_packed));
+                        pack_alpha.reset(new packing<FieldType>(bp, alpha, alpha_packed));
 
                         all_zeros_test.reset(new disjunction<FieldType>(
-                            bp, blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n), not_all_zeros));
+                            bp, detail::blueprint_variable_vector<FieldType>(alpha.begin(), alpha.begin() + n), not_all_zeros));
                     };
 
                     void generate_gates() {
@@ -107,13 +107,13 @@ namespace nil {
 
                         /* constraints for packed(alpha) = 2^n + B - A */
                         pack_alpha->generate_gates(true);
-                        this->bp.add_r1cs_constraint(snark::r1cs_constraint<FieldType>(
+                        this->bp.add_r1cs_constraint(zk::snark::r1cs_constraint<FieldType>(
                             1, (typename FieldType::value_type(0x02).pow(n)) + B - A, alpha_packed));
 
                         /* compute result */
                         all_zeros_test->generate_gates();
                         this->bp.add_r1cs_constraint(
-                            snark::r1cs_constraint<FieldType>(less_or_eq, not_all_zeros, less));
+                            zk::snark::r1cs_constraint<FieldType>(less_or_eq, not_all_zeros, less));
                     }
 
                     void generate_assignments() {
@@ -130,7 +130,6 @@ namespace nil {
                         this->bp.val(less) = this->bp.val(less_or_eq) * this->bp.val(not_all_zeros);
                     }
                 };
-
             }    // namespace components
         }        // namespace blueprint
     }            // namespace crypto3

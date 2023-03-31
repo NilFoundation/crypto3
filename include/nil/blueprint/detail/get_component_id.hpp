@@ -34,15 +34,14 @@ namespace nil {
 
             using blueprint_component_id_type = std::string;
 
-            template <typename ComponentType>
-            blueprint_component_id_type get_component_id (ComponentType component){
+            template<typename ComponentType>
+            blueprint_component_id_type get_component_id(ComponentType component) {
                 std::stringstream id;
 
-                id << typeid(component).name() ;
+                id << typeid(component).name();
                 return id.str();
             }
-
         }    // namespace detail
-    }    // namespace blueprint
+    }        // namespace blueprint
 }    // namespace nil
 #endif    // CRYPTO3_BLUEPRINT_DETAIL_COMPONENT_ID_HPP

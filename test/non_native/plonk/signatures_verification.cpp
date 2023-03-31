@@ -39,8 +39,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/signatures_verification.hpp>
-#include <nil/blueprint/components/non_native/algebra/fields/plonk/ed25519.hpp>
+#include <nil/blueprint/components/pubkey/eddsa/plonk/non_native/verification.hpp>
 
 #include "../../test_plonk_component.hpp"
 
@@ -50,8 +49,8 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 template<typename ed25519_type>
 typename ed25519_type::scalar_field_type::value_type
-    sha512(typename ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type R,
-           typename ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type pk,
+    sha512(typename ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type R,
+           typename ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type pk,
            std::array<typename ed25519_type::base_field_type::integral_type, 4>
                M) {
     std::array<typename ed25519_type::base_field_type::integral_type, 80> round_constant = {
@@ -358,8 +357,8 @@ BOOST_AUTO_TEST_CASE(blueprint_signatures_verification) {
     using var_ec_point = typename ed25519_component::params_type::var_ec_point;
     using signature = typename ed25519_component::params_type::signature;
 
-    ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type B =
-        ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type::one();
+    ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type B =
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::one();
     auto M = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui256;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
@@ -368,17 +367,17 @@ BOOST_AUTO_TEST_CASE(blueprint_signatures_verification) {
 
     std::array<signature, k> signatures;
     std::array<var_ec_point, k> public_keys;
-    std::array<ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type, k> signatures_point;
+    std::array<ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type, k> signatures_point;
     std::array<ed25519_type::scalar_field_type::value_type, k> signatures_scalar;
-    std::array<ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type, k> public_keys_values;
+    std::array<ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type, k> public_keys_values;
 
     for (std::size_t i = 0; i < k; i++) {
-        ed25519_type::scalar_field_type::value_type r = nil::crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
-        ed25519_type::scalar_field_type::value_type c = nil::crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
+        ed25519_type::scalar_field_type::value_type r = crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
+        ed25519_type::scalar_field_type::value_type c = crypto3::algebra::random_element<ed25519_type::scalar_field_type>();
 
-        ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type R = r * B;
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type R = r * B;
         signatures_point[i] = R;
-        ed25519_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type P = c * B;
+        ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type P = c * B;
         public_keys_values[i] = P;
 
         auto sha_output = sha512<ed25519_type>(R, P,
