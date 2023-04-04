@@ -224,7 +224,6 @@ namespace nil {
 
                         // variable_values polynomials (table columns)
                         for (std::size_t variable_values_index = 0; variable_values_index < witness_columns + public_input_columns; variable_values_index++) {
-
                             std::vector<int> variable_values_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[variable_values_index];
 
