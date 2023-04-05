@@ -10,13 +10,30 @@
 #ifndef CRYPTO3_HASH_POSEIDON_HPP
 #define CRYPTO3_HASH_POSEIDON_HPP
 
+#ifdef __ZKLLVM__
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#else
 #include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#endif
 
 namespace nil {
     namespace crypto3 {
         namespace hashes {
+
+#ifdef __ZKLLVM__
+            class poseidon {
+            public:
+                typedef typename algebra::curves::pallas::base_field_type::value_type block_type;
+
+                struct process{
+                    block_type operator()(block_type first_input_block, block_type second_input_block){
+                        return __builtin_assigner_poseidon_pallas_base({0, first_input_block, second_input_block})[2];
+                    }
+                };
+            };
+#else
             template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
             class poseidon_compressor {
             protected:
@@ -92,6 +109,7 @@ namespace nil {
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
             };
+#endif
         }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
