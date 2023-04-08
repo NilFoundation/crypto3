@@ -138,13 +138,13 @@ namespace nil {
                                         F_compr_input[t] =
                                             F_compr_input[t] +
                                             theta_acc *
-                                                input_assignment[(j + lookup.vars[0].rotation) %
+                                                input_assignment[(t + lookup.vars[0].rotation) %
                                                                  input_assignment.size()] *
                                                 lookup.coeff *
                                                 plonk_columns.selector(lookup_gates[i].selector_index)[t];
                                         F_compr_value[t] =
                                             F_compr_value[t] +
-                                            theta_acc * value_assignment[j] *
+                                            theta_acc * value_assignment[t] *
                                                 plonk_columns.selector(lookup_gates[i].selector_index)[t];
                                     }
                                     k++;
@@ -158,9 +158,8 @@ namespace nil {
                         std::sort(F_perm_input.begin(), F_perm_input.end());
                         // to-do better sort for F_perm_value
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_value = F_compr_value;
-                        F_perm_value[0] = F_perm_input[0];
-                        for (std::size_t i = 1; i < basic_domain->m; i++) {
-                            if (F_perm_input[i] != F_perm_input[i - 1]) {
+                        for (std::size_t i = 0; i < basic_domain->m; i++) {
+                            if (i == 0 or F_perm_input[i] != F_perm_input[i - 1]) {
                                 if (F_perm_input[i] != F_perm_value[i]) {
                                     auto index = std::distance(
                                         F_perm_value.begin(),
