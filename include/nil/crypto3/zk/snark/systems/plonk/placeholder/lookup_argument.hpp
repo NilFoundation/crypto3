@@ -59,12 +59,12 @@ namespace nil {
 
                 public:
                     struct prover_lookup_result {
-                        std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
-                        math::polynomial<typename FieldType::value_type> input_polynomial;
+                        std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size> F_dfs;
+                        math::polynomial_dfs<typename FieldType::value_type> input_polynomial;
                         typename CommitmentSchemeTypePermutation::precommitment_type input_precommitment;
-                        math::polynomial<typename FieldType::value_type> value_polynomial;
+                        math::polynomial_dfs<typename FieldType::value_type> value_polynomial;
                         typename CommitmentSchemeTypePermutation::precommitment_type value_precommitment;
-                        math::polynomial<typename FieldType::value_type> V_L_polynomial;
+                        math::polynomial_dfs<typename FieldType::value_type> V_L_polynomial;
                         typename CommitmentSchemeTypePermutation::precommitment_type V_L_precommitment;
                     };
                     static inline prover_lookup_result prove_eval(
@@ -86,7 +86,7 @@ namespace nil {
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             preprocessed_data.common_data.basic_domain;
 
-                        std::array<math::polynomial<typename FieldType::value_type>, argument_size> F;
+                        std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size> F_dfs;
 
                         math::polynomial_dfs<typename FieldType::value_type> F_compr_input(basic_domain->m - 1,
                                                                                            basic_domain->m, 0);
@@ -135,17 +135,15 @@ namespace nil {
                                             break;
                                     }
                                     for (std::size_t t = 0; t < basic_domain->m; t++) {
-                                        F_compr_input[t] =
-                                            F_compr_input[t] +
+                                        F_compr_input[t] +=
                                             theta_acc *
-                                                input_assignment[(t + lookup.vars[0].rotation) %
-                                                                 input_assignment.size()] *
-                                                lookup.coeff *
-                                                plonk_columns.selector(lookup_gates[i].selector_index)[t];
-                                        F_compr_value[t] =
-                                            F_compr_value[t] +
+                                            input_assignment[(t + lookup.vars[0].rotation) %
+                                                             input_assignment.size()] *
+                                            lookup.coeff *
+                                            plonk_columns.selector(lookup_gates[i].selector_index)[t];
+                                        F_compr_value[t] +=
                                             theta_acc * value_assignment[t] *
-                                                plonk_columns.selector(lookup_gates[i].selector_index)[t];
+                                            plonk_columns.selector(lookup_gates[i].selector_index)[t];
                                     }
                                     k++;
                                     theta_acc = theta * theta_acc;
@@ -156,7 +154,7 @@ namespace nil {
                         // Produce the permutation polynomials $S_{\texttt{perm}}(X)$ and $A_{\texttt{perm}}(X)$
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_input = F_compr_input;
                         std::sort(F_perm_input.begin(), F_perm_input.end());
-                        // to-do better sort for F_perm_value
+                        // TODO better sort for F_perm_value
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_value = F_compr_value;
                         for (std::size_t i = 0; i < basic_domain->m; i++) {
                             if (i == 0 or F_perm_input[i] != F_perm_input[i - 1]) {
@@ -171,10 +169,10 @@ namespace nil {
                             }
                         }
 
-                        math::polynomial<typename FieldType::value_type> F_perm_input_normal =
-                            math::polynomial<typename FieldType::value_type>(F_perm_input.coefficients());
-                        math::polynomial<typename FieldType::value_type> F_perm_value_normal =
-                            math::polynomial<typename FieldType::value_type>(F_perm_value.coefficients());
+                        //                        math::polynomial<typename FieldType::value_type> F_perm_input_normal =
+                        //                            math::polynomial<typename FieldType::value_type>(F_perm_input.coefficients());
+                        //                        math::polynomial<typename FieldType::value_type> F_perm_value_normal =
+                        //                            math::polynomial<typename FieldType::value_type>(F_perm_value.coefficients());
 
                         typename CommitmentSchemeTypePermutation::precommitment_type F_perm_input_tree =
                             algorithms::precommit<CommitmentSchemeTypePermutation>(F_perm_input, fri_params.D[0],
@@ -202,8 +200,8 @@ namespace nil {
                                      ((F_perm_input[j - 1] + beta) * (F_perm_value[j - 1] + gamma)).inversed();
                         }
 
-                        math::polynomial<typename FieldType::value_type> V_L_normal =
-                            math::polynomial<typename FieldType::value_type>(V_L.coefficients());
+                        //                        math::polynomial<typename FieldType::value_type> V_L_normal =
+                        //                            math::polynomial<typename FieldType::value_type>(V_L.coefficients());
 
                         typename CommitmentSchemeTypePermutation::precommitment_type V_L_tree =
                             algorithms::precommit<CommitmentSchemeTypePermutation>(V_L, fri_params.D[0],
@@ -226,27 +224,20 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_input_shifted =
                             math::polynomial_shift(F_perm_input, -1, basic_domain->m);
 
-                        F[0] = math::polynomial<typename FieldType::value_type>(
-                            (preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_L)).coefficients());
-                        F[1] = math::polynomial<typename FieldType::value_type>(
-                            ((one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
-                             (V_L_shifted * h - V_L * g))
-                                .coefficients());
-                        F[2] = math::polynomial<typename FieldType::value_type>(
-                            (preprocessed_data.q_last * (V_L * V_L - V_L)).coefficients());
-                        F[3] = math::polynomial<typename FieldType::value_type>(
-                            (preprocessed_data.common_data.lagrange_0 * (F_perm_input - F_perm_value)).coefficients());
-                        F[4] = math::polynomial<typename FieldType::value_type>(
-                            ((one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
-                             (F_perm_input - F_perm_value) * (F_perm_input - F_perm_input_shifted))
-                                .coefficients());
+                        F_dfs[0] = preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_L);
+                        F_dfs[1] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
+                                   (V_L_shifted * h - V_L * g);
+                        F_dfs[2] = preprocessed_data.q_last * (V_L * V_L - V_L);
+                        F_dfs[3] = preprocessed_data.common_data.lagrange_0 * (F_perm_input - F_perm_value);
+                        F_dfs[4] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
+                                   (F_perm_input - F_perm_value) * (F_perm_input - F_perm_input_shifted);
 
-                        return {F,
-                                F_perm_input_normal,
+                        return {F_dfs,
+                                F_perm_input,
                                 F_perm_input_tree,
-                                F_perm_value_normal,
+                                F_perm_value,
                                 F_perm_value_tree,
-                                V_L_normal,
+                                V_L,
                                 V_L_tree};
                     }
 

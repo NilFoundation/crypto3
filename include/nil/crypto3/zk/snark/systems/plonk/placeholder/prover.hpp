@@ -220,33 +220,37 @@ namespace nil {
                         typename placeholder_lookup_argument<FieldType, permutation_commitment_scheme_type,
                                                              ParamsType>::prover_lookup_result lookup_argument;
                         if (is_lookup_enabled) {
-                            for (std::size_t i = 0; i < lookup_argument.F.size(); i++) {
-                                lookup_argument.F[i] = {0};
-                            }
-                            // lookup_argument =
-                            //     placeholder_lookup_argument<FieldType, permutation_commitment_scheme_type,
-                            //                                 ParamsType>::prove_eval(constraint_system,
-                            //                                                         preprocessed_public_data,
-                            //                                                         assignments,
-                            //                                                         fri_params,
-                            //                                                         transcript);
+//                            for (std::size_t i = 0; i < lookup_argument.F.size(); i++) {
+//                                lookup_argument.F[i] = {0};
+//                            }
+                             lookup_argument =
+                                 placeholder_lookup_argument<FieldType, permutation_commitment_scheme_type,
+                                                             ParamsType>::prove_eval(constraint_system,
+                                                                                     preprocessed_public_data,
+                                                                                     assignments,
+                                                                                     fri_params,
+                                                                                     transcript);
                         } else {
-
-                            for (std::size_t i = 0; i < lookup_argument.F.size(); i++) {
-                                lookup_argument.F[i] = {0};
+                            for (std::size_t i = 0; i < lookup_argument.F_dfs.size(); i++) {
+                                lookup_argument.F_dfs[i] = math::polynomial_dfs<typename FieldType::value_type>(0, F_dfs[0].size(), FieldType::value_type::zero());
                             }
                         }
                         // TODO: remove when lookups will be implemented
-                        F_dfs[3] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[4] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[5] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[6] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[7] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
+                        F_dfs[3] = lookup_argument.F_dfs[0];
+                        F_dfs[4] = lookup_argument.F_dfs[1];
+                        F_dfs[5] = lookup_argument.F_dfs[2];
+                        F_dfs[6] = lookup_argument.F_dfs[3];
+                        F_dfs[7] = lookup_argument.F_dfs[4];
+
+//                        F_dfs[4] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
+//                        F_dfs[5] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
+//                        F_dfs[6] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
+//                        F_dfs[7] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
 
                         if (is_lookup_enabled) {
-                            // proof.input_perm_commitment = lookup_argument.input_precommitment.root();
-                            // proof.value_perm_commitment = lookup_argument.value_precommitment.root();
-                            // proof.v_l_perm_commitment = lookup_argument.V_L_precommitment.root();
+                             proof.input_perm_commitment = lookup_argument.input_precommitment.root();
+                             proof.value_perm_commitment = lookup_argument.value_precommitment.root();
+                             proof.v_l_perm_commitment = lookup_argument.V_L_precommitment.root();
                         }
                         // 6. circuit-satisfability
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
@@ -378,9 +382,15 @@ namespace nil {
                         combined_poly[1].push_back(perm_poly_dfs);
                         // lookup polynomials evaluation
                         if (is_lookup_enabled) {
-//                             std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
-//                                                                                                  challenge * omega};
-//                             typename permutation_commitment_scheme_type::proof_type v_l_evaluation =
+                            std::vector<typename FieldType::value_type> evaluation_points_input = {challenge,
+                                                                                                  challenge * omega.inversed()};
+                            math::polynomial_dfs<typename FieldType::value_type> V_L_dfs = lookup_argument.V_L_polynomial;
+                            combined_poly[1].push_back(V_L_dfs);
+                            math::polynomial_dfs<typename FieldType::value_type> input_dfs = lookup_argument.input_polynomial;
+                            combined_poly[0].push_back(input_dfs);
+                            math::polynomial_dfs<typename FieldType::value_type> value_dfs = lookup_argument.value_polynomial;
+                            combined_poly[2].push_back(value_dfs);
+                            //                             typename permutation_commitment_scheme_type::proof_type v_l_evaluation =
 //                                 algorithms::proof_eval<permutation_commitment_scheme_type>(
 //                                     evaluation_points_v_l,
 //                                     lookup_argument.V_L_precommitment,
