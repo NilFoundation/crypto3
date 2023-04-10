@@ -48,11 +48,11 @@ std::string main_sol_file_template = R"(
 //---------------------------------------------------------------------------//
 pragma solidity >=0.8.4;
 
-import "../contracts/types.sol";
-import "../contracts/profiling.sol";
-import "../contracts/basic_marshalling.sol";
-import "../contracts/commitments/batched_lpc_verifier.sol";
-import "../contracts/gate_argument_interface.sol";
+import "../../contracts/types.sol";
+import "../../contracts/profiling.sol";
+import "../../contracts/basic_marshalling.sol";
+import "../../contracts/commitments/batched_lpc_verifier.sol";
+import "../../contracts/interfaces/gate_argument.sol";
 
 $GATES_IMPORTS$
 
@@ -64,11 +64,11 @@ contract gate_argument_split_gen  is IGateArgument{
     // TODO: columns_rotations could be hard-coded
     function evaluate_gates_be(
         bytes calldata blob,
-        types.gate_argument_local_vars memory gate_params,
         uint256 eval_proof_combined_value_offset,
+        types.gate_argument_local_vars memory gate_params,
         types.arithmetization_params memory ar_params,
         int256[][] calldata columns_rotations
-    ) external view returns (uint256 gates_evaluation) {
+    ) external pure returns (uint256 gates_evaluation) {
         // TODO: check witnesses number in proof
         gate_params.witness_evaluations = new uint256[][](ar_params.witness_columns);
         for (uint256 i = 0; i < ar_params.witness_columns;) {
@@ -135,8 +135,7 @@ std::string gate_sol_file_template = R"(
 //---------------------------------------------------------------------------//
 pragma solidity >=0.8.4;
 
-import "../contracts/types.sol";
-import "../contracts/logging.sol";
+import "../../contracts/types.sol";
 
 // TODO: name component
 library gate$CONTRACT_NUMBER${
