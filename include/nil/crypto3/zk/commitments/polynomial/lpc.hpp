@@ -155,7 +155,10 @@ namespace nil {
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
                 ) {
-                    typename LPC::field_type::value_type combined_alpha = transcript.template challenge<typename LPC::field_type>();
+                    for(std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
+                        transcript(commit<typename LPC::basic_fri>(precommitments[i]));
+                    }
+                    typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
                     math::polynomial<typename LPC::field_type::value_type> combined_Q;
                     std::array<typename LPC::proof_type::z_type, LPC::basic_fri::batches_num> z;
 
@@ -186,7 +189,7 @@ namespace nil {
                             math::polynomial<typename LPC::field_type::value_type> U = math::lagrange_interpolation(U_interpolation_points);
 
                             Q = g[k][polynom_index] - U;
-                            combined_U = combined_U * combined_alpha;
+                            combined_U = combined_U * theta;
                             combined_U = combined_U + U;
 
                             math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
@@ -200,7 +203,7 @@ namespace nil {
                             if (k == 0 && polynom_index == 0) {
                                 combined_Q = Q;
                             } else {
-                                combined_Q = combined_Q * combined_alpha + Q;
+                                combined_Q = combined_Q * theta + Q;
                             }
                         }
                     }
@@ -231,8 +234,12 @@ namespace nil {
                     const typename LPC::basic_fri::params_type &fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
                 ) {
+                    for(std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
+                        transcript(commit<typename LPC::basic_fri>(precommitments[i]));
+                    }
+                    
                     // Prepare z-s and combined_Q;
-                    typename LPC::field_type::value_type combined_alpha = transcript.template challenge<typename LPC::field_type>();
+                    typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
                     math::polynomial_dfs<typename LPC::field_type::value_type> combined_Q_dfs(
                         0, fri_params.D[0]->size(), 
                         LPC::field_type::value_type::zero()
@@ -284,7 +291,7 @@ namespace nil {
                             if (k == 0 && polynom_index == 0) {
                                 combined_Q_dfs = Q_dfs;
                             } else {
-                                combined_Q_dfs *= combined_alpha;
+                                combined_Q_dfs *= theta;
                                 combined_Q_dfs += Q_dfs;
                             }
                         }
@@ -318,15 +325,15 @@ namespace nil {
                     typename LPC::basic_fri::params_type fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
                 ) {
-                    // if (t_polynomials != proof.T_root)
-                    //     return false; 
-                    //make a check for t_poly and T_root
+                    for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
+                        transcript(commitments[k]);
+                    }
 
                     typename std::vector<std::size_t> evals_map;
                     typename std::vector<std::vector<typename LPC::field_type::value_type>> unique_eval_points;
                     typename std::vector<math::polynomial<typename LPC::field_type::value_type>> combined_U;
                     typename std::vector<math::polynomial<typename LPC::field_type::value_type>> denominators;
-                    typename LPC::field_type::value_type combined_alpha = transcript.template challenge<typename LPC::field_type>();
+                    typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
 
                     std::size_t batch_size = 0;
                     for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
@@ -397,7 +404,7 @@ namespace nil {
                         std::size_t ind = 0;
                         for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
                             for( std::size_t i = 0; i < proof.z[k].size(); i++ ){
-                                combined_U[point_index] = combined_U[point_index] * combined_alpha;
+                                combined_U[point_index] = combined_U[point_index] * theta;
                                 if(evals_map[ind] == point_index){
                                     BOOST_ASSERT(proof.z[k][i].size() == unique_eval_points[point_index].size());
                                     for( std::size_t xi_index = 0; xi_index < unique_eval_points[point_index].size(); xi_index++ ){
@@ -406,6 +413,7 @@ namespace nil {
                                             proof.z[k][i][xi_index]
                                         );
                                     }
+                                    math::polynomial<typename LPC::field_type::value_type> U = math::lagrange_interpolation(U_interpolation_points);
                                     combined_U[point_index] = combined_U[point_index] + math::lagrange_interpolation(U_interpolation_points);
                                 }
                                 ind++;
@@ -417,7 +425,7 @@ namespace nil {
                         proof.fri_proof,
                         fri_params, 
                         commitments,
-                        combined_alpha,
+                        theta,
                         evals_map,
                         combined_U,
                         denominators,

@@ -71,6 +71,7 @@ namespace nil {
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_columns = ParamsType::public_columns;
                     constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
+                    constexpr static const std::size_t constant_columns = ParamsType::constant_columns;
                     using merkle_hash_type = typename ParamsType::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
 
@@ -345,8 +346,7 @@ namespace nil {
                             variable_values_evaluation_points(witness_columns + public_input_columns);
 
                         // variable_values polynomials (table columns)
-                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns; variable_values_index++) {
-
+                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns + public_input_columns; variable_values_index++) {
                             std::vector<int> variable_values_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[variable_values_index];
 
@@ -355,9 +355,6 @@ namespace nil {
                                 variable_values_evaluation_points[variable_values_index].push_back(
                                     challenge * omega.pow(variable_values_rotation[rotation_index]));
                             }
-                        }
-                        for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i ++) {
-                            variable_values_evaluation_points[i].push_back(challenge);
                         }
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -430,32 +427,53 @@ namespace nil {
                         }
 
                         // quotient
-                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {{challenge}};
+                        std::vector<typename FieldType::value_type> challenge_point = {challenge};
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {challenge_point};
                         for (std::size_t k = 0; k < T_splitted.size(); k++) {
                             combined_poly[2].push_back(T_splitted_dfs[k]);
                         }
                         // public
-                        std::vector<std::vector<typename FieldType::value_type>> &evaluation_points_public =
-                            evaluation_points_quotient;
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_public;
 
                         for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
                             combined_poly[3].push_back(preprocessed_public_data.identity_polynomials[k]);
+                            evaluation_points_public.push_back(challenge_point);
                         }
                         
                         for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
                             combined_poly[3].push_back(preprocessed_public_data.permutation_polynomials[k]);
+                            evaluation_points_public.push_back(challenge_point);
                         }
 
-                        for (std::size_t k = 0; k < preprocessed_public_data.public_polynomial_table.constants().size(); k ++){
+                        for (std::size_t k = 0; k < constant_columns; k ++){
                             combined_poly[3].push_back(preprocessed_public_data.public_polynomial_table.constants()[k]);
+                            std::vector<int> rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
+                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            }
+                            evaluation_points_public.push_back(point);
                         }
                         
                         for (std::size_t k = 0; k < preprocessed_public_data.public_polynomial_table.selectors().size(); k ++){
                             combined_poly[3].push_back(preprocessed_public_data.public_polynomial_table.selectors()[k]);
+                            std::vector<int> rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + constant_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
+                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            }
+                            evaluation_points_public.push_back(point);
                         }
 
                         combined_poly[3].push_back(preprocessed_public_data.q_last);
+                        evaluation_points_public.push_back(challenge_point);
                         combined_poly[3].push_back(preprocessed_public_data.q_blind);
+                        evaluation_points_public.push_back(challenge_point);
+
                         std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
                         {variable_values_evaluation_points, evaluation_points_v_p, evaluation_points_quotient, evaluation_points_public};
                         std::array<typename commitment_scheme_type::precommitment_type, 4> precommitments = {
@@ -464,6 +482,8 @@ namespace nil {
                             T_precommitment, 
                             preprocessed_public_data.precommitments.fixed_values
                         };
+
+                        proof.fixed_values_commitment = preprocessed_public_data.common_data.commitments.fixed_values;
 
                         proof.eval_proof.combined_value = algorithms::proof_eval<commitment_scheme_type>(
                                                     evaluations_points,

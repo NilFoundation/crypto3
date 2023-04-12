@@ -82,11 +82,8 @@ namespace nil {
                         typedef std::array<typename field_type::value_type, m> polynomial_value_type;
                         typedef std::vector<polynomial_value_type> polynomial_values_type;
 
-                        // For initial proof only
-                        typedef typename std::vector<polynomial_values_type> polynomials_values_type;
-
-                        // For other rounds
-                        typedef std::vector<polynomial_values_type> rounds_polynomial_values_type;
+                        // For initial proof only, size of all values are similar
+                        typedef std::vector<polynomial_values_type> polynomials_values_type;
 
                         typedef typename containers::merkle_tree<MerkleTreeHashType, 2> merkle_tree_type;
                         typedef typename containers::merkle_proof<MerkleTreeHashType, 2> merkle_proof_type;
@@ -103,7 +100,8 @@ namespace nil {
 
                         struct params_type {
                             bool operator==(const params_type &rhs) const {
-                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D;
+                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D && 
+                                    batches_num == rhs.batches_num;
                             }
                             bool operator!=(const params_type &rhs) const {
                                 return !(rhs == *this);
@@ -123,8 +121,8 @@ namespace nil {
 
                             params_type() {};
 
-                            std::size_t r;
                             std::size_t batches_num;
+                            std::size_t r;
                             std::size_t max_degree;
                             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
                             std::vector<std::size_t> step_list;
@@ -139,8 +137,9 @@ namespace nil {
                                 return !(rhs == *this);
                             }
 
-                            merkle_proof_type p;                          // for proof(values[i], T_{i-})
-                            std::vector<std::array<typename field_type::value_type, m>> y;
+                            polynomial_values_type y;                   // Values for the next round.
+                                                                        // For the last round it's final_polynomial's values
+                            merkle_proof_type p;                        // Merkle proof(values[i-1], T_i)
                         };
 
                         struct initial_proof_type{
@@ -562,10 +561,6 @@ namespace nil {
                         }
                     }
 
-                    for( std::size_t i = 0; i < FRI::batches_num; i++ ){
-                        transcript(commit<FRI>(precommitments[i]));
-                    }
-
                     // Commit phase
                     auto f = combined_Q;
                     auto precommitment = combined_Q_precommitment;
@@ -715,7 +710,6 @@ namespace nil {
                     std::size_t polynomials_number = 0;
                     for(std::size_t k = 0; k < FRI::batches_num; k++ ){
                         polynomials_number += proof.query_proofs[0].initial_proof[k].values.size();
-                        transcript(commitments[k]);
                     }
                     BOOST_ASSERT(polynomials_number == evals_map.size());
                     if constexpr (FRI::m != 2) {
@@ -726,14 +720,14 @@ namespace nil {
                         std::pow(2, std::log2(fri_params.max_degree + 1) - fri_params.r + 1) - 1) {
                         return false;
                     }
-
                     
                     std::vector<typename FRI::field_type::value_type> alphas;
                     std::size_t t = 0;
                     for(std::size_t i = 0; i < fri_params.step_list.size(); i++){
                         transcript(proof.fri_roots[i]);
                         for(std::size_t step_i = 0; step_i < fri_params.step_list[i]; step_i++, t++){
-                            alphas.push_back(transcript.template challenge<typename FRI::field_type>());
+                            auto alpha = transcript.template challenge<typename FRI::field_type>();
+                            alphas.push_back(alpha);
                         }
                     }
 
@@ -821,7 +815,6 @@ namespace nil {
                         typename FRI::polynomial_values_type y_next;
                         for (std::size_t i = 0; i < fri_params.step_list.size(); i++) {
                             coset_size = 1 << fri_params.step_list[i];
-                            // check merkle proof p, polynomails' values y are already prepared
                             if(query_proof.round_proofs[i].p.root() !=  proof.fri_roots[i] ) return false;
 
                             std::tie(s, s_indices) = calculate_s<FRI>(x, x_index, fri_params.step_list[i], fri_params.D[t]);
@@ -837,7 +830,6 @@ namespace nil {
                             }
                             if ( !query_proof.round_proofs[i].p.validate(leaf_data)) {
                                 return false;
-                            } else {
                             }
 
                             // colinear check

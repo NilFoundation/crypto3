@@ -223,8 +223,7 @@ namespace nil {
                             variable_values_evaluation_points(witness_columns + public_input_columns);
 
                         // variable_values polynomials (table columns)
-                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns; variable_values_index++) {
-
+                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns + public_input_columns; variable_values_index++) {
                             std::vector<int> variable_values_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[variable_values_index];
 
@@ -234,10 +233,6 @@ namespace nil {
                                     challenge * omega.pow(variable_values_rotation[rotation_index]));
                             }
                         }
-                        for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i ++) {
-                            variable_values_evaluation_points[i].push_back(challenge);
-                        }
-
                         // permutation
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_permutation = {{challenge,
                                                                                                      challenge * omega}};
@@ -279,22 +274,68 @@ namespace nil {
                             // }
                         }
 
+                        std::vector<typename FieldType::value_type> challenge_point = {challenge};
+
                         // quotient
-                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {{challenge}};
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {challenge_point};
 
                         // public data
-                        std::vector<std::vector<typename FieldType::value_type>> &evaluation_points_public =
-                            evaluation_points_quotient;
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_public;
+
+                        for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
+                            evaluation_points_public.push_back(challenge_point);
+                        }
+                        
+                        for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
+                            evaluation_points_public.push_back(challenge_point);
+                        }
+
+                        // constant columns may be rotated
+                        for (std::size_t k = 0; k < constant_columns; k ++){
+                            std::vector<int> rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
+                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            }
+                            evaluation_points_public.push_back(point);
+                        }
+                        
+                        // selector columns may be rotated
+                        for (std::size_t k = 0; k < selector_columns; k ++){
+                            std::vector<int> rotation =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + constant_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
+                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            }
+                            evaluation_points_public.push_back(point);
+                        }
+
+                        // Evaluation points for special selectors q_last and q_blind
+                        evaluation_points_public.push_back(challenge_point); // for q_last
+                        evaluation_points_public.push_back(challenge_point); // for q_blind
+
                         std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
                         {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public};
                         std::array<typename commitment_scheme_type::commitment_type, 4> commitments = 
-                        {proof.variable_values_commitment, proof.v_perm_commitment,
-                                                    proof.T_commitment, preprocessed_public_data.common_data.commitments.fixed_values};
+                        {proof.variable_values_commitment, 
+                         proof.v_perm_commitment,
+                         proof.T_commitment, 
+                         preprocessed_public_data.common_data.commitments.fixed_values
+                        };
+                        
+                        if( proof.fixed_values_commitment != preprocessed_public_data.common_data.commitments.fixed_values )
+                            return false;
+
                         if (!algorithms::verify_eval<commitment_scheme_type>(
-                                evaluations_points,
-                                proof.eval_proof.combined_value,
-                                                    commitments,
-                                                    fri_params, transcript)) {
+                            evaluations_points,
+                            proof.eval_proof.combined_value,
+                            commitments,
+                            fri_params, transcript)
+                        ) {
                             return false;
                         }
 

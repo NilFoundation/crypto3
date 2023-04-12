@@ -117,8 +117,8 @@ namespace nil {
                             std::uint32_t max_gates_degree,
                             transcript_type &transcript = transcript_type()) {
 
-                        std::uint32_t extended_domain_size = original_domain->m * std::pow(2, max_gates_degree);
-
+                        std::uint32_t extended_domain_size = original_domain->m * std::pow(2, ceil(std::log2(max_gates_degree)));
+                        
                         const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             extended_column_polynomials = resize(column_polynomials, extended_domain_size);
 

@@ -134,8 +134,8 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m, 0> fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 1 > fri_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 1>
         lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
@@ -176,20 +176,32 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
             zk::algorithms::precommit<lpc_type>(poly, D[0], fri_params.step_list.front());    // phase_1: Commit
 
         // TODO: take a point outside of the basic domain
-        std::vector<typename FieldType::value_type> evaluation_points = {
-            algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
+        std::vector<typename FieldType::value_type> point = {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
+        std::vector<std::vector<typename FieldType::value_type>> evaluation_points = {
+            point
+        };
 
         std::array<std::uint8_t, 96> x_data {};
         zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
 
+        std::array<std::vector<std::vector<typename FieldType::value_type>>,1> evaluation_points_batch = {
+            evaluation_points
+        };
+        std::array<merkle_tree_type, 1> tree_batch = {tree};
+
+        std::vector<math::polynomial<typename FieldType::value_type>> poly_vector = {poly};
+        std::array<std::vector<math::polynomial<typename FieldType::value_type>>, 1> poly_batch = {poly_vector};
+
         auto proof = zk::algorithms::proof_eval<lpc_type>(
-            evaluation_points, tree, poly, fri_params, transcript);    // phase_2: Prove
+            evaluation_points_batch, tree_batch, poly_batch, fri_params, transcript);    // phase_2: Prove
 
         // verify
         zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
 
+        std::array<typename fri_type::commitment_type, 1> commitment_batch = {tree.root()};
         BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
-            evaluation_points, proof, fri_params, transcript_verifier));    // phase_3: Verify
+            evaluation_points_batch, proof, commitment_batch, fri_params, transcript_verifier)
+        );    // phase_3: Verify
     }
 }
 

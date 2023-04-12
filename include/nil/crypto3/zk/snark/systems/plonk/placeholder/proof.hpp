@@ -71,20 +71,18 @@ namespace nil {
 
                     typename commitment_scheme_type::commitment_type variable_values_commitment;
                     typename commitment_scheme_type::commitment_type v_perm_commitment;
-                    typename commitment_scheme_type::commitment_type input_perm_commitment;
-                    typename commitment_scheme_type::commitment_type value_perm_commitment;
-                    typename commitment_scheme_type::commitment_type v_l_perm_commitment;
                     typename commitment_scheme_type::commitment_type T_commitment;
+                    typename commitment_scheme_type::commitment_type fixed_values_commitment;
 
                     evaluation_proof eval_proof;
 
                     bool operator==(const placeholder_proof &rhs) const {
                         return /*witness_commitment == rhs.witness_commitment &&*/
-                               v_perm_commitment == rhs.v_perm_commitment &&
-                               input_perm_commitment == rhs.input_perm_commitment &&
-                               value_perm_commitment == rhs.value_perm_commitment &&
-                               v_l_perm_commitment == rhs.v_l_perm_commitment && T_commitment == rhs.T_commitment &&
-                               eval_proof == rhs.eval_proof;
+                            variable_values_commitment == rhs.variable_values_commitment &&
+                            v_perm_commitment == rhs.v_perm_commitment &&
+                            T_commitment == rhs.T_commitment &&
+                            fixed_values_commitment == rhs.fixed_values_commitment &&
+                            eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const placeholder_proof &rhs) const {
                         return !(rhs == *this);
