@@ -49,62 +49,12 @@ void profiling_inside_result_check(const std::vector<typename BlueprintFieldType
                                    std::vector<typename BlueprintFieldType::value_type> expected_res,
                                    AssignmentType &assignment, typename ComponentType::result_type &real_res) {
 
-#ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
-    std::array<typename BlueprintFieldType::value_type, 4> x, y, expected_x, expected_y, real_x, real_y;
-    for (std::size_t i = 0; i < 4; i++) {
-        x[i] = public_input[i];
-        y[i] = public_input[i + 4];
-        expected_x[i] = expected_res[i];
-        expected_y[i] = expected_res[i + 4];
-        real_x[i] = var_value(assignment, real_res.output.x[i]);
-        real_y[i] = var_value(assignment, real_res.output.y[i]);
-    }
-
-    std::cout << std::hex;
-
-    std::cout << "_____________________________________________________________________________________________________"
-                 "____________________________________________\n";
-    std::cout << "input  x: ";
-    for (std::size_t i = 0; i < 4; i++) {
-        std::cout << x[3 - i].data << " ";
-    }
-    std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(x).data << ")\n";
-
-    std::cout << "       y: ";
-    for (std::size_t i = 0; i < 4; i++) {
-        std::cout << y[3 - i].data << " ";
-    }
-    std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(y).data << ")\n";
-
-    std::cout << "    bool: " << public_input[8].data << "\n";
-
-    std::cout << "expected: ";
-    for (std::size_t i = 0; i < 4; i++) {
-        std::cout << expected_x[3 - i].data << " ";
-    }
-    std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(expected_x).data << ")\n";
-    std::cout << "          ";
-    for (std::size_t i = 0; i < 4; i++) {
-        std::cout << expected_y[3 - i].data << " ";
-    }
-    std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(expected_y).data << ")\n";
-
-    std::cout << "real    : ";
-    for (std::size_t i = 0; i < 4; i++) {
-        std::cout << real_x[3 - i].data << " ";
-    }
-    std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_x).data << ")\n";
-    std::cout << "          ";
-    for (std::size_t i = 0; i < 4; i++) {
-        std::cout << real_y[3 - i].data << " ";
-    }
-// std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_y).data << ")" << std::endl;
-#endif
 }
 
 template<typename BlueprintFieldType, typename NonNativeCurveType>
-auto test_bool_scalar_multiplication_inner(const std::vector<typename BlueprintFieldType::value_type> &public_input,
-                                           const std::vector<typename BlueprintFieldType::value_type> &expected_res) {
+void test_bool_scalar_multiplication(const std::vector<typename BlueprintFieldType::value_type> &public_input,
+                                    const std::vector<typename BlueprintFieldType::value_type> &expected_res,
+                                    const bool expected_to_pass) {
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -133,85 +83,83 @@ auto test_bool_scalar_multiplication_inner(const std::vector<typename BlueprintF
 
     typename component_type::input_type instance_input = {{T_x, T_y}, var(0, 8, false, var::column_type::public_input)};
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {}, {});
-
-    return std::make_tuple(component_instance, instance_input);
-}
-
-template<typename BlueprintFieldType, typename NonNativeCurveType>
-void test_bool_scalar_multiplication(const std::vector<typename BlueprintFieldType::value_type> &public_input,
-                                     const std::vector<typename BlueprintFieldType::value_type> &expected_res) {
-
-    constexpr std::size_t WitnessColumns = 9;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams = crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns,
-                                                                                   ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = blueprint::assignment<ArithmetizationType>;
-    using hash_type = crypto3::hashes::keccak_1600<256>;
-    constexpr std::size_t Lambda = 1;
-    using NonNativeFieldType = typename NonNativeCurveType::base_field_type;
-
-    using component_type =
-        blueprint::components::bool_scalar_multiplication<ArithmetizationType, NonNativeCurveType, 9,
-                                                          blueprint::basic_non_native_policy<BlueprintFieldType>>;
-
-    auto [component_instance, instance_input] =
-        test_bool_scalar_multiplication_inner<BlueprintFieldType, NonNativeCurveType>(public_input, expected_res);
-
-    auto result_check = [&expected_res, &public_input](AssignmentType &assignment,
-                                                       typename component_type::result_type &real_res) {
-        profiling_inside_result_check<BlueprintFieldType, AssignmentType, component_type>(public_input, expected_res,
-                                                                                          assignment, real_res);
+    auto result_check = [&expected_res, &public_input, &expected_to_pass](AssignmentType &assignment,
+                                                       typename component_type::result_type &real_res) { 
+#ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+        std::array<typename BlueprintFieldType::value_type, 4> x, y, expected_x, expected_y, real_x, real_y;
         for (std::size_t i = 0; i < 4; i++) {
-            assert(expected_res[i] == var_value(assignment, real_res.output.x[i]));
-            assert(expected_res[i + 4] == var_value(assignment, real_res.output.y[i]));
+            x[i] = public_input[i];
+            y[i] = public_input[i + 4];
+            expected_x[i] = expected_res[i];
+            expected_y[i] = expected_res[i + 4];
+            real_x[i] = var_value(assignment, real_res.output.x[i]);
+            real_y[i] = var_value(assignment, real_res.output.y[i]);
+        }
+
+        std::cout << std::hex;
+
+        std::cout << "_____________________________________________________________________________________________________"
+                    "____________________________________________\n";
+        std::cout << "input  x: ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << x[3 - i].data << " ";
+        }
+        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(x).data << ")\n";
+
+        std::cout << "       y: ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << y[3 - i].data << " ";
+        }
+        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(y).data << ")\n";
+
+        std::cout << "    bool: " << public_input[8].data << "\n";
+
+        std::cout << "expected: ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << expected_x[3 - i].data << " ";
+        }
+        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(expected_x).data << ")\n";
+        std::cout << "          ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << expected_y[3 - i].data << " ";
+        }
+        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(expected_y).data << ")\n";
+
+        std::cout << "real    : ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << real_x[3 - i].data << " ";
+        }
+        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_x).data << ")\n";
+        std::cout << "          ";
+        for (std::size_t i = 0; i < 4; i++) {
+            std::cout << real_y[3 - i].data << " ";
+        }
+    // std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_y).data << ")" << std::endl;
+#endif
+        if (expected_to_pass) {
+            for (std::size_t i = 0; i < 4; i++) {
+                assert(expected_res[i] == var_value(assignment, real_res.output.x[i]));
+                assert(expected_res[i + 4] == var_value(assignment, real_res.output.y[i]));
+            }
         }
     };
 
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {}, {});
+
+    if (expected_to_pass) {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
-}
-
-template<typename BlueprintFieldType, typename NonNativeCurveType>
-void test_bool_scalar_multiplication_to_fail(const std::vector<typename BlueprintFieldType::value_type> &public_input,
-                                             const std::vector<typename BlueprintFieldType::value_type> &expected_res) {
-
-    constexpr std::size_t WitnessColumns = 9;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams = crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns,
-                                                                                   ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = blueprint::assignment<ArithmetizationType>;
-    using hash_type = crypto3::hashes::keccak_1600<256>;
-    constexpr std::size_t Lambda = 1;
-    using NonNativeFieldType = typename NonNativeCurveType::base_field_type;
-
-    using component_type =
-        blueprint::components::bool_scalar_multiplication<ArithmetizationType, NonNativeCurveType, 9,
-                                                          blueprint::basic_non_native_policy<BlueprintFieldType>>;
-
-    auto [component_instance, instance_input] =
-        test_bool_scalar_multiplication_inner<BlueprintFieldType, NonNativeCurveType>(public_input, expected_res);
-
-    auto result_check = [&expected_res, &public_input](AssignmentType &assignment,
-                                                       typename component_type::result_type &real_res) {
-        profiling_inside_result_check<BlueprintFieldType, AssignmentType, component_type>(public_input, expected_res,
-                                                                                          assignment, real_res);
-    };
-
-    crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+    } else {
+        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
+    }
 }
 
 template<typename FieldType, typename NonNativeCurveType>
 void test_bool_scalar_multiplication_usable(
     typename NonNativeCurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type point,
-    typename FieldType::value_type scalar_bool) {
+    typename FieldType::value_type scalar_bool,
+    const bool expected_to_pass) {
 
     std::vector<typename FieldType::value_type> public_input =
         create_public_input<FieldType, typename NonNativeCurveType::base_field_type>(
@@ -226,28 +174,7 @@ void test_bool_scalar_multiplication_usable(
     }
     public_input.push_back(scalar_bool);
 
-    test_bool_scalar_multiplication<FieldType, NonNativeCurveType>(public_input, expected_res);
-}
-
-template<typename FieldType, typename NonNativeCurveType>
-void test_bool_scalar_multiplication_usable_to_fail(
-    typename NonNativeCurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type point,
-    typename FieldType::value_type scalar_bool) {
-
-    std::vector<typename FieldType::value_type> public_input =
-        create_public_input<FieldType, typename NonNativeCurveType::base_field_type>(
-            chop_non_native<FieldType, typename NonNativeCurveType::base_field_type>(point.X),
-            chop_non_native<FieldType, typename NonNativeCurveType::base_field_type>(point.Y));
-
-    std::vector<typename FieldType::value_type> expected_res;
-    if (scalar_bool == 1) {
-        expected_res = public_input;
-    } else {
-        expected_res = {0, 0, 0, 0, 1, 0, 0, 0};
-    }
-    public_input.push_back(scalar_bool);
-
-    test_bool_scalar_multiplication_to_fail<FieldType, NonNativeCurveType>(public_input, expected_res);
+    test_bool_scalar_multiplication<FieldType, NonNativeCurveType>(public_input, expected_res, expected_to_pass);
 }
 
 constexpr static const std::size_t random_tests_amount = 3;
@@ -265,12 +192,12 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_test1) {
     boost::random::mt19937 seed_seq;
     rand.seed(seed_seq);
 
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0, 1}, 1);
-    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0, 1}, 0);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0, 1}, 1, true);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0, 1}, 0, true);
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
-        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 1);
-        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 0);
+        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 1, true);
+        test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 0, true);
     }
 }
 
@@ -285,13 +212,12 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_must_fail) {
     boost::random::mt19937 seed_seq;
     rand.seed(seed_seq);
 
-    test_bool_scalar_multiplication_usable_to_fail<field_type, non_native_curve_type>({0, 1}, 2);
-    test_bool_scalar_multiplication_usable_to_fail<field_type, non_native_curve_type>({0, 1}, 10);
-    test_bool_scalar_multiplication_usable_to_fail<field_type, non_native_curve_type>({0, 1}, -1);
-
-    test_bool_scalar_multiplication_usable_to_fail<field_type, non_native_curve_type>(rand(), 2);
-    test_bool_scalar_multiplication_usable_to_fail<field_type, non_native_curve_type>(rand(), 10);
-    test_bool_scalar_multiplication_usable_to_fail<field_type, non_native_curve_type>(rand(), -1);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0, 1}, 2, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0, 1}, 10, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>({0, 1}, -1, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 2, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), 10, false);
+    test_bool_scalar_multiplication_usable<field_type, non_native_curve_type>(rand(), -1, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
