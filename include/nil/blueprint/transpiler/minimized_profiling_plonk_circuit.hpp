@@ -139,7 +139,8 @@ namespace nil {
                         for (std::size_t c_index = 0; c_index < gates[g_index].constraints.size(); c_index++) {
                             gate_lines += 2;
                             for (std::size_t t_index = 0; t_index < gates[g_index].constraints[c_index].terms.size(); t_index++) {
-                                gate_lines += 1;
+                                if(gates[g_index].constraints[c_index].terms[t_index].coeff != FieldType::value_type::one())
+                                    gate_lines += 1;
                                 for (std::size_t v_index = 0; v_index < gates[g_index].constraints[c_index].terms[t_index].vars.size(); v_index++) {
                                     gate_lines += 1;
                                 }
@@ -405,10 +406,20 @@ namespace nil {
             static std::string generate_term(
                 const profiling_params_type &profiling_params,
                 const Vars &vars, 
-                columns_rotations_type &columns_rotations 
+                columns_rotations_type &columns_rotations,
+                bool coeff_one = false
             ) {
                 std::stringstream res;
+                bool first = true;
+
                 for( auto it = std::cbegin(vars); it != std::end(vars); it++){
+                    if( first ){
+                        first = false;
+                        if(coeff_one){
+                            res << "\t\t\tterms:=" << generate_variable(profiling_params, *it, columns_rotations) << std::endl;
+                            continue;
+                        }
+                    }
                     res << "\t\t\tterms:=mulmod(terms, ";
                     res << generate_variable(profiling_params, *it, columns_rotations);
                     res << ", modulus)" << std::endl;
@@ -416,7 +427,6 @@ namespace nil {
                 return res.str();
             }
 
-            //TODO: optimise coeff = 0x1;
             template<typename Terms>
             static std::string generate_terms(
                     const profiling_params_type &profiling_params,
@@ -425,8 +435,12 @@ namespace nil {
             ) {
                 std::stringstream res;
                 for( auto it = std::cbegin(terms); it != std::cend(terms); it++ ){
-                    res << "\t\t\tterms:=0x" << std::hex << it->coeff.data << std::dec << std::endl;
-                    res << generate_term(profiling_params, it->vars, columns_rotations);
+                    if(it->coeff == FieldType::value_type::one())
+                        res << generate_term(profiling_params, it->vars, columns_rotations, true);
+                    else {
+                        res << "\t\t\tterms:=0x" << std::hex << it->coeff.data << std::dec << std::endl;
+                        res << generate_term(profiling_params, it->vars, columns_rotations, false);
+                    }
                     res << "\t\t\tmstore("
                           "add(local_vars, CONSTRAINT_EVAL_OFFSET),"
                           "addmod("
@@ -672,7 +686,6 @@ namespace nil {
                     std::stringstream executions;
 
                     if(!profiling_params.optimize_gates){
-                        std::cout << "Non-optimized gates" << std::endl;
                         for (const auto &gate : bp.gates()) {
                             imports << "import \"./gate" << i << ".sol\";" << std::endl;
                             executions << "\t\t(local_vars.gates_evaluation, local_vars.theta_acc) = gate"<< i <<".evaluate_gate_be(gate_params, local_vars);" << std::endl;
