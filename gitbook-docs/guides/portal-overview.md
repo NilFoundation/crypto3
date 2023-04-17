@@ -6,7 +6,7 @@ description: Navigating crypto3 documentation portal
 
 ## [Guides](portal-overview.md#guides)
 
-Under guides users can find step by step walk-through of setting up environment, scaffold projects or integrate Crypto3 library in the projects.
+Under guides, users can find step-by-step walk-through of setting up the environment, scaffolding projects or integrating the Crypto3 library in the projects.
 
 ## [Modules](portal-overview.md#modules)
 
@@ -18,11 +18,11 @@ Module descriptions/manuals are compartmentalised by programming language
 
 ### [C++](portal-overview.md#c++)
 
-Under the language , user can find the modules which are implemented by the library. Under each , the user can expect to find the following pages.
+Under the language, the user can find the modules which the library implements. Under each, the user can expect to find the following pages.
 
-* **Manual** : Describes the major components/APIs in the library and examples of usage.
-* **Concepts :** Describes in abstract terms the traits and policies which types are using.
-* **References :** doxygen generated documentation.
+* **Manual**: Describes the major components/APIs in the library and examples of usage.
+* **Concepts:** Describes in abstract terms the traits and policies which types are used.
+* **References:** doxygen generated documentation.
 
 Optional guides:
 
