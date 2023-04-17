@@ -6,15 +6,15 @@ description: Crypto3.Field manual
 
 ## Field
 
-`field` type is a generic type which is an extension of `boost::multiprecision`.&#x20;
+`field` type is a generic type which is an extension of `boost::multiprecision`.
 
-All fields implemented in algebra library conform to the concept of a field type. A field must conform to the field traits defined in `algebra/include/nil/crypto3/algebra/type_traits.hpp`
+All fields implemented in the algebra library conform to the concept of a field type. A field must conform to the field traits defined in `algebra/include/nil/crypto3/algebra/type_traits.hpp`
 
-Field consists of a set of stateless policies and with the extension of `modular_adaptor` allows for finite field arithmetic. Field is generally extended per curve and it holds the domain and other curve specific constants.&#x20;
+The field consists of a set of stateless policies and, with the extension,  `modular_adaptor` allows for finite field arithmetic. The field is generally extended per curve, and it holds the domain and other curve-specific constants.
 
-If you wish to use elliptic curve related arithmetic , use __ `element_fp.`
+If you wish to use elliptic curve-related arithmetic , use \_\_ `element_fp.`
 
-If you wish to perform multiprecision airthmetic unrelated to curves see `crypto3::multiprecision`
+If you wish to perform multi precision arithmetic unrelated to curves, see `crypto3::multiprecision`
 
 ### Usage
 
@@ -36,7 +36,7 @@ struct secp_k1_scalar_field<256> : public field<256>
 
 #### Example#1
 
-In this example , we see finite field element arithmetic performed on filed elements over`BLS12-381` curve.&#x20;
+In this example , we see finite field element arithmetic performed on filed elements over`BLS12-381` curve.
 
 ```cpp
 #include <iostream>
@@ -134,4 +134,3 @@ In the above BLS base field example we can see an `element_fp` type used which a
 ```cpp
 typedef typename detail::element_fp<params<bls12_base_field<381>>> value_type;
 ```
-

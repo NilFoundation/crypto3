@@ -106,7 +106,6 @@
 * [Examples](examples/examples/README.md)
   * [BLS Signature](examples/examples/bls-signature.md)
   * [BLS Weighted Threshold signature](examples/examples/bls-weighted-threshold-signature.md)
-  * [First zk Component](examples/examples/first-zk-component.md)
 
 ## Misc
 

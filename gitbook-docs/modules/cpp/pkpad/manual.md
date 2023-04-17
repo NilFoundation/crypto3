@@ -1,3 +1,2 @@
-# Manual # {#pkpad_manual}
+# manual
 
-@tableofcontents

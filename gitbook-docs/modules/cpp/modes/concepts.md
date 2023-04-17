@@ -1,3 +1,2 @@
-# Concepts # {#modes_concepts}
+# concepts
 
-@tableofcontents

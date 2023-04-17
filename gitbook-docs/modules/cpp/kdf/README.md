@@ -1,18 +1,16 @@
-# Introduction # {#kdf_introduction}
+# Kdf
 
-@tableofcontents
 
-The Crypto3.Kdf library extends the Nil Foundation's cryptography suite and provides a set of key derivation functions
-implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features
-support and clean architecture without compromising security and performance.
+
+The Crypto3.Kdf library extends the Nil Foundation's cryptography suite and provides a set of key derivation functions implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
 
 Crypto3.Kdf consists of several parts to review:
 
-* [Manual](@ref kdf_manual).
-* [Implementation](@ref kdf_impl).
-* [Concepts](@ref kdf_concepts).
+* Manual
+* Implementation
+* Concepts
 
-## Dependencies ## {#kdf_dependencies}
+## Dependencies <a href="#kdf_dependencies" id="kdf_dependencies"></a>
 
 Internal dependencies:
 

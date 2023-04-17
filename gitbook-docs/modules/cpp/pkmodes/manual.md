@@ -1,3 +1,2 @@
-# Manual # {#pkmodes_manual}
+# manual
 
-@tableofcontents

@@ -9,10 +9,10 @@ Multi-exponentiation can be performed in two forms
 * standard
 * mixed addition
 
-Each of the above forms take a policy which can be one of the following :&#x20;
+Each of the above forms takes a policy which can be one of the following :
 
-* Naive : simple multiplication & summation of result
-* Bos-Coster &#x20;
+* Naive: simple multiplication & summation of the result
+* Bos-Coster
 * [Pippenger (Special case)](https://eprint.iacr.org/2012/549.pdf)
 
 Each of the above functions takes ranges to vectors/scalars as inputs.
@@ -47,4 +47,3 @@ struct multiexp_method_naive_plain {
 ```cpp
 multiexp<policies::multiexp_method_BDLO12>(group_elements.cbegin(), group_elements.cend(),scalars.cbegin(), scalars.cend(), 1)
 ```
-

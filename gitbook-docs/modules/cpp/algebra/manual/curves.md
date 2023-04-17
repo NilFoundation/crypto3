@@ -4,7 +4,7 @@ description: Crypto3.Algebra Elliptic curves
 
 # curves
 
-The following elliptic curves are implemented&#x20;
+The following elliptic curves are implemented
 
 * Barreto-Naehrig
 * Babyjubjub
@@ -33,8 +33,6 @@ Curves variants defined are defined as `typedef` so it is suggested to check thi
 
 Curves are defined under the namespace `nil::crypto3::algebra::curves` and header need to be included ex: `nil/crypto3/algebra/curves/<curve_name.hpp>`
 
-
-
 A curve type is `policy` passed as a parameter to a cryptographic scheme. The template type can be instantiated as follows by including the relevant header:
 
 ```cpp
@@ -46,7 +44,7 @@ using curve_bls_377 = curves::bls12<377> // Explicityly passing variant
 
 Curves encompass one or more `field elements` types definitions (via `typedef` )which respect the curve specific constants and domain. Curves are generally used along with the [pubkey](https://github.com/NilFoundation/crypto3-pubkey) library which enables a user to create public/private keys and perform cryptographic operations.
 
-### Example #1&#x20;
+### Example #1
 
 Some curves support additional transformations for co-ordinates ex : babyjubjub supports transformation from `twisted_edwards` to `montgomery`
 
@@ -85,13 +83,11 @@ int main() {
 
 ### Example#2
 
-This example shows how a curve can be used in a cryptographic scheme , based on which a user can create public/private keys & sign message (see `pubkey`)
+This example shows how a curve can be used in a cryptographic scheme, based on which a user can create public/private keys & sign message (see `pubkey`)
 
 ```cpp
 using curve_type = curves::bls12_381;
 using scheme_type = bls<bls_default_public_params<>, bls_mss_ro_version, bls_basic_scheme, curve_type>;
 ```
 
-
-
-Also see examples in [field elements ](field.md)section.
+Also, see examples in the [field elements ](field.md)section.

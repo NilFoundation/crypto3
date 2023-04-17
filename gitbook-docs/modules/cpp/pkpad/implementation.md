@@ -1,3 +1,2 @@
-# Implementation {#pkpad_impl}
+# implementation
 
-@tableofcontents

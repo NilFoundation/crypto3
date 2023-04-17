@@ -1,3 +1,2 @@
-# Implementation {#kdf_impl}
+# implementation
 
-@tableofcontents

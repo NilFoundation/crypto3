@@ -1,3 +1,2 @@
-# Manual # {#mac_manual}
+# manual
 
-@tableofcontents

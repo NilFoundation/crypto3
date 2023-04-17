@@ -1,3 +1,2 @@
-# Concepts # {#pkmodes_concepts}
+# concepts
 
-@tableofcontents
