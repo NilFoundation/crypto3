@@ -4,7 +4,7 @@ description: Environment setup for crypto3 suite
 
 # Environment Setup
 
-In this guide, we setup packages/libraries we require in order to compile projects using the crypto3 library.
+In this guide, we set up packages/libraries we require in order to compile projects using the crypto3 library.
 
 ## Installation
 

@@ -15,7 +15,7 @@ crypto3 suite aims to provide :
 1. Secure, fast and architecturally clean C++ generic cryptography schemes implementation.
 2. Developer-friendly, modular suite, usable for novel schemes implementation and further extension.
 3. Standard Template Library-alike C++ interface and concept-based architecture and implementation.
-4. Easier prototyping of novel schemes/proof systems/hashes/other by keeping the Implementation as close to formal constructions.
+4. Easier prototyping of novel schemes/proof systems/hashes by keeping the implementation as close to formal constructions.
 
 ## Why?
 
@@ -23,9 +23,9 @@ Many libraries allow developers to integrate cryptographic primitives in their a
 
 A common theme with these libraries is that they are largely targeting primitives which are widely used and are not fully featured, certainly not on the bleeding edge of newer applications of applied cryptography. You might find that one library implements ECDSA signatures but may not have BLS signatures or support **weighted threshold** signing. This forces individual developers/projects to start rolling out their own implementations/libraries targeted for their own use cases. Forking existing implementations ex: [here](https://github.com/filecoin-project/bellperson), [here](https://github.com/cryptonomex/secp256k1-zkp) or [here](https://github.com/libressl-portable/openbsd), results in greater complexity adding overhead in maintenance as each roll-out starts becoming very specific with reliance on teams to provide support.
 
-One might ask why isn’t there isn’t a one-stop shop for primitives? There is a good reason for this — writing cryptography libraries is a hard, complex task. Most libraries like [boost](https://www.boost.org/) also avoid adding newer primitives or lack a cryptographic module as they are harder to review, and are not yet sold on the stability as the libraries need to evolve/patch at a quicker pace than they want to release.
+One might ask why isn’t there isn’t a one-stop shop for primitives? There is a good reason for this — writing cryptography libraries is a hard, complex task. Most libraries like [boost](https://www.boost.org/) also avoid adding newer primitives or lack a cryptographic module as they are harder to review and are not yet sold on the stability as the libraries need to evolve/patch at a quicker pace than they want to release.
 
-The current web3 landscape moves very quickly and there is a constant demand & need to use different schemes, curves, signing primitives etc. Zero-knowledge development is even harder to crack due to the limited set of libraries.
+The current web3 landscape moves very quickly, and there is a constant demand & need to use different schemes, curves, signing primitives etc. Zero-knowledge development is even harder to crack due to the limited set of libraries.
 
 crypto3 is used extensively in all applications, which =nil;Foundation is developing. This includes a ZK-proof system: placeholder. Database management protocol and ZK-bridges and ZK-LLVM. Thus we will continue to drive the project and maintain it at the same time; it is open for contributions and is available under an [MIT](https://github.com/NilFoundation/crypto3/blob/master/LICENSE) licence.
 

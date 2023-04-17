@@ -6,7 +6,7 @@ description: Navigating crypto3 documentation portal
 
 ## [Guides](portal-overview.md#guides)
 
-Under guides, users can find step-by-step walk-through of setting up the environment, scaffolding projects or integrating the Crypto3 library in the projects.
+Under guides, users can find step-by-step walk-throughs of setting up the environment, scaffolding projects or integrating the Crypto3 library in the projects.
 
 ## [Modules](portal-overview.md#modules)
 
@@ -21,15 +21,15 @@ Module descriptions/manuals are compartmentalised by programming language
 Under the language, the user can find the modules which the library implements. Under each, the user can expect to find the following pages.
 
 * **Manual**: Describes the major components/APIs in the library and examples of usage.
-* **Concepts:** Describes in abstract terms the traits and policies which types are used.
-* **References:** doxygen generated documentation.
+* **Concepts:** Describes in abstract terms the traits and policies in which types are used.
+* **References:** Doxygen generated documentation.
 
 Optional guides:
 
 * **Implementation**: Describes the architecture of the underlying implementation.
-* **Extension** : Describes how to extend the library
+* **Extension**: Describes how to extend the library.
 
-This guide is not designed to use in isolation and should be used in conjunction with the doxygen generated documentation. The aim of this guide is to introduce the user to major concepts and examples of the usage of the library.
+This guide is not designed to use in isolation and should be used in conjunction with the doxygen-generated documentation. The aim of this guide is to introduce the user to major concepts and examples of the usage of the library.
 
 ## [Examples](portal-overview.md#examples)
 
@@ -37,4 +37,4 @@ This section will present some working examples of code combining different modu
 
 ## [Misc](portal-overview.md#misc)
 
-This section covers other miscellaneous guidelines/information regarding contributing to the suite, code of conduct , feedback and contact details for collaboration.
+This section covers other miscellaneous guidelines/information regarding contributing to the suite, code of conduct, feedback and contact details for collaboration.
