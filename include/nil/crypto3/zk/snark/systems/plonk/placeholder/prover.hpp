@@ -29,6 +29,7 @@
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_PROVER_HPP
 
 #include <chrono>
+#include <set>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
@@ -347,13 +348,12 @@ namespace nil {
 
                         // variable_values polynomials (table columns)
                         for (std::size_t variable_values_index = 0; variable_values_index < witness_columns + public_input_columns; variable_values_index++) {
-                            std::vector<int> variable_values_rotation =
+                            std::set<int> variable_values_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[variable_values_index];
 
-                            for (std::size_t rotation_index = 0; rotation_index < variable_values_rotation.size();
-                                 rotation_index++) {
+                            for (int rotation: variable_values_rotation) {
                                 variable_values_evaluation_points[variable_values_index].push_back(
-                                    challenge * omega.pow(variable_values_rotation[rotation_index]));
+                                    challenge * omega.pow(rotation));
                             }
                         }
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
@@ -447,24 +447,24 @@ namespace nil {
 
                         for (std::size_t k = 0; k < constant_columns; k ++){
                             combined_poly[3].push_back(preprocessed_public_data.public_polynomial_table.constants()[k]);
-                            std::vector<int> rotation =
+                            std::set<int> rotations =
                                 preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + k];
                             std::vector<typename FieldType::value_type> point;
 
-                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
-                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            for (int rotation: rotations) {
+                                point.push_back( challenge * omega.pow(rotation));
                             }
                             evaluation_points_public.push_back(point);
                         }
                         
                         for (std::size_t k = 0; k < preprocessed_public_data.public_polynomial_table.selectors().size(); k ++){
                             combined_poly[3].push_back(preprocessed_public_data.public_polynomial_table.selectors()[k]);
-                            std::vector<int> rotation =
+                            std::set<int> rotations =
                                 preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + constant_columns + k];
                             std::vector<typename FieldType::value_type> point;
 
-                            for (std::size_t rotation_index = 0; rotation_index < rotation.size(); rotation_index++) {
-                                point.push_back( challenge * omega.pow(rotation[rotation_index]));
+                            for (int rotation: rotations) {
+                                point.push_back( challenge * omega.pow(rotation));
                             }
                             evaluation_points_public.push_back(point);
                         }

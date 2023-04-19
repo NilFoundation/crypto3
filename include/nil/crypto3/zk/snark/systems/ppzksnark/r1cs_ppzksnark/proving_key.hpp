@@ -54,9 +54,9 @@ namespace nil {
                     typedef CurveType curve_type;
                     typedef ConstraintSystemType constraint_system_type;
 
-                    knowledge_commitment_vector<g1_type, g1_type> A_query;
-                    knowledge_commitment_vector<g2_type, g1_type> B_query;
-                    knowledge_commitment_vector<g1_type, g1_type> C_query;
+                    commitments::knowledge_commitment_vector<g1_type, g1_type> A_query;
+                    commitments::knowledge_commitment_vector<g2_type, g1_type> B_query;
+                    commitments::knowledge_commitment_vector<g1_type, g1_type> C_query;
                     std::vector<g1_value_type> H_query;
                     std::vector<g1_value_type> K_query;
 
@@ -66,9 +66,9 @@ namespace nil {
                     r1cs_ppzksnark_proving_key &operator=(const r1cs_ppzksnark_proving_key &other) = default;
                     r1cs_ppzksnark_proving_key(const r1cs_ppzksnark_proving_key &other) = default;
                     r1cs_ppzksnark_proving_key(r1cs_ppzksnark_proving_key &&other) = default;
-                    r1cs_ppzksnark_proving_key(knowledge_commitment_vector<g1_type, g1_type> &&A_query,
-                                               knowledge_commitment_vector<g2_type, g1_type> &&B_query,
-                                               knowledge_commitment_vector<g1_type, g1_type> &&C_query,
+                    r1cs_ppzksnark_proving_key(commitments::knowledge_commitment_vector<g1_type, g1_type> &&A_query,
+                                               commitments::knowledge_commitment_vector<g2_type, g1_type> &&B_query,
+                                               commitments::knowledge_commitment_vector<g1_type, g1_type> &&C_query,
                                                typename std::vector<g1_value_type> &&H_query,
                                                typename std::vector<g1_value_type> &&K_query,
                                                constraint_system_type &&constraint_system) :

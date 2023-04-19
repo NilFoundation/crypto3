@@ -33,13 +33,13 @@ namespace nil {
             template<typename ProofSystemType, typename KeyPairType = typename ProofSystemType::keypair_type>
             KeyPairType generate(const typename ProofSystemType::constraint_system_type &constraint_system) {
 
-                return ProofSystemType::template generate<KeyPairType>(constraint_system);
+                return ProofSystemType::generate(constraint_system);
             }
 
             template<typename ProofSystemType, typename KeyPairType = typename ProofSystemType::keypair_type>
             KeyPairType generate(const typename ProofSystemType::circuit_type &circuit) {
 
-                return ProofSystemType::template generate<KeyPairType>(circuit);
+                return ProofSystemType::generate(circuit);
             }
 
             template<typename ProofSystemType>

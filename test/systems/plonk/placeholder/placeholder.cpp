@@ -595,8 +595,8 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
     auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
 
-    bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(preprocessed_public_data, proof,
-                                                                                   constraint_system, fri_params);
+    bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params);
     BOOST_CHECK(verifier_res);
 }
 

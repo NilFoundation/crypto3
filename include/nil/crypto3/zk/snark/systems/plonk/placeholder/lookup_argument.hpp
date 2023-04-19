@@ -100,7 +100,7 @@ namespace nil {
                         // TODO: change to new form
                         for (std::size_t i = 0; i < lookup_gates.size(); i++) {
                             for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
-                                for (math::non_linear_term<VariableType> lookup :
+                                for (const math::term<VariableType>& lookup :
                                      lookup_gates[i].constraints[j].lookup_input) {
                                     int k = 0;
                                     std::vector<typename FieldType::value_type> input_assignment;
@@ -286,7 +286,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i < lookup_gates.size(); i++) {
                             for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
-                                for (math::non_linear_term<VariableType> lookup :
+                                for (math::term<VariableType> lookup :
                                      lookup_gates[i].constraints[j].lookup_input) {
                                     int k = 0;
                                     std::tuple<std::size_t, int, typename VariableType::column_type> input_key =

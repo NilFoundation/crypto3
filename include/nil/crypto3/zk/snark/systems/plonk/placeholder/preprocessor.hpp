@@ -33,11 +33,14 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 
+#include <nil/crypto3/zk/math/expression.hpp>
+#include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/math/permutation.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/detail/column_polynomial.hpp>
 
 namespace nil {
@@ -48,9 +51,9 @@ namespace nil {
                 template<typename FieldType, typename ParamsType>
                 class placeholder_public_preprocessor {
                     typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
+                    typedef typename ParamsType::runtime_size_commitment_scheme_type fixed_values_commitment_scheme_type;
+                    typedef typename plonk_constraint<FieldType>::variable_type variable_type;
 
-                    using fixed_values_commitment_scheme_type =
-                        typename ParamsType::runtime_size_commitment_scheme_type;
                 public:
                     struct preprocessed_data_type {
 
@@ -75,7 +78,7 @@ namespace nil {
                         struct common_data_type {
                             using field_type = FieldType;
                             using commitments_type = public_commitments_type;
-                            using columns_rotations_type = std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns>;
+                            using columns_rotations_type = std::array<std::set<int>, ParamsType::arithmetization_params::total_columns>;
                             // marshalled
                             public_commitments_type commitments;
 
@@ -95,7 +98,7 @@ namespace nil {
                             common_data_type(
                                 std::shared_ptr<math::evaluation_domain<FieldType>> D, 
                                 public_commitments_type commts, 
-                                std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
+                                std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows, 
                                 std::uint32_t max_gates_degree
@@ -117,7 +120,7 @@ namespace nil {
                             // Constructor for marshalling. Domain is regenerated.
                             common_data_type(
                                 public_commitments_type commts, 
-                                std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
+                                std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows, 
                                 std::uint32_t max_gates_degree
@@ -272,87 +275,36 @@ namespace nil {
                     };
 
                 public:
-                    static inline std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns>
+                    static inline std::array<std::set<int>, ParamsType::arithmetization_params::total_columns>
                         columns_rotations(
                             plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                                 &constraint_system,
                             const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                                 &table_description) {
 
-                        std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> result;
+                        std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> result;
 
-                        std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates =
-                            constraint_system.gates();
+                        for (auto & s : result) {
+                            s.insert(0);
+                        }
 
-                        for (std::size_t g_index = 0; g_index < gates.size(); g_index++) {
+                        math::expression_for_each_variable_visitor<variable_type> visitor(
+                            [&table_description, &result](const variable_type& var) {
+                                result[table_description.global_index(var)].insert(var.rotation);
+                            }
+                        );
 
-                            for (std::size_t c_index = 0; c_index < gates[g_index].constraints.size(); c_index++) {
-
-                                for (std::size_t t_index = 0;
-                                     t_index < gates[g_index].constraints[c_index].terms.size();
-                                     t_index++) {
-                                    for (std::size_t v_index = 0;
-                                         v_index < gates[g_index].constraints[c_index].terms[t_index].vars.size();
-                                         v_index++) {
-
-                                        if (gates[g_index].constraints[c_index].terms[t_index].vars[v_index].relative) {
-                                            std::size_t column_index = table_description.global_index(
-                                                gates[g_index].constraints[c_index].terms[t_index].vars[v_index]);
-
-                                            int rotation = gates[g_index]
-                                                               .constraints[c_index]
-                                                               .terms[t_index]
-                                                               .vars[v_index]
-                                                               .rotation;
-
-                                            if (std::find(result[column_index].begin(), result[column_index].end(),
-                                                          rotation) == result[column_index].end()) {
-                                                result[column_index].push_back(rotation);
-                                            }
-                                        }
-                                    }
-                                }
+                        for (const auto& gate: constraint_system.gates()) {
+                            for (const auto& constraint: gate.constraints) {
+                               	visitor.visit(constraint);
                             }
                         }
 
-                        std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates =
-                            constraint_system.lookup_gates();
-
-                        for (std::size_t g_index = 0; g_index < lookup_gates.size(); g_index++) {
-
-                            for (std::size_t c_index = 0; c_index < lookup_gates[g_index].constraints.size();
-                                 c_index++) {
-
-                                for (std::size_t v_index = 0;
-                                     v_index < lookup_gates[g_index].constraints[c_index].lookup_input.size();
-                                     v_index++) {
-
-                                    if (lookup_gates[g_index]
-                                            .constraints[c_index]
-                                            .lookup_input[v_index]
-                                            .vars[0]
-                                            .relative) {
-                                        std::size_t column_index = table_description.global_index(
-                                            lookup_gates[g_index].constraints[c_index].lookup_input[v_index].vars[0]);
-
-                                        int rotation = lookup_gates[g_index]
-                                                           .constraints[c_index]
-                                                           .lookup_input[v_index]
-                                                           .vars[0]
-                                                           .rotation;
-
-                                        if (std::find(result[column_index].begin(), result[column_index].end(),
-                                                      rotation) == result[column_index].end()) {
-                                            result[column_index].push_back(rotation);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        for (std::size_t i = 0; i < ParamsType::arithmetization_params::total_columns; i++) {
-                            if (std::find(result[i].begin(), result[i].end(), 0) == result[i].end()) {
-                                result[i].push_back(0);
+                        for (const auto& gate: constraint_system.lookup_gates()) {
+                            for (const auto& constraint: gate.constraints) {
+                                for (const auto& expr: constraint.lookup_input) {
+                               	    visitor.visit(expr);
+                                } 
                             }
                         }
 
@@ -480,15 +432,18 @@ namespace nil {
                         std::size_t usable_rows = table_description.usable_rows_amount;
 
                         std::uint32_t max_gates_degree = 0;
+                        math::expression_max_degree_visitor<variable_type> gates_visitor;
                         for (auto gate : constraint_system.gates()) {
                             for (auto constr : gate.constraints) {
-                                max_gates_degree = std::max(max_gates_degree, (std::uint32_t)constr.max_degree());
+                                max_gates_degree = std::max(max_gates_degree, gates_visitor.compute_max_degree(constr));
                             }
                         }
+                        math::expression_max_degree_visitor<variable_type> lookup_visitor;
                         for (auto gate : constraint_system.lookup_gates()) {
                             for (auto constr : gate.constraints) {
                                 for (auto li : constr.lookup_input) {
-                                    max_gates_degree = std::max(max_gates_degree, (std::uint32_t)li.vars.size());
+                                    max_gates_degree = std::max(max_gates_degree, 
+                                        lookup_visitor.compute_max_degree(li));
                                 }
                             }
                         }
@@ -534,7 +489,7 @@ namespace nil {
                         typename preprocessed_data_type::public_commitments_type public_commitments =
                             commitments(public_precommitments);
 
-                        std::array<std::vector<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
+                        std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data (

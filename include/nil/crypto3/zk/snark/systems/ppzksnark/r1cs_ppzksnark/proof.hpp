@@ -48,9 +48,9 @@ namespace nil {
                     using g2_value_type = typename g2_type::value_type;
 
                 public:
-                    typename knowledge_commitment<g1_type, g1_type>::value_type g_A;
-                    typename knowledge_commitment<g2_type, g1_type>::value_type g_B;
-                    typename knowledge_commitment<g1_type, g1_type>::value_type g_C;
+                    typename commitments::knowledge_commitment<g1_type, g1_type>::value_type g_A;
+                    typename commitments::knowledge_commitment<g2_type, g1_type>::value_type g_B;
+                    typename commitments::knowledge_commitment<g1_type, g1_type>::value_type g_C;
                     g1_value_type g_H;
                     g1_value_type g_K;
 
@@ -65,9 +65,9 @@ namespace nil {
                         this->g_H = g1_value_type::one();
                         this->g_K = g1_value_type::one();
                     }
-                    r1cs_ppzksnark_proof(typename knowledge_commitment<g1_type, g1_type>::value_type &&g_A,
-                                         typename knowledge_commitment<g2_type, g1_type>::value_type &&g_B,
-                                         typename knowledge_commitment<g1_type, g1_type>::value_type &&g_C,
+                    r1cs_ppzksnark_proof(typename commitments::knowledge_commitment<g1_type, g1_type>::value_type &&g_A,
+                                         typename commitments::knowledge_commitment<g2_type, g1_type>::value_type &&g_B,
+                                         typename commitments::knowledge_commitment<g1_type, g1_type>::value_type &&g_C,
                                          g1_value_type &&g_H,
                                          g1_value_type &&g_K) :
                         g_A(std::move(g_A)),
