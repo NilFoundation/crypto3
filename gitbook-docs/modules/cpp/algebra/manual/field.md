@@ -12,9 +12,9 @@ All fields implemented in the algebra library conform to the concept of a field 
 
 The field consists of a set of stateless policies and, with the extension,  `modular_adaptor` allows for finite field arithmetic. The field is generally extended per curve, and it holds the domain and other curve-specific constants.
 
-If you wish to use elliptic curve-related arithmetic , use \_\_ `element_fp.`
+If you wish to use elliptic curve-related arithmetic, use \_\_ `element_fp.`
 
-If you wish to perform multi precision arithmetic unrelated to curves, see `crypto3::multiprecision`
+If you wish to perform multi-precision arithmetic unrelated to curves, see `crypto3::multiprecision`
 
 ### Usage
 
@@ -36,7 +36,7 @@ struct secp_k1_scalar_field<256> : public field<256>
 
 #### Example#1
 
-In this example , we see finite field element arithmetic performed on filed elements over`BLS12-381` curve.
+In this example, we see finite field element arithmetic performed on filed elements over`BLS12-381` curve.
 
 ```cpp
 #include <iostream>
@@ -97,7 +97,7 @@ Following field extensions are already built in and are used in the suite.
 * FP6\_3OVER2
 * FP12\_2OVER3OVER2
 
-Each of the above define a type trait which is then exhibited by specialisations.
+Each of the above defines a type trait which is then exhibited by specialisations.
 
 ### Usage
 
@@ -129,7 +129,7 @@ struct fp2 {
 };
 ```
 
-In the above BLS base field example we can see an `element_fp` type used which adheres to traits of `fp`
+In the above BLS base field example, we can see an `element_fp` type used which adheres to traits of `fp`
 
 ```cpp
 typedef typename detail::element_fp<params<bls12_base_field<381>>> value_type;

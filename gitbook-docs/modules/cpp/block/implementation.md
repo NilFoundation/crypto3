@@ -49,7 +49,7 @@ template<typename BlockCipher, typename InputIterator, typename KeyIterator, typ
 OutputIterator encrypt(InputIterator first, InputIterator last, KeyIterator kfirst, KeyIterator klast, OutputIterator out);
 ```
 
-`BlockCipher` represents the particular block cipher that will be used. `InputIterator` represents the input data coming to be encrypted. Since block ciphers rely on a secret key `KeyIterator` represents the key data, and `OutputIterator` is exactly the same as it was in `std::transform` the algorithm - it handles all the output storage operations.
+`BlockCipher` represents the particular block cipher that will be used. `InputIterator` represents the input data coming to be encrypted. Since block ciphers rely on a secret key `KeyIterator` that represents the key data and `OutputIterator` is exactly the same as it was in `std::transform` the algorithm - it handles all the output storage operations.
 
 The most obvious difference between `std::transform` is a representation of a policy defining the particular behaviour of an algorithm. `std::transform` proposes to pass it as a reference to `Functor`, which is also possible in the case of `BlockCipher` the policy used in function already pre-scheduled:
 
@@ -58,7 +58,7 @@ template<typename BlockCipher, typename InputIterator, typename KeyIterator, typ
 OutputIterator encrypt(InputIterator first, InputIterator last, KeyIterator kfirst, KeyIterator klast, OutputIterator out);
 ```
 
-Algorithms are no more than an internal structures initializer wrapper. In this particular case algorithm would initialize stream processor fed with accumulator set with \[`block`]\(@ref accumulators::block) accumulator inside initialized with \[`BlockCipher`]\(@ref block\_cipher\_concept) initialized with `KeyType` retrieved from input `KeyIterator` instances.
+Algorithms are no more than an internal structures initializer wrapper. In this particular case, algorithm would initialize stream processor fed with an accumulator set with \[`block`]\(@ref accumulators::block) accumulator inside initialized with \[`BlockCipher`]\(@ref block\_cipher\_concept) initialized with `KeyType` retrieved from input `KeyIterator` instances.
 
 ## Stream Data Processing <a href="#block_cipher_stream" id="block_cipher_stream"></a>
 
@@ -66,7 +66,7 @@ Block ciphers are usually defined for processing `Integral` value typed byte seq
 
 This requires the introduction of a stream processor specified with a particular parameter set unique for each `BlockCipher` type, which takes input data stream and gets it split into blocks filled with converted to appropriate size integers (words in the cryptography meaning, not machine words).
 
-Example. Let's assume input data stream consists of 16 bytes as follows.
+Example. Let's assume the input data stream consists of 16 bytes as follows.
 
 <figure><img src="../../../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
 
@@ -84,7 +84,7 @@ Since block cipher algorithms are usually defined for `Integral` types or byte s
 
 For example `rijndael` cipher is defined over blocks of 32-bit words, which could be represented with `uint32_t`. This means all the input data should be in some way converted to a 4-byte-sized `Integral` type. In case of `InputIterator` is defined over some range of `Integral` value type, this is handled with plain byte repack, as shown in the previous section. This is a case with both the input stream and required data format satisfying the same concept.
 
-The more case with input data being presented by a sequence of various type `T` requires for the `T` to have conversion operator `operator Integral()` to the type required by particular `BlockCipher`policy.
+The more case with input data being presented by a sequence of various type `T` requires for the `T` to have a conversion operator `operator Integral()` to the type required by particular `BlockCipher`policy.
 
 Example. Let us assume the following class is presented:
 
@@ -144,11 +144,11 @@ Block ciphers contain pre-defined\[`block::accumulator_set`, which is a `boost::
 
 Block accumulator accepts only one either `block_type::value_type` or `block_type` at insert.
 
-Accumulator is implemented as a caching one. This means there is an input cache sized as same as particular, which accumulates unprocessed data. After it gets filled, data gets encrypted, then it gets moved to the main accumulator storage, and then the cache gets emptied.
+Accumulator is implemented as a caching one. This means there is an input cache sized as same as particular, which accumulates unprocessed data. After it gets filled, data gets encrypted, it gets moved to the main accumulator storage, and the cache empties.
 
 `block` The accumulator is internally used `bit_count` and designed to be combined with other accumulators available for [Boost.Accumulators](https://boost.org/libs/accumulators).
 
-Example. Let's assume there is an accumulator set which intention is to encrypt all the incoming data with `rijndael<128, 128>` cipher and to compute a `sha2<256>` hashes of all the incoming data as well.
+Example. Let's assume there is an accumulator set whose intention is to encrypt all the incoming data with `rijndael<128, 128>` cipher and to compute a `sha2<256>` hashes of all the incoming data as well.
 
 This means there will be an accumulator set defined as follows:
 
@@ -170,7 +170,7 @@ std::string ciphertext = extract::block<block::rijndael<128, 128>>(acc);
 
 ## Value Post-processors <a href="#block_cipher_value" id="block_cipher_value"></a>
 
-Since the accumulator output type is strictly tied to `digest_type` of particular `BlockCipher` policy, the output format in generic is closely tied to the digest type too. Digest type is usually defined as a fixed or variable length byte array, which is not always the format of the container or ranges the user likes to store output in. It could easily be a `std::vector<uint32_t>` or a `std::string`, so there is a `cipher_value` state holder is made to be implicitly convertible to various container and range types with internal data repacking implemented.
+Since the accumulator output type is strictly tied to `digest_type` of particular `BlockCipher` policy, the output format in generic is closely tied to the digest type too. Digest type is usually defined as a fixed or variable length byte array, which is not always the format of the container or ranges the user likes to store the output in. It could easily be a `std::vector<uint32_t>` or a `std::string`, so there is a `cipher_value` state holder is made to be implicitly convertible to various container and range types with internal data repacking implemented.
 
 Such a state holder is split into a couple of types:
 

@@ -4,8 +4,6 @@
 This article is in progress
 {% endhint %}
 
-
-
 ## curve
 
 A `curve` is a policy intended to represent an elliptic curve of the form $$y^{2}=x^{3}+ax+b$$
@@ -30,7 +28,7 @@ The following type members must be valid and have their specified effects
 
 ## curves group
 
-TODO : Describe a curve group
+TODO: Describe a curve group
 
 #### Requirements
 
@@ -41,6 +39,3 @@ Given
 * `FieldType`, the type named by `X::`value\_type
 * `FieldType`, the type named by `X::`value\_type
 * `CurveType`, the type named by `X::curve_type`
-
-
-

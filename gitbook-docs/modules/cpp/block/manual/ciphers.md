@@ -12,7 +12,7 @@ The following block ciphers are implemented by the library:
 * md4/md5
 * rijndael
 
-All block ciphers implemented in the algebra library conform to the concept of a block type. They can be swapped in any policies or schemes and they are taken as input in the crypto3 suite. A block must conform to the traits defined in `block/include/nil/crypto3/detail/type_traits.hpp`
+All block ciphers implemented in the algebra library conform to the concept of a block type. They can be swapped in any policies or schemes and taken as input in the crypto3 suite. A block must conform to the traits defined in `block/include/nil/crypto3/detail/type_traits.hpp`
 
 ## Usage
 

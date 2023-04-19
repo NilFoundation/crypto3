@@ -25,7 +25,7 @@ Below we define some types used as inputs in algorithms:
 </strong>                     const typename PairingCurveType::template g2_type&#x3C;>::value_type &#x26;v2)
 </code></pre>
 
-TODO : Add description
+TODO: Add description
 
 ###
 
@@ -38,7 +38,7 @@ typename PairingCurveType::gt_type::value_type
 				 const typename PairingCurveType::template g2_type<>::value_type &v2)
 ```
 
-TODO : Add description
+TODO: Add description
 
 ### Miller Loop
 
@@ -49,7 +49,7 @@ typename PairingCurveType::gt_type::value_type
 		    const typename PairingPolicy::g2_precomputed_type &prec_Q)
 ```
 
-TODO : Add description
+TODO: Add description
 
 ### Double Miller Loop
 
@@ -62,4 +62,4 @@ typename PairingCurveType::gt_type::value_type
 			   const typename PairingPolicy::g2_precomputed_type &prec_Q2)
 ```
 
-TODO : Add description
+TODO: Add description

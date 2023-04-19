@@ -1,14 +1,14 @@
 # field
 
 {% hint style="warning" %}
-This article is in progress
+This article is in progress.
 {% endhint %}
 
 ##
 
 ## field
 
-A `field` is a generic type to represent element in finite field.
+A `field` is a generic type to represent elements in the finite field.
 
 #### Requirements
 

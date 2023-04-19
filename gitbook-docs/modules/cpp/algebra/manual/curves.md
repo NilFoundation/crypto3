@@ -25,7 +25,7 @@ The following elliptic curves are implemented
 * vesta
 * X9.62
 
-All curves implemented in algebra library conform to the concept of a curve type. They can be swapped in any policies or schemes which they are taken as input in the crypto3 suite. A curve must conform to the traits defined in `algebra/include/nil/crypto3/algebra/type_traits.hpp`
+All curves implemented in the algebra library conform to the concept of a curve type. They can be swapped in any policies or schemes and taken as input in the crypto3 suite. A curve must conform to the traits defined in `algebra/include/nil/crypto3/algebra/type_traits.hpp`
 
 Curves variants defined are defined as `typedef` so it is suggested to check this before writing out an extension.
 
@@ -42,11 +42,11 @@ using curve_bls_381 = curves::bls12_381; // As an existing typedef
 using curve_bls_377 = curves::bls12<377> // Explicityly passing variant
 ```
 
-Curves encompass one or more `field elements` types definitions (via `typedef` )which respect the curve specific constants and domain. Curves are generally used along with the [pubkey](https://github.com/NilFoundation/crypto3-pubkey) library which enables a user to create public/private keys and perform cryptographic operations.
+Curves encompass one or more `field elements` types definitions (via `typedef` ), which respect the curve-specific constants and domain. Curves are generally used along with the [pubkey](https://github.com/NilFoundation/crypto3-pubkey) library, enabling users to create public/private keys and perform cryptographic operations.
 
 ### Example #1
 
-Some curves support additional transformations for co-ordinates ex : babyjubjub supports transformation from `twisted_edwards` to `montgomery`
+Some curves support additional transformations for co-ordinates ex: babyjubjub supports transformation from `twisted_edwards` to `montgomery`
 
 ```cpp
 #include <nil/crypto3/algebra/curves/babyjubjub.hpp>
