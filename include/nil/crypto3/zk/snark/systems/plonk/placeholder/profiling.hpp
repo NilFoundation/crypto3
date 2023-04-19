@@ -134,10 +134,12 @@ namespace nil {
                             if (i != 0)
                                 out << ",";
                             out << "[";
-                            for (size_t j = 0; j < columns_rotations[i].size(); j++) {
-                                if (j != 0)
+                            bool print_coma = false;
+                            for (int r: columns_rotations[i]) {
+                                if (print_coma)
                                     out << ",";
-                                out << columns_rotations[i][j];
+                                out << r;
+                                print_coma = true;
                             }
                             out << "]";
                         }
