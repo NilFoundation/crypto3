@@ -327,7 +327,7 @@ namespace nil {
 
             // Operators for [VariableType or assignment_type or int] +-* expression.
             template<typename VariableType, typename LeftType, 
-                     typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_integral<LeftType>::value>>
+                     typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_same<LeftType, term<VariableType>>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator*(
                     const LeftType &left,
                     const expression<VariableType> &exp) {
@@ -335,7 +335,7 @@ namespace nil {
             }
 
             template<typename VariableType, typename LeftType, 
-                     typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_integral<LeftType>::value>>
+                     typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_same<LeftType, term<VariableType>>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator+(
                     const LeftType &left,
                     const expression<VariableType> &exp) {
@@ -343,7 +343,7 @@ namespace nil {
             }
 
             template<typename VariableType, typename LeftType, 
-                     typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_integral<LeftType>::value>>
+                     typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_same<LeftType, term<VariableType>>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator-(
                     const LeftType &left,
                     const expression<VariableType> &exp) {
