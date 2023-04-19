@@ -29,7 +29,7 @@ Optional guides:
 * **Implementation**: Describes the architecture of the underlying implementation.
 * **Extension**: Describes how to extend the library.
 
-This guide is not designed to use in isolation and should be used in conjunction with the doxygen-generated documentation. The aim of this guide is to introduce the user to major concepts and examples of the usage of the library.
+This guide is not designed to use in isolation and should be used in conjunction with the Doxygen-generated documentation. The aim of this guide is to introduce the user to major concepts and examples of the usage of the library.
 
 ## [Examples](portal-overview.md#examples)
 

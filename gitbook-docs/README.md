@@ -6,7 +6,7 @@ description: '=nil;Foundation''s Cryptography Suite'
 
 ## What?
 
-Crypto3 is an open-source cryptography suite of libraries written in modern C++ by =nil;Foundation and has been in under development since 2018.
+Crypto3 is an open-source cryptography suite of libraries written in modern C++ by =nil;Foundation and has been under development since 2018.
 
 It is a suite which consists of over 17 libraries, representing every major field of modern applied cryptography. It comprises of VDFs, signature schemes (including threshold with various DKGs), zero-knowledge proof systems (R1CS and PLONK-based ones), and more traditional cryptography notions (block cyphers, hashes, message authentication codes, key derivation functions etc.).
 
@@ -23,7 +23,7 @@ Many libraries allow developers to integrate cryptographic primitives in their a
 
 A common theme with these libraries is that they are largely targeting primitives which are widely used and are not fully featured, certainly not on the bleeding edge of newer applications of applied cryptography. You might find that one library implements ECDSA signatures but may not have BLS signatures or support **weighted threshold** signing. This forces individual developers/projects to start rolling out their own implementations/libraries targeted for their own use cases. Forking existing implementations ex: [here](https://github.com/filecoin-project/bellperson), [here](https://github.com/cryptonomex/secp256k1-zkp) or [here](https://github.com/libressl-portable/openbsd), results in greater complexity adding overhead in maintenance as each roll-out starts becoming very specific with reliance on teams to provide support.
 
-One might ask why isn’t there isn’t a one-stop shop for primitives? There is a good reason for this — writing cryptography libraries is a hard, complex task. Most libraries like [boost](https://www.boost.org/) also avoid adding newer primitives or lack a cryptographic module as they are harder to review and are not yet sold on the stability as the libraries need to evolve/patch at a quicker pace than they want to release.
+One might ask why isn’t there isn’t a one-stop shop for primitives. There is a good reason for this — writing cryptography libraries is a hard, complex task. Most libraries like [boost](https://www.boost.org/) also avoid adding newer primitives or lack a cryptographic module as they are harder to review and are not yet sold on the stability as the libraries need to evolve/patch at a quicker pace than they want to release.
 
 The current web3 landscape moves very quickly, and there is a constant demand & need to use different schemes, curves, signing primitives etc. Zero-knowledge development is even harder to crack due to the limited set of libraries.
 

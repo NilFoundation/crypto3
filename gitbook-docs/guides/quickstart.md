@@ -55,4 +55,4 @@ You should see the output `Verified signature successfully` on your console.
 
 ## Conclusion
 
-Congratulations! You now have the environment to start experimenting with the crypto3 suite. You can now explore [modules](broken-reference/) in the suite. Modules also have examples/tests in their repositories, ex: [algebra example](https://github.com/NilFoundation/crypto3-algebra/tree/master/example).
+Congratulations! You now have the environment to start experimenting with the crypto3 suite. You can now explore [modules](broken-reference/) in the suite. Modules also have examples/tests in their repositories, ex: [algebra examples](https://github.com/NilFoundation/crypto3-algebra/tree/master/example).
