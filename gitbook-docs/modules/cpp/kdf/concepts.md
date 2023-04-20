@@ -28,7 +28,7 @@ The following type members must be valid and have their specified effects
 | `X::label_type`  | `LabelType`  | `LabelType` type is a `SequenceContainer` of type `T` which satisfies `Integral` concept  |
 | `X::secret_type` | `SecretType` | `SecretType` type is a `SequenceContainer` of type `T` which satisfies `Integral` concept |
 
-The following static data member definitions must be valid and have their specified effects
+The following static data member definitions must be valid and have their specified effects.
 
 | Expression       | Type          | Requirements and Notes                 |
 | ---------------- | ------------- | -------------------------------------- |
@@ -37,7 +37,7 @@ The following static data member definitions must be valid and have their specif
 | `X::label_bits`  | `std::size_t` | `Integral` bits amount in `LabelType`  |
 | `X::secret_bits` | `std::size_t` | `Integral` bits amount in `SecretType` |
 
-The following expressions must be valid and have their specified effects
+The following expressions must be valid and have their specified effects.
 
 | Expression    | Requirements                                                                    | Return Type             |
 | ------------- | ------------------------------------------------------------------------------- | ----------------------- |

@@ -4,7 +4,7 @@
 
 ## MessageAuthenticationCode Concept <a href="#mac_concept" id="mac_concept"></a>
 
-A `MessageAuthenticationCode` is an object intended to compute non-isomorphic permutations over particular sized integers (e.g. rijndael).
+A `MessageAuthenticationCode` is an object intended to compute non-isomorphic permutations over particular-sized integers (e.g. Rijndael).
 
 ### Requirements  <a href="#mac_concepts_requirements" id="mac_concepts_requirements"></a>
 
@@ -24,7 +24,7 @@ The following type members must be valid and have their specified effects
 | `X::word_type`   | `WordType`   | `WordType` type satisfies `Integral` concept                             |
 | `X::digest_type` | `DigestType` | `DigestType` type is a `SequenceContainer` of type `T`                   |
 
-The following static data member definitions must be valid and have their specified effects
+The following static data member definitions must be valid and have their specified effects.
 
 | Expression       | Type          | Requirements and Notes                                |
 | ---------------- | ------------- | ----------------------------------------------------- |
@@ -33,7 +33,7 @@ The following static data member definitions must be valid and have their specif
 | `X::block_bits`  | `std::size_t` | `Integral` bits amount in `BlockType`                 |
 | `X::block_words` | `std::size_t` | `Integral` amount of `WordType` values in `BlockType` |
 
-The following expressions must be valid and have their specified effects
+The following expressions must be valid and have their specified effects.
 
 | Expression    | Requirements                                                                        | Return Type                 |
 | ------------- | ----------------------------------------------------------------------------------- | --------------------------- |

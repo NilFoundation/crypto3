@@ -4,11 +4,11 @@
 
 Pubkey is responsible for asymmetric cryptography. It implements public key signature and encryption schemes and secret sharing schemes.
 
-Asymmetric schemes usage is split to three stages:
+Asymmetric scheme usage is split into three stages:
 
-1. Initialization. Implicit stage with creation of accumulator to be used.
-2. Accumulation. Performed one or more times. Calling update several times is equivalent to calling it once with all the arguments concatenated. Particularly, during this phase the message for the following signing or encryption is supplied.
-3. Finalization. Accumulated data is required to be finalized, padded and prepared to be retrieved by user.
+1. Initialization. Implicit stage with the creation of accumulator to be used.
+2. Accumulation. Performed one or more times. Calling an update several times is equivalent to calling it once with all the arguments concatenated. Particularly, during this phase, the message for the following signing or encryption is supplied.
+3. Finalization. Accumulated data is required to be finalized, padded and prepared to be retrieved by the user.
 
 ## Architecture Overview <a href="#pubkey_arch" id="pubkey_arch"></a>
 
@@ -39,7 +39,7 @@ Detailed descriptions of each step and architecture parts are presented below.
 
 Implementation of a library is considered to be highly compliant with STL. So the crucial point is to have pubkey to be usable in the same way as STL algorithms do.
 
-STL algorithms library mostly consists of generic iterator and since C++20 range-based algorithms over generic concept-compliant types. Great example is`std::transform` algorithm:
+STL algorithms library mostly consists of generic iterators and since C++20 range-based algorithms over generic concept-compliant types. Great example is`std::transform` algorithm:
 
 ```cpp
 template<typename InputIterator, typename OutputIterator, typename UnaryOperation>
@@ -48,14 +48,14 @@ OutputIterator transform(InputIterator first, InputIterator last, OutputIterator
 
 Input values of type `InputIterator` operate over any iterable range, no matter which particular type is supposed to be processed. While `OutputIterator` provides a type-independent output place for the algorithm to put results no matter which particular range this `OutputIterator`represents.
 
-Since C++20 this algorithm got it analogous inside Ranges library as follows:
+Since C++20, this algorithm got it analogous inside the Ranges library as follows:
 
 ```cpp
 template<typename InputRange, typename OutputRange, typename UnaryOperation>
 OutputRange transform(InputRange rng, OutputRange out, UnaryOperation unary_op);
 ```
 
-This particular modification takes no difference if `InputRange` is a `Container` or something else. The algorithm is generic just as data representation types are.
+This particular modification makes no difference if `InputRange` is a `Container` or something else. The algorithm is generic, just as data representation types are.
 
 As much as such algorithms are implemented as generic ones, pubkey algorithms should follow that too, for example:
 
@@ -64,14 +64,14 @@ template<typename Scheme, typename InputIterator, typename OutputIterator, typen
 OutputIterator sign(InputIterator first, InputIterator last, const pubkey::private_key<Scheme> &key, OutputIterator out);
 ```
 
-* `Scheme` is a policy type which represents the particular asymmetric scheme will be used.
+* `Scheme` is a policy type which represents the particular asymmetric scheme that will be used.
 * `InputIterator` represents the input data coming to be hashed.
-* `OutputIterator` is exactly the same as it was in `std::transform` algorithm - it handles all the output storage operations.
-* `ProcessingMode` is a policy representing a work mode of the scheme, by default isomorphic, which means execute a signing operation as in specification, another example is threshold mode.
+* `OutputIterator` It is exactly the same as in `std::transform` algorithm - it handles all the output storage operations.
+* `ProcessingMode` is a policy representing a work mode of the scheme, by default isomorphic, which means executing a signing operation as in specification; another example is threshold mode.
 
-The most obvious difference between `std::transform` is a representation of a scheme and mode policies defining the particular behavior of an algorithm.
+The most obvious difference between `std::transform` is a representation of a scheme and mode policies defining the particular behaviour of an algorithm.
 
-Analogous interface function template is supposed to work with already pre-initialized accumulator:
+The analogous interface function template is supposed to work with an already pre-initialized accumulator:
 
 ```cpp
 template<typename Scheme, typename InputIterator, typename ProcessingMode, typename OutputAccumulator>
@@ -82,7 +82,7 @@ sign(InputIterator first, InputIterator last, OutputAccumulator &acc);
 
 `OutputAccumulator` is a pre-initialized accumulator set.
 
-Such interface is not the case when working with `std::transform` as it does not work with the accumulator concept. Passed message is used to update state of passed accumulator `acc`. Such call of `sign` doesn't complete signing algorithm. To retrieve resulted signature accumulator should be finalized, i.e. in the case of accumulator concept it should be extracted.
+Such an interface is not the case when working with `std::transform` it, as it does not work with the accumulator concept. The passed message is used to update the state of the passed accumulator `acc`. Such call of `sign` doesn't complete the signing algorithm. To retrieve the resulting signature accumulator should be finalized, i.e. in the case of the accumulator concept, it should be extracted.
 
 Another possible interface doesn't accept `OutputIterator` accumulator parameter:
 
@@ -92,11 +92,11 @@ template<typename Scheme, typename InputIterator, typename ProcessingMode, typen
 SchemeImpl sign(InputIterator first, InputIterator last, const pubkey::private_key<Scheme> &key);
 ```
 
-Such call return object of internal type (`range_pubkey_impl` or `itr_pubkey_impl`) which is implicitly convertible to accumulator set type, pre-initialized with input data of `InputIterator` type, or to `ProcessingMode::result_type`, which represents result of algorithm execution.
+Such call return object of internal type (`range_pubkey_impl` or `itr_pubkey_impl`) which is implicitly convertible to accumulator set type, pre-initialized with input data of `InputIterator` type, or to `ProcessingMode::result_type`, which represents the result of algorithm execution.
 
-Algorithms are no more than an internal structures initializer wrapper. In this particular case algorithm would initialize accumulator set with accumulator we \[`need` ]\(@ref accumulators::pubkey) inside initialized with `key` and in several cases with other parameters.
+Algorithms are no more than an internal structures initializer wrapper. In this particular case, the algorithm would initialize the accumulator set with the accumulator we \[`need` ]\(@ref accumulators::pubkey) inside initialized with `key` and in several cases, with other parameters.
 
-Brief survey of available algorithms of pubkey library is presented below.
+A brief survey of available algorithms of the pubkey library is presented below.
 
 ### Pubkey Algorithms ## <a href="#pubkey_algorithms" id="pubkey_algorithms"></a>
 
@@ -108,35 +108,35 @@ The algorithm is responsible for creating a signature.
 
 The function template `sign` takes as input parameters - a message to be signed, a private key for signing and other possible parameters depending on particular function overloading (for example, an iterator to output the signature). Once executed, the function's result is a signed message.
 
-The supplied private key should be of type `private_key<Scheme>`, so specialization of `private_key` template for intended `Scheme` should be defined (details about `private_key` see below).
+The supplied private key should be of type `private_key<Scheme>`, so the specialization of `private_key` template for intended `Scheme` should be defined (details about `private_key` see below).
 
-The resulted signature is of type `private_key<Scheme>::signature_type` (equivalently `ProcessingMode::result_type`).
+The resulting signature is of type. `private_key<Scheme>::signature_type` (equivalently `ProcessingMode::result_type`).
 
 #### verify.hpp
 
 The algorithm is responsible for verifying signatures.
 
-Verify is a validation algorithm that outputs true if the signature is a valid for the supplied public key, message and signature, and false otherwise.
+Verify is a validation algorithm that outputs true if the signature is valid for the supplied public key, message and signature and false otherwise.
 
-The supplied public key should be of type `public_key<Scheme>`, so specialization of `public_key` template for intended `Scheme` should be defined (details about `public_key` see below).
+The supplied public key should be of type `public_key<Scheme>`, so the specialization of `public_key` template for intended `Scheme` should be defined (details about `public_key` see below).
 
 The signature should be supplied in the correct form, namely defined as `public_key<Scheme>::signature_type` (equivalently `ProcessingMode::result_type`).
 
 #### aggregate.hpp
 
-The algorithm for a given list of signatures created for a some list of messages on some private keys generates one aggregated signature that authenticates the same list of messages on the corresponding public keys. Example of such algorithm see [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
+The algorithm for a given list of signatures created for some list of messages on some private keys generates one aggregated signature that authenticates the same list of messages on the corresponding public keys. An example of such an algorithm is [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
 
-All signatures should be of type `public_key<Scheme>::signature_type` (equivalently `ProcessingMode::result_type`). Resulted signature is of the same type.
+All signatures should be of type `public_key<Scheme>::signature_type` (equivalently `ProcessingMode::result_type`). Resulting in a signature of the same type.
 
 #### aggregate\_verify.hpp
 
-The algorithm verifies aggregated signature, created for a given list of messages, using a corresponding list of public key. Example of such algorithm see [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
+The algorithm verifies the aggregated signatures created for a given message list using a corresponding public key list. An example of such an algorithm is [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
 
 The signature should be of the type `public_key<Scheme>::signature_type` (equivalently `ProcessingMode::result_type`).
 
 #### aggregate\_verify\_single\_msg.hpp
 
-The optimized version of aggregate verification algorithm which should be used if aggregated signatures were created for the same message on the all keys. Example of such algorithm see [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
+The optimized version of the aggregate verification algorithm should be used if aggregated signatures were created for the same message on all keys. An example of such an algorithm is [here](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/).
 
 #### deal\_shares.hpp
 

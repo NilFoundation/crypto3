@@ -1,10 +1,8 @@
 # PkModes
 
+The Crypto3.PkModes library extends the =nil; Foundation's cryptography suite and provides a set of modes for public key cryptography schemes defined in pubkey library (e.g. threshold) implemented in a way C++ standard library implies concepts, algorithms, predictable behaviour, latest standard features support and clean architecture without compromising security and performance.
 
-
-The Crypto3.PkModes library extends the =nil; Foundation's cryptography suite and provides a set of modes for public key cryptography schemes defined in pubkey library (e.g. threshold) implemented in way C++ standard library implies: concepts , algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
-
-Crypto3.Modes consists of several parts to review:
+Crypto3.Modes consist of several parts to review:
 
 * Manual
 * Implementation

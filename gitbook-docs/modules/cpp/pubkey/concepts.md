@@ -16,7 +16,7 @@ A `SignaturePublicKeyScheme` is a stateless asymmetric crypto-scheme policy supp
 
 ### Requirements <a href="#signature_pubkey_concepts_requirements" id="signature_pubkey_concepts_requirements"></a>
 
-The type `X` satisfies `SignaturePublicKeyScheme` if it satisfies to the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `VerificationPublicKey` and `SigningPrivateKey` accordingly.
+The type `X` satisfies `SignaturePublicKeyScheme` if it satisfies the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `VerificationPublicKey` and `SigningPrivateKey` accordingly.
 
 ## Encryption public key scheme concept <a href="#encryption_pubkey_concept" id="encryption_pubkey_concept"></a>
 
@@ -32,7 +32,7 @@ An `SecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
 
 ### Requirements <a href="#secret_sharing_pubkey_concepts_requirements" id="secret_sharing_pubkey_concepts_requirements"></a>
 
-The type `X` satisfies `SecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `Share`, `public_share_sss<Scheme>` satisfying to the concepts `PublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret` and following expressions must be valid and have their specified effects.
+The type `X` satisfies `SecretSharingScheme` if at least there exist partial specializations of the templates `deal_shares_op<X>` satisfying to the concepts `PublicKeyOperation`, `share_sss<Scheme>` satisfying to the concepts `Share`, `public_share_sss<Scheme>` satisfying to the concepts `PublicShare`, `secret_sss<Scheme>` satisfying to the concepts `Secret` , and the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -59,13 +59,13 @@ The type `X` satisfies `WeightedSecretSharingScheme` if at least there exist par
 
 ## Public key concept ## <a href="#pubkey_concept" id="pubkey_concept"></a>
 
-A `PublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms, of some asymmetric crypto-scheme, assuming the use of the public key (for example, signature verification or message encryption).
+A `PublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms of some asymmetric crypto-scheme, assuming the use of the public key (for example, signature verification or message encryption).
 
-Implementation of concept `PublicKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
+Implementation of concept `PublicKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `public_key<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `PublicKey` concept then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `PublicKey` the concept, then the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -82,7 +82,7 @@ Given
 * `x` object of type `X`
 * `k` object of type `X::key_type`
 * `acc` lvalue of type `X::internal_accumulator_type`
-* `r` object of the type satisfying [`SequenceContainer`](https://en.cppreference.com/w/cpp/named\_req/SequenceContainer)concept
+* `r` the object of the type satisfying [`SequenceContainer`](https://en.cppreference.com/w/cpp/named\_req/SequenceContainer)concept
 * `i`, `j` objects of the type satisfying [`LegacyInputIterator`](https://en.cppreference.com/w/cpp/named\_req/InputIterator) concept
 * `s` object of type `X::signature_type`
 
@@ -97,11 +97,11 @@ Given
 
 A `VerificationPublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms of particular asymmetric signature crypto-scheme.
 
-Implementation of concept `VerificationPublicKey` for some asymmetric signature crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
+Implementation of concept `VerificationPublicKey` for some asymmetric signature crypto-scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `public_key<Scheme>`.
 
 ### Requirements  <a href="#signature_verification_pubkey_concepts_requirements" id="signature_verification_pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `VerificationPublicKey` concept then it satisfies to `PublicKey` and following expressions must be valid and have their specified effects.
+If the type `X` satisfies `VerificationPublicKey` the concept, then it satisfies the to `PublicKey` and the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -126,11 +126,11 @@ Given
 
 A `EncryptionPublicKey` is a concept of a stateful object containing cryptographic material of public key and defining methods to execute cryptographic algorithms, of particular asymmetric encryption crypto-scheme, assuming the use of the private key.
 
-Implementation of concept `EncryptionPublicKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_key<Scheme>`.
+Implementation of concept `EncryptionPublicKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `public_key<Scheme>`.
 
 ### Requirements <a href="#encryption_pubkey_concepts_requirements" id="encryption_pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `EncryptionPublicKey` concept then it satisfies to `PublicKey` and following expressions must be valid and have their specified effects.
+If the type `X` satisfies `EncryptionPublicKey` the concept, then it satisfies to `PublicKey` and the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -153,13 +153,13 @@ Given
 
 ## Private key concept  <a href="#pubkey_concept" id="pubkey_concept"></a>
 
-A `PrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of particular asymmetric crypto-scheme, assuming the use of the private key (for example, signature creation or message decryption).
+A `PrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms of particular asymmetric crypto-scheme, assuming the use of the private key (for example, signature creation or message decryption).
 
-Implementation of concept `PrivateKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
+Implementation of concept `PrivateKey` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `private_key<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `PrivateKey` concept then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `PrivateKey` the concept, then the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -176,7 +176,7 @@ Given
 * `x` object of type `X`
 * `k` object of type `X::key_type`
 * `acc` lvalue of type `X::internal_accumulator_type`
-* `r` object of the type satisfying [`SequenceContainer`](https://en.cppreference.com/w/cpp/named\_req/SequenceContainer) concept
+* `r`  object of the type satisfying [`SequenceContainer`](https://en.cppreference.com/w/cpp/named\_req/SequenceContainer) concept
 * `i`, `j` objects of the type satisfying [`LegacyInputIterator`](https://en.cppreference.com/w/cpp/named\_req/InputIterator) concept
 
 | Expression                | Return type | Effects                                                                                             |
@@ -188,13 +188,13 @@ Given
 
 ## Signing private key concept  <a href="#pubkey_concept" id="pubkey_concept"></a>
 
-A `SigningPrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of some asymmetric encryption crypto-scheme, assuming the use of the private key.
+A `SigningPrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms of some asymmetric encryption crypto-scheme, assuming the use of the private key.
 
-Implementation of concept `SigningPrivateKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
+Implementation of concept `SigningPrivateKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `private_key<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `SigningPrivateKey` concept then it satisfies `PrivateKey` concept and following expressions must be valid and have their specified effects.
+If the type `X` satisfies `SigningPrivateKey` the concept, then it satisfies `PrivateKey` concept and following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -216,13 +216,13 @@ Given
 
 ## Decryption private key concept <a href="#pubkey_concept" id="pubkey_concept"></a>
 
-A `DecryptionPrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms, of some asymmetric encryption crypto-scheme, assuming the use of the private key.
+A `DecryptionPrivateKey` is a concept of a stateful object containing cryptographic material of private key and defining methods to execute cryptographic algorithms of some asymmetric encryption crypto-scheme, assuming the use of the private key.
 
-Implementation of concept `DecryptionPrivateKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining partial specialization of template `private_key<Scheme>`.
+Implementation of concept `DecryptionPrivateKey` for some asymmetric encryption crypto-scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `private_key<Scheme>`.
 
 ### Requirements <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `DecryptionPrivateKey` concept then it satisfies `PrivateKey` concept and following expressions must be valid and have their specified effects.
+If the type `X` satisfies `DecryptionPrivateKey` the concept, then it satisfies `PrivateKey` concept and following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -246,11 +246,11 @@ Given
 
 A `PublicKeyOperation` is a concept of a stateless policy defining methods to execute an algorithm, supported by some asymmetric crypto-scheme, not assuming the use of a single cryptographic key (for example, [the BLS scheme aggregation algorithm](https://datatracker.ietf.org/doc/draft-irtf-cfrg-bls-signature/)).
 
-Implementation of concept `PublicKeyOperation` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by declaration of template named like `algorithm_name_op` and defining partial specialization of this template `algorithm_name_op<Scheme>`.
+Implementation of concept `PublicKeyOperation` for some asymmetric crypto-scheme policy `Scheme` is assumed to be done by the declaration of the template named like `algorithm_name_op` and defining the partial specialization of this template `algorithm_name_op<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `PublicKeyOperation` concept then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `PublicKeyOperation` the concept, then the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -279,11 +279,11 @@ Given
 
 A `Share` is a concept of a stateful object containing cryptographic material of share and defining methods to work with it of some secret sharing scheme.
 
-Implementation of concept `Share` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `share_sss<Scheme>`.
+Implementation of concept `Share` for some secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `share_sss<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `Share` concept then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `Share` the concept, then the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -307,11 +307,11 @@ If the type `X` satisfies `Share` concept then following expressions must be val
 
 A `PublicShare` is a concept of a stateful object containing cryptographic material of public representative of share and defining methods to work with it for some secret sharing scheme.
 
-Implementation of concept `PublicShare` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_share_sss<Scheme>`.
+Implementation of concept `PublicShare` for some secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `public_share_sss<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `PublicShare` concept then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `PublicShare` concept, then the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -334,11 +334,11 @@ If the type `X` satisfies `PublicShare` concept then following expressions must 
 
 A `WeightedShare` is a concept of a stateful object containing cryptographic material of share and defining methods to work with it of some weighted secret sharing scheme.
 
-Implementation of concept `WeightedShare` for some weighted secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `share_sss<Scheme>`.
+Implementation of concept `WeightedShare` for some weighted secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `share_sss<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `WeightedShare` concept then it satisfies to the `Share` concept and following expressions must be valid and have their specified effects.
+If the type `X` satisfies `WeightedShare` the concept, then it satisfies to the `Share` concept and following expressions must be valid and have their specified effects.
 
 | Expression       | Return type   | Effects                   |
 | ---------------- | ------------- | ------------------------- |
@@ -348,11 +348,11 @@ If the type `X` satisfies `WeightedShare` concept then it satisfies to the `Shar
 
 A `WeightedPublicShare` is a concept of a stateful object containing cryptographic material of public representative of share and defining methods to work with it for some weighted secret sharing scheme.
 
-Implementation of concept `WeightedPublicShare` for some weighted secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_share_sss<Scheme>`.
+Implementation of concept `WeightedPublicShare` for some weighted secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `public_share_sss<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `WeightedPublicShare` concept then it satisfies `PublicShare` concept following expressions must be valid and have their specified effects.
+If the type `X` satisfies `WeightedPublicShare` the concept, then it satisfies `PublicShare` concept following expressions must be valid and have their specified effects.
 
 | Expression       | Return type   | Effects                   |
 | ---------------- | ------------- | ------------------------- |
@@ -362,11 +362,11 @@ If the type `X` satisfies `WeightedPublicShare` concept then it satisfies `Publi
 
 A `Secret` is a concept of a stateful object containing cryptographic material of secret and defining methods to work with it for some secret sharing scheme.
 
-Implementation of concept `Secret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `secret_sss<Scheme>`.
+Implementation of concept `Secret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of a template `secret_sss<Scheme>`.
 
 ### Requirements <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `Secret` concept then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `Secret` the concept, then following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -386,11 +386,11 @@ If the type `X` satisfies `Secret` concept then following expressions must be va
 
 A `PublicSecret` is a concept of a stateful object containing cryptographic material of public representative of secret and defining methods to work with it for some secret sharing scheme.
 
-Implementation of concept `PublicSecret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining partial specialization of template `public_secret_sss<Scheme>`.
+Implementation of concept `PublicSecret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of template `public_secret_sss<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `PublicSecret` concept then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `PublicSecret` the concept, then the following expressions must be valid and have their specified effects.
 
 #### Member types
 
