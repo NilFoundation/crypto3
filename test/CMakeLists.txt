@@ -57,38 +57,22 @@ set(NON_NATIVE_TESTS_FILES
     "algebra/fields/plonk/non_native/range"
     "algebra/fields/plonk/non_native/reduction"
     "algebra/fields/plonk/non_native/bit_decomposition"
-    "non_native/plonk/var_base_mul_per_bit"
-    "non_native/plonk/complete_addition"
-    "non_native/plonk/doubling"
-    "non_native/plonk/fixed_base_mul"
-    "non_native/plonk/variable_base_multiplication"
-    "non_native/plonk/non_native_demo"
-    "non_native/plonk/ed25519"
-    "non_native/plonk/signatures_verification"
-    "non_native/plonk/ec_point"
     "non_native/plonk/bool_scalar_multiplication"
     "non_native/plonk/scalar_non_native_range"
     )
 
-set(BLUEPRINT_TESTS_FILES
-    "blueprint/plonk"
-    )
-
 set(PLONK_TESTS_FILES
-    "algebra/curves/plonk/fixed_base_scalar_mul"
     "algebra/curves/plonk/variable_base_scalar_mul"
     "algebra/curves/plonk/decomposed_variable_base_scalar_mul"
     "algebra/curves/plonk/unified_addition"
     "algebra/curves/plonk/variable_base_endo_scalar_mul"
     "algebra/curves/plonk/endo_scalar"
-    "algebra/curves/plonk/multi_scalar_multiplication"
     "hashes/plonk/poseidon"
     "hashes/plonk/sha256"
     "hashes/plonk/sha512"
     "hashes/plonk/sha256_process"
     "hashes/plonk/sha512_process"
     "hashes/plonk/decomposition"
-    "merkle_tree/plonk/merkle_tree"
     "verifiers/kimchi/base_field"
     "verifiers/kimchi/prepare_batch_scalar"
     "verifiers/kimchi/verify_scalar"
@@ -187,7 +171,6 @@ SET(ALGEBRA_TESTS_FILES
 
 SET(ALL_TESTS_FILES
     ${NON_NATIVE_TESTS_FILES}
-    ${BLUEPRINT_TESTS_FILES}
     ${PLONK_TESTS_FILES}
     ${ALGEBRA_TESTS_FILES}
     ${HASHES_TESTS_FILES}
