@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
  
 ```
 
-Similar technique is available for ranges:
+A similar technique is available for ranges:
 
 ```cpp
 #include <nil/crypto3/hash/md5.hpp>
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
 ## Stateful hashing
 
-In case of accumulative hashes requirement is present, following example demonstrates \[accumulator]\(@ref accumulator\_set) usage:
+In case of accumulative hashes requirement is present, the following example demonstrates \[accumulator]\(@ref accumulator\_set) usage:
 
 ```cpp
 #include <nil/crypto3/hash/md5.hpp>

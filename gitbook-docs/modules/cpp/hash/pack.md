@@ -1,10 +1,8 @@
 # pack
 
-
-
 ## Introduction
 
-This document provides a detailed description of pack algorithms used in the current project. Briefly, pack algorithms are used throughout the project to transform data divided into chunks with one parameters into the data divided into chunks with another parameters. The dependence of algorithms on these parameters is discussed further in the Section [Algorithms](pack.md##pack\_algorithms).
+This document provides a detailed description of pack algorithms used in the current project. Briefly, pack algorithms are used throughout the project to transform data divided into chunks with one parameter into data divided into chunks with another parameter. The dependence of algorithms on these parameters is discussed further in the Section [Algorithms](pack.md##pack\_algorithms).
 
 ## Basic notions and assumptions
 
@@ -12,28 +10,28 @@ This section introduces notions we will use throughout the document.
 
 We will assume further that the data to be transformed by pack algorithms is byte-aligned. In addition, the packed data is also considered to be byte-aligned.
 
-We will also suppose that the data (both input and output) is divided into chunks which are the groups of bytes for which the type is language-defined (such as `uint8_t` or `uint32_t`) or user-defined. Currently, we restrict the chunk type to be integral.
+We will also suppose that the data (both input and output) is divided into chunks which are the groups of bytes for which the type is language-defined (such as `uint8_t` or `uint32_t`) or user-defined. Currently, we restrict the chunk type to integral.
 
-By term _endianness_ we mean the significance order of groups of bytes further called _units_ combined with the significance order of bits inside of each unit. For example, bit\_unit\_little\_bit endianness refers to the _most significant unit first_ order, and each unit contains the bits in the _least significant bit first_ order.\
+By term _endianness,_ we mean the significance order of groups of bytes, further called _units,_ combined with the significance order of bits inside of each unit. For example, bit\_unit\_little\_bit endianness refers to the _most significant unit first_ order, and each unit contains the bits in the _least significant bit first_ order.\
 Generally, we have the four following types of endianness:
 
-1. `big_unit_big_bit` endianness refers to the _most significant unit first_ order, and each unit contains the bits in the `most significant bit first` order;
-2. `little_unit_big_bit` endianness refers to the _least significant unit first_ order, and each unit contains the bits in the `most significant bit first` order;
-3. `big_unit_little_bit` endianness refers to the _most significant unit first_ order, and each unit contains the bits in the `least significant bit first` order;
-4. `little_unit_little_bit` endianness refers to the _least significant unit first_ order, and each unit contains the bits in the `least significant bit first` order.
+1. `big_unit_big_bit` endianness refers to the _most significant unit in the first_ order, and each unit contains the bits in the `most significant bit first` order;
+2. `little_unit_big_bit` endianness refers to the _least significant unit in the first_ order, and each unit contains the bits in the `most significant bit first` order;
+3. `big_unit_little_bit` endianness refers to the _most significant unit in the first_ order, and each unit contains the bits in the `least significant bit first` order;
+4. `little_unit_little_bit` endianness refers to the _least significant unit in the first_ order, and each unit contains the bits in the `least significant bit first` order.
 
-Note that if the unit is byte, then the first two endiannesses coincide with well-known big-endian and little-endian byte orders. However, we prefer to use the above-introduced classification, since it takes into account the architectures with non-typical endiannesses and, hence, is wider than just the big/little-endian dichotomy.
+Note that if the unit is the byte, the first two endianness coincide with well-known big-endian and little-endian byte orders. However, we prefer to use the above-introduced classification since it takes into account the architectures with non-typical endianness and, hence, is wider than just the big/little-endian dichotomy.
 
-All the notation not described in this section will be introduced on the fly.
+All the notations not described in this section will be introduced on the fly.
 
 ## Algorithms  <a href="#pack_algorithms" id="pack_algorithms"></a>
 
-Pack algorithms are intended to transform byte-aligned data divided into chunks of bit size denoted by `InputValueBits` into byte-aligned data divided into chunks of bit size denoted by `OutputValueBits`. Moreover, we suppose that all input and output data chunks consist of units ordered in accordance with the corresponding endiannesses. We will refer to these endiannesses as `InputEndianness` and `OutputEndianness`, respectively.
+Pack algorithms are intended to transform byte-aligned data divided into chunks of bit size denoted by `InputValueBits` into byte-aligned data divided into chunks of bit size denoted by `OutputValueBits`. Moreover, we suppose that all input and output data chunks consist of units ordered in accordance with the corresponding endianness. We will refer to this endianness as `InputEndianness` and `OutputEndianness`, respectively.
 
 Pack algorithms are divided into the following categories depending on the relation between the chunk sizes:
 
-* `InputValueBits` < `OutputValueBits`. This algorithm combines several small chunks into big one, and is further referred to as imploder. It is also supposed that `OutputValueBits` is a multiple of `InputValueBits`.
-* `InputValueBits` > `OutputValueBits`. This algorithm splits one big chunk into several small chunks, and is further referred to as exploder. It is also supposed that `InputValueBits` is a multiple of `OutputValueBits`.
+* `InputValueBits` < `OutputValueBits`. This algorithm combines several small chunks into a big one and is further referred to as an imploder. It is also supposed that `OutputValueBits` is a multiple of `InputValueBits`.
+* `InputValueBits` > `OutputValueBits`. This algorithm splits one big chunk into several small chunks, and is further referred to as an exploder. It is also supposed that `InputValueBits` is a multiple of `OutputValueBits`.
 * `InputValueBits` = `OutputValueBits`. This algorithm transforms data chunk-by-chunk in accordance with the corresponding endianness conversion.
 
 It is important to note that the combining and splitting operations in imploder and exploder algorithms are also dependent on endianness conversion.
@@ -65,7 +63,7 @@ struct1 \[label="0x34 | 0x12 | 0x78 | 0x56 "];
 
 } @enddot
 
-In the example above we suppose that the unit of arrays is byte. It is easy to see, that the value written to the out array is obtained by combining each input chunk byte data in reverse byte order.
+In the example above, we suppose that the unit of arrays is a byte. It is easy to see that the value written to the out array is obtained by combining each input chunk byte data in reverse byte order.
 
 It may seem at first look that all same endianness conversions are simplicity itself, but that's not quite true. To dive deeper into the problem of endianness conversion, consider the inverse conversion.
 
@@ -92,9 +90,9 @@ struct1 \[label="0x78 | 0x56 | 0x34 | 0x12 "];
 
 } @enddot
 
-In this example, `input` array units are ordered in `big_unit_big_bit` endianness and `output` array units are ordered in `little_unit_big_bit` endianness (supposing that the unit is byte). One can see that in addition to reverse byte order we have the reverse order of input chunks in the _out_ array.
+In this example, `input` array units are ordered in `big_unit_big_bit` endianness and `output` array units are ordered in `little_unit_big_bit` endianness (supposing that the unit is a byte). In addition, we have the reverse order of input chunks in the out array to reverse byte order.
 
-An interested reader may wonder why changing of endiannesses leads to such a strange effect. Well, the answer to this question lies in the following convention: all data divided into chunks with units ordered in `big_unit_big_bit` endianness will stay unchanged when tranforming to data with chunk units ordered in `big_unit_big_bit` endianness. Let us explain it with the following example.
+An interested reader may wonder why changing of endianness leads to such a strange effect. Well, the answer to this question lies in the following convention: all data is divided into chunks with units ordered in `big_unit_big_bit` endianness will stay unchanged when transforming to data with chunk units ordered in `big_unit_big_bit` endianness. Let us explain it with the following example.
 
 ```cpp
 std::array<uint16_t, 4> input = {0x1234, 0x5678, 0x90ab, 0xcdef};
@@ -121,7 +119,7 @@ struct1 \[label="0x12 | 0x34 | 0x56 | 0x78 | 0x90 | 0xab | 0xcd | 0xef"];
 
 } @enddot
 
-Here it is easy to see that the data from `input` was just concatenated into the `output` data with no additional tranformations. Now, notice that the first and the second example described in this section implicitly rely on the above-described convention. In the first example the input data is concatenated in reverse byte order, and in the second example the byte order is reversed after the input data concatenation.
+Here it is easy to see that the data  `input` was just concatenated into the `output` data with no additional transformations. Now, the first and second examples described in this section implicitly rely on the above-described convention. In the first example, the input data is concatenated in reverse byte order, and in the second example, the byte order is reversed after the input data concatenation.
 
 We haven't touched the case of endian conversion with bit reversals yet. Let us see at the following example:
 
@@ -162,37 +160,37 @@ To conclude, there are three types of reversals that we must deal with in pack a
 
 ### Data chunk order reversal
 
-In this section we suppose that the chunk type of input and output data is integral.
+In this section, we suppose the chunk type of input and output data is integral.
 
-Data chunk order reversal tranforms a group of consecutive input chunks with units in `InputEndianness` order into an output chunk with units in `OutputEndianness` order and can be described as follows.
+Data chunk order reversal transforms a group of consecutive input chunks with units in `InputEndianness` order into an output chunk with units in `OutputEndianness` order and can be described as follows.
 
-1. Check whether `InputEndianness` or `OutputEndianness` is `little_bit`. This condition determines the data chunk order reversal presence or absence. (We have already seen how the order of chunks changed in `big_unit_big_bit` -to-`little_unit_big_bit` conversion, so this is just the generalization.)\
+1. Check whether `InputEndianness` or `OutputEndianness` is `little_bit`. This condition determines the data chunk order reversal presence or absence. (We have already seen how the order of chunks changed in `big_unit_big_bit` -to-`little_unit_big_bit` conversion, so this is just a generalization.)\
    The choice of endianness depends on an algorithm where this step is carried out (imploder or exploder).
-2. If the endianness on the previous step is `little_bit`, set shift equal to `OutputBits` - (`InputBits` + already\_processed\_bits) in the case of imploder, and to `InputBits` - (`OutputBits` + already\_processed\_bits) in the case of exploder. Otherwise, set shift equal to already\_processed\_bits.
+2. If the endianness on the previous step is, set shift equal to `OutputBits` - (`InputBits` + already\_processed\_bits) in the case of imploder, and to `InputBits` - (`OutputBits` + already\_processed\_bits) in the case of the exploder. Otherwise, set shift equal to already\_processed\_bits.
 
-By already\_processed\_bits we mean the number of already processed (i.e. combined or splitted) input chunks multiplied by the number bits in a byte. The shift is later used either to retrieve or to accumulate input chunks ( see \[`Imploder`]\(@ref pack\_imploder)).
+By already\_processed\_bits, we mean the number of already processed (i.e. combined or split) input chunks multiplied by the number of bits in a byte. The shift is later used either to retrieve or to accumulate input chunks ( see \[`Imploder`]\(@ref pack\_imploder)).
 
 ### Unit order reversal
 
-In this section we consider that the unit is no less than byte.
+This section considers that the unit is no less than a byte.
 
 Unit order reversal transforms the order of units in each input chunk. It can be described as follows:
 
-1. If `InputEndianness` and `OutputEndianness` have different unit orders, reverse byte order in input chunk and go to the next step. Otherwise, do nothing and return.
+1. If `InputEndianness` and `OutputEndianness` have different unit orders, reverse byte order in the input chunk and go to the next step. Otherwise, do nothing and return.
 2. Reverse byte order in each input chunk unit.
 
-Note that if unit is byte, the second step can be omitted.
+Note that the second step can be omitted if the unit is a byte.
 
 ### Bit order reversal
 
-In this section we consider that the unit is no less than byte.
+This section considers that the unit is no less than a byte.
 
 Bit order reversal transforms the order of bits in each input chunk unit. It can be described as follows:
 
 1. If `InputEndianness` and `OutputEndianness` have different bit orders, reverse byte order in each input chunk unit and go to the next step. Otherwise, do nothing and return.
 2. Reverse bit order in each byte of input chunk unit.
 
-Note that if unit is byte, the first step can be omitted.
+Note that the first step can be omitted if the unit is a byte.
 
 ### Imploder  <a href="#pack_imploder" id="pack_imploder"></a>
 
@@ -200,9 +198,9 @@ Recall that imploder algorithm deals with the case `InputValueBits` < `OutputVal
 
 There are three main parts of imploder algorithm:
 
-1. Calculation of the value that indicates the position of input chunk in the output and indicates data chunk order reversal, if present. This part is currently implemented via shift trait containing the value that depends on whether the output endianness is `little_unit`.
-2. Unit order reversal algorithm. This part is implemented via partial struct specializations which deal with different specific cases.
-3. Bit order reversal algorithm. This part is implemented via partial struct specializations which deal with different specific cases.
+1. Calculation of the value that indicates the position of the input chunk in the output and indicates data chunk order reversal, if present. This part is currently implemented via shift trait containing the value that depends on whether the output endianness is `little_unit`.
+2. Unit order reversal algorithm. This part is implemented via partial struct specializations, which deal with different specific cases.
+3. Bit order reversal algorithm. This part is implemented via partial struct specializations, which deal with different specific cases.
 
 The described process can be written in the following pseudocode:
 
@@ -240,13 +238,13 @@ Here `OR` denotes logical OR operation and `<<` denotes left shift operation.
 
 ### Exploder
 
-Exploder algorithm deals with the case `InputValueBits` > `OutputValueBits`, converts data from `InputEndianness` to `OutputEndianness` order and is the same as the imploder algorithm described in Section \[Imploder]\(@ref pack\_imploder) except for several points:
+The Exploder algorithm deals with the case `InputValueBits` > `OutputValueBits`, converts data from `InputEndianness` to `OutputEndianness` order and is the same as the imploder algorithm described in Section \[Imploder]\(@ref pack\_imploder) except for several points:
 
 * the condition of shift choice is replaced with `InputEndianness` instead of `OutputEndianness`;
-* right shift operation instead of left shift operation is used;
-* the output chunk is just the part of input chunk.
+* right shift operation instead of a left shift operation is used;
+* the output chunk is just part of the input chunk.
 
-The pseudocode of exploder with the above-described changes is presented below.
+The pseudocode of the exploder with the above-described changes is presented below.
 
 ```cpp
 take first output_chunk
@@ -281,7 +279,7 @@ for each input_chunk:
 
 ### Equal size case
 
-This algorithm deals with the case `InputValueBits` = `OutputValueBits` and converts data from `InputEndianness` to `OutputEndianness`. It uses the aforementioned unit and bit order reversal algorithms, and its pseudocode can be presented as follows:
+This algorithm deals with the case `InputValueBits` = `OutputValueBits` and converts data from `InputEndianness` to `OutputEndianness`. It uses the aforementioned unit, and bit order reversal algorithms, and its pseudocode can be presented as follows:
 
 ```cpp
 take first output_chunk

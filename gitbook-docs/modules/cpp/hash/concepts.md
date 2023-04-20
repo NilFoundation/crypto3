@@ -15,7 +15,7 @@ Given
 * `DigestType`, the type named by `X::digest_type`
 * `StreamProcessor`, the type template named by `X::stream_processor`
 
-The following type members must be valid and have their specified effects
+The following type members must be valid and have their specified effects.
 
 | Expression       | Type         | Requirements and Notes                                                    |
 | ---------------- | ------------ | ------------------------------------------------------------------------- |
@@ -23,7 +23,7 @@ The following type members must be valid and have their specified effects
 | `X::word_type`   | `WordType`   | `WordType` type satisfies `Integral` concept                              |
 | `X::digest_type` | `DigestType` | `DigestType` type is a `SequenceContainer` of type `T` or `std::array<T>` |
 
-The following static data member definitions must be valid and have their specified effects
+The following static data member definitions must be valid and have specified effects.
 
 | Expression       | Type          | Requirements and Notes                                |
 | ---------------- | ------------- | ----------------------------------------------------- |

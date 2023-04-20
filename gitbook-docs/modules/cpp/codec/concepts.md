@@ -23,7 +23,7 @@ The following type members must be valid and have their specified effects
 | `X::encoded_value_type` | `EncodedBlock::value_type` | `EncodedBlock` type is a `SequenceContainer` of an `Integral` type `T`                    |
 | `X::decoded_block_type` | `DecodedBlock::value_type` | `DecodedBlock` type is a `SequenceContainer` of an `Integral` type `T`                    |
 
-The following static data member definitions must be valid and have their specified effects
+The following static data member definitions must be valid and have their specified effects.
 
 | Expression                | Type          | Requirements and Notes                        |
 | ------------------------- | ------------- | --------------------------------------------- |
@@ -32,7 +32,7 @@ The following static data member definitions must be valid and have their specif
 | `X::encoded_block_bits`   | `std::size_t` | `Integral` bits amount in `EncodedBlock`      |
 | `X::decoded_block_bits`   | `std::size_t` | `Integral` bits amount in `DecodedBlock`      |
 
-The following expressions must be valid and have their specified effects
+The following expressions must be valid and have their specified effects.
 
 | Expression                     | Requirements                                                                                                                                                    | Return Type          |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
