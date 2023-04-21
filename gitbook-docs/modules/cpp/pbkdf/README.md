@@ -2,7 +2,7 @@
 
 
 
-The Crypto3.Pbkdf library extends the Nil Foundation's cryptography suite. It provides a set of password-based key derivation functions implemented in the way the C++ standard library implies: concepts, algorithms, predictable behaviour, latest standard features support and clean architecture without compromising security and performance.
+The Crypto3.Pbkdf library extends the =nil;Foundation's cryptography suite. It provides a set of password-based key derivation functions implemented in the way the C++ standard library implies: concepts, algorithms, predictable behaviour, latest standard features support and clean architecture without compromising security and performance.
 
 Crypto3.Pbkdf consists of several parts to review:
 

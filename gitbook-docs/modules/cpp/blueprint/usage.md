@@ -2,11 +2,11 @@
 
 This module is supposed to be used together with =nil; Crypto3 [zk](https://github.com/NilFoundation/crypto3-zk). The blueprint module is used to generate the input data in form of a constraint system, while [crypto3-zk](https://github.com/NilFoundation/crypto3-zk) is used to process them as input for what to prove.
 
-In this document, we introduce the very basic concepts of blueprint. For the example of usage please follow the [usage markdown](https://github.com/NilFoundation/crypto3-blueprint/blob/master/docs/usage.md) or look through the [simple example](https://github.com/NilFoundation/crypto3-blueprint/blob/master/example/simple\_example.hpp).
+In this document, we introduce the very basic concepts of the blueprint. For the example of usage, please follow the [usage markdown](https://github.com/NilFoundation/crypto3-blueprint/blob/master/docs/usage.md) or look through the [simple example](https://github.com/NilFoundation/crypto3-blueprint/blob/master/example/simple\_example.hpp).
 
 ## Preliminaries
 
-If you are a developer who is completely new to zk-SNARKS we would recommend you to look through this [great resource](https://zkp.science) with the list of the most meaningful zk-related papers and posts. You can find there both thorough pure-technical papers and a high-level overviews of zk technologies.
+If you are a developer completely new to zk-SNARKS, we recommend you look through this [great resource](https://zkp.science) with the list of the most meaningful zk-related papers and posts. You can find both thorough pure-technical papers and high-level overviews of zk technologies there.
 
 ## A quick intro to R1CS
 
@@ -87,7 +87,7 @@ w = [1, 3, 35, 9, 27, 30].
 
 Now let’s see how we can enter this R1CS into =nil;Crypto3 Blueprint, produce proofs and verify them. We will use the `blueprint_variable` type to declare our variables. See the file `test.cpp` for the full code.
 
-First, lets define the finite field where all our values live and initialize the curve parameters:
+First, let us define the finite field where all our values live and initialize the curve parameters:
 
 ```
 typedef libff::Fr<default_r1cs_ppzksnark_pp> field_type;
@@ -161,7 +161,7 @@ bp.val(y) = 27;
 bp.val(sym_2) = 30;
 ```
 
-Now that the values are set in the blueprint we can access the public values using `bp.primary_input()` and the private values through `bp.auxiliary_input()`. Let's use the proving key, the public inputs and the private inputs to create a proof that we know the witness values:
+Now that the values are set in the blueprint we can access the public values using `bp.primary_input()` and the private values through `bp.auxiliary_input()`. Let's use the proving key, the public inputs and the private inputs to create proof that we know the witness values:
 
 ```
 typename snark::r1cs_gg_ppzksnark<bls12<381>>::proof_type proof = prove<snark::r1cs_gg_ppzksnark<bls12<381>>>(keypair.pk, bp.primary_input(), bp.auxiliary_input());
@@ -173,17 +173,17 @@ Now that we have proof, we can also verify it using the previously created `proo
 bool verified = verify<snark::r1cs_gg_ppzksnark<bls12<381>>>(keypair.vk, bp.primary_input(), proof);
 ```
 
-At this stage the boolean `verified` should have the value `true`, given that we put in the correct values for the witness variables.
+At this stage, the boolean `verified` should have the value `true`, given that we put in the correct values for the witness variables.
 
 ### 2. Components
 
-The =nil;Crypto3 Blueprint library uses _components_ to package up R1CS into more manageable pieces and create cleaner developer interfaces. They do this by being a wrapper around a blueprint and handling generating R1CS constraints and also generating witness values.
+The =nil;Crypto3 Blueprint library uses _components_ to package up R1CS into more manageable pieces and create cleaner developer interfaces. They do this by wrapping around a blueprint, handling generating R1CS constraints, and generating witness values.
 
 We will show how to create a component for the example R1CS above to make it a bit more manageable.
 
-First, we create a new file `src/component.hpp` which contains the component file. In our case, we want the developer using the component to be able to set the public variable `out`, as well as the private witness variable `x`, but the component itself would take care of the intermediate variables `y`, `sym_1` and `sym_2`.
+First, we create a new file `src/component.hpp` which contains the component file. In our case, we want the developer using the component to be able to set the public variable `out`as well as the private witness variable `x`, but the component itself would take care of the intermediate variables, `y`, `sym_1` and `sym_2`.
 
-Thus we create a class `test_component`, derived from the base `component` class which has the variables `y`, `sym_1` and `sym_2` as private members (in the C++ sense). The variables `x` and `out` will be public class member variables.
+Thus we create a class `test_component`, derived from the base `component` the class which has the variables `y`, `sym_1` and `sym_2` as private members (in the C++ sense). The variables `x` and `out` will be public class member variables.
 
 In the following sections, we go over the functions of this component and how to use it.
 
@@ -205,7 +205,7 @@ This function adds the R1CS constraints corresponding to the circuits. These are
 
 ### Function `generate_r1cs_witness()`
 
-This function assumes that we've already set the public value `out`, and the witness value `x`. It then computes the inferred witness values for the intermediate variables `sym_1`, `y`, `sym_2`. Thus the user of the component never needs to worry about the intermediate variables.
+This function assumes that we've already set the public value `out`, and the witness value `x`. It then computes the inferred witness values for the intermediate variables `sym_1`, `y`, `sym_2`. Thus, the component user never needs to worry about the intermediate variables.
 
 ## Using the component
 
@@ -391,7 +391,7 @@ typename grth16::proof_type proof =
 
 ### Proof Verification
 
-To verify proof, you only need to put all the data in the byte vector and give it as a parameter to the TON vm instruction. `__builtin_tvm_vergrth16` .
+To verify proof, you only need to put all the data in the byte vector and give it as a parameter to the TON VM instruction. `__builtin_tvm_vergrth16` .
 
 zk-SNARK verifier argument has to contain 3 parts packed together:
 

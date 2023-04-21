@@ -1,6 +1,6 @@
 # Codec
 
-The Crypto3.Codec library extends the =nil; Crypto3 C++ cryptography suite and provides a set of encoding algorithms implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
+The Crypto3.Codec library extends the =nil;Crypto3 C++ cryptography suite and provides a set of encoding algorithms implemented in the way C++ standard library implies: concepts, algorithms, predictable behaviour, latest standard features support and clean architecture without compromising security and performance.
 
 Crypto3.Codec consists of several parts to review:
 
