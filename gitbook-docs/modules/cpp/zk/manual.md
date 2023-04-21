@@ -4,7 +4,7 @@
 
 ## Example 1: Inner-product component
 
-Let's show how to create a simple circuit for the calculation of the public inner product of two secret vectors. In crypto3-zk library, the blueprint is where arithmetic circuits are collected. The statement (or public values) is called primary\_input and the witness (or secret values) is called auxiliary\_input. Let `bp` be a blueprint and `A` and `B` are vectors which inner product `res` has to be calculated.
+Let's show how to create a simple circuit for the calculation of the public inner product of two secret vectors. In the crypto3-zk library, the blueprint is where arithmetic circuits are collected. The statement (or public values) is called primary\_input, and the witness (or secret values) is called auxiliary\_input. Let `bp` be a blueprint and `A` and `B` are vectors whose inner product `res` has to be calculated.
 
 ```
 blueprint<FieldType> bp;
@@ -13,7 +13,7 @@ blueprint_variable_vector<FieldType> B;
 variable<FieldType> res;
 ```
 
-Then we associate the variables to a blueprint by using the function `allocate()`. The variable `n` shows the size of the vectors `A` and `B`. Note, that each use of `allocate()` increases the size of `auxiliary_input`.
+Then we associate the variables to a blueprint by using the function `allocate()`. The variable `n` shows the size of the vectors `A` and `B`. Note that each use of `allocate()` increases the size of `auxiliary_input`.
 
 ```
 res.allocate(bp);
@@ -24,11 +24,11 @@ bp.set_input_sizes(1);
 
 Note, that the first allocated variable on the blueprint is a constant 1. So, the variables on the blueprint would be `1` , `res`, `A[0]`, ..., `A[n-1]`, `B[0]`, ..., `B[n-1]`.
 
-To specify which variables are public and which ones are private we use the function `set_input_sizes(1)`, so only `res` value is a primary input. Thus, usually, the primary input is allocated before the auxiliary input in the program.
+We use the function to specify which variables are public and which ones are private, so only `res` value is a primary input. Thus, the direct input is usually allocated before the auxiliary input in the program.
 
-_Component_ is a class for constructing a particular constraint system. The component's constructor allocates intermediate variables, so the developer is responsible for allocation only primary and auxiliary variables. Any Component has to implement two methods: `generate_r1cs_constraints()` and `generate_r1cs_witness()`.
+_The component_ is a class for constructing a particular constraint system. The component's constructor allocates intermediate variables, so the developer is responsible for the allocation of only primary and auxiliary variables. Any Component has to implement two methods: `generate_r1cs_constraints()` and `generate_r1cs_witness()`.
 
-Now we initialize the simple component `inner_product_component`. The function `generate_r1cs_constraints()` add R1CS constraints to the blueprint corresponding to the circuit.
+Now we initialize the simple component `inner_product_component`. The function `generate_r1cs_constraints()` adds R1CS constraints to the blueprint corresponding to the circuit.
 
 ```
 inner_product_component<FieldType> compute_inner_product(bp, A, B, res, "compute_inner_product");
@@ -52,11 +52,11 @@ compute_inner_product.generate_r1cs_witness();
 
 ### Proof generation
 
-Using the example above we can finally create and verify `proof`.
+Using the example above, we can finally create and verify `proof`.
 
 * The generator `grth16::generator` creates proving keys and verification keys for our constraints system.
-* The proving key `keypair.pk`, public input `bp.primary_input`, and private input `bp.auxiliary_input` are used for the constructing of the proof (`grth16::prover`).
-* For verifying of the `proof` we use verifying key `keypair.vk`, public input `bp.primary_input` in the `grth16::verifier`.
+* The proving key `keypair.pk`, public input `bp.primary_input`, and private input `bp.auxiliary_input` are used for the construction of the proof (`grth16::prover`).
+* To verify of the `proof` we use verifying key `keypair.vk`, public input `bp.primary_input` in the `grth16::verifier`.
 
 ```
 using grth16 = r1cs_gg_ppzksnark<curve_type>;
@@ -68,15 +68,15 @@ typename grth16::proof_type proof =
 const bool ans = grth16::verifier(keypair.vk, bp.primary_input, proof);
 ```
 
-We expect to obtain the boolean value `ans == true`, which says that we have a correct proof.
+We expect to obtain the boolean value `ans == true`, which says that we have the correct proof.
 
 ## Example 2: SHA2-256 component
 
-Now we want to consider a more complicated construction of a circuit. Assume that the prover wants to prove that they know a preimage for a hash digest chosen by the verifier, without revealing what the preimage is. Let hash function be a 2-to-1 SHA256 compression function for our example.
+Now we want to consider a more complicated construction of a circuit. Assume that the prover wants to prove that they know a preimage for a hash digest chosen by the verifier without revealing what the preimage is. Let the hash function be a 2-to-1 SHA256 compression function for our example.
 
 We will show the process for some pairing-friendly curve `curve_type` and its scalar field `field_type`.
 
-Firstly, we need to create a `blueprint` and allocate the variables `left`, `right` and `output` at the blueprint. The allocation on the blueprint proceeds at the constructor of digest\_variable. Then we initialize the gadget `sha256_two_to_one_hash_component` and add constraints at the `generate_r1cs_constraints()` function.
+Firstly, we need to create a `blueprint` and allocate the variables `left`, `right` and `output` at the blueprint. The allocation on the blueprint proceeds at the constructor of digest\_variable. Then we initialize the gadget `sha256_two_to_one_hash_component` and add constraints to the `generate_r1cs_constraints()` function.
 
 ```
 blueprint<field_type> bp;
@@ -147,4 +147,4 @@ f.generate_r1cs_witness();
 output.generate_r1cs_witness(hash_bv);
 ```
 
-Now we have the `blueprint` with SHA2-256 component on it and can prove our knowledge of the source message using Groth-16 (`r1cs_gg_ppzksnark`) as we did before .
+Now we have the `blueprint` with SHA2-256 component on it and can prove our knowledge of the source message using Groth-16 (`r1cs_gg_ppzksnark`) as we did before.

@@ -24,11 +24,11 @@ An `EncryptionPublicKeyScheme` is a stateless asymmetric crypto-scheme policy su
 
 ### Requirements <a href="#encryption_pubkey_concepts_requirements" id="encryption_pubkey_concepts_requirements"></a>
 
-The type `X` satisfies `EncryptionPublicKeyScheme` if it satisfies to the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `EncryptionPublicKey` and `DecryptionPrivateKey` accordingly.
+The type `X` satisfies `EncryptionPublicKeyScheme` if it satisfies the concept `PublicKeyScheme` and at least there exist partial specializations of the templates `public_key<X>` and `private_key<X>` satisfying to the concepts `EncryptionPublicKey` and `DecryptionPrivateKey` accordingly.
 
 ## Secret sharing scheme concept <a href="#secret_sharing_pubkey_concept" id="secret_sharing_pubkey_concept"></a>
 
-An `SecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
+An `SecretSharingScheme` is a stateless secret-sharing crypto-scheme policy.
 
 ### Requirements <a href="#secret_sharing_pubkey_concepts_requirements" id="secret_sharing_pubkey_concepts_requirements"></a>
 
@@ -43,7 +43,7 @@ The type `X` satisfies `SecretSharingScheme` if at least there exist partial spe
 
 ## Weighted secret sharing scheme concept <a href="#wsss_pubkey_concept" id="wsss_pubkey_concept"></a>
 
-An `WeightedSecretSharingScheme` is a stateless secret sharing crypto-scheme policy.
+An `WeightedSecretSharingScheme` is a stateless secret-sharing crypto-scheme policy.
 
 ### Requirements  <a href="#wsss_pubkey_concepts_requirements" id="wsss_pubkey_concepts_requirements"></a>
 
@@ -311,7 +311,7 @@ Implementation of concept `PublicShare` for some secret sharing scheme policy `S
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `PublicShare` concept, then the following expressions must be valid and have their specified effects.
+If the type `X` satisfies `PublicShare` concept, the following expressions must be valid and have specified effects.
 
 #### Member types
 
@@ -366,7 +366,7 @@ Implementation of concept `Secret` for some secret sharing scheme policy `Scheme
 
 ### Requirements <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 
-If the type `X` satisfies `Secret` the concept, then following expressions must be valid and have their specified effects.
+If the type `X` satisfies `Secret` the concept, then the following expressions must be valid and have their specified effects.
 
 #### Member types
 
@@ -386,7 +386,7 @@ If the type `X` satisfies `Secret` the concept, then following expressions must 
 
 A `PublicSecret` is a concept of a stateful object containing cryptographic material of public representative of secret and defining methods to work with it for some secret sharing scheme.
 
-Implementation of concept `PublicSecret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of template `public_secret_sss<Scheme>`.
+Implementation of concept `PublicSecret` for some secret sharing scheme policy `Scheme` is assumed to be done by defining the partial specialization of the template `public_secret_sss<Scheme>`.
 
 ### Requirements  <a href="#pubkey_concepts_requirements" id="pubkey_concepts_requirements"></a>
 

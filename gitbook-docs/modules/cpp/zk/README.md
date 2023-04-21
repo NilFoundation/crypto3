@@ -1,6 +1,6 @@
 # Zk
 
-This module contains followings.
+This module contains the following.
 
 Relations:
 

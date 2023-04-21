@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
 
 ## Stateful Processing
 
-In case of public-key scheme source data accumulation necessity is present, following example demonstrates accumulator usage:
+In the case of public-key scheme source data accumulation necessity is present, the following example demonstrates accumulator usage:
 
 ```cpp
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>

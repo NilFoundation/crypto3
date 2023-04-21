@@ -24,7 +24,7 @@ The following type members must be valid and have their specified effects
 | `X::key_type`             | `KeyType`            | `KeyType` type is a `SequenceContainer` of type `T`                      |
 | `X::round_constants_type` | `RoundConstantsType` | `RoundConstantsType` type satisfies `Integral` concept                   |
 
-The following static data member definitions must be valid and have their specified effects
+The following static data member definitions must be valid and have their specified effects.
 
 | Expression       | Type          | Requirements and Notes                                |
 | ---------------- | ------------- | ----------------------------------------------------- |
@@ -34,7 +34,7 @@ The following static data member definitions must be valid and have their specif
 | `X::block_words` | `std::size_t` | `Integral` amount of `WordType` values in `BlockType` |
 | `X::rounds`      | `std::size_t` | `Integral` amount of rounds the algorithm does.       |
 
-The following expressions must be valid and have their specified effects
+The following expressions must be valid and have their specified effects.
 
 | Expression              | Requirements                                                                                                                                                                                                                  | Return Type    |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |

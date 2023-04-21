@@ -2,7 +2,7 @@
 
 
 
-The Crypto3.Stream library extends the Nil Foundation's cryptography suite and provides a set of stream ciphers implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
+The Crypto3.Stream library extends the Nil Foundation's cryptography suite. It provides a set of stream ciphers implemented in the way the C++ standard library implies: concepts, algorithms, predictable behaviour, latest standard features support and clean architecture without compromising security and performance.
 
 Crypto3.Stream consists of several parts to review:
 
@@ -10,11 +10,11 @@ Crypto3.Stream consists of several parts to review:
 * Implementation
 * Concepts
 
-A small part of each topic is reviewed right at introduction, but the detailed information is recommended to look inside of a corresponding chapter.
+A small part of each topic is reviewed right at the introduction, but detailed information is recommended to look inside a corresponding chapter.
 
 ## Algorithms <a href="#stream_ciphers_algorithms" id="stream_ciphers_algorithms"></a>
 
-Crypto3.Stream library contains following block ciphers:
+Crypto3.Stream library contains the following block ciphers:
 
 * Chacha
 * Salsa20

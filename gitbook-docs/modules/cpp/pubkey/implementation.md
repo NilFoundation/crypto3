@@ -140,44 +140,44 @@ The optimized version of the aggregate verification algorithm should be used if 
 
 #### deal\_shares.hpp
 
-The algorithm deals shares according to the specification of chosen secret sharing scheme `Scheme`. Example of such scheme is Shamir secret sharing scheme.
+The algorithm deals shares according to the specification of chosen secret-sharing scheme `Scheme`. An example of such a scheme is Shamir's secret sharing scheme.
 
-It accepts range of polynomial coefficients and other parameters like threshold number and number of participants. Coefficients in range are assumed to be of type `Scheme::coeff_type`. The algorithm return vector of dealt shares of type `share_sss<Scheme>`.
+It accepts a range of polynomial coefficients and other parameters like threshold number and the number of participants. Coefficients in the range are assumed to be of type `Scheme::coeff_type`. The algorithm return vector of dealt shares of type `share_sss<Scheme>`.
 
 #### verify\_share.hpp
 
-The algorithm verifies share according to the specification of chosen secret sharing scheme `Scheme`. Example of secret sharing scheme supporting verification of dealt share is Feldman scheme.
+The algorithm verifies share according to the specification of chosen secret-sharing scheme `Scheme`. The Feldman scheme is an example of a secret sharing scheme supporting the verification of dealt shares.
 
-It accepts range of public representatives of polynomial coefficients which were used to deal shares and verified share of the type `share_sss<Scheme>`. Public representatives are assumed to be of the type `Scheme::public_coeff_type`.
+It accepts a range of public representatives of polynomial coefficients, which were used to deal with shares and verified shares of the type `share_sss<Scheme>`. Public representatives are assumed to be of the type `Scheme::public_coeff_type`.
 
 #### reconstruct\_secret.hpp
 
 The algorithm reconstructs secret value from the participant shares according to the specification of chosen secret sharing scheme `Scheme`.
 
-It accepts range of participant shares of the type `share_sss<Scheme>` and return secret value of the type `secret_sss<Scheme>`. To reconstruct secret correctly number of shares in the input range should be greater or equal to the threshold number specified during shares dealing.
+It accepts a range of participant shares of the type `share_sss<Scheme>` and returns the secret value of the type `secret_sss<Scheme>`. To reconstruct the secret correctly number of shares in the input range should be greater or equal to the threshold number specified during shares dealing.
 
 #### reconstruct\_public\_secret.hpp
 
-The algorithm reconstructs public representative of the secret value from the public representatives of participant shares according to the specification of chosen secret sharing scheme `Scheme`.
+The algorithm reconstructs public representation of the secret value from the public representatives of participant shares according to the specification of chosen secret sharing scheme `Scheme`.
 
-It accepts range of public representatives of participant shares of the type `public_share_sss<Scheme>` and return public representative of the secret value of the type `public_secret_sss<Scheme>`. To reconstruct public representative of the secret correctly number of public representatives of participant shares in the input range should be greater or equal to the threshold number specified during shares dealing.
+It accepts a range of public representatives of participant shares of the type `public_share_sss<Scheme>` and returns public representatives of the secret value of the type `public_secret_sss<Scheme>`. To reconstruct public representatives of the secret correctly number of public representatives of participant shares in the input range should be greater or equal to the threshold number specified during shares dealing.
 
 #### deal\_share.hpp
 
-The algorithm deals share according to the specification of chosen distributed key generation (DKG) scheme `Scheme`. Example of such scheme is Pedersen distributed key generation protocol.
+The algorithm deals share according to the specification of chosen distributed key generation (DKG) scheme `Scheme`. An example of such a scheme is Pedersen distributed key generation protocol.
 
-It accepts range of shares of the type `share_sss<Scheme>` dealt by other participant for current part and return its share of the same type. Except that range it accepts number of participants participating in the protocol execution.
+It accepts a range of shares of the type `share_sss<Scheme>` dealt by other participants for the current part and returns its share of the same type. Except for that range, it accepts a number of participants participating in the protocol execution.
 
 ## Pubkey Policies <a href="#pubkey_policies" id="pubkey_policies"></a>
 
-Pubkey policies architecturally are completely stateless. Pubkey policies are required to be compliant with \[`PublicKeyScheme` concept]\(@ref pubkey\_concept). Thus, a policy has to contain all the data corresponding to the `PublicKeyScheme` and defined in the \[`PublicKeyScheme` concept]\(@ref pubkey\_concept). Particular asymmetric crypto-scheme could support different set of algorithms, so it also should satisfy to the specific concept like `SignaturePublicKeyScheme`, `EncryptionPublicKeyScheme` or `SecretSharingScheme`.
+Pubkey policies architecturally are completely stateless. Pubkey policies are required to be compliant with \[`PublicKeyScheme` concept]\(@ref pubkey\_concept). Thus, a policy has to contain all the data corresponding to the `PublicKeyScheme` and defined in the \[`PublicKeyScheme` concept]\(@ref pubkey\_concept). Particular asymmetric crypto-scheme could support a different set of algorithms, so it also should satisfy the specific concept like `SignaturePublicKeyScheme`, `EncryptionPublicKeyScheme` or `SecretSharingScheme`.
 
-## Objects, containing cryptographic material <a href="#pubkey_objects" id="pubkey_objects"></a>
+## Objects containing cryptographic material <a href="#pubkey_objects" id="pubkey_objects"></a>
 
-Execution of asymmetric algorithms requires the use of cryptographic material like keys in the cases of signature and encryption crypto-schemes, or shares and secrets in the case of performing secret sharing protocols. To work with these objects several templates are defined in pubkey module:
+Execution of asymmetric algorithms requires the use of cryptographic material like keys in the cases of signature and encryption crypto-schemes or shares and secrets in the case of performing secret sharing protocols. To work with these objects, several templates are defined in the pubkey module:
 
-* `private_key` - the template specialization should be defined for a chosen asymmetric crypto-scheme `Scheme`, i.e. `private_key<Scheme>`. The object of that type contains cryptographic material of the private key for a chosen `Scheme` and defines methods to execute crypto algorithms supported by the crypto-scheme using stored key material. Particular specialization of the `private_key` should satisfy to the one or several defined \[concepts]\(@ref pubkey\_concept) depending on which algorithms are supported by the chosen `Scheme`. For example, there exist `SigningPrivateKey` concept for asymmetric signature crypto-schemes, and `DecryptionPrivateKey` for asymmetric encryption crypto-schemes.
-* `public_key` - the same as for `private_key` template, but regarding public key material for some asymmetric crypto-scheme and algorithms assuming the use of the public key. Examples of public key concepts are `VerificationPublicKey` concept for asymmetric signature crypto-schemes, and `EncryptionPublicKey` for asymmetric encryption crypto-schemes.
+* `private_key` - the template specialization should be defined for a chosen asymmetric crypto-scheme `Scheme`, i.e. `private_key<Scheme>`. The object of that type contains cryptographic material of the private key for a chosen `Scheme` and defines methods to execute crypto algorithms supported by the crypto-scheme using stored key material. Particular specialization of `private_key` should satisfy to the one or several defined \[concepts]\(@ref pubkey\_concept) depending on which algorithms are supported by the chosen `Scheme`. For example, there exists `SigningPrivateKey` concept for asymmetric signature crypto-schemes and `DecryptionPrivateKey` for asymmetric encryption crypto-schemes.
+* `public_key` - the same as for `private_key` template, but regarding public key material for some asymmetric crypto-scheme and algorithms assuming the use of the public key. Examples of public key concepts are `VerificationPublicKey` concepts for asymmetric signature crypto-schemes and `EncryptionPublicKey` for asymmetric encryption crypto-schemes.
 * `share_sss` - the template specialization should be defined for a chosen secret sharing `Scheme`, i.e. `share_sss<Scheme>`, and it should satisfy to the `Share` concept.
 * `public_share_sss` - the template specialization should be defined for a chosen secret sharing `Scheme`, i.e. `public_share_sss<Scheme>`, and it should satisfy to the `PublicShare` concept.
 * `secret_sss` - the template specialization should be defined for a chosen secret sharing `Scheme`, i.e. `secret_sss<Scheme>`, and it should satisfy to the `Secret` concept.
@@ -185,9 +185,9 @@ Execution of asymmetric algorithms requires the use of cryptographic material li
 
 ## Cryptographic operation policies <a href="#pubkey_operations" id="pubkey_operations"></a>
 
-To execute algorithms supported by some asymmetric crypto-scheme but not requiring the use of single key (private or public) \[`PublicKeyOperation` concept]\(@ref pubkey\_concept) was introduced. Example of such operation is aggregation algorithm, which aggregate several signatures created for some list of messages into a single signature that authenticates all the messages, wherein no need to use any key. Secret sharing algorithms are the other examples of operations not requiring the use of a key material.
+To execute algorithms supported by some asymmetric crypto-scheme but not requiring the use of a single key (private or public) \[`PublicKeyOperation` concept]\(@ref pubkey\_concept) was introduced. An example of such an operation is an aggregation algorithm, which aggregates several signatures created for some list of messages into a single signature that authenticates all the messages, wherein there is no need to use any key. Secret sharing algorithms are the other examples of operations not requiring the use of key material.
 
-Following types of operations are defined in pubkey module:
+The following types of operations are defined in the pubkey module:
 
 * `aggregate_op`
 * `aggregate_verify_op`
@@ -200,13 +200,13 @@ Following types of operations are defined in pubkey module:
 
 ## Accumulators <a href="#pubkey_accumulators" id="pubkey_accumulators"></a>
 
-Execution of any asymmetric crypto-scheme algorithm contains an accumulation step, which is implemented with [Boost.Accumulators](https://boost.org/libs/accumulators) library.
+Execution of any asymmetric crypto-scheme algorithm contains an accumulation step implemented with [Boost.Accumulators](https://boost.org/libs/accumulators) library.
 
 All the concepts are held.
 
-Pubkey contain pre-defined accumulator sets, which are a `boost::accumulator_set` with pre-filled accumulator type depending on executing algorithm.
+Pubkey contains pre-defined accumulator sets, which are a `boost::accumulator_set` with pre-filled accumulator type depending on executing the algorithm.
 
-Pubkey library defines following types of accumulators:
+Pubkey library defines the following types of accumulators:
 
 * signing accumulator
 * verification accumulator
@@ -217,11 +217,11 @@ Pubkey library defines following types of accumulators:
 * secret reconstruction accumulator
 * share dealing accumulator
 
-Each of the mentioned accumulators contain private field named internal accumulator. That type of accumulator is dedicated to accumulate input data of the executing algorithm and then during extraction it performs all needed preparation of input data like hashing, padding or encoding. Thus, pubkey accumulators play the role of wrapper of internal accumulator, performing more complex logic on the input data. Then during extraction of pubkey accumulator it extracts its internal accumulator and passes extracted data to the finalization function defined in the chosen operation policy or in the key object (`private_key` or `public_key`).
+Each of the mentioned accumulators contains a private field named internal accumulator. That type of accumulator is dedicated to accumulating input data of the executing algorithm, and then during extraction, it performs all needed preparation of input data like hashing, padding or encoding. Thus, pubkey accumulators play the role of the wrapper of the internal accumulator, performing more complex logic on the input data. Then during extraction of the pubkey accumulator, it extracts its internal accumulator and passes extracted data to the finalization function defined in the chosen operation policy or in the key object (`private_key` or `public_key`).
 
-Internal accumulators used in pubkey module could be classified into two classes:
+Internal accumulators used in the pubkey module could be classified into two classes:
 
-* pkpad accumulators - in that case accumulators defined in the pkpad module are used as internal accumulators. This module is dedicated to preprocessing data before execution of any asymmetric crypto-scheme algorithm. Example of such preprocessing procedure is hasing of input data before its signing by any asymmetric signature crypto-scheme according to the protocol [EMSA1](https://standards.ieee.org/standard/1363-2000.html).
-* crypto-scheme ad-hoc accumulators - in that case some internal type of the chosen asymmetric crypto-scheme policy is used. Every time new portion of input data is passed to the accumulator it is transmitted to the crypto-scheme policy function defined by the particular \[concept]\(@ref pubkey\_concept) where it is processed and accumulated. For example, in such manner accumulators of secret sharing schemes works. Such accumulators type exists due to not all pubkey algorithms process simple data of built-in types, like range of integrals. For example, shares dealing algorithm accepts polynomial coefficients which are of the algebraic field element type from algebra module, so additional logic to process such input data should be defined.
+* pkpad accumulators - in that case, accumulators defined in the pkpad module are used as internal accumulators. This module is dedicated to preprocessing data before the execution of any asymmetric crypto-scheme algorithm. An example of such preprocessing procedure is hashing of input data before its signing by any asymmetric signature crypto-scheme according to the protocol [EMSA1](https://standards.ieee.org/standard/1363-2000.html).
+* crypto-scheme ad-hoc accumulators - in that case, some internal type of the chosen asymmetric crypto-scheme policy is used. Every time a new portion of input data is passed to the accumulator, it is transmitted to the crypto-scheme policy function defined by the particular \[concept]\(@ref pubkey\_concept), where it is processed and accumulated. For example, in such a manner, accumulators of secret-sharing schemes work. Such accumulator type exists because not all pubkey algorithms process simple data of built-in types, like the range of integrals. For example, the shares dealing algorithm accepts polynomial coefficients of the algebraic field element type from the algebra module, so additional logic to process such input data should be defined.
 
-Accumulators caching ability depends on the used internal accumulator type and on the executing algorithm. For example, in the case of signature creation algorithm with hashing of input message, lower in the call stack hashing accumulator will be used. Such type of accumulators supports caching of input data, which means there is an input cache sized as same as particular `Hash::block_type`, which accumulates unprocessed data. Another example is secret reconstruction accumulator which should be fully filled with the input shares before execution of reconstruction process as all the indexes of the input shares should be known to the moment of secret reconstruction.
+Accumulators' caching ability depends on the internal accumulator type used and the executing algorithm. For example, in the case of the signature creation algorithm with hashing of the input message, lower in the call stack, hashing accumulator will be used. Such type of accumulators supports caching of input data, which means there is an input cache sized as same as particular `Hash::block_type`, which accumulates unprocessed data. Another example is the secret reconstruction accumulator, which should be fully filled with the input shares before the execution of the reconstruction process. All the indexes of the input shares should be known until the moment of secret reconstruction.
