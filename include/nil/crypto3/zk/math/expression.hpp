@@ -87,13 +87,14 @@ namespace nil {
                 expression(const VariableType &var)
                   : expr(term<VariableType>(var)) {
                 }
-                expression(const assignment_type &coeff)
-                  : expr(term<VariableType>(coeff)) {
-                }
-                expression(int coeff)
-                  : expr(term<VariableType>(coeff)) {
-                }
 
+                // Every number type will be accepted here, 
+                // if it can be converted to 'assignment_type'.
+                // This will include integral types and number<cpp_int_backend<...>>
+                template<class NumberType>
+                expression(const NumberType &coeff)
+                  : expr(term<VariableType>((assignment_type)coeff)) {
+                }
 
                 expression(const expression<VariableType>& other) = default;
                 expression(expression<VariableType>&& other) = default;
@@ -134,11 +135,11 @@ namespace nil {
                     vars.push_back(var);
                 }
 
-                term(const assignment_type &field_val) : coeff(field_val) {
-                }
-
-                // Sometimes int is used, instead of field element for coefficient.
-                term(int val) : coeff(val) {
+                // Every number type will be accepted here, 
+                // if it can be converted to 'assignment_type'.
+                // This will include integral types and number<cpp_int_backend<...>>
+                template<class NumberType>
+                term(const NumberType &field_val) : coeff(field_val) {
                 }
 
                 term(const std::vector<VariableType> &vars,
