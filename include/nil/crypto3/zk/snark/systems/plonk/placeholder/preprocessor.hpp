@@ -28,6 +28,8 @@
 #ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_PREPROCESSOR_HPP
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_PREPROCESSOR_HPP
 
+#include <set>
+
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
