@@ -107,6 +107,7 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_params<FieldType, arithmetization_params_1>, 4, 3> circuit_test_1() {
+
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 3;
 
@@ -156,18 +157,14 @@ namespace nil {
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
-                        for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
-                            private_assignment[i][j] = table[i][j];
-                        }
+                        private_assignment[i] = table[i];
                     }
 
-                    std::vector<plonk_column<FieldType>> selectors_assignment(selector_columns);
-                    std::vector<plonk_column<FieldType>> public_input_assignment(public_columns);
-                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment = {};
-                    for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
-                        selectors_assignment[0][j] = q_add[j];
-                        selectors_assignment[1][j] = q_mul[j];
-                    }
+                    std::array<plonk_column<FieldType>, public_columns> public_input_assignment;
+                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
+                    std::array<plonk_column<FieldType>, selector_columns> selectors_assignment;
+                    selectors_assignment[0] = q_add;
+                    selectors_assignment[1] = q_mul;
 
                     for (std::size_t i = 0; i < public_columns; i++) {
                         for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
@@ -178,7 +175,8 @@ namespace nil {
                     test_circuit.table = plonk_assignment_table<FieldType, arithmetization_params_1>(
                         plonk_private_assignment_table<FieldType, arithmetization_params_1>(private_assignment),
                         plonk_public_assignment_table<FieldType, arithmetization_params_1>(
-                            public_input_assignment, constant_assignment, selectors_assignment));
+                            public_input_assignment, constant_assignment, selectors_assignment)
+                    );
 
                     test_circuit.init();
 
