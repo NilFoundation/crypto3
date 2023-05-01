@@ -120,7 +120,7 @@ namespace nil {
 
                         assert(processed_verification_key.encoded_IC_query.domain_size() >= primary_input.size());
 
-                        const accumulation_vector<g1_type> accumulated_IC =
+                        const container::accumulation_vector<g1_type> accumulated_IC =
                             processed_verification_key.encoded_IC_query.accumulate_chunk(primary_input.begin(),
                                                                                          primary_input.end(), 0);
                         const g1_value_type &acc = accumulated_IC.first;

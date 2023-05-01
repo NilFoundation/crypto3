@@ -39,7 +39,8 @@ namespace nil {
                 template<typename PlaceholderParams>
                 struct placeholder_profiling;
 
-                template<typename FieldType, typename ArithmetizationParams, typename MerkleTreeHashType,
+
+/*              template<typename FieldType, typename ArithmetizationParams, typename MerkleTreeHashType,
                          typename TranscriptHashType, std::size_t Lambda, std::size_t R, std::size_t M>
                 struct placeholder_profiling<placeholder_params<FieldType, ArithmetizationParams, MerkleTreeHashType,
                                                                 TranscriptHashType, Lambda, R, M>> {
@@ -113,6 +114,60 @@ namespace nil {
                                      })
                                   << std::endl;
                     }
+*/
+
+                    template<typename FRI, typename TableDescriptionType, typename ColumnsRotationsType,
+                            typename ArithmetizationParams>
+                    void print_placeholder_params(typename FRI::params_type &fri_params, TableDescriptionType table_description,
+                                    ColumnsRotationsType &columns_rotations, std::string filename) {
+                        using FRIParamsType = typename FRI::params_type;
+                        std::ofstream out;
+
+                        out.open(filename);
+                        out << "{"
+                            << "\t\"_test_name\":\"Test name\"," << std::endl;
+                        out << "\t\"arithmetization_params\":[" << ArithmetizationParams::witness_columns << ","
+                            << ArithmetizationParams::public_input_columns << "," << ArithmetizationParams::constant_columns << ","
+                            << ArithmetizationParams::selector_columns << "]," << std::endl
+                            << "\t\"columns_rotations\":[";
+                        for (size_t i = 0; i < columns_rotations.size(); i++) {
+                            if (i != 0)
+                                out << ",";
+                            out << "[";
+                            bool print_coma = false;
+                            for (int r: columns_rotations[i]) {
+                                if (print_coma)
+                                    out << ",";
+                                out << r;
+                                print_coma = true;
+                            }
+                            out << "]";
+                        }
+                        out << "]," << std::endl;
+                        out << "\t\"modulus\":" << FRI::field_type::modulus << "," << std::endl;
+                        out << "\t\"r\":" << fri_params.r << "," << std::endl;
+                        out << "\t\"m\":" << FRI::m << "," << std::endl;
+                        out << "\t\"lambda\":" << FRI::lambda << "," << std::endl;
+                        out << "\t\"batches_num\":" << FRI::batches_num << "," << std::endl;
+                        out << "\t\"step_list\":[";
+                        for (size_t i = 0; i < fri_params.step_list.size(); i++) {
+                            if (i != 0)
+                                out << ",";
+                            out << fri_params.step_list[i];
+                        }
+                        out << "]," << std::endl;
+                        out << "\t\"D_omegas\":[" << std::endl;
+                        for (size_t i = 0; i < fri_params.D.size(); i++) {
+                            if (i != 0)
+                                out << "," << std::endl;
+                            out << "\t\t" << fri_params.D[i]->get_domain_element(1).data;
+                        }
+                        out << std::endl << "\t]," << std::endl;
+                        out << "\t\"rows_amount\":" << table_description.rows_amount << "," << std::endl;
+                        out << "\t\"max_degree\":" << fri_params.max_degree << "," << std::endl;
+                        out << "\t\"omega\":" << fri_params.D[0]->get_domain_element(1).data << std::endl;
+                        out << "}" << std::endl;
+                        out.close();
                 };
             }    // namespace snark
         }        // namespace zk

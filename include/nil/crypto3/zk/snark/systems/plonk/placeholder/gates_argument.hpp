@@ -48,6 +48,52 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<typename FieldType, typename ArithmetizationParams>
+                plonk_polynomial_dfs_table<FieldType, ArithmetizationParams>
+                    resize(const plonk_polynomial_dfs_table<FieldType, ArithmetizationParams> &table,
+                                            std::uint32_t new_size) {
+
+                    typename plonk_public_polynomial_dfs_table<FieldType,
+                            ArithmetizationParams>::public_input_container_type public_inputs=
+                            table.public_table().public_inputs();
+
+                    for (std::size_t pi_index = 0; pi_index < table.public_inputs_amount(); pi_index++) {
+                        public_inputs[pi_index].resize(new_size);
+                    }
+
+                    typename plonk_public_polynomial_dfs_table<FieldType,
+                        ArithmetizationParams>::constant_container_type constants=
+                        table.public_table().constants();
+
+                    for (std::size_t cst_index = 0; cst_index < table.constants_amount(); cst_index++) {
+                        constants[cst_index].resize(new_size);
+                    }
+
+                    typename plonk_public_polynomial_dfs_table<FieldType,
+                        ArithmetizationParams>::selector_container_type selectors=
+                        table.public_table().selectors();
+
+                    for (std::size_t sel_index = 0; sel_index < table.selectors_amount(); sel_index++) {
+                        selectors[sel_index].resize(new_size);
+                    }
+
+                    typename plonk_private_polynomial_dfs_table<FieldType,
+                        ArithmetizationParams>::witnesses_container_type witnesses=
+                        table.private_table().witnesses();
+
+                    for (std::size_t wts_index = 0; wts_index < table.witnesses_amount(); wts_index++) {
+                        witnesses[wts_index].resize(new_size);
+                    }
+
+                    return
+                        plonk_polynomial_dfs_table<FieldType, ArithmetizationParams>(
+                            plonk_private_polynomial_dfs_table<FieldType, ArithmetizationParams>(
+                                                                witnesses),
+                            plonk_public_polynomial_dfs_table<FieldType, ArithmetizationParams>(
+                                                                public_inputs, constants, selectors));
+
+                }
+
                 template<typename FieldType, typename ParamsType, std::size_t ArgumentSize = 1>
                 struct placeholder_gates_argument;
 
@@ -67,13 +113,19 @@ namespace nil {
                             const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                                 &column_polynomials,
                             std::shared_ptr<math::evaluation_domain<FieldType>>
-                                domain,
-                            transcript_type &transcript = transcript_type()) {    // TODO: remove domain
+                                original_domain,
+                            std::uint32_t max_gates_degree,
+                            transcript_type &transcript = transcript_type()) {
+
+                        std::uint32_t extended_domain_size = original_domain->m * std::pow(2, ceil(std::log2(max_gates_degree)));
+                        
+                        const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
+                            extended_column_polynomials = resize(column_polynomials, extended_domain_size);
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size> F;
-                        F[0] = math::polynomial_dfs<typename FieldType::value_type>(0, domain->size(), FieldType::value_type::zero());
+                        F[0] = math::polynomial_dfs<typename FieldType::value_type>(0, extended_domain_size, FieldType::value_type::zero());
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
@@ -82,15 +134,15 @@ namespace nil {
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             math::polynomial_dfs<typename FieldType::value_type> gate_result(
-                                0, domain->m, FieldType::value_type::zero());
+                                0, extended_domain_size, FieldType::value_type::zero());
 
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
                                 gate_result = gate_result +
-                                              gates[i].constraints[j].evaluate(column_polynomials, domain) * theta_acc;
+                                              gates[i].constraints[j].evaluate(extended_column_polynomials, original_domain) * theta_acc;
                                 theta_acc *= theta;
                             }
 
-                            gate_result = gate_result * column_polynomials.selector(gates[i].selector_index);
+                            gate_result = gate_result * extended_column_polynomials.selector(gates[i].selector_index);
 
                             F[0] = F[0] + gate_result;
                         }

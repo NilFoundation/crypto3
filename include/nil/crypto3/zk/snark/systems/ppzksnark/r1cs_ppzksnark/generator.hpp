@@ -34,7 +34,7 @@
 
 #include <nil/crypto3/container/accumulation_vector.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark/detail/basic_policy.hpp>
 
@@ -160,18 +160,18 @@ namespace nil {
                         algebra::window_table<g2_type> g2_table = algebra::get_window_table<g2_type>(
                             scalar_field_type::value_bits, g2_window, g2_type::value_type::one());
 
-                        knowledge_commitment_vector<g1_type, g1_type> A_query =
-                            kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                        commitments::knowledge_commitment_vector<g1_type, g1_type> A_query =
+                            commitments::kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
                                                                               g1_window, g1_table, g1_table, rA,
                                                                               rA * alphaA, At, chunks);
 
-                        knowledge_commitment_vector<g2_type, g1_type> B_query =
-                            kc_batch_exp<g2_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g2_window,
+                        commitments::knowledge_commitment_vector<g2_type, g1_type> B_query =
+                            commitments::kc_batch_exp<g2_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g2_window,
                                                                               g1_window, g2_table, g1_table, rB,
                                                                               rB * alphaB, Bt, chunks);
 
-                        knowledge_commitment_vector<g1_type, g1_type> C_query =
-                            kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
+                        commitments::knowledge_commitment_vector<g1_type, g1_type> C_query =
+                            commitments::kc_batch_exp<g1_type, g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
                                                                               g1_window, g1_table, g1_table, rC,
                                                                               rC * alphaC, Ct, chunks);
 
@@ -208,7 +208,7 @@ namespace nil {
                             algebra::batch_exp<g1_type, scalar_field_type>(scalar_field_type::value_bits, g1_window,
                                                                            g1_table, multiplied_IC_coefficients);
 
-                        accumulation_vector<g1_type> encoded_IC_query(std::move(encoded_IC_base),
+                        container::accumulation_vector<g1_type> encoded_IC_query(std::move(encoded_IC_base),
                                                                       std::move(encoded_IC_values));
 
                         verification_key_type vk =

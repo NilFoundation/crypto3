@@ -53,7 +53,7 @@ namespace nil {
                     typename g2_type::value_type gamma_beta_g2;
                     typename g2_type::value_type rC_Z_g2;
 
-                    accumulation_vector<g1_type> encoded_IC_query;
+                    container::accumulation_vector<g1_type> encoded_IC_query;
 
                     r1cs_ppzksnark_verification_key() = default;
                     r1cs_ppzksnark_verification_key(const typename g2_type::value_type &alphaA_g2,
@@ -63,7 +63,7 @@ namespace nil {
                                                     const typename g1_type::value_type &gamma_beta_g1,
                                                     const typename g2_type::value_type &gamma_beta_g2,
                                                     const typename g2_type::value_type &rC_Z_g2,
-                                                    const accumulation_vector<g1_type> &eIC) :
+                                                    const container::accumulation_vector<g1_type> &eIC) :
                         alphaA_g2(alphaA_g2),
                         alphaB_g1(alphaB_g1), alphaC_g2(alphaC_g2), gamma_g2(gamma_g2), gamma_beta_g1(gamma_beta_g1),
                         gamma_beta_g2(gamma_beta_g2), rC_Z_g2(rC_Z_g2), encoded_IC_query(eIC) {};
@@ -111,7 +111,7 @@ namespace nil {
                     typename pairing_policy::g1_precomputed_type vk_gamma_beta_g1_precomp;
                     typename pairing_policy::g2_precomputed_type vk_gamma_beta_g2_precomp;
 
-                    accumulation_vector<typename CurveType::template g1_type<>> encoded_IC_query;
+                    container::accumulation_vector<typename CurveType::template g1_type<>> encoded_IC_query;
 
                     bool operator==(const r1cs_ppzksnark_processed_verification_key &other) const {
                         return (this->pp_G2_one_precomp == other.pp_G2_one_precomp &&

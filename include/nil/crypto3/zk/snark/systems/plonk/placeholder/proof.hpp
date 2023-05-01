@@ -45,21 +45,15 @@ namespace nil {
                     typedef FieldType field_type;
                     typedef ParamsType params_type;
 
-                    using fixed_values_commitment_scheme_type =
-                        typename ParamsType::fixed_values_commitment_scheme_type;
-                    using variable_values_commitment_scheme_type =
-                        typename ParamsType::variable_values_commitment_scheme_type;
-                    using runtime_size_commitment_scheme_type =
+                    using commitment_scheme_type =
                         typename ParamsType::runtime_size_commitment_scheme_type;
-                    using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
-                    using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
 
                     struct evaluation_proof {
                         typename FieldType::value_type challenge;
                         typename FieldType::value_type lagrange_0;
 
-                        typename runtime_size_commitment_scheme_type::proof_type combined_value;
-                        std::vector<typename quotient_commitment_scheme_type::proof_type> lookups;
+                        typename commitment_scheme_type::proof_type combined_value;
+                        std::vector<typename commitment_scheme_type::proof_type> lookups;
 
 
                         bool operator==(const evaluation_proof &rhs) const {
@@ -75,27 +69,20 @@ namespace nil {
                     placeholder_proof() {
                     }
 
-                    typename variable_values_commitment_scheme_type::commitment_type variable_values_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type v_perm_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type input_perm_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type value_perm_commitment;
-
-                    typename permutation_commitment_scheme_type::commitment_type v_l_perm_commitment;
-
-                    typename runtime_size_commitment_scheme_type::commitment_type T_commitment;
+                    typename commitment_scheme_type::commitment_type variable_values_commitment;
+                    typename commitment_scheme_type::commitment_type v_perm_commitment;
+                    typename commitment_scheme_type::commitment_type T_commitment;
+                    typename commitment_scheme_type::commitment_type fixed_values_commitment;
 
                     evaluation_proof eval_proof;
 
                     bool operator==(const placeholder_proof &rhs) const {
                         return /*witness_commitment == rhs.witness_commitment &&*/
-                               v_perm_commitment == rhs.v_perm_commitment &&
-                               input_perm_commitment == rhs.input_perm_commitment &&
-                               value_perm_commitment == rhs.value_perm_commitment &&
-                               v_l_perm_commitment == rhs.v_l_perm_commitment && T_commitment == rhs.T_commitment &&
-                               eval_proof == rhs.eval_proof;
+                            variable_values_commitment == rhs.variable_values_commitment &&
+                            v_perm_commitment == rhs.v_perm_commitment &&
+                            T_commitment == rhs.T_commitment &&
+                            fixed_values_commitment == rhs.fixed_values_commitment &&
+                            eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const placeholder_proof &rhs) const {
                         return !(rhs == *this);

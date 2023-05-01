@@ -58,14 +58,7 @@ namespace nil {
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
                     constexpr static const std::size_t m = ParamsType::commitment_params_type::m;
 
-                    using fixed_values_commitment_scheme_type =
-                        typename ParamsType::fixed_values_commitment_scheme_type;
-                    using variable_values_commitment_scheme_type = typename ParamsType::variable_values_commitment_scheme_type;
-                    using runtime_size_commitment_scheme_type = typename ParamsType::runtime_size_commitment_scheme_type;
-                    
-                    using permutation_commitment_scheme_type = typename ParamsType::permutation_commitment_scheme_type;
-                    using quotient_commitment_scheme_type = typename ParamsType::quotient_commitment_scheme_type;
-
+                    using commitment_scheme_type = typename ParamsType::runtime_size_commitment_scheme_type;
                     using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
 
                     constexpr static const std::size_t gate_parts = 1;
@@ -95,13 +88,10 @@ namespace nil {
 
                         for (std::size_t i = 0; i < permutation_size; i++) {
                             std::size_t zero_index = 0;
-                            for (std::size_t j = 0;
-                                 j < preprocessed_public_data.common_data.columns_rotations[i].size();
-                                 j++) {
-
-                                if (preprocessed_public_data.common_data.columns_rotations[i][j] == 0) {
-                                    zero_index = j;
-                                }
+                            for (int v: preprocessed_public_data.common_data.columns_rotations[i]) {
+                                if (v == 0)
+                                    break;
+                                ++zero_index;
                             }
                             if (i < witness_columns + public_input_columns) {
                                 f[i] = proof.eval_proof.combined_value.z[0][i][zero_index];
@@ -125,59 +115,54 @@ namespace nil {
                         typename policy_type::evaluation_map columns_at_y;
                         for (std::size_t i = 0; i < witness_columns; i++) {
                             std::size_t i_global_index = i;
-                            for (std::size_t j = 0;
-                                 j < preprocessed_public_data.common_data.columns_rotations[i_global_index].size();
-                                 j++) {
-
+                            std::size_t j = 0;
+                            for (int rotation: preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
                                 auto key = std::make_tuple(
                                     i,
-                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                    rotation,
                                     plonk_variable<FieldType>::column_type::witness);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[0][i][j];
+                                ++j;
                             }
                         }
                         
                         for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
                             std::size_t i_global_index = witness_columns + i;
 
-                            for (std::size_t j = 0;
-                                 j < preprocessed_public_data.common_data.columns_rotations[i_global_index].size();
-                                 j++) {
-
+                            std::size_t j = 0;
+                            for (int rotation: preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
                                 auto key = std::make_tuple(
                                     i,
-                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                    rotation,
                                     plonk_variable<FieldType>::column_type::public_input);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[0][witness_columns + i][j];
+                                ++j;
                             }
                         }
 
                         for (std::size_t i = 0; i < 0 + constant_columns; i++) {
                             std::size_t i_global_index = witness_columns + public_input_columns + i;
-                            for (std::size_t j = 0;
-                                 j < preprocessed_public_data.common_data.columns_rotations[i_global_index].size();
-                                 j++) {
-
+                            std::size_t j = 0;
+                            for (int rotation: preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
                                 auto key = std::make_tuple(
                                     i,
-                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                    rotation,
                                     plonk_variable<FieldType>::column_type::constant);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[3][i + permutation_size*2][j];
+                                ++j;
                             }
                         }
 
                         for (std::size_t i = 0; i < selector_columns; i++) {
                             std::size_t i_global_index = witness_columns + constant_columns + public_input_columns + i;
-
-                            for (std::size_t j = 0;
-                                 j < preprocessed_public_data.common_data.columns_rotations[i_global_index].size();
-                                 j++) {
-
+                            std::size_t j = 0;
+                            for (int rotation: preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
                                 auto key = std::make_tuple(
                                     i,
-                                    preprocessed_public_data.common_data.columns_rotations[i_global_index][j],
+                                    rotation,
                                     plonk_variable<FieldType>::column_type::selector);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[3][i + permutation_size*2 + constant_columns][j];
+                                ++j;
                             }
                         }
 
@@ -235,21 +220,15 @@ namespace nil {
                             variable_values_evaluation_points(witness_columns + public_input_columns);
 
                         // variable_values polynomials (table columns)
-                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns; variable_values_index++) {
-
-                            std::vector<int> variable_values_rotation =
+                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns + public_input_columns; variable_values_index++) {
+                            std::set<int> variable_values_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[variable_values_index];
 
-                            for (std::size_t rotation_index = 0; rotation_index < variable_values_rotation.size();
-                                 rotation_index++) {
+                            for (int rotation: variable_values_rotation) {
                                 variable_values_evaluation_points[variable_values_index].push_back(
-                                    challenge * omega.pow(variable_values_rotation[rotation_index]));
+                                    challenge * omega.pow(rotation));
                             }
                         }
-                        for (std::size_t i = witness_columns; i < witness_columns + public_input_columns; i ++) {
-                            variable_values_evaluation_points[i].push_back(challenge);
-                        }
-
                         // permutation
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_permutation = {{challenge,
                                                                                                      challenge * omega}};
@@ -291,22 +270,68 @@ namespace nil {
                             // }
                         }
 
+                        std::vector<typename FieldType::value_type> challenge_point = {challenge};
+
                         // quotient
-                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {{challenge}};
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {challenge_point};
 
                         // public data
-                        std::vector<std::vector<typename FieldType::value_type>> &evaluation_points_public =
-                            evaluation_points_quotient;
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_public;
+
+                        for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
+                            evaluation_points_public.push_back(challenge_point);
+                        }
+                        
+                        for (std::size_t k = 0; k < preprocessed_public_data.identity_polynomials.size(); k++) {
+                            evaluation_points_public.push_back(challenge_point);
+                        }
+
+                        // constant columns may be rotated
+                        for (std::size_t k = 0; k < constant_columns; k ++){
+                            std::set<int> rotations =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (int rotation: rotations) {
+                                point.push_back( challenge * omega.pow(rotation));
+                            }
+                            evaluation_points_public.push_back(point);
+                        }
+                        
+                        // selector columns may be rotated
+                        for (std::size_t k = 0; k < selector_columns; k ++){
+                            std::set<int> rotations =
+                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + constant_columns + k];
+                            std::vector<typename FieldType::value_type> point;
+
+                            for (int rotation: rotations) {
+                                point.push_back( challenge * omega.pow(rotation));
+                            }
+                            evaluation_points_public.push_back(point);
+                        }
+
+                        // Evaluation points for special selectors q_last and q_blind
+                        evaluation_points_public.push_back(challenge_point); // for q_last
+                        evaluation_points_public.push_back(challenge_point); // for q_blind
+
                         std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
                         {variable_values_evaluation_points, evaluation_points_permutation, evaluation_points_quotient, evaluation_points_public};
-                        std::array<typename runtime_size_commitment_scheme_type::commitment_type, 4> commitments = 
-                        {proof.variable_values_commitment, proof.v_perm_commitment,
-                                                    proof.T_commitment, preprocessed_public_data.common_data.commitments.fixed_values};
-                        if (!algorithms::verify_eval<runtime_size_commitment_scheme_type>(
-                                evaluations_points,
-                                proof.eval_proof.combined_value,
-                                                    commitments,
-                                                    fri_params, transcript)) {
+                        std::array<typename commitment_scheme_type::commitment_type, 4> commitments = 
+                        {proof.variable_values_commitment, 
+                         proof.v_perm_commitment,
+                         proof.T_commitment, 
+                         preprocessed_public_data.common_data.commitments.fixed_values
+                        };
+                        
+                        if( proof.fixed_values_commitment != preprocessed_public_data.common_data.commitments.fixed_values )
+                            return false;
+
+                        if (!algorithms::verify_eval<commitment_scheme_type>(
+                            evaluations_points,
+                            proof.eval_proof.combined_value,
+                            commitments,
+                            fri_params, transcript)
+                        ) {
                             return false;
                         }
 

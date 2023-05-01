@@ -87,31 +87,6 @@ namespace nil {
                         << vk.delta_g2.to_affine().X.data[1].data << " " << vk.delta_g2.to_affine().Y.data[1].data << " " << vk.delta_g2.to_affine().Z.data[1].data << std::endl;
                 }
 
-                template<typename FieldType>
-                void print_r1cs_constraint(
-                        r1cs_constraint<FieldType> rc){
-                    std::cout << "a" << std::endl;
-                    for (auto it = rc.a.terms.begin(); 
-                            it != rc.a.terms.end();
-                            it++ ){
-                        std::cout << it->index << ": " << it->coeff.data << std::endl;
-                    }
-
-                    std::cout << "b" << std::endl;
-                    for (auto it = rc.b.terms.begin(); 
-                            it != rc.b.terms.end();
-                            it++ ){
-                        std::cout << it->index << ": " << it->coeff.data << std::endl;
-                    }
-
-                    std::cout << "c" << std::endl;
-                    for (auto it = rc.c.terms.begin(); 
-                            it != rc.c.terms.end();
-                            it++ ){
-                        std::cout << it->index << ": " << it->coeff.data << std::endl;
-                    }
-                }
-
                 template<>
                 bool run_r1cs_gg_ppzksnark_tvm_marshalling<nil::crypto3::algebra::curves::bls12<381>>(
                     const r1cs_example<typename nil::crypto3::algebra::curves::bls12<381>::scalar_field_type> &example) {
@@ -175,8 +150,6 @@ namespace nil {
 
                     for (std::size_t i = 0; i < keypair.first.constraint_system.constraints.size(); i++){
                         std::cout << std::endl << "i:" << i << std::endl;
-                        // print_r1cs_constraint(keypair.first.constraint_system.constraints[i]);
-                        // print_r1cs_constraint(other.constraint_system.constraints[i]);
                         BOOST_CHECK(keypair.first.constraint_system.constraints[i] == other.constraint_system.constraints[i]);
                     }
 

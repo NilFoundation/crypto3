@@ -35,7 +35,7 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment.hpp>
-#include <nil/crypto3/zk/snark/commitments/knowledge_commitment_multiexp.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/knowledge_commitment_multiexp.hpp>
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark/detail/basic_policy.hpp>
 
@@ -82,11 +82,11 @@ namespace nil {
                             reductions::r1cs_to_qap<scalar_field_type>::witness_map(
                                 proving_key.constraint_system, primary_input, auxiliary_input, d1, d2, d3);
 
-                        typename knowledge_commitment<g1_type, g1_type>::value_type g_A =
+                        typename commitments::knowledge_commitment<g1_type, g1_type>::value_type g_A =
                             proving_key.A_query[0] + qap_wit.d1 * proving_key.A_query[qap_wit.num_variables + 1];
-                        typename knowledge_commitment<g2_type, g1_type>::value_type g_B =
+                        typename commitments::knowledge_commitment<g2_type, g1_type>::value_type g_B =
                             proving_key.B_query[0] + qap_wit.d2 * proving_key.B_query[qap_wit.num_variables + 1];
-                        typename knowledge_commitment<g1_type, g1_type>::value_type g_C =
+                        typename commitments::knowledge_commitment<g1_type, g1_type>::value_type g_C =
                             proving_key.C_query[0] + qap_wit.d3 * proving_key.C_query[qap_wit.num_variables + 1];
 
                         g1_value_type g_H = g1_value_type::zero();

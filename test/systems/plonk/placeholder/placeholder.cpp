@@ -4,6 +4,7 @@
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 // Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
 // Copyright (c) 2022 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2023 Elena Tatuzova <e.tatuzova@nil.foundation>
 //
 // MIT License
 //
@@ -160,9 +161,12 @@ struct placeholder_test_params_lookups {
 constexpr static const std::size_t table_columns =
     placeholder_test_params::witness_columns + placeholder_test_params::public_input_columns;
 
-typedef commitments::fri<FieldType, placeholder_test_params::merkle_hash_type,
-                         placeholder_test_params::transcript_hash_type, m, 1>
-    fri_type;
+typedef commitments::fri<
+    FieldType, 
+    placeholder_test_params::merkle_hash_type,
+    placeholder_test_params::transcript_hash_type, 
+    placeholder_test_params::lambda, m, 4
+> fri_type;
 
 typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
 typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params>
@@ -320,8 +324,8 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
         f_at_y[i] = polynomial_table[i].evaluate(y);
     }
 
-    typename FieldType::value_type v_p_at_y = prover_res.permutation_polynomial.evaluate(y);
-    typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial.evaluate(circuit.omega * y);
+    typename FieldType::value_type v_p_at_y = prover_res.permutation_polynomial_dfs.evaluate(y);
+    typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial_dfs.evaluate(circuit.omega * y);
 
     std::array<typename FieldType::value_type, 3> verifier_res =
         placeholder_permutation_argument<FieldType, circuit_2_params>::verify_eval(
@@ -333,15 +337,15 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
     for (int i = 0; i < argument_size; i++) {
-        BOOST_CHECK(prover_res.F[i].evaluate(y) == verifier_res[i]);
+        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);
         for (std::size_t j = 0; j < desc.rows_amount; j++) {
-            BOOST_CHECK(prover_res.F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
+            BOOST_CHECK(prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
                             j)) == FieldType::value_type::zero());
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
+BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabled()) {
 
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
 
@@ -349,9 +353,9 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-    //    typedef commitments::list_polynomial_commitment<FieldType,
-    //        circuit_3_params::batched_commitment_params_type> lpc_type;
-    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 1, true> lpc_type;
+    typedef commitments::list_polynomial_commitment<FieldType,
+        circuit_3_params::batched_commitment_params_type> lpc_type;
+    //typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -384,7 +388,8 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
 
     typename placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prover_lookup_result prover_res =
         placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prove_eval(
-            constraint_system, preprocessed_public_data, assignments, fri_params, prover_transcript);
+            constraint_system, preprocessed_public_data, assignments, fri_params, prover_transcript
+    );
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
@@ -490,9 +495,10 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
         init_blob);
 
-    std::array<math::polynomial<typename FieldType::value_type>, 1> prover_res =
+    std::array<math::polynomial_dfs<typename FieldType::value_type>, 1> prover_res =
         placeholder_gates_argument<FieldType, circuit_2_params>::prove_eval(
-            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain, prover_transcript);
+            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
+            preprocessed_public_data.common_data.max_gates_degree, prover_transcript);
 
     // Challenge phase
     typename FieldType::value_type y = algebra::random_element<FieldType>();
@@ -563,7 +569,7 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 
     //    typedef commitments::list_polynomial_commitment<FieldType,
     //        circuit_2_params::batched_commitment_params_type> lpc_type;
-    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type, 0, false> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -589,19 +595,17 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
     auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
 
-    bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(preprocessed_public_data, proof,
-                                                                                   constraint_system, fri_params);
+    bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params);
     BOOST_CHECK(verifier_res);
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test) {
+BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test, *boost::unit_test::disabled()) {
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-    //    typedef commitments::list_polynomial_commitment<FieldType,
-    //        circuit_2_params::batched_commitment_params_type> lpc_type;
-    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 0, false> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 

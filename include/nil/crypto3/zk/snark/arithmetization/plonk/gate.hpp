@@ -28,6 +28,7 @@
 #ifndef CRYPTO3_ZK_PLONK_GATE_HPP
 #define CRYPTO3_ZK_PLONK_GATE_HPP
 
+#include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
@@ -40,6 +41,7 @@ namespace nil {
                 struct plonk_gate {
                     typedef FieldType field_type;
                     typedef ConstraintType constraint_type;
+                    typedef typename ConstraintType::variable_type variable_type;
 
                     std::size_t selector_index;
                     std::vector<ConstraintType> constraints;

@@ -190,17 +190,17 @@ namespace nil {
                                                  plonk_variable<FieldType>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
-                    add_constraint.add_term(w0);
-                    add_constraint.add_term(w1);
-                    add_constraint.add_term(-w2);
+                    add_constraint += w0;
+                    add_constraint += w1;
+                    add_constraint -= w2;
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
                     plonk_gate<FieldType, plonk_constraint<FieldType>> add_gate(0, add_gate_costraints);
                     test_circuit.gates.push_back(add_gate);
 
                     plonk_constraint<FieldType> mul_constraint;
-                    add_constraint.add_term(w0 * w1);
-                    add_constraint.add_term(-w2);
+                    add_constraint += w0 * w1;
+                    add_constraint -= w2;
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
                     plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
@@ -327,9 +327,9 @@ namespace nil {
                                                  plonk_variable<FieldType>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
-                    add_constraint.add_term(w0);
-                    add_constraint.add_term(w1);
-                    add_constraint.add_term(w2, -one);
+                    add_constraint += w0;
+                    add_constraint += w1;
+                    add_constraint -= w2;
 
                     std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
                     plonk_gate<FieldType, plonk_constraint<FieldType>> add_gate(0, add_gate_costraints);
@@ -338,9 +338,9 @@ namespace nil {
                     plonk_constraint<FieldType> mul_constraint;
                     typename plonk_constraint<FieldType>::term_type w0_term(w0);
                     typename plonk_constraint<FieldType>::term_type w1_term(w1); 
-                    mul_constraint.add_term(w0_term * w1_term);
-                    mul_constraint.add_term(w2, -one);
-                    mul_constraint.add_term(w0_prev);
+                    mul_constraint += w0_term * w1_term;
+                    mul_constraint -= w2;
+                    mul_constraint += w0_prev;
 
                     std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
                     plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
@@ -441,12 +441,9 @@ namespace nil {
 
 
                     plonk_lookup_constraint<FieldType> lookup_constraint;
-                    math::non_linear_term<plonk_variable<FieldType>> w0_term(w0);
-                    math::non_linear_term<plonk_variable<FieldType>> w1_term(w1);
-                    math::non_linear_term<plonk_variable<FieldType>> w2_term(w2);
-                    lookup_constraint.lookup_input.push_back(w0_term);
-                    lookup_constraint.lookup_input.push_back(w1_term);
-                    lookup_constraint.lookup_input.push_back(w2_term);
+                    lookup_constraint.lookup_input.push_back(w0);
+                    lookup_constraint.lookup_input.push_back(w1);
+                    lookup_constraint.lookup_input.push_back(w2);
                     lookup_constraint.lookup_value.push_back(c0);
                     lookup_constraint.lookup_value.push_back(c1);
                     lookup_constraint.lookup_value.push_back(c2);
