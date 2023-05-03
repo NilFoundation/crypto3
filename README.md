@@ -15,7 +15,7 @@ To actually include this library in a project it is required to:
 This library is used in [ZKLLVM]{https://github.com/NilFoundation/zkllvm} transpiler binary.
 It produces gate argument for EVM from zkllvm-assigner which consists of circuit.crct and assignment.tbl file.
 It can also create test proof to check gate argument by [evm-placeholder-verification]{https://github.com/NilFoundation/zkllvm}
-To build transpiler app follow ZKLLVM instructions to prepare evironment and input data.
+To build transpiler app follow ZKLLVM instructions to prepare evironment and input data. Use this branch [ZKLLVM](https://github.com/NilFoundation/zkllvm/tree/64-add-optimize-option-to-transpiler-app).
 
 1. Build transpiler binary file
 ```bash
@@ -25,18 +25,18 @@ make -C ${ZKLLVM_BUILD:-build} transpiler -j$(nproc)
 ```bash
 ${ZKLLVM_BUILD:-build}/bin/transpiler/transpiler -m gen-gate-argument -i input_folder -o output_folder
 ```
+Use --optimize-gates option to place small sequental gates to one .sol file
 Run to generate test proof:
 ```bash
 ${ZKLLVM_BUILD:-build}/bin/transpiler/transpiler -m gen-test-proof -i input_folder -o output_folder
 ```
-3. Copy `output_folder` to `evm-placeholder-verification`. Use this branch [evm-placholder-verification](https://github.com/NilFoundation/evm-placeholder-verification/tree/33-batching-evaluation-proofs)) 
+3. Copy `output_folder` to `evm-placeholder-verification/examples`. Use this branch [evm-placholder-verification](https://github.com/NilFoundation/evm-placeholder-verification/tree/37-merge-33-and-17) 
 
 4. Run python scripts from the folder `evm-placeholder-verification/test` to verify test proof
 ```bash
-python3 web3_deploy_gate_argument.py output_folder
-python3 web3_placeholder_universal_test.py output_folder
+python3 web3_deploy_gate_argument.py examples/output_folder
+python3 web3_placeholder_verify_deployed_test.py examples/output_folder
 ```
-
 ## Dependencies
 
 ### Internal
