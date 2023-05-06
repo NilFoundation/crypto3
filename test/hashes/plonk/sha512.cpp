@@ -38,7 +38,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/hashes/sha256/plonk/sha512.hpp>
+#include <nil/blueprint/components/hashes/sha2/plonk/sha512.hpp>
 
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/ed25519.hpp>

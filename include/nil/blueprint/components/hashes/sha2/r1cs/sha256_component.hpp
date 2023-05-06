@@ -30,7 +30,7 @@
 
 #include <nil/crypto3/zk/merkle_tree.hpp>
 #include <nil/blueprint/components/hashes/hash_io.hpp>
-#include <nil/blueprint/components/hashes/sha256/sha256_construction.hpp>
+#include <nil/blueprint/components/hashes/sha2/r1cs/sha256_construction.hpp>
 
 namespace nil {
     namespace crypto3 {

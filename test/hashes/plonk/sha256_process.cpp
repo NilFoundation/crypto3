@@ -37,7 +37,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/hashes/sha256/plonk/sha256_process.hpp>
+#include <nil/blueprint/components/hashes/sha2/plonk/sha256_process.hpp>
 
 #include "../../test_plonk_component.hpp"
 
