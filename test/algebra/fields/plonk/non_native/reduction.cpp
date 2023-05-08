@@ -60,7 +60,8 @@ void test_reduction(std::vector<typename BlueprintFieldType::value_type> public_
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
 
-    using component_type = blueprint::components::reduction<ArithmetizationType, BlueprintFieldType, 9>;
+    using component_type = blueprint::components::reduction<ArithmetizationType, BlueprintFieldType, 9,
+        blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 8> input_state_var = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
@@ -115,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 BOOST_AUTO_TEST_CASE(blueprint_variable_base_decomposition_edward25519) {
 
     using curve_type = nil::crypto3::algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::scalar_field_type;
+    using BlueprintFieldType = typename curve_type::base_field_type;
     using extended_integral = typename crypto3::algebra::curves::ed25519::scalar_field_type::extended_integral_type;
 
     test_reduction_input_expended_integral_calculate_expected<BlueprintFieldType>(max512);

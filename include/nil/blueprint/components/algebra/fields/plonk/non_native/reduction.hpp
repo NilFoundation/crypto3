@@ -37,22 +37,28 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/basic_non_native_policy.hpp>
+
 namespace nil {
     namespace blueprint {
         namespace components {
 
-            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType, typename FieldType, std::uint32_t WitnessesAmount,
+                typename NonNativePolicyType>
             class reduction;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             class reduction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                            BlueprintFieldType, 9>
+                            BlueprintFieldType, 9,
+                            basic_non_native_policy<BlueprintFieldType>>
                 : public plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 0, 0> {
 
                 constexpr static const std::uint32_t WitnessesAmount = 9;
 
                 using component_type =
                     plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0>;
+                using operating_field_type = crypto3::algebra::fields::curve25519_scalar_field;
+                using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
             public:
                 using var = typename component_type::var;
@@ -66,7 +72,7 @@ namespace nil {
                 };
 
                 struct result_type {
-                    var output;
+                    typename non_native_policy_type::template field<operating_field_type>::value_type output;
 
                     result_type(const reduction &component, std::uint32_t start_row_index) {
                         output = var(component.W(4), start_row_index + rows_amount - 3, false);
@@ -93,7 +99,8 @@ namespace nil {
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::int32_t WitnessesAmount>
             using plonk_reduction =
                 reduction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                          BlueprintFieldType, WitnessesAmount>;
+                          BlueprintFieldType, WitnessesAmount,
+                          basic_non_native_policy<BlueprintFieldType>>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             typename plonk_reduction<BlueprintFieldType, ArithmetizationParams, 9>::result_type generate_assignments(

@@ -37,6 +37,9 @@ namespace nil {
             template<typename BlueprintFieldType, typename OperatingFieldType>
             struct basic_non_native_policy_field_type;
 
+            /*
+             * Specialization for non-native Ed25519 base field element on Pallas base field
+             */
             template<>
             struct basic_non_native_policy_field_type<typename crypto3::algebra::curves::pallas::base_field_type,
                                                       typename crypto3::algebra::curves::ed25519::base_field_type> {
@@ -47,6 +50,19 @@ namespace nil {
                     crypto3::zk::snark::plonk_variable<typename crypto3::algebra::curves::pallas::base_field_type>,
                     ratio>
                     value_type;
+            };
+
+            /*
+             * Specialization for non-native Ed25519 scalar field element on Pallas base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::curves::pallas::base_field_type,
+                                                      typename crypto3::algebra::curves::ed25519::scalar_field_type> {
+
+                constexpr static const std::uint32_t ratio = 1;
+
+                typedef crypto3::zk::snark::plonk_variable<typename crypto3::algebra::curves::pallas::base_field_type>
+                value_type;
             };
 
             /*
