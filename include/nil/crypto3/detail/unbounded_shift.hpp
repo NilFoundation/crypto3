@@ -67,16 +67,22 @@ namespace nil {
 
             template<typename T>
             T unbounded_shl(T x, std::size_t n) {
+                if (sizeof(T) * CHAR_BIT <= n)
+                    n %= sizeof(T) * CHAR_BIT;
                 return x << n;
             }
 
             template<typename T>
             T unbounded_shr(T x, std::size_t n) {
+                if (sizeof(T) * CHAR_BIT <= n)
+                    return 0;
                 return x >> n;
             }
             // FIXME: it wouldn't work when Shift == sizeof(T) * CHAR_BIT
             template<int Shift, typename T>
             T low_bits(T x) {
+                if (sizeof(T) * CHAR_BIT <= Shift)
+                    return x;
                 T highmask = unbounded_shl<Shift, T>(~T());
                 return T(x & ~highmask);
             }
@@ -90,12 +96,16 @@ namespace nil {
 
             template<size_t type_bits, typename T>
             T low_bits(T x, std::size_t shift) {
+                if (sizeof(T) * CHAR_BIT <= shift)
+                    return x;
                 T lowmask = ((bool)shift) * unbounded_shr<T>(~T(), type_bits - shift);
                 return x & lowmask;
             }
 
             template<size_t type_bits, typename T>
             T high_bits(T x, std::size_t shift) {
+                if (sizeof(T) * CHAR_BIT <= shift)
+                    return x;
                 T highmask = ((bool)shift) * unbounded_shl<T>(~T(), type_bits - shift);
                 return x & highmask;
             }
