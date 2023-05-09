@@ -207,6 +207,16 @@ namespace nil {
                             polynomial_table,
                             fri_params,
                             transcript);
+
+                        auto permutation_polynomial_precommitment = algorithms::precommit<commitment_scheme_type>(
+                            permutation_argument.permutation_polynomial_dfs, fri_params.D[0], fri_params.step_list.front()
+                        );
+                        auto permutation_polynomial_commitment = algorithms::commit<commitment_scheme_type>(
+                            permutation_polynomial_precommitment
+                        );
+                        transcript(permutation_polynomial_commitment);
+                        proof.v_perm_commitment = permutation_polynomial_commitment;
+
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
                             std::chrono::high_resolution_clock::now() - last);
@@ -214,8 +224,6 @@ namespace nil {
                                   << elapsed.count() * 1e-6 << "ms" << std::endl;
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        proof.v_perm_commitment = permutation_argument.permutation_poly_precommitment.root();
-
                         std::array<math::polynomial_dfs<typename FieldType::value_type>, f_parts> F_dfs;
 
                         F_dfs[0] = permutation_argument.F_dfs[0];
@@ -507,7 +515,7 @@ namespace nil {
                         {variable_values_evaluation_points, evaluation_points_v_p, evaluation_points_quotient, evaluation_points_public};
                         std::array<typename commitment_scheme_type::precommitment_type, 4> precommitments = {
                             variable_values_precommitment, 
-                            permutation_argument.permutation_poly_precommitment,
+                            permutation_polynomial_precommitment,
                             T_precommitment, 
                             preprocessed_public_data.precommitments.fixed_values
                         };

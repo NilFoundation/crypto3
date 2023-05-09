@@ -110,7 +110,9 @@ namespace nil {
                             placeholder_permutation_argument<FieldType, ParamsType>::verify_eval(
                                 preprocessed_public_data, proof.eval_proof.challenge, f,
                                 proof.eval_proof.combined_value.z[1][0][0], proof.eval_proof.combined_value.z[1][0][1],
-                                proof.v_perm_commitment, transcript);
+                                transcript
+                        );
+                        transcript( proof.v_perm_commitment ); 
 
                         typename policy_type::evaluation_map columns_at_y;
                         for (std::size_t i = 0; i < witness_columns; i++) {
@@ -346,9 +348,6 @@ namespace nil {
                         F[6] = lookup_argument[3];
                         F[7] = lookup_argument[4];
                         F[8] = gate_argument[0];
-//                        for( std::size_t i = 0; i < f_parts; i++ ){
-//                            std::cout << "F[" << i << "] = " << F[i].data << std::endl;
-//                        }
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {
@@ -357,18 +356,13 @@ namespace nil {
 
                         typename FieldType::value_type T_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < proof.eval_proof.combined_value.z[2].size(); i++) {
-//                            std::cout << "T_splitted[" << i << "] = " << proof.eval_proof.combined_value.z[2][i][0].data << std::endl;
                             T_consolidated = T_consolidated + proof.eval_proof.combined_value.z[2][i][0] *
                                                                   challenge.pow((fri_params.max_degree + 1) * i);
                         }
-                        //std::cout << "T_consolidated = " << T_consolidated.data << std::endl;
 //
                         // Z is polynomial -1, 0 ...., 0, 1
                         typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);                     
-//                        std::cout << "Z_at_challenge = " << Z_at_challenge.data << std::endl;
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
-//                            std::cout << "F_consolidated = " << F_consolidated.data << std::endl;
-//                            std::cout << "Z_at_challenge * T_consolidated = " << (Z_at_challenge * T_consolidated).data << std::endl;
                             return false;
                         }
 

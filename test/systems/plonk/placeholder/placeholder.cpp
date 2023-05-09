@@ -381,7 +381,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     std::array<typename FieldType::value_type, 3> verifier_res =
         placeholder_permutation_argument<FieldType, circuit_2_params>::verify_eval(
             preprocessed_public_data, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
-            prover_res.permutation_poly_precommitment.root(), verifier_transcript);
+            verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
