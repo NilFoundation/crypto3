@@ -493,7 +493,8 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data (
-                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount,
+                            public_commitments, c_rotations,  
+                            N_rows, usable_rows,
                             max_gates_degree);
 
                         preprocessed_data_type preprocessed_data({public_polynomial_table, sigma_perm_polys,

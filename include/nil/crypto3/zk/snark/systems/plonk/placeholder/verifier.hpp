@@ -169,31 +169,31 @@ namespace nil {
                         // 6. lookup argument
                         bool use_lookup = constraint_system.lookup_gates().size() > 0;
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument;
-                        if (use_lookup) {
-                            for (std::size_t i = 0; i < lookup_parts; i++) {
-                                lookup_argument[i] = 0;
-                            }
-                             lookup_argument = placeholder_lookup_argument<
-                                 FieldType, permutation_commitment_scheme_type,
-                                 ParamsType>::verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
-                                                          proof.eval_proof.challenge, columns_at_y,
-                                                          proof.eval_proof.combined_value.z[0][0][0],
-                                                          proof.eval_proof.combined_value.z[0][0][1],
-                                                          proof.eval_proof.combined_value.z[2][0][0],
-                                                          proof.eval_proof.combined_value.z[1][0][0],
-                                                          proof.eval_proof.combined_value.z[1][0][1],
+//                        if (use_lookup) {
+//                            for (std::size_t i = 0; i < lookup_parts; i++) {
+//                                lookup_argument[i] = 0;
+//                            }
+//                             lookup_argument = placeholder_lookup_argument<
+//                                 FieldType, permutation_commitment_scheme_type,
+//                                 ParamsType>::verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
+//                                                          proof.eval_proof.challenge, columns_at_y,
+ //                                                         proof.eval_proof.combined_value.z[0][0][0],
+ //                                                         proof.eval_proof.combined_value.z[0][0][1],
+ //                                                         proof.eval_proof.combined_value.z[2][0][0],
+ //                                                         proof.eval_proof.combined_value.z[1][0][0],
+ //                                                         proof.eval_proof.combined_value.z[1][0][1],
 //                                                          proof.eval_proof.lookups[1].z[0][0],
 //                                                          proof.eval_proof.lookups[1].z[0][1],
 //                                                          proof.eval_proof.lookups[2].z[0][0],
 //                                                          proof.eval_proof.lookups[0].z[0][0],
 //                                                          proof.eval_proof.lookups[0].z[0][1],
-                                                          proof.input_perm_commitment, proof.value_perm_commitment,
-                                                          proof.v_l_perm_commitment, transcript);
-                        } else {
+//                                                          proof.input_perm_commitment, proof.value_perm_commitment,
+//                                                          proof.v_l_perm_commitment, transcript);
+//                        } else {
                             for (std::size_t i = 0; i < lookup_parts; i++) {
                                 lookup_argument[i] = 0;
                             }
-                        }
+//                        }
 
                         // 7. gate argument
                         std::array<typename FieldType::value_type, 1> gate_argument =
@@ -325,7 +325,7 @@ namespace nil {
                         
                         if( proof.fixed_values_commitment != preprocessed_public_data.common_data.commitments.fixed_values )
                             return false;
-
+                        
                         if (!algorithms::verify_eval<commitment_scheme_type>(
                             evaluations_points,
                             proof.eval_proof.combined_value,
@@ -346,6 +346,9 @@ namespace nil {
                         F[6] = lookup_argument[3];
                         F[7] = lookup_argument[4];
                         F[8] = gate_argument[0];
+//                        for( std::size_t i = 0; i < f_parts; i++ ){
+//                            std::cout << "F[" << i << "] = " << F[i].data << std::endl;
+//                        }
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {
@@ -354,13 +357,18 @@ namespace nil {
 
                         typename FieldType::value_type T_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < proof.eval_proof.combined_value.z[2].size(); i++) {
+//                            std::cout << "T_splitted[" << i << "] = " << proof.eval_proof.combined_value.z[2][i][0].data << std::endl;
                             T_consolidated = T_consolidated + proof.eval_proof.combined_value.z[2][i][0] *
                                                                   challenge.pow((fri_params.max_degree + 1) * i);
                         }
-
+                        //std::cout << "T_consolidated = " << T_consolidated.data << std::endl;
+//
                         // Z is polynomial -1, 0 ...., 0, 1
                         typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);                     
+//                        std::cout << "Z_at_challenge = " << Z_at_challenge.data << std::endl;
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
+//                            std::cout << "F_consolidated = " << F_consolidated.data << std::endl;
+//                            std::cout << "Z_at_challenge * T_consolidated = " << (Z_at_challenge * T_consolidated).data << std::endl;
                             return false;
                         }
 
