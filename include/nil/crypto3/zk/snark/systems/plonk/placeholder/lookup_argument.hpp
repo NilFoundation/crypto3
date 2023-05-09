@@ -96,7 +96,7 @@ namespace nil {
                         
                         // $/theta = \challenge$
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
-                        theta = FieldType::value_type::one();
+                        
                         // Construct lookup gates
                         const std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates =
                             constraint_system.lookup_gates();
@@ -258,7 +258,7 @@ namespace nil {
                         const typename FieldType::value_type &F_perm_input_polynomial_value,
                         // A_perm(y * omega ^ {-1}):
                         const typename FieldType::value_type &F_perm_input_shifted_polynomial_value,
-                        // S_perm(y):
+                        // L_perm(y):
                         const typename FieldType::value_type &F_perm_value_polynomial_value,
                         // V_L(y):
                         const typename FieldType::value_type &V_L_polynomial_value,
@@ -269,7 +269,7 @@ namespace nil {
                     ) {
                         // 1. Get theta
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
-                        theta = FieldType::value_type::one();
+
                         // 2. Add commitments to transcript
                         transcript(lookup_commitment);
 
@@ -314,6 +314,7 @@ namespace nil {
                         // 4. Denote g and h
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
+
                         typename FieldType::value_type g = (F_input_compr + beta) * (F_value_compr + gamma);
                         typename FieldType::value_type h =
                             (F_perm_input_polynomial_value + beta) * (F_perm_value_polynomial_value + gamma);

@@ -32,6 +32,11 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                constexpr std::size_t VARIABLE_VALUES_INDEX = 0;
+                constexpr std::size_t V_PERM_INDEX = 1;
+                constexpr std::size_t QUOTIENT_INDEX = 2;
+                constexpr std::size_t FIXED_VALUES_INDEX = 3;
+                constexpr std::size_t LOOKUP_INDEX = 4;
 
                 /**
                  * A proof for the Placeholder cheme.
@@ -53,13 +58,10 @@ namespace nil {
                         typename FieldType::value_type lagrange_0;
 
                         typename commitment_scheme_type::proof_type combined_value;
-                        std::vector<typename commitment_scheme_type::proof_type> lookups;
-
 
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && lagrange_0 == rhs.lagrange_0 &&
-                                    combined_value == rhs.combined_value &&
-                                   lookups == rhs.lookups;
+                                    combined_value == rhs.combined_value;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);
@@ -70,6 +72,7 @@ namespace nil {
                     }
 
                     typename commitment_scheme_type::commitment_type variable_values_commitment;
+                    typename commitment_scheme_type::commitment_type lookup_commitment;
                     typename commitment_scheme_type::commitment_type v_perm_commitment;
                     typename commitment_scheme_type::commitment_type T_commitment;
                     typename commitment_scheme_type::commitment_type fixed_values_commitment;

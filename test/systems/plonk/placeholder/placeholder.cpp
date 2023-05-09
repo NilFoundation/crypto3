@@ -215,7 +215,7 @@ typedef commitments::fri<
     FieldType, 
     placeholder_test_2_params::merkle_hash_type,
     placeholder_test_2_params::transcript_hash_type, 
-    placeholder_test_2_params::lambda, m, 4
+    placeholder_test_2_params::lambda, m, 5
 > fri_type;
 
 typedef placeholder_params<FieldType, typename placeholder_test_1_params::arithmetization_params> circuit_1_params;

@@ -42,7 +42,7 @@ namespace nil {
                          std::size_t Lambda = 40,
                          std::size_t R = 1, 
                          std::size_t M = 2, 
-                         std::size_t BatchesNum = 4>
+                         std::size_t BatchesNum = 5>
                 struct placeholder_params {
 
                     typedef MerkleTreeHashType merkle_hash_type;
