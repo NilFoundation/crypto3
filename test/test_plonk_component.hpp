@@ -40,7 +40,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/utils/table_profiling.hpp>
+//#include <nil/blueprint/utils/table_profiling.hpp>
 #include <nil/blueprint/utils/satisfiability_check.hpp>
 
 #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
