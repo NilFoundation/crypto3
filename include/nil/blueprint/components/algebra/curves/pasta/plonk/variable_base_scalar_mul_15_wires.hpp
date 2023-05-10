@@ -103,7 +103,7 @@ namespace nil {
                     constexpr static const std::size_t mul_rows_amount = 102;
                     constexpr static const std::size_t add_component_rows_amount = add_component::rows_amount;
                     constexpr static const std::size_t rows_amount = add_component_rows_amount + mul_rows_amount + 1;
-                    constexpr static const std::size_t gates_amount = 2;
+                    constexpr static const std::size_t gates_amount = 6;
 
                     constexpr static const typename BlueprintFieldType::value_type shifted_minus_one = variable_base_scalar_mul_shifted_consts<CurveType>::shifted_minus_one;
                     constexpr static const typename BlueprintFieldType::value_type shifted_zero = variable_base_scalar_mul_shifted_consts<CurveType>::shifted_zero;
@@ -117,6 +117,18 @@ namespace nil {
 
                         var_ec_point T;
                         var b;
+                        var b_high;
+                        input_type(var_ec_point _T, var _b) {
+                            T.x = _T.x;
+                            T.y = _T.y;
+                            b = _b;
+                        }
+                        input_type(var_ec_point _T, var _b, var _b_high) {
+                            T.x = _T.x;
+                            T.y = _T.y;
+                            b = _b;
+                            b_high = _b_high;
+                        }
                     };
 
                     struct result_type {
@@ -163,6 +175,12 @@ namespace nil {
                             const std::uint32_t start_row_index) {
 
                         typename BlueprintFieldType::value_type b = var_value(assignment, instance_input.b);
+                        typename BlueprintFieldType::value_type b_high;
+                        if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
+                            b_high = var_value(assignment, instance_input.b_high);
+                        } else {
+                            b_high = 0;
+                        }
                         typename BlueprintFieldType::value_type T_x = var_value(assignment, instance_input.T.x);
                         typename BlueprintFieldType::value_type T_y = var_value(assignment, instance_input.T.y);
                         typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T(T_x,
@@ -179,6 +197,50 @@ namespace nil {
                         nil::marshalling::status_type status;
                         std::array<bool, scalar_size> bits =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+
+                        // test for malicious bit changing (vesta curve case)
+                        // typename BlueprintFieldType::value_type fake_b = 0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255 - 1; // == p-1
+                        // typename CurveType::scalar_field_type::integral_type integral_fake_b =
+                        //     typename CurveType::scalar_field_type::integral_type(fake_b.data);
+                        // bits =
+                        //     nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_fake_b, status);
+                        // bits[253] = true; // == p+1
+
+                        // test for malicious bit changing (pallas curve case)
+                        // typename CurveType::scalar_field_type::value_type fake_b = 0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255 - 1; // == q-1
+                        // typename CurveType::scalar_field_type::integral_type integral_fake_b =
+                        //     typename CurveType::scalar_field_type::integral_type(fake_b.data);
+                        // bits =
+                        //     nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_fake_b, status);
+                        // bits[253] = true; // == q+1
+
+                        // q = 0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255 = 2**254 + t_q
+                        // p = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255 = 2**254 + t_p (q > p)
+                        constexpr static const typename BlueprintFieldType::value_type t_q = 0x224698fc0994a8dd8c46eb2100000001_cppui255;
+                        constexpr static const typename BlueprintFieldType::value_type t_p = 0x224698fc094cf91b992d30ed00000001_cppui255;
+                        constexpr static const typename BlueprintFieldType::value_type two = 2;
+                        typename BlueprintFieldType::value_type z_n2;
+                        typename BlueprintFieldType::value_type aux;
+                        if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
+                            z_n2 = integral_b;
+                            aux = z_n2 - t_q + two.pow(130);
+                            typename BlueprintFieldType::integral_type intehral_b_high = typename BlueprintFieldType::integral_type(b_high.data);
+                            if (intehral_b_high == 1) {
+                                bits[0] = 1;
+                            }
+                        } else {
+                            z_n2 = integral_b - bits[0] * two.pow(254);
+                            aux = z_n2 - t_p + two.pow(130);
+                        }
+                        typename CurveType::scalar_field_type::integral_type integral_aux =
+                            typename CurveType::scalar_field_type::integral_type(aux.data);
+                        const std::size_t base_size = 255;
+                        std::array<bool, base_size> aux_bits =
+                            nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_aux, status);
+
+                        // std::cout << "b = " << b.data << std::endl;
+                        // std::cout << "x = " << (T.X).data << std::endl;
+                        // std::cout << std::flush;
 
                         typename BlueprintFieldType::value_type n = 0;
                         typename BlueprintFieldType::value_type n_next = 0;
@@ -249,6 +311,38 @@ namespace nil {
                             assignment.witness(component.W(5), i + 1) = bits[((i - j) / 2) * 5 + 3];
                             assignment.witness(component.W(6), i + 1) = bits[((i - j) / 2) * 5 + 4];
                         }
+
+                        // additional bits of aux for the check (integral_b < p) or (integral_b < q)
+                        typename BlueprintFieldType::value_type u_prev = 0;
+                        typename BlueprintFieldType::value_type u0, u1;
+                        for (std::size_t i = j; i <= j + 40; i = i + 2) {
+                            assignment.witness(component.W(6), i) = u_prev;
+                            const std::size_t ind = 125 + ((i - j) / 2) * 6; 
+                            u0 = 4 * aux_bits[ind] + 2 * aux_bits[ind+1] + aux_bits[ind+2];
+                            u1 = 4 * aux_bits[ind+3] + 2 * aux_bits[ind+4] + aux_bits[ind+5]; 
+                            assignment.witness(component.W(12), i+1) = u0;
+                            assignment.witness(component.W(13), i+1) = u1;
+                            assignment.witness(component.W(14), i+1) = 64 * u_prev + 8 * u0 + u1;
+                            u_prev = 64 * u_prev + 8 * u0 + u1; 
+                        }
+                        assignment.witness(component.W(6), j+42) = u_prev;
+                        const std::size_t ind = 125 + ((42) / 2) * 6; 
+                        u0 = 4 * aux_bits[ind] + 2 * aux_bits[ind+1] + aux_bits[ind+2];
+                        u1 = aux_bits[ind+3];
+                        assignment.witness(component.W(12), j+43) = u0;
+                        assignment.witness(component.W(13), j+43) = u1;
+                        assignment.witness(component.W(14), j+43) = 16 * u_prev + 2 * u0 + u1;
+                        assignment.witness(component.W(12), j+45) = bits[0];
+                        typename BlueprintFieldType::value_type e2 = 0;
+                        for (std::size_t l = 130; l <= 254; l = l + 1) { 
+                            e2 = e2 + bits[254-l] * two.pow(l - 130);
+                        }
+                        assignment.witness(component.W(13), j+45) = e2;
+                        assignment.witness(component.W(14), j+45) = integral_b;
+                        assignment.witness(component.W(6), j+44) = aux;
+                        assignment.witness(component.W(12), j+101) = integral_b;
+                        assignment.witness(component.W(13), j+101) = bits[0];
+
                         typename BlueprintFieldType::value_type m = ((n_next - component.shifted_minus_one)*
                         (n_next - component.shifted_zero)*(n_next - component.shifted_one));
                         typename BlueprintFieldType::value_type t0 = ( m == 0 ? 0 : m.inversed());
@@ -310,6 +404,13 @@ namespace nil {
                         assignment.enable_selector(first_selector_index, start_row_index + component.add_component_rows_amount,
                                                    start_row_index + component.rows_amount - 4, 2);
                         assignment.enable_selector(first_selector_index + 1, start_row_index + component.rows_amount - 2);
+                        assignment.enable_selector(first_selector_index + 2, start_row_index + component.add_component_rows_amount,
+                                                   start_row_index + component.add_component_rows_amount + 40, 2);
+                        assignment.enable_selector(first_selector_index + 3, start_row_index + component.add_component_rows_amount + 42);
+                        assignment.enable_selector(first_selector_index + 4, start_row_index + component.add_component_rows_amount + 44);
+                        if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
+                            assignment.enable_selector(first_selector_index + 5, start_row_index + component.add_component_rows_amount + 100);
+                        } 
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                         typename unified_addition<ArithmetizationType, CurveType, 11>::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
@@ -525,6 +626,65 @@ namespace nil {
                                      constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
                                      constraint_16, constraint_17, constraint_18, constraint_19, constraint_20,
                                      constraint_21, constraint_22});
+
+                        std::size_t selector_index_3 = first_selector_index + 2;
+                        constraint_1 = bp.add_constraint(
+                            var(component.W(12), +1) * (var(component.W(12), +1) - 1) * (var(component.W(12), +1) - 2) * (var(component.W(12), +1) - 3)
+                                * (var(component.W(12), +1) - 4) * (var(component.W(12), +1) - 5)  * (var(component.W(12), +1) - 6) * (var(component.W(12), +1) - 7)     
+                                                        );
+                        constraint_2 = bp.add_constraint(
+                            var(component.W(13), +1) * (var(component.W(13), +1) - 1) * (var(component.W(13), +1) - 2) * (var(component.W(13), +1) - 3)
+                                * (var(component.W(13), +1) - 4) * (var(component.W(13), +1) - 5)  * (var(component.W(13), +1) - 6) * (var(component.W(13), +1) - 7)     
+                                                        );
+                        constraint_3 = bp.add_constraint(
+                            var(component.W(14), +1) - 64 * var(component.W(6), 0) - 8 * var(component.W(12), +1) - var(component.W(13), +1)
+                                                        );
+                        bp.add_gate(selector_index_3, {constraint_1, constraint_2, constraint_3});
+
+                        std::size_t selector_index_4 = first_selector_index + 3;
+                        constraint_1 = bp.add_constraint(
+                            var(component.W(12), +1) * (var(component.W(12), +1) - 1) * (var(component.W(12), +1) - 2) * (var(component.W(12), +1) - 3)
+                                * (var(component.W(12), +1) - 4) * (var(component.W(12), +1) - 5)  * (var(component.W(12), +1) - 6) * (var(component.W(12), +1) - 7)     
+                                                        );
+                        constraint_2 = bp.add_constraint(
+                            var(component.W(13), +1) * (var(component.W(13), +1) - 1)    
+                                                        );
+                        constraint_3 = bp.add_constraint(
+                            var(component.W(14), +1) - 16 * var(component.W(6), 0) - 2 * var(component.W(12), +1) - var(component.W(13), +1)
+                                                        );
+                        bp.add_gate(selector_index_4, {constraint_1, constraint_2, constraint_3}); 
+
+                        std::size_t selector_index_5 = first_selector_index + 4;
+                        constraint_1 = bp.add_constraint(
+                            var(component.W(12), +1) * (var(component.W(6), 0) - var(component.W(14), -1)) 
+                                                        );
+                        constexpr static const typename BlueprintFieldType::value_type two = 2;
+                        constraint_2 = bp.add_constraint(
+                            var(component.W(12), +1) * (var(component.W(13), +1) - two.pow(124)) 
+                                                        );
+
+                        constexpr static const typename BlueprintFieldType::value_type t_q = 0x224698fc0994a8dd8c46eb2100000001_cppui255;
+                        constexpr static const typename BlueprintFieldType::value_type t_p = 0x224698fc094cf91b992d30ed00000001_cppui255;
+                        typename CurveType::scalar_field_type::integral_type integral_t_q = typename CurveType::scalar_field_type::integral_type(t_q.data);
+                        typename CurveType::scalar_field_type::integral_type integral_t_p = typename CurveType::scalar_field_type::integral_type(t_p.data);
+                        if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
+                            constraint_3 = bp.add_constraint(
+                            var(component.W(6), 0) - var(component.W(14), +1) + integral_t_q - two.pow(130)
+                                                        );
+                        } else {
+                            constraint_3 = bp.add_constraint(
+                            var(component.W(6), 0) - var(component.W(14), +1) + var(component.W(12), +1) * two.pow(254) + integral_t_p - two.pow(130)
+                                                        );
+                        }
+
+                        bp.add_gate(selector_index_5, {constraint_1, constraint_2, constraint_3});
+
+                        std::size_t selector_index_6 = first_selector_index + 5;
+                        constraint_1 = bp.add_constraint(
+                            var(component.W(5), 0) - var(component.W(12), +1) - var(component.W(13), +1) * two.pow(254) 
+                                                        );
+                        bp.add_gate(selector_index_6, {constraint_1});
+
                     }
 
                         template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
@@ -580,8 +740,33 @@ namespace nil {
                         bp.add_copy_constraint({{component.W(4), (std::int32_t)(j), false},
                                                 {component.W(0), (std::int32_t)(j), false, var::column_type::constant}});
 
+                        // bp.add_copy_constraint(
+                        //     {instance_input.b, {component.W(5), (std::int32_t)(j + component.rows_amount - 4), false}});    // scalar value check
+
+                        if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
+                            bp.add_copy_constraint(
+                                {instance_input.b, {component.W(12), (std::int32_t)(j + 101), false}});
+                            bp.add_copy_constraint(
+                                    {{component.W(2), (std::int32_t)(j + 1), false}, {component.W(13), (std::int32_t)(j + 101), false}});
+                            bp.add_copy_constraint(
+                                {instance_input.b_high, {component.W(2), (std::int32_t)(j + 1), false}});
+                        } else {
+                            bp.add_copy_constraint(
+                                {instance_input.b, {component.W(5), (std::int32_t)(j + component.rows_amount - 4), false}});    // scalar value check 
+                        }
+
+                        // additional checks for (integral_b < p)
+                        for (int z = 0; z < 40; z += 2) {
+                            bp.add_copy_constraint(
+                                {{component.W(14), (std::int32_t)(j + z + 1), false}, {component.W(6), (std::int32_t)(j + z + 2), false}});
+                        }
                         bp.add_copy_constraint(
-                            {instance_input.b, {component.W(5), (std::int32_t)(j + component.rows_amount - 4), false}});    // scalar value check
+                                {{component.W(2), (std::int32_t)(j + 1), false}, {component.W(12), (std::int32_t)(j + 45), false}});
+                        bp.add_copy_constraint(
+                                {{component.W(5), (std::int32_t)(j + 48), false}, {component.W(13), (std::int32_t)(j + 45), false}});
+                        bp.add_copy_constraint(
+                            {instance_input.b, {component.W(14), (std::int32_t)(j + 45), false}});
+
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
