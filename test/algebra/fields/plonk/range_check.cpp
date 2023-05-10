@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2023 Dmitrii Tabalin <d.tabalin@nil.foundation>
 //
 // MIT License
 //
@@ -44,25 +45,30 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include "test_plonk_component.hpp"
 
-template <typename BlueprintFieldType>
-auto test_range_check(std::vector<typename BlueprintFieldType::value_type> public_input,
-                    const bool expected_to_pass) {
-    constexpr std::size_t WitnessColumns = 15;
+template <typename BlueprintFieldType, std::size_t R, std::uint32_t WitnessesAmount>
+auto test_range_check(typename BlueprintFieldType::value_type input) {
+    constexpr std::size_t WitnessColumns = WitnessesAmount;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 1;
-    constexpr std::size_t R = 64;
-    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
-    PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    // We use either one or two depending on whether R divides chunk_size or not.
+    // Since we need to know SelectorColumns amount before the component is actually intialized,
+    // we use two.
+    constexpr std::size_t SelectorColumns = 2;
+    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                 ArithmetizationParams>;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
     using component_type = nil::blueprint::components::range_check<ArithmetizationType, R, WitnessColumns>;
 	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using value_type = typename BlueprintFieldType::value_type;
 
     var x(0, 0, false, var::column_type::public_input);
+
+    std::vector<typename BlueprintFieldType::value_type> public_input = {input};
 
     typename component_type::input_type instance_input = {x};
 
@@ -70,42 +76,64 @@ auto test_range_check(std::vector<typename BlueprintFieldType::value_type> publi
     std::cout << "range_check_test_input: " << std::hex << public_input[0].data << "\n";
     #endif
 
-    auto result_check = [](AssignmentType &assignment,
-	    typename component_type::result_type &real_res) {
-    };
+    auto result_check = [](AssignmentType &assignment, typename component_type::result_type &real_res) {};
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{0});
+    const bool expected_to_pass = input < value_type(2).pow(R);
 
-    if (expected_to_pass) {
-        nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-        (component_instance, public_input, result_check, instance_input);
+    if (WitnessesAmount == 15 && expected_to_pass) {
+        component_type component_instance =
+            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0});
+        nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    } else if (WitnessesAmount == 9 && expected_to_pass) {
+        component_type component_instance = component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0});
+        nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    } else if (WitnessesAmount == 15 && !expected_to_pass) {
+        component_type component_instance =
+            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0});
+        nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
+                                             hash_type, Lambda>(
+                                                component_instance, public_input, result_check, instance_input);
+    } else if (WitnessesAmount == 9 && !expected_to_pass) {
+        component_type component_instance = component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0});
+        nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
+                                             hash_type, Lambda>(
+                                                component_instance, public_input, result_check, instance_input);
     } else {
-        nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-        (component_instance, public_input, result_check, instance_input);
+        assert(false);
     }
 }
 
-template<typename FieldType>
-void test_range_check_specific_inputs(){
-    test_range_check<FieldType>({0}, true);
-    test_range_check<FieldType>({1}, true);
-    test_range_check<FieldType>({35000}, true);
-    test_range_check<FieldType>({0xFFFFFFFFFFFFFFFF_cppui256}, true);
+template<typename BlueprintFieldType, std::size_t R, std::uint32_t WitnessesAmount>
+void test_range_check_specific_inputs() {
+    using value_type = typename BlueprintFieldType::value_type;
+
+    test_range_check<BlueprintFieldType, R, WitnessesAmount>(0);
+    // This one would fail for R = 0.
+    test_range_check<BlueprintFieldType, R, WitnessesAmount>(1);
+    // This one would fail for R < 16, and succeed for R >= 16.
+    test_range_check<BlueprintFieldType, R, WitnessesAmount>(35000);
+    test_range_check<BlueprintFieldType, R, WitnessesAmount>(value_type(1).pow(R) - 1);
 }
 
-template<typename FieldType, std::size_t RandomTestsAmount>
-void test_range_check_random_inputs(){
+template<typename BlueprintFieldType, std::size_t R, std::uint32_t WitnessesAmount, std::size_t RandomTestsAmount>
+void test_range_check_random_inputs() {
+    using value_type = typename BlueprintFieldType::value_type;
+    using integral_type = typename BlueprintFieldType::integral_type;
 
-    nil::crypto3::random::algebraic_engine<FieldType> generate_random;
+    nil::crypto3::random::algebraic_engine<BlueprintFieldType> generate_random;
     boost::random::mt19937 seed_seq;
     generate_random.seed(seed_seq);
 
     for (std::size_t i = 0; i < RandomTestsAmount; i++){
-        typename FieldType::value_type input = generate_random();
-    	typename FieldType::integral_type input_integral = typename FieldType::integral_type(input.data);
-        input_integral = input_integral & 0xFFFFFFFFFFFFFFFF_cppui255;
-    	typename FieldType::value_type input_scalar =  input_integral;
-        test_range_check<FieldType>({input_scalar}, true);
+        value_type input = generate_random();
+    	integral_type input_integral = integral_type(input.data);
+        input_integral = input_integral & integral_type((value_type(1).pow(R) - 1).data);
+    	value_type input_scalar = input_integral;
+        // Sanity check
+        assert(input_scalar < value_type(1).pow(R));
+        test_range_check<BlueprintFieldType, R, WitnessesAmount>(input_scalar);
 	}
 }
 
@@ -113,69 +141,122 @@ constexpr static const std::size_t random_tests_amount = 10;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_fields_range_check_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_bls12) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_bls12_15_64) {
     using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
-    test_range_check_specific_inputs<field_type>();
-    test_range_check_random_inputs<field_type, random_tests_amount>();
+    test_range_check_specific_inputs<field_type, 64, 15>();
+    test_range_check_random_inputs<field_type, 64, 15, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_15_64) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_range_check_specific_inputs<field_type>();
-    test_range_check_random_inputs<field_type, random_tests_amount>();
+    test_range_check_specific_inputs<field_type, 64, 15>();
+    test_range_check_random_inputs<field_type, 64, 15, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_15_64) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-    test_range_check_specific_inputs<field_type>();
-    test_range_check_random_inputs<field_type, random_tests_amount>();
+    test_range_check_specific_inputs<field_type, 64, 15>();
+    test_range_check_random_inputs<field_type, 64, 15, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_15_1) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_range_check_specific_inputs<field_type, 1, 15>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_bls12_9_121) {
+    using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
+    test_range_check_specific_inputs<field_type, 121, 9>();
+    test_range_check_random_inputs<field_type, 121, 9, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_9_121) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_range_check_specific_inputs<field_type, 121, 9>();
+    test_range_check_random_inputs<field_type, 121, 9, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_9_121) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_range_check_specific_inputs<field_type, 121, 9>();
+    test_range_check_random_inputs<field_type, 121, 9, random_tests_amount>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-template<typename FieldType>
-void test_range_check_fail_specific_inputs(){
-    test_range_check<FieldType>({-1}, false);
-    test_range_check<FieldType>({0x10000000000000000_cppui256}, false);
-    test_range_check<FieldType>({0x4000000000000000000000000000000000000000000000000000000000000000_cppui256}, false);
+template<typename BlueprintFieldType, std::size_t R, std::uint32_t WitnessesAmount>
+void test_range_check_fail_specific_inputs() {
+    using value_type = typename BlueprintFieldType::value_type;
+
+    test_range_check<BlueprintFieldType, R, WitnessesAmount>(-1);
+    test_range_check<BlueprintFieldType, R, WitnessesAmount>(value_type(1).pow(R));
+    // Failure of this test actually depends on the specific field size / R.
+    test_range_check<BlueprintFieldType, R, WitnessesAmount>(
+        0x4000000000000000000000000000000000000000000000000000000000000000_cppui256);
 }
 
-template<typename FieldType, std::size_t RandomTestsAmount>
+template<typename BlueprintFieldType, std::size_t R, std::uint32_t WitnessesAmount, std::size_t RandomTestsAmount>
 void test_range_check_fail_random_inputs(){
+    using value_type = typename BlueprintFieldType::value_type;
+    using integral_type = typename BlueprintFieldType::integral_type;
 
-    nil::crypto3::random::algebraic_engine<FieldType> generate_random;
+    nil::crypto3::random::algebraic_engine<BlueprintFieldType> generate_random;
     boost::random::mt19937 seed_seq;
     generate_random.seed(seed_seq);
 
     for (std::size_t i = 0; i < RandomTestsAmount; i++){
-        typename FieldType::value_type input = generate_random();
-        if (input < 0x10000000000000000_cppui255) {
-            continue;
-        }
-    	typename FieldType::integral_type input_integral = typename FieldType::integral_type(input.data);
-    	typename FieldType::value_type input_scalar =  input_integral;
-        test_range_check<FieldType>({input_scalar}, false);
+        value_type input = generate_random();
+        integral_type input_integral = integral_type(input.data);
+        input_integral = input_integral | integral_type(value_type(2).pow(R).data);
+    	value_type input_scalar = input_integral;
+        // Sanity check
+        assert(input_scalar >= value_type(1).pow(R));
+        test_range_check<BlueprintFieldType, R, WitnessesAmount>(input_scalar);
 	}
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_fields_range_check_fail_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_bls12) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_bls12_15_64) {
     using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
-    test_range_check_fail_specific_inputs<field_type>();
-    test_range_check_fail_random_inputs<field_type, random_tests_amount>();
+    test_range_check_fail_specific_inputs<field_type, 64, 15>();
+    test_range_check_fail_random_inputs<field_type, 64, 15, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_pallas) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_pallas_15_64) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_range_check_fail_specific_inputs<field_type>();
-    test_range_check_fail_random_inputs<field_type, random_tests_amount>();
+    test_range_check_fail_specific_inputs<field_type, 64, 15>();
+    test_range_check_fail_random_inputs<field_type, 64, 15, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_vesta) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_vesta_15_64) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-    test_range_check_fail_specific_inputs<field_type>();
-    test_range_check_fail_random_inputs<field_type, random_tests_amount>();
+    test_range_check_fail_specific_inputs<field_type, 64, 15>();
+    test_range_check_fail_random_inputs<field_type, 64, 15, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_15_1) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_range_check_fail_specific_inputs<field_type, 1, 15>();
+    test_range_check_fail_random_inputs<field_type, 1, 15, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_bls12_9_121) {
+    using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
+    test_range_check_fail_specific_inputs<field_type, 121, 9>();
+    test_range_check_fail_random_inputs<field_type, 121, 9, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_pallas_9_121) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_range_check_fail_specific_inputs<field_type, 121, 9>();
+    test_range_check_fail_random_inputs<field_type, 121, 9, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_fail_vesta_9_121) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_range_check_fail_specific_inputs<field_type, 121, 9>();
+    test_range_check_fail_random_inputs<field_type, 121, 9, random_tests_amount>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
