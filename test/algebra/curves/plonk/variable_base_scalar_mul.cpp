@@ -53,7 +53,7 @@ typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates:
     constexpr std::size_t WitnessColumns = 15;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 8;
+    constexpr std::size_t SelectorColumns = 4;
 	using BlueprintFieldType = typename CurveType::base_field_type;
     using BlueprintScalarType = typename CurveType::scalar_field_type;
     using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
@@ -89,7 +89,6 @@ typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates:
 	var scalar_var = {0, 2, false, var::column_type::public_input};
     var T_X_var = {0, 0, false, var::column_type::public_input};
     var T_Y_var = {0, 1, false, var::column_type::public_input};
-	// typename component_type::input_type instance_input;
 
 	if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
 		var high_bit = {0, 3, false, var::column_type::public_input};
@@ -138,10 +137,6 @@ typename CurveType::scalar_field_type::value_type shift_scalar(typename CurveTyp
 	}
 
 	return shifted;
-
-	// typename CurveType::scalar_field_type::integral_type shifted_integral_type = typename CurveType::scalar_field_type::integral_type(shifted.data);
-	// typename CurveType::base_field_type::value_type shifted_base_value_type = shifted_integral_type;
-	// return shifted_base_value_type;
 }
 
 template<typename CurveType>
@@ -184,7 +179,6 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pallas) {
 
 	// regular test (base field larger than scalar field)
-	std::cout << "*** Vesta tests ***" << std::endl << std::endl;
     using curve_type = nil::crypto3::algebra::curves::vesta;
     using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
@@ -201,26 +195,25 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pall
 	typename BlueprintScalarType::value_type threefff = 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui255;
 	typename BlueprintScalarType::value_type unshifted_threefff = 2*threefff + two.pow(255) + 1;
 
-	// test_vbsm<curve_type>(random_point(), two + two.pow(255) + 1);
-	// test_vbsm<curve_type>(random_point(), two - two + two.pow(255) + 1);
-	// test_vbsm<curve_type>(random_point(), two - two - two + two.pow(255) + 1);
-	// test_vbsm<curve_type>(random_point(), unshifted_threefff);
-	// test_vbsm<curve_type>(random_point(), random_scalar());
-	// test_vbsm<curve_type>(random_point(), 1);
-	// test_vbsm<curve_type>(random_point(), 0);
-	// test_vbsm<curve_type>(random_point(), -1);
+	test_vbsm<curve_type>(random_point(), two + two.pow(255) + 1);
+	test_vbsm<curve_type>(random_point(), two - two + two.pow(255) + 1);
+	test_vbsm<curve_type>(random_point(), two - two - two + two.pow(255) + 1);
+	test_vbsm<curve_type>(random_point(), unshifted_threefff);
+	test_vbsm<curve_type>(random_point(), random_scalar());
+	test_vbsm<curve_type>(random_point(), 1);
+	test_vbsm<curve_type>(random_point(), 0);
+	test_vbsm<curve_type>(random_point(), -1);
 
-	// test_vbsm<curve_type>({0, 0}, two + two.pow(255) + 1);
-	// test_vbsm<curve_type>({0, 0}, two - two + two.pow(255) + 1);
-	// test_vbsm<curve_type>({0, 0}, two - two - two + two.pow(255) + 1);
-	// test_vbsm<curve_type>({0, 0}, unshifted_threefff);
-	// test_vbsm<curve_type>({0, 0}, random_scalar());
-	// test_vbsm<curve_type>({0, 0}, 1);
-	// test_vbsm<curve_type>({0, 0}, 0);
-	// test_vbsm<curve_type>({0, 0}, -1);
+	test_vbsm<curve_type>({0, 0}, two + two.pow(255) + 1);
+	test_vbsm<curve_type>({0, 0}, two - two + two.pow(255) + 1);
+	test_vbsm<curve_type>({0, 0}, two - two - two + two.pow(255) + 1);
+	test_vbsm<curve_type>({0, 0}, unshifted_threefff);
+	test_vbsm<curve_type>({0, 0}, random_scalar());
+	test_vbsm<curve_type>({0, 0}, 1);
+	test_vbsm<curve_type>({0, 0}, 0);
+	test_vbsm<curve_type>({0, 0}, -1);
 
 	// decomposed test (scalar field larger than base field)
-	std::cout << "*** Pallas tests ***" << std::endl << std::endl;
 	using pallas_curve_type = nil::crypto3::algebra::curves::pallas;
 
 	nil::crypto3::random::algebraic_engine<typename pallas_curve_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>> pallas_random_point;
@@ -233,24 +226,27 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pall
 	typename pallas_curve_type::scalar_field_type::value_type pallas_two = 2;
 	typename pallas_curve_type::scalar_field_type::value_type pallas_threefff = 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui255;
 	typename pallas_curve_type::scalar_field_type::value_type pallas_unshifted_threefff = 2*pallas_threefff + pallas_two.pow(255) + 1;
+	typename pallas_curve_type::scalar_field_type::value_type pallas_p = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255;
 
 	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_two + pallas_two.pow(255) + 1);
-	// test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_two - pallas_two + pallas_two.pow(255) + 1);
-	// test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_two - pallas_two - pallas_two + pallas_two.pow(255) + 1);
-	// test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_unshifted_threefff);
-	// test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_random_scalar());
-	// test_vbsm<pallas_curve_type>(pallas_random_point(), 1);
-	// test_vbsm<pallas_curve_type>(pallas_random_point(), 0);
-	// test_vbsm<pallas_curve_type>(pallas_random_point(), -1);
+	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_two - pallas_two + pallas_two.pow(255) + 1);
+	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_two - pallas_two - pallas_two + pallas_two.pow(255) + 1);
+	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_unshifted_threefff);
+	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_random_scalar());
+	test_vbsm<pallas_curve_type>(pallas_random_point(), 1);
+	test_vbsm<pallas_curve_type>(pallas_random_point(), 0);
+	test_vbsm<pallas_curve_type>(pallas_random_point(), -1);
 
-	// test_vbsm<pallas_curve_type>({0, 0}, pallas_two + pallas_two.pow(255) + 1);
-	// test_vbsm<pallas_curve_type>({0, 0}, pallas_two - pallas_two + pallas_two.pow(255) + 1);
-	// test_vbsm<pallas_curve_type>({0, 0}, pallas_two - pallas_two - pallas_two + pallas_two.pow(255) + 1);
-	// test_vbsm<pallas_curve_type>({0, 0}, pallas_unshifted_threefff);
-	// test_vbsm<pallas_curve_type>({0, 0}, pallas_random_scalar());
-	// test_vbsm<pallas_curve_type>({0, 0}, 1);
-	// test_vbsm<pallas_curve_type>({0, 0}, 0);
-	// test_vbsm<pallas_curve_type>({0, 0}, -1);
+	test_vbsm<pallas_curve_type>({0, 0}, pallas_two + pallas_two.pow(255) + 1);
+	test_vbsm<pallas_curve_type>({0, 0}, pallas_two - pallas_two + pallas_two.pow(255) + 1);
+	test_vbsm<pallas_curve_type>({0, 0}, pallas_two - pallas_two - pallas_two + pallas_two.pow(255) + 1);
+	test_vbsm<pallas_curve_type>({0, 0}, pallas_unshifted_threefff);
+	test_vbsm<pallas_curve_type>({0, 0}, pallas_random_scalar());
+	test_vbsm<pallas_curve_type>({0, 0}, 1);
+	test_vbsm<pallas_curve_type>({0, 0}, 0);
+	test_vbsm<pallas_curve_type>({0, 0}, -1);
+
+	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_p + 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
