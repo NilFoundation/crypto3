@@ -635,9 +635,8 @@ namespace nil {
                             var(component.W(9), +1) * (var(component.W(14), 0) - var(component.W(12), +1)) 
                                                         );
                         // check   (bits[0] = 1) =>  V_130 = 2^124
-                        constexpr static const typename BlueprintFieldType::value_type two = 2;
                         auto constraint_27 = bp.add_constraint(
-                            var(component.W(9), +1) * (var(component.W(10), +1) - two.pow(124)) 
+                            var(component.W(9), +1) * (var(component.W(10), +1) - component.two.pow(124)) 
                                                         );
                         
                         // check   b_high * 2^254 + b = accamulator(b_i) (mod p)
@@ -645,7 +644,7 @@ namespace nil {
                         auto constraint_29 = bp.add_constraint(var(component.W(9), 0) - (var(component.W(9), 0) ));
                         if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
                             constraint_29 = bp.add_constraint(
-                                var(component.W(5), -1) - var(component.W(11), +1) - var(component.W(9), +1) * two.pow(254) 
+                                var(component.W(5), -1) - var(component.W(11), +1) - var(component.W(9), +1) * component.two.pow(254) 
                                                             );
                         }
 
