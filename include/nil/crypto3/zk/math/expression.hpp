@@ -235,6 +235,18 @@ namespace nil {
                 bool operator==(const binary_arithmetic_operation<VariableType>& other) const;
                 bool operator!=(const binary_arithmetic_operation<VariableType>& other) const;
 
+                // Use for testing.
+                std::string get_operator_string() const {
+                    switch (op) {
+                        case ArithmeticOperator::ADD:
+                            return "+";
+                        case ArithmeticOperator::SUB:
+                            return "-";
+                        case ArithmeticOperator::MULT:
+                            return "*";
+                    }
+                }
+
                 expression<VariableType> expr_left;
                 expression<VariableType> expr_right;
                 ArithmeticOperator op;
@@ -401,6 +413,31 @@ namespace nil {
                 for (const auto& var : term.vars) {
                     os << " * " << var;
                 }
+                return os;
+            }
+
+            // Used in the unit tests, so we can use BOOST_CHECK_EQUALS, and see
+            // the values of terms, when the check fails.
+            template<typename VariableType>
+            std::ostream& operator<<(std::ostream& os, const pow_operation<VariableType>& power) {
+                os << "(" << power.expr << ")" << " ^ " << power.power;
+                return os;
+            }
+
+            // Used in the unit tests, so we can use BOOST_CHECK_EQUALS, and see
+            // the values of terms, when the check fails.
+            template<typename VariableType>
+            std::ostream& operator<<(std::ostream& os, const binary_arithmetic_operation<VariableType>& bin_op) {
+                os << "(" << bin_op.expr_left << ")" << bin_op.get_operator_string() 
+                    << "(" << bin_op.expr_right << ")";
+                return os;
+            }
+
+            // Used in the unit tests, so we can use BOOST_CHECK_EQUALS, and see
+            // the values of terms, when the check fails.
+            template<typename VariableType>
+            std::ostream& operator<<(std::ostream& os, const expression<VariableType>& expr) {
+                os << expr.expr;
                 return os;
             }
 
