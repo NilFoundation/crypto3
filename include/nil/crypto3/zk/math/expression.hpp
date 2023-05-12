@@ -29,6 +29,7 @@
 #ifndef CRYPTO3_ZK_MATH_EXPRESSION_HPP
 #define CRYPTO3_ZK_MATH_EXPRESSION_HPP
 
+#include <ostream>
 #include <vector>
 #include <boost/variant.hpp>
 #include <boost/variant/recursive_wrapper.hpp>
@@ -176,8 +177,10 @@ namespace nil {
                 // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
                 bool operator==(const term<VariableType>& other) const;
                 bool operator!=(const term<VariableType>& other) const;
+                // Used for debugging, to be able to see what's inside the term.
+                std::string to_string() const;
 
-                std::vector<VariableType> vars;
+                std::vector<variable_type> vars;
                 assignment_type coeff;
             };
 
@@ -377,7 +380,7 @@ namespace nil {
                     return false;
                 }
                 for (auto i = 0; i < this->vars.size(); i++) {
-                    if (this->vars[i] == other.vars[i]) {
+                    if (this->vars[i] != other.vars[i]) {
                         return false;
                     }
                 }
@@ -388,6 +391,17 @@ namespace nil {
             template<typename VariableType>
             bool term<VariableType>::operator!=(const term<VariableType>& other) const {
                 return !(*this == other);
+            }
+
+            // Used in the unit tests, so we can use BOOST_CHECK_EQUALS, and see
+            // the values of terms, when the check fails.
+            template<typename VariableType>
+            std::ostream& operator<<(std::ostream& os, const term<VariableType>& term) {
+                os << term.coeff.data;
+                for (const auto& var : term.vars) {
+                    os << " * " << var;
+                }
+                return os;
             }
 
             // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
