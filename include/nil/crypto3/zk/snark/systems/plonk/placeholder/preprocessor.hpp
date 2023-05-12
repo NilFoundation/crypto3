@@ -130,8 +130,8 @@ namespace nil {
                                 commitments(commts), 
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
-                                max_gates_degree(max_gates_degree
-                            ) {
+                                max_gates_degree(max_gates_degree) 
+                            {
                                 // Z is polynomial -1, 0,..., 0, 1
                                 Z[0] = -FieldType::value_type::one();
                                 Z[Z.size()-1] = FieldType::value_type::one();
@@ -151,7 +151,7 @@ namespace nil {
                                 commitments == rhs.commitments &&
                                 basic_domain->size() == rhs.basic_domain->size() &&
                                 lagrange_0 == rhs.lagrange_0 &&
-                                Z == rhs.Z;
+                                Z == rhs.Z &&
                                 max_gates_degree == rhs.max_gates_degree;
                             }
                             bool operator!=(const common_data_type &rhs) const {
