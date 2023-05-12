@@ -116,6 +116,7 @@ namespace nil {
 
                 // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
                 bool operator==(const expression<VariableType>& other) const;
+                bool operator!=(const expression<VariableType>& other) const;
 
                 expression_type expr;
             };
@@ -174,6 +175,7 @@ namespace nil {
 
                 // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
                 bool operator==(const term<VariableType>& other) const;
+                bool operator!=(const term<VariableType>& other) const;
 
                 std::vector<VariableType> vars;
                 assignment_type coeff;
@@ -196,6 +198,7 @@ namespace nil {
 
                 // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
                 bool operator==(const pow_operation<VariableType>& other) const;
+                bool operator!=(const pow_operation<VariableType>& other) const;
 
                 const expression<VariableType> expr;
                 const int power;
@@ -227,6 +230,7 @@ namespace nil {
 
                 // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
                 bool operator==(const binary_arithmetic_operation<VariableType>& other) const;
+                bool operator!=(const binary_arithmetic_operation<VariableType>& other) const;
 
                 expression<VariableType> expr_left;
                 expression<VariableType> expr_right;
@@ -380,11 +384,24 @@ namespace nil {
                 return true;
             }
 
+            // Used for testing purposes.
+            template<typename VariableType>
+            bool term<VariableType>::operator!=(const term<VariableType>& other) const {
+                return !(*this == other);
+            }
+
             // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
             template<typename VariableType>
             bool pow_operation<VariableType>::operator==(
                     const pow_operation<VariableType>& other) const {
                 return this->power == other.power && this->expr == other.expr;
+            }
+
+            // Used for testing purposes.
+            template<typename VariableType>
+            bool pow_operation<VariableType>::operator!=(
+                    const pow_operation<VariableType>& other) const {
+                return !(*this == other);
             }
 
             // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
@@ -398,10 +415,22 @@ namespace nil {
 
             // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
             template<typename VariableType>
+            bool binary_arithmetic_operation<VariableType>::operator!=(
+                    const binary_arithmetic_operation<VariableType>& other) const {
+                return !(*this == other);
+            }
+ 
+            // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
+            template<typename VariableType>
             bool expression<VariableType>::operator==(const expression<VariableType>& other) const {
                 return this->expr == other.expr;
             }
 
+            // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
+            template<typename VariableType>
+            bool expression<VariableType>::operator!=(const expression<VariableType>& other) const {
+                return this->expr != other.expr;
+            }
         }    // namespace math
     }            // namespace crypto3
 }    // namespace nil
