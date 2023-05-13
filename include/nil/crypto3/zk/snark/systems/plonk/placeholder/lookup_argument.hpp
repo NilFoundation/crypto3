@@ -92,7 +92,9 @@ namespace nil {
                         const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             &plonk_columns,
                         typename CommitmentSchemeTypePermutation::params_type fri_params,
-                        transcript_type &transcript = transcript_type()) {
+                        transcript_type &transcript = transcript_type()
+                    ) {
+                        prover_lookup_result result;
                         
                         // $/theta = \challenge$
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -111,28 +113,18 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        // Construct the input lookup compression and table compression values
+                         // Construct the input lookup compression and table compression values
                         // TODO: change to new form
-//                        typename FieldType::value_type y = typename FieldType::value_type(7);
                         for (std::size_t i = 0; i < lookup_gates.size(); i++) {
                             for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
-                                int k = 0;
-                                for (const math::term<VariableType>& lookup :lookup_gates[i].constraints[j].lookup_input) {
+                                for (std::size_t k = 0; k < lookup_gates[i].constraints[j].lookup_input.size(); k++) {
+                                    const math::expression<VariableType>& lookup = lookup_gates[i].constraints[j].lookup_input[k];
+
                                     math::polynomial_dfs<typename FieldType::value_type> input_assignment;
                                     math::polynomial_dfs<typename FieldType::value_type> value_assignment;
-                                    switch (lookup.vars[0].type) {
-                                        case VariableType::column_type::witness:
-                                            input_assignment = plonk_columns.witness(lookup.vars[0].index);
-                                            break;
-                                        case VariableType::column_type::public_input:
-                                            input_assignment = plonk_columns.public_input(lookup.vars[0].index);
-                                            break;
-                                        case VariableType::column_type::constant:
-                                            input_assignment = plonk_columns.constant(lookup.vars[0].index);
-                                            break;
-                                        case VariableType::column_type::selector:
-                                            break;
-                                    }
+
+                                    input_assignment = lookup_gates[i].constraints[j].evaluate(k, plonk_columns, basic_domain);
+
                                     switch (lookup_gates[i].constraints[j].lookup_value[k].type) {
                                         case VariableType::column_type::witness:
                                             value_assignment = plonk_columns.witness(
@@ -151,21 +143,17 @@ namespace nil {
                                     }
                                     
 
-                                    math::polynomial_shift(input_assignment, lookup.vars[0].rotation, basic_domain->m);
-
                                     // This can have degree more than basic_domain->m
                                     // It's extremely important.
                                     // We should reduce 
-                                    F_compr_input += theta_acc * input_assignment * lookup.coeff 
+                                    F_compr_input += theta_acc * input_assignment 
                                         * plonk_columns.selector(lookup_gates[i].selector_index);
                                     F_compr_value += theta_acc * value_assignment;
-
-
-                                    k++;
                                     theta_acc = theta * theta_acc;
                                 }
                             }
                         }
+
 
                         auto reduced_input = reduce_dfs_polynomial_domain(F_compr_input, basic_domain->m);
 
@@ -219,7 +207,7 @@ namespace nil {
 
                         // Calculate lookup-related numerators of the quotinent polynomial
                         math::polynomial_dfs<typename FieldType::value_type> g =
-                            (F_compr_input + beta) * (F_compr_value + gamma);
+                            (reduced_input + beta) * (F_compr_value + gamma);
                         math::polynomial_dfs<typename FieldType::value_type> h =
                             (F_perm_input + beta) * (F_perm_value + gamma);
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
@@ -230,7 +218,6 @@ namespace nil {
 
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_input_shifted =
                             math::polynomial_shift(F_perm_input, -1, basic_domain->m);
-
 
                         F_dfs[0] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
                                    (F_perm_input - F_perm_value) * (F_perm_input - F_perm_input_shifted);
@@ -267,7 +254,7 @@ namespace nil {
                         const typename CommitmentSchemeTypePermutation::commitment_type &lookup_commitment,
                         transcript_type &transcript = transcript_type()
                     ) {
-                        // 1. Get theta
+                       // 1. Get theta
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         // 2. Add commitments to transcript
@@ -277,20 +264,11 @@ namespace nil {
                         typename FieldType::value_type F_input_compr = FieldType::value_type::zero();
                         typename FieldType::value_type F_value_compr = FieldType::value_type::zero();
 
-                        typename FieldType::value_type theta_acc = FieldType::value_type::one();
+                        typename FieldType::value_type theta_acc = FieldType::value_type::one();                        
 
                         for (std::size_t i = 0; i < lookup_gates.size(); i++) {
                             for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
-                                int k = 0;
-                                for (math::term<VariableType> lookup :
-                                     lookup_gates[i].constraints[j].lookup_input
-                                ) {
-                                    std::tuple<std::size_t, int, typename VariableType::column_type> input_key =
-                                        std::make_tuple(
-                                            lookup.vars[0].index, 
-                                            lookup.vars[0].rotation,
-                                            lookup.vars[0].type
-                                        );
+                                for( std::size_t k = 0; k < lookup_gates[i].constraints[j].lookup_input.size(); k++ ) {
                                     std::tuple<std::size_t, int, typename VariableType::column_type> value_key =
                                         std::make_tuple(lookup_gates[i].constraints[j].lookup_value[k].index,
                                                         lookup_gates[i].constraints[j].lookup_value[k].rotation,
@@ -301,11 +279,9 @@ namespace nil {
                                             std::make_tuple(lookup_gates[i].selector_index, 0,
                                                             plonk_variable<FieldType>::column_type::selector);
                     
-                                    F_input_compr = F_input_compr +  theta_acc * evaluations[input_key] * lookup.coeff *
-                                                                        evaluations[selector_key];
+                                    F_input_compr = F_input_compr +  theta_acc * lookup_gates[i].constraints[j].evaluate(k, evaluations);
                                     F_value_compr += theta_acc * evaluations[value_key];
 
-                                    k++;
                                     theta_acc = theta * theta_acc;
                                 }
                             }
@@ -329,9 +305,7 @@ namespace nil {
                         F[1] = preprocessed_data.common_data.lagrange_0.evaluate(challenge) *
                                (F_perm_input_polynomial_value - F_perm_value_polynomial_value);
                         F[2] = (V_L_polynomial_shifted_value * h - V_L_polynomial_value * g);
-
-                        F[2] *= (one - (preprocessed_data.q_last.evaluate(challenge) +
-                                preprocessed_data.q_blind.evaluate(challenge)));
+                        F[2] *= (one - (preprocessed_data.q_last.evaluate(challenge) + preprocessed_data.q_blind.evaluate(challenge)));
                         F[3] =  preprocessed_data.common_data.lagrange_0.evaluate(challenge) * (one - V_L_polynomial_value);
                         F[4] = preprocessed_data.q_last.evaluate(challenge) *
                                (V_L_polynomial_value * V_L_polynomial_value - V_L_polynomial_value);

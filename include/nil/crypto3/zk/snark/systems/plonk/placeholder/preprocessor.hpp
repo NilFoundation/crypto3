@@ -309,7 +309,7 @@ namespace nil {
                                 } 
                             }
                         }
-
+                        
                         return result;
                     }
 

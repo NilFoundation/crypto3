@@ -224,7 +224,6 @@ typedef placeholder_params<FieldType, typename placeholder_test_3_params::arithm
 typedef placeholder_params<FieldType, typename placeholder_test_4_params::arithmetization_params> circuit_4_params;
 
 BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
-
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
     std::size_t expected_size = 4;
     std::size_t max_degree = 3;
@@ -396,7 +395,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test/*, *boost::unit_test::disabled()*/) {
+BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
     auto circuit = circuit_test_3<FieldType>();
 
     constexpr std::size_t argument_size = 5;
@@ -504,14 +503,14 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test/*, *boost::unit_test::disa
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
     for (int i = 0; i < argument_size; i++) {
-        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);
+        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);        
         for (std::size_t j = 0; j < desc.rows_amount; j++) {
             BOOST_CHECK(prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) == FieldType::value_type::zero());
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_lookup_4_argument_test/*, *boost::unit_test::disabled()*/) {
+BOOST_AUTO_TEST_CASE(placeholder_lookup_4_argument_test) {
     srand(time(NULL));
     auto circuit = circuit_test_4<FieldType>();
 

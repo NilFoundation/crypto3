@@ -105,10 +105,10 @@ namespace nil {
                     }
 
                     template<typename ArithmetizationParams>
-                    math::polynomial<typename VariableType::assignment_type>
-                        evaluate(const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments,
-                                 std::shared_ptr<math::evaluation_domain<FieldType>>
-                                     domain) const {
+                    math::polynomial<typename VariableType::assignment_type> evaluate(
+                        const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments,
+                        std::shared_ptr<math::evaluation_domain<FieldType>> domain
+                    ) const {
                         math::expression_evaluator<
                                 VariableType, 
                                 math::polynomial<typename VariableType::assignment_type>> evaluator(

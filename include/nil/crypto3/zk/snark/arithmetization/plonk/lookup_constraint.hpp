@@ -42,8 +42,142 @@ namespace nil {
                     using variable_type = VariableType;
                     using expression = math::expression<VariableType>;
 
-                    std::vector<math::term<VariableType>> lookup_input;
+                    std::vector<math::expression<VariableType>> lookup_input;
                     std::vector<VariableType> lookup_value;
+
+                    // Computes values of lookup_input_index lookup input in row_index
+                    template<typename ArithmetizationParams>
+                    typename VariableType::assignment_type evaluate(
+                        std::size_t row_index, std::size_t lookup_input_index,
+                        const plonk_assignment_table<FieldType, ArithmetizationParams> &assignments
+                    ) const {
+                        auto lookup = this->lookup_input[lookup_input_index];
+                        math::expression_evaluator<
+                                VariableType,
+                                typename VariableType::assignment_type
+                        > evaluator(
+                            lookup, 
+                            [lookup, &assignments, row_index](const VariableType &var) {
+                                switch (var.type) {
+                                    case VariableType::column_type::witness:
+                                        return assignments.witness(var.index)[row_index + var.rotation];
+                                    case VariableType::column_type::public_input:
+                                        return assignments.public_input(var.index)[row_index + var.rotation];
+                                    case VariableType::column_type::constant:
+                                        return assignments.constant(var.index)[row_index + var.rotation];
+                                    case VariableType::column_type::selector:
+                                        return assignments.selector(var.index)[row_index + var.rotation];
+                                }
+                            });
+
+                        return evaluator.evaluate();
+                    }
+
+                    // Compute math::polynomial of i-th lookup_input_index
+                    template<typename ArithmetizationParams>
+                    math::polynomial<typename VariableType::assignment_type>
+                    evaluate(
+                        std::size_t lookup_input_index,
+                        const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments,
+                        std::shared_ptr<math::evaluation_domain<FieldType>>domain
+                    ) const {
+                        auto lookup = this->lookup_input[lookup_input_index];
+
+                        math::expression_evaluator<
+                                VariableType, 
+                                math::polynomial<typename VariableType::assignment_type>> evaluator(
+                            lookup, 
+                            [&domain, &assignments](const VariableType &var) {
+                                math::polynomial<typename VariableType::assignment_type> assignment;
+                                switch (var.type) {
+                                    case VariableType::column_type::witness:
+                                        assignment = assignments.witness(var.index);
+                                        break;
+                                    case VariableType::column_type::public_input:
+                                        assignment = assignments.public_input(var.index);
+                                        break;
+                                    case VariableType::column_type::constant:
+                                        assignment = assignments.constant(var.index);
+                                        break;
+                                    case VariableType::column_type::selector:
+                                        assignment = assignments.selector(var.index);
+                                        break;
+                                }
+
+                                if (var.rotation != 0) {
+                                    assignment =
+                                        math::polynomial_shift(assignment, domain->get_domain_element(var.rotation));
+                                }
+                                return assignment;
+                            });
+                        return evaluator.evaluate();
+                    }
+
+                    // Compute math::polynomial_dfs of i-th lookup_input_index
+                    template<typename ArithmetizationParams>
+                    math::polynomial_dfs<typename VariableType::assignment_type> evaluate(
+                        std::size_t lookup_input_index,
+                        const plonk_polynomial_dfs_table<FieldType, ArithmetizationParams> &assignments,
+                        std::shared_ptr<math::evaluation_domain<FieldType>> domain
+                    ) const {
+                        auto lookup = this->lookup_input[lookup_input_index];
+                        math::expression_evaluator<
+                                VariableType, 
+                                math::polynomial_dfs<typename VariableType::assignment_type>> evaluator(
+                            lookup, 
+                            [&domain, &assignments](const VariableType &var) {
+                                math::polynomial_dfs<typename VariableType::assignment_type> assignment;
+                                switch (var.type) {
+                                    case VariableType::column_type::witness:
+                                        assignment = assignments.witness(var.index);
+                                        break;
+                                    case VariableType::column_type::public_input:
+                                        assignment = assignments.public_input(var.index);
+                                        break;
+                                    case VariableType::column_type::constant:
+                                        assignment = assignments.constant(var.index);
+                                        break;
+                                    case VariableType::column_type::selector:
+                                        assignment = assignments.selector(var.index);
+                                        break;
+                                }
+
+                                if (var.rotation != 0) {
+                                    assignment = math::polynomial_shift(assignment, var.rotation, domain->m);
+                                }
+                                return assignment;
+                            },
+                            [&assignments](const typename VariableType::assignment_type& coeff) {
+                                return  math::polynomial_dfs<typename VariableType::assignment_type> (
+                                    0, assignments.rows_amount(), coeff);
+                            }
+                        );
+
+                        return evaluator.evaluate();
+                    }
+
+                    // Evaluate outside of evaluation_point
+                    typename VariableType::assignment_type evaluate(
+                        std::size_t lookup_input_index,
+                        detail::plonk_evaluation_map<VariableType> &assignments
+                    ) const {
+                        auto lookup = this->lookup_input[lookup_input_index];
+
+                        typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
+                        math::expression_evaluator<
+                                VariableType,
+                                typename VariableType::assignment_type> evaluator(
+                            lookup, 
+                            [lookup, &assignments](const VariableType &var) {
+                                std::tuple<std::size_t, int, typename VariableType::column_type> key =
+                                    std::make_tuple(var.index, var.rotation, var.type);
+
+                                BOOST_ASSERT(assignments.count(key) > 0);
+                                return assignments[key];
+                            });
+
+                        return evaluator.evaluate();
+                    }
                 };
             }    // namespace snark
         }        // namespace zk
