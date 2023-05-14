@@ -123,7 +123,7 @@ namespace nil {
                                     math::polynomial_dfs<typename FieldType::value_type> input_assignment;
                                     math::polynomial_dfs<typename FieldType::value_type> value_assignment;
 
-                                    input_assignment = lookup_gates[i].constraints[j].evaluate(k, plonk_columns, basic_domain);
+                                    input_assignment = lookup_gates[i].constraints[j].lookup_input[k].evaluate(plonk_columns, basic_domain);
 
                                     switch (lookup_gates[i].constraints[j].lookup_value[k].type) {
                                         case VariableType::column_type::witness:
@@ -279,7 +279,7 @@ namespace nil {
                                             std::make_tuple(lookup_gates[i].selector_index, 0,
                                                             plonk_variable<FieldType>::column_type::selector);
                     
-                                    F_input_compr = F_input_compr +  theta_acc * lookup_gates[i].constraints[j].evaluate(k, evaluations);
+                                    F_input_compr = F_input_compr +  theta_acc * lookup_gates[i].constraints[j].lookup_input[k].evaluate(evaluations);
                                     F_value_compr += theta_acc * evaluations[value_key];
 
                                     theta_acc = theta * theta_acc;
