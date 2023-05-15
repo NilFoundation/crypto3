@@ -18,8 +18,6 @@ include(CMDeploy)
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_setup_version(VERSION 1.74.0)
-
 option(BUILD_EXAMPLES "Build examples" FALSE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 
@@ -29,16 +27,18 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
 
 cm_project(random WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
+cm_setup_version(VERSION 1.74.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
+
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY
              EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
-                      crypto3::algebra
-                      crypto3::hash
-                      crypto3::mac
-                      crypto3::stream
+                      ${CMAKE_WORKSPACE_NAME}::algebra
+                      ${CMAKE_WORKSPACE_NAME}::hash
+                      ${CMAKE_WORKSPACE_NAME}::mac
+                      ${CMAKE_WORKSPACE_NAME}::stream
 
                       marshalling::crypto3_algebra
 
