@@ -37,7 +37,7 @@ macro(cm_find_package NAME)
 endmacro()
 
 if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost REQUIRED COMPONENTS container)
+    cm_find_package(Boost COMPONENTS container)
 endif()
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
