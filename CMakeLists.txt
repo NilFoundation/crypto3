@@ -19,8 +19,6 @@ include(CMDeploy)
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_setup_version(VERSION 1.73.0)
-
 option(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS "Build for CI suppressing known issues" FALSE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 
@@ -30,9 +28,24 @@ endif()
 
 if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
     set(BOOST_CMAKE TRUE)
+else()
+    cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
-    cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
+    if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
+        cm_find_package(Boost COMPONENTS REQUIRED random)
+    endif()
+endif()
 
+cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
+
+cm_setup_version(VERSION 1.76.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
+
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
+
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                           $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
+
+if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
     find_package(${CMAKE_WORKSPACE_NAME}_core)
     find_package(${CMAKE_WORKSPACE_NAME}_static_assert)
     find_package(${CMAKE_WORKSPACE_NAME}_predef)
@@ -49,12 +62,6 @@ if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
     find_package(${CMAKE_WORKSPACE_NAME}_config)
     find_package(${CMAKE_WORKSPACE_NAME}_throw_exception)
     find_package(${CMAKE_WORKSPACE_NAME}_math)
-
-    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          EXPORT_NAME ${CURRENT_PROJECT_NAME}
-                          CXX_STANDARD 11
-                          CXX_STANDARD_REQUIRED TRUE)
 
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::core)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::static_assert)
@@ -74,24 +81,14 @@ if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::math)
 
 else()
-    cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
-
-    cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
-
-    if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-        cm_find_package(Boost COMPONENTS REQUIRED random)
-    endif()
-
-    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          EXPORT_NAME ${CURRENT_PROJECT_NAME})
-
-    target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                               $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
-
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                           ${Boost_LIBRARIES})
 endif()
+
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME}
+                      CXX_STANDARD 11
+                      CXX_STANDARD_REQUIRED TRUE)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE ${CURRENT_SOURCES_DIR}/include
