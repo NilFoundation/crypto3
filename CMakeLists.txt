@@ -32,7 +32,7 @@ else()
     cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
     if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-        cm_find_package(Boost COMPONENTS random)
+        cm_find_package(Boost COMPONENTS REQUIRED random)
     endif()
 endif()
 
