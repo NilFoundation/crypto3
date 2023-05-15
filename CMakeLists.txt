@@ -52,7 +52,7 @@ include(CMDeploy)
 include(CMSetupVersion)
 
 if (NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS filesystem)
+    cm_find_package(Boost COMPONENTS REQUIRED filesystem)
 endif ()
 
 cm_project(containers WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
