@@ -38,7 +38,7 @@ macro(cm_find_package NAME)
 endmacro()
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS container)
+    cm_find_package(Boost COMPONENTS REQUIRED container)
 endif()
 
 include(TargetArchitecture)
