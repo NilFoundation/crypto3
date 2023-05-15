@@ -409,9 +409,21 @@ namespace nil {
             // the values of terms, when the check fails.
             template<typename VariableType>
             std::ostream& operator<<(std::ostream& os, const term<VariableType>& term) {
-                os << term.coeff.data;
+                if (term.coeff != VariableType::assignment_type::one()) {
+                    if (term.vars.size() != 0) {
+                        os << term.coeff.data << " * ";
+                    } else {
+                        os << term.coeff.data;
+                    }
+                } else if (term.vars.size() == 0) {
+                    os << term.coeff.data;
+                }
+                bool first = true;
                 for (const auto& var : term.vars) {
-                    os << " * " << var;
+                    if (!first)
+                        os << " * ";
+                    os << var;
+                    first = false;
                 }
                 return os;
             }
@@ -420,7 +432,7 @@ namespace nil {
             // the values of terms, when the check fails.
             template<typename VariableType>
             std::ostream& operator<<(std::ostream& os, const pow_operation<VariableType>& power) {
-                os << "(" << power.expr << ")" << " ^ " << power.power;
+                os << "(" << power.expr << " ^ " << power.power << ")";
                 return os;
             }
 
@@ -428,8 +440,8 @@ namespace nil {
             // the values of terms, when the check fails.
             template<typename VariableType>
             std::ostream& operator<<(std::ostream& os, const binary_arithmetic_operation<VariableType>& bin_op) {
-                os << "(" << bin_op.expr_left << ")" << bin_op.get_operator_string() 
-                    << "(" << bin_op.expr_right << ")";
+                os << "(" << bin_op.expr_left << " " << bin_op.get_operator_string() << " "
+                    << bin_op.expr_right << ")";
                 return os;
             }
 

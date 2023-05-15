@@ -151,8 +151,14 @@ namespace nil {
                 template<typename FieldType>
                 std::ostream& operator<<(std::ostream& os, const plonk_variable<FieldType>& var)
                 {
+                    std::map<typename plonk_variable<FieldType>::column_type, std::string> type_map = {
+                        {plonk_variable<FieldType>::column_type::witness, "witness"}, 
+                        {plonk_variable<FieldType>::column_type::public_input, "public_input"},
+                        {plonk_variable<FieldType>::column_type::constant, "constant"},
+                        {plonk_variable<FieldType>::column_type::selector, "selector"}
+                    };
                     os << "var_" << var.index << '_' << var.rotation << '_'
-                        << static_cast<int>(var.type)
+                        << type_map[var.type]
                         << (var.relative ? "_relative" : "");
                     return os;
                 }
