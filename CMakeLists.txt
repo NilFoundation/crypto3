@@ -71,7 +71,7 @@ if(UNIX AND BUILD_WITH_CCACHE)
 endif()
 
 if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS container)
+    cm_find_package(Boost COMPONENTS REQUIRED container)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
