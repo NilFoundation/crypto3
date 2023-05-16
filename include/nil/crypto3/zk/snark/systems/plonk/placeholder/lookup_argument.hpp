@@ -198,6 +198,7 @@ namespace nil {
                         V_L[0] = FieldType::value_type::one();
                        
                         for (std::size_t j = 1; j < basic_domain->m; j++) {
+                            BOOST_ASSERT(reduced_input[j-1] == F_compr_input.evaluate(basic_domain->get_domain_element(j - 1)));
                             V_L[j] = V_L[j - 1];
                             V_L[j] *= (reduced_input[j - 1] + beta) * (F_compr_value[j - 1] + gamma);
                             V_L[j] *= ((F_perm_input[j - 1] + beta) * (F_perm_value[j - 1] + gamma)).inversed();
@@ -207,7 +208,7 @@ namespace nil {
 
                         // Calculate lookup-related numerators of the quotinent polynomial
                         math::polynomial_dfs<typename FieldType::value_type> g =
-                            (reduced_input + beta) * (F_compr_value + gamma);
+                            (F_compr_input + beta) * (F_compr_value + gamma);
                         math::polynomial_dfs<typename FieldType::value_type> h =
                             (F_perm_input + beta) * (F_perm_value + gamma);
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
@@ -279,7 +280,7 @@ namespace nil {
                                             std::make_tuple(lookup_gates[i].selector_index, 0,
                                                             plonk_variable<FieldType>::column_type::selector);
                     
-                                    F_input_compr = F_input_compr +  theta_acc * lookup_gates[i].constraints[j].lookup_input[k].evaluate(evaluations);
+                                    F_input_compr = F_input_compr +  theta_acc * evaluations[selector_key] * lookup_gates[i].constraints[j].lookup_input[k].evaluate(evaluations);
                                     F_value_compr += theta_acc * evaluations[value_key];
 
                                     theta_acc = theta * theta_acc;
