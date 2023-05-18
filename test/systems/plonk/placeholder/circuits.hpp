@@ -220,6 +220,28 @@ namespace nil {
 
                     return test_circuit;
                 }
+                struct placeholder_test_1_params {
+                    constexpr static const std::size_t table_rows_log = 4;
+                    constexpr static const std::size_t table_rows = 1 << table_rows_log;
+                    constexpr static const std::size_t permutation_size = 4;
+                    constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
+
+                    using merkle_hash_type = hashes::keccak_1600<512>;
+                    using transcript_hash_type = hashes::keccak_1600<512>;
+
+                    constexpr static const std::size_t witness_columns = witness_columns_1;
+                    constexpr static const std::size_t public_input_columns = public_columns_1;
+                    constexpr static const std::size_t constant_columns = constant_columns_1;
+                    constexpr static const std::size_t selector_columns = selector_columns_1;
+
+                    using arithmetization_params =
+                        plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
+
+                    constexpr static const std::size_t lambda = 40;
+                    constexpr static const std::size_t r = table_rows_log - 1;
+                    constexpr static const std::size_t m = 2;
+                };
+
 
                 //---------------------------------------------------------------------------//
                 // Test circuit 2
@@ -360,6 +382,28 @@ namespace nil {
 
                     return test_circuit;
                 }
+                struct placeholder_test_2_params {
+                    constexpr static const std::size_t table_rows_log = 4;
+                    constexpr static const std::size_t table_rows = 1 << table_rows_log;
+                    constexpr static const std::size_t permutation_size = 4;
+                    constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
+
+                    using merkle_hash_type = hashes::keccak_1600<512>;
+                    using transcript_hash_type = hashes::keccak_1600<512>;
+
+                    constexpr static const std::size_t witness_columns = witness_columns_2;
+                    constexpr static const std::size_t public_input_columns = public_columns_2;
+                    constexpr static const std::size_t constant_columns = constant_columns_2;
+                    constexpr static const std::size_t selector_columns = selector_columns_2;
+
+                    using arithmetization_params =
+                        plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
+
+                    constexpr static const std::size_t lambda = 40;
+                    constexpr static const std::size_t r = table_rows_log - 1;
+                    constexpr static const std::size_t m = 2;
+                };
+
 
                 constexpr static const std::size_t witness_columns_3 = 3;
                 constexpr static const std::size_t public_columns_3 = 0;
@@ -370,9 +414,8 @@ namespace nil {
                     public_columns_3, constant_columns_3, selector_columns_3>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_params<FieldType,
-                    arithmetization_params_3>, 4, 3> circuit_test_3() {
-                    constexpr static const std::size_t rows_log = 4;
+                circuit_description<FieldType, placeholder_params<FieldType, arithmetization_params_3>, 3, 3> circuit_test_3() {
+                    constexpr static const std::size_t rows_log = 3;
                     constexpr static const std::size_t permutation = 3;
 
                     constexpr static const std::size_t witness_columns = witness_columns_3;
@@ -396,7 +439,7 @@ namespace nil {
                     typename FieldType::value_type zero = FieldType::value_type::zero();
                     table[0][0] = one;
                     table[1][0] = zero;
-                    table[2][0] = one;
+                    table[2][0] = zero;
 
                     //lookup values
                     table[3][0] = one;
@@ -424,7 +467,6 @@ namespace nil {
                     sel_lookup[0] = one;
                     sel_lookup[1] = zero;
                     sel_lookup[2] = zero;
-                    sel_lookup[3] = zero;
                     selectors_assignment[0] = sel_lookup;
 
                     for (std::size_t i = 0; i < constant_columns; i++) {
@@ -464,6 +506,28 @@ namespace nil {
 
                     return test_circuit;
                 }
+                struct placeholder_test_3_params {
+                    constexpr static const std::size_t table_rows_log = 3;
+                    constexpr static const std::size_t table_rows = 1 << table_rows_log;
+                    constexpr static const std::size_t permutation_size = 4;
+                    constexpr static const std::size_t usable_rows = 4;
+
+                    using merkle_hash_type = hashes::keccak_1600<512>;
+                    using transcript_hash_type = hashes::keccak_1600<512>;
+
+                    constexpr static const std::size_t witness_columns = witness_columns_3;
+                    constexpr static const std::size_t public_input_columns = public_columns_3;
+                    constexpr static const std::size_t constant_columns = constant_columns_3;
+                    constexpr static const std::size_t selector_columns = selector_columns_3;
+
+                    using arithmetization_params =
+                        plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
+
+                    constexpr static const std::size_t lambda = 40;
+                    constexpr static const std::size_t r = table_rows_log - 1;
+                    constexpr static const std::size_t m = 2;
+                };
+
 
                 constexpr static const std::size_t witness_columns_4= 3;
                 constexpr static const std::size_t public_columns_4 = 0;
@@ -475,8 +539,8 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_params<FieldType,
-                    arithmetization_params_4>, 4, 3> circuit_test_4() {
-                    constexpr static const std::size_t rows_log = 4;
+                    arithmetization_params_4>, 3, 3> circuit_test_4() {
+                    constexpr static const std::size_t rows_log = 3;
                     constexpr static const std::size_t permutation = 3;
 
                     constexpr static const std::size_t witness_columns = witness_columns_4;
@@ -498,8 +562,8 @@ namespace nil {
                     // lookup inputs
                     typename FieldType::value_type one = FieldType::value_type::one();
                     typename FieldType::value_type zero = FieldType::value_type::zero();
-                    table[0][0] = rand() % 2 ? one : zero;
-                    table[1][0] = rand() % 2 ? one : zero;
+                    table[0][0] = one+one;
+                    table[1][0] = one+one+one;
                     table[2][0] = table[0][0] * table[1][0];
 
                     table[0][1] = rand() % 2 ? one : zero;
@@ -541,7 +605,7 @@ namespace nil {
                     std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
 
                     std::vector<typename FieldType::value_type> sel_lookup(test_circuit.table_rows);
-                    sel_lookup[0] = one;
+                    sel_lookup[0] = zero;
                     sel_lookup[1] = one;
                     sel_lookup[2] = one;
                     sel_lookup[3] = one;
@@ -600,6 +664,29 @@ namespace nil {
 
                     return test_circuit;
                 }
+
+                struct placeholder_test_4_params {
+                    constexpr static const std::size_t table_rows_log = 3;
+                    constexpr static const std::size_t table_rows = 1 << table_rows_log;
+                    constexpr static const std::size_t permutation_size = 4;
+                    constexpr static const std::size_t usable_rows = 4;
+
+                    using merkle_hash_type = hashes::keccak_1600<512>;
+                    using transcript_hash_type = hashes::keccak_1600<512>;
+
+                    constexpr static const std::size_t witness_columns = witness_columns_4;
+                    constexpr static const std::size_t public_input_columns = public_columns_4;
+                    constexpr static const std::size_t constant_columns = constant_columns_4;
+                    constexpr static const std::size_t selector_columns = selector_columns_4;
+
+                    using arithmetization_params =
+                        plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
+
+                    constexpr static const std::size_t lambda = 40;
+                    constexpr static const std::size_t r = table_rows_log - 1;
+                    constexpr static const std::size_t m = 2;
+                };
+
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

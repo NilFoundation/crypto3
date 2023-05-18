@@ -164,9 +164,9 @@ namespace nil {
 
                         // TODO:!!! better sort for F_perm_value
                         math::polynomial_dfs<typename FieldType::value_type> F_perm_value = F_compr_value;
-                        for (std::size_t i = 0; i < basic_domain->m; i++) {
+                        for (std::size_t i = 0; i < preprocessed_data.common_data.usable_rows_amount; i++) {
                             if( i == 0 || F_perm_input[i] != F_perm_input[i - 1]){
-                                for (std::size_t j = 0; j < basic_domain->m; j++) {
+                                for (std::size_t j = 0; j < preprocessed_data.common_data.usable_rows_amount; j++) {
                                     if( F_perm_value[j] == F_perm_input[i] ){
                                         auto tmp = F_perm_value[i];
                                         F_perm_value[i] = F_perm_value[j];
@@ -226,7 +226,7 @@ namespace nil {
                         F_dfs[2] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
                                    (V_L_shifted * h - V_L * g);
                         F_dfs[3] = preprocessed_data.common_data.lagrange_0 * (one_polynomial - V_L);
-                        F_dfs[4] = preprocessed_data.q_last * (V_L * V_L - V_L);
+                        F_dfs[4] = preprocessed_data.q_last * ( V_L * V_L - V_L );
 
                         return {F_dfs,
                                 F_perm_input,
