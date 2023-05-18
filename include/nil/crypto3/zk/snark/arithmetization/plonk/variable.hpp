@@ -31,6 +31,7 @@
 #ifndef CRYPTO3_ZK_PLONK_VARIABLE_HPP
 #define CRYPTO3_ZK_PLONK_VARIABLE_HPP
 
+#include <ostream>
 #include <vector>
 
 namespace nil {
@@ -114,7 +115,11 @@ namespace nil {
 
                     bool operator==(const plonk_variable &other) const {
                         return ((this->index == other.index) && (this->rotation == other.rotation) &&
-                                this->type == other.type);
+                                this->type == other.type && this->relative == other.relative);
+                    }
+
+                    bool operator!=(const plonk_variable &other) const {
+                        return !(*this == other);
                     }
 
                     bool operator<(const plonk_variable &other) const {
@@ -141,6 +146,22 @@ namespace nil {
                     return -(var - field_val);
                 }
 
+                // Used in the unit test, so we can use BOOST_CHECK_EQUALS, and see
+                // the values of terms, when the check fails.
+                template<typename FieldType>
+                std::ostream& operator<<(std::ostream& os, const plonk_variable<FieldType>& var)
+                {
+                    std::map<typename plonk_variable<FieldType>::column_type, std::string> type_map = {
+                        {plonk_variable<FieldType>::column_type::witness, "witness"}, 
+                        {plonk_variable<FieldType>::column_type::public_input, "public_input"},
+                        {plonk_variable<FieldType>::column_type::constant, "constant"},
+                        {plonk_variable<FieldType>::column_type::selector, "selector"}
+                    };
+                    os << "var_" << var.index << '_' << var.rotation << '_'
+                        << type_map[var.type]
+                        << (var.relative ? "_relative" : "");
+                    return os;
+                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

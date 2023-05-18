@@ -40,7 +40,7 @@ namespace nil {
                 public:
                     using field_type = FieldType;
                     using variable_type = VariableType;
-                    using expression = math::expression<VariableType>;
+                    using term = math::term<VariableType>;
 
                     std::vector<math::term<VariableType>> lookup_input;
                     std::vector<VariableType> lookup_value;
