@@ -112,10 +112,23 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> F_compr_value(0, basic_domain->m, FieldType::value_type::zero());
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
+                        math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
+                            basic_domain->m - 1, basic_domain->m, FieldType::value_type::one());
 
-                         // Construct the input lookup compression and table compression values
+                        math::polynomial_dfs<typename FieldType::value_type> mask_assignment = one_polynomial -  preprocessed_data.common_data.lagrange_0;
+
+                        // Construct the input lookup compression and table compression values
                         // TODO: change to new form
                         for (std::size_t i = 0; i < lookup_gates.size(); i++) {
+                            // Append selector to lookup input.
+                            math::polynomial_dfs<typename FieldType::value_type> selector_assignment = plonk_columns.selector(lookup_gates[i].selector_index);
+                            F_compr_input += theta_acc * selector_assignment;
+                            
+                            // Append mask to lookup value.
+                            F_compr_value += theta_acc * mask_assignment;
+
+                            theta_acc *= theta;
+
                             for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
                                 for (std::size_t k = 0; k < lookup_gates[i].constraints[j].lookup_input.size(); k++) {
                                     const math::expression<VariableType>& lookup = lookup_gates[i].constraints[j].lookup_input[k];
@@ -211,8 +224,6 @@ namespace nil {
                             (F_compr_input + beta) * (F_compr_value + gamma);
                         math::polynomial_dfs<typename FieldType::value_type> h =
                             (F_perm_input + beta) * (F_perm_value + gamma);
-                        math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
-                            basic_domain->m - 1, basic_domain->m, FieldType::value_type::one());
 
                         math::polynomial_dfs<typename FieldType::value_type> V_L_shifted =
                             math::polynomial_shift(V_L, 1, basic_domain->m);
@@ -266,19 +277,24 @@ namespace nil {
                         typename FieldType::value_type F_value_compr = FieldType::value_type::zero();
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();                        
+                        typename FieldType::value_type one = FieldType::value_type::one();
 
                         for (std::size_t i = 0; i < lookup_gates.size(); i++) {
+                            std::tuple<std::size_t, int, typename plonk_variable<FieldType>::column_type>
+                                selector_key =  std::make_tuple(lookup_gates[i].selector_index, 0,  plonk_variable<FieldType>::column_type::selector);
+
+                            // Append selector to lookup input.
+                            F_input_compr += theta_acc * evaluations[selector_key];
+                            // Append mask to lookup value.
+                            F_value_compr += one - preprocessed_data.common_data.lagrange_0.evaluate(challenge);
+
+                            theta_acc = theta * theta_acc;
                             for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
                                 for( std::size_t k = 0; k < lookup_gates[i].constraints[j].lookup_input.size(); k++ ) {
                                     std::tuple<std::size_t, int, typename VariableType::column_type> value_key =
                                         std::make_tuple(lookup_gates[i].constraints[j].lookup_value[k].index,
                                                         lookup_gates[i].constraints[j].lookup_value[k].rotation,
                                                         lookup_gates[i].constraints[j].lookup_value[k].type);
-
-                                    std::tuple<std::size_t, int, typename plonk_variable<FieldType>::column_type>
-                                        selector_key =
-                                            std::make_tuple(lookup_gates[i].selector_index, 0,
-                                                            plonk_variable<FieldType>::column_type::selector);
                     
                                     F_input_compr = F_input_compr +  theta_acc * evaluations[selector_key] * lookup_gates[i].constraints[j].lookup_input[k].evaluate(evaluations);
                                     F_value_compr += theta_acc * evaluations[value_key];
@@ -297,7 +313,6 @@ namespace nil {
                             (F_perm_input_polynomial_value + beta) * (F_perm_value_polynomial_value + gamma);
 
                         std::array<typename FieldType::value_type, argument_size> F;
-                        typename FieldType::value_type one = FieldType::value_type::one();
 
                         F[0] = (one - preprocessed_data.q_last.evaluate(challenge) -
                                 preprocessed_data.q_blind.evaluate(challenge)) *

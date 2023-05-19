@@ -226,8 +226,6 @@ namespace nil {
                     constexpr static const std::size_t permutation_size = 4;
                     constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
 
-                    using merkle_hash_type = hashes::keccak_1600<512>;
-                    using transcript_hash_type = hashes::keccak_1600<512>;
 
                     constexpr static const std::size_t witness_columns = witness_columns_1;
                     constexpr static const std::size_t public_input_columns = public_columns_1;
@@ -442,17 +440,21 @@ namespace nil {
                     table[2][0] = zero;
 
                     //lookup values
-                    table[3][0] = one;
+                    table[3][0] = zero;
                     table[4][0] = zero;
-                    table[5][0] = one;
+                    table[5][0] = zero;
 
-                    table[3][1] = zero;
-                    table[4][1] = one;
-                    table[5][1] = zero;
+                    table[3][1] = one;
+                    table[4][1] = zero;
+                    table[5][1] = one;
 
-                    table[3][2] = one;
-                    table[4][2] = zero;
+                    table[3][2] = zero;
+                    table[4][2] = one;
                     table[5][2] = zero;
+
+                    table[3][3] = one;
+                    table[4][3] = zero;
+                    table[5][3] = zero;
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
@@ -467,6 +469,7 @@ namespace nil {
                     sel_lookup[0] = one;
                     sel_lookup[1] = zero;
                     sel_lookup[2] = zero;
+                    sel_lookup[3] = zero;
                     selectors_assignment[0] = sel_lookup;
 
                     for (std::size_t i = 0; i < constant_columns; i++) {
@@ -562,23 +565,28 @@ namespace nil {
                     // lookup inputs
                     typename FieldType::value_type one = FieldType::value_type::one();
                     typename FieldType::value_type zero = FieldType::value_type::zero();
-                    table[0][0] = one+one;
-                    table[1][0] = one+one+one;
+                    table[0][0] = rand() % 2 ? one : zero;
+                    table[1][0] = rand() % 2 ? one : zero;
                     table[2][0] = table[0][0] * table[1][0];
 
                     table[0][1] = rand() % 2 ? one : zero;
                     table[1][1] = rand() % 2 ? one : zero;
                     table[2][1] = table[0][1] * table[1][1];
 
-                    table[0][2] = rand() % 2 ? one : zero;
-                    table[1][2] = rand() % 2 ? one : zero;
+                    table[0][2] = one+one;
+                    table[1][2] = one+one+one;
                     table[2][2] = table[0][2] * table[1][2];
 
                     table[0][3] = rand() % 2 ? one : zero;
                     table[1][3] = rand() % 2 ? one : zero;
                     table[2][3] = table[0][3] * table[1][3];
+
+                    table[0][4] = rand() % 2 ? one : zero;
+                    table[1][4] = rand() % 2 ? one : zero;
+                    table[2][4] = table[0][4] * table[1][4];
                     
                     //lookup values
+                    // Reserved zero row for unselected lookup input rows                    
                     table[3][0] = zero;
                     table[4][0] = zero;
                     table[5][0] = zero;
@@ -595,6 +603,10 @@ namespace nil {
                     table[4][3] = one;
                     table[5][3] = one;
 
+                    table[3][4] = zero;
+                    table[4][4] = zero;
+                    table[5][4] = zero;
+
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
                         private_assignment[i] = table[i];
@@ -605,10 +617,11 @@ namespace nil {
                     std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
 
                     std::vector<typename FieldType::value_type> sel_lookup(test_circuit.table_rows);
-                    sel_lookup[0] = zero;
+                    sel_lookup[0] = one;
                     sel_lookup[1] = one;
-                    sel_lookup[2] = one;
+                    sel_lookup[2] = zero;
                     sel_lookup[3] = one;
+                    sel_lookup[4] = one;
                     selectors_assignment[0] = sel_lookup;
 
                     std::vector<typename FieldType::value_type> sel_gate0(test_circuit.table_rows);
@@ -616,6 +629,7 @@ namespace nil {
                     sel_gate0[1] = one;
                     sel_gate0[2] = one;
                     sel_gate0[3] = one;
+                    sel_gate0[4] = one;
                     selectors_assignment[1] = sel_gate0;
 
                     for (std::size_t i = 0; i < constant_columns; i++) {
@@ -669,7 +683,7 @@ namespace nil {
                     constexpr static const std::size_t table_rows_log = 3;
                     constexpr static const std::size_t table_rows = 1 << table_rows_log;
                     constexpr static const std::size_t permutation_size = 4;
-                    constexpr static const std::size_t usable_rows = 4;
+                    constexpr static const std::size_t usable_rows = 5;
 
                     using merkle_hash_type = hashes::keccak_1600<512>;
                     using transcript_hash_type = hashes::keccak_1600<512>;

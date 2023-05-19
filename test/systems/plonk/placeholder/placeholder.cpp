@@ -110,32 +110,14 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log, const i
     return params;
 }
 
-BOOST_AUTO_TEST_SUITE(placeholder_prover_test_suite)
-
-// using curve_type = algebra::curves::bls12<381>;
-using curve_type = algebra::curves::pallas;
-using FieldType = typename curve_type::base_field_type;
-
 // lpc params
 constexpr static const std::size_t m = 2;
 
+BOOST_AUTO_TEST_SUITE(placeholder_tools)
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
 
-constexpr static const std::size_t table_columns =
-    placeholder_test_2_params::witness_columns + placeholder_test_2_params::public_input_columns;
-
-typedef commitments::fri<
-    FieldType, 
-    placeholder_test_2_params::merkle_hash_type,
-    placeholder_test_2_params::transcript_hash_type, 
-    placeholder_test_2_params::lambda, m, 5
-> fri_type;
-
-typedef placeholder_params<FieldType, typename placeholder_test_1_params::arithmetization_params> circuit_1_params;
-typedef placeholder_params<FieldType, typename placeholder_test_2_params::arithmetization_params> circuit_2_params;
-typedef placeholder_params<FieldType, typename placeholder_test_3_params::arithmetization_params> circuit_3_params;
-typedef placeholder_params<FieldType, typename placeholder_test_4_params::arithmetization_params> circuit_4_params;
-
-BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
+BOOST_AUTO_TEST_CASE(split_polynomial_test) {
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
     std::size_t expected_size = 4;
     std::size_t max_degree = 3;
@@ -155,22 +137,89 @@ BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
 
     BOOST_CHECK(f_at_y == f_splitted_at_y);
 }
+BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
+BOOST_AUTO_TEST_SUITE(placeholder_circuit_1)
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using merkle_hash_type = hashes::keccak_1600<512>;
+    using transcript_hash_type = hashes::keccak_1600<512>;
 
-    circuit_description<FieldType, circuit_2_params, placeholder_test_2_params::table_rows_log, placeholder_test_2_params::permutation_size> circuit =
-        circuit_test_2<FieldType>();
+    typedef placeholder_params<FieldType, typename placeholder_test_1_params::arithmetization_params> circuit_params;
 
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_params>;    
+    typedef commitments::lpc<FieldType, circuit_params::batched_commitment_params_type> lpc_type;
+
+    constexpr static const std::size_t table_columns =
+        placeholder_test_1_params::witness_columns + placeholder_test_1_params::public_input_columns;
+
+    typedef commitments::fri<
+        FieldType, 
+        merkle_hash_type,
+        transcript_hash_type, 
+        placeholder_test_1_params::lambda, m, 5
+    > fri_type;
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_1_params::table_rows_log);
+
+BOOST_AUTO_TEST_CASE(prover_test) {
+    auto circuit = circuit_test_1<FieldType>();
+
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
+
+    desc.rows_amount = placeholder_test_1_params::table_rows;
+    desc.usable_rows_amount = placeholder_test_1_params::usable_rows;
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.private_table(), desc, fri_params);
+
+    auto proof = placeholder_prover<FieldType, circuit_params>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
+
+    bool verifier_res = placeholder_verifier<FieldType, circuit_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params);
+    BOOST_CHECK(verifier_res);
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(placeholder_circuit_2)
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using merkle_hash_type = hashes::keccak_1600<512>;
+    using transcript_hash_type = hashes::keccak_1600<512>;
+
+    typedef placeholder_params<FieldType, typename placeholder_test_2_params::arithmetization_params> circuit_params;
+
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_params>;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_params::batched_commitment_params_type>
+        lpc_type;
+
+    typedef commitments::fri<
+        FieldType, 
+        merkle_hash_type,
+        transcript_hash_type, 
+        placeholder_test_2_params::lambda, m, 5
+    > fri_type;
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_1_params::table_rows_log);
+
+BOOST_AUTO_TEST_CASE(permutation_polynomials_test) {
     constexpr std::size_t argument_size = 3;
 
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
-
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::batched_commitment_params_type>
-        lpc_type;
+    auto circuit = circuit_test_2<FieldType>();
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_2_params::table_rows_log);
     
-    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
 
     desc.rows_amount = placeholder_test_2_params::table_rows;
     desc.usable_rows_amount = placeholder_test_2_params::usable_rows;
@@ -181,12 +230,12 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
 
-    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_2_params>::process(
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.private_table(), desc, fri_params);
 
     auto polynomial_table =
@@ -232,21 +281,15 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
     BOOST_CHECK_MESSAGE(id_res == sigma_res, "Complex check");
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
+BOOST_AUTO_TEST_CASE(permutation_argument_test) {
 
-    circuit_description<FieldType, circuit_2_params, placeholder_test_2_params::table_rows_log, placeholder_test_2_params::permutation_size> circuit =
+    circuit_description<FieldType, circuit_params, placeholder_test_2_params::table_rows_log, placeholder_test_2_params::permutation_size> circuit =
         circuit_test_2<FieldType>();
 
     constexpr std::size_t argument_size = 3;
-
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
-
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::batched_commitment_params_type>
-        lpc_type;
-
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_2_params::table_rows_log);
 
-    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
 
     desc.rows_amount = placeholder_test_2_params::table_rows;
     desc.usable_rows_amount = placeholder_test_2_params::usable_rows;
@@ -257,12 +300,12 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
 
-    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_2_params>::process(
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.private_table(), desc, fri_params);
 
     auto polynomial_table =
@@ -275,8 +318,8 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_2_params::transcript_hash_type> verifier_transcript(
         init_blob);
 
-    typename placeholder_permutation_argument<FieldType, circuit_2_params>::prover_result_type prover_res =
-        placeholder_permutation_argument<FieldType, circuit_2_params>::prove_eval(
+    typename placeholder_permutation_argument<FieldType, circuit_params>::prover_result_type prover_res =
+        placeholder_permutation_argument<FieldType, circuit_params>::prove_eval(
             constraint_system, preprocessed_public_data, desc, polynomial_table, fri_params, prover_transcript);
 
     // Challenge phase
@@ -290,7 +333,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     typename FieldType::value_type v_p_at_y_shifted = prover_res.permutation_polynomial_dfs.evaluate(circuit.omega * y);
 
     std::array<typename FieldType::value_type, 3> verifier_res =
-        placeholder_permutation_argument<FieldType, circuit_2_params>::verify_eval(
+        placeholder_permutation_argument<FieldType, circuit_params>::verify_eval(
             preprocessed_public_data, y, f_at_y, v_p_at_y, v_p_at_y_shifted,
             verifier_transcript);
 
@@ -307,19 +350,167 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
+BOOST_AUTO_TEST_CASE(gate_argument_test) {
+    circuit_description<FieldType, circuit_params, placeholder_test_2_params::table_rows_log, placeholder_test_2_params::permutation_size> circuit =
+        circuit_test_2<FieldType>();
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_2_params::table_rows_log);
+
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
+
+    desc.rows_amount = placeholder_test_2_params::table_rows;
+    desc.usable_rows_amount = placeholder_test_2_params::usable_rows;
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.private_table(), desc, fri_params);
+
+    auto polynomial_table =
+        plonk_polynomial_dfs_table<FieldType, typename placeholder_test_2_params::arithmetization_params>(
+            preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
+
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_2_params::transcript_hash_type> prover_transcript(
+        init_blob);
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_2_params::transcript_hash_type> verifier_transcript(
+        init_blob);
+
+    std::array<math::polynomial_dfs<typename FieldType::value_type>, 1> prover_res =
+        placeholder_gates_argument<FieldType, circuit_params>::prove_eval(
+            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
+            preprocessed_public_data.common_data.max_gates_degree, prover_transcript);
+
+    // Challenge phase
+    typename FieldType::value_type y = algebra::random_element<FieldType>();
+    typename FieldType::value_type omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
+
+    typename policy_type::evaluation_map columns_at_y;
+    for (std::size_t i = 0; i < placeholder_test_2_params::witness_columns; i++) {
+
+        std::size_t i_global_index = i;
+
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
+            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < 0 + placeholder_test_2_params::public_input_columns; i++) {
+
+        std::size_t i_global_index = placeholder_test_2_params::witness_columns + i;
+
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::public_input);
+
+            columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < 0 + placeholder_test_2_params::constant_columns; i++) {
+
+        std::size_t i_global_index =
+            placeholder_test_2_params::witness_columns + placeholder_test_2_params::public_input_columns + i;
+
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
+
+            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+    for (std::size_t i = 0; i < placeholder_test_2_params::selector_columns; i++) {
+
+        std::size_t i_global_index = placeholder_test_2_params::witness_columns +
+                                     placeholder_test_2_params::constant_columns +
+                                     placeholder_test_2_params::public_input_columns + i;
+
+        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
+            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
+
+            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
+        }
+    }
+
+    std::array<typename FieldType::value_type, 1> verifier_res =
+        placeholder_gates_argument<FieldType, circuit_params>::verify_eval(constraint_system.gates(), columns_at_y, y,
+                                                                             verifier_transcript);
+
+    typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
+    typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
+    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+
+    BOOST_CHECK(prover_res[0].evaluate(y) == verifier_res[0]);
+}
+
+BOOST_AUTO_TEST_CASE(prover_test) {
+
+    circuit_description<FieldType, circuit_params, placeholder_test_2_params::table_rows_log, placeholder_test_2_params::permutation_size> circuit =
+        circuit_test_2<FieldType>();
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_2_params::table_rows_log);
+
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
+
+    desc.rows_amount = placeholder_test_2_params::table_rows;
+    desc.usable_rows_amount = placeholder_test_2_params::usable_rows;
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.private_table(), desc, fri_params);
+
+    auto proof = placeholder_prover<FieldType, circuit_params>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
+
+    bool verifier_res = placeholder_verifier<FieldType, circuit_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params);
+    BOOST_CHECK(verifier_res);
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(placeholder_circuit_3)
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using merkle_hash_type = hashes::keccak_1600<512>;
+    using transcript_hash_type = hashes::keccak_1600<512>;
+
+    typedef placeholder_params<FieldType, typename placeholder_test_3_params::arithmetization_params> circuit_params;
+
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_params>;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_params::batched_commitment_params_type> lpc_type;
+
+    typedef commitments::fri<
+        FieldType, 
+        merkle_hash_type,
+        transcript_hash_type, 
+        placeholder_test_3_params::lambda, m, 5
+    > fri_type;
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_3_params::table_rows_log);
+BOOST_AUTO_TEST_CASE(lookup_argument_test) {
     auto circuit = circuit_test_3<FieldType>();
 
     constexpr std::size_t argument_size = 5;
-
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
-
-    typedef commitments::list_polynomial_commitment<FieldType,
-        circuit_3_params::batched_commitment_params_type> lpc_type;
-
+    
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_3_params::table_rows_log);
 
-    plonk_table_description<FieldType, typename circuit_3_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
 
     desc.rows_amount = placeholder_test_3_params::table_rows;
     desc.usable_rows_amount = placeholder_test_3_params::usable_rows;
@@ -328,12 +519,12 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
                                                                    circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.public_table(), desc, fri_params, 0);
 
-    typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_3_params>::process(
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.private_table(), desc, fri_params);
 
     auto polynomial_table =
@@ -346,8 +537,8 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_3_params::transcript_hash_type>
         verifier_transcript(init_blob);
 
-    typename placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prover_lookup_result prover_res =
-        placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::prove_eval(
+    typename placeholder_lookup_argument<FieldType, lpc_type, circuit_params>::prover_lookup_result prover_res =
+        placeholder_lookup_argument<FieldType, lpc_type, circuit_params>::prove_eval(
             constraint_system, preprocessed_public_data, polynomial_table, fri_params, prover_transcript
     );
 
@@ -405,7 +596,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
     auto half = prover_res.F_dfs[2].evaluate(y) * special_selectors.inversed();
 
     std::array<typename FieldType::value_type, 5> verifier_res =
-         placeholder_lookup_argument<FieldType, lpc_type, circuit_3_params>::verify_eval(
+         placeholder_lookup_argument<FieldType, lpc_type, circuit_params>::verify_eval(
             preprocessed_public_data, constraint_system.lookup_gates(), y, columns_at_y, input_at_y, input_at_y_shifted,
             value_at_y, v_l_at_y, v_l_at_y_shifted, prover_res.lookup_precommitment.root(), verifier_transcript);
 
@@ -426,20 +617,67 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_lookup_4_argument_test) {
+BOOST_AUTO_TEST_CASE( prover_test ) {
+    auto circuit = circuit_test_3<FieldType>();
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_3_params::table_rows_log);
+
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
+
+    desc.rows_amount = placeholder_test_3_params::table_rows;
+    desc.usable_rows_amount = placeholder_test_3_params::usable_rows;
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
+            constraint_system, assignments.private_table(), desc, fri_params);
+
+    auto proof = placeholder_prover<FieldType, circuit_params>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
+
+    bool verifier_res = placeholder_verifier<FieldType, circuit_params>::process(preprocessed_public_data, proof,
+                                                                                   constraint_system, fri_params);
+    BOOST_CHECK(verifier_res);
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(placeholder_circuit_4)
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using merkle_hash_type = hashes::keccak_1600<512>;
+    using transcript_hash_type = hashes::keccak_1600<512>;
+
+    typedef placeholder_params<FieldType, typename placeholder_test_4_params::arithmetization_params> circuit_params;
+
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_params>;
+    typedef commitments::list_polynomial_commitment<FieldType, circuit_params::batched_commitment_params_type> lpc_type;
+
+    typedef commitments::fri<
+        FieldType, 
+        merkle_hash_type,
+        transcript_hash_type, 
+        placeholder_test_4_params::lambda, m, 5
+    > fri_type;
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_4_params::table_rows_log);
+
+BOOST_AUTO_TEST_CASE(lookup_argument_test) {
     srand(time(NULL));
     auto circuit = circuit_test_4<FieldType>();
 
     constexpr std::size_t argument_size = 5;
 
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_4_params>;
-
-    typedef commitments::list_polynomial_commitment<FieldType,
-        circuit_4_params::batched_commitment_params_type> lpc_type;
-
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_4_params::table_rows_log);
 
-    plonk_table_description<FieldType, typename circuit_4_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
 
     desc.rows_amount = placeholder_test_4_params::table_rows;
     desc.usable_rows_amount = placeholder_test_4_params::usable_rows;
@@ -448,12 +686,12 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_4_argument_test) {
                                                                    circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    typename placeholder_public_preprocessor<FieldType, circuit_4_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_4_params>::process(
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.public_table(), desc, fri_params, 0);
 
-    typename placeholder_private_preprocessor<FieldType, circuit_4_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_4_params>::process(
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.private_table(), desc, fri_params);
 
     auto polynomial_table =
@@ -466,8 +704,8 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_4_argument_test) {
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_4_params::transcript_hash_type>
         verifier_transcript(init_blob);
 
-    typename placeholder_lookup_argument<FieldType, lpc_type, circuit_4_params>::prover_lookup_result prover_res =
-        placeholder_lookup_argument<FieldType, lpc_type, circuit_4_params>::prove_eval(
+    typename placeholder_lookup_argument<FieldType, lpc_type, circuit_params>::prover_lookup_result prover_res =
+        placeholder_lookup_argument<FieldType, lpc_type, circuit_params>::prove_eval(
             constraint_system, preprocessed_public_data, polynomial_table, fri_params, prover_transcript
     );
 
@@ -517,7 +755,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_4_argument_test) {
     typename FieldType::value_type v_l_at_y_shifted = prover_res.V_L_polynomial.evaluate(circuit.omega * y);
 
     std::array<typename FieldType::value_type, 5> verifier_res =
-        placeholder_lookup_argument<FieldType, lpc_type, circuit_4_params>::verify_eval(
+        placeholder_lookup_argument<FieldType, lpc_type, circuit_params>::verify_eval(
             preprocessed_public_data, constraint_system.lookup_gates(), y, columns_at_y, input_at_y, input_at_y_shifted,
             value_at_y, v_l_at_y, v_l_at_y_shifted, prover_res.lookup_precommitment.root(), verifier_transcript);
 
@@ -536,236 +774,11 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_4_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
-
-    circuit_description<FieldType, circuit_2_params, placeholder_test_2_params::table_rows_log, placeholder_test_2_params::permutation_size> circuit =
-        circuit_test_2<FieldType>();
-
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
-
-    typedef commitments::list_polynomial_commitment<FieldType, circuit_2_params::commitment_params_type> lpc_type;
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_2_params::table_rows_log);
-
-    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
-
-    desc.rows_amount = placeholder_test_2_params::table_rows;
-    desc.usable_rows_amount = placeholder_test_2_params::usable_rows;
-
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                   circuit.lookup_gates);
-    typename policy_type::variable_assignment_type assignments = circuit.table;
-
-    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-
-    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
-
-    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.private_table(), desc, fri_params);
-
-    auto polynomial_table =
-        plonk_polynomial_dfs_table<FieldType, typename placeholder_test_2_params::arithmetization_params>(
-            preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
-
-    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    transcript::fiat_shamir_heuristic_sequential<placeholder_test_2_params::transcript_hash_type> prover_transcript(
-        init_blob);
-    transcript::fiat_shamir_heuristic_sequential<placeholder_test_2_params::transcript_hash_type> verifier_transcript(
-        init_blob);
-
-    std::array<math::polynomial_dfs<typename FieldType::value_type>, 1> prover_res =
-        placeholder_gates_argument<FieldType, circuit_2_params>::prove_eval(
-            constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
-            preprocessed_public_data.common_data.max_gates_degree, prover_transcript);
-
-    // Challenge phase
-    typename FieldType::value_type y = algebra::random_element<FieldType>();
-    typename FieldType::value_type omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
-
-    typename policy_type::evaluation_map columns_at_y;
-    for (std::size_t i = 0; i < placeholder_test_2_params::witness_columns; i++) {
-
-        std::size_t i_global_index = i;
-
-        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
-            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
-        }
-    }
-    for (std::size_t i = 0; i < 0 + placeholder_test_2_params::public_input_columns; i++) {
-
-        std::size_t i_global_index = placeholder_test_2_params::witness_columns + i;
-
-        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::public_input);
-
-            columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
-        }
-    }
-    for (std::size_t i = 0; i < 0 + placeholder_test_2_params::constant_columns; i++) {
-
-        std::size_t i_global_index =
-            placeholder_test_2_params::witness_columns + placeholder_test_2_params::public_input_columns + i;
-
-        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
-
-            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
-        }
-    }
-    for (std::size_t i = 0; i < placeholder_test_2_params::selector_columns; i++) {
-
-        std::size_t i_global_index = placeholder_test_2_params::witness_columns +
-                                     placeholder_test_2_params::constant_columns +
-                                     placeholder_test_2_params::public_input_columns + i;
-
-        for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
-
-            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
-        }
-    }
-
-    std::array<typename FieldType::value_type, 1> verifier_res =
-        placeholder_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), columns_at_y, y,
-                                                                             verifier_transcript);
-
-    typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
-    typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
-    BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
-
-    BOOST_CHECK(prover_res[0].evaluate(y) == verifier_res[0]);
-}
-
-BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
-
-    circuit_description<FieldType, circuit_2_params, placeholder_test_2_params::table_rows_log, placeholder_test_2_params::permutation_size> circuit =
-        circuit_test_2<FieldType>();
-
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
-
-    //    typedef commitments::list_polynomial_commitment<FieldType,
-    //        circuit_2_params::batched_commitment_params_type> lpc_type;
-    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type> lpc_type;
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_2_params::table_rows_log);
-
-    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
-
-    desc.rows_amount = placeholder_test_2_params::table_rows;
-    desc.usable_rows_amount = placeholder_test_2_params::usable_rows;
-
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                   circuit.lookup_gates);
-    typename policy_type::variable_assignment_type assignments = circuit.table;
-
-    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-
-    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
-
-    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_2_params>::process(
-            constraint_system, assignments.private_table(), desc, fri_params);
-
-    auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
-
-    bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
-        preprocessed_public_data, proof, constraint_system, fri_params);
-    BOOST_CHECK(verifier_res);
-}
-
-BOOST_AUTO_TEST_CASE(placeholder_prover_test_1) {
-
-    circuit_description<FieldType, circuit_1_params, placeholder_test_1_params::table_rows_log, placeholder_test_1_params::permutation_size> circuit =
-        circuit_test_1<FieldType>();
-
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_1_params>;
-
-    typedef commitments::lpc<FieldType, circuit_1_params::batched_commitment_params_type> lpc_type;
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_1_params::table_rows_log);
-
-    plonk_table_description<FieldType, typename circuit_1_params::arithmetization_params> desc;
-
-    desc.rows_amount = placeholder_test_1_params::table_rows;
-    desc.usable_rows_amount = placeholder_test_1_params::usable_rows;
-
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                   circuit.lookup_gates);
-    typename policy_type::variable_assignment_type assignments = circuit.table;
-
-    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-
-    typename placeholder_public_preprocessor<FieldType, circuit_1_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_1_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
-
-    typename placeholder_private_preprocessor<FieldType, circuit_1_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_1_params>::process(
-            constraint_system, assignments.private_table(), desc, fri_params);
-
-    auto proof = placeholder_prover<FieldType, circuit_1_params>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
-
-    bool verifier_res = placeholder_verifier<FieldType, circuit_1_params>::process(
-        preprocessed_public_data, proof, constraint_system, fri_params);
-    BOOST_CHECK(verifier_res);
-}
-
-BOOST_AUTO_TEST_CASE( placeholder_prover_test_3 ) {
-    auto circuit = circuit_test_3<FieldType>();
-
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
-
-    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type> lpc_type;
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_3_params::table_rows_log);
-
-    plonk_table_description<FieldType, typename circuit_3_params::arithmetization_params> desc;
-
-    desc.rows_amount = placeholder_test_3_params::table_rows;
-    desc.usable_rows_amount = placeholder_test_3_params::usable_rows;
-
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                   circuit.lookup_gates);
-    typename policy_type::variable_assignment_type assignments = circuit.table;
-
-    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-
-    typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
-            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
-
-    typename placeholder_private_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_3_params>::process(
-            constraint_system, assignments.private_table(), desc, fri_params);
-
-    auto proof = placeholder_prover<FieldType, circuit_3_params>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
-
-    bool verifier_res = placeholder_verifier<FieldType, circuit_3_params>::process(preprocessed_public_data, proof,
-                                                                                   constraint_system, fri_params);
-    BOOST_CHECK(verifier_res);
-}
-
-
-BOOST_AUTO_TEST_CASE( placeholder_prover_test_4 ) {
-    circuit_description<FieldType, circuit_4_params, placeholder_test_4_params::table_rows_log, 3> circuit = circuit_test_4<FieldType>();
-
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_4_params>;
-
-    typedef commitments::lpc<FieldType, circuit_4_params::batched_commitment_params_type> lpc_type;
-
+BOOST_AUTO_TEST_CASE( prover_test ) {
+    auto circuit = circuit_test_4<FieldType>();
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(placeholder_test_4_params::table_rows_log);
 
-    plonk_table_description<FieldType, typename circuit_4_params::arithmetization_params> desc;
+    plonk_table_description<FieldType, typename circuit_params::arithmetization_params> desc;
 
     desc.rows_amount = placeholder_test_4_params::table_rows;
     desc.usable_rows_amount = placeholder_test_4_params::usable_rows;
@@ -776,18 +789,18 @@ BOOST_AUTO_TEST_CASE( placeholder_prover_test_4 ) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    typename placeholder_public_preprocessor<FieldType, circuit_4_params>::preprocessed_data_type
-        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_4_params>::process(
+    typename placeholder_public_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
 
-    typename placeholder_private_preprocessor<FieldType, circuit_4_params>::preprocessed_data_type
-        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_4_params>::process(
+    typename placeholder_private_preprocessor<FieldType, circuit_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_params>::process(
             constraint_system, assignments.private_table(), desc, fri_params);
 
-    auto proof = placeholder_prover<FieldType, circuit_4_params>::process(
+    auto proof = placeholder_prover<FieldType, circuit_params>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
 
-    bool verifier_res = placeholder_verifier<FieldType, circuit_4_params>::process(preprocessed_public_data, proof,
+    bool verifier_res = placeholder_verifier<FieldType, circuit_params>::process(preprocessed_public_data, proof,
                                                                                    constraint_system, fri_params);
     BOOST_CHECK(verifier_res);
 }
