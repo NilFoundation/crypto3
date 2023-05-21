@@ -180,6 +180,9 @@ namespace nil {
                                                              WitnessesAmount, R>;
                     using value_type = typename BlueprintFieldType::value_type;
                     using integral_type = typename BlueprintFieldType::integral_type;
+                    using chunk_type = std::uint8_t;
+                    BOOST_ASSERT(component.chunk_size <= 8);
+
                     value_type x = var_value(assignment, instance_input.x);
 
                     integral_type x_integral = integral_type(x.data);
@@ -196,9 +199,9 @@ namespace nil {
 
                     BOOST_ASSERT(component.chunk_size <= 8);
 
-                    std::array<std::uint8_t, component_type::padded_chunks> chunks;
+                    std::array<chunk_type, component_type::padded_chunks> chunks;
                     for (std::size_t i = 0; i < component.padded_chunks; i++) {
-                        std::uint8_t chunk_value = 0;
+                        chunk_type chunk_value = 0;
                         for (std::size_t j = 0; j < component.chunk_size; j++) {
                             chunk_value <<= 1;
                             chunk_value |= bits[i * component.chunk_size + j];
@@ -209,19 +212,16 @@ namespace nil {
                     assignment.witness(component.W(0), row) = 0;
                     row++;
 
-                    value_type shift = 2;
-                    shift = shift.pow(component.chunk_size * component.chunks_per_row);
+                    value_type sum = 0;
 
                     for (std::size_t i = 0; i < component.rows_amount - 1; i++) {
-                        value_type sum = 0;
                         for (std::size_t j = 0; j < component.chunks_per_row; j++) {
                             assignment.witness(component.W(0 + component.reserved_columns + j), row) =
                                 chunks[i * component.chunks_per_row + j];
                             sum *= (1 << component.chunk_size);
                             sum += chunks[i * component.chunks_per_row + j];
                         }
-                        assignment.witness(component.W(0), row) =
-                            sum + assignment.witness(component.W(0), row - 1) * shift;
+                        assignment.witness(component.W(0), row) = sum;
                         row++;
                     }
 
@@ -273,7 +273,6 @@ namespace nil {
 
                         constraints.push_back(bp.add_constraint(chunk_range_constraint));
                     }
-
                     // assert sum
                     constraint_type sum_constraint = var(component.W(0 + component.reserved_columns), 0, true);
                     for (std::size_t i = 1; i < component.chunks_per_row; i++) {
@@ -294,7 +293,7 @@ namespace nil {
                     // If R is not divisible by chunk size, the first chunk should be constrained to be
                     // less than 2^{R % component.chunk_size}
                     constraint_type first_chunk_range_constraint = generate_chunk_size_constraint(
-                        var(component.W(0 + component.reserved_columns + component.padded_chunks), 0, true),
+                        var(component.W(0 + component.reserved_columns + component.padding_size), 0, true),
                         R % component.chunk_size);
 
                     gate = gate_type(first_selector_index + 1, first_chunk_range_constraint);

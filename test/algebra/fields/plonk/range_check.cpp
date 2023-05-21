@@ -34,7 +34,6 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/random/algebraic_engine.hpp>
 
@@ -43,11 +42,25 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
+
 #include "test_plonk_component.hpp"
 
-template <typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::size_t R>
-auto test_range_check(typename BlueprintFieldType::value_type input) {
-    constexpr std::size_t WitnessColumns = WitnessesAmount;
+template<typename BlueprintFieldType>
+std::size_t clz(typename BlueprintFieldType::value_type value) {
+    std::size_t count = 0;
+    typename BlueprintFieldType::integral_type integral = typename BlueprintFieldType::integral_type(value.data);
+    while (integral != 0) {
+        integral >>= 1;
+        ++count;
+    }
+    return count;
+}
+
+template <typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::size_t R,
+          bool CustomAssignments = false >
+auto test_range_check(typename BlueprintFieldType::value_type input,
+                      const std::map<std::pair<std::size_t, std::size_t>, typename BlueprintFieldType::value_type>
+                        &patches = {}) {
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     // We use either one or two depending on whether R divides chunk_size or not.
@@ -55,14 +68,14 @@ auto test_range_check(typename BlueprintFieldType::value_type input) {
     // we use two.
     constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<
-        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+        WitnessesAmount, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                                  ArithmetizationParams>;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using component_type = nil::blueprint::components::range_check<ArithmetizationType, WitnessColumns, R>;
+    using component_type = nil::blueprint::components::range_check<ArithmetizationType, WitnessesAmount, R>;
 	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     using value_type = typename BlueprintFieldType::value_type;
 
@@ -77,31 +90,40 @@ auto test_range_check(typename BlueprintFieldType::value_type input) {
     #endif
 
     auto result_check = [](AssignmentType &assignment, typename component_type::result_type &real_res) {};
-
     const bool expected_to_pass = input < value_type(2).pow(R);
 
-    if (WitnessesAmount == 15 && expected_to_pass) {
-        component_type component_instance =
-            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0});
-        nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    } else if (WitnessesAmount == 9 && expected_to_pass) {
-        component_type component_instance = component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0});
-        nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
-    } else if (WitnessesAmount == 15 && !expected_to_pass) {
-        component_type component_instance =
-            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0});
-        nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
-                                             hash_type, Lambda>(
-                                                component_instance, public_input, result_check, instance_input);
-    } else if (WitnessesAmount == 9 && !expected_to_pass) {
-        component_type component_instance = component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0});
-        nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
-                                             hash_type, Lambda>(
-                                                component_instance, public_input, result_check, instance_input);
+    component_type component_instance = WitnessesAmount == 15 ?
+                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0})
+                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0});
+
+    if (!(WitnessesAmount == 15 || WitnessesAmount == 9)) {
+        BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
+    }
+
+    if (!CustomAssignments) {
+        if (expected_to_pass) {
+            nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+        } else {
+            nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
+                                                 hash_type, Lambda>(
+                                                    boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+        }
     } else {
-        assert(false);
+        auto custom_assignment = nil::crypto3::generate_patched_assignments<
+             BlueprintFieldType, ArithmetizationParams, component_type>(patches);
+
+        if (expected_to_pass) {
+            nil::crypto3::test_component_custom_assignments<component_type, BlueprintFieldType, ArithmetizationParams,
+                    hash_type, Lambda>(
+                        boost::get<component_type>(component_instance), public_input,
+                        result_check, custom_assignment, instance_input);
+        } else {
+            nil::crypto3::test_component_to_fail_custom_assignments<component_type, BlueprintFieldType,
+                    ArithmetizationParams, hash_type, Lambda>(
+                            boost::get<component_type>(component_instance), public_input, result_check,
+                            custom_assignment, instance_input);
+        }
     }
 }
 
@@ -111,6 +133,7 @@ void test_range_check_specific_inputs() {
 
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(0);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(1);
+    test_range_check<BlueprintFieldType, WitnessesAmount, R>(2);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(35000);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(value_type(1).pow(R) - 1);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(-1);
@@ -129,13 +152,15 @@ void test_range_check_random_inputs() {
     boost::random::mt19937 seed_seq;
     generate_random.seed(seed_seq);
 
+    value_type max_value = value_type(2).pow(R);
+
     for (std::size_t i = 0; i < RandomTestsAmount; i++){
         value_type input = generate_random();
     	integral_type input_integral = integral_type(input.data);
-        input_integral = input_integral & integral_type((value_type(1).pow(R) - 1).data);
+        input_integral = input_integral & integral_type((max_value - 1).data);
     	value_type input_scalar = input_integral;
         // Sanity check
-        assert(input_scalar < value_type(1).pow(R));
+        assert(input_scalar < max_value);
         test_range_check<BlueprintFieldType, WitnessesAmount, R >(input_scalar);
 	}
 }
@@ -149,20 +174,21 @@ void test_range_check_fail_random_inputs(){
     boost::random::mt19937 seed_seq;
     generate_random.seed(seed_seq);
 
+    value_type max_value = value_type(2).pow(R);
+    integral_type restriction_modulus = BlueprintFieldType::modulus - integral_type(max_value.data);
+
     for (std::size_t i = 0; i < RandomTestsAmount; i++){
         value_type input = generate_random();
-        integral_type input_integral = integral_type(input.data);
-        input_integral = input_integral | integral_type(value_type(2).pow(R).data);
-    	value_type input_scalar = input_integral;
+        input = max_value + (value_type(integral_type(input.data) % restriction_modulus));
         // Sanity check
-        assert(input_scalar >= value_type(1).pow(R));
-        test_range_check<BlueprintFieldType, WitnessesAmount, R>(input_scalar);
+        assert(input >= max_value);
+        test_range_check<BlueprintFieldType, WitnessesAmount, R>(input);
 	}
 }
 
 constexpr static const std::size_t random_tests_amount = 10;
 
-BOOST_AUTO_TEST_SUITE(blueprint_plonk_fields_range_check_test_suite)
+BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_bls12_15_64) {
     using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
@@ -209,6 +235,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_15_254) {
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_15_1) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     test_range_check_specific_inputs<field_type, 15, 1>();
+    test_range_check_fail_random_inputs<field_type, 15, 1, random_tests_amount>();
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_9_1) {
@@ -237,6 +264,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_9_121) {
     test_range_check_fail_random_inputs<field_type, 9, 121, random_tests_amount>();
 }
 
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_9_253) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_range_check_specific_inputs<field_type, 9, 253>();
+    test_range_check_random_inputs<field_type, 9, 253, random_tests_amount>();
+    test_range_check_fail_random_inputs<field_type, 9, 253, random_tests_amount>();
+}
+
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_bls12_9_254) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     test_range_check_specific_inputs<field_type, 9, 254>();
@@ -256,6 +290,41 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_9_254) {
     test_range_check_specific_inputs<field_type, 9, 254>();
     test_range_check_random_inputs<field_type, 9, 254, random_tests_amount>();
     test_range_check_fail_random_inputs<field_type, 9, 254, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_oops_first_chunk_overflow) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    using value_type = typename field_type::value_type;
+    // 17 rows, 1 padding
+    std::map<std::pair<std::size_t, std::size_t>, value_type> patches;
+    value_type test_val = value_type(2).pow(253) + 11;
+    patches[std::make_pair(1, 2)] = value_type(2);
+    value_type sum = 1 / (value_type(8));
+    for (std::size_t i = 1; i < 17; i++) {
+        patches[std::make_pair(i, 0)] = sum = value_type(2).pow(16) * sum + (i != 16 ? 0 : 11);
+    }
+    assert(sum == test_val);
+    // For 17th row we have to also get 11 assigned.
+    patches[std::make_pair(16, 8)] = 3;
+    patches[std::make_pair(16, 7)] = 2;
+    test_range_check<field_type, 9, 253, true>(test_val, patches);
+
+    using field_type_2 = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_range_check<field_type_2, 15, 1, true>(2,
+        {std::make_pair(std::make_pair(1, 14), 2),
+         std::make_pair(std::make_pair(1, 0 ), 2)});
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_oops_wrong_chunks) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    using value_type = typename field_type::value_type;
+
+    std::map<std::pair<std::size_t, std::size_t>, value_type> patches;
+    patches[std::make_pair(1, 0)] = 1024;
+    for (std::size_t i = 1; i < 15; i++) {
+        patches[std::make_pair(1, i)] = 0;
+    }
+    test_range_check<field_type, 15, 8, true>(1024, patches);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

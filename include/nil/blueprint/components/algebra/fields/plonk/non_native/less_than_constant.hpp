@@ -44,7 +44,7 @@ namespace nil {
 
             /*
                 Checks if input x is less than some predefined constant c, which has R bits.
-                Constant c should be less than 2^{modulus_bits - 2}.
+                Constant c should be less than 2^{modulus_bits - 2} (so R < modulus_bits - 1).
 
                 We first find the smallest n such that 2^{n} > c.
                 We check that both x and c - x are less than 2^{n} and c - x != 0.
@@ -90,7 +90,10 @@ namespace nil {
                 constexpr static const std::size_t padding_bits = padded_chunks * chunk_size - R;
 
                 constexpr static const std::size_t rows_amount = 1 + 2 * padded_chunks / (WitnessesAmount - 1);
-                constexpr static const std::size_t gates_amount = 2 + (R % chunk_size ? 1 : 0);
+                constexpr static const bool needs_first_chunk_constraint =
+                    (R % chunk_size ? 1 : 0) &&
+                    (R + ((chunk_size - R % chunk_size) % chunk_size) >= BlueprintFieldType::modulus_bits - 1);
+                constexpr static const std::size_t gates_amount = 2 + needs_first_chunk_constraint;
 
                 struct input_type {
                     var x;
@@ -186,7 +189,6 @@ namespace nil {
                                         var(component.W(var_idx), 1, true);
                     constraints.push_back(bp.add_constraint(sum_constraint));
                 }
-                //std::cout << "Added " << constraints.size() << " constraints" << std::endl;
 
                 gate_type gate(first_selector_index, constraints);
                 bp.add_gate(gate);
@@ -200,19 +202,23 @@ namespace nil {
                 gate = gate_type(first_selector_index + 1, correctness_constraints);
                 bp.add_gate(gate);
 
-                if (R % component.chunk_size == 0) return;
+                if (!component.needs_first_chunk_constraint) return;
                 // If R is not divisible by chunk size, the first chunk of both x/c-x should be constrained to be
-                // less than 2^{R % component.chunk_size}
+                // less than 2^{R % component.chunk_size}.
+                // We actually only need this constraint when c - x can do an unsafe overflow.
+                // Otherwise the constraint on c - x takes care of this.
                 std::vector<constraint_type> first_chunk_range_constraints;
 
-                var size_constraint_var = var(component.W(1 + component.padded_chunks), 0, true);
+                var size_constraint_var = component.padding_size != WitnessesAmount - 2 ?
+                                            var(component.W(2 + component.padding_size), 0, true)
+                                          : var(component.W(0), 1, true);
                 constraint_type first_chunk_range_constraint = generate_chunk_size_constraint(
                     size_constraint_var, R % component.chunk_size);
                 first_chunk_range_constraints.push_back(first_chunk_range_constraint);
 
-                size_constraint_var = var(component.W(component.padded_chunks), 1, true);
+                size_constraint_var = var(component.W(1 + component.padding_size), 1, true);
                 first_chunk_range_constraint =
-                    generate_chunk_size_constraint(size_constraint_var, component.chunk_size);
+                    generate_chunk_size_constraint(size_constraint_var, R % component.chunk_size);
                 first_chunk_range_constraints.push_back(first_chunk_range_constraint);
 
                 gate = gate_type(first_selector_index + 2, first_chunk_range_constraints);
@@ -242,30 +248,20 @@ namespace nil {
                 std::uint32_t row = start_row_index;
                 var zero(0, start_row_index, false, var::column_type::constant);
 
-                //std::size_t copy_num = 0;
                 bp.add_copy_constraint({zero, var(component.W(0), start_row_index, false)});
-                //copy_num++;
                 bp.add_copy_constraint({zero, var(component.W(1), start_row_index, false)});
-                //copy_num++;
 
                 // Padding constraints for x
                 for (std::size_t i = 0; i < component.padding_size; i++) {
                     bp.add_copy_constraint({zero, var(component.W(i + 1), start_row_index + 1, false)});
-                    //copy_num++;
                 }
                 // Padding constraints for y
-                //std::cout << "copy num: " << copy_num << std::endl;
-                //std::cout << component.padding_size << std::endl;
                 for (std::size_t i = 0; i < component.padding_size; i++) {
                     bp.add_copy_constraint({zero, var(component.W(i + 2), start_row_index, false)});
-                    //copy_num++;
                 }
-                //std::cout << "copy num: " << copy_num << std::endl;
 
                 row += component.rows_amount - 1;
                 bp.add_copy_constraint({instance_input.x, var(component.W(0), row, false)});
-                //copy_num++;
-                //std::cout << "copy num: " << copy_num << std::endl;
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
@@ -302,7 +298,7 @@ namespace nil {
                                            start_row_index + component.rows_amount - 2, 2);
                 assignment.enable_selector(first_selector_index + 1, start_row_index + component.rows_amount - 1);
 
-                if ((R % component.chunk_size) != 0) {
+                if (component.needs_first_chunk_constraint) {
                     assignment.enable_selector(first_selector_index + 2, start_row_index);
                 }
 
@@ -337,6 +333,8 @@ namespace nil {
                                                                 WitnessesAmount, R>;
                 using value_type = typename BlueprintFieldType::value_type;
                 using integral_type = typename BlueprintFieldType::integral_type;
+                using chunk_type = std::uint8_t;
+                BOOST_ASSERT(component.chunk_size <= 8);
 
                 value_type x = var_value(assignment, instance_input.x),
                            y = instance_input.constant - x;
@@ -355,12 +353,10 @@ namespace nil {
                     assert(status == nil::marshalling::status_type::success);
                 }
 
-                BOOST_ASSERT(component.chunk_size <= 8);
-
-                std::array<std::array<std::uint8_t, component_type::padded_chunks>, 2> chunks;
+                std::array<std::array<chunk_type, component_type::padded_chunks>, 2> chunks;
                 for (std::size_t i = 0; i < 2; i++) {
                     for (std::size_t j = 0; j < component.padded_chunks; j++) {
-                        std::uint8_t chunk_value = 0;
+                        chunk_type chunk_value = 0;
                         for (std::size_t k = 0; k < component.chunk_size; k++) {
                             chunk_value <<= 1;
                             chunk_value |= bits[i][j * component.chunk_size + k];
@@ -371,11 +367,8 @@ namespace nil {
 
                 assignment.witness(component.W(0), row) = assignment.witness(component.W(1), row) = 0;
 
-                value_type shift = 2;
-                shift = shift.pow(component.chunk_size * component.chunks_per_row);
-
+                std::array<value_type, 2> sum = {0, 0};
                 for (std::size_t i = 0; i < (component.rows_amount - 1) / 2; i++) {
-                    std::array<value_type, 2> sum = {0, 0};
                     // Filling the first row.
                     for (std::size_t j = 0; j < component.chunks_per_row - 1; j++) {
                         assignment.witness(component.W(j + 2), row) =
@@ -393,21 +386,14 @@ namespace nil {
                     for (std::size_t j = 0; j < component.chunks_per_row; j++) {
                         assignment.witness(component.W(j + 1), row) =
                             chunks[0][i * component.chunks_per_row + j];
-                        //std::cout << int(chunks[0][i * component.chunks_per_row + j]) << ' ';
                         sum[0] *= (1 << component.chunk_size);
                         sum[0] += chunks[0][i * component.chunks_per_row + j];
                     }
                     row++;
                     // Filling the sums
-                    assignment.witness(component.W(0), row) =
-                        sum[0] + assignment.witness(component.W(0), row - 2) * shift;
-                    assignment.witness(component.W(1), row) =
-                        sum[1] + assignment.witness(component.W(1), row - 2) * shift;
-                    //std::cout << "sum[0] = " << sum[0].data << std::endl;
-                    //std::cout << "sum[1] = " << sum[1].data << std::endl;
-                    //std::cout << assignment.witness(component.W(1), row).data << std::endl;
+                    assignment.witness(component.W(0), row) = sum[0];
+                    assignment.witness(component.W(1), row) = sum[1];
                 }
-                //std::cout << "y = " << y.data << std::endl;
                 assignment.witness(component.W(2), row) = 1 / y;
                 row++;
                 BOOST_ASSERT(row == start_row_index + component.rows_amount);
