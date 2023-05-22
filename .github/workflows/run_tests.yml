@@ -87,6 +87,7 @@ jobs:
             blueprint_algebra_fields_plonk_non_native_bit_shift_constant_test,
             blueprint_algebra_fields_plonk_non_native_logic_ops_test,
             blueprint_algebra_fields_plonk_non_native_comparsion_test,
+            blueprint_algebra_fields_plonk_non_native_comparsion_flag_test,
             blueprint_non_native_plonk_scalar_non_native_range_test,
             blueprint_non_native_plonk_bool_scalar_multiplication_test,
             blueprint_hashes_plonk_decomposition_test,

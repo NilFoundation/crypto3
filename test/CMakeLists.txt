@@ -62,6 +62,7 @@ set(NON_NATIVE_TESTS_FILES
     "algebra/fields/plonk/non_native/logic_ops"
     "algebra/fields/plonk/non_native/less_than_constant"
     "algebra/fields/plonk/non_native/comparsion"
+    "algebra/fields/plonk/non_native/comparsion_flag"
     "non_native/plonk/bool_scalar_multiplication"
     "non_native/plonk/scalar_non_native_range"
     )

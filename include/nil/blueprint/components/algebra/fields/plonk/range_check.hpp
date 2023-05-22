@@ -91,11 +91,12 @@ namespace nil {
                         result_type(const range_check &component, std::size_t start_row_index) {}
                     };
 
-                    template <typename ContainerType>
+                    template<typename ContainerType>
                         range_check(ContainerType witness):
                             component_type(witness, {}, {}) {};
 
-                    template <typename WitnessContainerType, typename ConstantContainerType, typename PublicInputContainerType>
+                    template<typename WitnessContainerType, typename ConstantContainerType,
+                             typename PublicInputContainerType>
                         range_check(WitnessContainerType witness, ConstantContainerType constant, PublicInputContainerType public_input):
                             component_type(witness, constant, public_input) {};
 

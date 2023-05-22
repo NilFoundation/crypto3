@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 // Copyright (c) 2023 Dmitrii Tabalin <d.tabalin@nil.foundation>
 //
 // MIT License
@@ -39,28 +38,20 @@
 #include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
-#include <nil/blueprint/components/algebra/fields/plonk/non_native/comparsion.hpp>
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
+
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/comparsion.hpp>
+
 #include "test_plonk_component.hpp"
 
 using nil::blueprint::components::detail::comparsion_mode;
 
-template<typename BlueprintFieldType>
-std::size_t clz(typename BlueprintFieldType::value_type value) {
-    std::size_t count = 0;
-    typename BlueprintFieldType::integral_type integral = typename BlueprintFieldType::integral_type(value.data);
-    while (integral != 0) {
-        integral >>= 1;
-        ++count;
-    }
-    return count;
-}
-
-template <typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::size_t R, comparsion_mode Mode,
-          bool CustomAssignments = false>
-auto test_comparsion(typename BlueprintFieldType::value_type x, typename BlueprintFieldType::value_type y,
+template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R,
+         comparsion_mode Mode, bool CustomAssignments = false >
+auto test_comparsion(typename BlueprintFieldType::value_type x,
+                     typename BlueprintFieldType::value_type y,
                      const std::map<std::pair<std::size_t, std::size_t>,
                                     typename BlueprintFieldType::value_type> &patches = {}) {
     constexpr std::size_t PublicInputColumns = 1;
@@ -74,9 +65,9 @@ auto test_comparsion(typename BlueprintFieldType::value_type x, typename Bluepri
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using component_type = nil::blueprint::components::comparsion<ArithmetizationType, WitnessesAmount, R, Mode>;
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     using value_type = typename BlueprintFieldType::value_type;
+    using component_type = nil::blueprint::components::comparsion<ArithmetizationType, WitnessesAmount, R, Mode>;
 
     var x_var(0, 0, false, var::column_type::public_input),
         y_var(0, 1, false, var::column_type::public_input);
@@ -85,43 +76,31 @@ auto test_comparsion(typename BlueprintFieldType::value_type x, typename Bluepri
 
     typename component_type::input_type instance_input = {x_var, y_var};
 
-    value_type max_value = value_type(2).pow(R) - 1;
-    bool inputs_fit = x <= max_value && y <= max_value;
+    auto result_check = [](AssignmentType &assignment, typename component_type::result_type &real_res) {};
 
-    bool expected_to_pass;
+    value_type max_val = value_type(2).pow(R);
+    bool expected_to_pass = x < max_val && y < max_val;
     switch (Mode) {
-        case comparsion_mode::FLAG:
-            expected_to_pass = inputs_fit;
-            break;
-        case comparsion_mode::GREATER_THAN:
-            expected_to_pass = inputs_fit && (x > y);
-            break;
-        case comparsion_mode::GREATER_EQUAL:
-            expected_to_pass = inputs_fit && (x >= y);
-            break;
         case comparsion_mode::LESS_THAN:
-            expected_to_pass = inputs_fit && (x < y);
+            expected_to_pass &= x < y;
             break;
         case comparsion_mode::LESS_EQUAL:
-            expected_to_pass = inputs_fit && (x <= y);
+            expected_to_pass &= x <= y;
+            break;
+        case comparsion_mode::GREATER_THAN:
+            expected_to_pass &= x > y;
+            break;
+        case comparsion_mode::GREATER_EQUAL:
+            expected_to_pass &= x >= y;
             break;
     }
 
-    auto result_check = [&x, &y, expected_to_pass](AssignmentType &assignment,
-                                                   typename component_type::result_type &real_res) {
-        if (Mode == comparsion_mode::FLAG && expected_to_pass) {
-            value_type expected_result = x > y ? 1 :
-                                         x == y ? 0 : -1;
-
-            assert(var_value(assignment, real_res.flag) == expected_result);
-        }
-    };
-
     component_type component_instance = WitnessesAmount == 15 ?
                                             component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0})
-                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0});
+                                      : WitnessesAmount == 9 ? component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0})
+                                                             : component_type({0, 1, 2}, {0}, {0});
 
-    if (!(WitnessesAmount == 15 || WitnessesAmount == 9)) {
+    if (!(WitnessesAmount == 15 || WitnessesAmount == 9 || WitnessesAmount == 3)) {
         BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
     }
 
@@ -152,29 +131,22 @@ auto test_comparsion(typename BlueprintFieldType::value_type x, typename Bluepri
     }
 }
 
-template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::size_t R, comparsion_mode Mode>
+template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R, comparsion_mode Mode>
 void test_comparsion_specific_inputs() {
     using value_type = typename BlueprintFieldType::value_type;
 
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(
-        value_type(78), value_type(109));
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(
-        value_type(109), value_type(78));
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(
-        value_type(300), value_type(300));
-
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(
-        value_type(-1), value_type(0));
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(
-        value_type(value_type(2).pow(R) - 1), value_type(R));
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(
-        value_type(value_type(2).pow(R) + 1), value_type(value_type(2).pow(R) + 1));
-        test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(
-        value_type(value_type(2).pow(R)), value_type(value_type(2).pow(R) + 2));
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(0, 42);
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(400 - 1, 400);
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(70, 70);
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(700001, 700001);
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(-1, 404);
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(300 - value_type(2).pow(R) + 1, 300);
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(value_type(2).pow(R) + 1, value_type(2).pow(R));
+    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(value_type(2).pow(R), -1);
 }
 
-template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::size_t R, comparsion_mode Mode,
-         std::size_t RandomTestsAmount>
+template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R,
+         comparsion_mode Mode, std::size_t RandomTestsAmount>
 void test_comparsion_random_inputs() {
     using value_type = typename BlueprintFieldType::value_type;
     using integral_type = typename BlueprintFieldType::integral_type;
@@ -184,16 +156,14 @@ void test_comparsion_random_inputs() {
     generate_random.seed(seed_seq);
 
     value_type max_val = value_type(2).pow(R);
-
     for (std::size_t i = 0; i < RandomTestsAmount; i++){
         value_type x = generate_random(),
                    y = generate_random();
         integral_type x_integral = integral_type(x.data) & integral_type((max_val - 1).data),
                       y_integral = integral_type(y.data) & integral_type((max_val - 1).data);
-        x = x_integral;
-        y = y_integral;
-        // Sanity check.
-        assert(x < max_val && y < max_val);
+        x = value_type(x_integral);
+        y = value_type(y_integral);
+
         test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(x, y);
         test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(y, x);
         test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(x, x);
@@ -204,119 +174,153 @@ constexpr static const std::size_t random_tests_amount = 10;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_15_254_flag) {
-    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 15, field_type::modulus_bits - 1, comparsion_mode::FLAG>();
-    test_comparsion_random_inputs<field_type, 15, field_type::modulus_bits - 1,
-                                  comparsion_mode::FLAG, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_15_254_less_than) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 15, field_type::modulus_bits - 1, comparsion_mode::LESS_THAN>();
-    test_comparsion_random_inputs<field_type, 15, field_type::modulus_bits - 1,
-                                  comparsion_mode::LESS_THAN, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_15_254_less_equal) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 15, field_type::modulus_bits - 1, comparsion_mode::LESS_EQUAL>();
-    test_comparsion_random_inputs<field_type, 15, field_type::modulus_bits - 1,
-                                  comparsion_mode::LESS_EQUAL, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_15_254_greater_than) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 15, field_type::modulus_bits - 1, comparsion_mode::GREATER_THAN>();
-    test_comparsion_random_inputs<field_type, 15, field_type::modulus_bits - 1,
-                                  comparsion_mode::GREATER_THAN, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_15_254_greater_equal) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 15, field_type::modulus_bits - 1, comparsion_mode::GREATER_EQUAL>();
-    test_comparsion_random_inputs<field_type, 15, field_type::modulus_bits - 1,
-                                  comparsion_mode::GREATER_EQUAL, random_tests_amount>();
-}
-
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_15_135_flag) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 15, 137, comparsion_mode::FLAG>();
-    test_comparsion_random_inputs<field_type, 15, 137,
-                                  comparsion_mode::FLAG, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_9_32_flag) {
-    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 9, 32, comparsion_mode::FLAG>();
-    test_comparsion_random_inputs<field_type, 9, 32,
-                                  comparsion_mode::FLAG, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_9_64_flag) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 9, 64, comparsion_mode::GREATER_EQUAL>();
-    test_comparsion_random_inputs<field_type, 9, 64,
-                                  comparsion_mode::GREATER_EQUAL, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_9_128_flag) {
-    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 9, 128, comparsion_mode::FLAG>();
-    test_comparsion_random_inputs<field_type, 9, 128,
-                                  comparsion_mode::FLAG, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_9_3_greater_than) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 9, 64, comparsion_mode::GREATER_THAN>();
-    test_comparsion_random_inputs<field_type, 9, 64,
-                                  comparsion_mode::GREATER_THAN, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_9_77_flag) {
-    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-
-    test_comparsion_specific_inputs<field_type, 9, 77, comparsion_mode::FLAG>();
-    test_comparsion_random_inputs<field_type, 9, 77,
-                                  comparsion_mode::FLAG, random_tests_amount>();
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_comparsion_oops_wrong_chunks) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_15_4_less_than) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     using value_type = typename field_type::value_type;
+    test_comparsion_specific_inputs<field_type, 15, 4, comparsion_mode::LESS_THAN>();
+    test_comparsion_random_inputs<field_type, 15, 4, comparsion_mode::LESS_THAN, random_tests_amount>();
+}
 
-    std::map<std::pair<std::size_t, std::size_t>, value_type> patches;
-    value_type greater_value = -4;
-    patches[std::make_pair(1, 0)] = 1024;
-    patches[std::make_pair(1, 0)] = 512;
-    // Modifying the chunks.
-    patches[std::make_pair(1, 0)] = 0;
-    for (std::size_t i = 3; i < 15; i += 2) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_15_128_greater_than) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 15, 128, comparsion_mode::GREATER_THAN>();
+    test_comparsion_random_inputs<field_type, 15, 128, comparsion_mode::GREATER_THAN, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_15_251_greater_equal) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 15, 251, comparsion_mode::GREATER_EQUAL>();
+    test_comparsion_random_inputs<field_type, 15, 251, comparsion_mode::GREATER_EQUAL, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_15_253_less_equal) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 15, 253, comparsion_mode::LESS_EQUAL>();
+    test_comparsion_random_inputs<field_type, 15, 253, comparsion_mode::LESS_EQUAL, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_9_4_less_than) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 9, 4, comparsion_mode::LESS_THAN>();
+    test_comparsion_random_inputs<field_type, 9, 4, comparsion_mode::LESS_THAN, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_9_32_greater_than) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 9, 32, comparsion_mode::GREATER_THAN>();
+    test_comparsion_random_inputs<field_type, 9, 32, comparsion_mode::GREATER_THAN, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_3_16_greater_equal) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 3, 16, comparsion_mode::GREATER_EQUAL>();
+    test_comparsion_random_inputs<field_type, 3, 16, comparsion_mode::GREATER_EQUAL, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_3_16_greater_than) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 3, 16, comparsion_mode::GREATER_THAN>();
+    test_comparsion_random_inputs<field_type, 3, 16, comparsion_mode::GREATER_THAN, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_9_33_less_equal) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 9, 33, comparsion_mode::LESS_EQUAL>();
+    test_comparsion_random_inputs<field_type, 9, 33, comparsion_mode::LESS_EQUAL, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_9_64_greater_equal) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 9, 64, comparsion_mode::GREATER_EQUAL>();
+    test_comparsion_random_inputs<field_type, 9, 64, comparsion_mode::GREATER_EQUAL, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_9_127_less_than) {
+    using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 9, 127, comparsion_mode::LESS_THAN>();
+    test_comparsion_random_inputs<field_type, 9, 127, comparsion_mode::LESS_THAN, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_15_253_greater_than) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_comparsion_specific_inputs<field_type, 9, 253, comparsion_mode::GREATER_THAN>();
+    test_comparsion_random_inputs<field_type, 9, 253, comparsion_mode::GREATER_THAN, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_mnt4_15_less_equal) {
+    using field_type = nil::crypto3::algebra::curves::mnt4<298>::base_field_type;
+    test_comparsion_specific_inputs<field_type, 15, 296, comparsion_mode::LESS_EQUAL>();
+    test_comparsion_random_inputs<field_type, 15, 296, comparsion_mode::LESS_EQUAL, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_oops_wrong_chunks) {
+    using field_type = nil::crypto3::algebra::curves::mnt4<298>::base_field_type;
+    using value_type = typename field_type::value_type;
+
+    value_type x = -1,
+               y = value_type(2).pow(8) - 1;
+
+    std::map<std::pair<std::size_t, std::size_t>, value_type> patches = {};
+    for (std::size_t i = 2; i < 15; i++) {
+        patches[std::make_pair(0, i)] = 0;
+    }
+    for (std::size_t i = 0; i < 15; i++) {
         patches[std::make_pair(1, i)] = 0;
     }
-    // Modifying the flags.
-    patches[std::make_pair(0, 5)] = patches[std::make_pair(0, 6)] = 0;
-    patches[std::make_pair(0, 7)] = -2;
-    patches[std::make_pair(0, 8)] = greater_value;
-    for (std::size_t i = 9; i < 15; i++) {
-        patches[std::make_pair(0, i)] = greater_value;
+    patches[std::make_pair(2, 0)] = x;
+    patches[std::make_pair(2, 1)] = y - x;
+
+    test_comparsion<field_type, 15, 8, comparsion_mode::LESS_EQUAL, true>(x, y, patches);
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_oops_chunk_overflow) {
+    // Due to the way the component works, the only time first chunk overflow is actually harmful is
+    // when it occurs on maximum possible R. Testing on R less than that would not reveal if the
+    // first chunk constraints are correct or not.
+    using field_type = nil::crypto3::algebra::curves::vesta::base_field_type;
+    using value_type = typename field_type::value_type;
+
+    value_type val_253 = value_type(2).pow(253) - 1,
+               val_254 = value_type(2).pow(254) - 1,
+               difference = val_253 - val_254;
+    std::map<std::pair<std::size_t, std::size_t>, value_type> patches;
+    value_type sum, sum_diff;
+    // 21 rows, 13 padding.
+    std::array<uint32_t, 10> corrections = {
+        2, 0, 0, 0, 0, 0x2246, 0x98fc099, 0x4a8dd8c, 0x46eb210, 1
+    };
+    auto place_gate_chunks = [&patches](std::size_t row, std::size_t idx, uint32_t chunk) {
+        std::array<bool, 32> bits;
+        for (std::size_t i = 0; i < 32; i++) {
+            bits[i] = chunk & (1 << (31 - i));
+        }
+        if (idx == 1) {
+            for (std::size_t i = 0; i < 13; i++) {
+                patches[std::make_pair(row, i + 2)] = 2 * bits[4 + i * 2] + bits[4 + i * 2 + 1];
+            }
+            patches[std::make_pair(row + 1, 0)] = 2 * bits[30] + bits[31];
+        } else {
+            for (std::size_t i = 0; i < 14; i++) {
+                patches[std::make_pair(row + 1, i + 1)] = 2 * bits[4 + i * 2] + bits[4 + i * 2 + 1];
+            }
+        }
+    };
+    sum = 3 / value_type(2).pow(28);
+    sum_diff = 0;
+    for (std::size_t i = 2; i < 21; i += 2) {
+        if (i != 2) {
+            place_gate_chunks(i - 2, 0, uint32_t((1 << 28) - 1));
+        } else {
+            place_gate_chunks(i - 2, 0, uint32_t(3));
+        }
+        patches[std::make_pair(i, 0)] = sum = sum * value_type(2).pow(28) + (i != 2) * (value_type(2).pow(28) - 1);
+        place_gate_chunks(i - 2, 1, uint32_t(corrections[i / 2 - 1]));
+        patches[std::make_pair(i, 1)] = sum_diff = sum_diff * value_type(2).pow(28) +
+                                        value_type(corrections[i / 2 - 1]);
     }
-    patches[std::make_pair(1, 2)] = greater_value;
-    patches[std::make_pair(2, 2)] = greater_value;
-    patches[std::make_pair(2, 3)] = -1;
-    test_comparsion<field_type, 15, 14, comparsion_mode::LESS_THAN, true>(1024, 512, patches);
+    assert(sum_diff == difference);
+    assert(sum == val_254);
+    test_comparsion<field_type, 15, 253, comparsion_mode::LESS_THAN, true>(val_254, val_253, patches);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
