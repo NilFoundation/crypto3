@@ -34,6 +34,7 @@
 #include <sstream>
 #include <filesystem>
 
+#include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
@@ -53,7 +54,7 @@ namespace nil {
             static const std::size_t MAX_LINES = 1200;
             static const std::size_t ONE_FILE_GATES_MAX_LINES = 1000;
 
-            using columns_rotations_type = std::array<std::vector<int>, ArithmetizationParams::total_columns>;
+            using columns_rotations_type = std::array<std::set<int>, ArithmetizationParams::total_columns>;
             using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<FieldType, ArithmetizationParams>;
             using TableDescriptionType = nil::crypto3::zk::snark::plonk_table_description<FieldType, ArithmetizationParams>;
             using GateType = nil::crypto3::zk::snark::plonk_gate<FieldType, nil::crypto3::zk::snark::plonk_constraint<FieldType>>;
@@ -102,48 +103,48 @@ namespace nil {
                     this->rotated_constant = false;
                     this->rotated_selector = false;
 
-                    using variable_type = const nil::crypto3::zk::snark::plonk_variable<FieldType>;
+                    using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
                     std::size_t offset = 0x80;
                     
                     // compute needed and rotated vars
-                    for (std::size_t g_index = 0; g_index < gates.size(); g_index++) {
+                    for (const auto& gate: gates) {
                         // constraint
                         // gate_evaluation
                         // theta_acc
-                        for (std::size_t c_index = 0; c_index < gates[g_index].constraints.size(); c_index++) {
-                            for (std::size_t t_index = 0; t_index < gates[g_index].constraints[c_index].terms.size(); t_index++) {
-                                for (std::size_t v_index = 0; v_index < gates[g_index].constraints[c_index].terms[t_index].vars.size(); v_index++) {
-                                    auto var = gates[g_index].constraints[c_index].terms[t_index].vars[v_index];
-                                    if (var.type == variable_type::witness) {
-                                        this->need_witness = true;
-                                        if( var.rotation != 0){ this->rotated_witness = true; }
-                                    }
-                                    if (var.type == variable_type::public_input) {
-                                        this->need_public_input = true;
-                                        if( var.rotation != 0){ this->rotated_public_input = true; }
-                                    }
-                                    if (var.type == variable_type::constant) {
-                                        this->need_constant = true;
-                                        if( var.rotation != 0) { this->rotated_constant = true; }
-                                    }
-                                    if (var.type == variable_type::selector) {
-                                        if( var.rotation != 0) { this->rotated_selector = true; }
-                                    }
+                        for (const auto& constraint: gate.constraints) {
+			    expression_for_each_variable_visitor visitor([this](const variable_type& var){
+                                if (var.type == variable_type::witness) {
+                                    this->need_witness = true;
+                                    if( var.rotation != 0){ this->rotated_witness = true; }
+                                }
+                                if (var.type == variable_type::public_input) {
+                                    this->need_public_input = true;
+                                    if( var.rotation != 0){ this->rotated_public_input = true; }
+                                }
+                                if (var.type == variable_type::constant) {
+                                    this->need_constant = true;
+                                    if( var.rotation != 0) { this->rotated_constant = true; }
+                                }
+                                if (var.type == variable_type::selector) {
+                                    if( var.rotation != 0) { this->rotated_selector = true; }
                                 }
                             }
+			    visitor.visit(constraint);
                         }
                     }
 
-                    for (std::size_t g_index = 0; g_index < gates.size(); g_index++) {
+                    for (const auto& gate: gates) {
                         std::size_t gate_lines = 2;
-                        for (std::size_t c_index = 0; c_index < gates[g_index].constraints.size(); c_index++) {
+                        for (const auto& constraint: gate.constraints) {
                             gate_lines += 2;
-                            for (std::size_t t_index = 0; t_index < gates[g_index].constraints[c_index].terms.size(); t_index++) {
-                                if(gates[g_index].constraints[c_index].terms[t_index].coeff != FieldType::value_type::one())
+			    // Convert constraint expression to non_linear_combination.
+ 	                    math::expression_to_non_linear_combination_visitor<variable_type> visitor;
+                            auto comb = visitor.convert(constraint);
+
+                            for (std::size_t t_index = 0; t_index < comb.terms.size(); t_index++) {
+                                if (comb.terms[t_index].coeff != FieldType::value_type::one())
                                     gate_lines += 1;
-                                for (std::size_t v_index = 0; v_index < gates[g_index].constraints[c_index].terms[t_index].vars.size(); v_index++) {
-                                    gate_lines += 1;
-                                }
+                                gate_lines += comb.terms[t_index].vars.size();
                                 gate_lines += 1;
                             }
                             gate_lines += 1;
@@ -268,68 +269,34 @@ namespace nil {
                 ArithmetizationType &constraint_system,  const TableDescriptionType &table_description
             ) {
                 columns_rotations_type result;
-
-                std::vector<nil::crypto3::zk::snark::plonk_gate<FieldType, nil::crypto3::zk::snark::plonk_constraint<FieldType>>> gates =
-                    constraint_system.gates();
-
-                for (std::size_t g_index = 0; g_index < gates.size(); g_index++) {
-
-                    for (std::size_t c_index = 0; c_index < gates[g_index].constraints.size(); c_index++) {
-
-                        for (std::size_t t_index = 0; t_index < gates[g_index].constraints[c_index].terms.size();
-                             t_index++) {
-                            for (std::size_t v_index = 0;
-                                 v_index < gates[g_index].constraints[c_index].terms[t_index].vars.size();
-                                 v_index++) {
-
-                                if (gates[g_index].constraints[c_index].terms[t_index].vars[v_index].relative) {
-                                    std::size_t column_index = table_description.global_index(
-                                        gates[g_index].constraints[c_index].terms[t_index].vars[v_index]);
-
-                                    int rotation =
-                                        gates[g_index].constraints[c_index].terms[t_index].vars[v_index].rotation;
-
-                                    if (std::find(result[column_index].begin(), result[column_index].end(), rotation) ==
-                                        result[column_index].end()) {
-                                        result[column_index].push_back(rotation);
-                                    }
+                for (const auto& gate: constraint_system.gates()) {
+                    for (const auto& constraint: constraints) {
+			expression_for_each_variable_visitor visitor([&table_description, &result](const variable_type& var){
+                                if (var.relative) {
+                                    std::size_t column_index = table_description.global_index(var);
+                                    result[column_index].insert(var.rotation);
                                 }
                             }
                         }
+			visitor.visit(constraint);
                     }
                 }
 
-                std::vector<nil::crypto3::zk::snark::plonk_gate<FieldType, nil::crypto3::zk::snark::plonk_lookup_constraint<FieldType>>>
-                    lookup_gates = constraint_system.lookup_gates();
-
-                for (std::size_t g_index = 0; g_index < lookup_gates.size(); g_index++) {
-
-                    for (std::size_t c_index = 0; c_index < lookup_gates[g_index].constraints.size(); c_index++) {
-
-                        for (std::size_t v_index = 0;
-                             v_index < lookup_gates[g_index].constraints[c_index].lookup_input.size();
-                             v_index++) {
-
-                            if (lookup_gates[g_index].constraints[c_index].lookup_input[v_index].vars[0].relative) {
-                                std::size_t column_index = table_description.global_index(
-                                    lookup_gates[g_index].constraints[c_index].lookup_input[v_index].vars[0]);
-
-                                int rotation =
-                                    lookup_gates[g_index].constraints[c_index].lookup_input[v_index].vars[0].rotation;
-
-                                if (std::find(result[column_index].begin(), result[column_index].end(), rotation) ==
-                                    result[column_index].end()) {
-                                    result[column_index].push_back(rotation);
+                for (const auto& gate: constraint_system.lookup_gates()) {
+                    for (const auto& constraint: constraints) {
+			expression_for_each_variable_visitor visitor([&table_description, &result](const variable_type& var){
+                                if (var.relative) {
+                                    std::size_t column_index = table_description.global_index(var);
+                                    result[column_index].insert(var.rotation);
                                 }
                             }
                         }
+			visitor.visit(constraint);
                     }
                 }
 
                 for (std::size_t i = 0; i < ArithmetizationParams::total_columns; i++) {
-                    if (std::find(result[i].begin(), result[i].end(), 0) == result[i].end()) {
-                        result[i].push_back(0);
-                    }
+                    result[i].insert(0);
                 }
 
                 return result;
@@ -345,7 +312,7 @@ namespace nil {
                 const nil::crypto3::zk::snark::plonk_variable<FieldType> &var,
                 columns_rotations_type &columns_rotations
             ) {
-                using variable_type = const nil::crypto3::zk::snark::plonk_variable<FieldType>;
+                using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
 
                 std::stringstream res;
                 std::size_t index = var.index;
@@ -459,7 +426,11 @@ namespace nil {
             ) {
                 std::stringstream res;
                 res << "\t\t\tmstore(add(local_vars, CONSTRAINT_EVAL_OFFSET), 0)" << std::endl;
-                res << generate_terms(profiling_params, constraint.terms, columns_rotations);
+
+		// Convert constraint expression to non_linear_combination.
+		math::expression_to_non_linear_combination_visitor<nil::crypto3::zk::snark::plonk_variable<FieldType>> visitor;
+                auto comb = visitor.convert(constraint);
+                res << generate_terms(profiling_params, comb.terms, columns_rotations);
                 return res.str();
             }
 
