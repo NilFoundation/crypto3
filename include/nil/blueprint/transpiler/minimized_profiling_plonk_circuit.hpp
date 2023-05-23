@@ -112,24 +112,25 @@ namespace nil {
                         // gate_evaluation
                         // theta_acc
                         for (const auto& constraint: gate.constraints) {
-			    expression_for_each_variable_visitor visitor([this](const variable_type& var){
-                                if (var.type == variable_type::witness) {
-                                    this->need_witness = true;
-                                    if( var.rotation != 0){ this->rotated_witness = true; }
-                                }
-                                if (var.type == variable_type::public_input) {
-                                    this->need_public_input = true;
-                                    if( var.rotation != 0){ this->rotated_public_input = true; }
-                                }
-                                if (var.type == variable_type::constant) {
-                                    this->need_constant = true;
-                                    if( var.rotation != 0) { this->rotated_constant = true; }
-                                }
-                                if (var.type == variable_type::selector) {
-                                    if( var.rotation != 0) { this->rotated_selector = true; }
-                                }
-                            }
-			    visitor.visit(constraint);
+		                    crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
+                                [this](const variable_type& var){
+                                    if (var.type == variable_type::witness) {
+                                        this->need_witness = true;
+                                        if( var.rotation != 0){ this->rotated_witness = true; }
+                                    }
+                                    if (var.type == variable_type::public_input) {
+                                        this->need_public_input = true;
+                                        if( var.rotation != 0){ this->rotated_public_input = true; }
+                                    }
+                                    if (var.type == variable_type::constant) {
+                                        this->need_constant = true;
+                                        if( var.rotation != 0) { this->rotated_constant = true; }
+                                    }
+                                    if (var.type == variable_type::selector) {
+                                        if( var.rotation != 0) { this->rotated_selector = true; }
+                                    }
+                                });
+			                visitor.visit(constraint);
                         }
                     }
 
@@ -137,8 +138,8 @@ namespace nil {
                         std::size_t gate_lines = 2;
                         for (const auto& constraint: gate.constraints) {
                             gate_lines += 2;
-			    // Convert constraint expression to non_linear_combination.
- 	                    math::expression_to_non_linear_combination_visitor<variable_type> visitor;
+            			    // Convert constraint expression to non_linear_combination.
+ 	                        crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
                             auto comb = visitor.convert(constraint);
 
                             for (std::size_t t_index = 0; t_index < comb.terms.size(); t_index++) {
@@ -268,30 +269,31 @@ namespace nil {
             static inline columns_rotations_type columns_rotations(
                 ArithmetizationType &constraint_system,  const TableDescriptionType &table_description
             ) {
+                using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+
                 columns_rotations_type result;
                 for (const auto& gate: constraint_system.gates()) {
-                    for (const auto& constraint: constraints) {
-			expression_for_each_variable_visitor visitor([&table_description, &result](const variable_type& var){
+                    for (const auto& constraint: gate.constraints) {
+			            crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
+                            [&table_description, &result](const variable_type& var) {
                                 if (var.relative) {
                                     std::size_t column_index = table_description.global_index(var);
                                     result[column_index].insert(var.rotation);
                                 }
-                            }
-                        }
-			visitor.visit(constraint);
+                            });
+			            visitor.visit(constraint);
                     }
                 }
 
                 for (const auto& gate: constraint_system.lookup_gates()) {
-                    for (const auto& constraint: constraints) {
-			expression_for_each_variable_visitor visitor([&table_description, &result](const variable_type& var){
-                                if (var.relative) {
-                                    std::size_t column_index = table_description.global_index(var);
-                                    result[column_index].insert(var.rotation);
-                                }
+                    for (const auto& constraint: gate.constraints) {
+                        for (const auto& lookup_input: constraint.lookup_input) {
+                            const auto& var = lookup_input.vars[0];
+                            if (var.relative) {
+                                std::size_t column_index = table_description.global_index(var);
+                                result[column_index].insert(var.rotation);
                             }
                         }
-			visitor.visit(constraint);
                     }
                 }
 
@@ -336,11 +338,10 @@ namespace nil {
                 }
 
                 // Find out rotation_idx
-                std::size_t rotation_idx = std::find(
-                    std::cbegin(columns_rotations.at(global_index)),
-                    std::cend(columns_rotations.at(global_index)),
-                    var.rotation
-                ) - std::begin(columns_rotations.at(global_index));
+                std::size_t rotation_idx = std::distance(
+                    columns_rotations.at(global_index).begin(),
+                    columns_rotations.at(global_index).find(var.rotation)
+                    );
 
                 if (var.type == variable_type::witness) {
                     if( profiling_params.rotated_witness )
@@ -424,11 +425,13 @@ namespace nil {
                 const typename nil::crypto3::zk::snark::plonk_constraint<FieldType> &constraint,
                 columns_rotations_type &columns_rotations
             ) {
+                using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+
                 std::stringstream res;
                 res << "\t\t\tmstore(add(local_vars, CONSTRAINT_EVAL_OFFSET), 0)" << std::endl;
 
-		// Convert constraint expression to non_linear_combination.
-		math::expression_to_non_linear_combination_visitor<nil::crypto3::zk::snark::plonk_variable<FieldType>> visitor;
+		        // Convert constraint expression to non_linear_combination.
+		        crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
                 auto comb = visitor.convert(constraint);
                 res << generate_terms(profiling_params, comb.terms, columns_rotations);
                 return res.str();
@@ -487,16 +490,14 @@ namespace nil {
                 const profiling_params_type &profiling_params, 
                 int gate_ind, const GateType &gate, 
                 columns_rotations_type &columns_rotations
-            ){
+            ) {
                 std::stringstream res;
                 res << "\t\t\t//Gate" << gate_ind << std::endl;
                 res << "\t\t\tmstore(add(local_vars, GATE_EVAL_OFFSET), 0)" << std::endl;
-                std::size_t i = 0;
                 for (auto &constraint : gate.constraints) {
                     res << generate_constraint(profiling_params, constraint, columns_rotations);
                     res << generate_gate_evaluation();
                     res << generate_theta_acc();
-                    i++;
                 }
                 res << generate_selector(gate);
                 res << generate_gate_argument_evaluation();
