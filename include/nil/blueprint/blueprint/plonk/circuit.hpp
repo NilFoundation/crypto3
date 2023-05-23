@@ -94,7 +94,7 @@ namespace nil {
             }
 
             crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>
-                add_lookup_constraint(std::vector<crypto3::math::non_linear_term<crypto3::zk::snark::plonk_variable<BlueprintFieldType>>> lookup_input, 
+                add_lookup_constraint(std::vector<crypto3::math::term<crypto3::zk::snark::plonk_variable<BlueprintFieldType>>> lookup_input, 
                 std::vector<crypto3::zk::snark::plonk_variable<BlueprintFieldType>> lookup_value) {
                 crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType> lookup_constraint;
                 lookup_constraint.lookup_input = lookup_input;
