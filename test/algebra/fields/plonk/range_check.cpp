@@ -257,6 +257,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_9_121) {
     test_range_check_fail_random_inputs<field_type, 9, 121, random_tests_amount>();
 }
 
+BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_9_128) {
+    using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
+    test_range_check_specific_inputs<field_type, 9, 128>();
+    test_range_check_random_inputs<field_type, 9, 128, random_tests_amount>();
+    test_range_check_fail_random_inputs<field_type, 9, 128, random_tests_amount>();
+}
+
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_vesta_9_121) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     test_range_check_specific_inputs<field_type, 9, 121>();

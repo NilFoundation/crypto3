@@ -91,6 +91,7 @@ namespace nil {
                     return;
                 }
                 this->_copy_constraints.emplace_back(copy_constraint);
+                std::cout << "Copy amount: " << this->_copy_constraints.size() << std::endl;
             }
 
             crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>

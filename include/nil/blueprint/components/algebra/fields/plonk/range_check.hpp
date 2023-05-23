@@ -46,6 +46,7 @@ namespace nil {
                 // Constraint that x < 2**R.
                 // Works when R < modulus_bits.
                 // Input: x \in Fp
+                // Takes one gate less for R divisible by chunk_size.
                 template<typename ArithmetizationType, std::uint32_t WitnessesAmount, std::size_t R>
                 class range_check;
 
@@ -128,7 +129,7 @@ namespace nil {
                                                                         ArithmetizationParams>>
                         &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                        ArithmetizationParams>>
+                                                                           ArithmetizationParams>>
                         &assignment,
                     const typename plonk_range_check<BlueprintFieldType, ArithmetizationParams,
                                                      WitnessesAmount, R>::input_type
@@ -312,7 +313,7 @@ namespace nil {
                                                                         ArithmetizationParams>>
                         &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                            ArithmetizationParams>>
+                                                                           ArithmetizationParams>>
                         &assignment,
                     const typename plonk_range_check<BlueprintFieldType, ArithmetizationParams,
                                                      WitnessesAmount, R>::input_type
@@ -330,8 +331,7 @@ namespace nil {
                     }
 
                     bp.add_copy_constraint({instance_input.x,
-                                            var(component.W(0),
-                                                start_row_index + component.rows_amount - 1, false)});
+                                            var(component.W(0), start_row_index + component.rows_amount - 1, false)});
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
@@ -342,7 +342,7 @@ namespace nil {
                                             WitnessesAmount, R>
                         &component,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                            ArithmetizationParams>>
+                                                                           ArithmetizationParams>>
                         &assignment,
                     const typename plonk_range_check<BlueprintFieldType, ArithmetizationParams,
                                                      WitnessesAmount, R>::input_type

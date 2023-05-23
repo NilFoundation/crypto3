@@ -52,6 +52,7 @@ namespace nil {
                 Compares two field elements, which are both less than 2^{R}. This condition is checked.
                 Outputs a flag value, depending on the comparsion result.
                 If you do not require a flag, use a more efficient comparsion_fail component.
+                Takes one gate less if R is divisible by chunk_size.
 
                 R should be less than BlueprintFieldType::modulus_bits.
                 This component can be used in multiple modes:

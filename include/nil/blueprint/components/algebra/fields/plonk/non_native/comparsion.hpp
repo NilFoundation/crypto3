@@ -47,8 +47,9 @@ namespace nil {
             class comparsion;
 
             /*
-                Checks if input x is less than y, both fitting in R bits.
+                Checks if input x is less than y, both fitting in R bits (this condition is checked).
                 Additionally, R has to satisfy: R < modulus_bits - 1.
+                Takes one gate less for R divisible by chunk_size.
 
                 We check that both x and x - y are less than 2^{R}.
                 The check is done by splitting x (x-y) into bit chunks and checking that their weighted sum is
@@ -449,10 +450,10 @@ namespace nil {
                     case comparsion_mode::LESS_THAN:
                     case comparsion_mode::GREATER_THAN:
                         if (!component.needs_bonus_row) {
-                            assignment.witness(component.W(3), row) = 1 / diff;
+                            assignment.witness(component.W(3), row) = diff != 0 ? 1 / diff : 0;
                         } else {
                             row++;
-                            assignment.witness(component.W(0), row) = 1 / diff;
+                            assignment.witness(component.W(0), row) = diff != 0 ? 1 / diff : 0;
                         }
                         break;
                     case comparsion_mode::LESS_EQUAL:

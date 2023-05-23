@@ -22,6 +22,9 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARSION_MODE_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARSION_MODE_HPP
+
 namespace nil {
     namespace blueprint {
         namespace components {
@@ -39,3 +42,5 @@ namespace nil {
         }       // namespace components
     }           // namespace blueprint
 }   // namespace nil
+
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARSION_MODE_HPP
