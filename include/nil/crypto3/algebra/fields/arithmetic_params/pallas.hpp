@@ -38,7 +38,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace fields {
-                
+
                 template<>
                 struct arithmetic_params<pallas_base_field> : public params<pallas_base_field> {
                 private:
@@ -54,6 +54,7 @@ namespace nil {
                     constexpr static const integral_type multiplicative_generator = 0x05;
                     constexpr static const integral_type root_of_unity =
                         0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui255;
+                    constexpr static const integral_type nqr = 0x05;
                 };
 
                 constexpr std::size_t const arithmetic_params<pallas_base_field>::s;
@@ -66,10 +67,12 @@ namespace nil {
 
                 constexpr typename arithmetic_params<pallas_base_field>::integral_type const
                     arithmetic_params<pallas_base_field>::geometric_generator;
-                
+
                 constexpr typename arithmetic_params<pallas_base_field>::integral_type const
                     arithmetic_params<pallas_base_field>::multiplicative_generator;
-           
+
+                constexpr typename arithmetic_params<pallas_base_field>::integral_type const
+                    arithmetic_params<pallas_base_field>::nqr;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

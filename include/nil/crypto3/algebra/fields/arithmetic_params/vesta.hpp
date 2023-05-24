@@ -53,6 +53,7 @@ namespace nil {
                     constexpr static const std::size_t s = 0x20;
                     constexpr static const integral_type root_of_unity =
                         0x39579430a0535caa2072a2239079f02b4c5b0caa29bfe9396f80d8a28434208f_cppui255;
+                    constexpr static const integral_type nqr = 0x05;
                 };
 
                 constexpr std::size_t const arithmetic_params<vesta_base_field>::s;
@@ -65,10 +66,12 @@ namespace nil {
 
                 constexpr typename arithmetic_params<vesta_base_field>::integral_type const
                     arithmetic_params<vesta_base_field>::geometric_generator;
-                
+
                 constexpr typename arithmetic_params<vesta_base_field>::integral_type const
                     arithmetic_params<vesta_base_field>::multiplicative_generator;
-                
+
+                constexpr typename arithmetic_params<vesta_base_field>::integral_type const
+                    arithmetic_params<vesta_base_field>::nqr;
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3
