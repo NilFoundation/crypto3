@@ -24,8 +24,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MARSHALLING_ZK_MATH_NON_LINEAR_TERM_HPP
-#define CRYPTO3_MARSHALLING_ZK_MATH_NON_LINEAR_TERM_HPP
+#ifndef CRYPTO3_MARSHALLING_ZK_MATH_TERM_HPP
+#define CRYPTO3_MARSHALLING_ZK_MATH_TERM_HPP
 
 #include <type_traits>
 
@@ -37,7 +37,7 @@
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
-#include <nil/crypto3/zk/math/non_linear_combination.hpp>
+#include <nil/crypto3/zk/math/expression.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 
 namespace nil {
@@ -45,31 +45,35 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 template<typename TTypeBase, typename NonLinearTerm, typename = void>
-                struct non_linear_term;
+                struct term;
 
                 template<typename TTypeBase, typename VariableType>
-                struct non_linear_term<TTypeBase, nil::crypto3::math::non_linear_term<VariableType>, void> {
+                struct term<TTypeBase, nil::crypto3::math::term<VariableType>, void> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
                             // assignment_type coeff
                             field_element<TTypeBase,
-                                          typename nil::crypto3::math::non_linear_term<VariableType>::assignment_type>,
+                                          typename nil::crypto3::math::term<VariableType>::assignment_type>,
                             // std::vector<VariableType> vars
                             nil::marshalling::types::array_list<
                                 TTypeBase, typename variable<TTypeBase, VariableType>::type,
                                 nil::marshalling::option::sequence_size_field_prefix<
-                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>>>>;
+                                    nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                                >
+                            >
+                        >;
                 };
 
                 template<typename NonLinearTerm, typename Endianness>
                 typename std::enable_if<
-                    std::is_same<nil::crypto3::math::non_linear_term<typename NonLinearTerm::variable_type>,
+                    std::is_same<nil::crypto3::math::term<typename NonLinearTerm::variable_type>,
                                  NonLinearTerm>::value,
-                    typename non_linear_term<nil::marshalling::field_type<Endianness>, NonLinearTerm>::type>::type
-                    fill_non_linear_term(const NonLinearTerm &term) {
+                    typename term<nil::marshalling::field_type<Endianness>, NonLinearTerm>::type>::type
+                    fill_term(const NonLinearTerm &t) {
+
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using result_type = typename non_linear_term<TTypeBase, NonLinearTerm>::type;
+                    using result_type = typename term<TTypeBase, NonLinearTerm>::type;
                     using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
                     using field_element_marhsalling_type =
                         field_element<TTypeBase, typename NonLinearTerm::assignment_type>;
@@ -80,33 +84,33 @@ namespace nil {
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
 
                     variable_vector_marshalling_type filled_vars;
-                    for (const auto &var : term.vars) {
+                    for (const auto &var : t.vars) {
                         filled_vars.value().push_back(
                             fill_variable<typename NonLinearTerm::variable_type, Endianness>(var));
                     }
 
-                    return result_type(std::make_tuple(field_element_marhsalling_type(term.coeff), filled_vars));
+                    return result_type(std::make_tuple(field_element_marhsalling_type(t.coeff), filled_vars));
                 }
 
                 template<typename NonLinearTerm, typename Endianness>
                 typename std::enable_if<
-                    std::is_same<nil::crypto3::math::non_linear_term<typename NonLinearTerm::variable_type>,
+                    std::is_same<nil::crypto3::math::term<typename NonLinearTerm::variable_type>,
                                  NonLinearTerm>::value,
                     NonLinearTerm>::type
-                    make_non_linear_term(const typename non_linear_term<nil::marshalling::field_type<Endianness>,
+                    make_term(const typename term<nil::marshalling::field_type<Endianness>,
                                                                         NonLinearTerm>::type &filled_term) {
-                    NonLinearTerm term;
-                    term.coeff = std::get<0>(filled_term.value()).value();
-                    term.vars.reserve(std::get<1>(filled_term.value()).value().size());
+                    NonLinearTerm t;
+                    t.coeff = std::get<0>(filled_term.value()).value();
+                    t.vars.reserve(std::get<1>(filled_term.value()).value().size());
                     for (auto i = 0; i < std::get<1>(filled_term.value()).value().size(); i++) {
-                        term.vars.emplace_back(make_variable<typename NonLinearTerm::variable_type, Endianness>(
+                        t.vars.emplace_back(make_variable<typename NonLinearTerm::variable_type, Endianness>(
                             std::get<1>(filled_term.value()).value().at(i)));
                     }
-                    return term;
+                    return t;
                 }
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MARSHALLING_ZK_MATH_NON_LINEAR_TERM_HPP
+#endif    // CRYPTO3_MARSHALLING_ZK_MATH_TERM_HPP

@@ -39,7 +39,8 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
-#include <nil/crypto3/marshalling/math/types/non_linear_combination.hpp>
+#include <nil/crypto3/marshalling/math/types/term.hpp>
+#include <nil/crypto3/marshalling/math/types/expression.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -48,7 +49,7 @@ namespace nil {
                 /*********************** Plonk constraint ****************************/
                 template<typename TTypeBase, typename PlonkConstraint>
                 using plonk_constraint =
-                    typename non_linear_combination<TTypeBase, typename PlonkConstraint::base_type>::type;
+                    typename expression<TTypeBase, typename PlonkConstraint::base_type>::type;
 
                 template<typename PlonkConstraint, typename Endianness,  typename = typename std::enable_if<
                              std::is_same<PlonkConstraint, nil::crypto3::zk::snark::plonk_constraint<
@@ -56,7 +57,7 @@ namespace nil {
                                                                typename PlonkConstraint::variable_type>>::value>::type>
                 plonk_constraint<nil::marshalling::field_type<Endianness>, PlonkConstraint>
                 fill_plonk_constraint(const PlonkConstraint &constr) {
-                    return fill_non_linear_combination<typename PlonkConstraint::base_type, Endianness>(constr);
+                    return fill_expression<typename PlonkConstraint::base_type, Endianness>(constr);
                 }
 
                 template<typename PlonkConstraint, typename Endianness,  typename = typename std::enable_if<
@@ -66,16 +67,16 @@ namespace nil {
                 PlonkConstraint make_plonk_constraint(
                     const plonk_constraint<nil::marshalling::field_type<Endianness>, PlonkConstraint> &filled_constr
                 ) {
-                    return make_non_linear_combination<typename PlonkConstraint::base_type, Endianness>(filled_constr);
+                    return make_expression<typename PlonkConstraint::base_type, Endianness>(filled_constr);
                 }
 
                 /*********************** Plonk lookup constraint ****************************/
                 template<typename TTypeBase, typename PlonkLookupConstraint>
-                using plonk_lookup_constraint =  nil::marshalling::types::bundle<
+                using plonk_lookup_constraint = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<                  
-                        // std::vector<math::non_linear_term<VariableType>> lookup_input;          
+                        // std::vector<math::term<VariableType>> lookup_input;          
                         nil::marshalling::types::array_list<
-                            TTypeBase, typename non_linear_term<TTypeBase, typename PlonkLookupConstraint::non_linear_term>::type,
+                            TTypeBase, typename term<TTypeBase, typename PlonkLookupConstraint::term>::type,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >,
                         //  std::vector<VariableType> lookup_value;
@@ -96,12 +97,12 @@ namespace nil {
                     using result_type = plonk_lookup_constraint<TTypeBase, PlonkLookupConstraint>;
 
                     nil::marshalling::types::array_list<
-                            TTypeBase, typename non_linear_term<TTypeBase, typename PlonkLookupConstraint::non_linear_term>::type,
+                            TTypeBase, typename term<TTypeBase, typename PlonkLookupConstraint::term>::type,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_lookup_input;
                     for(std::size_t i = 0; i < constr.lookup_input.size(); i++){
                         filled_lookup_input.value().push_back(
-                            fill_non_linear_term<typename PlonkLookupConstraint::non_linear_term, Endianness>(constr.lookup_input[i])
+                            fill_term<typename PlonkLookupConstraint::term, Endianness>(constr.lookup_input[i])
                         );
                     }
 
@@ -124,7 +125,7 @@ namespace nil {
                     auto filled_lookup_input = std::get<0>(filled_constr.value());
                     for(size_t i = 0; i < filled_lookup_input.value().size(); i++){
                         lookup_constraint.lookup_input.emplace_back(
-                            make_non_linear_term<typename PlonkLookupConstraint::non_linear_term, Endianness>(
+                            make_term<typename PlonkLookupConstraint::term, Endianness>(
                                 filled_lookup_input.value().at(i)
                             )
                         );

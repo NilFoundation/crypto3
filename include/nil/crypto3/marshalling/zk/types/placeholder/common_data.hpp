@@ -48,27 +48,12 @@ namespace nil {
         namespace marshalling {
             namespace types {
                 /******************* placeholder public commitments***************************/
-                template<typename TTypeBase, typename PublicCommitmentsType>
+/*                template<typename TTypeBase, typename PublicCommitmentsType>
                 using public_commitments_type = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-//                      typename runtime_size_commitment_scheme_type::commitment_type id_permutation;
-                        typename merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::runtime_size_commitment_scheme_type::commitment_type>::type,
-
-//                      typename runtime_size_commitment_scheme_type::commitment_type sigma_permutation;
-                        typename  merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::runtime_size_commitment_scheme_type::commitment_type>::type,
-
-//                      typename public_input_commitment_scheme_type::commitment_type public_input;
-                        typename merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::public_input_commitment_scheme_type::commitment_type>::type,
-
-//                      typename constant_commitment_scheme_type::commitment_type constant;
-                        typename merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::constant_commitment_scheme_type::commitment_type>::type,
-
-//                      typename selector_commitment_scheme_type::commitment_type selector;
-                        typename merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::selector_commitment_scheme_type::commitment_type>::type,
-
-//                        typename special_commitment_scheme_type::commitment_type special_selectors
-                        typename merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::special_commitment_scheme_type::commitment_type>::type
+//                      typename constant_commitment_scheme_type::commitment_type fixed_values;
+                        typename merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::commitment_params_type>::type
                     >
                 >;
 
@@ -79,12 +64,7 @@ namespace nil {
                     using result_type = public_commitments_type<nil::marshalling::field_type<Endianness>, PublicCommitmentsType>;
 
                     return result_type(std::make_tuple(
-                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::runtime_size_commitment_scheme_type::commitment_type , Endianness>(commitments.id_permutation),
-                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::runtime_size_commitment_scheme_type::commitment_type , Endianness>(commitments.sigma_permutation),
-                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::public_input_commitment_scheme_type::commitment_type , Endianness>(commitments.public_input),
-                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::constant_commitment_scheme_type::commitment_type , Endianness>(commitments.constant),
-                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::selector_commitment_scheme_type::commitment_type , Endianness>(commitments.selector),
-                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::special_commitment_scheme_type::commitment_type , Endianness>(commitments.special_selectors)
+                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::commitment_params_type, Endianness>(commitments.fixed_values)
                     ));
                 }
                 
@@ -93,15 +73,10 @@ namespace nil {
                 make_public_commitments(const public_commitments_type<nil::marshalling::field_type<Endianness>, PublicCommitmentsType> &filled_public_commitments){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     PublicCommitmentsType result;
-                    result.id_permutation = make_merkle_node_value<typename PublicCommitmentsType::params_type::runtime_size_commitment_scheme_type::commitment_type , Endianness>(std::get<0>(filled_public_commitments.value()));
-                    result.sigma_permutation = make_merkle_node_value<typename PublicCommitmentsType::params_type::runtime_size_commitment_scheme_type::commitment_type , Endianness>(std::get<1>(filled_public_commitments.value()));
-                    result.public_input = make_merkle_node_value<typename PublicCommitmentsType::params_type::public_input_commitment_scheme_type::commitment_type , Endianness>(std::get<2>(filled_public_commitments.value()));
-                    result.constant =  make_merkle_node_value<typename PublicCommitmentsType::params_type::constant_commitment_scheme_type::commitment_type , Endianness>(std::get<3>(filled_public_commitments.value()));
-                    result.selector =  make_merkle_node_value<typename PublicCommitmentsType::params_type::selector_commitment_scheme_type::commitment_type , Endianness>(std::get<4>(filled_public_commitments.value()));
-                    result.special_selectors = make_merkle_node_value<typename PublicCommitmentsType::params_type::special_commitment_scheme_type::commitment_type , Endianness>(std::get<5>(filled_public_commitments.value()));
+                    result.fixed_values = make_merkle_node_value<typename PublicCommitmentsType::params_type::commitment_params_type, Endianness>(std::get<0>(filled_public_commitments.value()));
                     return result;
                 }
-
+*/
                 /******************* placeholder common data *********************************/
                 template<typename TTypeBase, typename CommonDataType>
                 using placeholder_common_data = nil::marshalling::types::bundle<
@@ -110,7 +85,7 @@ namespace nil {
 //                        std::shared_ptr<math::evaluation_domain<typename CommonDataType::field_type>> basic_domain;
 
 //                        typename CommonDataType::public_commitments_type commitments;
-                        nil::crypto3::marshalling::types::public_commitments_type<TTypeBase, typename CommonDataType::commitments_type>,
+                        typename merkle_node_value<TTypeBase, typename CommonDataType::commitments_type::params_type::runtime_size_commitment_scheme_type::commitment_type>::type,
 
 //                      std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> columns_rotations;
                         nil::marshalling::types::array_list <TTypeBase, 
@@ -125,6 +100,9 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
 
 //                      std::size_t usable_rows_amount;
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
+
+//                      std::size_t max_gates_degree;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>
                     >
                 >;
@@ -134,8 +112,8 @@ namespace nil {
                 fill_placeholder_common_data(const CommonDataType &common_data){
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using FieldType = typename CommonDataType::field_type;
-                    using PublicCommitmentsType = typename CommonDataType::commitments_type;
                     using result_type = placeholder_common_data<TTypeBase, CommonDataType>;
+                    using commitments_type = typename CommonDataType::commitments_type::params_type::runtime_size_commitment_scheme_type::commitment_type;
 
                     using array_int_marshalling_type = nil::marshalling::types::array_list <TTypeBase, 
                         nil::marshalling::types::integral<TTypeBase, int>,
@@ -156,13 +134,17 @@ namespace nil {
                         filled_columns_rotations.value().push_back(filled_column);
                     }
 
-                    public_commitments_type<TTypeBase, typename CommonDataType::commitments_type> filled_commitments = fill_public_commitments<typename CommonDataType::commitments_type, Endianness>(common_data.commitments);
+                    auto filled_commitments = 
+                    fill_merkle_node_value<commitments_type, Endianness>(
+                        common_data.commitments.fixed_values
+                    );
 
                     return result_type(std::make_tuple(
                         filled_commitments,
                         filled_columns_rotations,
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.rows_amount),
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.usable_rows_amount)
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.usable_rows_amount),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.max_gates_degree)
                     ));
                 }
 
@@ -173,21 +155,25 @@ namespace nil {
                 ){
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using FieldType = typename CommonDataType::field_type;
+                    using commitments_type = typename CommonDataType::commitments_type::params_type::runtime_size_commitment_scheme_type::commitment_type;
 
-                    auto commitments = make_public_commitments<typename CommonDataType::commitments_type, Endianness>( std::get<0>(filled_common_data.value()) );
+                    auto fixed_values = make_merkle_node_value<commitments_type, Endianness>(std::get<0>(filled_common_data.value()));
 
                     typename CommonDataType::columns_rotations_type columns_rotations;
                     for(size_t i = 0; i < std::get<1>(filled_common_data.value()).value().size(); i++){
                         auto filled_column = std::get<1>(filled_common_data.value()).value().at(i);
                         for(size_t j = 0; j < filled_column.value().size(); j++){
-                            columns_rotations[i].emplace_back(filled_column.value()[j].value());
+                            columns_rotations[i].insert(filled_column.value()[j].value());
                         }
                     }
                     
                     auto rows_amount = std::get<2>(filled_common_data.value()).value();
                     auto usable_rows_amount = std::get<3>(filled_common_data.value()).value();
+                    auto max_gates_degree = std::get<4>(filled_common_data.value()).value();
 
-                    return CommonDataType(commitments, columns_rotations, rows_amount, usable_rows_amount);
+                    typename CommonDataType::commitments_type commitments;
+                    commitments.fixed_values = fixed_values;
+                    return CommonDataType(commitments, columns_rotations, rows_amount, usable_rows_amount, max_gates_degree);
                 }
             }    // namespace types
         }        // namespace marshalling

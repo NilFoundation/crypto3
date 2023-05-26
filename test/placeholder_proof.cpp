@@ -66,16 +66,42 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/profiling.hpp>
 
-#include <nil//blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
-#include <../test/test_plonk_component.hpp>
+//#include <nil//blueprint/blueprint/plonk/assignment.hpp>
+//#include <nil/blueprint/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+
+//#include <../test/test_plonk_component.hpp>
 #include "./detail/circuits.hpp"
 
 using namespace nil;
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
+
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+    using dist_type = std::uniform_int_distribution<int>;
+    static std::random_device random_engine;
+
+    std::vector<std::size_t> step_list;
+    std::size_t steps_sum = 0;
+    while (steps_sum != r) {
+        if (r - steps_sum <= max_step) {
+            while (r - steps_sum != 1) {
+                step_list.emplace_back(r - steps_sum - 1);
+                steps_sum += step_list.back();
+            }
+            step_list.emplace_back(1);
+            steps_sum += step_list.back();
+        } else {
+            step_list.emplace_back(dist_type(1, max_step)(random_engine));
+            steps_sum += step_list.back();
+        }
+    }
+    return step_list;
+}
 
 template<typename TIter>
 void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
@@ -169,107 +195,29 @@ void test_placeholder_proof_marshalling(const Proof &proof, bool print_proof = f
     BOOST_CHECK(proof == constructed_val_read);
 }
 
-BOOST_AUTO_TEST_SUITE(placeholder_marshalling_proof_test_suite)
-// This is test template for printing blueprint components proofs
-BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) { 
-    // Add code from component test there
-    using curve_type = crypto3::algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::base_field_type;
+template<typename fri_type, typename FieldType>
+typename fri_type::params_type create_fri_params(std::size_t degree_log, const int max_step = 1) {
+    typename fri_type::params_type params;
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-    // We need this to derandomize test. It's convenient to check test with constant seed.
-    // You can change randomgen(0) to randomgen(seed) to generate a new test
-    boost::random::mt11213b randomgen(0);
+    constexpr std::size_t expand_factor = 4;
 
-    auto P = crypto3::algebra::random_element<curve_type::template g1_type<>>(randomgen).to_affine();
-    auto Q(P);
+    std::size_t r = degree_log - 1;
 
-    std::vector<typename curve_type::base_field_type::value_type> public_input = {P.X, P.Y, Q.X, Q.Y};
-    typename curve_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type expected_res = P + Q;
-    
-    constexpr std::size_t WitnessColumns = 11;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = blueprint::assignment<ArithmetizationType>;
-    using hash_type = crypto3::hashes::keccak_1600<256>;
-    constexpr std::size_t Lambda = 2;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
+        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    params.r = r;
+    params.D = domain_set;
+    params.max_degree = (1 << degree_log) - 1;
+    params.step_list = generate_random_step_list(r, max_step);
 
-    using component_type = blueprint::components::unified_addition<ArithmetizationType, curve_type, 11>;
-
-    typename component_type::input_type instance_input = {
-        {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)},
-        {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
-
-    auto result_check = [&expected_res](AssignmentType &assignment, 
-        typename component_type::result_type &real_res) {
-        assert(expected_res.X == var_value(assignment, real_res.X));
-        assert(expected_res.Y == var_value(assignment, real_res.Y));
-    };
-
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},{},{});
-
-    // Here is the piece of test_plonk_component function. It's similar for all components.
-    auto [desc, bp, assignments] =
-        prepare_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input
-        );
-
-    using placeholder_params =
-        zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
-    using types = zk::snark::detail::placeholder_policy<BlueprintFieldType, placeholder_params>;
-
-    using fri_type =
-        typename zk::commitments::fri<BlueprintFieldType, typename placeholder_params::merkle_hash_type,
-                                        typename placeholder_params::transcript_hash_type, Lambda, 2, 4>;
-
-    std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
-
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(table_rows_log);
-
-    std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
-
-    typename zk::snark::placeholder_public_preprocessor<
-        BlueprintFieldType, placeholder_params>::preprocessed_data_type public_preprocessed_data =
-        zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params>::process(
-            bp, assignments.public_table(), desc, fri_params, permutation_size);
-   typename zk::snark::placeholder_private_preprocessor<
-        BlueprintFieldType, placeholder_params>::preprocessed_data_type private_preprocessed_data =
-        zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params>::process(
-            bp, assignments.private_table(), desc, fri_params);
-
-    using ProofType = zk::snark::placeholder_proof<BlueprintFieldType, placeholder_params>;
-    ProofType proof = zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params>::process(
-        public_preprocessed_data, private_preprocessed_data, desc, bp, assignments, fri_params);
-
-    bool verifier_res = zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params>::process(
-        public_preprocessed_data, proof, bp, fri_params);
-
-    BOOST_CHECK(verifier_res);
-
-    //Test marshalling
-     using Endianness = nil::marshalling::option::big_endian;
-    test_placeholder_proof_marshalling<Endianness, ProofType>(proof, true);
-
-    using ColumnsRotationsType = std::array<std::vector<int>, ArithmetizationParams::total_columns>;
-    using TableDescriptionType = nil::crypto3::zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams>;
-
-    nil::crypto3::zk::snark::print_placeholder_params<
-        fri_type,
-        TableDescriptionType,
-        ColumnsRotationsType,
-        ArithmetizationParams        
-    >( fri_params, desc, public_preprocessed_data.common_data.columns_rotations, "params.json");
+    return params;
 }
-BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(marshalling_small_test_proof)
 
-// using curve_type = algebra::curves::bls12<381>;
+//using curve_type = algebra::curves::bls12<381>;
 using curve_type = algebra::curves::pallas;
 using FieldType = typename curve_type::base_field_type;
 
@@ -373,7 +321,7 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_2_params_test) {
     test_placeholder_proof_marshalling<Endianness, placeholder_proof<FieldType, circuit_2_params>>(proof);
 }
 
-BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_3_params_test, *boost::unit_test::disabled()) {
+BOOST_AUTO_TEST_CASE(marshalling_placeholder_proof_circuit_3_params_test/*, *boost::unit_test::disabled() */) {
     circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit =
         circuit_test_3<FieldType>();
 

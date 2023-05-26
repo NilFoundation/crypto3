@@ -13,7 +13,7 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
-#include <nil/crypto3/marshalling/math/types/non_linear_combination.hpp>
+#include <nil/crypto3/marshalling/math/types/expression.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 
 namespace nil {

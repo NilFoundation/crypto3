@@ -40,11 +40,10 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/profiling.hpp>
 
-#include <nil/crypto3/zk/blueprint/plonk.hpp>
-#include <nil/crypto3/zk/assignment/plonk.hpp>
-#include <nil/crypto3/zk/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
-#include <../test/test_plonk_component.hpp>
 #include "./detail/circuits.hpp"
 
 
@@ -52,6 +51,48 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
+
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+    using dist_type = std::uniform_int_distribution<int>;
+    static std::random_device random_engine;
+
+    std::vector<std::size_t> step_list;
+    std::size_t steps_sum = 0;
+    while (steps_sum != r) {
+        if (r - steps_sum <= max_step) {
+            while (r - steps_sum != 1) {
+                step_list.emplace_back(r - steps_sum - 1);
+                steps_sum += step_list.back();
+            }
+            step_list.emplace_back(1);
+            steps_sum += step_list.back();
+        } else {
+            step_list.emplace_back(dist_type(1, max_step)(random_engine));
+            steps_sum += step_list.back();
+        }
+    }
+    return step_list;
+}
+
+template<typename fri_type, typename FieldType>
+typename fri_type::params_type create_fri_params(std::size_t degree_log, const int max_step = 1) {
+    typename fri_type::params_type params;
+    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+
+    constexpr std::size_t expand_factor = 4;
+
+    std::size_t r = degree_log - 1;
+
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
+        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
+
+    params.r = r;
+    params.D = domain_set;
+    params.max_degree = (1 << degree_log) - 1;
+    params.step_list = generate_random_step_list(r, max_step);
+
+    return params;
+}
 
 template<typename CommonDataType>
 void test_placeholder_common_data(CommonDataType common_data){
@@ -74,64 +115,6 @@ void test_placeholder_common_data(CommonDataType common_data){
     auto constructed_val_read = nil::crypto3::marshalling::types::make_placeholder_common_data<CommonDataType, Endianness>(test_val_read);
     BOOST_CHECK(common_data == constructed_val_read);
 }
-
-BOOST_AUTO_TEST_SUITE(placeholder_marshalling_proof_test_suite)
-
-BOOST_AUTO_TEST_CASE(placeholder_proof_pallas_unified_addition_be) {
-    using namespace nil::crypto3;
-    using Endianness = nil::marshalling::option::big_endian;
-    auto start = std::chrono::high_resolution_clock::now();
-
-    using curve_type = algebra::curves::pallas;
-    using BlueprintFieldType = typename curve_type::base_field_type;
-    constexpr std::size_t WitnessColumns = 11;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
-    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    constexpr std::size_t Lambda = 5;
-
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
-
-    using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3,
-                                                                          4, 5, 6, 7, 8, 9, 10>;
-    using functor_result_check_type = curve_type::template g1_type<>; 
-
-     //auto P = curve_type::template g1_type<>::value_type::one().to_affine();
-     //auto Q = curve_type::template g1_type<>::value_type::one().to_affine();
-    auto P = algebra::random_element<curve_type::template g1_type<>>().to_affine();
-    auto Q = algebra::random_element<curve_type::template g1_type<>>().to_affine();
-
-    auto expected_res = P + Q;
-
-    typename component_type::params_type params = {
-        {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)},
-        {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
-
-    std::vector<typename BlueprintFieldType::value_type> public_input = {P.X, P.Y, Q.X, Q.Y};
-
-    auto result_check = [&expected_res](AssignmentType &assignment, component_type::result_type &real_res) {
-        assert(expected_res.X == assignment.var_value(real_res.X));
-        assert(expected_res.Y == assignment.var_value(real_res.Y));
-    };
-
-    using placeholder_params =
-        zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
-
-    auto [desc, bp, fri_params, assignments, public_preprocessed_data, private_preprocessed_data] =
-    nil::crypto3::prepare_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        params, public_input, result_check
-    );
-
-    test_placeholder_common_data(public_preprocessed_data.common_data);
-}
-BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(marshalling_placeholder_common_data_test_2)
 // using curve_type = algebra::curves::bls12<381>;
@@ -183,9 +166,12 @@ struct placeholder_test_params_lookups {
 constexpr static const std::size_t table_columns =
     placeholder_test_params::witness_columns + placeholder_test_params::public_input_columns;
 
-typedef commitments::fri<FieldType, placeholder_test_params::merkle_hash_type,
-                         placeholder_test_params::transcript_hash_type, m, 1>
-    fri_type;
+typedef commitments::fri<
+    FieldType, 
+    placeholder_test_params::merkle_hash_type,
+    placeholder_test_params::transcript_hash_type, 
+    placeholder_test_params::lambda, m, 4
+>  fri_type;
 
 typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
 typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params>
@@ -200,7 +186,7 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_2_params){
 
 //    typedef commitments::list_polynomial_commitment<FieldType,
 //        circuit_2_params::batched_commitment_params_type> lpc_type;
-    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type, 0, false> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -221,7 +207,7 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_2_params){
             constraint_system, assignments.public_table(), desc,
             fri_params, columns_with_copy_constraints.size());
 
-    test_placeholder_common_data(preprocessed_public_data.common_data);
+    test_placeholder_common_data<typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type::common_data_type>(preprocessed_public_data.common_data);
 }
 
 BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_3_params){
@@ -231,9 +217,7 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_3_params){
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-//    typedef commitments::list_polynomial_commitment<FieldType,
-//        circuit_3_params::batched_commitment_params_type> lpc_type;
-    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type, 1, true> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type> lpc_type;
 
     typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
 
@@ -251,6 +235,6 @@ BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_3_params){
         placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
             constraint_system, assignments.public_table(), desc, fri_params, 0);
 
-    test_placeholder_common_data(preprocessed_public_data.common_data);
+    test_placeholder_common_data<typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type::common_data_type>(preprocessed_public_data.common_data);
 }
 BOOST_AUTO_TEST_SUITE_END()

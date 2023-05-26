@@ -41,8 +41,8 @@
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 
-#include <nil/crypto3/marshalling/math/types/non_linear_term.hpp>
-#include <nil/crypto3/marshalling/math/types/non_linear_combination.hpp>
+#include <nil/crypto3/marshalling/math/types/term.hpp>
+#include <nil/crypto3/marshalling/math/types/expression.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/gate.hpp>
@@ -69,63 +69,18 @@ void print_field_element(std::ostream &os,
 }
 
 template<typename Field>
-bool are_variables_equal(const nil::crypto3::zk::snark::plonk_variable<Field> &lhs,
-                         const nil::crypto3::zk::snark::plonk_variable<Field> &rhs) {
-    if (lhs.index != rhs.index)
-        return false;
-    if (lhs.relative != rhs.relative)
-        return false;
-    if (lhs.rotation != rhs.rotation)
-        return false;
-    if (lhs.type != rhs.type)
-        return false;
-    return true;
-}
-
-template<typename Field>
-bool are_non_linear_terms_equal(
-    const nil::crypto3::math::non_linear_term<nil::crypto3::zk::snark::plonk_variable<Field>> &lhs,
-    const nil::crypto3::math::non_linear_term<nil::crypto3::zk::snark::plonk_variable<Field>> &rhs) {
-    if (lhs.coeff != rhs.coeff) {
-        return false;
-    }
-    if (lhs.vars.size() != rhs.vars.size()) {
-        return false;
-    }
-    for (auto i = 0; i < lhs.vars.size(); i++) {
-        if (!are_variables_equal(lhs.vars[i], rhs.vars[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-template<typename Field>
-bool are_non_linear_combinations_equal(
-    const nil::crypto3::math::non_linear_combination<nil::crypto3::zk::snark::plonk_variable<Field>> &lhs,
-    const nil::crypto3::math::non_linear_combination<nil::crypto3::zk::snark::plonk_variable<Field>> &rhs) {
-    if (lhs.terms.size() != rhs.terms.size())
-        return false;
-    for (auto i = 0; i < lhs.terms.size(); i++) {
-        if (!are_non_linear_terms_equal(lhs.terms[i], rhs.terms[i]))
-            return false;
-    }
-    return true;
-}
-
-template<typename Field>
 bool are_lookup_constraints_equal(
     const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &lhs,
     const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &rhs
 ){
     if(lhs.lookup_input.size() != rhs.lookup_input.size() ) return false;
     for( size_t i = 0; i < lhs.lookup_input.size(); i++ ){
-        if(! are_non_linear_terms_equal(lhs.lookup_input[i], rhs.lookup_input[i])) return false;
+        if(lhs.lookup_input[i] != rhs.lookup_input[i]) return false;
     }
 
     if(lhs.lookup_value.size() != rhs.lookup_value.size() ) return false;
     for( size_t i = 0; i < lhs.lookup_value.size(); i++ ){
-        if(!are_variables_equal(lhs.lookup_value[i], rhs.lookup_value[i])) return false;
+        if(lhs.lookup_value[i] != rhs.lookup_value[i]) return false;
     }
     return true;
 }
@@ -140,7 +95,7 @@ bool are_plonk_gates_equal(
     if (lhs.constraints.size() != rhs.constraints.size())
         return false;
     for (auto i = 0; i < lhs.constraints.size(); i++) {
-        if (!are_non_linear_combinations_equal(lhs.constraints[i], rhs.constraints[i]))
+        if (lhs.constraints[i] != rhs.constraints[i])
             return false;
     }
     return true;
@@ -188,8 +143,8 @@ PlonkVariable generate_random_plonk_variable() {
 }
 
 template<typename PlonkVariable>
-nil::crypto3::math::non_linear_term<PlonkVariable> generate_random_plonk_non_linear_term(std::size_t vars_n) {
-    nil::crypto3::math::non_linear_term<PlonkVariable> result;
+nil::crypto3::math::term<PlonkVariable> generate_random_plonk_term(std::size_t vars_n) {
+    nil::crypto3::math::term<PlonkVariable> result;
     nil::crypto3::random::algebraic_random_device<typename PlonkVariable::field_type> d;
     result.coeff = d();
     for (auto i = 0; i < vars_n; i++) {
@@ -199,13 +154,13 @@ nil::crypto3::math::non_linear_term<PlonkVariable> generate_random_plonk_non_lin
 }
 
 template<typename PlonkVariable>
-nil::crypto3::math::non_linear_combination<PlonkVariable>
-    generate_random_plonk_non_linear_combination(std::size_t vars_n, std::size_t terms_n) {
-    nil::crypto3::math::non_linear_combination<PlonkVariable> comb;
-    for (auto i = 0; i < terms_n; i++) {
-        comb.terms.template emplace_back(generate_random_plonk_non_linear_term<PlonkVariable>(vars_n));
+nil::crypto3::math::expression<PlonkVariable>
+    generate_random_plonk_expression(std::size_t vars_n, std::size_t terms_n) {
+    nil::crypto3::math::expression<PlonkVariable> expr(generate_random_plonk_term<PlonkVariable>(vars_n));
+    for (auto i = 0; i < terms_n - 1; i++) {
+        expr += generate_random_plonk_term<PlonkVariable>(vars_n);
     }
-    return comb;
+    return expr;
 }
 
 template<typename Field>
@@ -219,7 +174,7 @@ generate_random_plonk_gate(std::size_t vars_n, std::size_t terms_n, std::size_t 
     std::vector<constraint_type> constraints;
     for (auto i = 0; i < constr_n; i++) {
         constraints.template emplace_back(
-            generate_random_plonk_non_linear_combination<nil::crypto3::zk::snark::plonk_variable<Field>>(vars_n,
+            generate_random_plonk_expression<nil::crypto3::zk::snark::plonk_variable<Field>>(vars_n,
                                                                                                          terms_n));
     }
     return {selector_index, constraints};
@@ -230,7 +185,7 @@ nil::crypto3::zk::snark::plonk_lookup_constraint<Field> generate_random_plonk_lo
     nil::crypto3::zk::snark::plonk_lookup_constraint<Field> result;
 
     for( size_t i = 0; i < inp_len; i++ ){
-        result.lookup_input.push_back(generate_random_plonk_non_linear_term<nil::crypto3::zk::snark::plonk_variable<Field>>(vars_n));
+        result.lookup_input.push_back(generate_random_plonk_term<nil::crypto3::zk::snark::plonk_variable<Field>>(vars_n));
     }
     for( size_t i = 0; i < value_len; i++ ){
         result.lookup_value.push_back(generate_random_plonk_variable<nil::crypto3::zk::snark::plonk_variable<Field>>());
@@ -266,7 +221,7 @@ void test_plonk_variable() {
 
     auto filled_val = nil::crypto3::marshalling::types::fill_variable<value_type, Endianness>(val);
     auto _val = types::make_variable<value_type, Endianness>(filled_val);
-    BOOST_CHECK(are_variables_equal(val, _val));
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -279,7 +234,7 @@ void test_plonk_variable() {
     status = test_val_read.read(read_iter, cv.size());
     auto constructed_val_read = types::make_variable<value_type, Endianness>(test_val_read);
     BOOST_CHECK(val == constructed_val_read);
-    BOOST_CHECK(are_variables_equal(val, constructed_val_read));
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -299,7 +254,7 @@ void test_plonk_variables(std::size_t n) {
     auto _val = types::make_variables<value_type, Endianness>(filled_val);
     BOOST_CHECK(val.size() == _val.size());
     for( std::size_t i = 0; i < val.size(); i++ ){
-        BOOST_CHECK(are_variables_equal(val[i], _val[i]));
+        BOOST_CHECK(val[i] == _val[i]);
     }
 
     std::vector<std::uint8_t> cv;
@@ -314,24 +269,24 @@ void test_plonk_variables(std::size_t n) {
     auto constructed_val_read = types::make_variables<value_type, Endianness>(test_val_read);
     BOOST_CHECK(val.size() == _val.size());
     for( std::size_t i = 0; i < val.size(); i++ ){
-        BOOST_CHECK(are_variables_equal(val[i], _val[i]));
+        BOOST_CHECK(val[i] == _val[i]);
     }
 }
 
 template<typename Field, typename Endianness>
-void test_plonk_non_linear_term(std::size_t vars_n) {
+void test_plonk_term(std::size_t vars_n) {
     using namespace nil::crypto3::marshalling;
 
     using variable_type = nil::crypto3::zk::snark::plonk_variable<Field>;
-    using value_type = nil::crypto3::math::non_linear_term<variable_type>;
+    using value_type = nil::crypto3::math::term<variable_type>;
     using value_marshalling_type =
-        typename types::non_linear_term<nil::marshalling::field_type<Endianness>, value_type>::type;
+        typename types::term<nil::marshalling::field_type<Endianness>, value_type>::type;
 
-    auto val = generate_random_plonk_non_linear_term<variable_type>(vars_n);
+    auto val = generate_random_plonk_term<variable_type>(vars_n);
 
-    auto filled_val = types::fill_non_linear_term<value_type, Endianness>(val);
-    auto _val = types::make_non_linear_term<value_type, Endianness>(filled_val);
-    BOOST_CHECK(are_non_linear_terms_equal(val, _val));
+    auto filled_val = types::fill_term<value_type, Endianness>(val);
+    auto _val = types::make_term<value_type, Endianness>(filled_val);
+    BOOST_CHECK_EQUAL(val, _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -342,24 +297,24 @@ void test_plonk_non_linear_term(std::size_t vars_n) {
     value_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
-    auto constructed_val_read = types::make_non_linear_term<value_type, Endianness>(test_val_read);
-    BOOST_CHECK(are_non_linear_terms_equal(val, constructed_val_read));
+    auto constructed_val_read = types::make_term<value_type, Endianness>(test_val_read);
+    BOOST_CHECK_EQUAL(val, constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
-void test_non_linear_combination(std::size_t vars_n, std::size_t terms_n) {
+void test_expression(std::size_t vars_n, std::size_t terms_n) {
     using namespace nil::crypto3::marshalling;
 
     using variable_type = nil::crypto3::zk::snark::plonk_variable<Field>;
-    using value_type = nil::crypto3::math::non_linear_combination<variable_type>;
+    using value_type = nil::crypto3::math::expression<variable_type>;
     using value_marshalling_type =
-        typename types::non_linear_combination<nil::marshalling::field_type<Endianness>, value_type>::type;
+        typename types::expression<nil::marshalling::field_type<Endianness>, value_type>::type;
 
-    auto val = generate_random_plonk_non_linear_combination<variable_type>(vars_n, terms_n);
+    auto val = generate_random_plonk_expression<variable_type>(vars_n, terms_n);
 
-    auto filled_val = types::fill_non_linear_combination<value_type, Endianness>(val);
-    auto _val = types::make_non_linear_combination<value_type, Endianness>(filled_val);
-    BOOST_CHECK(are_non_linear_combinations_equal(val, _val));
+    auto filled_val = types::fill_expression<value_type, Endianness>(val);
+    auto _val = types::make_expression<value_type, Endianness>(filled_val);
+    BOOST_CHECK_EQUAL(val, _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -370,8 +325,8 @@ void test_non_linear_combination(std::size_t vars_n, std::size_t terms_n) {
     value_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
-    auto constructed_val_read = types::make_non_linear_combination<value_type, Endianness>(test_val_read);
-    BOOST_CHECK(are_non_linear_combinations_equal(val, constructed_val_read));
+    auto constructed_val_read = types::make_expression<value_type, Endianness>(test_val_read);
+    BOOST_CHECK_EQUAL(val, constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -382,11 +337,11 @@ void test_plonk_constraint(std::size_t vars_n, std::size_t terms_n) {
     using value_type = nil::crypto3::zk::snark::plonk_constraint<Field, variable_type>;
     using value_marshalling_type = types::plonk_constraint<nil::marshalling::field_type<Endianness>, value_type>;
 
-    auto val = value_type(generate_random_plonk_non_linear_combination<variable_type>(vars_n, terms_n));
+    auto val = value_type(generate_random_plonk_expression<variable_type>(vars_n, terms_n));
 
     auto filled_val = types::fill_plonk_constraint<value_type, Endianness>(val);
     auto _val = types::make_plonk_constraint<value_type, Endianness>(filled_val);
-    BOOST_CHECK(are_non_linear_combinations_equal(val, _val));
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -398,7 +353,7 @@ void test_plonk_constraint(std::size_t vars_n, std::size_t terms_n) {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     auto constructed_val_read = types::make_plonk_constraint<value_type, Endianness>(test_val_read);
-    BOOST_CHECK(are_non_linear_combinations_equal(val, constructed_val_read));
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -412,14 +367,14 @@ void test_plonk_constraints(std::size_t vars_n, std::size_t terms_n, std::size_t
 
     value_type val;
     for( std::size_t i = 0; i < constraints_n; i++ ){
-        val.emplace_back(generate_random_plonk_non_linear_combination<variable_type>(vars_n, terms_n));
+        val.emplace_back(generate_random_plonk_expression<variable_type>(vars_n, terms_n));
     }
 
     auto filled_val = types::fill_plonk_constraints<constraint_type, Endianness>(val);
     auto _val = types::make_plonk_constraints<constraint_type, Endianness>(filled_val);
     BOOST_CHECK(val.size() == _val.size());
     for( std::size_t i = 0; i < _val.size(); i++){
-        BOOST_CHECK(are_non_linear_combinations_equal(val[i], _val[i]));
+        BOOST_CHECK(val[i] == _val[i]);
     }  
 
     std::vector<std::uint8_t> cv;
@@ -435,7 +390,7 @@ void test_plonk_constraints(std::size_t vars_n, std::size_t terms_n, std::size_t
 
     BOOST_CHECK(val.size() == constructed_val_read.size());
     for( std::size_t i = 0; i < val.size(); i++){
-        BOOST_CHECK(are_non_linear_combinations_equal(val[i], constructed_val_read[i]));
+        BOOST_CHECK(val[i] == constructed_val_read[i]);
     }  
 }
     
@@ -651,12 +606,12 @@ BOOST_AUTO_TEST_CASE(marshalling_plonk_variables) {
     test_plonk_variables<field_type,endianness>(50);
 }
 
-BOOST_AUTO_TEST_CASE(marshalling_plonk_non_linear_term) {
-    test_plonk_non_linear_term<field_type, endianness>(50);
+BOOST_AUTO_TEST_CASE(marshalling_plonk_term) {
+    test_plonk_term<field_type, endianness>(50);
 }
 
-BOOST_AUTO_TEST_CASE(marshalling_plonk_non_linear_combination) {
-    test_non_linear_combination<field_type, endianness>(50, 50);
+BOOST_AUTO_TEST_CASE(marshalling_plonk_expression) {
+    test_expression<field_type, endianness>(50, 50);
 }
 
 BOOST_AUTO_TEST_CASE(marshalling_plonk_constraint) {
