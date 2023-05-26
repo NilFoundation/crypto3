@@ -28,6 +28,7 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <nil/crypto3/zk/math/expression.hpp>
+#include <nil/crypto3/zk/math/non_linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -163,6 +164,55 @@ namespace nil {
                     std::function<void(const VariableType&)> callback;
             };
 
+            // Converts tree-structured expression to flat one, a vector of terms.
+            // Used for generating solidity code for constraints, because we want 
+            // to use minimal number of variables in the stack.
+            template<typename VariableType>
+            class expression_to_non_linear_combination_visitor 
+                : public boost::static_visitor<math::non_linear_combination<VariableType>> {
+            public:
+                expression_to_non_linear_combination_visitor() {}
+
+                math::non_linear_combination<VariableType> convert(
+                        const math::expression<VariableType>& expr) {
+                    return boost::apply_visitor(*this, expr.expr);
+                }
+
+                math::non_linear_combination<VariableType> operator()(
+                        const math::term<VariableType>& term) {
+                    return math::non_linear_combination<VariableType>(term);
+                }
+
+                math::non_linear_combination<VariableType> operator()(
+                        const math::pow_operation<VariableType>& pow) {
+                    math::non_linear_combination<VariableType> base = boost::apply_visitor(
+                        *this, pow.expr.expr);
+                    math::non_linear_combination<VariableType> result = base;
+
+                    // It does not matter how we compute power here.
+                    for (int i = 1; i < pow.power; ++i)
+                    {
+                        result = result * base;
+                    }
+                    return result;
+                }
+
+                math::non_linear_combination<VariableType> operator()(
+                        const math::binary_arithmetic_operation<VariableType>& op) {
+                    math::non_linear_combination<VariableType> left =
+                        boost::apply_visitor(*this, op.expr_left.expr);
+                    math::non_linear_combination<VariableType> right =
+                        boost::apply_visitor(*this, op.expr_right.expr);
+                    switch (op.op) {
+                        case ArithmeticOperator::ADD:
+                            return left + right;
+                        case ArithmeticOperator::SUB:
+                            return left - right;
+                        case ArithmeticOperator::MULT:
+                            return left * right;
+                    }
+                }
+            };
         }    // namespace math
     }            // namespace crypto3
 }    // namespace nil

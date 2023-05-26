@@ -70,6 +70,7 @@ set(TESTS_NAMES
     "commitment/type_traits"
     "commitment/kimchi_pedersen"
 
+    "math/expression"
 
     "routing_algorithms/test_routing_algorithms"
 
