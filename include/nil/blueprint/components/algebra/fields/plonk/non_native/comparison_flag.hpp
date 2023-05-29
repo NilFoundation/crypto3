@@ -22,7 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#pragma once
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_NON_NATIVE_COMPARISON_FLAG_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_NON_NATIVE_COMPARISON_FLAG_HPP
 
 #include <cmath>
 
@@ -596,3 +597,5 @@ namespace nil {
         }   // namespace components
     }       // namespace blueprint
 }   // namespace nil
+
+#endif  // CRYPTO3_BLUEPRINT_COMPONENTS_NON_NATIVE_COMPARISON_FLAG_HPP

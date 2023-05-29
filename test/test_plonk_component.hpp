@@ -55,7 +55,6 @@
 #include <functional>
 #include <utility>
 #include <map>
-#include <sstream>
 
 namespace nil {
     namespace crypto3 {

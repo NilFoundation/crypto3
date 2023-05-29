@@ -22,7 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#pragma once
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_ALGEBRA_FIELDS_PLONK_NON_NATIVE_COMPARISON_UNCHECKED_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_ALGEBRA_FIELDS_PLONK_NON_NATIVE_COMPARISON_UNCHECKED_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
@@ -330,3 +331,5 @@ namespace nil {
         }    // namespace components
     }        // namespace blueprint
 }   // namespace nil
+
+#endif  // CRYPTO3_BLUEPRINT_COMPONENTS_ALGEBRA_FIELDS_PLONK_NON_NATIVE_COMPARISON_UNCHECKED_HPP
