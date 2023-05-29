@@ -78,7 +78,7 @@ namespace nil {
                     constexpr static const std::size_t bits_per_row = chunks_per_row * chunk_size;
 
                     constexpr static const std::size_t rows_amount =
-                        1 + (R + bits_per_row - 1) / bits_per_row;    // ceil(R / bits_per_row)
+                        1 + (R + bits_per_row - 1) / bits_per_row;    // 1 + ceil(R / bits_per_row)
                     constexpr static const std::size_t padded_chunks = (rows_amount - 1) * chunks_per_row;
                     constexpr static const std::size_t padding_size = padded_chunks - (R + chunk_size - 1) / chunk_size;
                     constexpr static const std::size_t padding_bits = padded_chunks * chunk_size - R;

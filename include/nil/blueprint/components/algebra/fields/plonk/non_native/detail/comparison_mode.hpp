@@ -22,16 +22,16 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARSION_MODE_HPP
-#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARSION_MODE_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARISON_MODE_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARISON_MODE_HPP
 
 namespace nil {
     namespace blueprint {
         namespace components {
             namespace detail {
                 // Ordering is important here: the logic differs for FLAG and non-FLAG modes.
-                // We use comparsion with comparsion_mode::FLAG in order to distinguish between the two cases.
-                enum comparsion_mode {
+                // We use comparison with comparison_mode::FLAG in order to distinguish between the two cases.
+                enum comparison_mode {
                     FLAG,
                     LESS_THAN,
                     LESS_EQUAL,
@@ -43,4 +43,4 @@ namespace nil {
     }           // namespace blueprint
 }   // namespace nil
 
-#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARSION_MODE_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_NON_NATIVE_DETAIL_COMPARISON_MODE_HPP

@@ -100,17 +100,73 @@ namespace nil {
             return params;
         }
 
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams>
+        class plonk_test_assigner {
+        public:
+            virtual typename ComponentType::result_type operator()(
+                const ComponentType&,
+                nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                            ArithmetizationParams>>&,
+                const typename ComponentType::input_type&,
+                const std::uint32_t) const = 0;
+        };
+
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams>
+        class plonk_test_default_assigner :
+            public plonk_test_assigner<ComponentType, BlueprintFieldType, ArithmetizationParams> {
+        public:
+            typename ComponentType::result_type operator()(
+                const ComponentType &component,
+                nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                            ArithmetizationParams>>
+                    &assignment,
+                const typename ComponentType::input_type &instance_input,
+                const std::uint32_t start_row_index) const override {
+
+                return blueprint::components::generate_assignments<BlueprintFieldType,
+                                                                   ArithmetizationParams>(
+                            component, assignment, instance_input, start_row_index);
+            }
+        };
+
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams>
+        class plonk_test_custom_assigner :
+            public plonk_test_assigner<ComponentType, BlueprintFieldType, ArithmetizationParams> {
+
+            using assigner_type =
+                std::function<typename ComponentType::result_type(
+                    const ComponentType&,
+                    nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                            ArithmetizationParams>>&,
+                    const typename ComponentType::input_type&,
+                    const std::uint32_t)>;
+            assigner_type assigner;
+        public:
+            plonk_test_custom_assigner(assigner_type assigner) : assigner(assigner) {};
+
+            typename ComponentType::result_type operator()(
+                const ComponentType &component,
+                nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                            ArithmetizationParams>>
+                    &assignment,
+                const typename ComponentType::input_type &instance_input,
+                const std::uint32_t start_row_index) const override {
+
+                return this->assigner(component, assignment, instance_input, start_row_index);
+            }
+        };
+
         template<
             typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-            std::size_t Lambda, typename FunctorResultCheck, typename FunctorCustomAssignment,
-            typename PublicInputContainerType,
+            std::size_t Lambda, typename FunctorResultCheck, typename PublicInputContainerType,
             typename std::enable_if<std::is_same<typename BlueprintFieldType::value_type,
                                                  typename std::iterator_traits<
                                                      typename PublicInputContainerType::iterator>::value_type>::value,
                                     bool>::type = true>
         auto prepare_component(ComponentType component_instance, const PublicInputContainerType &public_input,
                                const FunctorResultCheck &result_check,
-                               const FunctorCustomAssignment &custom_assignment,
+                               const plonk_test_assigner<ComponentType, BlueprintFieldType,
+                                                         ArithmetizationParams> &assigner,
                                typename ComponentType::input_type instance_input,
                                bool expected_to_pass) {
 
@@ -130,13 +186,8 @@ namespace nil {
                 component_instance, bp, assignment, instance_input, start_row);
             boost::variant<bool, typename component_type::result_type> component_result;
 
-            if constexpr (std::is_same<FunctorCustomAssignment, bool>::value) {
-                component_result = blueprint::components::generate_assignments<BlueprintFieldType,
-                                                                               ArithmetizationParams>(
-                            component_instance, assignment, instance_input, start_row);
-            } else {
-                component_result = custom_assignment(component_instance, assignment, instance_input, start_row);
-            }
+            component_result = assigner(component_instance, assignment, instance_input, start_row);
+
             result_check(assignment, boost::get<typename component_type::result_type>(component_result));
 
             zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
@@ -156,19 +207,20 @@ namespace nil {
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck,
-                 typename FunctorCustomAssignments>
+                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck>
         typename std::enable_if<
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
             test_component_inner(ComponentType component_instance, const PublicInputContainerType &public_input,
-                           FunctorResultCheck result_check, FunctorCustomAssignments custom_assignment,
-                           typename ComponentType::input_type instance_input,
-                           bool expected_to_pass) {
+                            const FunctorResultCheck &result_check,
+                            const plonk_test_assigner<ComponentType, BlueprintFieldType, ArithmetizationParams>
+                                &assigner,
+                            const typename ComponentType::input_type &instance_input,
+                            bool expected_to_pass) {
             auto [desc, bp, assignments] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                  FunctorResultCheck, FunctorCustomAssignments>(component_instance, public_input,
-                                        result_check, custom_assignment, instance_input, expected_to_pass);
+                                  FunctorResultCheck>(component_instance, public_input,
+                                        result_check, assigner, instance_input, expected_to_pass);
 
 #ifdef BLUEPRINT_PLACEHOLDER_PROOF_GEN_ENABLED
             using placeholder_params =
@@ -216,9 +268,11 @@ namespace nil {
                            FunctorResultCheck result_check,
                            typename ComponentType::input_type instance_input) {
             return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                 PublicInputContainerType, FunctorResultCheck, bool>(component_instance, public_input,
-                                                                               result_check, false, instance_input,
-                                                                               true);
+                                 PublicInputContainerType, FunctorResultCheck>(
+                                    component_instance, public_input, result_check,
+                                    plonk_test_default_assigner<ComponentType, BlueprintFieldType,
+                                                                ArithmetizationParams>(),
+                                    instance_input, true);
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
@@ -230,42 +284,44 @@ namespace nil {
                            FunctorResultCheck result_check,
                            typename ComponentType::input_type instance_input) {
             return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                 PublicInputContainerType, FunctorResultCheck, bool>(component_instance, public_input,
-                                                                               result_check, false, instance_input,
-                                                                               false);
+                                 PublicInputContainerType, FunctorResultCheck>(
+                                    component_instance, public_input, result_check,
+                                    plonk_test_default_assigner<ComponentType, BlueprintFieldType,
+                                                                ArithmetizationParams>(),
+                                    instance_input, false);
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck,
-                 typename FunctorCustomAssignments>
+                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck>
         typename std::enable_if<
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
             test_component_custom_assignments(ComponentType component_instance,
                             const PublicInputContainerType &public_input, FunctorResultCheck result_check,
-                            FunctorCustomAssignments custom_assignments,
+                            const plonk_test_custom_assigner<ComponentType, BlueprintFieldType,
+                                                             ArithmetizationParams> &custom_assigner,
                             typename ComponentType::input_type instance_input) {
 
                 return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                 PublicInputContainerType, FunctorResultCheck, FunctorCustomAssignments>
-                                    (component_instance, public_input, result_check, custom_assignments,
+                                 PublicInputContainerType, FunctorResultCheck>
+                                    (component_instance, public_input, result_check, custom_assigner,
                                      instance_input, true);
             }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
-                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck,
-                 typename FunctorCustomAssignments>
+                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck>
         typename std::enable_if<
             std::is_same<typename BlueprintFieldType::value_type,
                          typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
             test_component_to_fail_custom_assignments(ComponentType component_instance,
                             const PublicInputContainerType &public_input, FunctorResultCheck result_check,
-                            FunctorCustomAssignments custom_assignments,
+                            const plonk_test_custom_assigner<ComponentType, BlueprintFieldType,
+                                                             ArithmetizationParams> &custom_assigner,
                             typename ComponentType::input_type instance_input) {
 
                 return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                 PublicInputContainerType, FunctorResultCheck, FunctorCustomAssignments>
-                                    (component_instance, public_input, result_check, custom_assignments,
+                                 PublicInputContainerType, FunctorResultCheck>
+                                    (component_instance, public_input, result_check, custom_assigner,
                                      instance_input, false);
             }
 

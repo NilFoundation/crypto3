@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_non_native_comparsion_test
+#define BOOST_TEST_MODULE blueprint_plonk_non_native_comparison_checked_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -42,15 +42,15 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
-#include <nil/blueprint/components/algebra/fields/plonk/non_native/comparsion.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/comparison_checked.hpp>
 
 #include "test_plonk_component.hpp"
 
-using nil::blueprint::components::detail::comparsion_mode;
+using nil::blueprint::components::detail::comparison_mode;
 
 template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R,
-         comparsion_mode Mode, bool CustomAssignments = false >
-auto test_comparsion(typename BlueprintFieldType::value_type x,
+         comparison_mode Mode, bool CustomAssignments = false >
+auto test_comparison_checked(typename BlueprintFieldType::value_type x,
                      typename BlueprintFieldType::value_type y,
                      const std::map<std::pair<std::size_t, std::size_t>,
                                     typename BlueprintFieldType::value_type> &patches = {}) {
@@ -67,7 +67,7 @@ auto test_comparsion(typename BlueprintFieldType::value_type x,
 
     using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     using value_type = typename BlueprintFieldType::value_type;
-    using component_type = nil::blueprint::components::comparsion<ArithmetizationType, WitnessesAmount, R, Mode>;
+    using component_type = nil::blueprint::components::comparison_checked<ArithmetizationType, WitnessesAmount, R, Mode>;
 
     var x_var(0, 0, false, var::column_type::public_input),
         y_var(0, 1, false, var::column_type::public_input);
@@ -81,16 +81,16 @@ auto test_comparsion(typename BlueprintFieldType::value_type x,
     value_type max_val = value_type(2).pow(R);
     bool expected_to_pass = x < max_val && y < max_val;
     switch (Mode) {
-        case comparsion_mode::LESS_THAN:
+        case comparison_mode::LESS_THAN:
             expected_to_pass &= x < y;
             break;
-        case comparsion_mode::LESS_EQUAL:
+        case comparison_mode::LESS_EQUAL:
             expected_to_pass &= x <= y;
             break;
-        case comparsion_mode::GREATER_THAN:
+        case comparison_mode::GREATER_THAN:
             expected_to_pass &= x > y;
             break;
-        case comparsion_mode::GREATER_EQUAL:
+        case comparison_mode::GREATER_EQUAL:
             expected_to_pass &= x >= y;
             break;
     }
@@ -131,23 +131,23 @@ auto test_comparsion(typename BlueprintFieldType::value_type x,
     }
 }
 
-template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R, comparsion_mode Mode>
-void test_comparsion_specific_inputs() {
+template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R, comparison_mode Mode>
+void test_comparison_checked_specific_inputs() {
     using value_type = typename BlueprintFieldType::value_type;
 
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(0, 42);
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(400 - 1, 400);
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(70, 70);
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(700001, 700001);
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(-1, 404);
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(300 - value_type(2).pow(R) + 1, 300);
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(value_type(2).pow(R) + 1, value_type(2).pow(R));
-    test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(value_type(2).pow(R), -1);
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(0, 42);
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(400 - 1, 400);
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(70, 70);
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(700001, 700001);
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(-1, 404);
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(300 - value_type(2).pow(R) + 1, 300);
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(value_type(2).pow(R) + 1, value_type(2).pow(R));
+    test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(value_type(2).pow(R), -1);
 }
 
 template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R,
-         comparsion_mode Mode, std::size_t RandomTestsAmount>
-void test_comparsion_random_inputs() {
+         comparison_mode Mode, std::size_t RandomTestsAmount>
+void test_comparison_checked_random_inputs() {
     using value_type = typename BlueprintFieldType::value_type;
     using integral_type = typename BlueprintFieldType::integral_type;
 
@@ -164,9 +164,9 @@ void test_comparsion_random_inputs() {
         x = value_type(x_integral);
         y = value_type(y_integral);
 
-        test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(x, y);
-        test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(y, x);
-        test_comparsion<BlueprintFieldType, WitnessesAmount, R, Mode>(x, x);
+        test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(x, y);
+        test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(y, x);
+        test_comparison_checked<BlueprintFieldType, WitnessesAmount, R, Mode>(x, x);
 	}
 }
 
@@ -174,86 +174,86 @@ constexpr static const std::size_t random_tests_amount = 10;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_15_4_less_than) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_vesta_15_4_less_than) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     using value_type = typename field_type::value_type;
-    test_comparsion_specific_inputs<field_type, 15, 4, comparsion_mode::LESS_THAN>();
-    test_comparsion_random_inputs<field_type, 15, 4, comparsion_mode::LESS_THAN, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 15, 4, comparison_mode::LESS_THAN>();
+    test_comparison_checked_random_inputs<field_type, 15, 4, comparison_mode::LESS_THAN, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_15_128_greater_than) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_vesta_15_128_greater_than) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 15, 128, comparsion_mode::GREATER_THAN>();
-    test_comparsion_random_inputs<field_type, 15, 128, comparsion_mode::GREATER_THAN, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 15, 128, comparison_mode::GREATER_THAN>();
+    test_comparison_checked_random_inputs<field_type, 15, 128, comparison_mode::GREATER_THAN, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_15_251_greater_equal) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_pallas_15_251_greater_equal) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 15, 251, comparsion_mode::GREATER_EQUAL>();
-    test_comparsion_random_inputs<field_type, 15, 251, comparsion_mode::GREATER_EQUAL, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 15, 251, comparison_mode::GREATER_EQUAL>();
+    test_comparison_checked_random_inputs<field_type, 15, 251, comparison_mode::GREATER_EQUAL, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_15_253_less_equal) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_vesta_15_253_less_equal) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 15, 253, comparsion_mode::LESS_EQUAL>();
-    test_comparsion_random_inputs<field_type, 15, 253, comparsion_mode::LESS_EQUAL, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 15, 253, comparison_mode::LESS_EQUAL>();
+    test_comparison_checked_random_inputs<field_type, 15, 253, comparison_mode::LESS_EQUAL, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_9_4_less_than) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_vesta_9_4_less_than) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 9, 4, comparsion_mode::LESS_THAN>();
-    test_comparsion_random_inputs<field_type, 9, 4, comparsion_mode::LESS_THAN, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 9, 4, comparison_mode::LESS_THAN>();
+    test_comparison_checked_random_inputs<field_type, 9, 4, comparison_mode::LESS_THAN, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_9_32_greater_than) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_pallas_9_32_greater_than) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 9, 32, comparsion_mode::GREATER_THAN>();
-    test_comparsion_random_inputs<field_type, 9, 32, comparsion_mode::GREATER_THAN, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 9, 32, comparison_mode::GREATER_THAN>();
+    test_comparison_checked_random_inputs<field_type, 9, 32, comparison_mode::GREATER_THAN, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_3_16_greater_equal) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_pallas_3_16_greater_equal) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 3, 16, comparsion_mode::GREATER_EQUAL>();
-    test_comparsion_random_inputs<field_type, 3, 16, comparsion_mode::GREATER_EQUAL, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 3, 16, comparison_mode::GREATER_EQUAL>();
+    test_comparison_checked_random_inputs<field_type, 3, 16, comparison_mode::GREATER_EQUAL, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_3_16_greater_than) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_pallas_3_16_greater_than) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 3, 16, comparsion_mode::GREATER_THAN>();
-    test_comparsion_random_inputs<field_type, 3, 16, comparsion_mode::GREATER_THAN, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 3, 16, comparison_mode::GREATER_THAN>();
+    test_comparison_checked_random_inputs<field_type, 3, 16, comparison_mode::GREATER_THAN, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_9_33_less_equal) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_pallas_9_33_less_equal) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 9, 33, comparsion_mode::LESS_EQUAL>();
-    test_comparsion_random_inputs<field_type, 9, 33, comparsion_mode::LESS_EQUAL, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 9, 33, comparison_mode::LESS_EQUAL>();
+    test_comparison_checked_random_inputs<field_type, 9, 33, comparison_mode::LESS_EQUAL, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_9_64_greater_equal) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_pallas_9_64_greater_equal) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 9, 64, comparsion_mode::GREATER_EQUAL>();
-    test_comparsion_random_inputs<field_type, 9, 64, comparsion_mode::GREATER_EQUAL, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 9, 64, comparison_mode::GREATER_EQUAL>();
+    test_comparison_checked_random_inputs<field_type, 9, 64, comparison_mode::GREATER_EQUAL, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_vesta_9_127_less_than) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_vesta_9_127_less_than) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 9, 127, comparsion_mode::LESS_THAN>();
-    test_comparsion_random_inputs<field_type, 9, 127, comparsion_mode::LESS_THAN, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 9, 127, comparison_mode::LESS_THAN>();
+    test_comparison_checked_random_inputs<field_type, 9, 127, comparison_mode::LESS_THAN, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_pallas_15_253_greater_than) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_pallas_15_253_greater_than) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
-    test_comparsion_specific_inputs<field_type, 9, 253, comparsion_mode::GREATER_THAN>();
-    test_comparsion_random_inputs<field_type, 9, 253, comparsion_mode::GREATER_THAN, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 9, 253, comparison_mode::GREATER_THAN>();
+    test_comparison_checked_random_inputs<field_type, 9, 253, comparison_mode::GREATER_THAN, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_mnt4_15_less_equal) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_mnt4_15_less_equal) {
     using field_type = nil::crypto3::algebra::curves::mnt4<298>::base_field_type;
-    test_comparsion_specific_inputs<field_type, 15, 296, comparsion_mode::LESS_EQUAL>();
-    test_comparsion_random_inputs<field_type, 15, 296, comparsion_mode::LESS_EQUAL, random_tests_amount>();
+    test_comparison_checked_specific_inputs<field_type, 15, 296, comparison_mode::LESS_EQUAL>();
+    test_comparison_checked_random_inputs<field_type, 15, 296, comparison_mode::LESS_EQUAL, random_tests_amount>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_oops_wrong_chunks) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_oops_wrong_chunks) {
     using field_type = nil::crypto3::algebra::curves::mnt4<298>::base_field_type;
     using value_type = typename field_type::value_type;
 
@@ -270,10 +270,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_oops_wrong_chunks) {
     patches[std::make_pair(2, 0)] = x;
     patches[std::make_pair(2, 1)] = y - x;
 
-    test_comparsion<field_type, 15, 8, comparsion_mode::LESS_EQUAL, true>(x, y, patches);
+    test_comparison_checked<field_type, 15, 8, comparison_mode::LESS_EQUAL, true>(x, y, patches);
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_oops_chunk_overflow) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_oops_chunk_overflow) {
     // Due to the way the component works, the only time first chunk overflow is actually harmful is
     // when it occurs on maximum possible R. Testing on R less than that would not reveal if the
     // first chunk constraints are correct or not.
@@ -320,7 +320,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparsion_oops_chunk_overflow) 
     }
     assert(sum_diff == difference);
     assert(sum == val_254);
-    test_comparsion<field_type, 15, 253, comparsion_mode::LESS_THAN, true>(val_254, val_253, patches);
+    test_comparison_checked<field_type, 15, 253, comparison_mode::LESS_THAN, true>(val_254, val_253, patches);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
