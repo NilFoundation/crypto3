@@ -120,6 +120,7 @@ namespace nil {
                             }
                         }
                     }
+                    terms = std::move(new_terms);
                 }
 
                 bool operator==(const non_linear_combination &other) {

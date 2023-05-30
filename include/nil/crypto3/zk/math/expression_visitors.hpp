@@ -73,16 +73,20 @@ namespace nil {
 
                 ValueType operator()(
                         const math::binary_arithmetic_operation<VariableType>& op) {
-                    ValueType left = boost::apply_visitor(*this, op.expr_left.expr);
-                    ValueType right = boost::apply_visitor(*this, op.expr_right.expr);
+                    
+                    ValueType result = boost::apply_visitor(*this, op.expr_left.expr);
                     switch (op.op) {
                         case ArithmeticOperator::ADD:
-                            return left + right;
+                            result += boost::apply_visitor(*this, op.expr_right.expr);
+                            break;
                         case ArithmeticOperator::SUB:
-                            return left - right;
+                            result -= boost::apply_visitor(*this, op.expr_right.expr);
+                            break;
                         case ArithmeticOperator::MULT:
-                            return left * right;
+                            result *= boost::apply_visitor(*this, op.expr_right.expr);
+                            break;
                     }
+                    return result;
                 }
 
             private:
