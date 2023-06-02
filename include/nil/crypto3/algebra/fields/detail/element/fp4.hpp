@@ -65,6 +65,8 @@ namespace nil {
                         };
 
                         constexpr element_fp4(const element_fp4 &B) : data {B.data} {};
+                        constexpr element_fp4(const element_fp4 &&B) BOOST_NOEXCEPT 
+                            : data(std::move(B.data)) {};
 
                         constexpr inline static element_fp4 zero() {
                             return element_fp4(underlying_type::zero(), underlying_type::zero());

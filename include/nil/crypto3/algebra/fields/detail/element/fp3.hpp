@@ -74,11 +74,13 @@ namespace nil {
 
                         constexpr element_fp3(const underlying_type &in_data0,
                                               const underlying_type &in_data1,
-                                              const underlying_type &in_data2) {
-                            data = data_type({in_data0, in_data1, in_data2});
+                                              const underlying_type &in_data2)
+                            : data({in_data0, in_data1, in_data2})
+                        {
                         }
 
-                        constexpr element_fp3(const element_fp3 &B) : data {B.data} {};
+                        constexpr element_fp3(const element_fp3 &B) : data(B.data) {};
+                        constexpr element_fp3(const element_fp3 &&B) BOOST_NOEXCEPT : data(std::move(B.data)) {};
 
                         constexpr inline static element_fp3 zero() {
                             return element_fp3(

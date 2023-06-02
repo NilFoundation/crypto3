@@ -66,6 +66,8 @@ namespace nil {
                         };
 
                         constexpr element_fp6_3over2(const element_fp6_3over2 &B) : data {B.data} {};
+                        constexpr element_fp6_3over2(const element_fp6_3over2 &&B) BOOST_NOEXCEPT 
+                            : data(std::move(B.data)) {};
 
                         constexpr inline static element_fp6_3over2 zero() {
                             return element_fp6_3over2(

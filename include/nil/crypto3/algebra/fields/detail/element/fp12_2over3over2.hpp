@@ -66,6 +66,8 @@ namespace nil {
                         };
 
                         element_fp12_2over3over2(const element_fp12_2over3over2 &B) : data {B.data} {};
+                        element_fp12_2over3over2(const element_fp12_2over3over2 &&B) BOOST_NOEXCEPT 
+                            : data(std::move(B.data)) {};
 
                         inline static element_fp12_2over3over2 zero() {
                             return element_fp12_2over3over2(underlying_type::zero(), underlying_type::zero());

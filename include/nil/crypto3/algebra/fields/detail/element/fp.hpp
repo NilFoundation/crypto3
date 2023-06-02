@@ -73,8 +73,12 @@ namespace nil {
                                                          bool>::type = true>
                         constexpr element_fp(const Number &data) : data(data, modulus_params) {};
 
-                        constexpr element_fp(const element_fp &B) {
-                            data = B.data;
+                        constexpr element_fp(const element_fp &B)
+                            : data(B.data) {
+                        };
+
+                        constexpr element_fp(const element_fp &&B) BOOST_NOEXCEPT
+                            : data(std::move(B.data)) {
                         };
 
                         constexpr inline static element_fp zero() {
