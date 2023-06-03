@@ -506,6 +506,7 @@ namespace nil {
 
             static void print_gate_file(
                 int gate_ind, std::ostream &gate_out, 
+                std::string id,
                 const profiling_params_type &profiling_params,
                 std::string gate_sol_file_template, 
                 const GateType &gate,
@@ -513,6 +514,7 @@ namespace nil {
             ) {
                 std::string result = gate_sol_file_template;
 
+                boost::replace_all(result, "$TEST_ID$", id);
                 boost::replace_all(result, "$GATE_ARGUMENT_LOCAL_VARS_OFFSETS$", profiling_params.evals_offsets);
                 boost::replace_all(result, "$GATES_GET_EVALUATIONS_FUNCTIONS$", profiling_params.get_evals_functions);
                 boost::replace_all(result, "$CONTRACT_NUMBER$", std::to_string(gate_ind));
@@ -522,6 +524,7 @@ namespace nil {
 
             static void print_multiple_gates_file(
                 int file_ind, std::ostream &gate_out, 
+                std::string id,
                 const profiling_params_type &profiling_params,
                 std::string gate_sol_file_template, 
                 const ArithmetizationType &bp,
@@ -538,6 +541,7 @@ namespace nil {
 
                 std::string result = gate_sol_file_template;
 
+                boost::replace_all(result, "$TEST_ID$", id);
                 boost::replace_all(result, "$GATE_ARGUMENT_LOCAL_VARS_OFFSETS$", profiling_params.evals_offsets);
                 boost::replace_all(result, "$GATES_GET_EVALUATIONS_FUNCTIONS$", profiling_params.get_evals_functions);
                 boost::replace_all(result, "$CONTRACT_NUMBER$", std::to_string(profiling_params.gates_first[file_ind]));
@@ -547,6 +551,7 @@ namespace nil {
 
             static void print_main_file(
                 std::ostream &out, 
+                std::string id,
                 profiling_params_type &profiling_params,
                 std::string main_file_template, 
                 std::string includes,
@@ -559,11 +564,13 @@ namespace nil {
                 boost::replace_all(result, "$GATES_EXECUTION$", executions);
                 boost::replace_all(result, "$GATES_LOCAL_VARS_EVALUATION_FIELDS$", profiling_params.evaluation_fields);
                 boost::replace_all(result, "$GATES_LOAD_EVALUATIONS$", profiling_params.load_evaluation_fields);
+                boost::replace_all(result, "$TEST_ID$", id );
                 out << result;
             }
 
             static void print_single_sol_file(
                 std::ostream &out, 
+                std::string id,
                 profiling_params_type &profiling_params,
                 columns_rotations_type columns_rotations,
                 std::string single_file_template, 
@@ -578,6 +585,7 @@ namespace nil {
                 }
 
                 std::string result = single_file_template;
+                boost::replace_all(result, "$TEST_ID$", id);
                 boost::replace_all(result, "$GATES_NUMBER$", std::to_string(bp.gates().size()));
                 boost::replace_all(result, "$GATES_LOCAL_VARS_EVALUATION_FIELDS$", profiling_params.evaluation_fields);
                 boost::replace_all(result, "$GATES_LOAD_EVALUATIONS$", profiling_params.load_evaluation_fields);
@@ -588,7 +596,7 @@ namespace nil {
                 out << result;
             }
 
-            static void print_linked_libraries_list(std::ostream &out, const profiling_params_type &profiling_params) {
+            static void print_linked_libraries_list(std::ostream &out, std::string id, const profiling_params_type &profiling_params) {
                 bool first = true;
                 if(!profiling_params.optimize_gates){
                     out << "[" << std::endl;
@@ -597,7 +605,7 @@ namespace nil {
                             first = false;
                         else
                             out << "," << std::endl;
-                        out << "\"gate" << i << "\"";
+                        out << "\""<< id << "_gate" << i << "\"";
                     }
                     out << std::endl << "]" << std::endl;
                     return;
@@ -614,7 +622,7 @@ namespace nil {
                         first = false;
                     else
                         out << "," << std::endl;
-                    out << "\"gate" << profiling_params.gates_first[i] << "\"";
+                    out << "\""<< id << "_gate" << profiling_params.gates_first[i] << "\"";
                 }
                 out << std::endl << "]" << std::endl;
             }
@@ -628,18 +636,21 @@ namespace nil {
                 std::string out_folder_path = ".",
                 bool optimize_gates = false
             ) {
+                auto id = out_folder_path.substr(out_folder_path.rfind("/") + 1);
+
                 profiling_params_type profiling_params(bp, optimize_gates);
 
                 if( profiling_params.optimize_gates && profiling_params.one_file_gates ){
                     std::ofstream json_out;
                     json_out.open(out_folder_path + "/linked_libs_list.json");
-                    print_linked_libraries_list(json_out, profiling_params);
+                    print_linked_libraries_list(json_out,id, profiling_params);
                     json_out.close();
 
                     std::ofstream gate_argument_out;
                     gate_argument_out.open(out_folder_path + "/gate_argument.sol");
                     print_single_sol_file(
-                        gate_argument_out, 
+                        gate_argument_out,
+                        id, 
                         profiling_params,
                         columns_rotations,
                         single_sol_file_template,
@@ -649,7 +660,7 @@ namespace nil {
                 }else{
                     std::ofstream json_out;
                     json_out.open(out_folder_path + "/linked_libs_list.json");
-                    print_linked_libraries_list(json_out, profiling_params);
+                    print_linked_libraries_list(json_out, id, profiling_params);
                     json_out.close();
 
                     size_t i = 0;
@@ -660,20 +671,20 @@ namespace nil {
                     if(!profiling_params.optimize_gates){
                         for (const auto &gate : bp.gates()) {
                             imports << "import \"./gate" << i << ".sol\";" << std::endl;
-                            executions << "\t\t(local_vars.gates_evaluation, local_vars.theta_acc) = gate"<< i <<".evaluate_gate_be(gate_params, local_vars);" << std::endl;
+                            executions << "\t\t(local_vars.gates_evaluation, local_vars.theta_acc) = "<< id <<"_gate"<< i <<".evaluate_gate_be(gate_params, local_vars);" << std::endl;
                             std::ofstream gate_out;
                             gate_out.open(out_folder_path + "/gate" + std::to_string(i) + ".sol");
-                            print_gate_file(i, gate_out, profiling_params, gate_file_template, gate, columns_rotations);
+                            print_gate_file(i, gate_out, id, profiling_params, gate_file_template, gate, columns_rotations);
                             gate_out.close();
                             i++;
                         }
                     } else {
                         for (std::size_t i = 0; i < profiling_params.gates_first.size(); i++) {
                             imports << "import \"./gate" << profiling_params.gates_first[i] << ".sol\";" << std::endl;
-                            executions << "\t\t(local_vars.gates_evaluation, local_vars.theta_acc) = gate"<< profiling_params.gates_first[i] <<".evaluate_gate_be(gate_params, local_vars);" << std::endl;
+                            executions << "\t\t(local_vars.gates_evaluation, local_vars.theta_acc) = " << id << "_gate"<< profiling_params.gates_first[i] <<".evaluate_gate_be(gate_params, local_vars);" << std::endl;
                             std::ofstream gate_out;
                             gate_out.open(out_folder_path + "/gate" + std::to_string(profiling_params.gates_first[i]) + ".sol");
-                            print_multiple_gates_file(i, gate_out, profiling_params, gate_file_template, bp, columns_rotations);
+                            print_multiple_gates_file(i, gate_out, id, profiling_params, gate_file_template, bp, columns_rotations);
                             gate_out.close();
                         }
                     }
@@ -682,6 +693,7 @@ namespace nil {
                     gate_argument_out.open(out_folder_path + "/gate_argument.sol");
                     print_main_file(
                         gate_argument_out, 
+                        id,
                         profiling_params,
                         main_file_template,
                         imports.str(),

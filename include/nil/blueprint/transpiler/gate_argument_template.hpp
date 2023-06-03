@@ -130,15 +130,14 @@ std::string main_sol_file_template = R"(
 //---------------------------------------------------------------------------//
 pragma solidity >=0.8.4;
 
-import "../../contracts/types.sol";
-import "../../contracts/profiling.sol";
-import "../../contracts/basic_marshalling.sol";
-import "../../contracts/commitments/batched_lpc_verifier.sol";
-import "../../contracts/interfaces/gate_argument.sol";
+import "../../../contracts/types.sol";
+import "../../../contracts/basic_marshalling.sol";
+import "../../../contracts/commitments/batched_lpc_verifier.sol";
+import "../../../contracts/interfaces/gate_argument.sol";
 
 $GATES_IMPORTS$
 
-contract gate_argument_split_gen  is IGateArgument{
+contract $TEST_ID$_gate_argument_split_gen  is IGateArgument{
     uint256 constant GATES_N = $GATES_NUMBER$;
 
     struct local_vars_type{
@@ -278,10 +277,10 @@ std::string gate_sol_file_template = R"(
 //---------------------------------------------------------------------------//
 pragma solidity >=0.8.4;
 
-import "../../contracts/types.sol";
+import "../../../contracts/types.sol";
 import "./gate_argument.sol";
 
-library gate$CONTRACT_NUMBER${
+library $TEST_ID$_gate$CONTRACT_NUMBER${
     uint256 constant MODULUS_OFFSET = 0x0;
     uint256 constant THETA_OFFSET = 0x20;
 
@@ -294,7 +293,7 @@ $GATE_ARGUMENT_LOCAL_VARS_OFFSETS$
 
     function evaluate_gate_be(
         types.gate_argument_params memory gate_params,
-        gate_argument_split_gen.local_vars_type memory local_vars
+        $TEST_ID$_gate_argument_split_gen.local_vars_type memory local_vars
     ) external pure returns (uint256 gates_evaluation, uint256 theta_acc) {
         gates_evaluation = local_vars.gates_evaluation;
         theta_acc = local_vars.theta_acc;
@@ -332,13 +331,12 @@ std::string single_sol_file_template = R"(
 //---------------------------------------------------------------------------//
 pragma solidity >=0.8.4;
 
-import "../../contracts/types.sol";
-import "../../contracts/profiling.sol";
-import "../../contracts/basic_marshalling.sol";
-import "../../contracts/commitments/batched_lpc_verifier.sol";
-import "../../contracts/interfaces/gate_argument.sol";
+import "../../../contracts/types.sol";
+import "../../../contracts/basic_marshalling.sol";
+import "../../../contracts/commitments/batched_lpc_verifier.sol";
+import "../../../contracts/interfaces/gate_argument.sol";
 
-contract gate_argument_split_gen  is IGateArgument{
+contract $TEST_ID$_gate_argument_split_gen  is IGateArgument{
     uint256 constant GATES_N = $GATES_NUMBER$;
 
     struct local_vars_type{
