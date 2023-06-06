@@ -638,7 +638,7 @@ namespace nil {
 
                     polynomial_dfs power_of_2 = *this;
                     size_t expected_size = detail::power_of_two(
-                        std::max({this->size(), this->degree() * power + 1}); 
+                        std::max({this->size(), this->degree() * power + 1})); 
                     power_of_2.resize(expected_size);
                     polynomial_dfs result(0, expected_size, FieldValueType::one());
                     while (power) {
