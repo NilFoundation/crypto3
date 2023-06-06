@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_equal_test){
          0x847CB0018EA2D483DD42D0024EA2D0000000EFFFFFFFFFFFC_cppui253,
          0x2B7BEB45D9D4969219C969B2F10D22200E6B010383CB544B5AE23FF1F00B0DD4_cppui253}};
 
-    BOOST_CHECK(a == a1);
+    BOOST_CHECK_EQUAL(a, a1);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_from_coefficients_less_degree) {
@@ -110,6 +110,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_coefficients_less_degree) {
          0x2B7BEB45D9D4969219C969B2F10D22200E6B010383CB544B5AE23FF1F00B0DD4_cppui253}};
     std::vector<typename FieldType::value_type> c_res = {1, 3, 4, 25, 6, 7, 7};
     std::vector<typename FieldType::value_type> c = a.coefficients();
+
     BOOST_CHECK_EQUAL(c_res.size(), c.size());
     for (std::size_t i = 0; i < c_res.size(); i++) {
         BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
@@ -172,11 +173,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_equal) {
             0x13522f003a2269a89044690056226900000022fffffffffffc_cppui253,
             0x1b9239b76363d4f78ac0ffb6e7d342ef42bea1837a069096d1c84e1e35076f94_cppui253,
         }};
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_b) {
@@ -204,11 +201,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_b) {
          0x4a6902185237e5dffc8fbf66155bd15f9620bcfadb4dfa8bcd291f88e7ae0b60_cppui253,
          0x7ba79334a742a436ce82a0022742a0000000dfffffffffffa_cppui253,
          0x5a8fa2a6cb26338cef1cd76f6106a8baa60293c9c1c0d2c31e813ed413279c47_cppui253}};
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_a) {
@@ -237,11 +230,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_a) {
          0x4a6902185237e5dffc8fbf66155bd15f9620bcfadb4dfa8bcd291f88e7ae0b60_cppui253,
          0x7ba79334a742a436ce82a0022742a0000000dfffffffffffa_cppui253,
          0x5a8fa2a6cb26338cef1cd76f6106a8baa60293c9c1c0d2c31e813ed413279c47_cppui253}};
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -282,11 +271,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_eq_equal) {
             0x13522f003a2269a89044690056226900000022fffffffffffc_cppui253,
             0x1b9239b76363d4f78ac0ffb6e7d342ef42bea1837a069096d1c84e1e35076f94_cppui253,
         }};
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_b) {
@@ -314,11 +299,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_b) {
          0x4a6902185237e5dffc8fbf66155bd15f9620bcfadb4dfa8bcd291f88e7ae0b60_cppui253,
          0x7ba79334a742a436ce82a0022742a0000000dfffffffffffa_cppui253,
          0x5a8fa2a6cb26338cef1cd76f6106a8baa60293c9c1c0d2c31e813ed413279c47_cppui253}};
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_a) {
@@ -347,11 +328,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_a) {
          0x4a6902185237e5dffc8fbf66155bd15f9620bcfadb4dfa8bcd291f88e7ae0b60_cppui253,
          0x7ba79334a742a436ce82a0022742a0000000dfffffffffffa_cppui253,
          0x5a8fa2a6cb26338cef1cd76f6106a8baa60293c9c1c0d2c31e813ed413279c47_cppui253}};
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -403,11 +380,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_equal) {
             0x24e7ea060cf3f93a7276bad4aa6144d100c89f87a9e23c03aca0269608dfa9fa_cppui253,
         }};
 
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c.degree(), c_res.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_less_b) {
@@ -454,11 +427,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_less_b) {
             0xb203697e3324b9d8315e428232ba34b78aeadd2c545d3e39e250eb8731af5f4_cppui253,
         }};
 
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c.degree(), c_res.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_less_a) {
@@ -505,11 +474,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_less_a) {
             0x649ccd32710d737a8efeaef98207fc9e8908d4848972fb1cb8072040cf67f593_cppui253,
         }};
 
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c.degree(), c_res.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -558,11 +523,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_eq_equal) {
             0x24e7ea060cf3f93a7276bad4aa6144d100c89f87a9e23c03aca0269608dfa9fa_cppui253,
         }};
 
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < a.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(a.degree(), c_res.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_eq_less_b) {
@@ -609,11 +570,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_eq_less_b) {
             0xb203697e3324b9d8315e428232ba34b78aeadd2c545d3e39e250eb8731af5f4_cppui253,
         }};
 
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(a.degree(), c_res.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_eq_less_a) {
     // 1, 3, 4, 25, 6
@@ -658,11 +615,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_eq_less_a) {
             0x649ccd32710d737a8efeaef98207fc9e8908d4848972fb1cb8072040cf67f593_cppui253,
         }};
 
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < a.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(a.degree(), c_res.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -707,11 +660,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_without_resize) {
          0x73eda753299d7d34e10ad7cde7382f750f54a3acdd955bfeffdcffff00000049_cppui253,
          0x4e6a878a05be2a9286699d8914dd99192ae6f17e04c2df49ae2385605c1ec93e_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_resize_a) {
@@ -758,11 +707,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_resize_a) {
          0x73721a26b66974539fb88c09a3bb4a78a3390559c9a71dd174605df675bcd662_cppui253,
          0x6e7160e3c6fbf795fb196134578308430a76778e089ecbd6e0229ea7c8467781_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_resize_b) {
@@ -809,11 +754,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_resize_b) {
          0x73721a26b66974539fb88c09a3bb4a78a3390559c9a71dd174605df675bcd662_cppui253,
          0x6e7160e3c6fbf795fb196134578308430a76778e089ecbd6e0229ea7c8467781_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_resize_both) {
@@ -853,11 +794,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_resize_both) {
          0x5f60b98f26ef342b6887669ab422cd5a5ca3c2eea47bea999633e8e23a2106ff_cppui253,
          0x16fe8c53e3dba6560be2697c242189564a3e2834817d28c13e3c2af4ff29d935_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), c.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, c[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c.degree());
+    BOOST_CHECK_EQUAL(c_res, c);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -903,11 +840,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_eq_without_resize) {
          0x73eda753299d7d34e10ad7cde7382f750f54a3acdd955bfeffdcffff00000049_cppui253,
          0x4e6a878a05be2a9286699d8914dd99192ae6f17e04c2df49ae2385605c1ec93e_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_eq_resize_a) {
@@ -953,11 +886,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_eq_resize_a) {
          0x73721a26b66974539fb88c09a3bb4a78a3390559c9a71dd174605df675bcd662_cppui253,
          0x6e7160e3c6fbf795fb196134578308430a76778e089ecbd6e0229ea7c8467781_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_eq_resize_b) {
@@ -1004,11 +933,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_eq_resize_b) {
          0x73721a26b66974539fb88c09a3bb4a78a3390559c9a71dd174605df675bcd662_cppui253,
          0x6e7160e3c6fbf795fb196134578308430a76778e089ecbd6e0229ea7c8467781_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_eq_resize_both) {
@@ -1048,11 +973,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_eq_resize_both) {
          0x5f60b98f26ef342b6887669ab422cd5a5ca3c2eea47bea999633e8e23a2106ff_cppui253,
          0x16fe8c53e3dba6560be2697c242189564a3e2834817d28c13e3c2af4ff29d935_cppui253}};
 
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1102,17 +1023,8 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_division) {
                                                              0x5_cppui253, 0x5_cppui253, 0x5_cppui253,
                                                              0x5_cppui253}};    //{5};
 
-    BOOST_CHECK_EQUAL(Q_ans.size(), Q.size());
-    for (std::size_t i = 0; i < Q.size(); i++) {
-        BOOST_CHECK_EQUAL(Q_ans[i].data, Q[i].data);
-    }
-    BOOST_CHECK_EQUAL(Q_ans.degree(), Q.degree());
-
-    BOOST_CHECK_EQUAL(R_ans.size(), R.size());
-    for (std::size_t i = 0; i < R.size(); i++) {
-        BOOST_CHECK_EQUAL(R_ans[i].data, R[i].data);
-    }
-    BOOST_CHECK_EQUAL(R_ans.degree(), R.degree());
+    BOOST_CHECK_EQUAL(Q_ans, Q);
+    BOOST_CHECK_EQUAL(R_ans, R);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_shift) {
@@ -1199,26 +1111,9 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_add_constant) {
     polynomial_dfs<typename FieldType::value_type> c2 = c + a;
     a+=c;
 
-    BOOST_CHECK_EQUAL(c_res.size(), c1.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != c1[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c1[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, c1[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c1.degree());
-
-    BOOST_CHECK_EQUAL(c_res.size(), c2.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != c2[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c2[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, c2[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c2.degree());
-
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != a[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c1[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, c1);
+    BOOST_CHECK_EQUAL(c_res, c2);
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_sub_constant) {
@@ -1259,26 +1154,9 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_sub_constant) {
     polynomial_dfs<typename FieldType::value_type> c2 = c - a;
     a-=c;
 
-    BOOST_CHECK_EQUAL(c_res.size(), c1.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != c1[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c1[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, c1[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c1.degree());
-
-    BOOST_CHECK_EQUAL(c_res.size(), c2.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c2_res[i].data != c2[i].data ) std::cout << "Error with i=" << i << ":" << c2_res[i].data << "," << c2[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c2_res[i].data, c2[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c2.degree());
-
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != a[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c1[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, c1);
+    BOOST_CHECK_EQUAL(c2_res, c2);
+    BOOST_CHECK_EQUAL(c_res, a);
 }
 
 
@@ -1311,25 +1189,33 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_mul_constant) {
     polynomial_dfs<typename FieldType::value_type> c2 = c * a;
     a *= c;
 
-    BOOST_CHECK_EQUAL(c_res.size(), c1.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != c1[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c1[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, c1[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c1.degree());
-
-    BOOST_CHECK_EQUAL(c_res.size(), c2.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != c2[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c2[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, c2[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), c2.degree());
-
-    BOOST_CHECK_EQUAL(c_res.size(), a.size());
-    for (std::size_t i = 0; i < c_res.size(); i++) {
-        if( c_res[i].data != a[i].data ) std::cout << "Error with i=" << i << ":" << c_res[i].data << "," << c1[i].data << std::endl;
-        BOOST_CHECK_EQUAL(c_res[i].data, a[i].data);
-    }
-    BOOST_CHECK_EQUAL(c_res.degree(), a.degree());
+    BOOST_CHECK_EQUAL(c_res, c1);
+    BOOST_CHECK_EQUAL(c_res, c2);
+    BOOST_CHECK_EQUAL(c_res, a);
 }
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(polynomial_dfs_pow_eq_test_suite)
+BOOST_AUTO_TEST_CASE(polynomial_dfs_pow_eq_test) {
+
+    polynomial_dfs<typename FieldType::value_type> a = {
+        3,
+        {
+            0x21_cppui253,
+            0x396e56c94dd65906159d4f74c19202bc115b4696f2872527bbf6d249d35592e8_cppui253,
+            0x73eda753299d7d3c0e323e49e55f6e110b7ba3ccdbbc5bfeffe9fffefffffffe_cppui253,
+            0x5aedf3feb052db4e740b467d229f14d5eac1f0781703da9f46a4b599d626236a_cppui253,
+            0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffeffffffea_cppui253,
+            0x3a7f5089dbc72446882aef06f827fbd0a27a5d7fbd8f36d744112db52caa6d1b_cppui253,
+            0xc250799be244269f448420036244200000015fffffffffffd_cppui253,
+            0x18ffb354794aa1f554a02b1736ea9ca808e3b37738e2815fb9534a6529d9dc99_cppui253,
+        }};
+
+    polynomial_dfs<typename FieldType::value_type> res = a;
+    for (int i = 1; i < 7; ++i)
+        res *= a;
+    
+    BOOST_CHECK_EQUAL(res, a.pow(7));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

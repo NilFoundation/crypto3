@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <ostream>
 
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
@@ -113,12 +114,14 @@ namespace nil {
                 // TODO: add constructor with omega
 
                 polynomial_dfs(polynomial_dfs&& x)
-                    BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value) :
-                    val(x.val),
-                    _d(x._d) {
+                    BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value)
+                    : val(std::move(x.val))
+                    , _d(x._d) {
                 }
 
-                polynomial_dfs(polynomial_dfs&& x, const allocator_type& a) : val(x.val, a), _d(x._d) {
+                polynomial_dfs(polynomial_dfs&& x, const allocator_type& a) 
+                    : val(std::move(x.val), a)
+                    , _d(x._d) {
                 }
 
                 polynomial_dfs(size_t d, const container_type& c) : val(c), _d(d) {
@@ -138,7 +141,7 @@ namespace nil {
                 }
 
                 polynomial_dfs& operator=(polynomial_dfs&& x) {
-                    val = x.val;
+                    val = std::move(x.val);
                     _d = x._d;
                     return *this;
                 }
@@ -296,7 +299,7 @@ namespace nil {
                 }
 
                 void push_back(value_type&& _x) {
-                    val.push_back(_x);
+                    val.emplace_back(_x);
                 }
 
                 template<class... Args>
@@ -346,13 +349,14 @@ namespace nil {
                 }
 
                 void resize(size_type _sz) {
+                    if (this->size() == _sz)
+                        return;
                     // BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
-
                     if (this->size() == 1){
                         this->val.resize(_sz, this->val[0]);
                     } else {
                         typedef typename value_type::field_type FieldType;
-
+            
                         make_evaluation_domain<FieldType>(this->size())->inverse_fft(this->val);
                         this->val.resize(_sz, FieldValueType::zero());
                         make_evaluation_domain<FieldType>(_sz)->fft(this->val);
@@ -529,9 +533,9 @@ namespace nil {
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs operator*=(const polynomial_dfs& other) {
-                    this->_d += other._d;
                     size_t polynomial_s =
                         detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
+                    this->_d += other._d;
 
                     if (this->size() < polynomial_s) {
                         this->resize(polynomial_s);
@@ -627,17 +631,49 @@ namespace nil {
                     return tmp;
                 }
 
-                polynomial_dfs pow(size_t power) {
+                polynomial_dfs pow(size_t power) const {
                     if (power == 1) {
                         return *this;
                     }
-                    size_t half = power / 2;
-                    polynomial_dfs r = this->pow(half);
-                    r *= r;
-                    if (power != half + half) {
-                        r *= *this;
+                    // Compute the final size of result first. Resizing the input to 
+                    // the expected size of the output slightly improves performance.
+                    size_t power_of_2_size = this->size();
+                    size_t power_of_2_degree = this->degree();
+                    size_t result_size = this->size();
+                    size_t result_degree = 0;
+                    size_t power2 = power;
+
+                    while (power2) {
+                        if (power2 % 2 == 1) {
+                            // result *= power_of_2;
+                            result_size = detail::power_of_two(
+                                std::max({result_size, power_of_2_size, 
+                                          result_degree + power_of_2_degree + 1}));
+                            result_degree += power_of_2_degree;
+                        } 
+                        power2 /= 2;
+                        if (power2 == 0)
+                            break;
+                        // power_of_2 *= power_of_2;
+                        power_of_2_size = detail::power_of_two(
+                            std::max(power_of_2_size, 2 * power_of_2_degree + 1));
+                        power_of_2_degree += power_of_2_degree;
                     }
-                    return r;
+
+                    polynomial_dfs power_of_2 = *this;
+                    // Now resize to the expected final size of result.
+                    power_of_2.resize(result_size);
+                    polynomial_dfs result(0, result_size, FieldValueType::one());
+                    while (power) {
+                        if (power % 2 == 1) {
+                            result *= power_of_2;
+                        } 
+                        power /= 2;
+                        if (power == 0)
+                            break;
+                        power_of_2 *= power_of_2;
+                    }
+                    return result;
                 }
             };
 
@@ -722,6 +758,22 @@ namespace nil {
 
                 return polynomial_dfs<FieldValueType>(0, B.size(), A) / B;
             }
+
+            // Used in the unit tests, so we can use BOOST_CHECK_EQUALS, and see
+            // the values of polynomials, when the check fails.
+            template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            std::ostream& operator<<(std::ostream& os,
+                                     const polynomial_dfs<FieldValueType, Allocator>& poly) {
+                os << "[Polynomial DFS, size " << poly.size()
+                   << " degree " << poly.degree() << " values ";
+                for( auto it = poly.begin(); it != poly.end(); it++ ){
+                    os << it->data << ", ";
+                }
+                os << "]";
+                return os;
+            }
+
         }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
