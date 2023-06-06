@@ -635,35 +635,12 @@ namespace nil {
                     if (power == 1) {
                         return *this;
                     }
-                    // Compute the final size of result first. Resizing the input to 
-                    // the expected size of the output slightly improves performance.
-                    size_t power_of_2_size = this->size();
-                    size_t power_of_2_degree = this->degree();
-                    size_t result_size = this->size();
-                    size_t result_degree = 0;
-                    size_t power2 = power;
-
-                    while (power2) {
-                        if (power2 % 2 == 1) {
-                            // result *= power_of_2;
-                            result_size = detail::power_of_two(
-                                std::max({result_size, power_of_2_size, 
-                                          result_degree + power_of_2_degree + 1}));
-                            result_degree += power_of_2_degree;
-                        } 
-                        power2 /= 2;
-                        if (power2 == 0)
-                            break;
-                        // power_of_2 *= power_of_2;
-                        power_of_2_size = detail::power_of_two(
-                            std::max(power_of_2_size, 2 * power_of_2_degree + 1));
-                        power_of_2_degree += power_of_2_degree;
-                    }
 
                     polynomial_dfs power_of_2 = *this;
-                    // Now resize to the expected final size of result.
-                    power_of_2.resize(result_size);
-                    polynomial_dfs result(0, result_size, FieldValueType::one());
+                    size_t expected_size = detail::power_of_two(
+                        std::max({this->size(), this->degree() * power + 1}); 
+                    power_of_2.resize(expected_size);
+                    polynomial_dfs result(0, expected_size, FieldValueType::one());
                     while (power) {
                         if (power % 2 == 1) {
                             result *= power_of_2;
