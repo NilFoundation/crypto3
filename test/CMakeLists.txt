@@ -14,7 +14,6 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::containers
                        ${CMAKE_WORKSPACE_NAME}::pkpad
                        ${CMAKE_WORKSPACE_NAME}::random
-                       ${CMAKE_WORKSPACE_NAME}::blueprint
 
                        ${Boost_LIBRARIES})
 
