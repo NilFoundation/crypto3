@@ -97,82 +97,35 @@ namespace nil {
                 using plonk_logic_and_flag_component = logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessesAmount>;
 
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
-                typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 2>::result_type generate_assignments(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 2>& component, 
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
+                typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>::result_type generate_assignments(
+                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>& component, 
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment, 
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 2>::input_type &instance_input, 
+                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>::input_type &instance_input, 
                     const std::uint32_t start_row_index){
 
                         std::size_t row = start_row_index;
-    
-                        typename BlueprintFieldType::value_type x = var_value(assignment, instance_input.x);
-                        typename BlueprintFieldType::value_type y = var_value(assignment, instance_input.y);
-                        typename BlueprintFieldType::value_type p = x*y;
-                        typename BlueprintFieldType::value_type v = p.is_zero() ? p : p.inversed();
-                        typename BlueprintFieldType::value_type f = p*v;
-                        
-                        assignment.witness(component.W(0), row) = x;
-                        assignment.witness(component.W(1), row) = y;
-                        
-                        assignment.witness(component.W(0), row+1) = p;
-                        assignment.witness(component.W(1), row+1) = v;
+                        std::size_t offset = 6 / component.rows_amount - 1;
+                        std::size_t witness_amount = WitnessesAmount;
 
-                        assignment.witness(component.W(0), row+2) = v-p;
-                        assignment.witness(component.W(1), row+2) = f;
+                        std::array<typename BlueprintFieldType::value_type, 6> t;
+                        t[0] = var_value(assignment, instance_input.x);
+                        t[1] = var_value(assignment, instance_input.y);
+                        t[2] = t[0]*t[1];       // p
+                        t[3] = t[2].is_zero() ? t[2] : t[2].inversed(); //v
+                        t[4] = t[3]-t[2]; // v-p
+                        t[5] = t[3]*t[2]; // f
+                        
+                        for(std::size_t i=0;i<component.rows_amount;i++){
+                            for(std::size_t j=0; j < witness_amount; j++){
+                                assignment.witness(component.W(j), row+i) = t[i*witness_amount + j];
+                            }
+                        }
+                        assignment.witness(component.W(witness_amount-1), row+component.rows_amount-1) = t[5]; //always set last element as output
 
-                        return typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 2>::result_type(component, start_row_index);
+                        return typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>::result_type(component, start_row_index);
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
-                typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 3>::result_type generate_assignments(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 3>& component, 
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment, 
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input, 
-                    const std::uint32_t start_row_index){
-
-                        std::size_t row = start_row_index;
-
-                        typename BlueprintFieldType::value_type x = var_value(assignment, instance_input.x);
-                        typename BlueprintFieldType::value_type y = var_value(assignment, instance_input.y);
-                        typename BlueprintFieldType::value_type p = x*y;
-                        typename BlueprintFieldType::value_type v = p.is_zero() ? p : p.inversed();
-                        typename BlueprintFieldType::value_type f = p*v;
-                        
-                        assignment.witness(component.W(0), row) = x;
-                        assignment.witness(component.W(1), row) = y;
-                        assignment.witness(component.W(2), row) = p;
-                        
-                        assignment.witness(component.W(0), row+1) = v;
-                        assignment.witness(component.W(1), row+1) = v-p;
-                        assignment.witness(component.W(2), row+1) = f;
-
-                        return typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 3>::result_type(component, start_row_index);
-                }
-
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
-                typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 5>::result_type generate_assignments(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 5>& component, 
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment, 
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 5>::input_type &instance_input, 
-                    const std::uint32_t start_row_index){
-
-                        std::size_t row = start_row_index;
-    
-                        typename BlueprintFieldType::value_type x = var_value(assignment, instance_input.x);
-                        typename BlueprintFieldType::value_type y = var_value(assignment, instance_input.y);
-                        typename BlueprintFieldType::value_type p = x*y;
-                        typename BlueprintFieldType::value_type v = p.is_zero() ? p : p.inversed();
-                        typename BlueprintFieldType::value_type f = p*v;
-                        
-                        assignment.witness(component.W(0), row) = x;
-                        assignment.witness(component.W(1), row) = y;
-                        assignment.witness(component.W(2), row) = p;
-                        assignment.witness(component.W(3), row) = v;
-                        assignment.witness(component.W(4), row) = f;
-
-                        return typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 5>::result_type(component, start_row_index);
-                }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
                 void generate_gates(
