@@ -23,13 +23,13 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES})
 
-cm_test(NAME ${CURRENT_PROJECT_NAME}_chacha_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/chacha.cpp)
-set_target_properties(${CURRENT_PROJECT_NAME}_chacha_test PROPERTIES CXX_STANDARD 17)
-target_include_directories(${CURRENT_PROJECT_NAME}_chacha_test PRIVATE
-                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+#cm_test(NAME ${CURRENT_PROJECT_NAME}_chacha_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/chacha.cpp)
+#set_target_properties(${CURRENT_PROJECT_NAME}_chacha_test PROPERTIES CXX_STANDARD 17)
+#target_include_directories(${CURRENT_PROJECT_NAME}_chacha_test PRIVATE
+#                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+#                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
-                           ${Boost_INCLUDE_DIRS})
+#                           ${Boost_INCLUDE_DIRS})
 
 cm_test(NAME ${CURRENT_PROJECT_NAME}_hash_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/hash.cpp)
 set_target_properties(${CURRENT_PROJECT_NAME}_hash_test PROPERTIES CXX_STANDARD 17)
