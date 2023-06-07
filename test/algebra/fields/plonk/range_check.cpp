@@ -70,7 +70,7 @@ auto test_range_check(std::vector<typename BlueprintFieldType::value_type> publi
     std::cout << "range_check_test_input: " << std::hex << public_input[0].data << "\n";
     #endif
 
-    auto result_check = [](AssignmentType &assignment, 
+    auto result_check = [](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
     };
 

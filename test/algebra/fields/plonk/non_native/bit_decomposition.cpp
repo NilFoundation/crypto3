@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2022 Polina Chernyshova <pockvokhbtra@nil.foundation>
+// Copyright (c) 2023 Dmitrii Tabalin <d.tabalin@nil.foundation>
 //
 // MIT License
 //
@@ -43,14 +44,16 @@
 
 using namespace nil;
 
-template <typename BlueprintFieldType>
-void test_bit_decomposition(std::vector<typename BlueprintFieldType::value_type> public_input, 
-        std::vector<typename BlueprintFieldType::value_type> expected_res){
-    
-    constexpr std::size_t WitnessColumns = 9;
+using mode = blueprint::components::detail::bit_composition_mode;
+
+template <typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount, mode Mode>
+void test_bit_decomposition(typename BlueprintFieldType::value_type input,
+                            std::vector<typename BlueprintFieldType::value_type> expected_res){
+
+    constexpr std::size_t WitnessColumns = WitnessesAmount;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 2;
+    constexpr std::size_t SelectorColumns = 1;
     using ArithmetizationParams =
         crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -59,13 +62,17 @@ void test_bit_decomposition(std::vector<typename BlueprintFieldType::value_type>
     constexpr std::size_t Lambda = 1;
 
     using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using value_type = typename BlueprintFieldType::value_type;
 
-    using component_type = blueprint::components::bit_decomposition<ArithmetizationType,
-        BlueprintFieldType, 9>;
+    using component_type = blueprint::components::bit_decomposition<ArithmetizationType, WitnessesAmount>;
 
     typename component_type::input_type instance_input = {var(0, 0, false, var::column_type::public_input)};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    std::vector<value_type> public_input = {input};
+
+    bool expected_to_pass = input < value_type(2).pow(BitsAmount);
+
+    auto result_check = [&expected_res, input, expected_to_pass](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "input: " << std::hex << public_input[0].data << "\n";
@@ -79,60 +86,210 @@ void test_bit_decomposition(std::vector<typename BlueprintFieldType::value_type>
             }
             std::cout << std::endl;
             #endif
-            
-            for(std::size_t i = 0; i < real_res.output.size(); i++) {
-                assert(expected_res[i] == var_value(assignment, real_res.output[i]));
+            if (expected_to_pass) {
+                for (std::size_t i = 0; i < real_res.output.size(); i++) {
+                    assert(expected_res[i] == var_value(assignment, real_res.output[i]));
+                }
             }
     };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
+    component_type component_instance = WitnessesAmount == 15 ?
+                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0},
+                                                           BitsAmount, Mode)
+                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0},
+                                                           BitsAmount, Mode);
 
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+    if (!(WitnessesAmount == 15 || WitnessesAmount == 9)) {
+        BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
+    }
+
+    assert(BitsAmount + component_instance.padding_bits_amount() + component_instance.sum_bits_amount() ==
+           WitnessColumns * component_instance.rows_amount);
+
+    if (expected_to_pass) {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    } else {
+        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 constexpr static const std::size_t random_tests_amount = 10;
 
-template<typename FieldType>
-void calculate_expected_and_test_bit_decomposition(typename FieldType::value_type input) {
+template<typename FieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount, mode Mode>
+void calc_expected_and_test_bit_decomposition(typename FieldType::value_type input) {
+    using value_type = typename FieldType::value_type;
+    using integral_type = typename FieldType::integral_type;
 
-    typename FieldType::integral_type input_integral = 1;
-    typename FieldType::integral_type max253 = (input_integral << 253) - 1;
+    integral_type input_integral = integral_type(input.data);
 
-    input_integral = typename FieldType::integral_type(input.data);
-    input_integral = input_integral % max253; 
-
-    std::vector <typename FieldType::value_type> expected_res = std::vector <typename FieldType::value_type>(253);
-    for (std::size_t i = 0; i < 253; i++) {
-        if (((input_integral >> i) & 0b1) == 1) {
-            expected_res[252 - i] = 1;
-        }
-        else {
-            expected_res[252 - i] = 0;
-        }
+    std::vector<value_type> expected_res = std::vector<value_type>(BitsAmount);
+    for (std::size_t i = 0; i < BitsAmount; i++) {
+        expected_res[Mode == bit_composition_mode::MSB ? BitsAmount - i - 1 : i] =
+            ((input_integral >> i) & 0b1) == 1 ? value_type::one() : value_type::zero();
     }
-    input = typename FieldType::value_type(input_integral);
-    test_bit_decomposition<FieldType>({input}, expected_res);   
+    input = value_type(input_integral);
+    test_bit_decomposition<FieldType, WitnessesAmount, BitsAmount, Mode>(input, expected_res);
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test1) {
-    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+template<typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount>
+void test_decomposition_specific_inputs() {
+    using value_type = typename BlueprintFieldType::value_type;
 
-    calculate_expected_and_test_bit_decomposition<field_type>(1);
-    calculate_expected_and_test_bit_decomposition<field_type>(0);
-    calculate_expected_and_test_bit_decomposition<field_type>(0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255);
-    calculate_expected_and_test_bit_decomposition<field_type>(45524);
+    value_type max_elem = (typename BlueprintFieldType::integral_type(1) << BitsAmount) - 1;
 
-    using generator_type = nil::crypto3::random::algebraic_engine<field_type>;
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(1);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(0);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(-1);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(45524);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(max_elem);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(max_elem + 1);
+
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(1);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(0);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(-1);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(45524);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(max_elem);
+    calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(max_elem + 1);
+}
+
+template<typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount,
+         std::size_t RandomTestsAmount>
+void test_decomposition_random_inputs() {
+    using generator_type = nil::crypto3::random::algebraic_engine<BlueprintFieldType>;
+    using value_type = typename BlueprintFieldType::value_type;
+    using integral_type = typename BlueprintFieldType::integral_type;
     generator_type rand;
     boost::random::mt19937 seed_seq;
     rand.seed(seed_seq);
 
+    value_type max_value = value_type(2).pow(BitsAmount);
+
     for (std::size_t j = 0; j < random_tests_amount; j++) {
-        calculate_expected_and_test_bit_decomposition<field_type>(rand());
+        value_type random = rand();
+        integral_type input_integral = integral_type(random.data);
+        input_integral = input_integral & integral_type((max_value - 1).data);
+        value_type input = value_type(input_integral);
+        // Sanity check
+        assert(input < max_value);
+
+        calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(input);
+        calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(input);
     }
+}
+
+template<typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount,
+         std::size_t RandomTestsAmount>
+void test_decomposition_fail_random_inputs() {
+    using value_type = typename BlueprintFieldType::value_type;
+    using integral_type = typename BlueprintFieldType::integral_type;
+    using generator_type = nil::crypto3::random::algebraic_engine<BlueprintFieldType>;
+    generator_type rand;
+    boost::random::mt19937 seed_seq;
+    rand.seed(seed_seq);
+
+    value_type max_value = value_type(2).pow(BitsAmount);
+    integral_type restriction_modulus = BlueprintFieldType::modulus - integral_type(max_value.data);
+
+    for (std::size_t j = 0; j < random_tests_amount; j++) {
+        value_type random = rand();
+        value_type input = max_value + (value_type(integral_type(random.data) % restriction_modulus));
+        // Sanity check
+        assert(input >= max_value);
+
+        calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::MSB>(input);
+        calc_expected_and_test_bit_decomposition<BlueprintFieldType, WitnessesAmount, BitsAmount, mode::LSB>(input);
+    }
+}
+
+template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::size_t BitsAmount>
+void test_decomposition() {
+    test_decomposition_specific_inputs<BlueprintFieldType, WitnessesAmount, BitsAmount>();
+    test_decomposition_random_inputs<BlueprintFieldType, WitnessesAmount, BitsAmount, random_tests_amount>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_1) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 1>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_8) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 8>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_16) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 16>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_32) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 32>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_44) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 44>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_64) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 64>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_128) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 128>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_15_254) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 15, 254>();
+}
+
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_1) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 1>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_8) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 8>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_16) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 16>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_32) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 32>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_26) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 26>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_64) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 64>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_128) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 128>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_254) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    test_decomposition<field_type, 9, 254>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

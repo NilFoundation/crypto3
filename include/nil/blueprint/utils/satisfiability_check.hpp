@@ -65,9 +65,9 @@ namespace nil {
 
                             typename BlueprintFieldType::value_type constraint_result =
                                 gates[i].constraints[j].evaluate(selector_row, assignments);
-                                
+
                             if (!constraint_result.is_zero()) {
-                                std::cout << "Constraint " << j << " from gate " << i << "on row " << selector_row << " is not satisfied." << std::endl;
+                                std::cout << "Constraint " << j << " from gate " << i << " on row " << selector_row << " is not satisfied." << std::endl;
                                 return false;
                             }
                         }

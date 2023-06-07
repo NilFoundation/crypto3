@@ -109,7 +109,7 @@ namespace nil {
                     using plonk_range_check = range_check<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, R, 15>;
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t R>
-                    typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::result_type 
+                    typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::result_type
                         generate_circuit(
                         const plonk_range_check<BlueprintFieldType, ArithmetizationParams, R> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
@@ -139,7 +139,7 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t R>
-                    typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::result_type 
+                    typename plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>::result_type
                         generate_assignments(
                         const plonk_range_check<BlueprintFieldType, ArithmetizationParams, R> &component,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
@@ -147,12 +147,13 @@ namespace nil {
                         const std::uint32_t start_row_index) {
 
                         std::size_t row = start_row_index;
+                        using component_type = plonk_range_check<BlueprintFieldType, ArithmetizationParams, R>;
                         typename BlueprintFieldType::value_type x = var_value(assignment, instance_input.x);
 
                         typename BlueprintFieldType::integral_type x_integral =
                             typename BlueprintFieldType::integral_type(x.data);
 
-                        std::array<bool, component.padded_chunks * component.chunk_size> bits;
+                        std::array<bool, component_type::padded_chunks * component_type::chunk_size> bits;
                         {
                             nil::marshalling::status_type status;
                             std::array<bool, 255> bytes_all =
@@ -162,7 +163,7 @@ namespace nil {
 
                         BOOST_ASSERT(component.chunk_size <= 8);
 
-                        std::array<std::uint8_t, component.padded_chunks> chunks;
+                        std::array<std::uint8_t, component_type::padded_chunks> chunks;
                         for (std::size_t i = 0; i < component.padded_chunks; i++) {
                             std::uint8_t chunk_value = 0;
                             for (std::size_t j = 0; j < component.chunk_size; j++) {
