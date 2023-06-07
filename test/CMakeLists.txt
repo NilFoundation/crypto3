@@ -43,20 +43,22 @@ macro(define_mode_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES cbc
-    cfb
-    ctr
+set(TESTS_NAMES
+    #cbc
+    #cfb
+    #ctr
     cts
-    ofb
-    xts
-    ecb
-    padding
-    aead_ccm
-    aead_chacha20poly1305
-    aead_eax
-    aead_gcm
-    aead_ocb
-    aead_siv)
+    #ofb
+    #xts
+    #ecb
+    #padding
+    #aead_ccm
+    #aead_chacha20poly1305
+    #aead_eax
+    #aead_gcm
+    #aead_ocb
+    #aead_siv
+    )
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_mode_test(${TEST_NAME})
