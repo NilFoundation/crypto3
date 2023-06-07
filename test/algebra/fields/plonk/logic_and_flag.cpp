@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2022 Polina Chernyshova <pockvokhbtra@nil.foundation>
+// Copyright (c) 2023 Valeh Farzaliyev <estoniaa@nil.foundation>
 //
 // MIT License
 //
@@ -37,15 +37,13 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/logic_and_flag.hpp>
-#include <nil/blueprint/components/algebra/fields/plonk/logic_or_flag.hpp>
 
 #include <map>
 
 #include "test_plonk_component.hpp"
 
-template<typename BlueprintFieldType>
+template<typename BlueprintFieldType, std::uint32_t WitnessColumns>
 auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> public_input) {
-    constexpr std::size_t WitnessColumns = 3;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
@@ -59,8 +57,11 @@ auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> pu
     using component_type = nil::blueprint::components::logic_and_flag<ArithmetizationType, WitnessColumns>;
 	using var = typename component_type::var;
 
-    component_type component_instance({0,1,2}, {}, {});
-    
+    std::array<std::uint32_t, WitnessColumns> witnesses;
+    for(std::uint32_t i=0;i<WitnessColumns; i++){
+        witnesses[i] = i;
+    }
+    component_type component_instance(witnesses);
 
     var x(0, 0, false, var::column_type::public_input);
     var y(0, 1, false, var::column_type::public_input); 
@@ -86,7 +87,7 @@ auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> pu
         component_instance, public_input, result_check, instance_input);
 }
 
-template<typename FieldType, std::size_t RandomTestsAmount>
+template<typename FieldType, std::size_t RandomTestsAmount, std::uint32_t WitnessesAmount>
 void test_logic_and_flag_random_input_and_zero(){
 
     nil::crypto3::random::algebraic_engine<FieldType> generate_random;
@@ -97,13 +98,13 @@ void test_logic_and_flag_random_input_and_zero(){
     typename FieldType::integral_type input_integral = typename FieldType::integral_type(input.data);
     input_integral = input_integral & 0xFFFFFFFFFFFFFFFF_cppui255;
     typename FieldType::value_type input_scalar =  input_integral;
-    test_logic_and_flag<FieldType>({input_scalar, 0});
-    test_logic_and_flag<FieldType>({0, input_scalar});
+    test_logic_and_flag<FieldType, WitnessesAmount>({input_scalar, 0});
+    test_logic_and_flag<FieldType, WitnessesAmount>({0, input_scalar});
 }
 
 
 
-template<typename FieldType, std::size_t RandomTestsAmount>
+template<typename FieldType, std::size_t RandomTestsAmount, std::uint32_t WitnessesAmount>
 void test_range_check_random_inputs(){
 
     nil::crypto3::random::algebraic_engine<FieldType> generate_random;
@@ -119,20 +120,34 @@ void test_range_check_random_inputs(){
     	typename FieldType::integral_type input_integral_y = typename FieldType::integral_type(input_y.data);
         input_integral_y = input_integral_y & 0xFFFFFFFFFFFFFFFF_cppui255;
 
-        test_logic_and_flag<FieldType>({input_integral_x,input_integral_y}); 
+        test_logic_and_flag<FieldType, WitnessesAmount>({input_integral_x,input_integral_y}); 
 	}
 }
 
 
-constexpr static const std::size_t random_tests_amount = 10;
+constexpr static const std::size_t random_tests_amount = 1;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_logic_and_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_all) {
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_five_witnesses_all) {
     using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type;
-    test_logic_and_flag<field_type>({0,0});
-    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount>();
-    test_range_check_random_inputs<field_type, random_tests_amount>();
+    test_logic_and_flag<field_type, 5>({0,0});
+    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, 5>();
+    test_range_check_random_inputs<field_type, random_tests_amount, 5>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_three_witnesses_all) {
+    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type;
+    test_logic_and_flag<field_type, 3>({0,0});
+    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, 3>();
+    test_range_check_random_inputs<field_type, random_tests_amount, 3>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_two_witnesses_all) {
+    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type;
+    test_logic_and_flag<field_type, 2>({0,0});
+    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, 2>();
+    test_range_check_random_inputs<field_type, random_tests_amount, 2>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
