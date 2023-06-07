@@ -33,6 +33,7 @@ cm_setup_version(VERSION 0.3.0 PREFIX ${CMAKE_WORKSPACE_NAME})
 
 option(BUILD_SHARED_LIBS "Build shared library" TRUE)
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
+option(BUILD_WITH_BOOST_STATIC_LIBS "Build using Boost static libraries" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_DOCS "Build with configuring Doxygen documentation compiler" TRUE)
 
@@ -40,6 +41,12 @@ set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
 set(DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/docs" CACHE STRING "Specify doxygen output directory")
 
 include(TargetArchitecture)
+
+if(BUILD_WITH_BOOST_STATIC_LIBS)
+    set(Boost_USE_STATIC_LIBS TRUE)
+else()
+    set(Boost_USE_STATIC_LIBS FALSE)
+endif()
 
 if(UNIX AND BUILD_WITH_CCACHE)
     find_program(CCACHE_FOUND ccache)
