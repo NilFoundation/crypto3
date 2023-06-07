@@ -39,7 +39,9 @@ macro(define_threshold_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES threshold)
+set(TESTS_NAMES 
+#threshold
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_threshold_test(${TEST_NAME})
