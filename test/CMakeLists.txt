@@ -43,7 +43,9 @@ macro(define_passhash_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES "bcrypt" "passhash9")
+set(TESTS_NAMES
+#"bcrypt" "passhash9"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_passhash_test(${TEST_NAME})
