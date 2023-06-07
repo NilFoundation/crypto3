@@ -26,16 +26,16 @@ make -C ${ZKLLVM_BUILD:-build} transpiler -j$(nproc)
 ${ZKLLVM_BUILD:-build}/bin/transpiler/transpiler -m gen-gate-argument -i input_folder -o output_folder
 ```
 Use `--optimize-gates` option to place small sequental gates to one `.sol` file
-Run to generate test proof:
+Let `public_input_file` is a file with public input. Run to generate test proof:
 ```bash
-${ZKLLVM_BUILD:-build}/bin/transpiler/transpiler -m gen-test-proof -i input_folder -o output_folder
+${ZKLLVM_BUILD:-build}/bin/transpiler/transpiler -m gen-test-proof -i input_folder -o output_folder -p public_input_file
 ```
-3. Copy `output_folder` to `evm-placeholder-verification/examples`. Use the branch [evm-placholder-verification](https://github.com/NilFoundation/evm-placeholder-verification/tree/37-merge-33-and-17) 
+3. Copy `output_folder` to `evm-placeholder-verification/contracts/zkllvm`.
 
-4. Run python scripts from the folder `evm-placeholder-verification/test` to verify test proof
+4. Run hardhat to verify proof:
 ```bash
-python3 web3_deploy_gate_argument.py examples/output_folder
-python3 web3_placeholder_verify_deployed_test.py examples/output_folder
+npx hardhat deploy
+npx hardhat verify-circuit-proof --test output_folder
 ```
 ## Dependencies
 
