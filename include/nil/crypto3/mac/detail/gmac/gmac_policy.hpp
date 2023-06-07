@@ -27,7 +27,7 @@
 
 #include <boost/integer.hpp>
 
-#include <nil/crypto3/mac/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 namespace nil {
     namespace crypto3 {
