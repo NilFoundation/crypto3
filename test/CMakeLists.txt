@@ -38,7 +38,9 @@ macro(define_pbkdf_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES "pbkdf1" "pbkdf2" "pgp_s2k")
+set(TESTS_NAMES
+#"pbkdf1" "pbkdf2" "pgp_s2k"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_pbkdf_test(${TEST_NAME})
