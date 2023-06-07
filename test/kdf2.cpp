@@ -25,7 +25,7 @@
 
 #define BOOST_TEST_MODULE kdf2_test
 
-#include <nil/crypto3/kdf/algorithm/kdf.hpp>
+#include <nil/crypto3/kdf/algorithm/derive.hpp>
 
 #include <nil/crypto3/kdf/kdf2.hpp>
 #include <nil/crypto3/kdf/kdf_state.hpp>

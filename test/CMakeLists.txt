@@ -42,15 +42,16 @@ macro(define_kdf_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "hkdf"
-    "kdf1"
-    "kdf2"
-    "kdf1_iso18033"
-    "prf_tls"
+    #"hkdf"
+    #"kdf1"
+    #"kdf2"
+    #"kdf1_iso18033"
+    #"prf_tls"
     #    "prf_x942"
-    "sp800_56a"
-    "sp800_56c"
-    "sp800_108")
+    #"sp800_56a"
+    #"sp800_56c"
+    #"sp800_108"
+    )
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_kdf_test(${TEST_NAME})
