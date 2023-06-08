@@ -271,7 +271,7 @@ namespace nil {
                         const typename CommitmentSchemeTypePermutation::commitment_type &F_perm_input_commitment,
                         const typename CommitmentSchemeTypePermutation::commitment_type &F_perm_value_commitment,
                         const typename CommitmentSchemeTypePermutation::commitment_type &V_L_commitment,
-                        transcript_type &transcript = transcript_type()) {
+                        transcript_type transcript = transcript_type()) {
                         // 1. Get theta
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
                         // 2. Add commitments to transcript

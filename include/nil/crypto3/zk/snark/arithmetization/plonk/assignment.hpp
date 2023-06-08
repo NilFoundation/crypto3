@@ -41,17 +41,17 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType, typename ArithmetizationParams>
-                struct plonk_constraint_system;
+                class plonk_constraint_system;
 
                 template<typename FieldType>
                 using plonk_column = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
-                struct plonk_table;
+                class plonk_table;
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
-                struct plonk_private_table {
-
+                class plonk_private_table {
+                public:
                     using witnesses_container_type = std::array<ColumnType, ArithmetizationParams::witness_columns>;
 
                 protected:
@@ -61,7 +61,7 @@ namespace nil {
                 public:
                     plonk_private_table(
                         witnesses_container_type witness_columns = {}) :
-                        _witnesses(witness_columns) {
+                        _witnesses(std::move(witness_columns)) {
                     }
 
                     std::uint32_t witnesses_amount() const {
@@ -101,8 +101,8 @@ namespace nil {
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
-                struct plonk_public_table {
-
+                class plonk_public_table {
+                public:
                     using public_input_container_type = std::array<ColumnType, ArithmetizationParams::public_input_columns>;
                     using constant_container_type = std::array<ColumnType, ArithmetizationParams::constant_columns>;
                     using selector_container_type = std::array<ColumnType, ArithmetizationParams::selector_columns>;
@@ -117,10 +117,10 @@ namespace nil {
                     plonk_public_table(
                         public_input_container_type public_input_columns = {},
                         constant_container_type constant_columns = {},
-                        selector_container_type selector_columns = {}) :
-                        _public_inputs(public_input_columns),
-                        _constants(constant_columns),
-                        _selectors(selector_columns) {
+                        selector_container_type selector_columns = {})
+                            : _public_inputs(std::move(public_input_columns))
+                            , _constants(std::move(constant_columns))
+                            , _selectors(std::move(selector_columns)) {
                     }
 
                     std::uint32_t public_inputs_amount() const {
@@ -202,8 +202,8 @@ namespace nil {
                 };
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
-                struct plonk_table {
-
+                class plonk_table {
+                public:
                     using private_table_type = plonk_private_table<FieldType, ArithmetizationParams, ColumnType>;
                     using public_table_type = plonk_public_table<FieldType, ArithmetizationParams, ColumnType>;
 
@@ -212,10 +212,10 @@ namespace nil {
                     public_table_type _public_table;
 
                 public:
-                    plonk_table(private_table_type private_table = private_table_type(),
-                                public_table_type public_table = public_table_type()) :
-                        _private_table(private_table),
-                        _public_table(public_table) {
+                    plonk_table(private_table_type private_table = {},
+                                public_table_type public_table = {})
+                        : _private_table(std::move(private_table))
+                        , _public_table(std::move(public_table)) {
                     }
 
                     ColumnType witness(std::uint32_t index) const {

@@ -66,7 +66,7 @@ namespace nil {
                     };
 
                     static inline prover_result_type prove_eval(
-                        plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
                             preprocessed_data,
@@ -75,7 +75,7 @@ namespace nil {
                         const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             &column_polynomials,
                         typename ParamsType::commitment_params_type fri_params,
-                        transcript_type &transcript = transcript_type()) {
+                        transcript_type transcript = transcript_type()) {
 
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;
@@ -164,7 +164,7 @@ namespace nil {
                         // V_P(omega * y):
                         const typename FieldType::value_type &perm_polynomial_shifted_value,
                         const typename permutation_commitment_scheme_type::commitment_type &V_P_commitment,
-                        transcript_type &transcript = transcript_type()) {
+                        transcript_type transcript = transcript_type()) {
 
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;

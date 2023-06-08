@@ -320,7 +320,7 @@ namespace nil {
                 >
                 static bool verify_eval(
                     const std::array<std::vector<std::vector<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &evaluation_points,
-                    typename LPC::proof_type &proof,
+                    const typename LPC::proof_type &proof,
                     const std::array<typename LPC::commitment_type, LPC::basic_fri::batches_num> &commitments,
                     typename LPC::basic_fri::params_type fri_params,
                     typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()

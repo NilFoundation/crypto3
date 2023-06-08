@@ -109,13 +109,13 @@ namespace nil {
 
                     static inline std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size>
                         prove_eval(
-                            typename policy_type::constraint_system_type &constraint_system,
+                            const typename policy_type::constraint_system_type &constraint_system,
                             const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                                 &column_polynomials,
                             std::shared_ptr<math::evaluation_domain<FieldType>>
                                 original_domain,
                             std::uint32_t max_gates_degree,
-                            transcript_type &transcript = transcript_type()) {
+                            transcript_type transcript = transcript_type()) {
 
                         std::uint32_t extended_domain_size = original_domain->m * std::pow(2, ceil(std::log2(max_gates_degree)));
                         

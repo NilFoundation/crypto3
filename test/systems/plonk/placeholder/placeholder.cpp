@@ -592,8 +592,9 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
         preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_2_params>::process(
             constraint_system, assignments.private_table(), desc, fri_params);
 
-    auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
+    auto prover = placeholder_prover<FieldType, circuit_2_params>(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
+    const auto& proof = prover.process();
 
     bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
         preprocessed_public_data, proof, constraint_system, fri_params);
@@ -628,11 +629,11 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test, *boost::unit_test::disabled
         preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_3_params>::process(
             constraint_system, assignments.private_table(), desc, fri_params);
 
-    auto proof = placeholder_prover<FieldType, circuit_3_params>::process(
+    auto prover = placeholder_prover<FieldType, circuit_3_params>(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
-
-    bool verifier_res = placeholder_verifier<FieldType, circuit_3_params>::process(preprocessed_public_data, proof,
-                                                                                   constraint_system, fri_params);
+    const auto& proof = prover.process();
+    bool verifier_res = placeholder_verifier<FieldType, circuit_3_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params);
     BOOST_CHECK(verifier_res);
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -74,15 +74,12 @@ namespace nil {
                     std::vector<plonk_copy_constraint<FieldType>> copy_constraints;
                     std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates;
 
-                    circuit_description() {
-                        domain = math::make_evaluation_domain<FieldType>(table_rows);
-
-                        omega = domain->get_domain_element(1);
-                        delta = algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;
+                    circuit_description()
+                        : domain(math::make_evaluation_domain<FieldType>(table_rows))
+                        , omega(domain->get_domain_element(1))
+                        , delta(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator) {
                     }
 
-                    void init() {
-                    }
                 };
 
                 //---------------------------------------------------------------------------//
@@ -156,9 +153,7 @@ namespace nil {
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
-                        for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
-                            private_assignment[i][j] = table[i][j];
-                        }
+                        private_assignment[i] = table[i];
                     }
 
                     std::vector<plonk_column<FieldType>> selectors_assignment(selector_columns);
@@ -170,17 +165,13 @@ namespace nil {
                     }
 
                     for (std::size_t i = 0; i < public_columns; i++) {
-                        for (std::size_t j = 0; j < test_circuit.table_rows; j++) {
-                            public_input_assignment[i][j] = table[witness_columns + i][j];
-                        }
+                        public_input_assignment[i] = table[witness_columns + i];
                     }
 
                     test_circuit.table = plonk_assignment_table<FieldType, arithmetization_params_1>(
                         plonk_private_assignment_table<FieldType, arithmetization_params_1>(private_assignment),
                         plonk_public_assignment_table<FieldType, arithmetization_params_1>(
                             public_input_assignment, constant_assignment, selectors_assignment));
-
-                    test_circuit.init();
 
                     plonk_variable<FieldType> w0(0, 0,
                                                  plonk_variable<FieldType>::column_type::witness);
@@ -315,8 +306,6 @@ namespace nil {
                         plonk_public_assignment_table<FieldType, arithmetization_params_2>(
                             public_input_assignment, constant_assignment, selectors_assignment));
 
-                    test_circuit.init();
-
                     plonk_variable<FieldType> w0(0, 0, true,
                                                  plonk_variable<FieldType>::column_type::witness);
                     plonk_variable<FieldType> w1(1, 0, true,
@@ -424,7 +413,6 @@ namespace nil {
                         plonk_public_assignment_table<FieldType, arithmetization_params_3>(
                             public_input_assignment, constant_assignment, selectors_assignment));
 
-                    test_circuit.init();
                     plonk_variable<FieldType> w0(0, 0, true,
                                                 plonk_variable<FieldType>::column_type::witness);
                     plonk_variable<FieldType> w1(1, 0, true,
@@ -449,6 +437,7 @@ namespace nil {
                     lookup_constraint.lookup_value.push_back(c2);
                     std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints = {lookup_constraint};
                     plonk_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(0, lookup_constraints);
+                    test_circuit.lookup_gates.push_back(lookup_gate);
                     return test_circuit;
                 }
             }    // namespace snark
