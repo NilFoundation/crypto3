@@ -37,9 +37,15 @@ namespace nil {
         namespace components {
 
 
-            /**
+            /** && component
+             *  Input: x, y
+             *  Output: f = 0 if xy=0, f=1 otherwise
              * 
-             * 
+             *  Let p = xy; Then there exists v such that vp=f.
+             *  If p=0, then v=0, so f. Otherwise, v = p.inverse() and f = 1
+             *  Additional constraints: 
+             *      f(f-1) = 0
+             *      (v-p)(f-1)=0
              * */
             template<typename ArithmetizationType, std::uint32_t WitnessesAmount> 
             class logic_and_flag;
@@ -48,16 +54,13 @@ namespace nil {
             class logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessesAmount>
                 : public plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0>{
 
-                // constexpr static const std::uint32_t WitnessesAmount = WitnessesAmount;
-                
-
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0>;
                 using value_type = typename BlueprintFieldType::value_type;
             public:
                 using var = typename component_type::var;
 
                 const std::size_t gates_amount = 1;
-                const std::size_t rows_amount = 6 / WitnessesAmount;
+                const std::size_t rows_amount = WitnessesAmount == 2 ? 3 : WitnessesAmount < 5 ? 2 : 1;
 
                 struct input_type{
                     var x;
@@ -105,7 +108,6 @@ namespace nil {
                     const std::uint32_t start_row_index){
 
                         std::size_t row = start_row_index;
-                        std::size_t offset = 6 / component.rows_amount - 1;
                         std::size_t witness_amount = WitnessesAmount;
 
                         std::array<typename BlueprintFieldType::value_type, 6> t;
@@ -116,9 +118,11 @@ namespace nil {
                         t[4] = t[3]-t[2]; // v-p
                         t[5] = t[3]*t[2]; // f
                         
+                        std::size_t _idx;
                         for(std::size_t i=0;i<component.rows_amount;i++){
                             for(std::size_t j=0; j < witness_amount; j++){
-                                assignment.witness(component.W(j), row+i) = t[i*witness_amount + j];
+                                _idx = i*witness_amount + j;
+                                assignment.witness(component.W(j), row+i) = t[_idx % 6];  // circularly fill all witness/rows table
                             }
                         }
                         assignment.witness(component.W(witness_amount-1), row+component.rows_amount-1) = t[5]; //always set last element as output
@@ -127,63 +131,55 @@ namespace nil {
                 }
 
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
                 void generate_gates(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 2>& component,
+                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>& component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment, 
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 2>::input_type &instance_input, 
+                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>::input_type &instance_input, 
                     const std::uint32_t first_selector_index
                 ){
                     
-                    using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 2>::var;
-                    
-                    auto constraint_1 = bp.add_constraint(var(component.W(0), 0) - var(component.W(0), -1) * var(component.W(1),-1));  // p =x*y
-                    auto constraint_2 = bp.add_constraint(var(component.W(1), +1)*(var(component.W(1),+1) - 1));                       // f(f-1)=0
-                    auto constraint_3 = bp.add_constraint(var(component.W(1), +1) - var(component.W(0), 0)*var(component.W(1),0));   // f = pv
-                    auto constraint_4 = bp.add_constraint(var(component.W(0), +1) - (var(component.W(1), 0) - var(component.W(0),0))); // W1[2] = p-v
-                    auto constraint_5 = bp.add_constraint(var(component.W(0), +1)*(var(component.W(1),+1) - 1));                       // (p-v)(f-1)=0
+                    using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>::var;
 
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5});
-                }
+                    std::size_t offset = component.rows_amount == 3 ? -1 : 0;
+                    std::size_t witness_amount = WitnessesAmount;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_gates(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 3>& component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment, 
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 3>::input_type &instance_input, 
-                    const std::uint32_t first_selector_index
-                ){
-                    
-                    using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 3>::var;
-                    
-                    auto constraint_1 = bp.add_constraint(var(component.W(2), 0) - var(component.W(0), 0) * var(component.W(1),0));  // p =x*y
-                    auto constraint_2 = bp.add_constraint(var(component.W(2), +1)*(var(component.W(2),+1) - 1));                       // f(f-1)=0
-                    auto constraint_3 = bp.add_constraint(var(component.W(2), +1) - var(component.W(0), +1)*var(component.W(2),0));   // f = pv
-                    auto constraint_4 = bp.add_constraint(var(component.W(1), +1) - (var(component.W(0), +1) - var(component.W(2),0))); // W1[2] = v-p
-                    auto constraint_5 = bp.add_constraint(var(component.W(1), +1)*(var(component.W(2),+1) - 1));                       // (v-p)(f-1)=0
+                    std::array<std::pair<std::size_t, std::size_t>, 6> wl;
 
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5});
-                }
+                    int _idx;
+                    for(int i=0; i<component.rows_amount;i++){
+                        for(int j=0; j<witness_amount;j++){
+                            _idx = i*witness_amount + j;
+                            if(_idx < 6){
+                                wl[_idx] = std::make_pair(j, i+offset);
+                            }
+                        }
+                    }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_gates(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 5>& component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment, 
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 5>::input_type &instance_input, 
-                    const std::uint32_t first_selector_index
-                ){
-                    
-                    using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, 5>::var;
-                    
-                    auto constraint_1 = bp.add_constraint(var(component.W(2), 0) - var(component.W(0), 0) * var(component.W(1),0));  // p =x*y
-                    auto constraint_2 = bp.add_constraint(var(component.W(4), 0)*(var(component.W(4),0) - 1));                       // f(f-1)=0
-                    auto constraint_3 = bp.add_constraint(var(component.W(4), 0) - var(component.W(2), 0)*var(component.W(3),0));   // f = pv
-                    auto constraint_4 = bp.add_constraint((var(component.W(3), 0) - var(component.W(2),0))*(var(component.W(4),0) - 1)); // (v-p)(f-1)=0
+                    auto _x = var(component.W(wl[0].first), wl[0].second);
+                    auto _y = var(component.W(wl[1].first), wl[1].second);
+                    auto _p = var(component.W(wl[2].first), wl[2].second);
+                    auto _v = var(component.W(wl[3].first), wl[3].second);
+                    auto _vp = var(component.W(wl[4].first), wl[4].second);
+                    auto _f = var(component.W(witness_amount-1), offset + component.rows_amount - 1);
 
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
+
+                    auto constraint_1 = bp.add_constraint(_p - _x*_y);  // p =x*y
+                    auto constraint_2 = bp.add_constraint(_f*(_f-1));                       // f(f-1)=0
+                    auto constraint_3 = bp.add_constraint(_f - _p*_v);     // f = pv
+                    
+                    if(witness_amount != 5){
+                        auto constraint_4 = bp.add_constraint(_vp - (_v - _p)); // W1[2] = p-v
+                        auto constraint_5 = bp.add_constraint(_vp*(_f - 1));                       // (p-v)(f-1)=0
+
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5});
+                    }
+                    else{
+                        auto constraint_4 = bp.add_constraint((_v - _p)*(_f - 1)); // (v-p)(f-1)=0    
+
+                        bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
+                    }
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
@@ -220,7 +216,7 @@ namespace nil {
                         first_selector_index = selector_iterator->second;
                     }
                     
-                    assignment.enable_selector(first_selector_index, start_row_index + (WitnessesAmount == 2 ?  1 : 0));
+                    assignment.enable_selector(first_selector_index, start_row_index + (component.rows_amount == 3 ?  1 : 0));
                     
                     generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 

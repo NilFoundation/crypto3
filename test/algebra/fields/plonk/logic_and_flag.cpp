@@ -129,25 +129,38 @@ constexpr static const std::size_t random_tests_amount = 1;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_logic_and_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_five_witnesses_all) {
-    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type;
-    test_logic_and_flag<field_type, 5>({0,0});
-    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, 5>();
-    test_range_check_random_inputs<field_type, random_tests_amount, 5>();
+#define test_case_expand(WitnessesAmount) \
+    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type; \
+    std::cout << "witness size: " << WitnessesAmount << "\n"; \
+    test_logic_and_flag<field_type, WitnessesAmount>({0,0}); \
+    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, WitnessesAmount>(); \
+    test_range_check_random_inputs<field_type, random_tests_amount, WitnessesAmount>();
+
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_two_witnesses_all) {
+    test_case_expand(2);
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_three_witnesses_all) {
-    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type;
-    test_logic_and_flag<field_type, 3>({0,0});
-    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, 3>();
-    test_range_check_random_inputs<field_type, random_tests_amount, 3>();
+    test_case_expand(3);
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_two_witnesses_all) {
-    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type;
-    test_logic_and_flag<field_type, 2>({0,0});
-    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, 2>();
-    test_range_check_random_inputs<field_type, random_tests_amount, 2>();
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_four_witnesses_all) {
+    test_case_expand(4);
 }
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_five_witnesses_all) {
+    test_case_expand(5);
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_six_witnesses_all) {
+    test_case_expand(6);
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_seven_witnesses_all) {
+    test_case_expand(7);     
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
