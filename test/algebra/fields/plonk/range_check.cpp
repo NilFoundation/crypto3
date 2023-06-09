@@ -75,7 +75,7 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using component_type = nil::blueprint::components::range_check<ArithmetizationType, WitnessesAmount, R>;
+    using component_type = nil::blueprint::components::range_check<ArithmetizationType, WitnessesAmount>;
 	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     using value_type = typename BlueprintFieldType::value_type;
 
@@ -93,8 +93,9 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
     const bool expected_to_pass = input < value_type(2).pow(R);
 
     component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0})
-                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0});
+                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0},
+                                                           {0}, R)
+                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0}, R);
 
     if (!(WitnessesAmount == 15 || WitnessesAmount == 9)) {
         BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;

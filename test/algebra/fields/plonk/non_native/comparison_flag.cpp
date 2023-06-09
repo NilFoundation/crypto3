@@ -63,7 +63,7 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using component_type = nil::blueprint::components::comparison_flag<ArithmetizationType, WitnessesAmount, R, Mode>;
+    using component_type = nil::blueprint::components::comparison_flag<ArithmetizationType, WitnessesAmount>;
 	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     using value_type = typename BlueprintFieldType::value_type;
 
@@ -104,9 +104,11 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
     };
 
     component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0})
-                                      : WitnessesAmount == 9 ? component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0})
-                                                             : component_type({0, 1, 2}, {0}, {0});
+                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0},
+                                                           {0}, R, Mode)
+                                      : WitnessesAmount == 9 ? component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0},
+                                                                              R, Mode)
+                                                             : component_type({0, 1, 2}, {0}, {0}, R, Mode);
 
     if (!(WitnessesAmount == 15 || WitnessesAmount == 9 || WitnessesAmount == 3)) {
         BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
@@ -296,7 +298,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_pallas_3_64_greater_equa
 
     test_comparison_flag_specific_inputs<field_type, 3, 64, comparison_mode::GREATER_EQUAL>();
     test_comparison_flag_random_inputs<field_type, 3, 64,
-                                  comparison_mode::GREATER_EQUAL, random_tests_amount>();
+                                       comparison_mode::GREATER_EQUAL, random_tests_amount>();
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_comparison_oops_wrong_chunks) {

@@ -67,7 +67,7 @@ auto test_comparison_checked(typename BlueprintFieldType::value_type x,
 
     using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
     using value_type = typename BlueprintFieldType::value_type;
-    using component_type = nil::blueprint::components::comparison_checked<ArithmetizationType, WitnessesAmount, R, Mode>;
+    using component_type = nil::blueprint::components::comparison_checked<ArithmetizationType, WitnessesAmount>;
 
     var x_var(0, 0, false, var::column_type::public_input),
         y_var(0, 1, false, var::column_type::public_input);
@@ -96,9 +96,11 @@ auto test_comparison_checked(typename BlueprintFieldType::value_type x,
     }
 
     component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0})
-                                      : WitnessesAmount == 9 ? component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0})
-                                                             : component_type({0, 1, 2}, {0}, {0});
+                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0},
+                                                           {0}, R, Mode)
+                                      : WitnessesAmount == 9 ? component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0},
+                                                                              R, Mode)
+                                                             : component_type({0, 1, 2}, {0}, {0}, R, Mode);
 
     if (!(WitnessesAmount == 15 || WitnessesAmount == 9 || WitnessesAmount == 3)) {
         BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;

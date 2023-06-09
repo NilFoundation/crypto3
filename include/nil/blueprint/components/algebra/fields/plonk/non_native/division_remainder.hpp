@@ -43,25 +43,32 @@
 namespace nil {
     namespace blueprint {
         namespace components {
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount, std::size_t R, bool CheckInputs>
+            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
             class division_remainder;
 
             /*
-                For x, y < 2^{R} bits, where R < modulus_bits / 2, we divide x by y:
+                For x, y < 2^{bits_amount} bits, where bits_amount < modulus_bits / 2, we divide x by y:
                 x = qy + r, r < y,
                 outputting q and r.
-                If CheckInputs = true, this checks that x and y satisfy x, y < 2^{R}.
+                If check_inputs = true, this checks that x and y satisfy x, y < 2^{bits_amount}.
             */
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
-                     std::size_t R, bool CheckInputs>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
             class division_remainder<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                                  ArithmetizationParams>,
-                                     WitnessesAmount, R, CheckInputs> :
+                                     WitnessesAmount> :
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 1, 0> {
 
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams,
                                                        WitnessesAmount, 1, 0>;
                 using value_type = typename BlueprintFieldType::value_type;
+
+                static std::size_t range_check_amount_init(bool check_inputs) {
+                    return 2 + 2 * check_inputs;
+                }
+
+                std::size_t rows() const {
+                    return range_check_amount * range_checks[0].rows_amount + 1 + needs_bonus_row;
+                }
 
             public:
                 using var = typename component_type::var;
@@ -69,15 +76,17 @@ namespace nil {
                 using range_check_component_type =
                     range_check<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                             ArithmetizationParams>,
-                                WitnessesAmount, R>;
+                                WitnessesAmount>;
 
-                constexpr static const std::size_t range_check_amount = 2 + 2 * CheckInputs;
+                const std::size_t bits_amount;
+                const bool check_inputs;
 
-                std::array<range_check_component_type, range_check_amount> range_checks;
+                const std::size_t range_check_amount;
+
+                std::vector<range_check_component_type> range_checks;
 
                 constexpr static const bool needs_bonus_row = WitnessesAmount < 5;
-                constexpr static const std::size_t rows_amount =
-                    range_check_amount * range_check_component_type::rows_amount + 1 + needs_bonus_row;
+                const std::size_t rows_amount;
                 constexpr static const std::size_t gates_amount = 1;
 
                 enum var_address {
@@ -113,69 +122,55 @@ namespace nil {
                     }
                 };
 
-                template<typename ContainerType, std::size_t... Is>
-                division_remainder(ContainerType witness, std::index_sequence<Is...>):
-                    component_type(witness, {}, {}),
-                    range_checks({((void) Is, range_check_component_type(witness, {}, {}))...})
-                {};
+                #define __division_remainder_init_macro(witness, constant, public_input, \
+                                                        bits_amount_, check_inputs_) \
+                    bits_amount(bits_amount_), \
+                    check_inputs(check_inputs_), \
+                    range_check_amount(range_check_amount_init(check_inputs_)), \
+                    range_checks(range_check_amount, \
+                                 range_check_component_type(witness, constant, public_input, bits_amount_)), \
+                    rows_amount(rows())
 
                 template<typename ContainerType>
-                division_remainder(ContainerType witness) :
-                    division_remainder(witness, {}, {}, std::make_index_sequence<range_check_amount>{})
-                {};
-
-                template<typename WitnessContainerType, typename ConstantContainerType,
-                         typename PublicInputContainerType, std::size_t... Is>
-                division_remainder(WitnessContainerType witness, ConstantContainerType constant,
-                                   PublicInputContainerType public_input,
-                                   std::index_sequence<Is...>):
-                    component_type(witness, constant, public_input),
-                    range_checks({((void) Is, range_check_component_type(witness, constant, public_input))...})
-                {};
+                division_remainder(ContainerType witness, std::size_t bits_amount_, bool check_inputs_) :
+                    component_type(witness, {}, {}),
+                    __division_remainder_init_macro(witness, {}, {}, bits_amount_, check_inputs_) {};
 
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 division_remainder(WitnessContainerType witness, ConstantContainerType constant,
-                                   PublicInputContainerType public_input):
-                    division_remainder(witness, constant, public_input, std::make_index_sequence<range_check_amount>{})
-                {};
+                                   PublicInputContainerType public_input,
+                                   std::size_t bits_amount_, bool check_inputs_):
+                    component_type(witness, constant, public_input),
+                    __division_remainder_init_macro(witness, constant, public_input, bits_amount_, check_inputs_) {};
 
-                template<std::size_t... Is>
                 division_remainder(
                     std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
                     std::initializer_list<typename component_type::constant_container_type::value_type> constants,
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
-                    std::index_sequence<Is...>) :
-                            component_type(witnesses, constants, public_inputs),
-                            range_checks(
-                                {((void) Is, range_check_component_type(witnesses, constants, public_inputs))...})
+                    std::size_t bits_amount_, bool check_inputs_) :
+                        component_type(witnesses, constants, public_inputs),
+                        __division_remainder_init_macro(witnesses, constants, public_inputs,
+                                                        bits_amount_, check_inputs_)
                 {};
 
-                division_remainder(
-                    std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
-                    std::initializer_list<typename component_type::constant_container_type::value_type> constants,
-                    std::initializer_list<typename component_type::public_input_container_type::value_type>
-                        public_inputs) :
-                            division_remainder(
-                                witnesses, constants, public_inputs, std::make_index_sequence<range_check_amount>{})
-                {};
+                #undef __division_remainder_init_macro
+                #undef __division_remainder_range_checks_init_macro
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
-                     std::size_t R, bool CheckInputs>
+            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
             using plonk_division_remainder =
                 division_remainder<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                                ArithmetizationParams>,
-                                   WitnessesAmount, R, CheckInputs>;
+                                   WitnessesAmount>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
-                     std::size_t R, bool CheckInputs,
-                     std::enable_if_t<R < BlueprintFieldType::modulus_bits / 2, bool> = true>
+                     std::enable_if_t<WitnessesAmount >= 2, bool> = true>
             void generate_gates(
                 const plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                               WitnessesAmount, R, CheckInputs>
+                                               WitnessesAmount>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                     ArithmetizationParams>>
@@ -184,12 +179,12 @@ namespace nil {
                                                                        ArithmetizationParams>>
                     &assignment,
                 const typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                        WitnessesAmount, R, CheckInputs>::input_type
+                                                        WitnessesAmount>::input_type
                     &instance_input,
                 const std::size_t first_selector_index) {
 
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                                WitnessesAmount, R, CheckInputs>;
+                                                                WitnessesAmount>;
                 using var = typename component_type::var;
                 using var_address = typename component_type::var_address;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
@@ -213,11 +208,10 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
-                     std::size_t R, bool CheckInputs,
-                     std::enable_if_t<R < BlueprintFieldType::modulus_bits / 2, bool> = true>
+                     std::enable_if_t<WitnessesAmount >= 2, bool> = true>
             void generate_copy_constraints(
                 const plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                               WitnessesAmount, R, CheckInputs>
+                                               WitnessesAmount>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                     ArithmetizationParams>>
@@ -226,12 +220,12 @@ namespace nil {
                                                                        ArithmetizationParams>>
                     &assignment,
                 const typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                        WitnessesAmount, R, CheckInputs>::input_type
+                                                        WitnessesAmount>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                                WitnessesAmount, R, CheckInputs>;
+                                                                WitnessesAmount>;
                 using var = typename component_type::var;
                 using var_address = typename component_type::var_address;
                 std::uint32_t row = start_row_index;
@@ -245,13 +239,12 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
-                     std::size_t R, bool CheckInputs,
-                     std::enable_if_t<R < BlueprintFieldType::modulus_bits / 2, bool> = true>
+                     std::enable_if_t<WitnessesAmount >= 2, bool> = true>
             typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                              WitnessesAmount, R, CheckInputs>::result_type
+                                              WitnessesAmount>::result_type
             generate_circuit(
                 const plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                               WitnessesAmount, R, CheckInputs>
+                                               WitnessesAmount>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                     ArithmetizationParams>>
@@ -260,7 +253,7 @@ namespace nil {
                                                                        ArithmetizationParams>>
                     &assignment,
                 const typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                        WitnessesAmount, R, CheckInputs>::input_type
+                                                        WitnessesAmount>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
@@ -269,7 +262,7 @@ namespace nil {
                 std::size_t row = start_row_index;
 
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                                WitnessesAmount, R, CheckInputs>;
+                                                                WitnessesAmount>;
                 using var = typename component_type::var;
                 using var_address = typename component_type::var_address;
 
@@ -298,7 +291,7 @@ namespace nil {
                                  {var(component.W(q_address.second), q_address.first)}, row);
                 row += component.range_checks[1].rows_amount;
 
-                if (CheckInputs) {
+                if (component.check_inputs) {
                     generate_circuit(component.range_checks[2], bp, assignment,
                                      {var(component.W(x_address.second), x_address.first)}, row);
                     row += component.range_checks[2].rows_amount;
@@ -316,26 +309,25 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
-                     std::size_t R, bool CheckInputs,
-                     std::enable_if_t<R < BlueprintFieldType::modulus_bits / 2, bool> = true>
+                     std::enable_if_t<WitnessesAmount >= 2, bool> = true>
             typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                              WitnessesAmount, R, CheckInputs>::result_type
+                                              WitnessesAmount>::result_type
             generate_assignments(
                 const plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                               WitnessesAmount, R, CheckInputs>
+                                               WitnessesAmount>
                     &component,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                        ArithmetizationParams>>
                     &assignment,
                 const typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                        WitnessesAmount, R, CheckInputs>::input_type
+                                                        WitnessesAmount>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
 
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams,
-                                                                WitnessesAmount, R, CheckInputs>;
+                                                                WitnessesAmount>;
                 using value_type = typename BlueprintFieldType::value_type;
                 using integral_type = typename BlueprintFieldType::integral_type;
                 using var = typename component_type::var;
@@ -372,7 +364,7 @@ namespace nil {
                                      {var(component.W(q_address.second), q_address.first)}, row);
                 row += component.range_checks[1].rows_amount;
 
-                if (CheckInputs) {
+                if (component.check_inputs) {
                     generate_assignments(component.range_checks[2], assignment,
                                          {var(component.W(x_address.second), x_address.first)}, row);
                     row += component.range_checks[2].rows_amount;
