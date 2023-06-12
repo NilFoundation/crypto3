@@ -437,7 +437,7 @@ namespace nil {
                     lookup_constraint.lookup_value.push_back(c2);
                     std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints = {lookup_constraint};
                     plonk_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(0, lookup_constraints);
-                    test_circuit.lookup_gates.push_back(lookup_gate);
+                    // test_circuit.lookup_gates.push_back(lookup_gate);
                     return test_circuit;
                 }
             }    // namespace snark

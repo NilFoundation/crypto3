@@ -75,7 +75,7 @@ namespace nil {
                         const plonk_assignment_table<FieldType, typename ParamsType::arithmetization_params>
                             &plonk_columns,
                         typename CommitmentSchemeTypePermutation::params_type fri_params,
-                        transcript_type &transcript = transcript_type()) {
+                        transcript_type &transcript) {
 
                         // $/theta = \challenge$
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -271,7 +271,7 @@ namespace nil {
                         const typename CommitmentSchemeTypePermutation::commitment_type &F_perm_input_commitment,
                         const typename CommitmentSchemeTypePermutation::commitment_type &F_perm_value_commitment,
                         const typename CommitmentSchemeTypePermutation::commitment_type &V_L_commitment,
-                        transcript_type transcript = transcript_type()) {
+                        transcript_type& transcript) {
                         // 1. Get theta
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
                         // 2. Add commitments to transcript

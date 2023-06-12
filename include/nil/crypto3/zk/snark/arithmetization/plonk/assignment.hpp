@@ -72,21 +72,19 @@ namespace nil {
                         return _witnesses[index].size();
                     }
 
-                    ColumnType witness(std::uint32_t index) const {
+                    const ColumnType& witness(std::uint32_t index) const {
                         assert(index < ArithmetizationParams::witness_columns);
                         return _witnesses[index];
                     }
 
-                    witnesses_container_type witnesses() const {
+                    const witnesses_container_type& witnesses() const {
                         return _witnesses;
                     }
 
-                    ColumnType operator[](std::uint32_t index) const {
+                    const ColumnType& operator[](std::uint32_t index) const {
                         if (index < ArithmetizationParams::witness_columns)
                             return _witnesses[index];
-                        index -= ArithmetizationParams::witness_columns;
-                        return {};
-
+                        throw std::out_of_range("Public table index out of range."); 
                     }
 
                     constexpr std::uint32_t size() const {
@@ -131,12 +129,12 @@ namespace nil {
                         return _public_inputs[index].size();
                     }
 
-                    ColumnType public_input(std::uint32_t index) const {
+                    const ColumnType& public_input(std::uint32_t index) const {
                         assert(index < public_inputs_amount());
                         return _public_inputs[index];
                     }
 
-                    public_input_container_type public_inputs() const {
+                    const public_input_container_type& public_inputs() const {
                         return _public_inputs;
                     }
 
@@ -148,12 +146,12 @@ namespace nil {
                         return _constants[index].size();
                     }
 
-                    ColumnType constant(std::uint32_t index) const {
+                    const ColumnType& constant(std::uint32_t index) const {
                         assert(index < constants_amount());
                         return _constants[index];
                     }
 
-                    constant_container_type constants() const {
+                    const constant_container_type& constants() const {
                         return _constants;
                     }
 
@@ -165,16 +163,16 @@ namespace nil {
                         return _selectors[index].size();
                     }
 
-                    ColumnType selector(std::uint32_t index) const {
+                    const ColumnType& selector(std::uint32_t index) const {
                         assert(index < selectors_amount());
                         return _selectors[index];
                     }
 
-                    selector_container_type selectors() const {
+                    const selector_container_type& selectors() const {
                         return _selectors;
                     }
 
-                    ColumnType operator[](std::uint32_t index) const {
+                    const ColumnType& operator[](std::uint32_t index) const {
                         if (index < public_inputs_amount())
                             return public_input(index);
                         index -= public_inputs_amount();
@@ -184,8 +182,7 @@ namespace nil {
                         if (index < selectors_amount()) {
                             return selector(index);
                         }
-                        index -= selectors_amount();
-                        return {};
+                        throw std::out_of_range("Public table index out of range."); 
                     }
 
                     constexpr std::uint32_t size() const {
@@ -218,36 +215,36 @@ namespace nil {
                         , _public_table(std::move(public_table)) {
                     }
 
-                    ColumnType witness(std::uint32_t index) const {
+                    const ColumnType& witness(std::uint32_t index) const {
                         return _private_table.witness(index);
                     }
 
-                    ColumnType public_input(std::uint32_t index) const {
+                    const ColumnType& public_input(std::uint32_t index) const {
                         return _public_table.public_input(index);
                     }
 
-                    ColumnType constant(std::uint32_t index) const {
+                    const ColumnType& constant(std::uint32_t index) const {
                         return _public_table.constant(index);
                     }
 
-                    ColumnType selector(std::uint32_t index) const {
+                    const ColumnType& selector(std::uint32_t index) const {
                         return _public_table.selector(index);
                     }
 
-                    ColumnType operator[](std::uint32_t index) const {
+                    const ColumnType& operator[](std::uint32_t index) const {
                         if (index < _private_table.size())
                             return _private_table[index];
                         index -= _private_table.size();
                         if (index < _public_table.size())
                             return _public_table[index];
-                        return {};
+                        throw std::out_of_range("Private table index out of range."); 
                     }
 
-                    private_table_type private_table() const {
+                    const private_table_type& private_table() const {
                         return _private_table;
                     }
 
-                    public_table_type public_table() const {
+                    const public_table_type& public_table() const {
                         return _public_table;
                     }
 

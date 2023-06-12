@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/lookup_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
@@ -54,6 +55,8 @@ namespace nil {
                     static inline std::vector<math::polynomial<typename FieldType::value_type>>
                         split_polynomial(const math::polynomial<typename FieldType::value_type> &f,
                                          std::size_t max_degree) {
+                        PROFILE_PLACEHOLDER_SCOPE("split_polynomial_time");
+
                         std::size_t parts = ((f.size() - 1) / (max_degree + 1)) + 1;
                         std::vector<math::polynomial<typename FieldType::value_type>> f_splitted;
 
@@ -79,6 +82,8 @@ namespace nil {
                     using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
 
                     typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
+                    typedef typename math::polynomial<typename FieldType::value_type> polynomial_type;
+                    typedef typename math::polynomial_dfs<typename FieldType::value_type> polynomial_dfs_type;
 
                     constexpr static const std::size_t lambda = ParamsType::commitment_params_type::lambda;
                     constexpr static const std::size_t r = ParamsType::commitment_params_type::r;
@@ -96,11 +101,27 @@ namespace nil {
 
               public:
 
+                    static inline placeholder_proof<FieldType, ParamsType> process(
+                        const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
+                        const typename private_preprocessor_type::preprocessed_data_type &preprocessed_private_data,
+                        const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
+                            &table_description,
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                            &constraint_system,
+                        const typename policy_type::variable_assignment_type &assignments,
+                        const typename ParamsType::commitment_params_type &fri_params) { 
+
+                        auto prover = placeholder_prover<FieldType, ParamsType>(
+                            preprocessed_public_data, preprocessed_private_data, table_description,
+                            constraint_system, assignments, fri_params);
+                        return prover.process();
+                    }
+
                     placeholder_prover(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         const typename private_preprocessor_type::preprocessed_data_type &preprocessed_private_data,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description,
-                        plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
                         const typename ParamsType::commitment_params_type &fri_params) 
                             : preprocessed_public_data(preprocessed_public_data)
@@ -110,55 +131,34 @@ namespace nil {
                             , assignments(assignments)
                             , fri_params(fri_params)
                             , _polynomial_table(preprocessed_private_data.private_polynomial_table,
-                                               preprocessed_public_data.public_polynomial_table) 
+                                                preprocessed_public_data.public_polynomial_table) 
+                            , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
+                            , transcript(std::vector<std::uint8_t>())
                     {
- 
-                    }
-
-                    const placeholder_proof<FieldType, ParamsType>& process() {
-                        auto begin = std::chrono::high_resolution_clock::now();
-                        auto last = begin;
-                        auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-
                         // 1. Add circuit definition to transcript
                         // transcript(short_description); 
                         //TODO: circuit_short_description marshalling
-                        std::vector<std::uint8_t> transcript_init {};
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
+                    }
+
+                    placeholder_proof<FieldType, ParamsType> process() {
+                        PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time:");
 
                         // 2. Commit witness columns and public_input columns
 
-                        std::array<std::vector<math::polynomial_dfs<typename FieldType::value_type>>, 4> combined_poly;
-                        
                         for (std::size_t i = 0; i < _polynomial_table.witnesses_amount(); i++){
-                            combined_poly[0].push_back( _polynomial_table.witness(i));
+                            _combined_poly[0].push_back( _polynomial_table.witness(i));
                         }
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        last = std::chrono::high_resolution_clock::now();
-#endif
                         for (std::size_t i = 0; i < _polynomial_table.public_inputs_amount(); i++){
-                            combined_poly[0].push_back(_polynomial_table.public_input(i));
+                            _combined_poly[0].push_back(_polynomial_table.public_input(i));
                         }
-                        typename commitment_scheme_type::precommitment_type variable_values_precommitment =
-                            algorithms::precommit<commitment_scheme_type>(combined_poly[0], fri_params.D[0],
-                                                                                  fri_params.step_list.front());
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "witness_precommit_time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
-#endif
+                        auto variable_values_precommitment = precommit_witness();
+
                         _proof.variable_values_commitment =
                             algorithms::commit<commitment_scheme_type>(variable_values_precommitment);
                         transcript(_proof.variable_values_commitment);
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        last = std::chrono::high_resolution_clock::now();
-#endif
                         // 4. permutation_argument
                         auto permutation_argument = placeholder_permutation_argument<FieldType, ParamsType>::prove_eval(
                             constraint_system,
@@ -167,30 +167,134 @@ namespace nil {
                             _polynomial_table,
                             fri_params,
                             transcript);
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "permutation_argument_prove_eval_time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
-#endif
+
                         _proof.v_perm_commitment = permutation_argument.permutation_poly_precommitment.root();
 
-                        std::array<math::polynomial_dfs<typename FieldType::value_type>, f_parts> F_dfs;
-
-                        F_dfs[0] = permutation_argument.F_dfs[0];
-                        F_dfs[1] = permutation_argument.F_dfs[1];
-                        F_dfs[2] = permutation_argument.F_dfs[2];
+                        _F_dfs[0] = std::move(permutation_argument.F_dfs[0]);
+                        _F_dfs[1] = std::move(permutation_argument.F_dfs[1]);
+                        _F_dfs[2] = std::move(permutation_argument.F_dfs[2]);
 
                         // 5. lookup_argument
-                        bool is_lookup_enabled = constraint_system.lookup_gates().size() > 0;
-                        typename placeholder_lookup_argument<FieldType, commitment_scheme_type,
-                                                             ParamsType>::prover_lookup_result lookup_argument;
-                        if (is_lookup_enabled) {
-                            for (std::size_t i = 0; i < lookup_argument.F.size(); i++) {
-                                lookup_argument.F[i] = {0};
+                        auto lookup_argument_result = lookup_argument();
+
+                        // 6. circuit-satisfability
+                        _F_dfs[8] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
+                            constraint_system, _polynomial_table,
+                            preprocessed_public_data.common_data.basic_domain,
+                            preprocessed_public_data.common_data.max_gates_degree,
+                            transcript)[0];
+
+                        /////TEST
+#ifdef ZK_PLACEHOLDER_DEBUG_ENABLED
+                        placeholder_debug_output();
+#endif
+
+                        // 7. Aggregate quotient polynomial
+                        std::vector<polynomial_dfs_type> T_splitted_dfs = 
+                            quotient_polynomial_split_dfs();
+
+                        auto T_precommitment = T_precommit(T_splitted_dfs);
+                        
+                        commit_T(T_precommitment);
+
+                        // 8. Run evaluation proofs
+                        auto variable_values_evaluation_points = run_evaluation_proofs();
+
+                        // permutation polynomial evaluation 
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_v_p = 
+                            {{_proof.eval_proof.challenge, _proof.eval_proof.challenge * _omega}};
+
+                        _combined_poly[1].push_back(std::move(permutation_argument.permutation_polynomial_dfs));
+
+                        // lookup polynomials evaluation
+                        run_lookup_polynomials_eval();
+
+                        // quotient
+                        _challenge_point = {_proof.eval_proof.challenge};
+
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {_challenge_point};
+                        _combined_poly[2].insert(
+                            std::end(_combined_poly[2]),
+                            std::make_move_iterator(std::begin(T_splitted_dfs)),
+                            std::make_move_iterator(std::end(T_splitted_dfs)));
+
+                        // public
+                        _proof.eval_proof.combined_value = compute_combined_value(
+                            std::move(variable_values_evaluation_points),
+                            std::move(evaluation_points_quotient),
+                            std::move(variable_values_precommitment),
+                            std::move(T_precommitment),
+                            std::move(evaluation_points_v_p),
+                            std::move(permutation_argument.permutation_poly_precommitment));
+
+                        _proof.fixed_values_commitment = preprocessed_public_data.common_data.commitments.fixed_values;
+                        return std::move(_proof);
+                    }
+
+                private:
+                    typename commitment_scheme_type::precommitment_type precommit_witness() {
+                        PROFILE_PLACEHOLDER_SCOPE("witness_precommit_time");
+                        return algorithms::precommit<commitment_scheme_type>(
+                            _combined_poly[0], fri_params.D[0], fri_params.step_list.front());
+                    }
+
+                    std::vector<polynomial_dfs_type> quotient_polynomial_split_dfs() {
+                        std::vector<polynomial_type> T_splitted = 
+                            detail::split_polynomial<FieldType>(
+                                quotient_polynomial(), fri_params.max_degree);
+
+                        PROFILE_PLACEHOLDER_SCOPE("split_polynomial_dfs_conversion_time");
+
+                        std::vector<polynomial_dfs_type> T_splitted_dfs(
+                            T_splitted.size(), polynomial_dfs_type(0, fri_params.D[0]->size()));
+                        for (std::size_t k = 0; k < T_splitted.size(); k++) {
+                            T_splitted_dfs[k].from_coefficients(T_splitted[k]);
+                            if (T_splitted_dfs[k].size() != fri_params.D[0]->size())
+                                T_splitted_dfs[k].resize(fri_params.D[0]->size());
+                        }
+                        return T_splitted_dfs;
+                    }
+
+                    polynomial_type quotient_polynomial() {
+                        PROFILE_PLACEHOLDER_SCOPE("quotient_polynomial_time");
+
+                        // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
+                        std::array<typename FieldType::value_type, f_parts> alphas =
+                            transcript.template challenges<FieldType, f_parts>();
+
+                        // 7.2. Compute F_consolidated
+                        polynomial_dfs_type F_consolidated_dfs(
+                            0, _F_dfs[0].size(), FieldType::value_type::zero());
+                        for (std::size_t i = 0; i < f_parts; i++) {
+                            if (_F_dfs[i].is_zero()) {
+                                continue;
                             }
-                            // lookup_argument =
+                            F_consolidated_dfs += alphas[i] * _F_dfs[i];
+                        }
+
+                        polynomial_type F_consolidated_normal(F_consolidated_dfs.coefficients());
+                        polynomial_type T_consolidated =
+                            F_consolidated_normal / preprocessed_public_data.common_data.Z;
+
+                        return T_consolidated;
+                    }
+                    
+                    typename placeholder_lookup_argument<
+                        FieldType, commitment_scheme_type, ParamsType>::prover_lookup_result 
+                    lookup_argument() {
+
+                        PROFILE_PLACEHOLDER_SCOPE("lookup_argument_time");
+
+                        typename placeholder_lookup_argument<
+                            FieldType,
+                            commitment_scheme_type,
+                            ParamsType>::prover_lookup_result lookup_argument_result;
+
+                        if (_is_lookup_enabled) {
+                            for (std::size_t i = 0; i < lookup_argument_result.F.size(); i++) {
+                                lookup_argument_result.F[i] = {0};
+                            }
+                            // lookup_argument_result =
                             //     placeholder_lookup_argument<FieldType, permutation_commitment_scheme_type,
                             //                                 ParamsType>::prove_eval(constraint_system,
                             //                                                         preprocessed_public_data,
@@ -198,54 +302,53 @@ namespace nil {
                             //                                                         fri_params,
                             //                                                         transcript);
                         } else {
-
-                            for (std::size_t i = 0; i < lookup_argument.F.size(); i++) {
-                                lookup_argument.F[i] = {0};
+                            for (std::size_t i = 0; i < lookup_argument_result.F.size(); i++) {
+                                lookup_argument_result.F[i] = {0};
                             }
                         }
                         // TODO: remove when lookups will be implemented
-                        F_dfs[3] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[4] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[5] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[6] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-                        F_dfs[7] = math::polynomial_dfs<typename FieldType::value_type>(0,F_dfs[0].size(),FieldType::value_type::zero());
-
-                        if (is_lookup_enabled) {
-                            // _proof.input_perm_commitment = lookup_argument.input_precommitment.root();
-                            // _proof.value_perm_commitment = lookup_argument.value_precommitment.root();
-                            // _proof.v_l_perm_commitment = lookup_argument.V_L_precommitment.root();
+                        _F_dfs[3] = _F_dfs[4]  = _F_dfs[5] = _F_dfs[6] = _F_dfs[7] =
+                            polynomial_dfs_type(0,_F_dfs[0].size(),FieldType::value_type::zero());
+                        
+                        if (_is_lookup_enabled) {
+                            // _proof.input_perm_commitment = lookup_argument_result.input_precommitment.root();
+                            // _proof.value_perm_commitment = lookup_argument_result.value_precommitment.root();
+                            // _proof.v_l_perm_commitment = lookup_argument_result.V_L_precommitment.root();
                         }
-                        // 6. circuit-satisfability
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        last = std::chrono::high_resolution_clock::now();
-#endif
-                        F_dfs[8] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
-                            constraint_system, _polynomial_table, preprocessed_public_data.common_data.basic_domain,
-                            preprocessed_public_data.common_data.max_gates_degree, transcript)[0];
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "gate_argument_time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
-#endif
-                        /////TEST
-#ifdef ZK_PLACEHOLDER_DEBUG_ENABLED
+                        return lookup_argument_result;
+                    }
+
+                    typename commitment_scheme_type::precommitment_type 
+                    T_precommit(const std::vector<polynomial_dfs_type>& T_splitted_dfs) {
+                        PROFILE_PLACEHOLDER_SCOPE("T_splitted_precommit_time");
+
+                        return algorithms::precommit<commitment_scheme_type>(
+                            T_splitted_dfs,
+                            fri_params.D[0],
+                            fri_params.step_list.front());
+                    }
+                
+                    void commit_T(const typename commitment_scheme_type::precommitment_type& T_precommitment) {
+                        PROFILE_PLACEHOLDER_SCOPE("T_splitted_commit_time");
+                        _proof.T_commitment = algorithms::commit<commitment_scheme_type>(T_precommitment);
+                        transcript(_proof.T_commitment);
+                    }
+
+                    void placeholder_debug_output() {
                         for (std::size_t i = 0; i < f_parts; i++) {
                             for (std::size_t j = 0; j < table_description.rows_amount; j++) {
-                                if (F[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
+                                if (_F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
                                         j)) != FieldType::value_type::zero()) {
-                                    std::cout << "F[" << i << "] != 0 at j = " << j << std::endl;
+                                    std::cout << "F_dfs[" << i << "] != 0 at j = " << j << std::endl;
                                 }
                             }
                         }
 
-                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates =
-                            constraint_system.gates();
+                        const auto& gates = constraint_system.gates();
 
                         for (std::size_t i = 0; i < gates.size(); i++) {
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-                                math::polynomial_dfs<typename FieldType::value_type> constraint_result =
+                                polynomial_dfs_type constraint_result =
                                     gates[i].constraints[j].evaluate(
                                         _polynomial_table, preprocessed_public_data.common_data.basic_domain) *
                                     _polynomial_table.selector(gates[i].selector_index);
@@ -255,99 +358,48 @@ namespace nil {
                                     FieldType::value_type::zero()) {
                                     std::cout << "constraint " << j << " from gate " << i << "on row " << std::endl;
                                 }
-                                //}
                             }
                         }
-#endif
+                    }
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        last = std::chrono::high_resolution_clock::now();
-#endif
-                        // 7. Aggregate quotient polynomial
-                        math::polynomial<typename FieldType::value_type> T = quotient_polynomial(preprocessed_public_data, F_dfs, transcript);
+                    std::vector<std::vector<typename FieldType::value_type>> run_evaluation_proofs() {
+                        PROFILE_PLACEHOLDER_SCOPE("witness_evaluation_points_generated_time");
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "quotient_polynomial_time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
-#endif
-
-                        std::vector<math::polynomial<typename FieldType::value_type>> T_splitted =
-                            detail::split_polynomial<FieldType>(T, fri_params.max_degree);
-
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "split_polynomial_time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
-#endif
-                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> T_splitted_dfs(
-                            T_splitted.size(), math::polynomial_dfs<typename FieldType::value_type>(0, fri_params.D[0]->size()));
-                        for( std::size_t k = 0; k < T_splitted.size(); k++ ) {
-                            T_splitted_dfs[k].from_coefficients(T_splitted[k]);
-                            if(T_splitted_dfs[k].size() != fri_params.D[0]->size())
-                                T_splitted_dfs[k].resize(fri_params.D[0]->size());
-                        }
-
-                        typename commitment_scheme_type::precommitment_type T_precommitment =
-                            algorithms::precommit<commitment_scheme_type>(T_splitted_dfs, fri_params.D[0],  fri_params.step_list.front());
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "T_splitted_precommit_time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
-#endif
-                        _proof.T_commitment = algorithms::commit<commitment_scheme_type>(T_precommitment);
-                        transcript(_proof.T_commitment);
-
-                        // 8. Run evaluation proofs
-                        typename FieldType::value_type challenge = transcript.template challenge<FieldType>();
-                        _proof.eval_proof.challenge = challenge;
+                        _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
                         _proof.eval_proof.lagrange_0 =
-                            preprocessed_public_data.common_data.lagrange_0.evaluate(challenge);
+                            preprocessed_public_data.common_data.lagrange_0.evaluate(_proof.eval_proof.challenge);
 
-                        typename FieldType::value_type omega =
-                            preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
+                        _omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
                         std::vector<std::vector<typename FieldType::value_type>>
                             variable_values_evaluation_points(witness_columns + public_input_columns);
 
                         // variable_values polynomials (table columns)
-                        for (std::size_t variable_values_index = 0; variable_values_index < witness_columns + public_input_columns; variable_values_index++) {
-                            std::set<int> variable_values_rotation =
+                        for (std::size_t variable_values_index = 0; 
+                             variable_values_index < witness_columns + public_input_columns;
+                             variable_values_index++) {
+                            const std::set<int>& variable_values_rotation =
                                 preprocessed_public_data.common_data.columns_rotations[variable_values_index];
 
+                            auto& evaluation_points = variable_values_evaluation_points[variable_values_index];
+                            evaluation_points.reserve(variable_values_rotation.size());
+
                             for (int rotation: variable_values_rotation) {
-                                variable_values_evaluation_points[variable_values_index].push_back(
-                                    challenge * omega.pow(rotation));
+                                evaluation_points.push_back(_proof.eval_proof.challenge * _omega.pow(rotation));
                             }
                         }
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        std::cout << "witness_evaluation_points_generated_time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-                        last = std::chrono::high_resolution_clock::now();
-#endif
+                        return variable_values_evaluation_points;
+                    }
 
-                        // permutation polynomial evaluation 
-                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_v_p = {{challenge,
-                                                                                             challenge * omega}};
-                        math::polynomial_dfs<typename FieldType::value_type> perm_poly_dfs = permutation_argument.permutation_polynomial_dfs;
-                        combined_poly[1].push_back(perm_poly_dfs);
-                        // lookup polynomials evaluation
-                        if (is_lookup_enabled) {
-//                             std::vector<typename FieldType::value_type> evaluation_points_v_l = {challenge,
-//                                                                                                  challenge * omega};
+                    void run_lookup_polynomials_eval() {
+                        if (_is_lookup_enabled) {
+//                             std::vector<typename FieldType::value_type> evaluation_points_v_l = {_proof.eval_proof.challenge,
+//                                                                                                  _proof.eval_proof.challenge * _omega};
 //                             typename permutation_commitment_scheme_type::proof_type v_l_evaluation =
 //                                 algorithms::proof_eval<permutation_commitment_scheme_type>(
 //                                     evaluation_points_v_l,
-//                                     lookup_argument.V_L_precommitment,
-//                                     lookup_argument.V_L_polynomial,
+//                                     lookup_argument_result.V_L_precommitment,
+//                                     lookup_argument_result.V_L_polynomial,
 //                                     fri_params,
 //                                     transcript);
 //                             _proof.eval_proof.lookups.push_back(v_l_evaluation);
@@ -360,12 +412,12 @@ namespace nil {
 //                             last = std::chrono::high_resolution_clock::now();
 // #endif
 //                             std::vector<typename FieldType::value_type> evaluation_points_input = {
-//                                 challenge, challenge * omega.inversed()};
+//                                 _proof.eval_proof.challenge, _proof.eval_proof.challenge * _omega.inversed()};
 //                             typename permutation_commitment_scheme_type::proof_type input_evaluation =
 //                                 algorithms::proof_eval<permutation_commitment_scheme_type>(
 //                                     evaluation_points_input,
-//                                     lookup_argument.input_precommitment,
-//                                     lookup_argument.input_polynomial,
+//                                     lookup_argument_result.input_precommitment,
+//                                     lookup_argument_result.input_polynomial,
 //                                     fri_params,
 //                                     transcript);
 //                             _proof.eval_proof.lookups.push_back(input_evaluation);
@@ -377,12 +429,12 @@ namespace nil {
 //                                       << elapsed.count() * 1e-6 << "ms" << std::endl;
 //                             last = std::chrono::high_resolution_clock::now();
 // #endif
-//                             std::vector<typename FieldType::value_type> evaluation_points_value = {challenge};
+//                             std::vector<typename FieldType::value_type> evaluation_points_value = {_proof.eval_proof.challenge};
 //                             typename permutation_commitment_scheme_type::proof_type value_evaluation =
 //                                 algorithms::proof_eval<permutation_commitment_scheme_type>(
 //                                     evaluation_points_value,
-//                                     lookup_argument.value_precommitment,
-//                                     lookup_argument.value_polynomial,
+//                                     lookup_argument_result.value_precommitment,
+//                                     lookup_argument_result.value_polynomial,
 //                                     fri_params,
 //                                     transcript);
 //                             _proof.eval_proof.lookups.push_back(value_evaluation);
@@ -395,121 +447,97 @@ namespace nil {
 //                             last = std::chrono::high_resolution_clock::now();
 // #endif
                         }
+                    }
 
-                        // quotient
-                        std::vector<typename FieldType::value_type> challenge_point = {challenge};
-                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {challenge_point};
-                        combined_poly[2].insert(std::end(combined_poly[2]), std::begin(T_splitted_dfs), std::end(T_splitted_dfs));
-                        // public
-                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_public(preprocessed_public_data.identity_polynomials.size() + preprocessed_public_data.permutation_polynomials.size(), challenge_point);
-                        combined_poly[3].insert(
-                            std::end(combined_poly[3]),
+                    std::vector<std::vector<typename FieldType::value_type>> compute_evaluation_points_public() {
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_public(
+                            preprocessed_public_data.identity_polynomials.size() + 
+                            preprocessed_public_data.permutation_polynomials.size(),
+                            _challenge_point);
+
+                        // TODO: Can't move the values from preprocessed_public_data, maybe change it later.
+                        _combined_poly[3].insert(
+                            std::end(_combined_poly[3]),
                             std::begin(preprocessed_public_data.identity_polynomials),
                             std::end(preprocessed_public_data.identity_polynomials));
-                        combined_poly[3].insert(
-                            std::end(combined_poly[3]),
+                        _combined_poly[3].insert(
+                            std::end(_combined_poly[3]),
                             std::begin(preprocessed_public_data.permutation_polynomials),
                             std::end(preprocessed_public_data.permutation_polynomials));
-                        combined_poly[3].insert(
-                            std::end(combined_poly[3]),
+                        _combined_poly[3].insert(
+                            std::end(_combined_poly[3]),
                             std::begin(preprocessed_public_data.public_polynomial_table.constants()),
                             std::end(preprocessed_public_data.public_polynomial_table.constants()));
-                        combined_poly[3].insert(
-                            std::end(combined_poly[3]),
+                        _combined_poly[3].insert(
+                            std::end(_combined_poly[3]),
                             std::begin(preprocessed_public_data.public_polynomial_table.selectors()),
                             std::end(preprocessed_public_data.public_polynomial_table.selectors()));
-                        for (std::size_t k = 0; k < constant_columns; k++){
+
+                        for (std::size_t k = 0, rotation_index = witness_columns + public_input_columns; k < constant_columns; k++, rotation_index++) {
                             const std::set<int>& rotations =
-                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + k];
+                                preprocessed_public_data.common_data.columns_rotations[rotation_index];
                             std::vector<typename FieldType::value_type> point;
+                            point.reserve(rotations.size());
 
                             for (int rotation: rotations) {
-                                point.push_back( challenge * omega.pow(rotation));
+                                // TODO: Maybe precompute values of _omega.pow(rotation)??? Rotation can be -1, causing computation
+                                // of inverse element multiple times.
+                                point.push_back( _proof.eval_proof.challenge * _omega.pow(rotation));
                             }
                             evaluation_points_public.push_back(std::move(point));
                         }
                         
-                        for (std::size_t k = 0; k < preprocessed_public_data.public_polynomial_table.selectors().size(); k ++){
+                        for (std::size_t k = 0, rotation_index = witness_columns + public_input_columns + constant_columns; k < preprocessed_public_data.public_polynomial_table.selectors().size(); k++, rotation_index++) {
                             const std::set<int>& rotations =
-                                preprocessed_public_data.common_data.columns_rotations[witness_columns + public_input_columns + constant_columns + k];
+                                preprocessed_public_data.common_data.columns_rotations[rotation_index];
                             std::vector<typename FieldType::value_type> point;
+                            point.reserve(rotations.size());
 
                             for (int rotation: rotations) {
-                                point.push_back( challenge * omega.pow(rotation));
+                                point.push_back( _proof.eval_proof.challenge * _omega.pow(rotation));
                             }
-                            evaluation_points_public.push_back(point);
+                            evaluation_points_public.push_back(std::move(point));
                         }
 
-                        combined_poly[3].push_back(preprocessed_public_data.q_last);
-                        evaluation_points_public.push_back(challenge_point);
-                        combined_poly[3].push_back(preprocessed_public_data.q_blind);
-                        evaluation_points_public.push_back(challenge_point);
+                        _combined_poly[3].push_back(preprocessed_public_data.q_last);
+                        evaluation_points_public.push_back(_challenge_point);
+                        _combined_poly[3].push_back(preprocessed_public_data.q_blind);
+                        evaluation_points_public.push_back(_challenge_point);
 
-                        std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points =
-                            {variable_values_evaluation_points, evaluation_points_v_p, evaluation_points_quotient, evaluation_points_public};
+                        return evaluation_points_public;
+                    }
+
+                    typename commitment_scheme_type::proof_type compute_combined_value(
+                        std::vector<std::vector<typename FieldType::value_type>> variable_values_evaluation_points,
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient,
+                        typename commitment_scheme_type::precommitment_type variable_values_precommitment,
+                        typename commitment_scheme_type::precommitment_type T_precommitment, 
+                        std::vector<std::vector<typename FieldType::value_type>> evaluation_points_v_p,
+                        typename commitment_scheme_type::precommitment_type permutation_poly_precommitment)
+                    {
+                        auto evaluation_points_public = compute_evaluation_points_public();
+
+                        std::array<std::vector<std::vector<typename FieldType::value_type>>, 4> evaluations_points = {
+                            std::move(variable_values_evaluation_points),
+                            std::move(evaluation_points_v_p),
+                            std::move(evaluation_points_quotient),
+                            std::move(evaluation_points_public)
+                        };
                         std::array<typename commitment_scheme_type::precommitment_type, 4> precommitments = {
-                            variable_values_precommitment, 
-                            permutation_argument.permutation_poly_precommitment,
-                            T_precommitment, 
+                            std::move(variable_values_precommitment),
+                            std::move(permutation_poly_precommitment),
+                            std::move(T_precommitment),
                             preprocessed_public_data.precommitments.fixed_values
                         };
 
-                        _proof.fixed_values_commitment = preprocessed_public_data.common_data.commitments.fixed_values;
-
-                        _proof.eval_proof.combined_value = algorithms::proof_eval<commitment_scheme_type>(
-                                                    evaluations_points,
-                                                    precommitments,
-                                                    combined_poly, fri_params, transcript);
-
-//#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-//                                                elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-//                                                    std::chrono::high_resolution_clock::now() - last);
-//                                                std::cout << "fixed_values_proof_eval_time: " << std::fixed << std::setprecision(3)
-//                                                        << elapsed.count() * 1e-6 << "ms" << std::endl;
-//                                                last = std::chrono::high_resolution_clock::now();
-//#endif
-
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - last);
-                        last = std::chrono::high_resolution_clock::now();
-                        elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::high_resolution_clock::now() - begin);
-                        std::cout << "Placeholder prover, total time: " << std::fixed << std::setprecision(3)
-                                  << elapsed.count() * 1e-6 << "ms" << std::endl;
-#endif
-                        return _proof;
+                        return algorithms::proof_eval<commitment_scheme_type>(
+                             evaluations_points,
+                             precommitments,
+                             _combined_poly, fri_params, transcript);
                     }
 
                 private:
-                    math::polynomial<typename FieldType::value_type> quotient_polynomial(
-                        const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
-                        const std::array<math::polynomial_dfs<typename FieldType::value_type>, f_parts> &F_dfs,
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> &transcript) {
-
-                        // 7.1. Get $\alpha_0, \dots, \alpha_8 \in \mathbb{F}$ from $hash(\text{transcript})$
-                        std::array<typename FieldType::value_type, f_parts> alphas =
-                            transcript.template challenges<FieldType, f_parts>();
-
-                        // 7.2. Compute F_consolidated
-                        math::polynomial_dfs<typename FieldType::value_type> F_consolidated_dfs(
-                            0, F_dfs[0].size(), FieldType::value_type::zero());
-                        for (std::size_t i = 0; i < f_parts; i++) {
-                            if (F_dfs[i].is_zero()){
-                                continue;
-                            }
-                            F_consolidated_dfs += alphas[i] * F_dfs[i];
-                        }
-
-                        math::polynomial<typename FieldType::value_type> F_consolidated_normal(F_consolidated_dfs.coefficients());
-                        math::polynomial<typename FieldType::value_type> T_consolidated =
-                            F_consolidated_normal / preprocessed_public_data.common_data.Z;
-
-                        return T_consolidated;
-                    }
-  
-                private:
-                    // Structed passed from outside.
+                    // Structures passed from outside by reference.
                     const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data;
                     const typename private_preprocessor_type::preprocessed_data_type &preprocessed_private_data;
                     const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description;
@@ -520,6 +548,12 @@ namespace nil {
                     // Members created during proof generation.
                     plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> _polynomial_table;
                     placeholder_proof<FieldType, ParamsType> _proof;
+                    std::array<std::vector<polynomial_dfs_type>, 4> _combined_poly;
+                    std::array<polynomial_dfs_type, f_parts> _F_dfs;
+                    transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript;
+                    bool _is_lookup_enabled;
+                    typename FieldType::value_type _omega;
+                    std::vector<typename FieldType::value_type> _challenge_point;
 
                 };
             }    // namespace snark
