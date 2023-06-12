@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELDS_logic_OR_FLAG_HPP
-#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELDS_logic_OR_FLAG_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELDS_LOGIC_OR_FLAG_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELDS_LOGIC_OR_FLAG_HPP
 
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
@@ -35,6 +35,22 @@
 namespace nil {
     namespace blueprint {
         namespace components {
+
+            /** || component
+             *  Input: x, y
+             *  Output: f = 0 if x=y=0, f=1 otherwise
+             * 
+             *  Constraints: 
+             *      x*v_x = f_x
+             *      f_x(f_x-1) = 0
+             *      (v_x-x)(f_x-1) = 0
+             *      y*v_y = f_y
+             *      f_y(f_y-1) = 0
+             *      (v_y-y)(f_y-1) = 0
+             *      f_x + f_y - f_x * f_y = f
+             *  
+             *  First convert each input to 0 or 1, then apply usual boolean || operator
+             * */
 
             template<typename ArithmetizationType, std::uint32_t WitnessesAmount> 
             class logic_or_flag;
@@ -50,7 +66,7 @@ namespace nil {
             public:
                 using var = typename component_type::var;
 
-                const std::size_t gates_amount = 1 + 1*(WitnessesAmount == 2);
+                const std::size_t gates_amount = 1 + 1 * (WitnessesAmount == 2);
                 const std::size_t rows_amount = WitnessesAmount <= 4 ? 6 - WitnessesAmount : (WitnessesAmount < 7 ? 2 : 1);
 
                 struct input_type{
@@ -64,13 +80,12 @@ namespace nil {
                     result_type(const logic_or_flag<
                             crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                             WitnessesAmount> &component, std::uint32_t start_row_index){
-                                output = var(component.W(WitnessesAmount - 1), start_row_index + component.rows_amount - 1);
+                                output = var(component.W(WitnessesAmount - 1), start_row_index + component.rows_amount - 1, false);
                     }
                 };
 
                 template<typename ContainerType>
-                logic_or_flag(ContainerType witness) : component_type(witness, std::array<std::uint32_t, 0>(),
-                                                                                std::array<std::uint32_t, 0>()) {};
+                logic_or_flag(ContainerType witness) : component_type(witness, {}, {}) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -107,18 +122,18 @@ namespace nil {
                         t[1] = var_value(assignment, instance_input.y);
                         t[2] = t[0].is_zero() ? t[0] : t[0].inversed();
                         t[3] = t[1].is_zero() ? t[1] : t[1].inversed();
-                        t[4] = t[0]*t[2];
-                        t[5] = t[1]*t[3];
-                        t[6] = t[4] + t[5] - t[4]*t[5];
+                        t[4] = t[0] * t[2];
+                        t[5] = t[1] * t[3];
+                        t[6] = t[4] + t[5] - t[4] * t[5];
                         
                         std::size_t _idx;
-                        for(std::size_t i=0;i<component.rows_amount;i++){
-                            for(std::size_t j=0; j < witness_amount; j++){
-                                _idx = i*witness_amount + j;
-                                assignment.witness(component.W(j), row+i) = t[_idx % 7];  // circularly fill all witness/rows table
+                        for (std::size_t i = 0; i < component.rows_amount; i++) {
+                            for (std::size_t j = 0; j < witness_amount; j++) {
+                                _idx = i * witness_amount + j;
+                                assignment.witness(component.W(j), row + i) = t[_idx % 7];  // circularly fill all witness/rows table
                             }
                         }
-                        assignment.witness(component.W(witness_amount-1), row+component.rows_amount-1) = t[6]; //always set last element as output
+                        assignment.witness(component.W(witness_amount - 1), row + component.rows_amount - 1) = t[6]; //always set last element as output
 
 
                         return typename plonk_logic_or_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>::result_type(component, start_row_index);
@@ -138,13 +153,13 @@ namespace nil {
                     std::size_t offset = component.rows_amount == 3 ? -1 : 0;
                     std::size_t witness_amount = WitnessesAmount;
 
-                    std::array<std::pair<std::size_t, std::size_t>, 7> wl;
+                    std::array<std::pair<std::size_t, std::size_t>, 6> wl;
 
                     int _idx;
-                    for(int i=0; i<component.rows_amount;i++){
-                        for(int j=0; j<witness_amount;j++){
-                            _idx = i*witness_amount + j;
-                            if(_idx < 7){
+                    for (int i = 0; i < component.rows_amount; i++) {
+                        for (int j = 0; j < witness_amount; j++) {
+                            _idx = i * witness_amount + j;
+                            if (_idx < 6) {
                                 wl[_idx] = std::make_pair(j, i+offset);
                             }
                         }
@@ -156,7 +171,7 @@ namespace nil {
                          _vy = var(component.W(wl[3].first), wl[3].second),
                          _fx = var(component.W(wl[4].first), wl[4].second),
                          _fy = var(component.W(wl[5].first), wl[5].second),
-                         _f = var(component.W(witness_amount-1), offset + component.rows_amount - 1);
+                         _f = var(component.W(witness_amount - 1), offset + component.rows_amount - 1);
 
 
                     auto constraint_1 = bp.add_constraint(_fx - _x * _vx);  // fx =x*vx
@@ -168,17 +183,15 @@ namespace nil {
                     auto constraint_5 = bp.add_constraint((_vx - _x)*(_fx - 1));  // (vx-x)(fx-1)=0
                     auto constraint_6 = bp.add_constraint((_vy - _y)*(_fy - 1));  // (vy-y)(fy-1)=0
                     
-                      
-
-                    if(witness_amount == 2){
+                    if (witness_amount == 2) {
                         _fx = var(component.W(wl[4].first), 0),
                         _fy = var(component.W(wl[5].first), 0),
-                        _f = var(component.W(witness_amount-1), +1);
+                        _f = var(component.W(witness_amount - 1), +1);
                         auto constraint_7 = bp.add_constraint(_f - _fx - _fy+ _fx*_fy);  // f = f_x + f_y - f_x*f_y
                         bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6});
                         bp.add_gate(first_selector_index+1, {constraint_7});
                     }
-                    else{
+                    else {
                         auto constraint_7 = bp.add_constraint(_f - _fx - _fy+ _fx*_fy); // f = f_x + f_y - f_x*f_y
                         bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6, constraint_7});
                     }
@@ -217,8 +230,8 @@ namespace nil {
                     } else {
                         first_selector_index = selector_iterator->second;
                     }
-                    assignment.enable_selector(first_selector_index, start_row_index + component.rows_amount == 3 ? 1 : 0);
-                    if(WitnessesAmount == 2){
+                    assignment.enable_selector(first_selector_index, start_row_index + (component.rows_amount == 3 ? 1 : 0));
+                    if (WitnessesAmount == 2) {
                         assignment.enable_selector(first_selector_index+1, start_row_index + 2);
                     }
 
@@ -230,4 +243,4 @@ namespace nil {
     }
 }
 
-#endif CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELDS_logic_OR_FLAG_HPP
+#endif CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELDS_LOGIC_OR_FLAG_HPP

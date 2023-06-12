@@ -44,10 +44,9 @@
 
 template<typename BlueprintFieldType, std::size_t WitnessColumns>
 auto test_logic_or_flag(std::vector<typename BlueprintFieldType::value_type> public_input) {
-
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1 + 1*(WitnessColumns == 2);
+    constexpr std::size_t SelectorColumns = 1 + 1 * (WitnessColumns == 2);
 
     using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -59,10 +58,10 @@ auto test_logic_or_flag(std::vector<typename BlueprintFieldType::value_type> pub
 	using var = typename component_type::var;
 
     std::array<std::uint32_t, WitnessColumns> witnesses;
-    for(std::uint32_t i=0;i<WitnessColumns; i++){
+    for (std::uint32_t i = 0; i < WitnessColumns; i++) {
         witnesses[i] = i;
     }
-    component_type component_instance(witnesses);
+    component_type component_instance(witnesses, std::array<std::uint32_t, 0>(), std::array<std::uint32_t, 0>());
     
 
     var x(0, 0, false, var::column_type::public_input);
@@ -72,7 +71,7 @@ auto test_logic_or_flag(std::vector<typename BlueprintFieldType::value_type> pub
 
     typename BlueprintFieldType::value_type fx = (public_input[0].is_zero() ? public_input[0] : BlueprintFieldType::value_type::one());
     typename BlueprintFieldType::value_type fy = (public_input[1].is_zero() ? public_input[1] : BlueprintFieldType::value_type::one());
-    typename BlueprintFieldType::value_type expected_result = fx+fy-fx*fy;
+    typename BlueprintFieldType::value_type expected_result = fx + fy - fx * fy;
 
     auto result_check = [&expected_result, &public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
@@ -99,16 +98,11 @@ void test_logic_or_flag_random_inputs(){
     boost::random::mt19937 seed_seq;
     generate_random.seed(seed_seq);
 
-    for (std::size_t i = 0; i < RandomTestsAmount; i++){
+    for (std::size_t i = 0; i < RandomTestsAmount; i++) {
         typename FieldType::value_type input_x = generate_random();
-    	typename FieldType::integral_type input_integral_x = typename FieldType::integral_type(input_x.data);
-        input_integral_x = input_integral_x & 0xFFFFFFFFFFFFFFFF_cppui255;
-
         typename FieldType::value_type input_y = generate_random();
-    	typename FieldType::integral_type input_integral_y = typename FieldType::integral_type(input_y.data);
-        input_integral_y = input_integral_y & 0xFFFFFFFFFFFFFFFF_cppui255;
 
-        test_logic_or_flag<FieldType, WitnessColumns>({input_integral_x,input_integral_y}); 
+        test_logic_or_flag<FieldType, WitnessColumns>({input_x,input_y}); 
 	}
 }
 
@@ -117,33 +111,35 @@ constexpr static const std::size_t random_tests_amount = 10;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_logic_or_test_suite)
 
-#define test_case_expand(WitnessesAmount) \
-    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type; \
-    test_logic_or_flag<field_type, WitnessesAmount>({0,0}); \
+template<std::uint32_t WitnessesAmount>
+void test_witness_size() {
+    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type; 
+    test_logic_or_flag<field_type, WitnessesAmount>({0,0}); 
     test_logic_or_flag_random_inputs<field_type, random_tests_amount, WitnessesAmount>();
+}
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_or_flag_two_all) {
-    test_case_expand(2); 
+    test_witness_size<2>();
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_or_flag_three_all) {
-    test_case_expand(3); 
+    test_witness_size<3>();
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_or_flag_four_all) {
-    test_case_expand(4); 
+    test_witness_size<4>();
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_or_flag_five_all) {
-    test_case_expand(5); 
+    test_witness_size<5>();
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_or_flag_six_all) {
-    test_case_expand(6); 
+    test_witness_size<6>();
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_or_flag_seven_all) {
-    test_case_expand(7); 
+    test_witness_size<7>();
 }
 
 
