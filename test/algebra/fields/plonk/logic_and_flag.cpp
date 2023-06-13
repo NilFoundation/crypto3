@@ -48,14 +48,16 @@ auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> pu
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
 
-    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationParams = nil::crypto3::zk::snark::
+        plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using ArithmetizationType =
+        nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
-	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
     using component_type = nil::blueprint::components::logic_and_flag<ArithmetizationType, WitnessColumns>;
-	using var = typename component_type::var;
+    using var = typename component_type::var;
 
     std::array<std::uint32_t, WitnessColumns> witnesses;
     for (std::uint32_t i = 0; i < WitnessColumns; i++) {
@@ -64,7 +66,7 @@ auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> pu
     component_type component_instance(witnesses, std::array<std::uint32_t, 0>(), std::array<std::uint32_t, 0>());
 
     var x(0, 0, false, var::column_type::public_input);
-    var y(0, 1, false, var::column_type::public_input); 
+    var y(0, 1, false, var::column_type::public_input);
 
     typename component_type::input_type instance_input = {x, y};
 
@@ -72,23 +74,22 @@ auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> pu
     typename BlueprintFieldType::value_type expected_result = (p.is_zero() ? p : BlueprintFieldType::value_type::one());
 
     auto result_check = [&expected_result, &public_input](AssignmentType &assignment,
-	    typename component_type::result_type &real_res) {
-            #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
-            std::cout << "logic and test: \n";
-            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n"; 
-            std::cout << "expected: " << expected_result.data    << "\n";
-            std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n"; 
-            #endif
-            assert(var_value(assignment, real_res.output) == expected_result);
+                                                          typename component_type::result_type &real_res) {
+#ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+        std::cout << "logic and test: \n";
+        std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n";
+        std::cout << "expected: " << expected_result.data << "\n";
+        std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n";
+#endif
+        assert(var_value(assignment, real_res.output) == expected_result);
     };
-
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
 }
 
 template<typename FieldType, std::size_t RandomTestsAmount, std::uint32_t WitnessesAmount>
-void test_logic_and_flag_random_input_and_zero(){
+void test_logic_and_flag_random_input_and_zero() {
 
     nil::crypto3::random::algebraic_engine<FieldType> generate_random;
     boost::random::mt19937 seed_seq;
@@ -99,10 +100,8 @@ void test_logic_and_flag_random_input_and_zero(){
     test_logic_and_flag<FieldType, WitnessesAmount>({0, input});
 }
 
-
-
 template<typename FieldType, std::size_t RandomTestsAmount, std::uint32_t WitnessesAmount>
-void test_range_check_random_inputs(){
+void test_range_check_random_inputs() {
 
     nil::crypto3::random::algebraic_engine<FieldType> generate_random;
     boost::random::mt19937 seed_seq;
@@ -112,10 +111,9 @@ void test_range_check_random_inputs(){
         typename FieldType::value_type input_x = generate_random();
         typename FieldType::value_type input_y = generate_random();
 
-        test_logic_and_flag<FieldType, WitnessesAmount>({input_x,input_y}); 
-	}
+        test_logic_and_flag<FieldType, WitnessesAmount>({input_x, input_y});
+    }
 }
-
 
 constexpr static const std::size_t random_tests_amount = 10;
 
@@ -123,9 +121,9 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_logic_and_test_suite)
 
 template<std::uint32_t WitnessesAmount>
 void test_witness_size() {
-    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type; 
-    test_logic_and_flag<field_type, WitnessesAmount>({0,0}); 
-    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, WitnessesAmount>(); 
+    using field_type = typename nil::crypto3::algebra::curves::pallas::base_field_type;
+    test_logic_and_flag<field_type, WitnessesAmount>({0, 0});
+    test_logic_and_flag_random_input_and_zero<field_type, random_tests_amount, WitnessesAmount>();
     test_range_check_random_inputs<field_type, random_tests_amount, WitnessesAmount>();
 }
 
@@ -136,7 +134,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_two_witnesses_all) {
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_three_witnesses_all) {
     test_witness_size<3>();
 }
-
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_four_witnesses_all) {
     test_witness_size<4>();
@@ -151,8 +148,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_six_witnesses_all) {
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_logic_and_flag_seven_witnesses_all) {
-    test_witness_size<7>();     
+    test_witness_size<7>();
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
