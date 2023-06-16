@@ -69,8 +69,8 @@ namespace nil {
                 public:
                     static inline bool process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
-                        placeholder_proof<FieldType, ParamsType> &proof,
-                        plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                        const placeholder_proof<FieldType, ParamsType> &proof,
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename ParamsType::commitment_params_type &fri_params) {
                         

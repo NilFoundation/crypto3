@@ -42,6 +42,7 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 
 namespace nil {
@@ -53,45 +54,31 @@ namespace nil {
                     resize(const plonk_polynomial_dfs_table<FieldType, ArithmetizationParams> &table,
                                             std::uint32_t new_size) {
 
-                    typename plonk_public_polynomial_dfs_table<FieldType,
-                            ArithmetizationParams>::public_input_container_type public_inputs=
-                            table.public_table().public_inputs();
-
-                    for (std::size_t pi_index = 0; pi_index < table.public_inputs_amount(); pi_index++) {
-                        public_inputs[pi_index].resize(new_size);
+                    auto public_inputs = table.public_table().public_inputs();
+                    for (auto& public_input : public_inputs) {
+                        public_input.resize(new_size);
                     }
 
-                    typename plonk_public_polynomial_dfs_table<FieldType,
-                        ArithmetizationParams>::constant_container_type constants=
-                        table.public_table().constants();
-
-                    for (std::size_t cst_index = 0; cst_index < table.constants_amount(); cst_index++) {
-                        constants[cst_index].resize(new_size);
+                    auto constants = table.public_table().constants();
+                    for (auto& constant : constants) {
+                        constant.resize(new_size);
                     }
 
-                    typename plonk_public_polynomial_dfs_table<FieldType,
-                        ArithmetizationParams>::selector_container_type selectors=
-                        table.public_table().selectors();
-
-                    for (std::size_t sel_index = 0; sel_index < table.selectors_amount(); sel_index++) {
-                        selectors[sel_index].resize(new_size);
+                    auto selectors = table.public_table().selectors();
+                    for (auto& selector : selectors) {
+                        selector.resize(new_size);
                     }
 
-                    typename plonk_private_polynomial_dfs_table<FieldType,
-                        ArithmetizationParams>::witnesses_container_type witnesses=
-                        table.private_table().witnesses();
-
-                    for (std::size_t wts_index = 0; wts_index < table.witnesses_amount(); wts_index++) {
-                        witnesses[wts_index].resize(new_size);
+                    auto witnesses = table.private_table().witnesses();
+                    for (auto& witness : witnesses) {
+                        witness.resize(new_size);
                     }
 
-                    return
-                        plonk_polynomial_dfs_table<FieldType, ArithmetizationParams>(
-                            plonk_private_polynomial_dfs_table<FieldType, ArithmetizationParams>(
-                                                                witnesses),
-                            plonk_public_polynomial_dfs_table<FieldType, ArithmetizationParams>(
-                                                                public_inputs, constants, selectors));
-
+                    return plonk_polynomial_dfs_table<FieldType, ArithmetizationParams>(
+                        plonk_private_polynomial_dfs_table<FieldType, ArithmetizationParams>(
+                            std::move(witnesses)),
+                        plonk_public_polynomial_dfs_table<FieldType, ArithmetizationParams>(
+                            std::move(public_inputs), std::move(constants), std::move(selectors)));
                 }
 
                 template<typename FieldType, typename ParamsType, std::size_t ArgumentSize = 1>
@@ -109,13 +96,14 @@ namespace nil {
 
                     static inline std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size>
                         prove_eval(
-                            typename policy_type::constraint_system_type &constraint_system,
+                            const typename policy_type::constraint_system_type &constraint_system,
                             const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                                 &column_polynomials,
                             std::shared_ptr<math::evaluation_domain<FieldType>>
                                 original_domain,
                             std::uint32_t max_gates_degree,
-                            transcript_type &transcript = transcript_type()) {
+                            transcript_type& transcript) {
+                        PROFILE_PLACEHOLDER_SCOPE("gate_argument_time");
 
                         std::uint32_t extended_domain_size = original_domain->m * std::pow(2, ceil(std::log2(max_gates_degree)));
                         
@@ -129,22 +117,20 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates =
-                            constraint_system.gates();
-
-                        for (std::size_t i = 0; i < gates.size(); i++) {
+                        const auto& gates = constraint_system.gates();
+                        for (const auto& gate: gates) {
                             math::polynomial_dfs<typename FieldType::value_type> gate_result(
                                 0, extended_domain_size, FieldType::value_type::zero());
 
-                            for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
+                            for (const auto& constraint : gate.constraints) {
                                 gate_result = gate_result +
-                                              gates[i].constraints[j].evaluate(extended_column_polynomials, original_domain) * theta_acc;
+                                              constraint.evaluate(extended_column_polynomials, original_domain) * theta_acc;
                                 theta_acc *= theta;
                             }
 
-                            gate_result = gate_result * extended_column_polynomials.selector(gates[i].selector_index);
+                            gate_result = gate_result * extended_column_polynomials.selector(gate.selector_index);
 
-                            F[0] = F[0] + gate_result;
+                            F[0] += gate_result;
                         }
 
                         return F;
@@ -154,28 +140,28 @@ namespace nil {
                         verify_eval(const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
                                     typename policy_type::evaluation_map &evaluations,
                                     const typename FieldType::value_type &challenge,
-                                    transcript_type &transcript = transcript_type()) {
+                                    transcript_type &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         std::array<typename FieldType::value_type, argument_size> F;
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
-                        for (std::size_t i = 0; i < gates.size(); i++) {
+                        for (const auto& gate: gates) {
                             typename FieldType::value_type gate_result = {0};
 
-                            for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-                                gate_result = gate_result + gates[i].constraints[j].evaluate(evaluations) * theta_acc;
+                            for (const auto& constraint : gate.constraints) {
+                                gate_result = gate_result + constraint.evaluate(evaluations) * theta_acc;
                                 theta_acc *= theta;
                             }
 
                             std::tuple<std::size_t, int, typename plonk_variable<FieldType>::column_type> selector_key =
-                                std::make_tuple(gates[i].selector_index, 0,
+                                std::make_tuple(gate.selector_index, 0,
                                                 plonk_variable<FieldType>::column_type::selector);
 
                             gate_result = gate_result * evaluations[selector_key];
 
-                            F[0] = F[0] + gate_result;
+                            F[0] += gate_result;
                         }
 
                         return F;

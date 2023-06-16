@@ -195,9 +195,7 @@ BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
 }
 
 BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
-
-    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-        circuit_test_2<FieldType>();
+    auto circuit = circuit_test_2<FieldType>();
 
     constexpr std::size_t argument_size = 3;
 
@@ -272,8 +270,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
 
 BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
 
-    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-        circuit_test_2<FieldType>();
+    auto circuit = circuit_test_2<FieldType>();
 
     constexpr std::size_t argument_size = 3;
 
@@ -347,7 +344,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
 
 BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabled()) {
 
-    circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
+    auto circuit = circuit_test_3<FieldType>();
 
     constexpr std::size_t argument_size = 5;
 
@@ -457,8 +454,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabl
 
 BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
-    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-        circuit_test_2<FieldType>();
+    auto circuit = circuit_test_2<FieldType>();
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
@@ -550,8 +546,8 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
     }
 
     std::array<typename FieldType::value_type, 1> verifier_res =
-        placeholder_gates_argument<FieldType, circuit_2_params>::verify_eval(constraint_system.gates(), columns_at_y, y,
-                                                                             verifier_transcript);
+        placeholder_gates_argument<FieldType, circuit_2_params>::verify_eval(
+            constraint_system.gates(), columns_at_y, y, verifier_transcript);
 
     typename FieldType::value_type verifier_next_challenge = verifier_transcript.template challenge<FieldType>();
     typename FieldType::value_type prover_next_challenge = prover_transcript.template challenge<FieldType>();
@@ -562,8 +558,7 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
 BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 
-    circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-        circuit_test_2<FieldType>();
+    auto circuit = circuit_test_2<FieldType>();
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
 
@@ -593,7 +588,8 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
             constraint_system, assignments.private_table(), desc, fri_params);
 
     auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
+        preprocessed_public_data, preprocessed_private_data, desc,
+        constraint_system, assignments, fri_params);
 
     bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
         preprocessed_public_data, proof, constraint_system, fri_params);
@@ -601,7 +597,7 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
 }
 
 BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test, *boost::unit_test::disabled()) {
-    circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
+    auto circuit = circuit_test_3<FieldType>();
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
@@ -630,9 +626,8 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test, *boost::unit_test::disabled
 
     auto proof = placeholder_prover<FieldType, circuit_3_params>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, fri_params);
-
-    bool verifier_res = placeholder_verifier<FieldType, circuit_3_params>::process(preprocessed_public_data, proof,
-                                                                                   constraint_system, fri_params);
+    bool verifier_res = placeholder_verifier<FieldType, circuit_3_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params);
     BOOST_CHECK(verifier_res);
 }
 BOOST_AUTO_TEST_SUITE_END()
