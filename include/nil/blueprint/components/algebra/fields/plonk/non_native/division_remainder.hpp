@@ -234,8 +234,8 @@ namespace nil {
                     x_address = component.get_var_address(var_address::X, start_row_index),
                     y_address = component.get_var_address(var_address::Y, start_row_index);
 
-                bp.add_copy_constraint({instance_input.x, var(component.W(x_address.second), x_address.first)});
-                bp.add_copy_constraint({instance_input.y, var(component.W(y_address.second), y_address.first)});
+                bp.add_copy_constraint({instance_input.x, var(component.W(x_address.second), x_address.first, false)});
+                bp.add_copy_constraint({instance_input.y, var(component.W(y_address.second), y_address.first, false)});
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount,
