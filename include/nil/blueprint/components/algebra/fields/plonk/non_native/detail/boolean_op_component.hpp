@@ -88,7 +88,7 @@ namespace nil {
                                                                                                 ArithmetizationParams>,
                                                             WitnessesAmount, ArgNum> &component,
                                                     const std::uint32_t start_row_index) {
-                            output = var(component.W(ArgNum), start_row_index);
+                            output = var(component.W(ArgNum), start_row_index, false);
                         }
                     };
 
