@@ -82,7 +82,7 @@ namespace nil {
                     var output;
                     result_type(const bit_composition &component, std::uint32_t start_row_index) {
                         auto pos = component.sum_bit_position(start_row_index, component.sum_bits_amount() - 1);
-                        output = var(component.W(pos.second), pos.first);
+                        output = var(component.W(pos.second), pos.first, false);
                     }
                 };
 
@@ -172,21 +172,21 @@ namespace nil {
                 for (; padding < component.padding_bits_amount(); padding++) {
                     auto bit_pos = component.bit_position(row, padding);
                     bp.add_copy_constraint({zero,
-                                            var(component.W(bit_pos.second), bit_pos.first)});
+                                            var(component.W(bit_pos.second), bit_pos.first, false)});
                 }
 
                 for (std::size_t i = 0; i < component.bits_amount; i++) {
                     auto bit_pos = component.bit_position(row, padding + i);
                     bp.add_copy_constraint({instance_input.bits[bit_index(i)],
-                                            var(component.W(bit_pos.second), bit_pos.first)});
+                                            var(component.W(bit_pos.second), bit_pos.first, false)});
                 }
 
                 for (std::size_t i = 0; i < component.sum_bits_amount() - 1; i += 2) {
                     auto sum_bit_pos_1 = component.sum_bit_position(row, i);
                     auto sum_bit_pos_2 = component.sum_bit_position(row, i + 1);
                     bp.add_copy_constraint(
-                        {var(component.W(sum_bit_pos_1.second), sum_bit_pos_1.first),
-                         var(component.W(sum_bit_pos_2.second), sum_bit_pos_2.first)});
+                        {var(component.W(sum_bit_pos_1.second), sum_bit_pos_1.first, false),
+                         var(component.W(sum_bit_pos_2.second), sum_bit_pos_2.first, false)});
                 }
             }
 
