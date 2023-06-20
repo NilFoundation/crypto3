@@ -540,34 +540,30 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_subtraction_eq_less_b) {
             0x9626e99b5d63351dfac330029d63300000010fffffffffffc_cppui253,
             0x203d11deb82be718fe9bdd45c91a43e021c3a08591f4664d3f343a5a1ef38cc7_cppui253,
         }};
-    // 9, 3, 11, 14, 7
+    // 9, 3, 11, 14
     polynomial_dfs<typename FieldType::value_type> b = {
-        4,
+        3,
         {
             0x2c_cppui253,
             0x4e10fd71a365a0a65335b02c5b209b200de95c55c9056ed99995e2b552bf20f1_cppui253,
             0x73eda753299d7d4220b60b28f780a30b2f9ca3e7eddd5bfefff4ffff00000006_cppui253,
             0x5ed0cc0c54a3e1c092ac452c3f70cd7c6266b11a0f0dc9955edad45d54276932_cppui253,
-            0xa_cppui253,
-            0x25dca9e18637dcae050bc199d2c3a6d98e1647e35b3aed2566801d49ad40df14_cppui253,
-            0x61283ccdf122134fa2421001b12210000000b000000000005_cppui253,
-            0x151cdb46d4f99b7b7b85f91da5eea094a914f2b2ccae9269a10f2ba1abd896d3_cppui253,
         }};
     polynomial_dfs<typename FieldType::value_type> c(8, 1, FieldType::value_type::zero());
 
     a -=  b;
-    //-8, 0, -7, 11, -1, 7, 7, 2
+    //-8, 0, -7, 11, 6, 7, 7, 2
     polynomial_dfs<typename FieldType::value_type> c_res = {
         7,
         {
             0xb_cppui253,
-            0x2648c18d7b4bbc9e686ea725a7f1bcfcd89c6d7d147b859642cb0623ff361543_cppui253,
-            0x73eda753299d7d44e34f0b31458fbb1fcbaba3f43bec5bfefff9fffefffffff8_cppui253,
-            0x68cd70bb466b31ba25165a74cecabb93ab62f675230c881b61f6f1468ce509ff_cppui253,
-            0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffeffffffe4_cppui253,
-            0x4da4e5c5ae51c09a55d8ca4d795b942eaacd3641032ed668bd18f9db00c9eab0_cppui253,
-            0x34feaccd6c4121ce58812000ec41200000005fffffffffff7_cppui253,
-            0xb203697e3324b9d8315e428232ba34b78aeadd2c545d3e39e250eb8731af5f4_cppui253,
+            0x2a0cf6cbe1265f2f69c5fd7f23de0a85a42a7b5b43d65a71dd6e2e081f3acfea_cppui253,
+            0x25dca9e18637dc987d958e25d84deb0599a1478360c5ed2566591d49ad40df0c_cppui253,
+            0x1200fa2d09728089883f89488cf6cfb560ba457f80713d469fdbf1666aff4730_cppui253,
+            0x61283ccdf122134fa2421001b12210000000affffffffffe8_cppui253,
+            0x6f8014ca51c232ed6480b1981a3dd3d72cfe0a9c2986ba7d8dc20181d20cf8db_cppui253,
+            0x151cdb46d4f99b9102fc2c91a0645c689d89f312c7239269a1362ba1abd896cb_cppui253,
+            0x35926b84873e2d16fc9273ec962a65b7d27133d4c3a8957fc8e27f9fcd265a6_cppui253
         }};
 
     BOOST_CHECK_EQUAL(c_res, a);
@@ -1216,6 +1212,58 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_pow_eq_test) {
         res *= a;
     
     BOOST_CHECK_EQUAL(res, a.pow(7));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(polynomial_evaluation_test_suite)
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_evaluate_after_resize_test) {
+
+    polynomial_dfs<typename FieldType::value_type> small_poly = {
+        3,
+        {
+            0x21_cppui253,
+            0x396e56c94dd65906159d4f74c19202bc115b4696f2872527bbf6d249d35592e8_cppui253,
+            0x73eda753299d7d3c0e323e49e55f6e110b7ba3ccdbbc5bfeffe9fffefffffffe_cppui253,
+            0x5aedf3feb052db4e740b467d229f14d5eac1f0781703da9f46a4b599d626236a_cppui253,
+            0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffeffffffea_cppui253,
+            0x3a7f5089dbc72446882aef06f827fbd0a27a5d7fbd8f36d744112db52caa6d1b_cppui253,
+            0xc250799be244269f448420036244200000015fffffffffffd_cppui253,
+            0x18ffb354794aa1f554a02b1736ea9ca808e3b37738e2815fb9534a6529d9dc99_cppui253,
+        }};
+
+    typename FieldType::value_type point = 0x10_cppui253;
+    polynomial_dfs<typename FieldType::value_type> large_poly = small_poly;
+    for (size_t new_size : {16, 32, 64, 128, 256, 512}) {
+        large_poly.resize(new_size);
+        BOOST_CHECK(small_poly.evaluate(point) == large_poly.evaluate(point));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_evaluate_after_resize_and_shift_test) {
+
+    polynomial_dfs<typename FieldType::value_type> small_poly = {
+        3,
+        {
+            0x21_cppui253,
+            0x396e56c94dd65906159d4f74c19202bc115b4696f2872527bbf6d249d35592e8_cppui253,
+            0x73eda753299d7d3c0e323e49e55f6e110b7ba3ccdbbc5bfeffe9fffefffffffe_cppui253,
+            0x5aedf3feb052db4e740b467d229f14d5eac1f0781703da9f46a4b599d626236a_cppui253,
+            0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffeffffffea_cppui253,
+            0x3a7f5089dbc72446882aef06f827fbd0a27a5d7fbd8f36d744112db52caa6d1b_cppui253,
+            0xc250799be244269f448420036244200000015fffffffffffd_cppui253,
+            0x18ffb354794aa1f554a02b1736ea9ca808e3b37738e2815fb9534a6529d9dc99_cppui253,
+        }};
+
+    typename FieldType::value_type point = 0x10_cppui253;
+    polynomial_dfs<typename FieldType::value_type> large_poly = small_poly;
+    small_poly = polynomial_shift(small_poly, -1, 8); 
+    for (size_t new_size : {16, 32, 64, 128, 256, 512}) {
+        large_poly.resize(new_size);
+        auto large_poly_shifted = polynomial_shift(large_poly, -1, 8);
+        BOOST_CHECK(small_poly.evaluate(point) == large_poly_shifted.evaluate(point));
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

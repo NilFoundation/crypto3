@@ -66,33 +66,33 @@ namespace nil {
                 }
 
                 explicit polynomial_dfs(size_t d, size_type n) : val(n), _d(d) {
-                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynomial size must be a power of two");
                 }
 
                 explicit polynomial_dfs(size_t d, size_type n, const allocator_type& a) : val(n, a), _d(d) {
-                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynomial size must be a power of two");
                 }
 
                 polynomial_dfs(size_t d, size_type n, const value_type& x) : val(n, x), _d(d) {
-                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynomial size must be a power of two");
                 }
 
                 polynomial_dfs(size_t d, size_type n, const value_type& x, const allocator_type& a) :
                     val(n, x, a), _d(d) {
-                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynom size must be power of two");
+                    BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynomial size must be a power of two");
                 }
 
                 template<typename InputIterator>
                 polynomial_dfs(size_t d, InputIterator first, InputIterator last) : val(first, last), _d(d) {
                     BOOST_ASSERT_MSG(std::distance(first, last) == detail::power_of_two(std::distance(first, last)),
-                                     "DFS optimal polynom size must be power of two");
+                                     "DFS optimal polynomial size must be a power of two");
                 }
 
                 template<typename InputIterator>
                 polynomial_dfs(size_t d, InputIterator first, InputIterator last, const allocator_type& a) :
                     val(first, last, a), _d(d) {
                     BOOST_ASSERT_MSG(std::distance(first, last) == detail::power_of_two(std::distance(first, last)),
-                                     "DFS optimal polynom size must be power of two");
+                                     "DFS optimal polynomial size must be a power of two");
                 }
 
                 ~polynomial_dfs() = default;
@@ -109,7 +109,7 @@ namespace nil {
                 polynomial_dfs(size_t d, std::initializer_list<value_type> il, const allocator_type& a) :
                     val(il, a), _d(d) {
                     BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
-                                     "DFS optimal polynom size must be power of two");
+                                     "DFS optimal polynomial size must be a power of two");
                 }
                 // TODO: add constructor with omega
 
@@ -126,12 +126,12 @@ namespace nil {
 
                 polynomial_dfs(size_t d, const container_type& c) : val(c), _d(d) {
                     BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
-                                     "DFS optimal polynom size must be power of two");
+                                     "DFS optimal polynomial size must be a power of two");
                 }
 
                 polynomial_dfs(size_t d, container_type&& c) : val(c), _d(d) {
                     BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
-                                     "DFS optimal polynom size must be power of two");
+                                     "DFS optimal polynomial size must be a power of two");
                 }
 
                 polynomial_dfs& operator=(const polynomial_dfs& x) {
@@ -351,7 +351,7 @@ namespace nil {
                 void resize(size_type _sz) {
                     if (this->size() == _sz)
                         return;
-                    // BOOST_ASSERT_MSG(_sz >= _d, "Can't restore polynomial in the future");
+                    BOOST_ASSERT_MSG(_sz >= _d, "Resizing DFS polynomial to a size less than degree is prohibited: can't restore the polynomial in the future.");
                     if (this->size() == 1){
                         this->val.resize(_sz, this->val[0]);
                     } else {
@@ -488,8 +488,7 @@ namespace nil {
                     if (this->size() > other.size()) {
                         polynomial_dfs tmp(other);
                         tmp.resize(this->size());
-
-                        std::transform(tmp.begin(), tmp.end(), this->begin(), this->begin(), std::minus<FieldValueType>());
+                        std::transform(this->begin(), this->end(), tmp.begin(), this->begin(), std::minus<FieldValueType>());
                         return *this;
                     }
                     std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::minus<FieldValueType>());
@@ -745,7 +744,7 @@ namespace nil {
                 os << "[Polynomial DFS, size " << poly.size()
                    << " degree " << poly.degree() << " values ";
                 for( auto it = poly.begin(); it != poly.end(); it++ ){
-                    os << it->data << ", ";
+                    os << "0x" << std::hex << it->data << ", ";
                 }
                 os << "]";
                 return os;
