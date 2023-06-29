@@ -36,7 +36,7 @@
 #include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/complete_addition.hpp>
 #include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/scalar_non_native_range.hpp>
 #include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/ec_point.hpp>
-#include <nil/blueprint/components/hashes/sha256/plonk/sha512.hpp>
+#include <nil/blueprint/components/hashes/sha2/plonk/sha512.hpp>
 
 namespace nil {
     namespace blueprint {

@@ -26,7 +26,7 @@
 #ifndef CRYPTO3_BLUEPRINT_COMPONENTS_SHA256_COMPONENT_TEST_HPP
 #define CRYPTO3_BLUEPRINT_COMPONENTS_SHA256_COMPONENT_TEST_HPP
 
-#include <nil/blueprint/components/hashes/sha256/r1cs/sha256_component.hpp>
+#include <nil/blueprint/components/hashes/sha2/r1cs/sha256_component.hpp>
 #include <nil/blueprint/components/hashes/hash_io.hpp>
 #include <nil/blueprint/blueprint/r1cs/circuit.hpp>
 #include <nil/blueprint/blueprint/r1cs/assignment.hpp>

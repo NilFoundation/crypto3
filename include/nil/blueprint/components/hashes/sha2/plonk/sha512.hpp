@@ -32,8 +32,8 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/hashes/sha256/plonk/sha512_process.hpp>
-//#include <nil/blueprint/components/hashes/sha256/plonk/decomposition.hpp>
+#include <nil/blueprint/components/hashes/sha2/plonk/sha512_process.hpp>
+//#include <nil/blueprint/components/hashes/sha2/plonk/decomposition.hpp>
 
 namespace nil {
     namespace blueprint {
