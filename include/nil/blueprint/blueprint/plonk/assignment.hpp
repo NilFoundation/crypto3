@@ -241,16 +241,17 @@ namespace nil {
                               max_constants_size = 0,
                               max_selectors_size = 0;
                 for (std::uint32_t i = 0; i < witnesses_size; i++) {
-                    max_witnesses_size = std::max(max_size, this->_private_table.witness_column_size(i));
+                    max_witnesses_size = std::max(max_witnesses_size, this->_private_table.witness_column_size(i));
                 }
                 for (std::uint32_t i = 0; i < public_size; i++) {
-                    max_public_inputs_size = std::max(max_size, this->_public_table.public_input_column_size(i));
+                    max_public_inputs_size = std::max(max_public_inputs_size,
+                                                      this->_public_table.public_input_column_size(i));
                 }
                 for (std::uint32_t i = 0; i < constants_size; i++) {
-                    max_constants_size = std::max(max_size, this->_public_table.constant_column_size(i));
+                    max_constants_size = std::max(max_constants_size, this->_public_table.constant_column_size(i));
                 }
                 for (std::uint32_t i = 0; i < selectors_size; i++) {
-                    max_selectors_size = std::max(max_size, this->_public_table.selector_column_size(i));
+                    max_selectors_size = std::max(max_selectors_size, this->_public_table.selector_column_size(i));
                 }
                 os << std::dec;
                 max_size = std::max({max_witnesses_size,

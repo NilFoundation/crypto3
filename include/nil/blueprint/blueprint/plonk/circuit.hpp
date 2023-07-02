@@ -116,12 +116,15 @@ namespace nil {
                    << "copy_constraints_size: " << copy_constraints_size << " "
                    << "lookup_gates_size: " << lookup_gates_size << "\n";
                 for (std::size_t i = 0; i < gates_size; i++) {
-                    os << "gate " << i << " selector " << this->_gates[i].selector_index
-                       << " constraints_size " << this->_gates[i].constraints.size() << "\n";
+                    os << "selector: " << this->_gates[i].selector_index
+                       << " constraints_size: " << this->_gates[i].constraints.size() << "\n";
                     for (std::size_t j = 0; j < this->_gates[i].constraints.size(); j++) {
-                        os << "constraint " << j << " : "
-                           << this->_gates[i].constraints[j] << "\n";
+                        os << this->_gates[i].constraints[j] << "\n";
                     }
+                }
+                for (std::size_t i = 0; i < copy_constraints_size; i++) {
+                    os << this->_copy_constraints[i].first << " "
+                       << this->_copy_constraints[i].second << "\n";
                 }
                 os.flush();
                 os.flags(os_flags);
