@@ -159,7 +159,7 @@ namespace nil {
                     var flag;
                     result_type(const comparison_flag &component, std::size_t start_row_index) {
                         std::size_t outuput_w = needs_bonus_row ? 0 : 3;
-                        flag = var(component.W(outuput_w), start_row_index + component.rows_amount - 1);
+                        flag = var(component.W(outuput_w), start_row_index + component.rows_amount - 1, false);
                     }
                 };
 

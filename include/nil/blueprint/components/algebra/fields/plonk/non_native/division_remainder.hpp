@@ -284,20 +284,20 @@ namespace nil {
                 row += 1 + component.needs_bonus_row;
 
                 generate_circuit(component.range_checks[0], bp, assignment,
-                                 {var(component.W(y_minus_r_address.second), y_minus_r_address.first)}, row);
+                                 {var(component.W(y_minus_r_address.second), y_minus_r_address.first, false)}, row);
                 row += component.range_checks[0].rows_amount;
 
                 generate_circuit(component.range_checks[1], bp, assignment,
-                                 {var(component.W(q_address.second), q_address.first)}, row);
+                                 {var(component.W(q_address.second), q_address.first, false)}, row);
                 row += component.range_checks[1].rows_amount;
 
                 if (component.check_inputs) {
                     generate_circuit(component.range_checks[2], bp, assignment,
-                                     {var(component.W(x_address.second), x_address.first)}, row);
+                                     {var(component.W(x_address.second), x_address.first, false)}, row);
                     row += component.range_checks[2].rows_amount;
 
                     generate_circuit(component.range_checks[3], bp, assignment,
-                                     {var(component.W(y_address.second), y_address.first)}, row);
+                                     {var(component.W(y_address.second), y_address.first, false)}, row);
                     row += component.range_checks[3].rows_amount;
                 }
 
@@ -357,20 +357,20 @@ namespace nil {
                 row += 1 + component.needs_bonus_row;
 
                 generate_assignments(component.range_checks[0], assignment,
-                                     {var(component.W(y_minus_r_address.second), y_minus_r_address.first)}, row);
+                                    {var(component.W(y_minus_r_address.second), y_minus_r_address.first, false)}, row);
                 row += component.range_checks[0].rows_amount;
 
                 generate_assignments(component.range_checks[1], assignment,
-                                     {var(component.W(q_address.second), q_address.first)}, row);
+                                     {var(component.W(q_address.second), q_address.first, false)}, row);
                 row += component.range_checks[1].rows_amount;
 
                 if (component.check_inputs) {
                     generate_assignments(component.range_checks[2], assignment,
-                                         {var(component.W(x_address.second), x_address.first)}, row);
+                                         {var(component.W(x_address.second), x_address.first, false)}, row);
                     row += component.range_checks[2].rows_amount;
 
                     generate_assignments(component.range_checks[3], assignment,
-                                         {var(component.W(y_address.second), y_address.first)}, row);
+                                         {var(component.W(y_address.second), y_address.first, false)}, row);
                     row += component.range_checks[3].rows_amount;
                 }
 
