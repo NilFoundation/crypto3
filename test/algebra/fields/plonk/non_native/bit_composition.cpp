@@ -46,9 +46,11 @@ using namespace nil;
 using mode = blueprint::components::detail::bit_composition_mode;
 
 template<typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount, mode Mode,
-         bool CheckInput>
+         bool CheckInput, bool CustomAssignments = false>
 void test_bit_composition(const std::vector<typename BlueprintFieldType::value_type> &bits,
-                          typename BlueprintFieldType::value_type expected_res){
+                          typename BlueprintFieldType::value_type expected_res,
+                          std::map<std::pair<std::size_t, std::size_t>, typename BlueprintFieldType::value_type>
+                                patches = {}){
 
     constexpr std::size_t WitnessColumns = WitnessesAmount;
     constexpr std::size_t PublicInputColumns = 1;
@@ -103,12 +105,21 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
         }
     };
 
-    if (expected_to_pass) {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, bits, result_check, instance_input);
+    if (!CustomAssignments) {
+        if (expected_to_pass) {
+            crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, bits, result_check, instance_input);
+        } else {
+            crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, bits, result_check, instance_input);
+        }
     } else {
-        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, bits, result_check, instance_input);
+        auto custom_assignments = crypto3::generate_patched_assignments<BlueprintFieldType,
+            ArithmetizationParams, component_type>(patches);
+        crypto3::test_component_to_fail_custom_assignments<
+            component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
+                (component_instance, bits, result_check,
+                 custom_assignments, instance_input);
     }
 }
 
@@ -169,106 +180,108 @@ void test_composition() {
     }
 }
 
-template<typename BlueprintFieldType, std::uint32_t WitnesesAmount, std::uint32_t BitsAmount>
-void test_composition_bad_bits() {
-    using value_type = typename BlueprintFieldType::value_type;
-    std::vector<value_type> test_bits(BitsAmount, 0);
-
-    mode m = mode::MSB;
-    for (std::size_t i = 0; i < BitsAmount; i++) {
-        value_type val = m == mode::MSB ? value_type(2).pow(BitsAmount - i) :
-                                                                        value_type(2).pow(i);
-        val *= -1;
-        test_bits[i] = -1;
-        test_bit_composition<BlueprintFieldType, WitnesesAmount, BitsAmount, mode::MSB, true>(test_bits, val);
-        test_bits[i] = 0;
-    }
-}
-
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_1) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_1) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 1>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_8) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_8) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 8>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_16) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_16) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 16>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_32) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_32) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 32>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_44) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_44) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 44>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_64) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_64) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 64>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_128) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_128) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 128>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_15_253) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_15_253) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 15, 253>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_oops_didnt_pass_bits) {
-    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
-    test_composition_bad_bits<field_type, 15, 253>();
-}
-
-
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_1) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_1) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 1>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_8) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_8) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 8>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_16) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_16) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 16>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_26) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_26) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 26>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_32) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_32) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 32>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_64) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_64) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 64>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_128) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_128) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 128>();
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_9_253) {
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_test_9_253) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_composition<field_type, 9, 253>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_composition_oops_didnt_pass_bits) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    using value_type = typename field_type::value_type;
+
+    std::map<std::pair<std::size_t, std::size_t>, value_type> patches;
+    for (std::size_t i = 0; i < 43; i++) {
+        value_type expected_res = value_type(2).pow(i + 1);
+        for (std::size_t j = 0; j < 3; j++) {
+            for (std::size_t k = 0; k < 15; k++) {
+                if (j == 2 && k == 14) {
+                    patches[std::make_pair(j, k)] = expected_res;
+                } else {
+                    patches[std::make_pair(j, k)] = 0;
+                }
+            }
+        }
+        patches[std::make_pair(2 - (i + 1) / 15, (43 - i) % 15)] = 2;
+        std::vector<value_type> input(43);
+        std::fill(input.begin(), input.end(), 0);
+        input[42 - i] = 2;
+        test_bit_composition<field_type, 15, 43, mode::MSB, true, true>(input, expected_res, patches);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
