@@ -35,6 +35,10 @@
 #include <utility>
 #include <map>
 
+#include <boost/random/random_device.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/mersenne_twister.hpp>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/padding.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
@@ -178,10 +182,12 @@ namespace nil {
             blueprint::circuit<ArithmetizationType> bp;
             blueprint::assignment<ArithmetizationType> assignment;
 
-            std::size_t start_row = 0;
+            static boost::random::mt19937 gen;
+            boost::random::uniform_int_distribution<> dist(0, 100);
+            std::size_t start_row = dist(gen);
 
             for (std::size_t i = 0; i < public_input.size(); i++) {
-                assignment.public_input(0, start_row + i) = (public_input[i]);
+                assignment.public_input(0, i) = (public_input[i]);
             }
 
             blueprint::components::generate_circuit<BlueprintFieldType, ArithmetizationParams>(
@@ -355,7 +361,8 @@ namespace nil {
                         component, assignment, instance_input, start_row_index);
 
                 for (const auto &patch : patches) {
-                    assignment.witness(component.W(patch.first.second), patch.first.first) = patch.second;
+                    assignment.witness(component.W(patch.first.second), patch.first.first + start_row_index) =
+                        patch.second;
                 }
 
                 return result;

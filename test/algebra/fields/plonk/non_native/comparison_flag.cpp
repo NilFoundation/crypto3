@@ -152,7 +152,7 @@ void test_comparison_flag_specific_inputs() {
         value_type(value_type(2).pow(R) - 1), value_type(R));
     test_comparison_flag<BlueprintFieldType, WitnessesAmount, R, Mode>(
         value_type(value_type(2).pow(R) + 1), value_type(value_type(2).pow(R) + 1));
-        test_comparison_flag<BlueprintFieldType, WitnessesAmount, R, Mode>(
+    test_comparison_flag<BlueprintFieldType, WitnessesAmount, R, Mode>(
         value_type(value_type(2).pow(R)), value_type(value_type(2).pow(R) + 2));
 }
 

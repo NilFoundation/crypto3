@@ -28,6 +28,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -73,11 +74,11 @@ void test_exponentiation(std::vector<typename FieldType::value_type> public_inpu
     typename BlueprintFieldType::integral_type exponent_value_integral = typename BlueprintFieldType::integral_type(public_input[1].data);
     typename BlueprintFieldType::value_type expected_res = power(base_value, exponent_value_integral);
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "exponentiation test: " << "\n";
-            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n"; 
+            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n";
             std::cout << "expected: " << expected_res.data    << "\n";
             std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n";
             #endif
@@ -85,7 +86,7 @@ void test_exponentiation(std::vector<typename FieldType::value_type> public_inpu
     };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{});
-	
+
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
 }

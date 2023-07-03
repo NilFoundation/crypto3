@@ -105,7 +105,7 @@ namespace nil {
                     using plonk_from_limbs = from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>;
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                    typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type 
+                    typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type
                         generate_circuit(
                         const plonk_from_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
@@ -131,7 +131,7 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                    typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type 
+                    typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type
                         generate_assignments(
                         const plonk_from_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
@@ -200,8 +200,8 @@ namespace nil {
 
                     constexpr static const std::size_t chunk_size = 64;
                     using range_check_component = nil::blueprint::components::range_check<
-                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 
-                        chunk_size, 15>;
+                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                        15>;
 
                 public:
                     using var = typename component_type::var;
@@ -249,7 +249,7 @@ namespace nil {
                     using plonk_to_limbs = to_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15>;
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                    typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::result_type 
+                    typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::result_type
                         generate_circuit(
                         const plonk_to_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
@@ -258,12 +258,13 @@ namespace nil {
                         const std::uint32_t start_row_index) {
 
                         using var = typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::var;
-                        
+
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                        range_check<ArithmetizationType, component.chunk_size_public, 15> range_check_instance(
+                        using component_type = plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>;
+                        range_check<ArithmetizationType, 15> range_check_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
-                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
-                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{});
+                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
+                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{},component_type::chunk_size_public);
 
                         auto selector_iterator = assignment.find_selector(component);
                         std::size_t first_selector_index;
@@ -278,26 +279,26 @@ namespace nil {
                         assignment.enable_selector(first_selector_index, start_row_index);
 
                         std::size_t row = start_row_index;
-                        std::array<var, component.chunk_amount> chunks = {
-                            var(component.W(1), row, false), 
-                            var(component.W(2), row, false), 
-                            var(component.W(3), row, false), 
+                        std::array<var, component_type::chunk_amount> chunks = {
+                            var(component.W(1), row, false),
+                            var(component.W(2), row, false),
+                            var(component.W(3), row, false),
                             var(component.W(4), row, false)
                         };
-                        std::array<var, component.chunk_amount> b_chunks_vars = {
-                            var(component.W(5), row, false), 
-                            var(component.W(6), row, false), 
-                            var(component.W(7), row, false), 
+                        std::array<var, component_type::chunk_amount> b_chunks_vars = {
+                            var(component.W(5), row, false),
+                            var(component.W(6), row, false),
+                            var(component.W(7), row, false),
                             var(component.W(8), row, false)
                         };
 
                         row++;
 
-                        for (std::size_t i = 0; i < component.chunk_amount; i++) {
+                        for (std::size_t i = 0; i < component_type::chunk_amount; i++) {
                             generate_circuit(range_check_instance, bp, assignment, {chunks[i]}, row);
-                            row += range_check<ArithmetizationType, component.chunk_size_public, 15>::rows_amount;
+                            row += range_check_instance.rows_amount;
                             generate_circuit(range_check_instance, bp, assignment, {b_chunks_vars[i]}, row);
-                            row += range_check<ArithmetizationType, component.chunk_size_public, 15>::rows_amount;
+                            row += range_check_instance.rows_amount;
                         }
 
                         generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
@@ -307,7 +308,7 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                    typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::result_type 
+                    typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::result_type
                         generate_assignments(
                         const plonk_to_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
@@ -317,10 +318,11 @@ namespace nil {
                         using var = typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::var;
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                        range_check<ArithmetizationType, component.chunk_size_public, 15> range_check_instance(
+                        using component_type = plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>;
+                        range_check<ArithmetizationType, 15> range_check_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
-                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
-                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{});
+                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
+                                        component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{},component_type::chunk_size_public);
 
                         std::size_t row = start_row_index;
                         typename BlueprintFieldType::value_type value = var_value(assignment, instance_input.param);
@@ -367,25 +369,25 @@ namespace nil {
                              c_chunks[2] - b_chunks[2] +
                              typename BlueprintFieldType::extended_integral_type(assignment.witness(component.W(10), row).data)) >>
                             64;
-                        std::array<var, component.chunk_amount> chunks = {
-                            var(component.W(1), row, false), 
+                        std::array<var, component_type::chunk_amount> chunks = {
+                            var(component.W(1), row, false),
                             var(component.W(2), row, false),
-                            var(component.W(3), row, false), 
+                            var(component.W(3), row, false),
                             var(component.W(4), row, false)};
 
-                        std::array<var, component.chunk_amount> b_chunks_vars = {
-                            var(component.W(5), row, false), 
+                        std::array<var, component_type::chunk_amount> b_chunks_vars = {
+                            var(component.W(5), row, false),
                             var(component.W(6), row, false),
-                            var(component.W(7), row, false), 
+                            var(component.W(7), row, false),
                             var(component.W(8), row, false)};
 
                         row++;
 
-                        for (std::size_t i = 0; i < component.chunk_amount; i++) {
+                        for (std::size_t i = 0; i < component_type::chunk_amount; i++) {
                             generate_assignments(range_check_instance, assignment, {chunks[i]}, row);
-                            row += range_check<ArithmetizationType, component.chunk_size_public, 15>::rows_amount;
+                            row += range_check_instance.rows_amount;
                             generate_assignments(range_check_instance, assignment, {b_chunks_vars[i]}, row);
-                            row += range_check<ArithmetizationType, component.chunk_size_public, 15>::rows_amount;
+                            row += range_check_instance.rows_amount;
                         }
 
                         return typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
