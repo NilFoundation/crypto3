@@ -28,6 +28,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -136,9 +137,9 @@ void test_range_check_specific_inputs() {
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(1);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(2);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(35000);
-    test_range_check<BlueprintFieldType, WitnessesAmount, R>(value_type(1).pow(R) - 1);
+    test_range_check<BlueprintFieldType, WitnessesAmount, R>(value_type(2).pow(R) - 1);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(-1);
-    test_range_check<BlueprintFieldType, WitnessesAmount, R>(value_type(1).pow(R));
+    test_range_check<BlueprintFieldType, WitnessesAmount, R>(value_type(2).pow(R));
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(
         0x4000000000000000000000000000000000000000000000000000000000000000_cppui256
     );
