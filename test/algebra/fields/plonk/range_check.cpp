@@ -163,7 +163,7 @@ void test_range_check_random_inputs() {
     	value_type input_scalar = input_integral;
         // Sanity check
         assert(input_scalar < max_value);
-        test_range_check<BlueprintFieldType, WitnessesAmount, R >(input_scalar);
+        test_range_check<BlueprintFieldType, WitnessesAmount, R>(input_scalar);
 	}
 }
 

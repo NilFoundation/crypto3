@@ -361,7 +361,8 @@ namespace nil {
                         component, assignment, instance_input, start_row_index);
 
                 for (const auto &patch : patches) {
-                    assignment.witness(component.W(patch.first.second), patch.first.first) = patch.second;
+                    assignment.witness(component.W(patch.first.second), patch.first.first + start_row_index) =
+                        patch.second;
                 }
 
                 return result;
