@@ -34,11 +34,14 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/comparison_mode.hpp>
 
 #include <utility>
 #include <type_traits>
+#include <sstream>
+#include <string>
 
 namespace nil {
     namespace blueprint {
@@ -162,6 +165,12 @@ namespace nil {
                         flag = var(component.W(outuput_w), start_row_index + component.rows_amount - 1, false);
                     }
                 };
+
+                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
+                    std::stringstream ss;
+                    ss << "_" << WitnessesAmount << "_" << bits_amount << "_" << mode;
+                    return ss.str();
+                }
 
                 #define __comparison_flag_init_macro(bits_amount_, mode_) \
                     bits_amount(bits_amount_), \

@@ -28,6 +28,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/bit_composition.hpp>
@@ -35,6 +36,8 @@
 
 #include <algorithm>
 #include <utility>
+#include <sstream>
+#include <string>
 
 namespace nil {
     namespace blueprint {
@@ -118,6 +121,12 @@ namespace nil {
                                     component.composition_subcomponent, row).output;
                     }
                 };
+
+                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
+                    std::stringstream ss;
+                    ss << "_" << WitnessesAmount << "_" << mode << "_" << shift;
+                    return ss.str();
+                }
 
                 template<typename ContainerType>
                 bit_shift_constant(ContainerType witness, std::uint32_t bits_amount, std::uint32_t shift_,

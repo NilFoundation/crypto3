@@ -32,12 +32,15 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/comparison_mode.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/range_check.hpp>
 
 #include <type_traits>
 #include <utility>
+#include <sstream>
+#include <string>
 
 namespace nil {
     namespace blueprint {
@@ -105,6 +108,12 @@ namespace nil {
                 struct result_type {
                     result_type(const comparison_unchecked &component, std::size_t start_row_index) {}
                 };
+
+                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
+                    std::stringstream ss;
+                    ss << "_" << WitnessesAmount << "_" << bits_amount << "_" << mode;
+                    return ss.str();
+                }
 
                 #define __comparison_unchecked_init_macro(witness, constant, public_input, bits_amount_, mode_) \
                     bits_amount(bits_amount_), \

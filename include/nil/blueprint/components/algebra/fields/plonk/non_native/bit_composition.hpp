@@ -30,10 +30,13 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp>
 
 #include <utility>
+#include <sstream>
+#include <string>
 
 using nil::blueprint::components::detail::bit_builder_component;
 using nil::blueprint::components::detail::bit_composition_mode;
@@ -85,6 +88,12 @@ namespace nil {
                         output = var(component.W(pos.second), pos.first, false);
                     }
                 };
+
+                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
+                    std::stringstream ss;
+                    ss << "_" << WitnessesAmount << "_" << mode << "_" << this->bits_amount << "_" << this->check_bits;
+                    return ss.str();
+                }
 
                 template<typename ContainerType>
                 bit_composition(ContainerType witness, std::uint32_t bits_amount, bool check_input,
