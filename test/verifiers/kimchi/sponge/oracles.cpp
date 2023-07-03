@@ -27,6 +27,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -67,13 +68,13 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
 
     typename component_type::input_type instance_input = {x, y};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "from_limbs input: " << std::hex << public_input[0].data << " " << public_input[1].data << std::endl;
             std::cout << "expected_res: " << std::hex << expected_res.data << std::endl;
             std::cout << "real     res: " << std::hex << var_value(assignment, real_res.result).data << "\n" << std::endl;
-            #endif 
+            #endif
             assert(expected_res == var_value(assignment, real_res.result));
     };
 
@@ -105,7 +106,7 @@ void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_i
 
     typename component_type::input_type instance_input = {x};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "to_limbs input: " << std::hex << public_input[0].data << std::endl;
@@ -153,13 +154,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs_pallas) {
 
 template<typename FieldType>
 void test_to_limbs_specific_data(){
-    test_to_limbs<FieldType>({0x1D42ED837696F2A777E7C1FF0436D46E96878B624ECDE039732E37AFCD409C88_cppui256}, 
+    test_to_limbs<FieldType>({0x1D42ED837696F2A777E7C1FF0436D46E96878B624ECDE039732E37AFCD409C88_cppui256},
     {0x732E37AFCD409C88_cppui256, 0x96878B624ECDE039_cppui256, 0x77E7C1FF0436D46E_cppui256, 0x1D42ED837696F2A7_cppui256});
 
-    test_to_limbs<FieldType>({0xE826DABA538B6DF0000000000000000FB812F513D0FCC04106CB4BD3F32FAD3_cppui256}, 
+    test_to_limbs<FieldType>({0xE826DABA538B6DF0000000000000000FB812F513D0FCC04106CB4BD3F32FAD3_cppui256},
     {0x106CB4BD3F32FAD3_cppui256, 0xFB812F513D0FCC04_cppui256, 0x0_cppui256, 0xE826DABA538B6DF_cppui256});
 
-    test_to_limbs<FieldType>({0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui256}, 
+    test_to_limbs<FieldType>({0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui256},
     {0xFFFFFFFFFFFFFFFF_cppui256, 0xFFFFFFFFFFFFFFFF_cppui256, 0xFFFFFFFFFFFFFFFF_cppui256, 0x3FFFFFFFFFFFFFFF_cppui256});
 
 }

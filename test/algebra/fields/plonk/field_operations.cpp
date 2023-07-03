@@ -27,6 +27,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -71,11 +72,11 @@ void test_add(std::vector<typename FieldType::value_type> public_input){
 
     typename BlueprintFieldType::value_type expected_res = public_input[0] + public_input[1];
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "add test: " << "\n";
-            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n"; 
+            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n";
             std::cout << "expected: " << expected_res.data    << "\n";
             std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n";
             #endif
@@ -110,11 +111,11 @@ void test_sub(std::vector<typename FieldType::value_type> public_input){
 
     typename BlueprintFieldType::value_type expected_res = public_input[0] - public_input[1];
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "sub test: " << "\n";
-            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n"; 
+            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n";
             std::cout << "expected: " << expected_res.data    << "\n";
             std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n";
             #endif
@@ -149,11 +150,11 @@ void test_mul(std::vector<typename FieldType::value_type> public_input){
 
     typename BlueprintFieldType::value_type expected_res = public_input[0] * public_input[1];
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "mul test: " << "\n";
-            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n"; 
+            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n";
             std::cout << "expected: " << expected_res.data    << "\n";
             std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n";
             #endif
@@ -189,11 +190,11 @@ void test_mul_by_const(std::vector<typename FieldType::value_type> public_input,
 
     typename BlueprintFieldType::value_type expected_res = public_input[0] * y;
 
-    auto result_check = [&expected_res, public_input, y](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input, y](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "mul_by_const test: " << "\n";
-            std::cout << "input   : " << public_input[0].data << " " << y.data << "\n"; 
+            std::cout << "input   : " << public_input[0].data << " " << y.data << "\n";
             std::cout << "expected: " << expected_res.data    << "\n";
             std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n";
             #endif
@@ -227,7 +228,7 @@ void test_div(std::vector<typename FieldType::value_type> public_input,
     typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             assert(expected_res == var_value(assignment, real_res.output));
     };
@@ -264,12 +265,12 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
     } else {
         expected_res = 0;
     }
-    
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "div_or_zero test: " << "\n";
-            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n"; 
+            std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n";
             std::cout << "expected: " << expected_res.data    << "\n";
             std::cout << "real    : " << var_value(assignment, real_res.output).data << "\n\n";
             #endif
