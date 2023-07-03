@@ -245,4 +245,19 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
+namespace std {
+
+template<typename FieldParams>
+struct hash<typename nil::crypto3::algebra::fields::detail::element_fp<FieldParams>>
+{
+    hash<typename nil::crypto3::algebra::fields::detail::element_fp<FieldParams>::modular_type> hasher;
+    size_t operator()(const nil::crypto3::algebra::fields::detail::element_fp<FieldParams>& elem) const
+    {
+        std::size_t result = hasher(elem.data);
+        return result;
+    }
+};
+
+} // namespace std
+
 #endif    // CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP_HPP
