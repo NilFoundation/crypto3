@@ -106,6 +106,29 @@ namespace nil {
                           const std::initializer_list<crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
                 this->_lookup_gates.emplace_back(selector_index, constraints);
             }
+
+            void export_circuit(std::ostream& os) const {
+                std::ios_base::fmtflags os_flags(os.flags());
+                std::size_t gates_size = this->_gates.size(),
+                            copy_constraints_size = this->_copy_constraints.size(),
+                            lookup_gates_size = this->_lookup_gates.size();
+                os << "gates_size: " << gates_size << " "
+                   << "copy_constraints_size: " << copy_constraints_size << " "
+                   << "lookup_gates_size: " << lookup_gates_size << "\n";
+                for (std::size_t i = 0; i < gates_size; i++) {
+                    os << "selector: " << this->_gates[i].selector_index
+                       << " constraints_size: " << this->_gates[i].constraints.size() << "\n";
+                    for (std::size_t j = 0; j < this->_gates[i].constraints.size(); j++) {
+                        os << this->_gates[i].constraints[j] << "\n";
+                    }
+                }
+                for (std::size_t i = 0; i < copy_constraints_size; i++) {
+                    os << this->_copy_constraints[i].first << " "
+                       << this->_copy_constraints[i].second << "\n";
+                }
+                os.flush();
+                os.flags(os_flags);
+            }
         };
     }    // namespace blueprint
 }    // namespace nil
