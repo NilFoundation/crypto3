@@ -46,9 +46,12 @@ using namespace nil;
 
 using mode = blueprint::components::detail::bit_composition_mode;
 
-template <typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount, mode Mode>
+template<typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount, mode Mode,
+         bool CustomAssignments = false>
 void test_bit_decomposition(typename BlueprintFieldType::value_type input,
-                            std::vector<typename BlueprintFieldType::value_type> expected_res){
+                            std::vector<typename BlueprintFieldType::value_type> expected_res,
+                            std::map<std::pair<std::size_t, std::size_t>, typename BlueprintFieldType::value_type>
+                                patches = {}) {
 
     constexpr std::size_t WitnessColumns = WitnessesAmount;
     constexpr std::size_t PublicInputColumns = 1;
@@ -106,12 +109,20 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
     assert(BitsAmount + component_instance.padding_bits_amount() + component_instance.sum_bits_amount() ==
            WitnessColumns * component_instance.rows_amount);
 
-    if (expected_to_pass) {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+    if (!CustomAssignments) {
+        if (expected_to_pass) {
+            crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, public_input, result_check, instance_input);
+        } else {
+            crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, public_input, result_check, instance_input);
+        }
     } else {
-        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+        auto custom_assignments = crypto3::generate_patched_assignments<BlueprintFieldType,
+            ArithmetizationParams, component_type>(patches);
+        crypto3::test_component_to_fail_custom_assignments<
+            component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
+                (component_instance, public_input, result_check, custom_assignments, instance_input);
     }
 }
 
@@ -290,6 +301,30 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_128) {
 BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_pallas_9_254) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     test_decomposition<field_type, 9, 254>();
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_bit_decomposition_test_oops_not_bits) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    using value_type = typename field_type::value_type;
+
+    std::map<std::pair<std::size_t, std::size_t>, value_type> patches;
+    for (std::size_t i = 0; i < 43; i++) {
+        value_type input = value_type(2).pow(i + 1);
+        for (std::size_t j = 0; j < 3; j++) {
+            for (std::size_t k = 0; k < 15; k++) {
+                if (j == 2 && k == 14) {
+                    patches[std::make_pair(j, k)] = input;
+                } else {
+                    patches[std::make_pair(j, k)] = 0;
+                }
+            }
+        }
+        patches[std::make_pair(2 - (i + 1) / 15, (43 - i) % 15)] = 2;
+        std::vector<value_type> expected_result(43);
+        std::fill(expected_result.begin(), expected_result.end(), 0);
+        expected_result[42 - i] = 2;
+        test_bit_decomposition<field_type, 15, 43, mode::MSB, true>(input, expected_result, patches);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

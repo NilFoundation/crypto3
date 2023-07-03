@@ -336,7 +336,6 @@ namespace nil {
 
                             constraints.push_back(var(component.W(col_idx), row_idx) *
                                                       (1 - var(component.W(col_idx), row_idx)));
-
                             col_idx++;
                             if (col_idx % WitnessesAmount == 0) {
                                 row_idx++;
@@ -345,7 +344,7 @@ namespace nil {
                         }
                     }
                     gate_type gate(first_selector_index, constraints);
-                    bp.add_gate(first_selector_index, sum_constraint);
+                    bp.add_gate(gate);
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>

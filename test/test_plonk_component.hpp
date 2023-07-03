@@ -31,6 +31,9 @@
 
 #include <fstream>
 #include <random>
+#include <functional>
+#include <utility>
+#include <map>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/padding.hpp>
