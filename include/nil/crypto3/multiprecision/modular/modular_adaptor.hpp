@@ -664,6 +664,12 @@ namespace nil {
                     eval_inverse_mod(res, new_base, input.mod_data().get_mod().backend());
                     assign_components(result, res, input.mod_data().get_mod().backend());
                 }
+
+                template<typename Backend, typename StorageType>
+                inline std::size_t hash_value(const modular_adaptor<Backend, StorageType>& val) {
+                    return hash_value(val.base_data());
+                }
+
             }    // namespace backends
 
             using nil::crypto3::multiprecision::backends::modular_adaptor;
