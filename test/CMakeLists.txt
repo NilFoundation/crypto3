@@ -60,6 +60,10 @@ set(NON_NATIVE_TESTS_FILES
     "algebra/fields/plonk/non_native/bit_composition"
     "algebra/fields/plonk/non_native/bit_shift_constant"
     "algebra/fields/plonk/non_native/logic_ops"
+    "algebra/fields/plonk/non_native/comparison_checked"
+    "algebra/fields/plonk/non_native/comparison_unchecked"
+    "algebra/fields/plonk/non_native/comparison_flag"
+    "algebra/fields/plonk/non_native/division_remainder"
     "non_native/plonk/bool_scalar_multiplication"
     "non_native/plonk/scalar_non_native_range"
     )

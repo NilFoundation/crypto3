@@ -56,18 +56,19 @@ namespace nil {
                         bp.lookup_gates();
 
             for (std::size_t i = 0; i < gates.size(); i++) {
-                crypto3::zk::snark::plonk_column<BlueprintFieldType> selector = assignments.selector(gates[i].selector_index);
+                crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
+                    assignments.selector(gates[i].selector_index);
 
-                for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
-
-                    for (std::size_t selector_row = 0; selector_row < selector.size(); selector_row++){
-                        if (!selector[selector_row].is_zero()){
+                for (std::size_t selector_row = 0; selector_row < selector.size(); selector_row++) {
+                    if (!selector[selector_row].is_zero()) {
+                        for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
 
                             typename BlueprintFieldType::value_type constraint_result =
                                 gates[i].constraints[j].evaluate(selector_row, assignments);
 
                             if (!constraint_result.is_zero()) {
-                                std::cout << "Constraint " << j << " from gate " << i << " on row " << selector_row << " is not satisfied." << std::endl;
+                                std::cout << "Constraint " << j << " from gate " << i << "on row " << selector_row
+                                          << " is not satisfied." << std::endl;
                                 return false;
                             }
                         }
