@@ -31,8 +31,11 @@
 
 #include <ostream>
 #include <vector>
+#include <functional>
+#include <boost/functional/hash.hpp>
 #include <boost/variant.hpp>
 #include <boost/variant/recursive_wrapper.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -148,7 +151,7 @@ namespace nil {
                 }
 
                 term(const std::vector<VariableType> &vars,
-                     assignment_type &coeff) 
+                     const assignment_type &coeff) 
                     : vars(vars)
                     , coeff(coeff) 
                 {
@@ -174,11 +177,15 @@ namespace nil {
                 expression<VariableType> pow(const std::size_t power) const;
                 term operator-() const;
 
-                // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
                 bool operator==(const term<VariableType>& other) const;
                 bool operator!=(const term<VariableType>& other) const;
+
                 // Used for debugging, to be able to see what's inside the term.
                 std::string to_string() const;
+                
+                // If variables repeat, in some cases we 
+                // want to be able to represent it as Product(var_i^power_i).
+                std::unordered_map<variable_type, int> to_unordered_map() const;
 
                 std::vector<variable_type> vars;
                 assignment_type coeff;
@@ -382,7 +389,20 @@ namespace nil {
                 return expression<VariableType>(left) - exp;
             }
 
-            // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
+            template<typename VariableType>
+            std::unordered_map<VariableType, int> term<VariableType>::to_unordered_map() const {
+                std::unordered_map<VariableType, int> vars_map;
+                for (const auto& var: vars) {
+                    auto iter = vars_map.find(var);
+                    if (iter != vars_map.end()) {
+                        iter->second++;
+                    } else {
+                        vars_map[var] = 1;
+                    }
+                }
+                return vars_map;
+            }
+
             template<typename VariableType>
             bool term<VariableType>::operator==(const term<VariableType>& other) const {
                 if (this->coeff != other.coeff) {
@@ -391,10 +411,20 @@ namespace nil {
                 if (this->vars.size() != other.vars.size()) {
                     return false;
                 }
-                for (auto i = 0; i < this->vars.size(); i++) {
-                    if (this->vars[i] != other.vars[i]) {
+                // Put both vars and other->vars into a hashmap, and check if
+                // everything is equal.
+                auto vars_map = this->to_unordered_map();
+                for (const auto& var: other.vars) {
+                    auto iter = vars_map.find(var);
+                    if (iter != vars_map.end()) {
+                        iter->second--;
+                    } else {
                         return false;
                     }
+                }
+                for (const auto& entry: vars_map) {
+                    if (entry.second != 0)
+                        return false;
                 }
                 return true;
             }
@@ -494,8 +524,32 @@ namespace nil {
             bool expression<VariableType>::operator!=(const expression<VariableType>& other) const {
                 return this->expr != other.expr;
             }
+
+            
         }    // namespace math
     }            // namespace crypto3
 }    // namespace nil
+
+namespace std {
+
+template <typename VariableType>
+struct std::hash<nil::crypto3::math::term<VariableType>>
+{
+    std::hash<VariableType> vars_hasher;
+    std::hash<typename VariableType::assignment_type> coeff_hasher;
+
+    std::size_t operator()(const nil::crypto3::math::term<VariableType>& term) const
+    {
+        std::size_t result = coeff_hasher(term.coeff);
+        auto vars = term.vars;
+        sort(vars.begin(), vars.end());
+        for (const auto& var: vars) {
+            boost::hash_combine(result, vars_hasher(var));
+        }
+        return result;
+    }
+};
+
+} // namespace std
 
 #endif    // CRYPTO3_ZK_MATH_EXPRESSION_HPP

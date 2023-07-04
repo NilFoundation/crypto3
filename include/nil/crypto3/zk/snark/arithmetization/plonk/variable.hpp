@@ -33,6 +33,8 @@
 
 #include <ostream>
 #include <vector>
+#include <functional>
+#include <boost/functional/hash.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -50,6 +52,7 @@ namespace nil {
             template<typename VariableType>
             struct expression;
         }    // namespace math
+
         namespace zk {
             namespace snark {
 
@@ -123,8 +126,13 @@ namespace nil {
                     }
 
                     bool operator<(const plonk_variable &other) const {
-                        return ((this->index < other.index) ||
-                                ((this->index == other.index) && (this->rotation < other.rotation)));
+                        if (this->index != other.index)
+                            return this->index < other.index;
+                        if (this->rotation != other.rotation)
+                            return this->rotation < other.rotation;
+                        if (this->type != other.type)
+                            return this->type < other.type;
+                        return this->relative < other.relative;
                     }
                 };
 
@@ -166,5 +174,18 @@ namespace nil {
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
+
+template<typename FieldType>
+struct std::hash<nil::crypto3::zk::snark::plonk_variable<FieldType>>
+{
+    std::size_t operator()(const nil::crypto3::zk::snark::plonk_variable<FieldType>& var) const
+    {
+        std::size_t result = std::hash<std::int32_t>()(var.rotation);
+        boost::hash_combine(result, std::hash<std::int8_t>()(var.type));
+        boost::hash_combine(result, std::hash<std::size_t>()(var.index));
+        boost::hash_combine(result, std::hash<bool>()(var.relative));
+        return result;
+    }
+};
 
 #endif    // CRYPTO3_ZK_PLONK_VARIABLE_HPP

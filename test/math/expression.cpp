@@ -59,13 +59,11 @@ BOOST_AUTO_TEST_CASE(expression_to_non_linear_combination_test) {
     expression<variable_type> expr = (w0 + w1) * (w2 + w3);
    
     expression_to_non_linear_combination_visitor<variable_type> visitor;
-    auto comb = visitor.convert(expr);
+    non_linear_combination<variable_type> result = visitor.convert(expr);
+    non_linear_combination<variable_type> expected({w0 * w2, w0 * w3, w1 * w2, w1 * w3});
  
-    BOOST_CHECK_EQUAL(comb.terms.size(), 4);
-    BOOST_CHECK_EQUAL(comb.terms[0], w0 * w2);
-    BOOST_CHECK_EQUAL(comb.terms[1], w0 * w3);
-    BOOST_CHECK_EQUAL(comb.terms[2], w1 * w2);
-    BOOST_CHECK_EQUAL(comb.terms[3], w1 * w3);
+    // We may get the terms in a different order due to changes in the code, and that's fine.
+    BOOST_CHECK_EQUAL(result, expected);
 }
 
 BOOST_AUTO_TEST_CASE(expression_evaluation_test) {

@@ -32,6 +32,7 @@
 #define CRYPTO3_ZK_MATH_NON_LINEAR_COMBINATION_HPP
 
 #include <vector>
+#include <unordered_map>
 #include <nil/crypto3/zk/math/expression.hpp>
 
 namespace nil {
@@ -46,7 +47,8 @@ namespace nil {
 
                 using term_type = term<VariableType>;
                 using variable_type = VariableType;
-                
+                using assignment_type = typename VariableType::assignment_type;
+
                 std::vector<term_type> terms;
 
                 non_linear_combination() {};
@@ -104,39 +106,64 @@ namespace nil {
                 non_linear_combination operator-() const {
                     return (*this) * (-VariableType::assignment_type::one());
                 }
-
-                void sort() {
-                    std::sort(terms.begin(), terms.end());
-                    std::vector<term_type> new_terms;
-
-                    if (terms.size()) {
-                        new_terms.push_back(terms[0]);
-
-                        for (std::size_t i = 1; i < terms.size(); i++) {
-                            if (terms[i].vars == terms[i - 1].vars) {
-                                (new_terms.end() - 1)->coeff += terms[i].coeff;
-                            } else {
-                                new_terms.push_back(terms[i]);
-                            }
-                        }
-                    }
-                    terms = std::move(new_terms);
-                }
-
-                bool operator==(const non_linear_combination &other) {
-
-                    this->sort();
-                    other.sort();
-
-                    return (this->terms == other.terms);
-                }
-
+                
                 std::size_t max_degree() const {
                     std::size_t max_degree = 0;
                     for (const term_type &nlt : this->terms) {
                         max_degree = std::max(max_degree, nlt.vars.size());
                     }
                     return max_degree;
+                }
+
+                void merge_equal_terms() {
+                    std::unordered_map<term_type, assignment_type> unique_terms;
+                    for (const auto& term: this->terms) {
+                        // Create a new term with variables only.
+                        term_type vars(term.vars);
+                        auto it = unique_terms.find(vars);
+                        if (it != unique_terms.end()) {
+                            unique_terms[vars] += term.coeff;
+                        } else {
+                            unique_terms[vars] = term.coeff; 
+                        }
+                    }
+                    this->terms.clear();
+                    for (const auto& it: unique_terms) {
+                        this->terms.emplace_back(it.first.vars, it.second);
+                    }
+                }
+                
+                bool operator==(const non_linear_combination &other) const {
+                    if (this->terms.size() != other.terms.size())
+                        return false;
+
+                    std::unordered_map<term_type, int> unique_terms;
+                    // Put both terms and other->terms into a hashmap, and check if
+                    // everything is equal.
+                    std::unordered_map<term_type, int> terms_map;
+                    for (const auto& term: this->terms) {
+                        auto iter = terms_map.find(term);
+                        if (iter != terms_map.end()) {
+                            iter->second++;
+                        } else {
+                            terms_map[term] = 1;
+                        }
+                    }
+
+                    for (const auto& term: other.terms) {
+                        auto iter = terms_map.find(term);
+                        if (iter != terms_map.end()) {
+                            iter->second--;
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    for (const auto& entry: terms_map) {
+                        if (entry.second != 0)
+                            return false;
+                    }
+                    return true;
                 }
             };
 
@@ -235,6 +262,21 @@ namespace nil {
                     const term<VariableType> &term) {
                 return lc - non_linear_combination<VariableType>(term);
             }
+
+            // Used in the unit tests, so we can use BOOST_CHECK_EQUALS, and see
+            // the values of terms, when the check fails.
+            template<typename VariableType>
+            std::ostream& operator<<(std::ostream& os, const non_linear_combination<VariableType> &comb) {
+                bool first = true;
+                for (const auto& term: comb.terms) {
+                    if (!first)
+                        os << " + ";
+                    os << term;
+                    first = false;
+                }
+                return os;
+            }
+
         }    // namespace math
     }            // namespace crypto3
 }    // namespace nil

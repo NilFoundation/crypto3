@@ -179,7 +179,10 @@ namespace nil {
 
                 math::non_linear_combination<VariableType> convert(
                         const math::expression<VariableType>& expr) {
-                    return boost::apply_visitor(*this, expr.expr);
+                    math::non_linear_combination<VariableType> result = 
+                        boost::apply_visitor(*this, expr.expr);
+                    result.merge_equal_terms();
+                    return result;
                 }
 
                 math::non_linear_combination<VariableType> operator()(
