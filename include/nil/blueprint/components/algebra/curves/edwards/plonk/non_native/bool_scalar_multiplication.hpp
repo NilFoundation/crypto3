@@ -65,8 +65,8 @@ namespace nil {
 
                 struct input_type {
                     struct var_ec_point {
-                        typename non_native_policy_type::template field<operating_field_type>::value_type x;
-                        typename non_native_policy_type::template field<operating_field_type>::value_type y;
+                        typename non_native_policy_type::template field<operating_field_type>::non_native_var_type x;
+                        typename non_native_policy_type::template field<operating_field_type>::non_native_var_type y;
                     };
 
                     var_ec_point T;
@@ -75,8 +75,8 @@ namespace nil {
 
                 struct result_type {
                     struct var_ec_point {
-                        typename non_native_policy_type::template field<operating_field_type>::value_type x;
-                        typename non_native_policy_type::template field<operating_field_type>::value_type y;
+                        typename non_native_policy_type::template field<operating_field_type>::non_native_var_type x;
+                        typename non_native_policy_type::template field<operating_field_type>::non_native_var_type y;
                     };
                     var_ec_point output;
 

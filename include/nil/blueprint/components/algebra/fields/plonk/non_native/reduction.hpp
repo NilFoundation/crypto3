@@ -72,7 +72,7 @@ namespace nil {
                 };
 
                 struct result_type {
-                    typename non_native_policy_type::template field<operating_field_type>::value_type output;
+                    typename non_native_policy_type::template field<operating_field_type>::non_native_var_type output;
 
                     result_type(const reduction &component, std::uint32_t start_row_index) {
                         output = var(component.W(4), start_row_index + rows_amount - 3, false);

@@ -84,12 +84,12 @@ namespace nil {
                 const std::size_t gates_amount = 1;
 
                 struct input_type {
-                    typename non_native_policy_type::template field<operating_field_type>::value_type A;
-                    typename non_native_policy_type::template field<operating_field_type>::value_type B;
+                    typename non_native_policy_type::template field<operating_field_type>::non_native_var_type A;
+                    typename non_native_policy_type::template field<operating_field_type>::non_native_var_type B;
                 };
 
                 struct result_type {
-                    typename non_native_policy_type::template field<operating_field_type>::value_type output;
+                    typename non_native_policy_type::template field<operating_field_type>::non_native_var_type output;
 
                     result_type(const addition &component, std::uint32_t start_row_index) {
                         output = {var(component.W(0), start_row_index + 2, false),

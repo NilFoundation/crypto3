@@ -71,7 +71,7 @@ namespace nil {
                 const std::size_t gates_amount = 1;
 
                 struct input_type {
-                    typename non_native_policy_type::template field<operating_field_type>::value_type
+                    typename non_native_policy_type::template field<operating_field_type>::non_native_var_type
                         input;    // 66,66,66,57 bits
                 };
 
