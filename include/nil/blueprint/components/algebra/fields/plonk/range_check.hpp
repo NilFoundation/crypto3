@@ -35,9 +35,12 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <utility>
 #include <type_traits>
+#include <sstream>
+#include <string>
 
 namespace nil {
         namespace blueprint {
@@ -115,6 +118,12 @@ namespace nil {
                     struct result_type {
                         result_type(const range_check &component, std::size_t start_row_index) {}
                     };
+
+                    nil::blueprint::detail::blueprint_component_id_type get_id() const override {
+                        std::stringstream ss;
+                        ss << "_" << WitnessesAmount << "_" << bits_amount;
+                        return ss.str();
+                    }
 
                     #define __range_check_init_macro(bits_amount_) \
                         bits_amount(bits_amount_), \

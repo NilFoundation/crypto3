@@ -33,11 +33,14 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp>
 
 #include <type_traits>
 #include <utility>
+#include <sstream>
+#include <string>
 
 using nil::blueprint::components::detail::bit_builder_component;
 using nil::blueprint::components::detail::bit_composition_mode;
@@ -60,7 +63,7 @@ namespace nil {
                                                             WitnessesAmount>
                                  : public
                                    bit_builder_component<crypto3::zk::snark::plonk_constraint_system<
-                                                            BlueprintFieldType, ArithmetizationParams>,
+                                                         BlueprintFieldType, ArithmetizationParams>,
                                                          WitnessesAmount> {
 
                 using component_type =
@@ -94,6 +97,12 @@ namespace nil {
                         }
                     }
                 };
+
+                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
+                    std::stringstream ss;
+                    ss << "_" << WitnessesAmount << "_" << mode << "_" << this->bits_amount;
+                    return ss.str();
+                }
 
                 template<typename ContainerType>
                 bit_decomposition(ContainerType witness, std::uint32_t bits_amount,

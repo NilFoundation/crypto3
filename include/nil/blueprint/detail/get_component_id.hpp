@@ -27,6 +27,8 @@
 #define CRYPTO3_BLUEPRINT_DETAIL_COMPONENT_ID_HPP
 
 #include <typeinfo>
+#include <string>
+#include <sstream>
 
 namespace nil {
     namespace blueprint {
@@ -38,7 +40,7 @@ namespace nil {
             blueprint_component_id_type get_component_id(const ComponentType& component) {
                 std::stringstream id;
 
-                id << typeid(component).name();
+                id << typeid(component).name() << component.get_id();
                 return id.str();
             }
         }    // namespace detail

@@ -51,7 +51,7 @@ namespace nil {
                 using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
                 using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
                 using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
-                
+
             public:
 
                 witness_container_type _W;
@@ -63,7 +63,7 @@ namespace nil {
 
                 /**
                  * Get Witness column global index by its internal index.
-                 * 
+                 *
                  * @param[in] internal witness signed index. For -1, last witness assumed.
                  */
                 typename witness_container_type::value_type W(std::int32_t index) const {
@@ -72,7 +72,7 @@ namespace nil {
 
                 /**
                  * Get Constant column global index by its internal index.
-                 * 
+                 *
                  * @param[in] internal constant signed index. For -1, last constant assumed.
                  */
                 typename constant_container_type::value_type C(std::int32_t index) const {
@@ -81,7 +81,7 @@ namespace nil {
 
                 /**
                  * Get Public Input column global index by its internal index.
-                 * 
+                 *
                  * @param[in] internal public input signed index. For -1, last public input assumed.
                  */
                 typename public_input_container_type::value_type PI(std::int32_t index) const {
@@ -93,7 +93,7 @@ namespace nil {
 
                 /**
                  * Constructor from arbitrary container types.
-                 * 
+                 *
                  * @tparam WitnessContainerType Input Witness Container Type
                  * @tparam ConstantContainerType Input Constant Container Type
                  * @tparam PublicInputContainerType Input PublicInput Container Type
@@ -122,6 +122,8 @@ namespace nil {
                     return _PI.size();
                 }
 
+                virtual detail::blueprint_component_id_type get_id() const { return std::string(""); };
+
                 template <typename ComponentType>
                 friend detail::blueprint_component_id_type detail::get_component_id (ComponentType component);
             };
@@ -135,7 +137,7 @@ namespace nil {
             //             ConstantAmount, PublicInputAmount>
             //         std::size_t operator() (const component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
             //                 ConstantAmount, PublicInputAmount> &node) const {
-                        
+
             //         }
             //     };
 
@@ -155,6 +157,8 @@ namespace nil {
             public:
                 r1cs_component(blueprint<ArithmetizationType> &bp) : bp(bp) {
                 }
+
+                virtual detail::blueprint_component_id_type get_id() const { return std::string(""); };
             };
 
         }    // namespace components

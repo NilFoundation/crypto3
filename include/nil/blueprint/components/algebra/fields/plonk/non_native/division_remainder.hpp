@@ -32,6 +32,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/range_check.hpp>
 
@@ -39,6 +40,8 @@
 
 #include <type_traits>
 #include <utility>
+#include <sstream>
+#include <string>
 
 namespace nil {
     namespace blueprint {
@@ -121,6 +124,12 @@ namespace nil {
                         remainder = var(component.W(r_address.second), r_address.first);
                     }
                 };
+
+                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
+                    std::stringstream ss;
+                    ss << "_" << WitnessesAmount << "_" << bits_amount << "_" << check_inputs;
+                    return ss.str();
+                }
 
                 #define __division_remainder_init_macro(witness, constant, public_input, \
                                                         bits_amount_, check_inputs_) \
