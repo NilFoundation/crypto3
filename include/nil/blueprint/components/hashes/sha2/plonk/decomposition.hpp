@@ -120,24 +120,25 @@ namespace nil {
                 std::size_t shift = 0;
 
                 for (std::size_t i = 0; i < 8; i++) {
-                    range_chunks[i] = (data[0] >> shift) & ((1 << 16) - 1);
+                    range_chunks[i] = (data[0] >> shift) & ((65536) - 1);
                     assignment.witness(component.W(i), row) = range_chunks[i];
-                    range_chunks[i + 8] = (data[1] >> shift) & ((1 << 16) - 1);
+                    range_chunks[i + 8] = (data[1] >> shift) & ((65536) - 1);
                     assignment.witness(component.W(i), row + 2) = range_chunks[i + 8];
                     shift += 16;
                 }
 
                 assignment.witness(component.W(8), row) = data[0];
-                assignment.witness(component.W(8), row + 2) = data[1];
+                assignment.witness(component.W(8), row + 2) = data[1]; 
 
-                assignment.witness(component.W(0), row + 1) = range_chunks[1] * (1 << 16) + range_chunks[0];
-                assignment.witness(component.W(1), row + 1) = range_chunks[3] * (1 << 16) + range_chunks[2];
-                assignment.witness(component.W(2), row + 1) = range_chunks[5] * (1 << 16) + range_chunks[4];
-                assignment.witness(component.W(3), row + 1) = range_chunks[7] * (1 << 16) + range_chunks[6];
-                assignment.witness(component.W(4), row + 1) = range_chunks[9] * (1 << 16) + range_chunks[8];
-                assignment.witness(component.W(5), row + 1) = range_chunks[11] * (1 << 16) + range_chunks[10];
-                assignment.witness(component.W(6), row + 1) = range_chunks[13] * (1 << 16) + range_chunks[12];
-                assignment.witness(component.W(7), row + 1) = range_chunks[15] * (1 << 16) + range_chunks[14];
+                assignment.witness(component.W(3), row + 1) = range_chunks[1] * (65536) + range_chunks[0];
+                assignment.witness(component.W(2), row + 1) = range_chunks[3] * (65536) + range_chunks[2];
+                assignment.witness(component.W(1), row + 1) = range_chunks[5] * (65536) + range_chunks[4];
+                assignment.witness(component.W(0), row + 1) = range_chunks[7] * (65536) + range_chunks[6];
+
+                assignment.witness(component.W(7), row + 1) = range_chunks[9] * (65536) + range_chunks[8];
+                assignment.witness(component.W(6), row + 1) = range_chunks[11] * (65536) + range_chunks[10];
+                assignment.witness(component.W(5), row + 1) = range_chunks[13] * (65536) + range_chunks[12];
+                assignment.witness(component.W(4), row + 1) = range_chunks[15] * (65536) + range_chunks[14];
 
                 return typename plonk_native_decomposition<BlueprintFieldType, ArithmetizationParams, 9>::result_type(
                     component, start_row_index);
@@ -158,29 +159,29 @@ namespace nil {
                 std::size_t selector_index = first_selector_index;
 
                 auto constraint_1 = bp.add_constraint(
-                    var(component.W(8), -1) - (var(component.W(0), 0) + var(component.W(1), 0) * 0x100000000_cppui255 +
-                                               var(component.W(2), 0) * 0x10000000000000000_cppui255 +
-                                               var(component.W(3), 0) * 0x1000000000000000000000000_cppui255));
+                    var(component.W(8), -1) - (var(component.W(3), 0) + var(component.W(2), 0) * 0x100000000_cppui255 +
+                                               var(component.W(1), 0) * 0x10000000000000000_cppui255 +
+                                               var(component.W(0), 0) * 0x1000000000000000000000000_cppui255));
                 auto constraint_2 = bp.add_constraint(
-                    var(component.W(8), 1) - (var(component.W(4), 0) + var(component.W(5), 0) * 0x100000000_cppui255 +
-                                              var(component.W(6), 0) * 0x10000000000000000_cppui255 +
-                                              var(component.W(7), 0) * 0x1000000000000000000000000_cppui255));
-                auto constraint_3 = bp.add_constraint(var(component.W(0), 0) -
-                                                      (var(component.W(0), -1) + var(component.W(1), -1) * (1 << 16)));
-                auto constraint_4 = bp.add_constraint(var(component.W(1), 0) -
-                                                      (var(component.W(2), -1) + var(component.W(3), -1) * (1 << 16)));
-                auto constraint_5 = bp.add_constraint(var(component.W(2), 0) -
-                                                      (var(component.W(4), -1) + var(component.W(5), -1) * (1 << 16)));
-                auto constraint_6 = bp.add_constraint(var(component.W(3), 0) -
-                                                      (var(component.W(6), -1) + var(component.W(7), -1) * (1 << 16)));
-                auto constraint_7 = bp.add_constraint(var(component.W(4), 0) -
-                                                      (var(component.W(0), +1) + var(component.W(1), +1) * (1 << 16)));
-                auto constraint_8 = bp.add_constraint(var(component.W(5), 0) -
-                                                      (var(component.W(2), +1) + var(component.W(3), +1) * (1 << 16)));
-                auto constraint_9 = bp.add_constraint(var(component.W(6), 0) -
-                                                      (var(component.W(4), +1) + var(component.W(5), +1) * (1 << 16)));
-                auto constraint_10 = bp.add_constraint(var(component.W(7), 0) -
-                                                       (var(component.W(6), +1) + var(component.W(7), +1) * (1 << 16)));
+                    var(component.W(8), 1) - (var(component.W(7), 0) + var(component.W(6), 0) * 0x100000000_cppui255 +
+                                              var(component.W(5), 0) * 0x10000000000000000_cppui255 +
+                                              var(component.W(4), 0) * 0x1000000000000000000000000_cppui255));
+                auto constraint_3 = bp.add_constraint(var(component.W(3), 0) -
+                                                      (var(component.W(0), -1) + var(component.W(1), -1) * (65536)));
+                auto constraint_4 = bp.add_constraint(var(component.W(2), 0) -
+                                                      (var(component.W(2), -1) + var(component.W(3), -1) * (65536)));
+                auto constraint_5 = bp.add_constraint(var(component.W(1), 0) -
+                                                      (var(component.W(4), -1) + var(component.W(5), -1) * (65536)));
+                auto constraint_6 = bp.add_constraint(var(component.W(0), 0) -
+                                                      (var(component.W(6), -1) + var(component.W(7), -1) * (65536)));
+                auto constraint_7 = bp.add_constraint(var(component.W(7), 0) -
+                                                      (var(component.W(0), +1) + var(component.W(1), +1) * (65536)));
+                auto constraint_8 = bp.add_constraint(var(component.W(6), 0) -
+                                                      (var(component.W(2), +1) + var(component.W(3), +1) * (65536)));
+                auto constraint_9 = bp.add_constraint(var(component.W(5), 0) -
+                                                      (var(component.W(4), +1) + var(component.W(5), +1) * (65536)));
+                auto constraint_10 = bp.add_constraint(var(component.W(4), 0) -
+                                                       (var(component.W(6), +1) + var(component.W(7), +1) * (65536)));
                 bp.add_gate(selector_index,
                             {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
                              constraint_7, constraint_8, constraint_9, constraint_10});
