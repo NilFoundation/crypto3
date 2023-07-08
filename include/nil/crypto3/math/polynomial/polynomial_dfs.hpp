@@ -389,6 +389,10 @@ namespace nil {
                     return polynomial_dfs(); 
                 }
 
+                inline static polynomial_dfs one() {
+                    return polynomial_dfs(0, 1, 1); 
+                }
+
                 /**
                  * Compute the reverse polynomial up to vector size n (degree n-1).
                  * Below we make use of the reversal endomorphism definition from

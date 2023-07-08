@@ -361,6 +361,10 @@ namespace nil {
                     return polynomial();
                 }
 
+                inline static polynomial one() {
+                    return polynomial(1, 1);
+                }
+
                 /**
                  * Removes extraneous zero entries from in vector representation of polynomial.
                  * Example - Degree-4 Polynomial: [0, 1, 2, 3, 4, 0, 0, 0, 0] -> [0, 1, 2, 3, 4]
