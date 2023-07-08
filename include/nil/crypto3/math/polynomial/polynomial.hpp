@@ -357,6 +357,10 @@ namespace nil {
                                        [](FieldValueType i) { return i == FieldValueType(0); });
                 }
 
+                inline static polynomial zero() {
+                    return polynomial();
+                }
+
                 /**
                  * Removes extraneous zero entries from in vector representation of polynomial.
                  * Example - Degree-4 Polynomial: [0, 1, 2, 3, 4, 0, 0, 0, 0] -> [0, 1, 2, 3, 4]

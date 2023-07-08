@@ -382,7 +382,11 @@ namespace nil {
                  * Returns true if polynomial is a zero polynomial.
                  */
                 bool is_zero() const {
-                    return _d == 0;
+                    return _d == 0 && val.size() == 1 && val[0] == FieldValueType::zero();
+                }
+
+                inline static polynomial_dfs zero() {
+                    return polynomial_dfs(); 
                 }
 
                 /**
@@ -651,6 +655,7 @@ namespace nil {
                     }
                     return result;
                 }
+
             };
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
