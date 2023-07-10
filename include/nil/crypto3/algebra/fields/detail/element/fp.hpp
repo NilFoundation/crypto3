@@ -239,6 +239,12 @@ namespace nil {
                     template<typename FieldParams>
                     constexpr typename element_fp<FieldParams>::modular_params_type const element_fp<FieldParams>::modulus_params;
 
+                    template<typename FieldParams>
+                    std::ostream& operator<<(std::ostream& os, const element_fp<FieldParams>& elem) {
+                        os << elem.data;
+                        return os;
+                    }
+
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra
