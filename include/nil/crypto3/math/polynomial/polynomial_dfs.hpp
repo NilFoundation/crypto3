@@ -61,7 +61,8 @@ namespace nil {
                 typedef typename container_type::reverse_iterator reverse_iterator;
                 typedef typename container_type::const_reverse_iterator const_reverse_iterator;
 
-                polynomial_dfs() : val({0}) {
+                // Default constructor creates a zero polynomial of degree 0 and size 1.
+                polynomial_dfs() : val(1, 0) {
                     _d = 0;
                 }
 
@@ -352,7 +353,7 @@ namespace nil {
                     if (this->size() == _sz)
                         return;
                     BOOST_ASSERT_MSG(_sz >= _d, "Resizing DFS polynomial to a size less than degree is prohibited: can't restore the polynomial in the future.");
-                    if (this->size() == 1){
+                    if (this->size() == 1) {
                         this->val.resize(_sz, this->val[0]);
                     } else {
                         typedef typename value_type::field_type FieldType;
@@ -382,7 +383,11 @@ namespace nil {
                  * Returns true if polynomial is a zero polynomial.
                  */
                 bool is_zero() const {
-                    return _d == 0 && val.size() == 1 && val[0] == FieldValueType::zero();
+                    for (const auto& v: val) {
+                        if (v != FieldValueType::zero())
+                            return false;
+                    }
+                    return true;
                 }
 
                 inline static polynomial_dfs zero() {
