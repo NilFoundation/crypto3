@@ -65,7 +65,7 @@ template<typename CurveType, typename BlueprintFieldType, typename KimchiParamsT
 void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
                    zk::components::kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType, EvelRounds> &circuit_proof,
                    std::vector<typename BlueprintFieldType::value_type> &public_input) {
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     // eval_proofs
     for (std::size_t point_idx = 0; point_idx < 2; point_idx++) {

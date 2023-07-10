@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
                                                                    13,
                                                                    14>;
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     constexpr static const std::size_t lookup_columns = KimchiParamsType::circuit_params::lookup_columns;
 

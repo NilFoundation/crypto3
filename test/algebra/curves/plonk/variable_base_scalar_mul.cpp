@@ -64,7 +64,7 @@ typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates:
     constexpr std::size_t Lambda = 1;
 	using component_type = nil::blueprint::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType, 15>;
 
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
 	component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{});
 	

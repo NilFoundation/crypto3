@@ -57,7 +57,7 @@ void test_decomposition(std::vector<typename BlueprintFieldType::value_type> pub
     using ArithmetizationParams =
         crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using component_type = blueprint::components::decomposition<ArithmetizationType,

@@ -73,7 +73,7 @@ namespace nil {
                 using ed25519_component = eddsa25519<ArithmetizationType, CurveType, Ed25519Type,
                 W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                 
-                using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 using var_ec_point = typename ed25519_component::params_type::var_ec_point;
                 using signature = typename ed25519_component::params_type::signature;
                 constexpr static const std::size_t selector_seed = 0xfcc7;

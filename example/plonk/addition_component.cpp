@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_addition_example) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = zk::components::addition<ArithmetizationType, 0, 1, 2>;
 

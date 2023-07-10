@@ -56,7 +56,7 @@ namespace nil {
                 typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                     ArithmetizationType;
 
-                using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 
                 using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
                 using add_component = zk::components::addition<ArithmetizationType, W0, W1, W2>;

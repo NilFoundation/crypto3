@@ -74,7 +74,7 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     using proof_binding =
                         typename zk::components::binding<ArithmetizationType, BlueprintFieldType, KimchiParamsType>;

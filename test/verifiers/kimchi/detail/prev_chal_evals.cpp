@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_prev_chal_evals) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     constexpr static std::size_t alpha_powers_n = 5;
     constexpr static std::size_t public_input_size = 3;

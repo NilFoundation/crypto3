@@ -50,7 +50,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType>
                 struct kimchi_opening_proof_scalar {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     var z1;
                     var z2;
@@ -58,7 +58,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType, typename KimchiParamsType, std::size_t EvalRounds>
                 struct kimchi_proof_scalar {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>, 2> proof_evals;
                     var ft_eval;
@@ -73,7 +73,7 @@ namespace nil {
                 struct batch_evaluation_proof_scalar {
                     using proof_binding =
                         typename zk::components::binding<ArithmetizationType, BlueprintFieldType, KimchiParamsType>;
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     var cip;
                     typename proof_binding::fq_sponge_output fq_output;
@@ -93,7 +93,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType, std::size_t EvalRounds>
                 struct kimchi_opening_proof_base {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 
                     std::array<var_ec_point, EvalRounds> L;
@@ -104,7 +104,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType, typename KimchiParamsType>
                 struct kimchi_proof_base {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                     using commitment_params_type = typename KimchiParamsType::commitment_params_type;
 
                     using commitment_type = typename zk::components::kimchi_commitment_type<
@@ -139,7 +139,7 @@ namespace nil {
                 struct batch_evaluation_proof_base {
                     using proof_binding =
                         typename zk::components::binding<ArithmetizationType, BlueprintFieldType, KimchiParamsType>;
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     using commitment_type = typename zk::components::kimchi_commitment_type<
                         BlueprintFieldType, KimchiCommitmentParamsType::shifted_commitment_split>;

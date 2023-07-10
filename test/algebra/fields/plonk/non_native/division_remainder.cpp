@@ -63,7 +63,7 @@ auto test_division_remainder(typename BlueprintFieldType::value_type x,
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
     using integral_type = typename BlueprintFieldType::integral_type;
     using component_type = nil::blueprint::components::division_remainder<ArithmetizationType, WitnessesAmount>;

@@ -68,7 +68,7 @@ namespace nil {
                         zk::components::curve_element_unified_addition<ArithmetizationType, CurveType, W0, W1, W2, W3,
                                                                        W4, W5, W6, W7, W8, W9, W10>;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 
                 public:

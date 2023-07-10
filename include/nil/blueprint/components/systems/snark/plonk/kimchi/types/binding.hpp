@@ -43,7 +43,7 @@ namespace nil {
 
                 template<typename ArithmetizationType, typename BlueprintFieldType, typename KimchiParamsType>
                 struct binding {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                     using commitment_parms_type = typename KimchiParamsType::commitment_params_type;
                     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 

@@ -72,7 +72,7 @@ namespace nil {
                     using div_component = zk::components::division<ArithmetizationType, W0, W1, W2>;
                     using mul_by_const_component = zk::components::mul_by_constant<ArithmetizationType, W0, W1>;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     constexpr static const std::size_t selector_seed = 0x0ff8;
 

@@ -63,7 +63,7 @@ void test_add(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t Lambda = 40;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::addition<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
@@ -102,7 +102,7 @@ void test_sub(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t Lambda = 40;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::subtraction<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
@@ -141,7 +141,7 @@ void test_mul(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t Lambda = 40;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::multiplication<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
@@ -181,7 +181,7 @@ void test_mul_by_const(std::vector<typename FieldType::value_type> public_input,
     constexpr std::size_t Lambda = 40;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::mul_by_constant<ArithmetizationType, BlueprintFieldType, 2>;
 
@@ -221,7 +221,7 @@ void test_div(std::vector<typename FieldType::value_type> public_input,
     constexpr std::size_t Lambda = 40;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::division<ArithmetizationType, BlueprintFieldType, 4, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
@@ -252,7 +252,7 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t Lambda = 40;
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::division_or_zero<ArithmetizationType, BlueprintFieldType, 5>;
 

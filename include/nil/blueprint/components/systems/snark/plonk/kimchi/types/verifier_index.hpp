@@ -46,7 +46,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType, std::size_t Permuts = 7>
                 struct kimchi_verifier_index_scalar {
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     // nil::crypto3::math::evaluation_domain<Fr> domain;
                     std::size_t max_quot_size;

@@ -64,7 +64,7 @@ void test_field_sub(std::vector<typename BlueprintFieldType::value_type> public_
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::subtraction<ArithmetizationType,
         NonNativeFieldType, 9, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;

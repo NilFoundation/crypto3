@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combined_inner_product) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = zk::components::combined_inner_product<ArithmetizationType, k, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;

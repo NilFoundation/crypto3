@@ -55,7 +55,7 @@ namespace nil {
             typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                     ArithmetizationParams> ArithmetizationType;
 
-            using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+            using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
             using component_selector_map_type = std::map<
                 detail::blueprint_component_id_type,
@@ -304,11 +304,11 @@ namespace nil {
         typename BlueprintFieldType::value_type var_value(
                 const crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
                         ArithmetizationParams> &input_assignment,
-                const crypto3::zk::snark::plonk_variable<BlueprintFieldType> &input_var) {
+                const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &input_var) {
             switch(input_var.type){
-                case crypto3::zk::snark::plonk_variable<BlueprintFieldType>::column_type::witness:
+                case crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>::column_type::witness:
                     return input_assignment.witness(input_var.index)[input_var.rotation];
-                case crypto3::zk::snark::plonk_variable<BlueprintFieldType>::column_type::public_input:
+                case crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>::column_type::public_input:
                     return input_assignment.public_input(input_var.index)[input_var.rotation];
                 default:
                     return input_assignment.constant(input_var.index)[input_var.rotation];

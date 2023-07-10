@@ -68,7 +68,7 @@ namespace nil {
 
                     using KimchiCommitmentParamsType = typename KimchiParamsType::commitment_params_type;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
 

@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_batch_verify_base_field_test) {
     using binding = typename zk::components::binding<ArithmetizationType, BlueprintFieldType, kimchi_params>;
 
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using batch_proof_type = typename zk::components::
         batch_evaluation_proof_base<BlueprintFieldType, ArithmetizationType, kimchi_params, commitment_params>;

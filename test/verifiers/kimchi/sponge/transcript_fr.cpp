@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input;
     var zero(0, 0, false, var::column_type::public_input);

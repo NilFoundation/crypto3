@@ -60,7 +60,7 @@ namespace nil {
                 using bit_decomposition_component =
                     bit_decomposition<ArithmetizationType, CurveType, Ed25519Type, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
-                using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 constexpr static const std::size_t selector_seed = 0xfcc2;
 
             public:

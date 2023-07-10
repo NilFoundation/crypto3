@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
     
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_1) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
     

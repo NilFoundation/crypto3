@@ -69,7 +69,7 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
                     static const std::size_t HIGH_ENTROPY_LIMBS = 2;

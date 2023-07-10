@@ -62,7 +62,7 @@ void test_exponentiation(std::vector<typename FieldType::value_type> public_inpu
     constexpr std::size_t Lambda = 1;
 	using component_type = nil::blueprint::components::exponentiation<ArithmetizationType, BlueprintFieldType, exp_size, 15>;
 
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     var base(0, 0, false, var::column_type::public_input);
     var exponent(0, 1, false, var::column_type::public_input);

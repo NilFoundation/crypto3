@@ -68,7 +68,7 @@ void test_bool_scalar_multiplication(const std::vector<typename BlueprintFieldTy
     constexpr std::size_t Lambda = 1;
     using NonNativeFieldType = typename NonNativeCurveType::base_field_type;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type =
         blueprint::components::bool_scalar_multiplication<ArithmetizationType, NonNativeCurveType, 9,

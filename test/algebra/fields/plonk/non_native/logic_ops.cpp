@@ -64,7 +64,7 @@ template <typename BlueprintFieldType, typename ArithmetizationParams, typename 
           typename ComponentType, std::size_t ArgsNum>
 void test_logic_component(std::map<std::array<bool, ArgsNum>, bool> expected_mapping) {
     using field_value_type = typename BlueprintFieldType::value_type;
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     std::array<std::uint32_t, ArgsNum + 1> witnesses;
     for (std::uint32_t i = 0; i < ArgsNum + 1; i++) {

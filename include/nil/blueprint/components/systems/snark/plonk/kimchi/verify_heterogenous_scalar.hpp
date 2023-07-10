@@ -78,7 +78,7 @@ namespace nil {
 
                     using ArithmetizationType = snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     using endo_scalar_component = zk::components::endo_scalar<ArithmetizationType, CurveType, ScalarSize, W0, W1, W2, W3, W4, W5, W6,
                                                                         W7, W8, W9, W10, W11, W12, W13, W14>;

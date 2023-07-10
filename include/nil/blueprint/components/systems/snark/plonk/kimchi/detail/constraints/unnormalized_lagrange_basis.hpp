@@ -62,7 +62,7 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
                     using exp_component = zk::components::exponentiation<ArithmetizationType, 64, W0, W1, W2, W3, W4,

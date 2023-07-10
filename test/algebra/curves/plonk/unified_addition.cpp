@@ -64,7 +64,7 @@ void test_unified_addition(std::vector<typename CurveType::base_field_type::valu
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::unified_addition<ArithmetizationType, curve_type, 11>;
 

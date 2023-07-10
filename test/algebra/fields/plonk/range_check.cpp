@@ -77,7 +77,7 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
     constexpr std::size_t Lambda = 1;
 
     using component_type = nil::blueprint::components::range_check<ArithmetizationType, WitnessesAmount>;
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
 
     var x(0, 0, false, var::column_type::public_input);

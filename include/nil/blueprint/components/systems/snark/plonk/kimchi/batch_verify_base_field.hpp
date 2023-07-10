@@ -100,7 +100,7 @@ namespace nil {
                     ArithmetizationParams> ArithmetizationType;
                 
 
-                using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 using sub_component = subtraction<ArithmetizationType, W0, W1, W2>;
 
                 using kimchi_constants = kimchi_inner_constants<KimchiParamsType>;

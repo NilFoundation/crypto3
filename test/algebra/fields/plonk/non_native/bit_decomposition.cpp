@@ -64,7 +64,7 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
 
     using component_type = blueprint::components::bit_decomposition<ArithmetizationType, WitnessesAmount>;

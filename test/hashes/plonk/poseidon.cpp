@@ -68,7 +68,7 @@ void test_poseidon(std::vector<typename BlueprintFieldType::value_type> public_i
     using component_type =
         blueprint::components::poseidon<ArithmetizationType, FieldType, 15>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     constexpr std::size_t Lambda = 5;
 
     std::array<var, component_type::state_size> input_state_var = {var(0, 0, false, var::column_type::public_input),

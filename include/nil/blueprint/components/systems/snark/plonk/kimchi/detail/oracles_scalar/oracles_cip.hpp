@@ -63,7 +63,7 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     constexpr static std::size_t poseidon_selector_size() {
                         if (KimchiParamsType::circuit_params::poseidon_gate == true) {

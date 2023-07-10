@@ -150,7 +150,7 @@ void test_endo_scalar(std::vector<typename CurveType::scalar_field_type::value_t
 
     using component_type = nil::blueprint::components::endo_scalar<ArithmetizationType, CurveType, num_bits, 15>;
 
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     var challenge_var(0, 0, false, var::column_type::public_input);
     typename component_type::input_type instance_input = {challenge_var};

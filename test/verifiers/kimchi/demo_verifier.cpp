@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     using component_type = zk::components::curve_element_unified_addition<ArithmetizationType, curve_type, 0, 1, 2, 3,
                                                                           4, 5, 6, 7, 8, 9, 10>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     auto P = kimchi_proof.commitments.w_comm[0].unshifted[0];
     auto Q = kimchi_proof.commitments.w_comm[1].unshifted[0];

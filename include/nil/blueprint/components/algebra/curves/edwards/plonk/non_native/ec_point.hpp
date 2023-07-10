@@ -83,7 +83,7 @@ namespace nil {
                 using non_native_range_component = non_native_range<ArithmetizationType, CurveType,
                 W0, W1, W2, W3, W4, W5, W6, W7, W8>;
 
-                using var = snark::plonk_variable<BlueprintFieldType>;
+                using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 constexpr static const std::size_t selector_seed = 0xfcd1;
 
             public:

@@ -65,7 +65,7 @@ namespace nil {
                     typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                         ArithmetizationType;
 
-                    using var = snark::plonk_variable<BlueprintFieldType>;
+                    using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                     using transcript_type = kimchi_transcript_fr<ArithmetizationType,
                                                                  typename KimchiParamsType::curve_type,

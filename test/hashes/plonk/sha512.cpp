@@ -64,7 +64,7 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
 
     using component_type = blueprint::components::sha512<ArithmetizationType, 9>;
     
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
 
     std::array<var, 4> e_R_x = {

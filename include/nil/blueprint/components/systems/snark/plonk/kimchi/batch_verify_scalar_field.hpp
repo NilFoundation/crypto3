@@ -108,7 +108,7 @@ namespace nil {
                     ArithmetizationParams> ArithmetizationType;
                 
 
-                using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                 using mul_component = multiplication<ArithmetizationType, W0, W1, W2>;
                 using sub_component = subtraction<ArithmetizationType, W0, W1, W2>;

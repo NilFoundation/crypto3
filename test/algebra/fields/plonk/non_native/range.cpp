@@ -60,7 +60,7 @@ void test_field_range(std::vector<typename BlueprintFieldType::value_type> publi
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::range<ArithmetizationType,
         typename crypto3::algebra::fields::curve25519_base_field, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;

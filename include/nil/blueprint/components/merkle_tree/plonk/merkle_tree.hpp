@@ -49,7 +49,7 @@ namespace nil {
                 typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                     ArithmetizationType;
 
-                using var = snark::plonk_variable<BlueprintFieldType>;
+                using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                 using sha256_component =
                     sha256<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;

@@ -65,7 +65,7 @@ auto test_comparison_unchecked(typename BlueprintFieldType::value_type x,
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
     using component_type = nil::blueprint::components::comparison_unchecked<ArithmetizationType, WitnessesAmount>;
 

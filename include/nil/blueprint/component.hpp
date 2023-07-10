@@ -59,7 +59,7 @@ namespace nil {
                 public_input_container_type _PI;
                 // underlying_components_container_type _underlying_components;
 
-                using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+                using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                 /**
                  * Get Witness column global index by its internal index.

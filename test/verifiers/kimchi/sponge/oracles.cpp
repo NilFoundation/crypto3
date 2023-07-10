@@ -61,7 +61,7 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
     constexpr std::size_t Lambda = 40;
 
     using component_type = nil::blueprint::components::from_limbs<ArithmetizationType, 3>;
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     var x(0, 0, false, var::column_type::public_input);
     var y(0, 1, false, var::column_type::public_input);
@@ -100,7 +100,7 @@ void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_i
     constexpr std::size_t Lambda = 40;
 
     using component_type = nil::blueprint::components::to_limbs<ArithmetizationType, 15>;
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     var x(0, 0, false, var::column_type::public_input);
 

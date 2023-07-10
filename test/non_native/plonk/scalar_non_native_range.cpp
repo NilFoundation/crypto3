@@ -59,7 +59,7 @@ void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::scalar_non_native_range<ArithmetizationType, ed25519_type, 9>;
 

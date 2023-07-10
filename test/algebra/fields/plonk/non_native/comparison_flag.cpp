@@ -64,7 +64,7 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
     constexpr std::size_t Lambda = 1;
 
     using component_type = nil::blueprint::components::comparison_flag<ArithmetizationType, WitnessesAmount>;
-	using var = nil::crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
 
     var x_var(0, 0, false, var::column_type::public_input),

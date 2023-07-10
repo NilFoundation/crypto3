@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_0) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input;
     var zero(0, 0, false, var::column_type::public_input);
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_1) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input = {{0, 1, false, var::column_type::public_input}};
     var zero(0, 0, false, var::column_type::public_input);
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_2) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input = {{0, 1, false, var::column_type::public_input}, {0, 2, false, var::column_type::public_input}};
     var zero(0, 0, false, var::column_type::public_input);
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_3) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input = {{0, 1, false, var::column_type::public_input}, 
         {0, 2, false, var::column_type::public_input}, {0, 3, false, var::column_type::public_input}};
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_4) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input = {{0, 1, false, var::column_type::public_input}, 
         {0, 2, false, var::column_type::public_input}, {0, 3, false, var::column_type::public_input}, {0, 4, false, var::column_type::public_input}};
@@ -274,7 +274,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_5) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input = {{0, 1, false, var::column_type::public_input}, 
         {0, 2, false, var::column_type::public_input}, {0, 3, false, var::column_type::public_input}, {0, 4, false, var::column_type::public_input},
@@ -320,7 +320,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sponge_double_squeeze) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     
     std::vector<var> input;
     var zero(0, 0, false, var::column_type::public_input);

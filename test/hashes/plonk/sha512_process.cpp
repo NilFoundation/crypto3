@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>;
-    using var = crypto3::zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     using component_type = blueprint::components::sha512_process<ArithmetizationType, 9, 1>;

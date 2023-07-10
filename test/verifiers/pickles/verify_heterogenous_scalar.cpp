@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_pickles_heterogenous_verify_scalar_field_te
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     constexpr static std::size_t public_input_size = 3;
     constexpr static std::size_t max_poly_size = 32;

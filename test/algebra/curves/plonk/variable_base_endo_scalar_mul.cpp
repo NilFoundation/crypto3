@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
                 ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-    using var = zk::snark::plonk_variable<BlueprintFieldType>;
+    using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     constexpr std::size_t Lambda = 40;
     using component_type = zk::components::curve_element_variable_base_endo_scalar_mul<ArithmetizationType, curve_type,
                                                             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;

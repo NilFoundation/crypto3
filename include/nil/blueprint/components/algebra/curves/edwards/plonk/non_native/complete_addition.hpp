@@ -111,7 +111,7 @@ namespace nil {
                                                                                    W7,
                                                                                    W8>;
 
-                using var = snark::plonk_variable<BlueprintFieldType>;
+                using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 constexpr static const std::size_t selector_seed = 0xff87;
 
             public:

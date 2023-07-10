@@ -82,7 +82,7 @@ namespace nil {
             }
 
             crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
-                add_bit_check(const crypto3::zk::snark::plonk_variable<BlueprintFieldType> &bit_variable) {
+                add_bit_check(const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &bit_variable) {
                 return add_constraint(bit_variable * (bit_variable - 1));
             }
 
@@ -94,8 +94,8 @@ namespace nil {
             }
 
             crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>
-                add_lookup_constraint(std::vector<crypto3::math::term<crypto3::zk::snark::plonk_variable<BlueprintFieldType>>> lookup_input,
-                std::vector<crypto3::zk::snark::plonk_variable<BlueprintFieldType>> lookup_value) {
+                add_lookup_constraint(std::vector<crypto3::math::term<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>> lookup_input,
+                std::vector<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>> lookup_value) {
                 crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType> lookup_constraint;
                 lookup_constraint.lookup_input = lookup_input;
                 lookup_constraint.lookup_value = lookup_value;
