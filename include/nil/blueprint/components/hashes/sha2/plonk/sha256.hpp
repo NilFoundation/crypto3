@@ -169,28 +169,28 @@ namespace nil {
                     generate_assignments(sha256_process_instance, assignment, sha256_process_input, row).output_state;
                 row += sha256_process<ArithmetizationType, 9, 1>::rows_amount;
 
-                std::array<typename BlueprintFieldType::value_type, 16> constants2 = {1 << 31, 0, 0, 0, 0, 0, 0,     0,
-                                                                                      0,       0, 0, 0, 0, 0, 1 << 9};
+                std::array<typename BlueprintFieldType::value_type, 16> constants2 = {2147483648, 0, 0, 0, 0, 0, 0,     0,
+                                                                                      0,       0, 0, 0, 0, 0, 0, 1 << 9};
                 for (int i = 0; i < 16; i++) {
                     assignment.constant(component.C(0), start_row_index + 8 + i) = constants2[i];
                 }
                 std::array<var, 16> input_words2_vars = {
-                    var(component.C(0), row + 8, false, var::column_type::constant),
-                    var(component.C(0), row + 9, false, var::column_type::constant),
-                    var(component.C(0), row + 10, false, var::column_type::constant),
-                    var(component.C(0), row + 11, false, var::column_type::constant),
-                    var(component.C(0), row + 12, false, var::column_type::constant),
-                    var(component.C(0), row + 13, false, var::column_type::constant),
-                    var(component.C(0), row + 14, false, var::column_type::constant),
-                    var(component.C(0), row + 15, false, var::column_type::constant),
-                    var(component.C(0), row + 16, false, var::column_type::constant),
-                    var(component.C(0), row + 17, false, var::column_type::constant),
-                    var(component.C(0), row + 18, false, var::column_type::constant),
-                    var(component.C(0), row + 19, false, var::column_type::constant),
-                    var(component.C(0), row + 20, false, var::column_type::constant),
-                    var(component.C(0), row + 21, false, var::column_type::constant),
-                    var(component.C(0), row + 22, false, var::column_type::constant),
-                    var(component.C(0), row + 23, false, var::column_type::constant)};
+                    var(component.C(0), start_row_index + 8, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 9, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 10, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 11, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 12, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 13, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 14, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 15, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 16, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 17, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 18, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 19, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 20, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 21, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 22, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 23, false, var::column_type::constant)};
 
                 typename sha256_process<ArithmetizationType, 9, 1>::input_type sha256_process_input_2 = {
                     first_block_state, input_words2_vars};
@@ -206,14 +206,14 @@ namespace nil {
 
                 row++;
 
-                assignment.witness(component.W(0), row) = var_value(assignment, second_block_state[0]) +
-                                                          var_value(assignment, second_block_state[1]) * (one << 32) +
-                                                          var_value(assignment, second_block_state[2]) * (one << 64) +
-                                                          var_value(assignment, second_block_state[3]) * (one << 96);
-                assignment.witness(component.W(1), row) = var_value(assignment, second_block_state[4]) +
-                                                          var_value(assignment, second_block_state[5]) * (one << 32) +
-                                                          var_value(assignment, second_block_state[6]) * (one << 64) +
-                                                          var_value(assignment, second_block_state[7]) * (one << 96);
+                assignment.witness(component.W(1), row) = var_value(assignment, second_block_state[7]) +
+                                                          var_value(assignment, second_block_state[6]) * (one << 32) +
+                                                          var_value(assignment, second_block_state[5]) * (one << 64) +
+                                                          var_value(assignment, second_block_state[4]) * (one << 96);
+                assignment.witness(component.W(0), row) = var_value(assignment, second_block_state[3]) +
+                                                          var_value(assignment, second_block_state[2]) * (one << 32) +
+                                                          var_value(assignment, second_block_state[1]) * (one << 64) +
+                                                          var_value(assignment, second_block_state[0]) * (one << 96);
 
                 return typename plonk_sha256<BlueprintFieldType, ArithmetizationParams, 9>::result_type(
                     component, start_row_index);
@@ -232,13 +232,13 @@ namespace nil {
 
                 typename BlueprintFieldType::integral_type one = 1;
                 auto constraint_1 =
-                    bp.add_constraint(var(component.W(0), +1) -
-                                      (var(component.W(0), 0) + var(component.W(1), 0) * (one << 32) +
-                                       var(component.W(2), 0) * (one << 64) + var(component.W(3), 0) * (one << 96)));
-                auto constraint_2 =
                     bp.add_constraint(var(component.W(1), +1) -
-                                      (var(component.W(4), 0) + var(component.W(5), 0) * (one << 32) +
-                                       var(component.W(6), 0) * (one << 64) + var(component.W(7), 0) * (one << 96)));
+                                      (var(component.W(7), 0) + var(component.W(6), 0) * (one << 32) +
+                                       var(component.W(5), 0) * (one << 64) + var(component.W(4), 0) * (one << 96)));
+                auto constraint_2 =
+                    bp.add_constraint(var(component.W(0), +1) -
+                                      (var(component.W(3), 0) + var(component.W(2), 0) * (one << 32) +
+                                       var(component.W(1), 0) * (one << 64) + var(component.W(0), 0) * (one << 96)));
                 bp.add_gate(first_selector_index, {constraint_1, constraint_2});
             }
 
@@ -295,14 +295,14 @@ namespace nil {
                     input_words_vars[i] = sha_block_part_1.output[i];
                     input_words_vars[8 + i] = sha_block_part_2.output[i];
                 }
-                std::array<var, 8> constants_vars = {var(component.C(0), row, false, var::column_type::constant),
-                                                     var(component.C(0), row + 1, false, var::column_type::constant),
-                                                     var(component.C(0), row + 2, false, var::column_type::constant),
-                                                     var(component.C(0), row + 3, false, var::column_type::constant),
-                                                     var(component.C(0), row + 4, false, var::column_type::constant),
-                                                     var(component.C(0), row + 5, false, var::column_type::constant),
-                                                     var(component.C(0), row + 6, false, var::column_type::constant),
-                                                     var(component.C(0), row + 7, false, var::column_type::constant)};
+                std::array<var, 8> constants_vars = {var(component.C(0), start_row_index, false, var::column_type::constant),
+                                                     var(component.C(0), start_row_index + 1, false, var::column_type::constant),
+                                                     var(component.C(0), start_row_index + 2, false, var::column_type::constant),
+                                                     var(component.C(0), start_row_index + 3, false, var::column_type::constant),
+                                                     var(component.C(0), start_row_index + 4, false, var::column_type::constant),
+                                                     var(component.C(0), start_row_index + 5, false, var::column_type::constant),
+                                                     var(component.C(0), start_row_index + 6, false, var::column_type::constant),
+                                                     var(component.C(0), start_row_index + 7, false, var::column_type::constant)};
 
                 typename sha256_process<ArithmetizationType, 9, 1>::input_type sha256_process_input = {
                     constants_vars, input_words_vars};
@@ -311,22 +311,22 @@ namespace nil {
 
                 row += sha256_process<ArithmetizationType, 9, 1>::rows_amount;
                 std::array<var, 16> input_words2_vars = {
-                    var(component.C(0), row + 8, false, var::column_type::constant),
-                    var(component.C(0), row + 9, false, var::column_type::constant),
-                    var(component.C(0), row + 10, false, var::column_type::constant),
-                    var(component.C(0), row + 11, false, var::column_type::constant),
-                    var(component.C(0), row + 12, false, var::column_type::constant),
-                    var(component.C(0), row + 13, false, var::column_type::constant),
-                    var(component.C(0), row + 14, false, var::column_type::constant),
-                    var(component.C(0), row + 15, false, var::column_type::constant),
-                    var(component.C(0), row + 16, false, var::column_type::constant),
-                    var(component.C(0), row + 17, false, var::column_type::constant),
-                    var(component.C(0), row + 18, false, var::column_type::constant),
-                    var(component.C(0), row + 19, false, var::column_type::constant),
-                    var(component.C(0), row + 20, false, var::column_type::constant),
-                    var(component.C(0), row + 21, false, var::column_type::constant),
-                    var(component.C(0), row + 22, false, var::column_type::constant),
-                    var(component.C(0), row + 23, false, var::column_type::constant)};
+                    var(component.C(0), start_row_index + 8, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 9, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 10, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 11, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 12, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 13, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 14, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 15, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 16, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 17, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 18, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 19, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 20, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 21, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 22, false, var::column_type::constant),
+                    var(component.C(0), start_row_index + 23, false, var::column_type::constant)};
 
                 typename sha256_process<ArithmetizationType, 9, 1>::input_type sha256_process_input_2 = {
                     first_block_state.output_state, input_words2_vars};
