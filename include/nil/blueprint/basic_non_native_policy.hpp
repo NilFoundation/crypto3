@@ -47,7 +47,7 @@ namespace nil {
                 constexpr static const std::uint32_t ratio = 4;    // 66,66,66,66 bits
                 using non_native_field_type = typename crypto3::algebra::curves::ed25519::base_field_type;
                 using native_field_type = typename crypto3::algebra::curves::pallas::base_field_type;
-                using var = crypto3::zk::snark::plonk_variable<native_field_type>;
+                using var = crypto3::zk::snark::plonk_variable<typename native_field_type::value_type>;
 
                 typedef std::array<var, ratio> non_native_var_type;
                 typedef std::array<native_field_type::value_type, ratio> chopped_value_type;
