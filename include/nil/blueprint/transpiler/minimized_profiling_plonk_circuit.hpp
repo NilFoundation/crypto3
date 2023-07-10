@@ -103,7 +103,7 @@ namespace nil {
                     this->rotated_constant = false;
                     this->rotated_selector = false;
 
-                    using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+                    using variable_type = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
                     std::size_t offset = 0x80;
                     
                     // compute needed and rotated vars
@@ -269,7 +269,7 @@ namespace nil {
             static inline columns_rotations_type columns_rotations(
                 ArithmetizationType &constraint_system,  const TableDescriptionType &table_description
             ) {
-                using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+                using variable_type = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
                 columns_rotations_type result;
                 for (const auto& gate: constraint_system.gates()) {
@@ -311,10 +311,10 @@ namespace nil {
 
             static std::string generate_variable(
                 const profiling_params_type &profiling_params,
-                const nil::crypto3::zk::snark::plonk_variable<FieldType> &var,
+                const nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type> &var,
                 columns_rotations_type &columns_rotations
             ) {
-                using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+                using variable_type = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
                 std::stringstream res;
                 std::size_t index = var.index;
@@ -425,7 +425,7 @@ namespace nil {
                 const typename nil::crypto3::zk::snark::plonk_constraint<FieldType> &constraint,
                 columns_rotations_type &columns_rotations
             ) {
-                using variable_type = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+                using variable_type = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
                 std::stringstream res;
                 res << "\t\t\tmstore(add(local_vars, CONSTRAINT_EVAL_OFFSET), 0)" << std::endl;
