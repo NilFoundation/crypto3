@@ -1266,4 +1266,31 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_evaluate_after_resize_and_shift_test) {
     }
 }
 
+BOOST_AUTO_TEST_CASE(polynomial_dfs_zero_one_test) {
+    polynomial_dfs<typename FieldType::value_type> small_poly = {
+        3,
+        {
+            0x21_cppui253,
+            0x396e56c94dd65906159d4f74c19202bc115b4696f2872527bbf6d249d35592e8_cppui253,
+            0x73eda753299d7d3c0e323e49e55f6e110b7ba3ccdbbc5bfeffe9fffefffffffe_cppui253,
+            0x5aedf3feb052db4e740b467d229f14d5eac1f0781703da9f46a4b599d626236a_cppui253,
+            0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffeffffffea_cppui253,
+            0x3a7f5089dbc72446882aef06f827fbd0a27a5d7fbd8f36d744112db52caa6d1b_cppui253,
+            0xc250799be244269f448420036244200000015fffffffffffd_cppui253,
+            0x18ffb354794aa1f554a02b1736ea9ca808e3b37738e2815fb9534a6529d9dc99_cppui253,
+        }};
+
+    polynomial_dfs<typename FieldType::value_type> zero = polynomial_dfs<typename FieldType::value_type>::zero();
+    polynomial_dfs<typename FieldType::value_type> one = polynomial_dfs<typename FieldType::value_type>::one();
+
+    BOOST_CHECK(zero.is_zero());
+    BOOST_CHECK((small_poly - one * small_poly).is_zero());
+
+    zero.resize(100);
+    BOOST_CHECK(zero.is_zero());
+
+    one.resize(100);
+    BOOST_CHECK((small_poly - one * small_poly).is_zero());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

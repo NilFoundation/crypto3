@@ -36,6 +36,7 @@
 #include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
 #include <nil/crypto3/math/detail/field_utils.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 namespace nil {
     namespace crypto3 {

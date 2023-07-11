@@ -55,7 +55,7 @@ namespace nil {
                 typedef typename container_type::reverse_iterator reverse_iterator;
                 typedef typename container_type::const_reverse_iterator const_reverse_iterator;
 
-                polynomial() : val({0}) {
+                polynomial() : val(1, 0) {
                 }
 
                 explicit polynomial(size_type n) : val(n) {
@@ -355,6 +355,14 @@ namespace nil {
                 bool is_zero() const {
                     return std::all_of(this->begin(), this->end(),
                                        [](FieldValueType i) { return i == FieldValueType(0); });
+                }
+
+                inline static polynomial zero() {
+                    return polynomial();
+                }
+
+                inline static polynomial one() {
+                    return polynomial(1, 1);
                 }
 
                 /**
