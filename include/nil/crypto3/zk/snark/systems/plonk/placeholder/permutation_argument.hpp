@@ -40,6 +40,7 @@
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 
 namespace nil {
@@ -64,7 +65,7 @@ namespace nil {
                     };
 
                     static inline prover_result_type prove_eval(
-                        plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
                             preprocessed_data,
@@ -72,8 +73,10 @@ namespace nil {
                             &table_description,
                         const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             &column_polynomials,
-                        typename ParamsType::commitment_params_type fri_params,
-                        transcript_type &transcript = transcript_type()) {
+                        const typename ParamsType::commitment_params_type& fri_params,
+                        transcript_type& transcript) {
+
+                        PROFILE_PLACEHOLDER_SCOPE("permutation_argument_prove_eval_time");
 
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;
@@ -169,10 +172,10 @@ namespace nil {
 
                         // 3. Calculate h_perm, g_perm at challenge point
                         math::polynomial_dfs<typename FieldType::value_type> g_poly(
-                            0,preprocessed_data.common_data.basic_domain->size(),FieldType::value_type::one()
+                            0, preprocessed_data.common_data.basic_domain->size(), FieldType::value_type::one()
                         );
                         math::polynomial_dfs<typename FieldType::value_type> h_poly(
-                            0,preprocessed_data.common_data.basic_domain->size(),FieldType::value_type::one()
+                            0, preprocessed_data.common_data.basic_domain->size(), FieldType::value_type::one()
                         );
 
                         for (std::size_t i = 0; i < column_polynomials_values.size(); i++) {

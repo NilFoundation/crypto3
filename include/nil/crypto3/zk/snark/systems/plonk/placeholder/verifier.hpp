@@ -63,17 +63,17 @@ namespace nil {
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
-                    constexpr static const std::size_t lookup_parts = 5;
-                    constexpr static const std::size_t f_parts = 9;
+                    constexpr static const std::size_t lookup_parts = 6;
+                    constexpr static const std::size_t f_parts = 10;
 
                 public:
                     static inline bool process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
-                        placeholder_proof<FieldType, ParamsType> &proof,
-                        plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                        const placeholder_proof<FieldType, ParamsType> &proof,
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename ParamsType::commitment_params_type &fri_params) {
-
+                        
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
                         std::vector<std::uint8_t> transcript_init {};
@@ -177,16 +177,17 @@ namespace nil {
                             FieldType, commitment_scheme_type,
                             ParamsType
                         >::verify_eval(
-                            preprocessed_public_data, constraint_system.lookup_gates(),
+                            preprocessed_public_data, 
+                            constraint_system.lookup_gates(),
+                            constraint_system.lookup_table(),
                             proof.eval_proof.challenge, columns_at_y,
-                            proof.eval_proof.combined_value.z[LOOKUP_INDEX][0][0],
-                            proof.eval_proof.combined_value.z[LOOKUP_INDEX][0][1],
-                            proof.eval_proof.combined_value.z[LOOKUP_INDEX][1][0],
-                            proof.eval_proof.combined_value.z[V_PERM_INDEX][1][0],
-                            proof.eval_proof.combined_value.z[V_PERM_INDEX][1][1],
+                            proof.eval_proof.combined_value.z[LOOKUP_INDEX],
+                            proof.eval_proof.combined_value.z[V_PERM_INDEX][1],
+                            proof.eval_proof.combined_value.z[V_PERM_INDEX][2],
                             proof.lookup_commitment, transcript
                         );
                         transcript(proof.v_perm_commitment);
+
 
                         // 7. gate argument
                         std::array<typename FieldType::value_type, 1> gate_argument =
@@ -225,13 +226,11 @@ namespace nil {
                         // permutation
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_permutation;
                         evaluation_points_permutation.push_back({challenge, challenge * omega});
-                        evaluation_points_permutation.push_back({challenge, challenge * omega});
 
                         std::vector<typename FieldType::value_type> challenge_point = {challenge};
                         // lookups
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_lookup;
-                        evaluation_points_lookup.push_back({challenge, challenge * omega.inversed()});
-                        evaluation_points_lookup.push_back({challenge});
+                        evaluation_points_lookup.push_back({challenge, challenge * omega});
 
                         // quotient
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_quotient = {challenge_point};
@@ -311,7 +310,8 @@ namespace nil {
                         F[5] = lookup_argument[2];
                         F[6] = lookup_argument[3];
                         F[7] = lookup_argument[4];
-                        F[8] = gate_argument[0];
+                        F[8] = lookup_argument[5];
+                        F[9] = gate_argument[0];
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {
@@ -329,7 +329,6 @@ namespace nil {
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
                             return false;
                         }
-
                         return true;
                     }
                 };

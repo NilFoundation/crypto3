@@ -92,7 +92,8 @@ namespace nil {
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
-                    constexpr static const std::size_t f_parts = 9;
+                    constexpr static const std::size_t lookup_parts = 6;
+                    constexpr static const std::size_t f_parts = 10;
 
                     static inline math::polynomial<typename FieldType::value_type> quotient_polynomial(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
@@ -234,10 +235,12 @@ namespace nil {
                         F_dfs[5] = lookup_argument.F_dfs[2];
                         F_dfs[6] = lookup_argument.F_dfs[3];
                         F_dfs[7] = lookup_argument.F_dfs[4];
+                        F_dfs[8] = lookup_argument.F_dfs[5];
 
-                        combined_poly[V_PERM_INDEX].resize(2);
+                        combined_poly[V_PERM_INDEX].resize(3);
                         combined_poly[V_PERM_INDEX][0] = permutation_argument.permutation_polynomial_dfs;
-                        combined_poly[V_PERM_INDEX][1] = lookup_argument.V_L_polynomial;
+                        combined_poly[V_PERM_INDEX][1] = lookup_argument.V_polynomials[0];
+                        combined_poly[V_PERM_INDEX][2] = lookup_argument.V_polynomials[1];
                         auto permutation_polynomial_precommitment = algorithms::precommit<commitment_scheme_type>(
                             combined_poly[V_PERM_INDEX], fri_params.D[0], fri_params.step_list.front()
                         );
@@ -251,7 +254,7 @@ namespace nil {
 #ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
                         last = std::chrono::high_resolution_clock::now();
 #endif
-                        F_dfs[8] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
+                        F_dfs[9] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
                             constraint_system, polynomial_table, preprocessed_public_data.common_data.basic_domain,
                             preprocessed_public_data.common_data.max_gates_degree, transcript)[0];
 
@@ -370,11 +373,10 @@ namespace nil {
                         // lookup polynomials evaluation
 
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_lookups;
-                        evaluation_points_lookups.push_back({challenge, challenge * omega.inversed()}); // For the first
-                        evaluation_points_lookups.push_back({challenge});
+                        evaluation_points_lookups.push_back({challenge, challenge * omega});
 
-                        combined_poly[LOOKUP_INDEX].push_back(lookup_argument.input_polynomial);
-                        combined_poly[LOOKUP_INDEX].push_back(lookup_argument.value_polynomial);
+//                        combined_poly[LOOKUP_INDEX].push_back(lookup_argument.input_polynomial);
+//                        combined_poly[LOOKUP_INDEX].push_back(lookup_argument.value_polynomial);
 
                         // quotient
                         std::vector<typename FieldType::value_type> challenge_point = {challenge};
@@ -424,11 +426,13 @@ namespace nil {
                         combined_poly[FIXED_VALUES_INDEX].push_back(preprocessed_public_data.q_blind);
                         evaluation_points_public.push_back(challenge_point);
 
+                        combined_poly[LOOKUP_INDEX] = lookup_argument.sorted_batch;
+
                         std::array<std::vector<std::vector<typename FieldType::value_type>>, 5> evaluations_points;
                         evaluations_points[VARIABLE_VALUES_INDEX] = variable_values_evaluation_points;
                         evaluations_points[V_PERM_INDEX] = evaluation_points_v_p;
-                        evaluations_points[QUOTIENT_INDEX] = evaluation_points_quotient;
                         evaluations_points[FIXED_VALUES_INDEX] = evaluation_points_public;
+                        evaluations_points[QUOTIENT_INDEX] = evaluation_points_quotient;
                         evaluations_points[LOOKUP_INDEX] = evaluation_points_lookups;
 
                         std::array<typename commitment_scheme_type::precommitment_type, 5> precommitments;
@@ -442,9 +446,9 @@ namespace nil {
                         proof.lookup_commitment = algorithms::commit<commitment_scheme_type>(lookup_argument.lookup_precommitment);
 
                         proof.eval_proof.combined_value = algorithms::proof_eval<commitment_scheme_type>(
-                                                    evaluations_points,
-                                                    precommitments,
-                                                    combined_poly, fri_params, transcript);
+                            evaluations_points,
+                            precommitments,
+                            combined_poly, fri_params, transcript);
 
 //#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
 //                                                elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(

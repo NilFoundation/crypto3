@@ -693,8 +693,8 @@ namespace nil {
                 }
 
                 template<typename FRI>
-                static bool verify_eval(typename FRI::proof_type                                                  &proof,
-                                        typename FRI::params_type                                                 &fri_params,
+                static bool verify_eval(const typename FRI::proof_type                                                  &proof,
+                                        const typename FRI::params_type                                           &fri_params,
                                         const std::array<typename FRI::commitment_type, FRI::batches_num>         &commitments,
                                         const typename FRI::field_type::value_type                                theta,
                                         const std::vector<std::size_t>                                            &evals_map,
@@ -732,7 +732,7 @@ namespace nil {
                     }
 
                     for( std::size_t query_id = 0; query_id < FRI::lambda; query_id++){
-                        typename FRI::query_proof_type &query_proof = proof.query_proofs[query_id];
+                        const typename FRI::query_proof_type &query_proof = proof.query_proofs[query_id];
 
                         std::size_t domain_size = fri_params.D[0]->size();
                         std::size_t coset_size = 1 << fri_params.step_list[0];
