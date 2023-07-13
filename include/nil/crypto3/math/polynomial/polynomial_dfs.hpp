@@ -756,17 +756,43 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             std::ostream& operator<<(std::ostream& os,
                                      const polynomial_dfs<FieldValueType, Allocator>& poly) {
-                os << "[Polynomial DFS, size " << poly.size()
-                   << " degree " << poly.degree() << " values ";
-                for( auto it = poly.begin(); it != poly.end(); it++ ){
-                    os << "0x" << std::hex << it->data << ", ";
+                if (poly.degree() == 0) {
+                    // If all it contains is a constant, print the constant, so it's more readable.
+                    os << *poly.begin();
+                } else {
+                    os << "[Polynomial DFS, size " << poly.size()
+                       << " degree " << poly.degree() << " values ";
+                    for( auto it = poly.begin(); it != poly.end(); it++ ){
+                        os << "0x" << std::hex << it->data << ", ";
+                    }
+                    os << "]";
                 }
-                os << "]";
                 return os;
             }
 
         }    // namespace math
     }        // namespace crypto3
 }    // namespace nil
+
+namespace std {
+
+    // As our operator== returns false for polynomials with different sizes, the same will happen here,
+    // resized polynomial will have a different hash from the initial one.
+    template<typename FieldValueType, typename Allocator>
+    struct std::hash<nil::crypto3::math::polynomial_dfs<FieldValueType, Allocator>>
+    {
+        std::hash<FieldValueType> value_hasher;
+
+        std::size_t operator()(const nil::crypto3::math::polynomial_dfs<FieldValueType, Allocator>& poly) const
+        {
+            std::size_t result = poly.degree();
+            for (const auto& val: poly) {
+                boost::hash_combine(result, value_hasher(val));
+            }
+            return result;
+        }
+    };
+
+} // namespace std
 
 #endif    // CRYPTO3_MATH_POLYNOMIAL_POLYNOM_DFT_HPP
