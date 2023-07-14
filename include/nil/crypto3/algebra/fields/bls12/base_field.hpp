@@ -54,12 +54,11 @@ namespace nil {
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
 
+                    typedef typename policy_type::integral_type integral_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 #ifdef __ZKLLVM__
                     typedef __zkllvm_field_bls12381_base value_type;
 #else
-
-                    typedef typename policy_type::integral_type integral_type;
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
                         0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAB_cppui381;
@@ -85,12 +84,11 @@ namespace nil {
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
 
+                    typedef typename policy_type::integral_type integral_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 #ifdef __ZKLLVM__
                     typedef __zkllvm_field_bls12377_base value_type;
 #else
-
-                    typedef typename policy_type::integral_type integral_type;
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
                         0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000001_cppui377;
@@ -121,12 +119,12 @@ namespace nil {
 #else
                 constexpr typename bls12_base_field<381>::integral_type const bls12_base_field<381>::modulus;
                 constexpr typename bls12_base_field<377>::integral_type const bls12_base_field<377>::modulus;
-#endif
+
                 constexpr
                     typename bls12_base_field<381>::modular_params_type const bls12_base_field<381>::modulus_params;
                 constexpr
                     typename bls12_base_field<377>::modular_params_type const bls12_base_field<377>::modulus_params;
-
+#endif
                 template<std::size_t Version = 381>
                 using bls12_fq = bls12_base_field<Version>;
 

@@ -48,11 +48,11 @@ namespace nil {
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
 
+                    typedef typename policy_type::integral_type integral_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
 #ifdef __ZKLLVM__
                     typedef __zkllvm_field_vesta_base value_type;
 #else
-                    typedef typename policy_type::integral_type integral_type;
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
                         0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255;
