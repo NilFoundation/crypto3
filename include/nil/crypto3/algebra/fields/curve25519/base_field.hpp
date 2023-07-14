@@ -47,12 +47,15 @@ namespace nil {
                     typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
-                    typedef typename policy_type::integral_type integral_type;
-
-                    typedef typename policy_type::extended_integral_type extended_integral_type;
-
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
+                    constexpr static const std::size_t value_bits = modulus_bits;
+                    constexpr static const std::size_t arity = 1;
 
+                    typedef typename policy_type::integral_type integral_type;
+                    typedef typename policy_type::extended_integral_type extended_integral_type;
+#ifdef __ZKLLVM__
+                    typedef __zkllvm_field_curve25519_base value_type;
+#else               
                     constexpr static const integral_type modulus =
                         0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed_cppui255;
 
@@ -65,18 +68,19 @@ namespace nil {
                         modular_type;
 
                     typedef typename detail::element_fp<params<curve25519_base_field>> value_type;
-
-                    constexpr static const std::size_t value_bits = modulus_bits;
-                    constexpr static const std::size_t arity = 1;
+#endif
                 };
 
                 constexpr typename std::size_t const curve25519_base_field::modulus_bits;
                 constexpr typename std::size_t const curve25519_base_field::number_bits;
                 constexpr typename std::size_t const curve25519_base_field::value_bits;
+
+#ifdef __ZKLLVM__
+#else
                 constexpr typename curve25519_base_field::integral_type const curve25519_base_field::modulus;
                 constexpr
                     typename curve25519_base_field::modular_params_type const curve25519_base_field::modulus_params;
-
+#endif
                 using curve25519_fq = curve25519_base_field;
 
                 using ed25519 = curve25519_base_field;

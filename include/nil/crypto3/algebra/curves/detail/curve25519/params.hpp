@@ -58,7 +58,8 @@ namespace nil {
 
                         template<typename Coordinates>
                         using group_type = curve25519_types::g1_type<forms::montgomery, Coordinates>;
-
+#ifdef __ZKLLVM__
+#else
                         constexpr static std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
 
@@ -66,6 +67,7 @@ namespace nil {
                             typename field_type::value_type(0x09),
                             typename field_type::value_type(
                                 0x20ae19a1b8a086b4e01edd2c7748d14c923d4d7e6d7c61b229e9c5a27eced3d9_cppui254)};
+#endif
                     };
 
                     /**
@@ -75,7 +77,8 @@ namespace nil {
                     struct curve25519_params<forms::twisted_edwards> {
                         using base_field_type = typename curve25519_types::base_field_type;
                         using scalar_field_type = typename curve25519_types::scalar_field_type;
-
+#ifdef __ZKLLVM__
+#else
                         constexpr static typename curve25519_types::integral_type a = typename curve25519_types::integral_type(
                             0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec_cppui255);    ///< coefficient
                                                                                                              ///< of
@@ -90,6 +93,7 @@ namespace nil {
                                                                                                              ///< Edwards
                                                                                                              ///< curves
                                                                                                              ///< $a*x^2+y^2=1+d*x^2*y^2$
+#endif
                     };
 
                     template<>
@@ -99,7 +103,8 @@ namespace nil {
 
                         template<typename Coordinates>
                         using group_type = curve25519_types::g1_type<forms::twisted_edwards, Coordinates>;
-
+#ifdef __ZKLLVM__
+#else
                         constexpr static std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
 
@@ -108,8 +113,10 @@ namespace nil {
                                 0x216936D3CD6E53FEC0A4E231FDD6DC5C692CC7609525A7B2C9562D608F25D51A_cppui254),
                             typename field_type::value_type(
                                 0x6666666666666666666666666666666666666666666666666666666666666658_cppui255)};
+#endif
                     };
-
+#ifdef __ZKLLVM__
+#else
                     constexpr typename curve25519_types::integral_type curve25519_params<forms::montgomery>::a;
                     constexpr typename curve25519_types::integral_type curve25519_params<forms::montgomery>::b;
 
@@ -127,6 +134,7 @@ namespace nil {
                     constexpr std::array<typename curve25519_g1_params<forms::twisted_edwards>::field_type::value_type,
                                          2>
                         curve25519_g1_params<forms::twisted_edwards>::one_fill;
+#endif
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

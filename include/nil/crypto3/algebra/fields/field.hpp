@@ -50,6 +50,8 @@ namespace nil {
                     constexpr static const std::size_t number_bits = ModulusBits;
 
 #ifdef __ZKLLVM__
+                    typedef int integral_type;
+                    typedef int extended_integral_type;
 #else
                     typedef nil::crypto3::multiprecision::number<
                         nil::crypto3::multiprecision::backends::cpp_int_backend<

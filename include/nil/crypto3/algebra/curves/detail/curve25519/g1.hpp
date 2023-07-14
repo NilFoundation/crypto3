@@ -28,8 +28,12 @@
 #define CRYPTO3_ALGEBRA_CURVES_CURVE25519_G1_HPP
 
 #include <nil/crypto3/algebra/curves/detail/curve25519/params.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
+#ifdef __ZKLLVM__
+#else
 // #include <nil/crypto3/algebra/curves/detail/forms/montgomery/xz/element_g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/extended_with_a_minus_1/element_g1.hpp>
+#endif
 
 namespace nil {
     namespace crypto3 {
@@ -56,7 +60,25 @@ namespace nil {
                             field_type::value_bits + 1;    ///< size of the base field in bits
 
 #ifdef __ZKLLVM__
-                        typedef __zkllvm_curve_curve25519 value_type;
+                        using value_type = __zkllvm_curve_curve25519;
+
+                        static value_type make_value(
+                            typename field_type::value_type affine_one_X,
+                            typename field_type::value_type affine_one_Y) {
+                            return __builtin_assigner_curve25519_curve_init(affine_one_X, affine_one_Y);
+                        }
+
+                        static value_type one () {
+                            return make_value(0, 1);
+                        }
+
+                        static value_type zero () {
+                            return make_value(0, 0);
+                        }
+
+                        static bool is_zero (value_type const &value) {
+                            return true;
+                        }
 #else
                         using value_type = curve_element<params_type, Form, Coordinates>;
 #endif
