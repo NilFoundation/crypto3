@@ -530,8 +530,6 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-namespace std {
-
 template <typename VariableType>
 struct std::hash<nil::crypto3::math::term<VariableType>>
 {
@@ -549,7 +547,5 @@ struct std::hash<nil::crypto3::math::term<VariableType>>
         return result;
     }
 };
-
-} // namespace std
 
 #endif    // CRYPTO3_ZK_MATH_EXPRESSION_HPP
