@@ -32,6 +32,7 @@
 #include <ostream>
 #include <vector>
 #include <functional>
+#include <unordered_map>
 #include <boost/functional/hash.hpp>
 #include <boost/variant.hpp>
 #include <boost/variant/recursive_wrapper.hpp>
