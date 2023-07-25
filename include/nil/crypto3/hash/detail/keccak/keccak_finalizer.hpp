@@ -26,6 +26,7 @@
 #ifndef CRYPTO3_KECCAK_FINALIZER_HPP
 #define CRYPTO3_KECCAK_FINALIZER_HPP
 
+#include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/detail/keccak/keccak_policy.hpp>
 #include <nil/crypto3/hash/type_traits.hpp>
 

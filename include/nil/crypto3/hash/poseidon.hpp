@@ -13,7 +13,7 @@
 #ifdef __ZKLLVM__
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #else
-#include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #endif
@@ -34,10 +34,10 @@ namespace nil {
                 };
             };
 #else
-            template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+            template<typename policy_type>
             class poseidon_compressor {
             protected:
-                typedef detail::poseidon_functions<FieldType, Arity, PartRounds> policy_type;
+                typedef detail::poseidon_permutation<policy_type> poseidon_permutation;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -59,17 +59,17 @@ namespace nil {
                     // for (std::size_t i = 0; i != state_words; ++i)
                     //     boost::endian::endian_reverse_inplace(state[i]);
 
-                    policy_type::permute(state);
+                    poseidon_permutation::permute(state);
 
                     // for (std::size_t i = 0; i != state_words; ++i)
                     //     boost::endian::endian_reverse_inplace(state[i]);
                 }
             };
 
-            template<typename FieldType, std::size_t Arity, std::size_t PartRounds>
+            template<typename policy_type>
             struct poseidon {
             protected:
-                typedef detail::poseidon_policy<FieldType, Arity, PartRounds> policy_type;
+                // typedef policy_type policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -91,7 +91,7 @@ namespace nil {
                     };
 
                     // typedef sponge_construction<params_type, typename policy_type::iv_generator,
-                    //                             poseidon_compressor<FieldType, Arity, strength>,
+                    //                             poseidon_compressor<FieldType, Rate, Capacity, strength>,
                     //                             // TODO: padding and finalizer
                     //                             detail::poseidon_padding<policy_type>,
                     //                             detail::poseidon_finalizer<policy_type>>
