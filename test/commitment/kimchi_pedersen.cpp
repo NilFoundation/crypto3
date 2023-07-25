@@ -91,7 +91,7 @@ struct aggregated_evaluation_proof {
         for (auto &eval_com : eval_commitments) {
             assert(eval_points.size() == eval_com.chunked_evals.size());
             coms.push_back(
-                evaluation_type({eval_com.commit.chunked_commitment, eval_com.chunked_evals, eval_com.commit.bound}));
+                evaluation_type({eval_com.commit.chunked_commitment, eval_com.chunked_evals, (int)eval_com.commit.bound}));
         }
 
         return batchproof_type({fq_sponge, coms, eval_points, polymask, evalmask, proof});
@@ -184,7 +184,10 @@ BOOST_AUTO_TEST_CASE(kimchi_commitment_test_case) {
     std::size_t count_eval_proofs = 1;
     for (std::size_t i = 0; i < count_eval_proofs; ++i) {
         std::vector<scalar_value_type> eval_points(7);
-        std::generate(eval_points.begin(), eval_points.end(), algebra::random_element<scalar_field_type>);
+        
+        // Random_element is called with the default parameter, yet we need to wrap it in a lamda.
+        std::generate(eval_points.begin(), eval_points.end(), 
+            [](){return algebra::random_element<scalar_field_type>();});
 
         std::vector<CommitmentAndSecrets> commitments;
 
@@ -192,7 +195,8 @@ BOOST_AUTO_TEST_CASE(kimchi_commitment_test_case) {
             unsigned int len = std::rand() % 500;
             std::vector<scalar_value_type> polynom_coeffs(len);
 
-            std::generate(polynom_coeffs.begin(), polynom_coeffs.end(), algebra::random_element<scalar_field_type>);
+            // Random_element is called with the default parameter, yet we need to wrap it in a lamda.
+            std::generate(polynom_coeffs.begin(), polynom_coeffs.end(), [](){return algebra::random_element<scalar_field_type>();});
             unsigned int bound = polynom_coeffs.size();
 
             math::polynomial<scalar_value_type> poly(polynom_coeffs.begin(), polynom_coeffs.end());
