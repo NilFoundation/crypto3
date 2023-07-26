@@ -296,8 +296,7 @@ namespace nil {
                     generate_sigma0_gates(component, bp, assignment, first_selector_index);
                     std::size_t selector_index_1 = first_selector_index + 1;
                     typename BlueprintFieldType::integral_type one = 1;
-                    typename BlueprintFieldType::integral_type m = typename BlueprintFieldType::integral_type(
-                        typename BlueprintFieldType::value_type(2).pow(32).data);
+                    auto m = typename BlueprintFieldType::value_type(2).pow(32);
                     auto constraint_1 =
                         bp.add_constraint(var(component.W(0), 0) + m * var(component.W(0), +1) -
                                           (var(component.W(0), -1) + var(component.W(1), -1) + var(component.W(1), 0) +
@@ -541,8 +540,7 @@ namespace nil {
 
                     generate_Sigma1_gates(component, bp, assignment, first_selector_index);
                     generate_Ch_gates(component, bp, assignment, first_selector_index + 5);
-                    typename BlueprintFieldType::integral_type m = typename BlueprintFieldType::integral_type(
-                        typename BlueprintFieldType::value_type(2).pow(32).data);
+                    auto m = typename BlueprintFieldType::value_type(2).pow(32);
                     auto constraint_1 = bp.add_constraint(
                         var(component.W(4), +1) -
                         (var(component.W(2), 0) + var(component.W(5), -1) + var(component.W(6), -1) * (1 << 14) +
