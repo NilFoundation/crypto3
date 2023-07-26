@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(expression_to_non_linear_combination_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(expression_max_degree_visitor_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(expression_for_each_variable_visitor_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);

@@ -70,7 +70,7 @@ namespace nil {
                         typedef plonk_assignment_table<FieldType, arithmetization_params>
                             variable_assignment_type;
 
-                        typedef detail::plonk_evaluation_map<plonk_variable<FieldType>> evaluation_map;
+                        typedef detail::plonk_evaluation_map<plonk_variable<typename FieldType::value_type>> evaluation_map;
 
                     };
                 }    // namespace detail

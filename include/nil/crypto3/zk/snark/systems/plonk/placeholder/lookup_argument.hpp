@@ -51,7 +51,7 @@ namespace nil {
                 class placeholder_lookup_argument {
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
-                    using VariableType = plonk_variable<FieldType>;
+                    using VariableType = plonk_variable<typename FieldType::value_type>;
 
                     static constexpr std::size_t argument_size = 5;
 
@@ -297,10 +297,10 @@ namespace nil {
                                                         lookup_gates[i].constraints[j].lookup_value[k].rotation,
                                                         lookup_gates[i].constraints[j].lookup_value[k].type);
 
-                                    std::tuple<std::size_t, int, typename plonk_variable<FieldType>::column_type>
+                                    std::tuple<std::size_t, int, typename plonk_variable<typename FieldType::value_type>::column_type>
                                         selector_key =
                                             std::make_tuple(lookup_gates[i].selector_index, 0,
-                                                            plonk_variable<FieldType>::column_type::selector);
+                                                            plonk_variable<typename FieldType::value_type>::column_type::selector);
 
                                     F_input_compr = F_input_compr + theta_acc * evaluations[input_key] * lookup.coeff *
                                                                         evaluations[selector_key];

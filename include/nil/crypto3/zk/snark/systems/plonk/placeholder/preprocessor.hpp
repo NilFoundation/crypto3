@@ -431,15 +431,15 @@ namespace nil {
 
                         std::uint32_t max_gates_degree = 0;
                         math::expression_max_degree_visitor<variable_type> gates_visitor;
-                        for (auto gate : constraint_system.gates()) {
-                            for (auto constr : gate.constraints) {
+                        for (const auto& gate : constraint_system.gates()) {
+                            for (const auto& constr : gate.constraints) {
                                 max_gates_degree = std::max(max_gates_degree, gates_visitor.compute_max_degree(constr));
                             }
                         }
                         math::expression_max_degree_visitor<variable_type> lookup_visitor;
-                        for (auto gate : constraint_system.lookup_gates()) {
-                            for (auto constr : gate.constraints) {
-                                for (auto li : constr.lookup_input) {
+                        for (const auto& gate : constraint_system.lookup_gates()) {
+                            for (const auto& constr : gate.constraints) {
+                                for (const auto& li : constr.lookup_input) {
                                     max_gates_degree = std::max(max_gates_degree, 
                                         lookup_visitor.compute_max_degree(li));
                                 }

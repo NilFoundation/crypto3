@@ -44,15 +44,15 @@ namespace nil {
                     std::size_t rows_amount = 0;
                     std::size_t usable_rows_amount = 0;
 
-                    std::size_t global_index(const plonk_variable<FieldType> &a) const {
+                    std::size_t global_index(const plonk_variable<typename FieldType::value_type> &a) const {
                         switch (a.type) {
-                            case plonk_variable<FieldType>::column_type::witness:
+                            case plonk_variable<typename FieldType::value_type>::column_type::witness:
                                 return a.index;
-                            case plonk_variable<FieldType>::column_type::public_input:
+                            case plonk_variable<typename FieldType::value_type>::column_type::public_input:
                                 return witness_columns + a.index;
-                            case plonk_variable<FieldType>::column_type::constant:
+                            case plonk_variable<typename FieldType::value_type>::column_type::constant:
                                 return witness_columns + public_input_columns + a.index;
-                            case plonk_variable<FieldType>::column_type::selector:
+                            case plonk_variable<typename FieldType::value_type>::column_type::selector:
                                 return witness_columns + public_input_columns + constant_columns + a.index;
                         }
                     }
@@ -73,15 +73,15 @@ namespace nil {
                     std::size_t rows_amount = 0;
                     std::size_t usable_rows_amount = 0;
 
-                    std::size_t global_index(const plonk_variable<FieldType> &a) const {
+                    std::size_t global_index(const plonk_variable<typename FieldType::value_type> &a) const {
                         switch (a.type) {
-                            case plonk_variable<FieldType>::column_type::witness:
+                            case plonk_variable<typename FieldType::value_type>::column_type::witness:
                                 return a.index;
-                            case plonk_variable<FieldType>::column_type::public_input:
+                            case plonk_variable<typename FieldType::value_type>::column_type::public_input:
                                 return witness_columns + a.index;
-                            case plonk_variable<FieldType>::column_type::constant:
+                            case plonk_variable<typename FieldType::value_type>::column_type::constant:
                                 return witness_columns + public_input_columns + a.index;
-                            case plonk_variable<FieldType>::column_type::selector:
+                            case plonk_variable<typename FieldType::value_type>::column_type::selector:
                                 return witness_columns + public_input_columns + constant_columns + a.index;
                         }
                     }

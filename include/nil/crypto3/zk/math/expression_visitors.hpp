@@ -34,11 +34,11 @@ namespace nil {
     namespace crypto3 {
         namespace math {
 
-            // ValueType is usually either VariableType::assignment_type or 
-            // math::polynomial_dfs<typename VariableType::assignment_type>.
-            template<typename VariableType, typename ValueType>
-            class expression_evaluator : public boost::static_visitor<ValueType> {
+            template<typename VariableType>
+            class expression_evaluator : public boost::static_visitor<typename VariableType::assignment_type> {
             public:
+                using ValueType = typename VariableType::assignment_type;
+
                 /** \Brief Later this class can optimize the given expression 
                            before starting the evaluation.
                  * @param expr - the expression that will be evaluated.
@@ -46,11 +46,9 @@ namespace nil {
                  */
                 expression_evaluator(
                     const math::expression<VariableType>& expr,
-                    std::function<ValueType(const VariableType&)> get_var_value,
-                    std::function<ValueType(const typename VariableType::assignment_type&)> convert_to_value_type = [](const typename VariableType::assignment_type& coeff) {return coeff;})
+                    std::function<ValueType(const VariableType&)> get_var_value)
                         : expr(expr)
-                        , get_var_value(get_var_value)
-                        , convert_to_value_type(convert_to_value_type) {
+                        , get_var_value(get_var_value) {
                 }
 
                 ValueType evaluate() {
@@ -58,7 +56,7 @@ namespace nil {
                 }
 
                 ValueType operator()(const math::term<VariableType>& term) {
-                    ValueType result = convert_to_value_type(term.coeff);
+                    ValueType result = term.coeff;
                     for (const VariableType& var : term.vars) {
                         result *= get_var_value(var);
                     }
@@ -94,10 +92,6 @@ namespace nil {
 
                 // A function used to retrieve the value of a variable.
                 std::function<ValueType(const VariableType &var)> get_var_value;
-
-                // Used to convert the coefficients from VariableType::assignment_type to 
-                // math::polynomial_dfs<typename VariableType::assignment_type> if needed.
-                std::function<ValueType(const typename VariableType::assignment_type&)> convert_to_value_type;
             };
 
             // Used for counting max degree of an expression.
@@ -219,6 +213,72 @@ namespace nil {
                             return left * right;
                     }
                 }
+            };
+
+
+            // Changes the underlying variable type of an expression. This is useful, when
+            // we have a constraint with variable type plonk_variable<AssignmentType>
+            // but we need a constraint of variable type 
+            // plonk_variable<math::polynomial_dfs<typename FieldType::value_type>>.
+            // You can convert between types if the coefficient types are convertable.
+            template<typename SourceVariableType, typename DestinationVariableType>
+            class expression_variable_type_converter
+                : public boost::static_visitor<math::expression<DestinationVariableType>> {
+            public:
+                /*
+                 * @param convert_coefficient - A function that can convert a coefficient of Source Type, into a coefficient 
+                                                of the destination type.
+                 */
+                expression_variable_type_converter(
+                    std::function<typename DestinationVariableType::assignment_type(
+                        const typename SourceVariableType::assignment_type&)> convert_coefficient = 
+                            [](const typename SourceVariableType::assignment_type& coeff) {return coeff;})
+                    : _convert_coefficient(convert_coefficient) {
+                }
+
+                math::expression<DestinationVariableType> convert(
+                        const math::expression<SourceVariableType>& expr) {
+                    return boost::apply_visitor(*this, expr.expr);
+                }
+
+                math::expression<DestinationVariableType> operator()(
+                        const math::term<SourceVariableType>& term) {
+                    math::term<DestinationVariableType> result;
+                    result.coeff = _convert_coefficient(term.coeff);
+                    for (const auto& var: term.vars) {
+                        result.vars.emplace_back(
+                            var.index, var.rotation, var.relative,
+                            static_cast<typename DestinationVariableType::column_type>(static_cast<std::uint8_t>(var.type)));
+                    }
+                    return result;
+                }
+
+                math::expression<DestinationVariableType> operator()(
+                        const math::pow_operation<SourceVariableType>& pow) {
+                    math::expression<DestinationVariableType> base = boost::apply_visitor(
+                        *this, pow.expr.expr);
+                    return math::pow_operation<DestinationVariableType>(base, pow.power);
+                }
+
+                math::expression<DestinationVariableType> operator()(
+                        const math::binary_arithmetic_operation<SourceVariableType>& op) {
+                    math::expression<DestinationVariableType> left =
+                        boost::apply_visitor(*this, op.expr_left.expr);
+                    math::expression<DestinationVariableType> right =
+                        boost::apply_visitor(*this, op.expr_right.expr);
+                    switch (op.op) {
+                        case ArithmeticOperator::ADD:
+                            return left + right;
+                        case ArithmeticOperator::SUB:
+                            return left - right;
+                        case ArithmeticOperator::MULT:
+                            return left * right;
+                    }
+                }
+            private:
+                std::function<typename DestinationVariableType::assignment_type(
+                    const typename SourceVariableType::assignment_type&)> _convert_coefficient;
+
             };
         }    // namespace math
     }            // namespace crypto3
