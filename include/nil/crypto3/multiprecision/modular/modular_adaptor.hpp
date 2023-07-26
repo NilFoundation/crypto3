@@ -666,7 +666,8 @@ namespace nil {
                 }
 
                 template<typename Backend, typename StorageType>
-                inline std::size_t hash_value(const modular_adaptor<Backend, StorageType>& val) {
+                inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(
+                    const modular_adaptor<Backend, StorageType> &val) noexcept {
                     return hash_value(val.base_data());
                 }
 

@@ -2345,26 +2345,23 @@ namespace nil {
     }    // namespace crypto3
 }    // namespace nil
 
-namespace std {
+template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+struct std::hash<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> {
+    BOOST_MP_CXX14_CONSTEXPR std::size_t
+        operator()(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& val) const {
+        return hash_value(val);
+    }
+};
 
-    template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    struct hash<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> {
-        BOOST_MP_CXX14_CONSTEXPR std::size_t
-            operator()(const nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>& val) const {
-            return hash_value(val);
-        }
+template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+struct std::hash<boost::rational<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>> {
+    BOOST_MP_CXX14_CONSTEXPR std::size_t operator()(
+        const boost::rational<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>& val) const {
+        std::size_t result = hash_value(val.numerator());
+        boost::hash_combine(result, hash_value(val.denominator()));
+        return result;
+    }
     };
-    template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    struct hash<boost::rational<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>> {
-        BOOST_MP_CXX14_CONSTEXPR std::size_t operator()(
-            const boost::rational<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>& val) const {
-            std::size_t result = hash_value(val.numerator());
-            boost::hash_combine(result, hash_value(val.denominator()));
-            return result;
-        }
-    };
-
-}    // namespace std
 
 #include <nil/crypto3/multiprecision/detail/ublas_interop.hpp>
 
