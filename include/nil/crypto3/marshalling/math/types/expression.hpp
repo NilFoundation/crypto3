@@ -91,7 +91,7 @@ namespace nil {
                 struct expression<TTypeBase, nil::crypto3::math::expression<VariableType>,
                                               typename std::enable_if<std::is_same<
                                                   VariableType, nil::crypto3::zk::snark::plonk_variable<
-                                                                    typename VariableType::field_type>>::value>::type> {
+                                                                    typename VariableType::assignment_type>>::value>::type> {
                     using type = 
                         nil::marshalling::types::bundle<
                             TTypeBase,

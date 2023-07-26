@@ -182,12 +182,12 @@ namespace nil {
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, 0,
-                                                 plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(0, 0,
-                                                 plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(0, 0,
-                                                 plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w0(0, 0,
+                                                 plonk_variable<typename FieldType::value_type>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w1(0, 0,
+                                                 plonk_variable<typename FieldType::value_type>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w2(0, 0,
+                                                 plonk_variable<typename FieldType::value_type>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint += w0;
@@ -272,10 +272,10 @@ namespace nil {
                         q_add[i] = one;
                         q_mul[i] = FieldType::value_type::zero();
 
-                        plonk_variable<FieldType> x(1, i, false, 
-                            plonk_variable<FieldType>::column_type::witness);
-                        plonk_variable<FieldType> y(2, i - 1, false, 
-                            plonk_variable<FieldType>::column_type::witness);
+                        plonk_variable<typename FieldType::value_type> x(1, i, false, 
+                            plonk_variable<typename FieldType::value_type>::column_type::witness);
+                        plonk_variable<typename FieldType::value_type> y(2, i - 1, false, 
+                            plonk_variable<typename FieldType::value_type>::column_type::witness);
                         test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
@@ -288,10 +288,10 @@ namespace nil {
                         q_add[i] = FieldType::value_type::zero();
                         q_mul[i] = one;
 
-                        plonk_variable<FieldType> x(1, i, false, 
-                            plonk_variable<FieldType>::column_type::witness);
-                        plonk_variable<FieldType> y(0, 0, false, 
-                            plonk_variable<FieldType>::column_type::public_input);
+                        plonk_variable<typename FieldType::value_type> x(1, i, false, 
+                            plonk_variable<typename FieldType::value_type>::column_type::witness);
+                        plonk_variable<typename FieldType::value_type> y(0, 0, false, 
+                            plonk_variable<typename FieldType::value_type>::column_type::public_input);
                         test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
@@ -317,14 +317,14 @@ namespace nil {
 
                     test_circuit.init();
 
-                    plonk_variable<FieldType> w0(0, 0, true,
-                                                 plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(1, 0, true,
-                                                 plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(2, 0, true,
-                                                 plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w0_prev(0, -1, true,
-                                                 plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w0(0, 0, true,
+                                                 plonk_variable<typename FieldType::value_type>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w1(1, 0, true,
+                                                 plonk_variable<typename FieldType::value_type>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w2(2, 0, true,
+                                                 plonk_variable<typename FieldType::value_type>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w0_prev(0, -1, true,
+                                                 plonk_variable<typename FieldType::value_type>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint += w0;
@@ -425,25 +425,25 @@ namespace nil {
                             public_input_assignment, constant_assignment, selectors_assignment));
 
                     test_circuit.init();
-                    plonk_variable<FieldType> w0(0, 0, true,
-                                                plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(1, 0, true,
-                                                plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(2, 0, true,
-                                                plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w0(0, 0, true,
+                                                plonk_variable<typename FieldType::value_type>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w1(1, 0, true,
+                                                plonk_variable<typename FieldType::value_type>::column_type::witness);
+                    plonk_variable<typename FieldType::value_type> w2(2, 0, true,
+                                                plonk_variable<typename FieldType::value_type>::column_type::witness);
 
-                    plonk_variable<FieldType> c0(0, 0, true,
-                                                plonk_variable<FieldType>::column_type::constant);
-                    plonk_variable<FieldType> c1(1, 0, true,
-                                                plonk_variable<FieldType>::column_type::constant);
-                    plonk_variable<FieldType> c2(2, 0, true,
-                                                plonk_variable<FieldType>::column_type::constant);
+                    plonk_variable<typename FieldType::value_type> c0(0, 0, true,
+                                                plonk_variable<typename FieldType::value_type>::column_type::constant);
+                    plonk_variable<typename FieldType::value_type> c1(1, 0, true,
+                                                plonk_variable<typename FieldType::value_type>::column_type::constant);
+                    plonk_variable<typename FieldType::value_type> c2(2, 0, true,
+                                                plonk_variable<typename FieldType::value_type>::column_type::constant);
 
 
                     plonk_lookup_constraint<FieldType> lookup_constraint;
-                    math::term<plonk_variable<FieldType>> w0_term(w0);
-                    math::term<plonk_variable<FieldType>> w1_term(w1);
-                    math::term<plonk_variable<FieldType>> w2_term(w2);
+                    math::term<plonk_variable<typename FieldType::value_type>> w0_term(w0);
+                    math::term<plonk_variable<typename FieldType::value_type>> w1_term(w1);
+                    math::term<plonk_variable<typename FieldType::value_type>> w2_term(w2);
                     lookup_constraint.lookup_input.push_back(w0_term);
                     lookup_constraint.lookup_input.push_back(w1_term);
                     lookup_constraint.lookup_input.push_back(w2_term);

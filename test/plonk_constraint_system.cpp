@@ -34,8 +34,8 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::marshalling;
 
 template<typename Field>
-bool are_variables_equal(const nil::crypto3::zk::snark::plonk_variable<Field> &lhs,
-                         const nil::crypto3::zk::snark::plonk_variable<Field> &rhs) {
+bool are_variables_equal(const nil::crypto3::zk::snark::plonk_variable<typename Field::value_type> &lhs,
+                         const nil::crypto3::zk::snark::plonk_variable<typename Field::value_type> &rhs) {
     if (lhs.index != rhs.index)
         return false;
     if (lhs.relative != rhs.relative)
@@ -49,8 +49,8 @@ bool are_variables_equal(const nil::crypto3::zk::snark::plonk_variable<Field> &l
 
 template<typename Field>
 bool are_terms_equal(
-    const nil::crypto3::math::term<nil::crypto3::zk::snark::plonk_variable<Field>> &lhs,
-    const nil::crypto3::math::term<nil::crypto3::zk::snark::plonk_variable<Field>> &rhs) {
+    const nil::crypto3::math::term<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &lhs,
+    const nil::crypto3::math::term<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &rhs) {
     if (lhs.coeff != rhs.coeff) {
         return false;
     }
@@ -67,8 +67,8 @@ bool are_terms_equal(
 
 template<typename Field>
 bool are_expressions_equal(
-    const nil::crypto3::math::expression<nil::crypto3::zk::snark::plonk_variable<Field>> &lhs,
-    const nil::crypto3::math::expression<nil::crypto3::zk::snark::plonk_variable<Field>> &rhs) {
+    const nil::crypto3::math::expression<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &lhs,
+    const nil::crypto3::math::expression<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &rhs) {
     if (lhs.terms.size() != rhs.terms.size())
         return false;
     for (auto i = 0; i < lhs.terms.size(); i++) {
@@ -79,8 +79,8 @@ bool are_expressions_equal(
 }
 
 template<typename Field>
-bool are_plonk_gates_equal(const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &lhs,
-                           const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<Field>>> &rhs) {
+bool are_plonk_gates_equal(const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
+                           const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
     if (lhs.selector_index != rhs.selector_index)
         return false;
     if (lhs.constraints.size() != rhs.constraints.size())
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE(circuit_3_test) {
 
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;   
-    using VariableType = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     using circuit_2_params = nil::crypto3::zk::snark::placeholder_params<
         FieldType, 
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(circuit_2_test) {
 
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;   
-    using VariableType = nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     using circuit_2_params = nil::crypto3::zk::snark::placeholder_params<
         FieldType, 

@@ -57,7 +57,7 @@ namespace nil {
 
                 template<typename PlonkConstraintSystem, typename Endianness>
                 plonk_constraint_system<nil::marshalling::field_type<Endianness>, PlonkConstraintSystem>
-                fill_plonk_constraint_system(const PlonkConstraintSystem &system){
+                fill_plonk_constraint_system(const PlonkConstraintSystem &system) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using result_type = plonk_constraint_system<TTypeBase, PlonkConstraintSystem>;
 
