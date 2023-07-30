@@ -357,6 +357,15 @@ namespace nil {
                                        [](FieldValueType i) { return i == FieldValueType(0); });
                 }
 
+                /**
+                 * Returns true if polynomial is a one polynomial.
+                 */
+                bool is_one() const {
+                    return (*this->begin() == FieldValueType(1)) && 
+                        std::all_of(++this->begin(), this->end(),
+                            [](FieldValueType i) { return i == FieldValueType(0); });
+                }
+
                 inline static polynomial zero() {
                     return polynomial();
                 }
