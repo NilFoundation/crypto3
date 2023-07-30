@@ -143,9 +143,9 @@ namespace nil {
                             auto comb = visitor.convert(constraint);
 
                             for (std::size_t t_index = 0; t_index < comb.terms.size(); t_index++) {
-                                if (comb.terms[t_index].coeff != FieldType::value_type::one())
+                                if (!comb.terms[t_index].get_coeff().is_one())
                                     gate_lines += 1;
-                                gate_lines += comb.terms[t_index].vars.size();
+                                gate_lines += comb.terms[t_index].get_vars().size();
                                 gate_lines += 1;
                             }
                             gate_lines += 1;
@@ -288,7 +288,7 @@ namespace nil {
                 for (const auto& gate: constraint_system.lookup_gates()) {
                     for (const auto& constraint: gate.constraints) {
                         for (const auto& lookup_input: constraint.lookup_input) {
-                            const auto& var = lookup_input.vars[0];
+                            const auto& var = lookup_input.get_vars()[0];
                             if (var.relative) {
                                 std::size_t column_index = table_description.global_index(var);
                                 result[column_index].insert(var.rotation);
@@ -403,11 +403,11 @@ namespace nil {
             ) {
                 std::stringstream res;
                 for( auto it = std::cbegin(terms); it != std::cend(terms); it++ ){
-                    if(it->coeff == FieldType::value_type::one())
-                        res << generate_term(profiling_params, it->vars, columns_rotations, true);
+                    if(it->get_coeff().is_one())
+                        res << generate_term(profiling_params, it->get_vars(), columns_rotations, true);
                     else {
-                        res << "\t\t\tterms:=0x" << std::hex << it->coeff.data << std::dec << std::endl;
-                        res << generate_term(profiling_params, it->vars, columns_rotations, false);
+                        res << "\t\t\tterms:=0x" << std::hex << it->get_coeff().data << std::dec << std::endl;
+                        res << generate_term(profiling_params, it->get_vars(), columns_rotations, false);
                     }
                     res << "\t\t\tmstore("
                           "add(local_vars, CONSTRAINT_EVAL_OFFSET),"
