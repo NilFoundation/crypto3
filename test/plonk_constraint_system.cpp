@@ -34,51 +34,6 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::marshalling;
 
 template<typename Field>
-bool are_variables_equal(const nil::crypto3::zk::snark::plonk_variable<typename Field::value_type> &lhs,
-                         const nil::crypto3::zk::snark::plonk_variable<typename Field::value_type> &rhs) {
-    if (lhs.index != rhs.index)
-        return false;
-    if (lhs.relative != rhs.relative)
-        return false;
-    if (lhs.rotation != rhs.rotation)
-        return false;
-    if (lhs.type != rhs.type)
-        return false;
-    return true;
-}
-
-template<typename Field>
-bool are_terms_equal(
-    const nil::crypto3::math::term<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &lhs,
-    const nil::crypto3::math::term<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &rhs) {
-    if (lhs.coeff != rhs.coeff) {
-        return false;
-    }
-    if (lhs.vars.size() != rhs.vars.size()) {
-        return false;
-    }
-    for (auto i = 0; i < lhs.vars.size(); i++) {
-        if (!are_variables_equal(lhs.vars[i], rhs.vars[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-template<typename Field>
-bool are_expressions_equal(
-    const nil::crypto3::math::expression<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &lhs,
-    const nil::crypto3::math::expression<nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>> &rhs) {
-    if (lhs.terms.size() != rhs.terms.size())
-        return false;
-    for (auto i = 0; i < lhs.terms.size(); i++) {
-        if (!are_terms_equal(lhs.terms[i], rhs.terms[i]))
-            return false;
-    }
-    return true;
-}
-
-template<typename Field>
 bool are_plonk_gates_equal(const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
                            const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
     if (lhs.selector_index != rhs.selector_index)
@@ -86,7 +41,7 @@ bool are_plonk_gates_equal(const nil::crypto3::zk::snark::plonk_gate<Field, nil:
     if (lhs.constraints.size() != rhs.constraints.size())
         return false;
     for (auto i = 0; i < lhs.constraints.size(); i++) {
-        if (!are_expressions_equal(lhs.constraints[i], rhs.constraints[i]))
+        if (lhs.constraints[i] != rhs.constraints[i])
             return false;
     }
     return true;
@@ -101,8 +56,8 @@ bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSy
 
     if(s1.copy_constraints().size() != s2.copy_constraints().size())    return false;
     for(size_t i = 0; i < s1.copy_constraints().size(); i++){
-        if(!are_variables_equal(std::get<0>(s1.copy_constraints()[i]), std::get<0>(s2.copy_constraints()[i]))) return false;
-        if(!are_variables_equal(std::get<1>(s1.copy_constraints()[i]), std::get<1>(s2.copy_constraints()[i]))) return false;
+        if(std::get<0>(s1.copy_constraints()[i]) != std::get<0>(s2.copy_constraints()[i])) return false;
+        if(std::get<1>(s1.copy_constraints()[i]) != std::get<1>(s2.copy_constraints()[i])) return false;
     }
 
     // TODO check lookup gates are equal

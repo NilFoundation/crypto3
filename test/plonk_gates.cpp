@@ -144,13 +144,13 @@ PlonkVariable generate_random_plonk_variable() {
 
 template<typename PlonkVariable>
 nil::crypto3::math::term<PlonkVariable> generate_random_plonk_term(std::size_t vars_n) {
-    nil::crypto3::math::term<PlonkVariable> result;
+     result;
     nil::crypto3::random::algebraic_random_device<typename PlonkVariable::field_type> d;
-    result.coeff = d();
+    std::vector<PlonkVariable> vars;
     for (auto i = 0; i < vars_n; i++) {
-        result.vars.emplace_back(generate_random_plonk_variable<PlonkVariable>());
+        vars.emplace_back(generate_random_plonk_variable<PlonkVariable>());
     }
-    return result;
+    return nil::crypto3::math::term<PlonkVariable>(vars, d());
 }
 
 template<typename PlonkVariable>

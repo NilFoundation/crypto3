@@ -118,7 +118,7 @@ namespace nil {
             class expression_flattener : public boost::static_visitor<void> {
             public:
                 expression_flattener(const math::expression<VariableType>& expr) {
-                    boost::apply_visitor(*this, expr.expr);
+                    boost::apply_visitor(*this, expr.get_expr());
                 }
 
                 const flat_expression<VariableType>& get_result() const {
@@ -134,8 +134,8 @@ namespace nil {
 
                 void operator()(
                         const math::pow_operation<VariableType>& pow) {
-                    boost::apply_visitor(*this, pow.expr.expr);
-                    result.pow_operations.push_back({pow.power, result.root_type, result.root_index});
+                    boost::apply_visitor(*this, pow.get_expr().get_expr());
+                    result.pow_operations.push_back({pow.get_power(), result.root_type, result.root_index});
 
                     result.root_type = flat_node_type::POWER;
                     result.root_index = result.pow_operations.size() - 1;
@@ -144,13 +144,13 @@ namespace nil {
                 void operator()(
                         const math::binary_arithmetic_operation<VariableType>& op) {
                     flat_binary_arithmetic_operation flat_op;
-                    flat_op.op = op.op;
+                    flat_op.op = op.get_op();
 
-                    boost::apply_visitor(*this, op.expr_left.expr);
+                    boost::apply_visitor(*this, op.get_expr_left().get_expr());
                     flat_op.left_type = result.root_type;
                     flat_op.left_index = result.root_index; 
 
-                    boost::apply_visitor(*this, op.expr_right.expr);
+                    boost::apply_visitor(*this, op.get_expr_right().get_expr());
                     flat_op.right_type = result.root_type;
                     flat_op.right_index = result.root_index; 
 

@@ -84,12 +84,12 @@ namespace nil {
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
 
                     variable_vector_marshalling_type filled_vars;
-                    for (const auto &var : t.vars) {
+                    for (const auto &var : t.get_vars()) {
                         filled_vars.value().push_back(
                             fill_variable<typename NonLinearTerm::variable_type, Endianness>(var));
                     }
 
-                    return result_type(std::make_tuple(field_element_marhsalling_type(t.coeff), filled_vars));
+                    return result_type(std::make_tuple(field_element_marhsalling_type(t.get_coeff()), filled_vars));
                 }
 
                 template<typename NonLinearTerm, typename Endianness>
@@ -99,14 +99,14 @@ namespace nil {
                     NonLinearTerm>::type
                     make_term(const typename term<nil::marshalling::field_type<Endianness>,
                                                                         NonLinearTerm>::type &filled_term) {
-                    NonLinearTerm t;
-                    t.coeff = std::get<0>(filled_term.value()).value();
-                    t.vars.reserve(std::get<1>(filled_term.value()).value().size());
+                    std::vector<typename NonLinearTerm::variable_type> vars;
+                    auto coeff = std::get<0>(filled_term.value()).value();
+                    vars.reserve(std::get<1>(filled_term.value()).value().size());
                     for (auto i = 0; i < std::get<1>(filled_term.value()).value().size(); i++) {
-                        t.vars.emplace_back(make_variable<typename NonLinearTerm::variable_type, Endianness>(
+                        vars.emplace_back(make_variable<typename NonLinearTerm::variable_type, Endianness>(
                             std::get<1>(filled_term.value()).value().at(i)));
                     }
-                    return t;
+                    return NonLinearTerm(vars, coeff);
                 }
             }    // namespace types
         }        // namespace marshalling
