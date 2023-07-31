@@ -110,7 +110,7 @@ namespace nil {
                 std::size_t max_degree() const {
                     std::size_t max_degree = 0;
                     for (const term_type &nlt : this->terms) {
-                        max_degree = std::max(max_degree, nlt.vars.size());
+                        max_degree = std::max(max_degree, nlt.get_vars().size());
                     }
                     return max_degree;
                 }
@@ -119,17 +119,17 @@ namespace nil {
                     std::unordered_map<term_type, assignment_type> unique_terms;
                     for (const auto& term: this->terms) {
                         // Create a new term with variables only.
-                        term_type vars(term.vars);
+                        term_type vars(term.get_vars());
                         auto it = unique_terms.find(vars);
                         if (it != unique_terms.end()) {
-                            unique_terms[vars] += term.coeff;
+                            unique_terms[vars] += term.get_coeff();
                         } else {
-                            unique_terms[vars] = term.coeff; 
+                            unique_terms[vars] = term.get_coeff();
                         }
                     }
                     this->terms.clear();
                     for (const auto& it: unique_terms) {
-                        this->terms.emplace_back(it.first.vars, it.second);
+                        this->terms.emplace_back(it.first.get_vars(), it.second);
                     }
                 }
                 
