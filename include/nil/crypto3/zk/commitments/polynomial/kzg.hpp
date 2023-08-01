@@ -527,17 +527,12 @@ namespace nil {
                         if (KZG::batch_size == 1) {
                             assert(right == KZG::verification_type::one());
                         }
-                        left_side_pairing = left_side_pairing + algebra::pair<typename KZG::curve_type>(left, right);
+                        left_side_pairing = left_side_pairing * algebra::pair_reduced<typename KZG::curve_type>(left, right);
                         factor = factor * gamma;
                     }
 
-                    typename KZG::gt_value_type one = algebra::pair<typename KZG::curve_type>(2 * KZG::commitment_type::one(), KZG::verification_type::one());
-                    typename KZG::gt_value_type two = algebra::pair<typename KZG::curve_type>(3 * KZG::commitment_type::one(), KZG::verification_type::one());
-                    typename KZG::gt_value_type three = algebra::pair<typename KZG::curve_type>(5 * KZG::commitment_type::one(), KZG::verification_type::one());
-                    assert(one * two == three);
-
                     auto right = commit_g2<KZG>(params, create_polynom_by_zeros<KZG>(public_key.T));
-                    auto right_side_pairing = algebra::pair<typename KZG::curve_type>(proof, right);
+                    auto right_side_pairing = algebra::pair_reduced<typename KZG::curve_type>(proof, right);
                     
                     return left_side_pairing == right_side_pairing;
                     // return true;

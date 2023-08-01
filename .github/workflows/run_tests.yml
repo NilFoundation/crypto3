@@ -72,6 +72,7 @@ jobs:
             crypto3_zk_commitment_fold_polynomial_test,
             crypto3_zk_commitment_fri_test,
             crypto3_zk_commitment_lpc_test,
+            crypto3_zk_commitment_kzg_test,
             crypto3_zk_systems_plonk_placeholder_placeholder_test,
             crypto3_zk_commitment_powers_of_tau_test,
             crypto3_zk_commitment_proof_of_knowledge_test,
