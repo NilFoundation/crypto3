@@ -39,72 +39,52 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            template<typename ArithmetizationType, typename CurveType, typename Ed25519Type, std::size_t... WireIndexes>
+            template<typename ArithmetizationType, typename CurveType, typename Ed25519Type,
+                std::uint32_t WitnessesAmount, typename NonNativePolicyType>
             class variable_base_multiplication_per_bit;
 
             template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename CurveType,
-                     typename Ed25519Type,
-                     std::size_t W0,
-                     std::size_t W1,
-                     std::size_t W2,
-                     std::size_t W3,
-                     std::size_t W4,
-                     std::size_t W5,
-                     std::size_t W6,
-                     std::size_t W7,
-                     std::size_t W8>
+                     typename ArithmetizationParams, typename CurveType, typename Ed25519Type>
             class variable_base_multiplication_per_bit<
                 crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                CurveType,
-                Ed25519Type,
-                W0,
-                W1,
-                W2,
-                W3,
-                W4,
-                W5,
-                W6,
-                W7,
-                W8> {
+                    CurveType,
+                    Ed25519Type,
+                    9,
+                    basic_non_native_policy<BlueprintFieldType>>:
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 1, 0> {
+
+                constexpr static const std::uint32_t WitnessesAmount = 9;
+
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 1, 0>;
+
+            public:
+                using var = typename component_type::var;
+                using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
                 typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                     ArithmetizationType;
 
-                using doubling_component =
-                    doubling<ArithmetizationType, CurveType, Ed25519Type, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                using doubling_component = doubling<
+                    ArithmetizationType, CurveType, Ed25519Type, 9, non_native_policy_type>;
 
-                using complete_addition_component =
-                    complete_addition<ArithmetizationType, CurveType, Ed25519Type, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
+                using complete_addition_component = complete_addition<
+                    ArithmetizationType, CurveType, Ed25519Type, 9, non_native_policy_type>;
 
-                using bool_scalar_multiplication_component = bool_scalar_multiplication<ArithmetizationType,
-                                                                                        CurveType,
-                                                                                        Ed25519Type,
-                                                                                        W0,
-                                                                                        W1,
-                                                                                        W2,
-                                                                                        W3,
-                                                                                        W4,
-                                                                                        W5,
-                                                                                        W6,
-                                                                                        W7,
-                                                                                        W8>;
+                using bool_scalar_multiplication_component = bool_scalar_multiplication<
+                    ArithmetizationType, Ed25519Type, 9, non_native_policy_type>;
 
-                using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-                constexpr static const std::size_t selector_seed = 0xff82;
 
-            public:
+
                 constexpr static const std::size_t rows_amount = doubling_component::rows_amount +
                                                                  complete_addition_component::rows_amount +
                                                                  bool_scalar_multiplication_component::rows_amount;
 
                 constexpr static const std::size_t gates_amount = 0;
 
-                struct params_type {
+                struct input_type {
                     struct var_ec_point {
-                        std::array<var, 4> x;
-                        std::array<var, 4> y;
+                        typename non_native_policy_type::template field<typename Ed25519Type::base_field_type>::non_native_var_type x;
+                        typename non_native_policy_type::template field<typename Ed25519Type::base_field_type>::non_native_var_type y;
                     };
 
                     var_ec_point T;
@@ -114,92 +94,181 @@ namespace nil {
 
                 struct result_type {
                     struct var_ec_point {
-                        std::array<var, 4> x;
-                        std::array<var, 4> y;
+                        typename non_native_policy_type::template field<typename Ed25519Type::base_field_type>::non_native_var_type x;
+                        typename non_native_policy_type::template field<typename Ed25519Type::base_field_type>::non_native_var_type y;
                     };
                     var_ec_point output;
+
+                    result_type(const variable_base_multiplication_per_bit &component, std::uint32_t start_row_index) {
+                        using complete_addition_component =
+                            components::complete_addition<ArithmetizationType, CurveType, Ed25519Type, 9,
+                                basic_non_native_policy<BlueprintFieldType>>;
+                        complete_addition_component component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {});
+
+                        auto final_addition_res = typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(
+                            component_instance, start_row_index + rows_amount - complete_addition_component::rows_amount);
+
+                        output.x = {final_addition_res.output.x[0],
+                                    final_addition_res.output.x[1],
+                                    final_addition_res.output.x[2],
+                                    final_addition_res.output.x[3]};
+                        output.y = {final_addition_res.output.y[0],
+                                    final_addition_res.output.y[1],
+                                    final_addition_res.output.y[2],
+                                    final_addition_res.output.y[3]};
+                    }
                 };
 
-                static result_type generate_assignments(blueprint_assignment_table<ArithmetizationType> &assignment,
-                                                        const params_type &params,
-                                                        std::size_t component_start_row) {
-                    std::size_t row = component_start_row;
-                    std::array<var, 4> T_x = params.T.x;
-                    std::array<var, 4> T_y = params.T.y;
-                    std::array<var, 4> R_x = params.R.x;
-                    std::array<var, 4> R_y = params.R.y;
+                template<typename ContainerType>
+                variable_base_multiplication_per_bit(ContainerType witness) : component_type(witness, {}, {}) {};
 
-                    auto bool_mul_res = bool_scalar_multiplication_component::generate_assignments(
-                        assignment,
-                        typename bool_scalar_multiplication_component::params_type({{T_x, T_y}, params.k}),
-                        row);
-                    row += bool_scalar_multiplication_component::rows_amount;
+                template<typename WitnessContainerType, typename ConstantContainerType,
+                         typename PublicInputContainerType>
+                variable_base_multiplication_per_bit(WitnessContainerType witness, ConstantContainerType constant,
+                         PublicInputContainerType public_input) :
+                    component_type(witness, constant, public_input) {};
 
-                    auto doubling_res = doubling_component::generate_assignments(
-                        assignment, typename doubling_component::params_type({R_x, R_y}), row);
-                    row += doubling_component::rows_amount;
-
-                    auto add_res = complete_addition_component::generate_assignments(
-                        assignment,
-                        typename complete_addition_component::params_type(
-                            {{doubling_res.output.x, doubling_res.output.y},
-                             {bool_mul_res.output.x, bool_mul_res.output.y}}),
-                        row);
-                    row += complete_addition_component::rows_amount;
-
-                    return {add_res.output.x, add_res.output.y};
-                }
-
-                static result_type generate_circuit(blueprint<ArithmetizationType> &bp,
-                                                    blueprint_public_assignment_table<ArithmetizationType> &assignment,
-                                                    const params_type &params,
-                                                    const std::size_t start_row_index) {
-                    std::size_t row = start_row_index;
-                    std::array<var, 4> T_x = params.T.x;
-                    std::array<var, 4> T_y = params.T.y;
-                    std::array<var, 4> R_x = params.R.x;
-                    std::array<var, 4> R_y = params.R.y;
-
-                    auto bool_mul_res = bool_scalar_multiplication_component::generate_circuit(
-                        bp,
-                        assignment,
-                        typename bool_scalar_multiplication_component::params_type({{T_x, T_y}, params.k}),
-                        row);
-                    row += bool_scalar_multiplication_component::rows_amount;
-
-                    auto doubling_res = doubling_component::generate_circuit(
-                        bp, assignment, typename doubling_component::params_type({R_x, R_y}), row);
-                    row += doubling_component::rows_amount;
-
-                    auto add_res = complete_addition_component::generate_circuit(
-                        bp,
-                        assignment,
-                        typename complete_addition_component::params_type(
-                            {{doubling_res.output.x, doubling_res.output.y},
-                             {bool_mul_res.output.x, bool_mul_res.output.y}}),
-                        row);
-                    row += complete_addition_component::rows_amount;
-
-                    generate_copy_constraints(bp, assignment, params, start_row_index);
-
-                    return {add_res.output.x, add_res.output.y};
-                }
-
-            private:
-                static void generate_gates(blueprint<ArithmetizationType> &bp,
-                                           blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                                           const params_type &params,
-                                           const std::size_t first_selector_index) {
-                }
-
-                static void
-                    generate_copy_constraints(blueprint<ArithmetizationType> &bp,
-                                              blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
-                                              const params_type &params,
-                                              std::size_t component_start_row) {
-                    std::size_t row = component_start_row;
-                }
+                variable_base_multiplication_per_bit(std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
+                         std::initializer_list<typename component_type::constant_container_type::value_type>
+                             constants,
+                         std::initializer_list<typename component_type::public_input_container_type::value_type>
+                             public_inputs) :
+                    component_type(witnesses, constants, public_inputs) {};
             };
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            using plonk_ed25519_mul_per_bit = variable_base_multiplication_per_bit<
+                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                CurveType,
+                typename crypto3::algebra::curves::ed25519,
+                9,
+                basic_non_native_policy<BlueprintFieldType>>;
+
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+                generate_assignments(
+                    const plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                    const typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                    const std::uint32_t start_row_index) {
+
+                    using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
+                    using var = typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                    using Ed25519Type = typename crypto3::algebra::curves::ed25519;
+                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
+
+                    using doubling_component = doubling<
+                        ArithmetizationType, CurveType, Ed25519Type, 9, non_native_policy_type>;
+
+                    using complete_addition_component = complete_addition<
+                        ArithmetizationType, CurveType, Ed25519Type, 9, non_native_policy_type>;
+
+                    using bool_scalar_multiplication_component = bool_scalar_multiplication<
+                        ArithmetizationType, Ed25519Type, 9, non_native_policy_type>;
+
+                    doubling_component doubling_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{component.C(0)},{});
+
+                    complete_addition_component complete_addition_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{component.C(0)},{});
+
+                    bool_scalar_multiplication_component bool_scalar_multiplication_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{},{});
+
+                    std::size_t row = start_row_index;
+                    std::array<var, 4> T_x = instance_input.T.x;
+                    std::array<var, 4> T_y = instance_input.T.y;
+                    std::array<var, 4> R_x = instance_input.R.x;
+                    std::array<var, 4> R_y = instance_input.R.y;
+
+                    typename bool_scalar_multiplication_component::result_type bool_mul_res =
+                        generate_assignments(bool_scalar_multiplication_instance, assignment,
+                        typename bool_scalar_multiplication_component::input_type({{T_x, T_y}, instance_input.k}), row);
+                    row += bool_scalar_multiplication_component::rows_amount;
+
+                    typename doubling_component::result_type doubling_res =
+                        generate_assignments(doubling_instance, assignment,
+                        typename doubling_component::input_type({R_x, R_y}), row);
+                    row += doubling_component::rows_amount;
+
+                    typename complete_addition_component::result_type add_res =
+                        generate_assignments(complete_addition_instance, assignment,
+                        typename complete_addition_component::input_type(
+                            {{doubling_res.output.x, doubling_res.output.y},
+                             {bool_mul_res.output.x, bool_mul_res.output.y}}), row);
+                    row += complete_addition_component::rows_amount;
+
+                    return typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
+
+                }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+                generate_circuit(
+                    const plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                    const typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                    const std::uint32_t start_row_index) {
+
+                    using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
+                    using var = typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                    using Ed25519Type = typename crypto3::algebra::curves::ed25519;
+                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                        ArithmetizationType;
+
+                    using doubling_component = doubling<
+                        ArithmetizationType, CurveType, Ed25519Type, 9, non_native_policy_type>;
+
+                    using complete_addition_component = complete_addition<
+                        ArithmetizationType, CurveType, Ed25519Type, 9, non_native_policy_type>;
+
+                    using bool_scalar_multiplication_component = bool_scalar_multiplication<
+                        ArithmetizationType, Ed25519Type, 9, non_native_policy_type>;
+
+                    doubling_component doubling_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{component.C(0)},{});
+
+                    complete_addition_component complete_addition_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{component.C(0)},{});
+
+                    bool_scalar_multiplication_component bool_scalar_multiplication_instance(
+                        {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                            component.W(5), component.W(6), component.W(7), component.W(8)},{},{});
+
+                    std::size_t row = start_row_index;
+                    std::array<var, 4> T_x = instance_input.T.x;
+                    std::array<var, 4> T_y = instance_input.T.y;
+                    std::array<var, 4> R_x = instance_input.R.x;
+                    std::array<var, 4> R_y = instance_input.R.y;
+
+                    typename bool_scalar_multiplication_component::result_type bool_mul_res =
+                        generate_circuit(bool_scalar_multiplication_instance, bp, assignment,
+                        typename bool_scalar_multiplication_component::input_type({{T_x, T_y}, instance_input.k}), row);
+                    row += bool_scalar_multiplication_component::rows_amount;
+
+                    typename doubling_component::result_type doubling_res =
+                        generate_circuit(doubling_instance, bp, assignment,
+                        typename doubling_component::input_type({R_x, R_y}), row);
+                    row += doubling_component::rows_amount;
+
+                    typename complete_addition_component::result_type add_res =
+                        generate_circuit(complete_addition_instance, bp, assignment,
+                        typename complete_addition_component::input_type(
+                            {{doubling_res.output.x, doubling_res.output.y},
+                             {bool_mul_res.output.x, bool_mul_res.output.y}}), row);
+                    row += complete_addition_component::rows_amount;
+
+                    return typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
+
+                }
 
         }    // namespace components
     }        // namespace blueprint
