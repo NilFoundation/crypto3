@@ -266,7 +266,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < input_bits.size(); i++) {
                         auto bit_pos = component.bit_position(start_row_index, padding + i);
-                        assignment.witness(component.W(bit_pos.second), bit_pos.first) = input_bits[i];
+                        assignment.witness(component.W(bit_pos.second), bit_pos.first) = (input_bits[i]);
                     }
 
                     field_value_type sum = 0;
