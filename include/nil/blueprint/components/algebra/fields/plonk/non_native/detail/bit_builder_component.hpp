@@ -266,7 +266,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < input_bits.size(); i++) {
                         auto bit_pos = component.bit_position(start_row_index, padding + i);
-                        assignment.witness(component.W(bit_pos.second), bit_pos.first) = (input_bits[i]);
+                        assignment.witness(component.W(bit_pos.second), bit_pos.first) = static_cast<bool>(input_bits[i]);
                     }
 
                     field_value_type sum = 0;
@@ -278,7 +278,7 @@ namespace nil {
                             component.last_bit_gate_pos - padding + (i / 2) * component.bits_per_gate;
 
                         for (; bit_num < max_bit_num; bit_num++) {
-                            sum = 2 * sum + input_bits[bit_num];
+                            sum = 2 * sum + static_cast<bool>(input_bits[bit_num]);
                         }
 
                         assignment.witness(component.W(sum_bit_pos.second), sum_bit_pos.first) = sum;
