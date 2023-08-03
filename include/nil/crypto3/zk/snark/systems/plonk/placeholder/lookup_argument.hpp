@@ -105,15 +105,15 @@ namespace nil {
                                     int k = 0;
                                     std::vector<typename FieldType::value_type> input_assignment;
                                     std::vector<typename FieldType::value_type> value_assignment;
-                                    switch (lookup.vars[0].type) {
+                                    switch (lookup.get_vars()[0].type) {
                                         case VariableType::column_type::witness:
-                                            input_assignment = plonk_columns.witness(lookup.vars[0].index);
+                                            input_assignment = plonk_columns.witness(lookup.get_vars()[0].index);
                                             break;
                                         case VariableType::column_type::public_input:
-                                            input_assignment = plonk_columns.public_input(lookup.vars[0].index);
+                                            input_assignment = plonk_columns.public_input(lookup.get_vars()[0].index);
                                             break;
                                         case VariableType::column_type::constant:
-                                            input_assignment = plonk_columns.constant(lookup.vars[0].index);
+                                            input_assignment = plonk_columns.constant(lookup.get_vars()[0].index);
                                             break;
                                         case VariableType::column_type::selector:
                                             break;
@@ -138,9 +138,9 @@ namespace nil {
                                         F_compr_input[t] =
                                             F_compr_input[t] +
                                             theta_acc *
-                                                input_assignment[(j + lookup.vars[0].rotation) %
+                                                input_assignment[(j + lookup.get_vars()[0].rotation) %
                                                                  input_assignment.size()] *
-                                                lookup.coeff *
+                                                lookup.get_coeff() *
                                                 plonk_columns.selector(lookup_gates[i].selector_index)[t];
                                         F_compr_value[t] =
                                             F_compr_value[t] +
@@ -290,8 +290,8 @@ namespace nil {
                                      lookup_gates[i].constraints[j].lookup_input) {
                                     int k = 0;
                                     std::tuple<std::size_t, int, typename VariableType::column_type> input_key =
-                                        std::make_tuple(lookup.vars[0].index, lookup.vars[0].rotation,
-                                                        lookup.vars[0].type);
+                                        std::make_tuple(lookup.get_vars()[0].index, lookup.get_vars()[0].rotation,
+                                                        lookup.get_vars()[0].type);
                                     std::tuple<std::size_t, int, typename VariableType::column_type> value_key =
                                         std::make_tuple(lookup_gates[i].constraints[j].lookup_value[k].index,
                                                         lookup_gates[i].constraints[j].lookup_value[k].rotation,
@@ -302,7 +302,7 @@ namespace nil {
                                             std::make_tuple(lookup_gates[i].selector_index, 0,
                                                             plonk_variable<typename FieldType::value_type>::column_type::selector);
 
-                                    F_input_compr = F_input_compr + theta_acc * evaluations[input_key] * lookup.coeff *
+                                    F_input_compr = F_input_compr + theta_acc * evaluations[input_key] * lookup.get_coeff() *
                                                                         evaluations[selector_key];
 
                                     F_value_compr =
