@@ -37,12 +37,6 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            namespace detail {
-                    enum bit_shift_mode {
-                    LEFT,
-                    RIGHT,
-                };
-            }   // namespace detail
             using detail::bit_shift_mode;
 
             template<typename ArithmetizationType, typename CurveType, typename Ed25519Type,
