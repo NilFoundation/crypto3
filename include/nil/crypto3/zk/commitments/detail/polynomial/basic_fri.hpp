@@ -693,8 +693,8 @@ namespace nil {
                 }
 
                 template<typename FRI>
-                static bool verify_eval(const typename FRI::proof_type                                                  &proof,
-                                        const typename FRI::params_type                                                 &fri_params,
+                static bool verify_eval(const typename FRI::proof_type                                            &proof,
+                                        const typename FRI::params_type                                           &fri_params,
                                         const std::array<typename FRI::commitment_type, FRI::batches_num>         &commitments,
                                         const typename FRI::field_type::value_type                                theta,
                                         const std::vector<std::size_t>                                            &evals_map,

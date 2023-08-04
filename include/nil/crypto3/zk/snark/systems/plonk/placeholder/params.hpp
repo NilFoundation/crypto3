@@ -36,13 +36,14 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
                 template<typename FieldType, typename ArithmetizationParams,
                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
                          typename TranscriptHashType = hashes::keccak_1600<512>, 
                          std::size_t Lambda = 40,
                          std::size_t R = 1, 
                          std::size_t M = 2, 
-                         std::size_t BatchesNum = 4>
+                         std::size_t BatchesNum = 5>
                 struct placeholder_params {
 
                     typedef MerkleTreeHashType merkle_hash_type;

@@ -118,8 +118,8 @@ namespace nil {
                                 Z[0] = -FieldType::value_type::one();
                                 Z[Z.size()-1] = FieldType::value_type::one();
 
-                                // lagrange_0(in dfs form):  0,0,...,1,0,0,...,0
-                                lagrange_0[usable_rows] = FieldType::value_type::one();
+                                // lagrange_0(in dfs form):  1,0,...,0,0,0,...,0
+                                lagrange_0[0] = FieldType::value_type::one();
                             }
 
                             // Constructor for marshalling. Domain is regenerated.
@@ -139,8 +139,8 @@ namespace nil {
                                 Z[0] = -FieldType::value_type::one();
                                 Z[Z.size()-1] = FieldType::value_type::one();
 
-                                // lagrange_0:  0,0,...,1,0,0,...,0
-                                lagrange_0[usable_rows] = FieldType::value_type::one();
+                                // lagrange_0:  1, 0,...,0
+                                lagrange_0[0] = FieldType::value_type::one();
 
                                 basic_domain = math::make_evaluation_domain<FieldType>(rows);
                             }
@@ -312,7 +312,7 @@ namespace nil {
                                 } 
                             }
                         }
-
+                        
                         return result;
                     }
 
@@ -491,7 +491,8 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         typename preprocessed_data_type::common_data_type common_data (
-                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount,
+                            public_commitments, c_rotations,  
+                            N_rows, usable_rows,
                             max_gates_degree);
 
                         preprocessed_data_type preprocessed_data({public_polynomial_table, sigma_perm_polys,

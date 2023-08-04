@@ -32,9 +32,15 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                constexpr std::size_t VARIABLE_VALUES_BATCH = 0;
+                constexpr std::size_t LOOKUP_BATCH = 1;
+                constexpr std::size_t PERMUTATION_BATCH =2;
+                constexpr std::size_t QUOTIENT_BATCH = 3;
+                constexpr std::size_t FIXED_VALUES_BATCH = 4;
+
 
                 /**
-                 * A proof for the Placeholder cheme.
+                 * A proof for the Placeholder scheme.
                  *
                  * While the proof has a structure, externally one merely opaquely produces,
                  * serializes/deserializes, and verifies proofs. We only expose some information
@@ -53,13 +59,10 @@ namespace nil {
                         typename FieldType::value_type lagrange_0;
 
                         typename commitment_scheme_type::proof_type combined_value;
-                        std::vector<typename commitment_scheme_type::proof_type> lookups;
-
 
                         bool operator==(const evaluation_proof &rhs) const {
                             return challenge == rhs.challenge && lagrange_0 == rhs.lagrange_0 &&
-                                    combined_value == rhs.combined_value &&
-                                   lookups == rhs.lookups;
+                                    combined_value == rhs.combined_value;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);
@@ -70,6 +73,7 @@ namespace nil {
                     }
 
                     typename commitment_scheme_type::commitment_type variable_values_commitment;
+                    typename commitment_scheme_type::commitment_type lookup_commitment;
                     typename commitment_scheme_type::commitment_type v_perm_commitment;
                     typename commitment_scheme_type::commitment_type T_commitment;
                     typename commitment_scheme_type::commitment_type fixed_values_commitment;
