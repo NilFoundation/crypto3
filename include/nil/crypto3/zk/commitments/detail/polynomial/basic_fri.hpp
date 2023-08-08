@@ -700,7 +700,7 @@ namespace nil {
                                         const std::vector<std::size_t>                                            &evals_map,
                                         const std::vector<math::polynomial<typename FRI::field_type::value_type>> &combined_U,
                                         const std::vector<math::polynomial<typename FRI::field_type::value_type>> &denominators,
-                                        typename FRI::transcript_type transcript = typename FRI::transcript_type()
+                                        typename FRI::transcript_type &transcript = typename FRI::transcript_type()
                 ) {
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
                     BOOST_ASSERT(combined_U.size() == denominators.size());
