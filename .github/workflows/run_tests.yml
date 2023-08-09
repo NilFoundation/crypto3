@@ -104,7 +104,7 @@ jobs:
       - name: Run test
         working-directory: ./build
         run: |
-            cd libs/marshlalling/zk/test
+            cd libs/marshalling/zk/test
             COLOR='\033[0;33m'
             echo -e "${COLOR}${{ matrix.target }}"
             ./${{ matrix.target }}
