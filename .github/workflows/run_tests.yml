@@ -80,7 +80,6 @@ jobs:
           marshalling_interfaces_test
           marshalling_lpc_commitment_test
           marshalling_merkle_proof_test
-          marshalling_pack_example
           marshalling_pack_test
           marshalling_placeholder_common_data_test
           marshalling_placeholder_proof_test
