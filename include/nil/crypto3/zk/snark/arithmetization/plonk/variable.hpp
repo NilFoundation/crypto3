@@ -117,7 +117,7 @@ namespace nil {
                     }
 
                     math::term<plonk_variable<AssignmentType>> operator-() const {
-                        return math::term<plonk_variable<AssignmentType>>(*this) * (-assignment_type::one());
+                        return -math::term<plonk_variable<AssignmentType>>(*this);
                     }
 
                     bool operator==(const plonk_variable &other) const {
