@@ -137,7 +137,6 @@ namespace nil {
                     if (this->terms.size() != other.terms.size())
                         return false;
 
-                    std::unordered_map<term_type, int> unique_terms;
                     // Put both terms and other->terms into a hashmap, and check if
                     // everything is equal.
                     std::unordered_map<term_type, int> terms_map;
