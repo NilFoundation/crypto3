@@ -69,14 +69,14 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          marshalling_fri_commitment_test
-          marshalling_lpc_commitment_test
-          marshalling_placeholder_common_data_test
-          marshalling_placeholder_proof_test
-          marshalling_sparse_vector_test
-          marshalling_plonk_constraint_system_test
-          marshalling_r1cs_gg_ppzksnark_primary_input_test
-          marshalling_r1cs_gg_ppzksnark_proof_test
+          marshalling_fri_commitment_test,
+          marshalling_lpc_commitment_test,
+          marshalling_placeholder_common_data_test,
+          marshalling_placeholder_proof_test,
+          marshalling_sparse_vector_test,
+          marshalling_plonk_constraint_system_test,
+          marshalling_r1cs_gg_ppzksnark_primary_input_test,
+          marshalling_r1cs_gg_ppzksnark_proof_test,
           marshalling_r1cs_gg_ppzksnark_verification_key_test
 #         Test should be fixed
 #          marshalling_merkle_proof_test
