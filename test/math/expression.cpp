@@ -27,6 +27,7 @@
 #include <string>
 #include <random>
 #include <iostream>
+#include <set>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
