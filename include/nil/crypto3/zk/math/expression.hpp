@@ -236,7 +236,6 @@ namespace nil {
                 std::unordered_map<variable_type, int> to_unordered_map() const;
 
                 std::size_t get_hash() const {
-std::cout << "Hash of " << *this << " is " << hash << std::endl;
                     return hash;
                 }
 
@@ -251,7 +250,6 @@ std::cout << "Hash of " << *this << " is " << hash << std::endl;
                         boost::hash_combine(result, vars_hasher(var));
                     }
                     hash = result;
-std::cout << "Updated:  Hash of " << *this << " is " << hash << std::endl;
                 }
 
                 const std::vector<variable_type>& get_vars() const {
