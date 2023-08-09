@@ -30,13 +30,6 @@ jobs:
           repository: ${{ env.SUITE_REPO }}
           submodules: recursive
 
-      - name: Checkout blueprint
-        uses: actions/checkout@master
-        with:
-          repository: "NilFoundation/zkllvm-blueprint"
-          path: ./libs/blueprint
-          submodules: recursive
-
       - name: Checkout source code
         uses: actions/checkout@v3
         with:
