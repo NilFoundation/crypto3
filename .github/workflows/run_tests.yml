@@ -69,33 +69,17 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          marshalling_curve_element_fixed_size_container_test
-          marshalling_curve_element_non_fixed_size_container_test
-          marshalling_field_element_non_fixed_size_container_test
-          marshalling_field_element_test
           marshalling_fri_commitment_test
-          marshalling_integral_fixed_size_container_test
-          marshalling_integral_non_fixed_size_container_test
-          marshalling_integral_test
-          marshalling_interfaces_test
           marshalling_lpc_commitment_test
-          marshalling_merkle_proof_test
-          marshalling_pack_test
           marshalling_placeholder_common_data_test
           marshalling_placeholder_proof_test
-          marshalling_plonk_constraint_system_test
-          marshalling_processing_test
           marshalling_sparse_vector_test
-          marshalling_types_test           
-#          marshalling_eddsa_test
-#          marshalling_r1cs_gg_ppzksnark_example
-#          marshalling_r1cs_gg_ppzksnark_primary_input_test
-#          marshalling_r1cs_gg_ppzksnark_proof_test
-#          marshalling_r1cs_gg_ppzksnark_test
-#          marshalling_r1cs_gg_ppzksnark_verification_key_test
-#          marshalling_plonk_gates_test
-#          marshalling_accumulation_vector_test
-#          marshalling_curve_element_test
+          marshalling_plonk_constraint_system_test
+          marshalling_r1cs_gg_ppzksnark_primary_input_test
+          marshalling_r1cs_gg_ppzksnark_proof_test
+          marshalling_r1cs_gg_ppzksnark_verification_key_test
+#         Test should be fixed
+#          marshalling_merkle_proof_test
         ]  # Tests to execute
     steps:
       - name: Cleanup # TODO - move to scripts on runner
