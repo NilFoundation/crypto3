@@ -71,14 +71,12 @@ jobs:
         target: [
           marshalling_curve_element_fixed_size_container_test
           marshalling_curve_element_non_fixed_size_container_test
-          marshalling_endian_example
           marshalling_field_element_non_fixed_size_container_test
           marshalling_field_element_test
           marshalling_fri_commitment_test
           marshalling_integral_fixed_size_container_test
           marshalling_integral_non_fixed_size_container_test
           marshalling_integral_test
-          marshalling_interfaces_example
           marshalling_interfaces_test
           marshalling_lpc_commitment_test
           marshalling_merkle_proof_test
