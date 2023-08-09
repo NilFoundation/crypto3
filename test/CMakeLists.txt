@@ -19,7 +19,6 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        crypto3::multiprecision
                        crypto3::algebra
                        crypto3::zk
-                       crypto3::blueprint
                        crypto3::pubkey
                        crypto3::pkpad
                        crypto3::hash
