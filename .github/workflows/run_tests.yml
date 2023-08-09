@@ -121,12 +121,17 @@ jobs:
 
       - name: Build
         working-directory: ./build
-        run: cmake --build . -t ${{ matrix.target }}
+        run: |
+          cmake --build . --target crypto3_zk_commitment_fold_polynomial_test
+          cmake --build . --target crypto3_zk_commitment_fri_test
+          cmake --build . --target crypto3_zk_commitment_lpc_test
+          cmake --build . --target crypto3_zk_systems_plonk_placeholder_placeholder_test
+
 
       - name: Run test
         working-directory: ./build
         run: |
-          cd libs/${{ env.LIB_NAME }}/test
-          COLOR='\033[0;33m'
-          echo -e "${COLOR}${{ matrix.target }}"
-          ./${{ matrix.target }}
+          ./libs/zk/test/crypto3_zk_commitment_fold_polynomial_test
+          ./libs/zk/test/crypto3_zk_commitment_fri_test
+          ./libs/zk/test/crypto3_zk_commitment_lpc_test
+          ./libs/zk/test/crypto3_zk_systems_plonk_placeholder_placeholder_test
