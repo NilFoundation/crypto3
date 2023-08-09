@@ -402,6 +402,7 @@ namespace nil {
                 term<VariableType> result(this->vars);
                 std::copy(other.vars.begin(), other.vars.end(), std::back_inserter(result.vars));
                 result.coeff = other.coeff * this->coeff;
+                result.update_hash();
                 return result; 
             }
 
