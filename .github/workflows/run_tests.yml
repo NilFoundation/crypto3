@@ -31,7 +31,7 @@ jobs:
           submodules: recursive
 
       - name: Checkout blueprint
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
         with:
           repository: "NilFoundation/zkllvm-blueprint"
           path: ./libs/blueprint
@@ -43,7 +43,7 @@ jobs:
           path: ./libs/${{ env.LIB_NAME }}
           submodules: recursive
 
-        - name: Cmake and build
+      - name: Cmake and build
         env:
           CMAKE_ARGS: "
             -DCMAKE_BUILD_TYPE=Debug
