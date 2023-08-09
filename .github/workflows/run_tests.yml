@@ -1,7 +1,7 @@
 name: Run tests
 
 on:
-  [push]
+  [push, pull_request]
   # Let's run it on any commit
   # Triggers the workflow on pull request events but only for the master branch
   #pull_request:
