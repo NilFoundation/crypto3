@@ -79,7 +79,8 @@ jobs:
             crypto3_zk_commitment_r1cs_gg_ppzksnark_mpc_test,
             crypto3_zk_math_expression_test,
             crypto3_zk_systems_plonk_plonk_constraint_test
-
+            crypto3_zk_commitment_kzg_test
+            
             # Performance tests pass, but they are excluded from here due to speed.
             # crypto3_zk_commitment_lpc_performance_test
 

@@ -30,6 +30,7 @@
 
 #include <tuple>
 #include <vector>
+#include <set>
 #include <type_traits>
 
 #include <boost/assert.hpp>
