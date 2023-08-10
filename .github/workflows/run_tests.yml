@@ -1,12 +1,14 @@
 name: Run tests
 
 on:
+  # Let's run it on any commit
+  [push]
   # Triggers the workflow on pull request events but only for the master branch
-  pull_request:
-    branches: [ master ]
+  #pull_request:
+  #  branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  #workflow_dispatch:
 
 env:
   SUITE_REPO: "NilFoundation/crypto3"
@@ -23,7 +25,7 @@ jobs:
           rm -rf ./.??* || true
 
       - name: Checkout suite
-        uses: actions/checkout@v3
+        uses: actions/checkout@61-update-github-actions
         with:
           repository: ${{ env.SUITE_REPO }}
           submodules: recursive
@@ -67,12 +69,12 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-            crypto3_zk_commitment_fold_polynomial_test
-            crypto3_zk_commitment_fri_test
-            crypto3_zk_commitment_lpc_test
-            crypto3_zk_systems_plonk_placeholder_placeholder_test
-            crypto3_zk_commitment_powers_of_tau_test
-            crypto3_zk_commitment_proof_of_knowledge_test
+            crypto3_zk_commitment_fold_polynomial_test,
+            crypto3_zk_commitment_fri_test,
+            crypto3_zk_commitment_lpc_test,
+            crypto3_zk_systems_plonk_placeholder_placeholder_test,
+            crypto3_zk_commitment_powers_of_tau_test,
+            crypto3_zk_commitment_proof_of_knowledge_test,
             crypto3_zk_commitment_r1cs_gg_ppzksnark_mpc_test
             crypto3_zk_math_expression_test
             crypto3_zk_systems_plonk_plonk_constraint_test

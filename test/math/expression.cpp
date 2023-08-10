@@ -27,6 +27,7 @@
 #include <string>
 #include <random>
 #include <iostream>
+#include <set>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -37,6 +38,7 @@
 
 #include <nil/crypto3/zk/math/expression.hpp>
 #include <nil/crypto3/zk/math/expression_visitors.hpp>
+#include <nil/crypto3/zk/math/expression_evaluator.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 using namespace nil::crypto3;
@@ -80,7 +82,7 @@ BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
 
     expression<variable_type> expr = (w0 + w1) * (w2 + w3);
    
-    expression_evaluator<variable_type, variable_type::assignment_type> evaluator(
+    expression_evaluator<variable_type> evaluator(
         expr,
         [&w0, &w1, &w2, &w3](const variable_type& var) {
             if (var == w0) return variable_type::assignment_type(1);

@@ -153,7 +153,7 @@ namespace nil {
                     const std::array<typename LPC::precommitment_type, LPC::basic_fri::batches_num> &precommitments,
                     std::array<std::vector<math::polynomial<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                    typename LPC::basic_fri::transcript_type &transcript
                 ) {
                     for(std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
                         transcript(commit<typename LPC::basic_fri>(precommitments[i]));
@@ -232,7 +232,7 @@ namespace nil {
                     const std::array<typename LPC::precommitment_type, LPC::basic_fri::batches_num> &precommitments,
                     std::array<std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &g,
                     const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                    typename LPC::basic_fri::transcript_type &transcript
                 ) {
                     for(std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
                         transcript(commit<typename LPC::basic_fri>(precommitments[i]));
@@ -323,7 +323,7 @@ namespace nil {
                     const typename LPC::proof_type &proof,
                     const std::array<typename LPC::commitment_type, LPC::basic_fri::batches_num> &commitments,
                     const typename LPC::basic_fri::params_type fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
+                    typename LPC::basic_fri::transcript_type &transcript
                 ) {
                     for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
                         transcript(commitments[k]);
