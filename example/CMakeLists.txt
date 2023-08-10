@@ -23,7 +23,6 @@ macro(define_marshalling_example name)
                           crypto3::multiprecision
                           crypto3::algebra
                           crypto3::zk
-                          crypto3::blueprint
                           ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
                           ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
                           ${CMAKE_WORKSPACE_NAME}::crypto3_zk
