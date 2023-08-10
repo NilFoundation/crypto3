@@ -25,8 +25,9 @@ jobs:
           rm -rf ./.??* || true
 
       - name: Checkout suite
-        uses: actions/checkout@61-update-github-actions
+        uses: actions/checkout@v3
         with:
+          ref: 61-update-github-actions
           repository: ${{ env.SUITE_REPO }}
           submodules: recursive
 
