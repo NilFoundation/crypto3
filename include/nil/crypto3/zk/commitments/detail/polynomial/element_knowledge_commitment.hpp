@@ -59,20 +59,27 @@ namespace nil {
                         typename Type2::value_type h;
 
                         element_kc() = default;
+
                         element_kc(const element_kc &other) = default;
+
                         element_kc(element_kc &&other) = default;
+
                         element_kc(const typename Type1::value_type &g, const typename Type2::value_type &h) :
-                            g(g), h(h) {
+                                g(g), h(h) {
                         }
 
                         element_kc &operator=(const element_kc &other) = default;
+
                         element_kc &operator=(element_kc &&other) noexcept = default;
+
                         element_kc operator+(const element_kc &other) const {
                             return element_kc(this->g + other.g, this->h + other.h);
                         }
+
                         element_kc mixed_add(const element_kc &other) const {
                             return element_kc(this->g.mixed_add(other.g), this->h.mixed_add(other.h));
                         }
+
                         element_kc doubled() const {
                             return element_kc(this->g.doubled(), this->h.doubled());
                         }
@@ -80,6 +87,7 @@ namespace nil {
                         element_kc to_projective() {
                             return element_kc(this->g.to_projective(), this->h.to_projective());
                         }
+
                         bool is_special() const {
                             return this->g->is_special() && this->h->is_special();
                         }
@@ -87,9 +95,11 @@ namespace nil {
                         bool is_zero() const {
                             return (g.is_zero() && h.is_zero());
                         }
+
                         bool operator==(const element_kc &other) const {
                             return (this->g == other.g && this->h == other.h);
                         }
+
                         bool operator!=(const element_kc &other) const {
                             return !((*this) == other);
                         }
@@ -97,6 +107,7 @@ namespace nil {
                         static element_kc zero() {
                             return element_kc(Type1::value_type::zero(), Type2::value_type::zero());
                         }
+
                         static element_kc one() {
                             return element_kc(Type1::value_type::one(), Type2::value_type::one());
                         }
@@ -160,43 +171,43 @@ namespace nil {
                     };
 
                     template<typename Type1,
-                             typename Type2,
-                             typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
-                    element_kc<Type1, Type2> operator*(const multiprecision::number<Backend, ExpressionTemplates> &lhs,
+                            typename Type2,
+                            typename Backend,
+                            multiprecision::expression_template_option ExpressionTemplates>
+                    element_kc<Type1, Type2> operator*(const multiprecision::number <Backend, ExpressionTemplates> &lhs,
                                                        const element_kc<Type1, Type2> &rhs) {
                         return element_kc<Type1, Type2>(lhs * rhs.g, lhs * rhs.h);
                     }
 
                     template<typename Type1,
-                             typename Type2,
-                             typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
+                            typename Type2,
+                            typename Backend,
+                            multiprecision::expression_template_option ExpressionTemplates>
                     element_kc<Type1, Type2>
-                        operator*(const element_kc<Type1, Type2> &lhs,
-                                  const multiprecision::number<Backend, ExpressionTemplates> &rhs) {
+                    operator*(const element_kc<Type1, Type2> &lhs,
+                              const multiprecision::number <Backend, ExpressionTemplates> &rhs) {
                         return element_kc<Type1, Type2>(rhs * lhs.g, rhs * lhs.h);
                     }
 
                     template<typename Type1,
-                             typename Type2,
-                             typename FieldValueType,
-                             typename = typename std::enable_if<
-                                 algebra::is_field<typename FieldValueType::field_type>::value &&
-                                     !algebra::is_extended_field<typename FieldValueType::field_type>::value,
-                                 FieldValueType>::type>
+                            typename Type2,
+                            typename FieldValueType,
+                            typename = typename std::enable_if<
+                                    algebra::is_field<typename FieldValueType::field_type>::value &&
+                                    !algebra::is_extended_field<typename FieldValueType::field_type>::value,
+                                    FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const FieldValueType &lhs, const element_kc<Type1, Type2> &rhs) {
 
                         return lhs.data * rhs;
                     }
 
                     template<typename Type1,
-                             typename Type2,
-                             typename FieldValueType,
-                             typename = typename std::enable_if<
-                                 algebra::is_field<typename FieldValueType::field_type>::value &&
-                                     !algebra::is_extended_field<typename FieldValueType::field_type>::value,
-                                 FieldValueType>::type>
+                            typename Type2,
+                            typename FieldValueType,
+                            typename = typename std::enable_if<
+                                    algebra::is_field<typename FieldValueType::field_type>::value &&
+                                    !algebra::is_extended_field<typename FieldValueType::field_type>::value,
+                                    FieldValueType>::type>
                     element_kc<Type1, Type2> operator*(const element_kc<Type1, Type2> &lhs, const FieldValueType &rhs) {
 
                         return lhs * rhs.data;

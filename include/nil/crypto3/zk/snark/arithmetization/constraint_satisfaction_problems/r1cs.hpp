@@ -63,7 +63,8 @@ namespace nil {
 
                     math::linear_combination<VariableType> a, b, c;
 
-                    r1cs_constraint() {};
+                    r1cs_constraint() = default;
+
                     r1cs_constraint(const math::linear_combination<VariableType> &a,
                                     const math::linear_combination<VariableType> &b,
                                     const math::linear_combination<VariableType> &c) :

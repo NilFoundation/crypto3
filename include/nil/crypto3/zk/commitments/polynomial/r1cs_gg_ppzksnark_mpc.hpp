@@ -70,19 +70,19 @@ namespace nil {
                     // and should thus be destroyed
                     static private_key_type generate_private_key() {
                         typename scalar_field_type::value_type delta = algebra::random_element<scalar_field_type>();
-                        return private_key_type {std::move(delta)};
+                        return private_key_type{std::move(delta)};
                     }
 
                     static public_key_type proof_eval(const private_key_type &private_key,
                                                       const boost::optional<public_key_type> &previous_public_key,
                                                       const proving_scheme_keypair_type &mpc_keypair) {
                         std::vector<std::uint8_t> transcript =
-                            compute_transcript(mpc_keypair.first.constraint_system, previous_public_key);
+                                compute_transcript(mpc_keypair.first.constraint_system, previous_public_key);
                         auto delta_pok = proof_of_knowledge_scheme_type::proof_eval(private_key.delta, transcript, 0);
                         g1_value_type delta_after =
-                            private_key.delta *
-                            (previous_public_key ? previous_public_key->delta_after : g1_value_type::one());
-                        return public_key_type {std::move(delta_after), std::move(delta_pok)};
+                                private_key.delta *
+                                (previous_public_key ? previous_public_key->delta_after : g1_value_type::one());
+                        return public_key_type{std::move(delta_after), std::move(delta_pok)};
                     }
 
                     static bool verify_eval(const proving_scheme_keypair_type &mpc_keypair,
@@ -90,7 +90,7 @@ namespace nil {
                                             const constraint_system_type &constraint_system,
                                             const detail::powers_of_tau_result<curve_type> &powers_of_tau_result) {
                         auto initial_keypair = detail::make_r1cs_gg_ppzksnark_keypair_from_powers_of_tau(
-                            constraint_system, powers_of_tau_result);
+                                constraint_system, powers_of_tau_result);
 
                         // H/L will change, but should have same length
                         if (initial_keypair.first.H_query.size() != mpc_keypair.first.H_query.size()) {
@@ -139,9 +139,9 @@ namespace nil {
 
                         auto transcript = compute_transcript(mpc_keypair.first.constraint_system, boost::none);
                         auto current_delta = g1_value_type::one();
-                        for (auto pk : pubkeys) {
+                        for (auto pk: pubkeys) {
                             auto g2_s = proof_of_knowledge_scheme_type::compute_g2_s(
-                                pk.delta_pok.g1_s, pk.delta_pok.g1_s_x, transcript, 0);
+                                    pk.delta_pok.g1_s, pk.delta_pok.g1_s_x, transcript, 0);
 
                             if (!proof_of_knowledge_scheme_type::verify_eval(pk.delta_pok, g2_s)) {
                                 return false;
@@ -198,8 +198,8 @@ namespace nil {
                     }
 
                     static std::vector<std::uint8_t>
-                        compute_transcript(const constraint_system_type &constraint_system,
-                                           const boost::optional<public_key_type> &pubkey) {
+                    compute_transcript(const constraint_system_type &constraint_system,
+                                       const boost::optional<public_key_type> &pubkey) {
                         std::vector<uint8_t> cs_blob = serialize_constraint_system(constraint_system);
                         std::vector<std::uint8_t> cs_pk_blob;
                         std::copy(std::cbegin(cs_blob), std::cend(cs_blob), std::back_inserter(cs_pk_blob));
@@ -213,8 +213,8 @@ namespace nil {
                     static std::vector<std::uint8_t> serialize_public_key(const public_key_type &pubkey) {
                         using endianness = nil::marshalling::option::little_endian;
                         auto filled_val =
-                            nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_mpc_public_key<public_key_type,
-                                                                                                    endianness>(pubkey);
+                                nil::crypto3::marshalling::types::fill_r1cs_gg_ppzksnark_mpc_public_key<public_key_type,
+                                        endianness>(pubkey);
                         std::vector<std::uint8_t> blob(filled_val.length());
                         auto it = std::begin(blob);
                         nil::marshalling::status_type status = filled_val.write(it, blob.size());
@@ -226,12 +226,12 @@ namespace nil {
                     }
 
                     static std::vector<std::uint8_t>
-                        serialize_constraint_system(const constraint_system_type &constraint_system) {
+                    serialize_constraint_system(const constraint_system_type &constraint_system) {
                         using endianness = nil::marshalling::option::little_endian;
                         auto filled_val =
-                            nil::crypto3::marshalling::types::fill_r1cs_constraint_system<constraint_system_type,
-                                                                                          endianness>(
-                                constraint_system);
+                                nil::crypto3::marshalling::types::fill_r1cs_constraint_system<constraint_system_type,
+                                        endianness>(
+                                        constraint_system);
                         std::vector<std::uint8_t> blob(filled_val.length());
                         auto it = std::begin(blob);
                         nil::marshalling::status_type status = filled_val.write(it, blob.size());

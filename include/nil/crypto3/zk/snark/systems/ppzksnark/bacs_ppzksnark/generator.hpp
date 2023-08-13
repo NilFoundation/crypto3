@@ -32,7 +32,7 @@
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/bacs_ppzksnark/detail/basic_policy.hpp>
 
-#include <nil/crypto3/zk/snark/algorithms/generate.hpp>
+#include <nil/crypto3/zk/algorithms/generate.hpp>
 
 namespace nil {
     namespace crypto3 {

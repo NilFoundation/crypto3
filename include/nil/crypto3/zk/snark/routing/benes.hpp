@@ -43,7 +43,7 @@
 
 #include <vector>
 
-#include <nil/crypto3/zk/snark/integer_permutation.hpp>
+#include <nil/crypto3/zk/math/integer_permutation.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -97,12 +97,12 @@ namespace nil {
                 /**
                  * Route the given permutation on a Benes network of suitable size.
                  */
-                benes_routing get_benes_routing(const integer_permutation &permutation);
+                benes_routing get_benes_routing(const math::integer_permutation &permutation);
 
                 /**
                  * Check if a routing "implements" the given permutation.
                  */
-                bool valid_benes_routing(const integer_permutation &permutation, const benes_routing &routing);
+                bool valid_benes_routing(const math::integer_permutation &permutation, const benes_routing &routing);
 
                 /**
                  * Compute the mask for all the cross edges originating at a
@@ -238,8 +238,8 @@ namespace nil {
                  * - piinv is the inverse of pi.
                  */
                 void route_benes_inner(size_t dimension,
-                                       const integer_permutation &permutation,
-                                       const integer_permutation &permutation_inv,
+                                       const math::integer_permutation &permutation,
+                                       const math::integer_permutation &permutation_inv,
                                        std::size_t column_idx_start,
                                        std::size_t column_idx_end,
                                        std::size_t subnetwork_offset,
@@ -258,8 +258,8 @@ namespace nil {
                     std::size_t w = subnetwork_offset; /* left-hand-side vertex to be routed. */
                     std::size_t last_unrouted = subnetwork_offset;
 
-                    integer_permutation new_permutation(subnetwork_offset, subnetwork_offset + subnetwork_size - 1);
-                    integer_permutation new_permutation_inv(subnetwork_offset, subnetwork_offset + subnetwork_size - 1);
+                    math::integer_permutation new_permutation(subnetwork_offset, subnetwork_offset + subnetwork_size - 1);
+                    math::integer_permutation new_permutation_inv(subnetwork_offset, subnetwork_offset + subnetwork_size - 1);
 
                     while (true) {
                         /**
@@ -321,14 +321,14 @@ namespace nil {
                         }
                     }
 
-                    const integer_permutation new_permutation_upper =
+                    const math::integer_permutation new_permutation_upper =
                         new_permutation.slice(subnetwork_offset, subnetwork_offset + subnetwork_size / 2 - 1);
-                    const integer_permutation new_permutation_lower = new_permutation.slice(
+                    const math::integer_permutation new_permutation_lower = new_permutation.slice(
                         subnetwork_offset + subnetwork_size / 2, subnetwork_offset + subnetwork_size - 1);
 
-                    const integer_permutation new_permutation_inv_upper =
+                    const math::integer_permutation new_permutation_inv_upper =
                         new_permutation_inv.slice(subnetwork_offset, subnetwork_offset + subnetwork_size / 2 - 1);
-                    const integer_permutation new_permutation_inv_lower = new_permutation_inv.slice(
+                    const math::integer_permutation new_permutation_inv_lower = new_permutation_inv.slice(
                         subnetwork_offset + subnetwork_size / 2, subnetwork_offset + subnetwork_size - 1);
 
                     /* route upper part */
@@ -341,7 +341,7 @@ namespace nil {
                                       routing);
                 }
 
-                benes_routing get_benes_routing(const integer_permutation &permutation) {
+                benes_routing get_benes_routing(const math::integer_permutation &permutation) {
                     std::size_t num_packets = permutation.size();
                     std::size_t num_columns = benes_num_columns(num_packets);
                     std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
@@ -377,7 +377,7 @@ namespace nil {
                     return res;
                 }
 
-                bool valid_benes_routing(const integer_permutation &permutation, const benes_routing &routing) {
+                bool valid_benes_routing(const math::integer_permutation &permutation, const benes_routing &routing) {
                     std::size_t num_packets = permutation.size();
                     std::size_t num_columns = benes_num_columns(num_packets);
 

@@ -64,15 +64,15 @@ namespace nil {
                                              const std::vector<g1_value_type> &alpha_coeffs_g1,
                                              const std::vector<g1_value_type> &beta_coeffs_g1,
                                              const std::vector<g1_value_type> &h) :
-                            alpha_g1(alpha_g1),
-                            beta_g1(beta_g1), beta_g2(beta_g2), coeffs_g1(coeffs_g1), coeffs_g2(coeffs_g2),
-                            alpha_coeffs_g1(alpha_coeffs_g1), beta_coeffs_g1(beta_coeffs_g1), h(h) {
+                                alpha_g1(alpha_g1),
+                                beta_g1(beta_g1), beta_g2(beta_g2), coeffs_g1(coeffs_g1), coeffs_g2(coeffs_g2),
+                                alpha_coeffs_g1(alpha_coeffs_g1), beta_coeffs_g1(beta_coeffs_g1), h(h) {
                         }
 
                         template<unsigned TauPowersLength>
                         static powers_of_tau_result
-                            from_accumulator(const powers_of_tau_accumulator<curve_type, TauPowersLength> &acc,
-                                             std::size_t m) {
+                        from_accumulator(const powers_of_tau_accumulator<curve_type, TauPowersLength> &acc,
+                                         std::size_t m) {
 
                             auto alpha_g1 = acc.alpha_tau_powers_g1[0];
                             auto beta_g1 = acc.beta_tau_powers_g1[0];
@@ -84,16 +84,16 @@ namespace nil {
                             BOOST_ASSERT(domain_g1->m <= TauPowersLength);
 
                             std::vector<g1_value_type> coeffs_g1 = domain_g1->evaluate_all_lagrange_polynomials(
-                                acc.tau_powers_g1.begin(), acc.tau_powers_g1.end());
+                                    acc.tau_powers_g1.begin(), acc.tau_powers_g1.end());
 
                             std::vector<g2_value_type> coeffs_g2 = domain_g2->evaluate_all_lagrange_polynomials(
-                                acc.tau_powers_g2.begin(), acc.tau_powers_g2.end());
+                                    acc.tau_powers_g2.begin(), acc.tau_powers_g2.end());
 
                             std::vector<g1_value_type> alpha_coeffs_g1 = domain_g1->evaluate_all_lagrange_polynomials(
-                                acc.alpha_tau_powers_g1.begin(), acc.alpha_tau_powers_g1.end());
+                                    acc.alpha_tau_powers_g1.begin(), acc.alpha_tau_powers_g1.end());
 
                             std::vector<g1_value_type> beta_coeffs_g1 = domain_g1->evaluate_all_lagrange_polynomials(
-                                acc.beta_tau_powers_g1.begin(), acc.beta_tau_powers_g1.end());
+                                    acc.beta_tau_powers_g1.begin(), acc.beta_tau_powers_g1.end());
 
                             std::vector<g1_value_type> h(m - 1, g1_value_type::zero());
 

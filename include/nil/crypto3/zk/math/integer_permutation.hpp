@@ -31,6 +31,7 @@
 #include <vector>
 #include <unordered_set>
 #include <numeric>
+#include <random>
 
 namespace nil {
     namespace crypto3 {
@@ -48,8 +49,9 @@ namespace nil {
                     contents.resize(size);
                     std::iota(contents.begin(), contents.end(), 0);
                 }
+
                 integer_permutation(const std::size_t min_element, const std::size_t max_element) :
-                    min_element(min_element), max_element(max_element) {
+                        min_element(min_element), max_element(max_element) {
                     assert(min_element <= max_element);
                     const std::size_t size = max_element - min_element + 1;
                     contents.resize(size);
@@ -79,6 +81,7 @@ namespace nil {
                     assert(min_element <= position && position <= max_element);
                     contents[position - min_element] = value;
                 }
+
                 std::size_t get(const std::size_t position) const {
                     assert(min_element <= position && position <= max_element);
                     return contents[position - min_element];
@@ -87,7 +90,7 @@ namespace nil {
                 bool is_valid() const {
                     std::unordered_set<std::size_t> elems;
 
-                    for (auto &el : contents) {
+                    for (auto &el: contents) {
                         if (el < min_element || el > max_element || elems.find(el) != elems.end()) {
                             return false;
                         }
@@ -136,7 +139,10 @@ namespace nil {
                 }
 
                 void random_shuffle() {
-                    return std::random_shuffle(contents.begin(), contents.end());
+                    std::random_device rd;
+                    std::mt19937 g(rd());
+
+                    return std::shuffle(contents.begin(), contents.end(), g);
                 }
             };
 

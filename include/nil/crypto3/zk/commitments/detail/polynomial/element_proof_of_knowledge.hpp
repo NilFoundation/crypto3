@@ -30,12 +30,12 @@ namespace nil {
         namespace zk {
             namespace commitments {
                 namespace detail {
-                template<typename CurveType>
+                    template<typename CurveType>
                     struct element_pok {
                         typedef CurveType curve_type;
                         using g1_value_type = typename CurveType::template g1_type<>::value_type;
                         using g2_value_type = typename CurveType::template g2_type<>::value_type;
-                        
+
                         g1_value_type g1_s;
                         g1_value_type g1_s_x;
                         g2_value_type g2_s_x;
@@ -43,7 +43,7 @@ namespace nil {
                         element_pok(const g1_value_type &g1_s,
                                     const g1_value_type &g1_s_x,
                                     const g2_value_type &g2_s_x) :
-                            g1_s(g1_s), g1_s_x(g1_s_x), g2_s_x(g2_s_x) {
+                                g1_s(g1_s), g1_s_x(g1_s_x), g2_s_x(g2_s_x) {
                         }
                     };
                 } // detail
