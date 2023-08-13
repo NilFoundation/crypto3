@@ -4,7 +4,6 @@
 #include <iostream>
 #include <iomanip>
 #include <random>
-#include <experimental/random>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -34,8 +33,9 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::marshalling;
 
 template<typename Field>
-bool are_plonk_gates_equal(const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
-                           const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
+bool are_plonk_gates_equal(
+        const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
+        const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
     if (lhs.selector_index != rhs.selector_index)
         return false;
     if (lhs.constraints.size() != rhs.constraints.size())
@@ -47,29 +47,29 @@ bool are_plonk_gates_equal(const nil::crypto3::zk::snark::plonk_gate<Field, nil:
     return true;
 }
 
-template <typename ConstraintSystem>
-bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSystem &s2){
-    if(s1.gates().size() != s2.gates().size()) return false;
-    for(size_t i = 0; i < s1.gates().size(); i++){
-        if(!are_plonk_gates_equal(s1.gates()[i], s2.gates()[i])) return false;
+template<typename ConstraintSystem>
+bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSystem &s2) {
+    if (s1.gates().size() != s2.gates().size()) return false;
+    for (size_t i = 0; i < s1.gates().size(); i++) {
+        if (!are_plonk_gates_equal(s1.gates()[i], s2.gates()[i])) return false;
     }
 
-    if(s1.copy_constraints().size() != s2.copy_constraints().size())    return false;
-    for(size_t i = 0; i < s1.copy_constraints().size(); i++){
-        if(std::get<0>(s1.copy_constraints()[i]) != std::get<0>(s2.copy_constraints()[i])) return false;
-        if(std::get<1>(s1.copy_constraints()[i]) != std::get<1>(s2.copy_constraints()[i])) return false;
+    if (s1.copy_constraints().size() != s2.copy_constraints().size()) return false;
+    for (size_t i = 0; i < s1.copy_constraints().size(); i++) {
+        if (std::get<0>(s1.copy_constraints()[i]) != std::get<0>(s2.copy_constraints()[i])) return false;
+        if (std::get<1>(s1.copy_constraints()[i]) != std::get<1>(s2.copy_constraints()[i])) return false;
     }
 
     // TODO check lookup gates are equal
-    if(s1.lookup_gates().size() != s2.lookup_gates().size())return false;
-    for(size_t i = 0; i < s1.lookup_gates().size(); i++){
+    if (s1.lookup_gates().size() != s2.lookup_gates().size())return false;
+    for (size_t i = 0; i < s1.lookup_gates().size(); i++) {
     }
 
     return true;
 }
 
-template <typename ConstraintSystem, typename Endianness>
-void test_constraint_system(ConstraintSystem val){
+template<typename ConstraintSystem, typename Endianness>
+void test_constraint_system(ConstraintSystem val) {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using value_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
 
@@ -86,6 +86,7 @@ void test_constraint_system(ConstraintSystem val){
     value_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_constraint_system<ConstraintSystem, Endianness>(test_val_read);
 
     BOOST_CHECK(are_constraint_systems_equal<ConstraintSystem>(val, constructed_val_read));
@@ -109,12 +110,12 @@ struct placeholder_test_params {
     constexpr static const std::size_t selector_columns = 2;
 
     using arithmetization_params =
-        nil::crypto3::zk::snark::plonk_arithmetization_params<
-            witness_columns, 
-            public_input_columns, 
-            constant_columns, 
-            selector_columns
-        >;
+            nil::crypto3::zk::snark::plonk_arithmetization_params<
+                    witness_columns,
+                    public_input_columns,
+                    constant_columns,
+                    selector_columns
+            >;
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t r = table_rows_log - 1;
@@ -131,12 +132,12 @@ struct placeholder_test_params_lookups {
     constexpr static const std::size_t selector_columns = 1;
 
     using arithmetization_params =
-        nil::crypto3::zk::snark::plonk_arithmetization_params<
-            witness_columns, 
-            public_input_columns, 
-            constant_columns, 
-            selector_columns
-        >;
+            nil::crypto3::zk::snark::plonk_arithmetization_params<
+                    witness_columns,
+                    public_input_columns,
+                    constant_columns,
+                    selector_columns
+            >;
 
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t r = table_rows_log - 1;
@@ -145,69 +146,69 @@ struct placeholder_test_params_lookups {
 
 BOOST_AUTO_TEST_SUITE(plonk_constraint_system_marshalling_test_suite)
 
-BOOST_AUTO_TEST_CASE(circuit_3_test) {
-    using endianness = nil::marshalling::option::big_endian;
-    using TTypeBase = nil::marshalling::field_type<endianness>;
+    BOOST_AUTO_TEST_CASE(circuit_3_test) {
+        using endianness = nil::marshalling::option::big_endian;
+        using TTypeBase = nil::marshalling::field_type<endianness>;
 
-    using curve_type = nil::crypto3::algebra::curves::pallas;
-    using FieldType = typename curve_type::base_field_type;   
-    using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
+        using curve_type = nil::crypto3::algebra::curves::pallas;
+        using FieldType = typename curve_type::base_field_type;
+        using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
-    using circuit_2_params = nil::crypto3::zk::snark::placeholder_params<
-        FieldType, 
-        typename placeholder_test_params::arithmetization_params
-    >;
-    using circuit_3_params = nil::crypto3::zk::snark::placeholder_params<
-        FieldType, 
-        typename placeholder_test_params_lookups::arithmetization_params
-    >;
+        using circuit_2_params = nil::crypto3::zk::snark::placeholder_params<
+                FieldType,
+                typename placeholder_test_params::arithmetization_params
+        >;
+        using circuit_3_params = nil::crypto3::zk::snark::placeholder_params<
+                FieldType,
+                typename placeholder_test_params_lookups::arithmetization_params
+        >;
 
-       
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-    nil::crypto3::zk::snark::circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit =
-        nil::crypto3::zk::snark::circuit_test_3<FieldType>();
+        using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
 
-//    using constraint_system_type = typename nil::crypto3::zk::snark::plonk_constraint_system<
-//        FieldType,
-//        placeholder_test_params_lookups::arithmetization_params
-//    >;
-
-    using constraint_system_type = typename policy_type::constraint_system_type;
-    constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                   circuit.lookup_gates);
-
-    test_constraint_system<constraint_system_type, endianness>(constraint_system);
-}
-
-BOOST_AUTO_TEST_CASE(circuit_2_test) {
-    using endianness = nil::marshalling::option::big_endian;
-    using TTypeBase = nil::marshalling::field_type<endianness>;
-
-    using curve_type = nil::crypto3::algebra::curves::pallas;
-    using FieldType = typename curve_type::base_field_type;   
-    using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
-
-    using circuit_2_params = nil::crypto3::zk::snark::placeholder_params<
-        FieldType, 
-        typename placeholder_test_params::arithmetization_params
-    >;
-       
-    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
-
-    nil::crypto3::zk::snark::circuit_description<FieldType, circuit_2_params, table_rows_log, 4> circuit =
-        nil::crypto3::zk::snark::circuit_test_2<FieldType>();
+        nil::crypto3::zk::snark::circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit =
+                nil::crypto3::zk::snark::circuit_test_3<FieldType>();
 
 //    using constraint_system_type = typename nil::crypto3::zk::snark::plonk_constraint_system<
 //        FieldType,
 //        placeholder_test_params_lookups::arithmetization_params
 //    >;
 
-    using constraint_system_type = typename policy_type::constraint_system_type;
-    constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                   circuit.lookup_gates);
+        using constraint_system_type = typename policy_type::constraint_system_type;
+        constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                 circuit.lookup_gates);
 
-    test_constraint_system<constraint_system_type, endianness>(constraint_system);
-}
+        test_constraint_system<constraint_system_type, endianness>(constraint_system);
+    }
+
+    BOOST_AUTO_TEST_CASE(circuit_2_test) {
+        using endianness = nil::marshalling::option::big_endian;
+        using TTypeBase = nil::marshalling::field_type<endianness>;
+
+        using curve_type = nil::crypto3::algebra::curves::pallas;
+        using FieldType = typename curve_type::base_field_type;
+        using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
+
+        using circuit_2_params = nil::crypto3::zk::snark::placeholder_params<
+                FieldType,
+                typename placeholder_test_params::arithmetization_params
+        >;
+
+        using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
+
+        nil::crypto3::zk::snark::circuit_description<FieldType, circuit_2_params, table_rows_log, 4> circuit =
+                nil::crypto3::zk::snark::circuit_test_2<FieldType>();
+
+//    using constraint_system_type = typename nil::crypto3::zk::snark::plonk_constraint_system<
+//        FieldType,
+//        placeholder_test_params_lookups::arithmetization_params
+//    >;
+
+        using constraint_system_type = typename policy_type::constraint_system_type;
+        constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                 circuit.lookup_gates);
+
+        test_constraint_system<constraint_system_type, endianness>(constraint_system);
+    }
 
 BOOST_AUTO_TEST_SUITE_END()

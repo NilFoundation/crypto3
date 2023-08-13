@@ -40,8 +40,8 @@
 #include <nil/crypto3/algebra/pairing/mnt4.hpp>
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
 
-#include <nil/crypto3/zk/blueprint/r1cs.hpp>
-#include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_variable.hpp>
+//#include <nil/crypto3/zk/blueprint/r1cs.hpp>
+//#include <nil/crypto3/zk/blueprint/detail/r1cs/blueprint_variable.hpp>
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/algorithms/generate.hpp>
 #include <nil/crypto3/zk/algorithms/verify.hpp>
