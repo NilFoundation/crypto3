@@ -28,6 +28,7 @@
 #define CRYPTO3_ALGEBRA_CURVES_EDWARDS_G2_ELEMENT_HPP
 
 #include <nil/crypto3/algebra/curves/detail/edwards/basic_policy.hpp>
+#include <nil/crypto3/algebra/curves/detail/scalar_mul.hpp>
 
 #include <nil/crypto3/detail/literals.hpp>
 
@@ -79,12 +80,23 @@ namespace nil {
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
-                        constexpr element_edwards_g2(underlying_field_value_type in_X, underlying_field_value_type in_Y,
-                                                     underlying_field_value_type in_Z) {
-                            this->X = in_X;
-                            this->Y = in_Y;
-                            this->Z = in_Z;
-                        };
+                        constexpr element_edwards_g2(const underlying_field_value_type& X,
+                                                const underlying_field_value_type& Y,
+                                                const underlying_field_value_type& Z) 
+                            : X(X), Y(Y), Z(Z) 
+                        { }
+
+                        explicit constexpr element_edwards_g2(const underlying_field_value_type &value) {
+                            *this = one() * value.data;
+                        }
+
+                        template<typename Backend,
+                                 multiprecision::expression_template_option ExpressionTemplates>
+                        explicit constexpr element_edwards_g2(
+                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                            *this = one() * value;
+                        }
+
                         /** @brief
                          *    @return the selected point $(X:Y:X*Y)$ in the inverted coordinates
                          *
@@ -162,6 +174,19 @@ namespace nil {
                             return *this;
                         }
 
+                        constexpr const element_edwards_g2& operator=(const underlying_field_value_type &value) {
+                            *this = one() * value.data;
+                            return *this;
+                        }
+
+                        template<typename Backend,
+                                 multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr const element_edwards_g2& operator=(
+                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                            *this = one() * value;
+                            return *this;
+                        }
+
                         constexpr element_edwards_g2 operator+(const element_edwards_g2 &other) const {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
@@ -179,6 +204,20 @@ namespace nil {
                             return this->add(other);
                         }
 
+                        constexpr element_edwards_g2& operator+=(const element_edwards_g2 &other) {
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                *this = other;
+                            } else if (other.is_zero()) {
+                                // Do nothing.
+                            } else if (*this == other) {
+                                *this = this->doubled();
+                            } else {
+                                *this = this->add(other);
+                            }
+                            return *this;
+                        }
+
                         constexpr element_edwards_g2 operator-() const {
                             return element_edwards_g2(-(this->X), this->Y, this->Z);
                         }
@@ -186,6 +225,26 @@ namespace nil {
                         constexpr element_edwards_g2 operator-(const element_edwards_g2 &other) const {
                             return (*this) + (-other);
                         }
+
+                        constexpr element_edwards_g2& operator-=(const element_edwards_g2 &other) {
+                            return (*this) += (-other);
+                        }
+
+                        template<typename Backend,
+                             multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr element_edwards_g2& operator*=(const multiprecision::number<Backend, ExpressionTemplates> &right) {
+                            (*this) = (*this) * right;
+                            return *this;
+                        }
+
+                        template<typename FieldValueType>
+                        typename std::enable_if<is_field<typename FieldValueType::field_type>::value &&
+                                                !is_extended_field<typename FieldValueType::field_type>::value,
+                                                element_edwards_g2>::type
+                            operator*=(const FieldValueType &right) {
+                                return (*this) *= right.data;
+                        }
+
                         /** @brief
                          *
                          * @return doubled element from group G2

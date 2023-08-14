@@ -225,6 +225,24 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL(points[p1].to_affine().Y, points[p1_to_affine].Y);
     // typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
     // BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
+
+    // Check in place addition, substraction, etc.
+    typename CurveGroup::value_type result = points[p1];
+    result += points[p2];
+
+    BOOST_CHECK_EQUAL(result, points[p1_plus_p2]);
+    result = points[p1];
+    result -= points[p2];
+    BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
+
+    result = points[p1];
+    result *= static_cast<cpp_int>(constants[C1]); 
+    BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
+
+    result = points[p2];
+    result *= static_cast<cpp_int>(constants[C1]); 
+    result += points[p2] * static_cast<cpp_int>(constants[C2]);
+    BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
 
 // temporary separated test for JubJub and BabyJubJub
@@ -249,6 +267,24 @@ void check_curve_operations_twisted_edwards(
     // BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
     // typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
     // BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
+
+    // Check in place addition, substraction, etc.
+    typename CurveGroup::value_type result = points[p1];
+    result += points[p2];
+
+    BOOST_CHECK_EQUAL(result, points[p1_plus_p2]);
+    result = points[p1];
+    result -= points[p2];
+    BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
+
+    result = points[p1];
+    result *= static_cast<cpp_int>(constants[C1]); 
+    BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
+
+    result = points[p2];
+    result *= static_cast<cpp_int>(constants[C1]); 
+    result += points[p2] * static_cast<cpp_int>(constants[C2]);
+    BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
 
 template<typename CurveParams>

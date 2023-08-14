@@ -89,10 +89,10 @@ namespace nil {
                             *this = one() * value.date;
                         }
 
-                        template<typename Backend, typename SafeType,
+                        template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr curve_element(
-                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &value) {
+                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                         }
 
@@ -238,10 +238,10 @@ namespace nil {
                             return *this;
                         }
 
-                        template<typename Backend, typename SafeType,
+                        template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         constexpr const curve_element& operator=(
-                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &value) {
+                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                             return *this;
                         }
@@ -272,7 +272,7 @@ namespace nil {
                             } else if (*this == other) {
                                 *this = this->doubled();
                             } else {
-                                *this = this->(other);
+                                *this = this->add(other);
                             }
                             return *this;
                         }
@@ -289,9 +289,9 @@ namespace nil {
                             return (*this) += (-other);
                         }
 
-                        template<typename Backend, typename SafeType,
+                        template<typename Backend,
                              multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &right) {
+                        constexpr curve_element& operator*=(const multiprecision::number<Backend, ExpressionTemplates> &right) {
                             (*this) = (*this) * right;
                             return *this;
                         }
@@ -301,7 +301,7 @@ namespace nil {
                                                 !is_extended_field<typename FieldValueType::field_type>::value,
                                                 curve_element>::type
                             operator*=(const FieldValueType &right) {
-                                return (*this) *= right.data;
+                            return (*this) *= right.data;
                         }
 
 

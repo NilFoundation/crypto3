@@ -100,10 +100,10 @@ namespace nil {
                             *this = one() * value.date;
                         }
 
-                        template<typename Backend, typename SafeType,
+                        template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr curve_element(
-                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &value) {
+                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                         }
 
@@ -255,10 +255,10 @@ namespace nil {
                             return *this;
                         }
 
-                        template<typename Backend, typename SafeType,
+                        template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         constexpr const curve_element& operator=(
-                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &value) {
+                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                             return *this;
                         }
@@ -306,9 +306,9 @@ namespace nil {
                             return (*this) += (-other);
                         }
 
-                        template<typename Backend, typename SafeType,
+                        template<typename Backend,
                              multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &right) {
+                        constexpr curve_element& operator*=(const multiprecision::number<Backend, ExpressionTemplates> &right) {
                             (*this) = (*this) * right;
                             return *this;
                         }
