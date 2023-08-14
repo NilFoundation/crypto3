@@ -86,6 +86,17 @@ namespace nil {
                         constexpr curve_element(const field_value_type &in_X, const field_value_type &in_Y) :
                             is_inf_point(false), X(in_X), Y(in_Y) {};
 
+                        explicit constexpr curve_element(const field_value_type &value) {
+                            *this = one() * value.date;
+                        }
+
+                        template<typename Backend, typename SafeType,
+                                 multiprecision::expression_template_option ExpressionTemplates>
+                        explicit constexpr curve_element(
+                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &value) {
+                            *this = one() * value;
+                        }
+
                         /**
                          * @brief Get the point at infinity
                          */
@@ -195,6 +206,19 @@ namespace nil {
                             return *this;
                         }
 
+                        constexpr const curve_element& operator=(const field_value_type &value) {
+                            *this = one() * value.date;
+                            return *this;
+                        }
+
+                        template<typename Backend, typename SafeType,
+                                 multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr const curve_element& operator=(
+                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &value) {
+                            *this = one() * value;
+                            return *this;
+                        }
+
                         constexpr curve_element operator+(const curve_element &other) const {
                             if (this->is_zero()) {
                                 return other;
@@ -211,6 +235,20 @@ namespace nil {
                             return this->add(other);
                         }
 
+                        constexpr curve_element& operator+=(const curve_element &other) {
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                *this = other;
+                            } else if (other.is_zero()) {
+                                // Do nothing.
+                            } else if (*this == other) {
+                                *this = this->doubled();
+                            } else {
+                                *this = this->add(other);
+                            }
+                            return *this;
+                        }
+
                         /**
                          * @brief Affine negation formulas: -(x1,y1)=(x1,-y1).
                          *
@@ -222,6 +260,25 @@ namespace nil {
 
                         constexpr curve_element operator-(const curve_element &other) const {
                             return (*this) + (-other);
+                        }
+
+                        constexpr curve_element& operator-=(const curve_element &other) {
+                            return (*this) += (-other);
+                        }
+
+                        template<typename Backend, typename SafeType,
+                             multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr curve_element& operator*=(const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &right) {
+                            (*this) = (*this) * right;
+                            return *this;
+                        }
+
+                        template<typename FieldValueType>
+                        typename std::enable_if<is_field<typename FieldValueType::field_type>::value &&
+                                                !is_extended_field<typename FieldValueType::field_type>::value,
+                                                curve_element>::type
+                            operator*=(const FieldValueType &right) {
+                                return (*this) *= right.data;
                         }
 
                         /**
