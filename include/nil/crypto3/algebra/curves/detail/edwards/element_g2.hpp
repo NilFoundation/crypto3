@@ -86,10 +86,6 @@ namespace nil {
                             : X(X), Y(Y), Z(Z) 
                         { }
 
-                        explicit constexpr element_edwards_g2(const underlying_field_value_type &value) {
-                            *this = one() * value.data;
-                        }
-
                         template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr element_edwards_g2(
@@ -171,11 +167,6 @@ namespace nil {
                             this->Y = other.Y;
                             this->Z = other.Z;
 
-                            return *this;
-                        }
-
-                        constexpr const element_edwards_g2& operator=(const underlying_field_value_type &value) {
-                            *this = one() * value.data;
                             return *this;
                         }
 

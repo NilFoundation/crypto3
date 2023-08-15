@@ -96,10 +96,6 @@ namespace nil {
                             : X(X), Y(Y), Z(Z) 
                         { }
 
-                        explicit constexpr curve_element(const field_value_type &value) {
-                            *this = one() * value.date;
-                        }
-
                         template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr curve_element(
@@ -196,11 +192,6 @@ namespace nil {
                             this->Y = other.Y;
                             this->Z = other.Z;
 
-                            return *this;
-                        }
-
-                        constexpr const curve_element& operator=(const field_value_type &value) {
-                            *this = one() * value.date;
                             return *this;
                         }
 

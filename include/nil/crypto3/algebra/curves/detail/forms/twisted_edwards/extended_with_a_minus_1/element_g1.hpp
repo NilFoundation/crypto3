@@ -100,10 +100,6 @@ namespace nil {
                             : X(X), Y(Y), T(T), Z(Z) 
                         { }
 
-                        explicit constexpr curve_element(const field_value_type &value) {
-                            *this = one() * value.date;
-                        }
-
                         template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr curve_element(
@@ -210,11 +206,6 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr const curve_element& operator=(const field_value_type &value) {
-                            *this = one() * value.date;
-                            return *this;
-                        }
-
                         template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>
                         constexpr const curve_element& operator=(
@@ -271,14 +262,6 @@ namespace nil {
                         constexpr curve_element& operator*=(const multiprecision::number<Backend, ExpressionTemplates> &right) {
                             (*this) = (*this) * right;
                             return *this;
-                        }
-
-                        template<typename FieldValueType>
-                        typename std::enable_if<is_field<typename FieldValueType::field_type>::value &&
-                                                !is_extended_field<typename FieldValueType::field_type>::value,
-                                                curve_element>::type
-                            operator*=(const FieldValueType &right) {
-                                return (*this) *= right.data;
                         }
 
                         /** @brief

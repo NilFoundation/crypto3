@@ -207,6 +207,8 @@ enum curve_operation_test_points : std::size_t {
 template<typename CurveGroup>
 void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points,
                             const std::vector<std::size_t> &constants) {
+std::cout << "check_curve_operations\n";
+
     using nil::crypto3::multiprecision::cpp_int;
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
@@ -227,6 +229,7 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     // BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
 
     // Check in place addition, substraction, etc.
+std::cout << "Checking in-place operations\n";
     typename CurveGroup::value_type result = points[p1];
     result += points[p2];
 
@@ -252,6 +255,7 @@ void check_curve_operations_twisted_edwards(
     const std::vector<typename CurveGroup::field_type::integral_type> &constants) {
     using nil::crypto3::multiprecision::cpp_int;
 
+std::cout << "check_curve_operations_twisted_edwards\n";
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
