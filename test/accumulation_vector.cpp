@@ -67,20 +67,20 @@ void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
 }
 
 template<typename Endianness, typename GroupType>
-void test_accumulation_vector(zk::snark::accumulation_vector<GroupType> val) {
+void test_accumulation_vector(nil::crypto3::container::accumulation_vector<GroupType> val) {
 
     using namespace nil::crypto3::marshalling;
 
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using accumulation_vector_type =
-        types::accumulation_vector<nil::marshalling::field_type<Endianness>, zk::snark::accumulation_vector<GroupType>>;
+        types::accumulation_vector<nil::marshalling::field_type<Endianness>, nil::crypto3::container::accumulation_vector<GroupType>>;
 
     accumulation_vector_type filled_val =
-        types::fill_accumulation_vector<zk::snark::accumulation_vector<GroupType>, Endianness>(val);
+        types::fill_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(val);
 
-    zk::snark::accumulation_vector<GroupType> constructed_val =
-        types::make_accumulation_vector<zk::snark::accumulation_vector<GroupType>, Endianness>(filled_val);
+    nil::crypto3::container::accumulation_vector<GroupType> constructed_val =
+        types::make_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(filled_val);
     BOOST_CHECK(val == constructed_val);
 
     std::size_t unitblob_size = filled_val.length();
@@ -91,14 +91,16 @@ void test_accumulation_vector(zk::snark::accumulation_vector<GroupType> val) {
     auto write_iter = cv.begin();
 
     nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     accumulation_vector_type test_val_read;
 
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    zk::snark::accumulation_vector<GroupType> constructed_val_read =
-        types::make_accumulation_vector<zk::snark::accumulation_vector<GroupType>, Endianness>(test_val_read);
+    nil::crypto3::container::accumulation_vector<GroupType> constructed_val_read =
+        types::make_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(test_val_read);
 
     BOOST_CHECK(val == constructed_val_read);
 }
@@ -117,7 +119,7 @@ void test_accumulation_vector() {
             rest.push_back(nil::crypto3::algebra::random_element<GroupType>());
         }
         test_accumulation_vector<Endianness>(
-            zk::snark::accumulation_vector<GroupType>(std::move(first), std::move(rest)));
+            nil::crypto3::container::accumulation_vector<GroupType>(std::move(first), std::move(rest)));
     }
 }
 
