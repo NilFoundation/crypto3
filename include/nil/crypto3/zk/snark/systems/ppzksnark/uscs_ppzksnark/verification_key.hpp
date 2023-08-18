@@ -48,13 +48,13 @@ namespace nil {
                     typename g2_type::value_type alpha_tilde_g2;
                     typename g2_type::value_type Z_g2;
 
-                    accumulation_vector<g1_type> encoded_IC_query;
+                    container::accumulation_vector<g1_type> encoded_IC_query;
 
                     uscs_ppzksnark_verification_key() = default;
                     uscs_ppzksnark_verification_key(const typename g2_type::value_type &tilde_g2,
                                                     const typename g2_type::value_type &alpha_tilde_g2,
                                                     const typename g2_type::value_type &Z_g2,
-                                                    const accumulation_vector<g1_type> &eIC) :
+                                                    const container::accumulation_vector<g1_type> &eIC) :
                         tilde_g2(tilde_g2),
                         alpha_tilde_g2(alpha_tilde_g2), Z_g2(Z_g2), encoded_IC_query(eIC) {};
 
@@ -97,7 +97,7 @@ namespace nil {
                     typename pairing_policy::g2_precomputed_type vk_Z_g2_precomp;
                     typename CurveType::gt_type::value_type pairing_of_g1_and_g2;
 
-                    accumulation_vector<typename CurveType::template g1_type<>> encoded_IC_query;
+                    container::accumulation_vector<typename CurveType::template g1_type<>> encoded_IC_query;
 
                     bool operator==(const uscs_ppzksnark_processed_verification_key &other) const {
                         return (this->pp_G1_one_precomp == other.pp_G1_one_precomp &&

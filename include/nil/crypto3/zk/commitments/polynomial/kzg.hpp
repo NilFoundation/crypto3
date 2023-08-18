@@ -36,14 +36,14 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/accumulators/accumulators.hpp>
 
-#include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/algebra/type_traits.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/algebra/pairing/pairing_policy.hpp>
 
-using namespace nil::crypto3::math;
-
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
+
+using namespace nil::crypto3::math;
 
 namespace nil {
     namespace crypto3 {

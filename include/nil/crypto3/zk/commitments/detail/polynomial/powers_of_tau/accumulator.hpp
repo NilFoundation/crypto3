@@ -65,10 +65,11 @@ namespace nil {
                         g2_value_type beta_g2;
 
                         powers_of_tau_accumulator() :
-                            tau_powers_g1(tau_powers_g1_length, g1_value_type::one()),
-                            tau_powers_g2(tau_powers_length, g2_value_type::one()),
-                            alpha_tau_powers_g1(tau_powers_length, g1_value_type::one()),
-                            beta_tau_powers_g1(tau_powers_length, g1_value_type::one()), beta_g2(g2_value_type::one()) {
+                                tau_powers_g1(tau_powers_g1_length, g1_value_type::one()),
+                                tau_powers_g2(tau_powers_length, g2_value_type::one()),
+                                alpha_tau_powers_g1(tau_powers_length, g1_value_type::one()),
+                                beta_tau_powers_g1(tau_powers_length, g1_value_type::one()),
+                                beta_g2(g2_value_type::one()) {
                         }
 
                         powers_of_tau_accumulator(const std::vector<g1_value_type> &tau_powers_g1,
@@ -76,9 +77,9 @@ namespace nil {
                                                   const std::vector<g1_value_type> &alpha_tau_powers_g1,
                                                   const std::vector<g1_value_type> &beta_tau_powers_g1,
                                                   g2_value_type beta_g2) :
-                            tau_powers_g1(tau_powers_g1),
-                            tau_powers_g2(tau_powers_g2), alpha_tau_powers_g1(alpha_tau_powers_g1),
-                            beta_tau_powers_g1(beta_tau_powers_g1), beta_g2(beta_g2) {
+                                tau_powers_g1(tau_powers_g1),
+                                tau_powers_g2(tau_powers_g2), alpha_tau_powers_g1(alpha_tau_powers_g1),
+                                beta_tau_powers_g1(beta_tau_powers_g1), beta_g2(beta_g2) {
                             BOOST_ASSERT(tau_powers_g1.size() == tau_powers_g1_length);
                             BOOST_ASSERT(tau_powers_g2.size() == tau_powers_length);
                             BOOST_ASSERT(alpha_tau_powers_g1.size() == tau_powers_length);
@@ -99,10 +100,10 @@ namespace nil {
 
                             // naive exp, could be parallelized
                             naive_batch_exp(
-                                tau_powers_g1.begin(), tau_powers_g1.end(), taupowers.begin(), taupowers.end());
+                                    tau_powers_g1.begin(), tau_powers_g1.end(), taupowers.begin(), taupowers.end());
 
                             naive_batch_exp(
-                                tau_powers_g2.begin(), tau_powers_g2.end(), taupowers.begin(), taupowers.end());
+                                    tau_powers_g2.begin(), tau_powers_g2.end(), taupowers.begin(), taupowers.end());
 
                             naive_batch_exp_with_coeff(alpha_tau_powers_g1.begin(),
                                                        alpha_tau_powers_g1.end(),
