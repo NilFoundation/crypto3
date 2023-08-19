@@ -49,8 +49,7 @@ namespace nil {
                     struct placeholder_policy {
 
                         constexpr static const std::size_t witness_columns = PlaceholderParams::witness_columns;
-                        constexpr static const std::size_t public_input_columns = 
-                            PlaceholderParams::public_input_columns;
+                        constexpr static const std::size_t public_input_columns = PlaceholderParams::public_input_columns;
                         constexpr static const std::size_t constant_columns = PlaceholderParams::constant_columns;
                         constexpr static const std::size_t selector_columns = PlaceholderParams::selector_columns;                       
 

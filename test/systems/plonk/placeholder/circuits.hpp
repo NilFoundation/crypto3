@@ -57,7 +57,6 @@ namespace nil {
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_columns = ParamsType::public_input_columns;
-                    using merkle_hash_type = typename ParamsType::merkle_hash_type;
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
 
                 public:
@@ -79,9 +78,8 @@ namespace nil {
                         , omega(domain->get_domain_element(1))
                         , delta(algebra::fields::arithmetic_params<FieldType>::multiplicative_generator) {
                     }
-
                 };
-
+/*
                 //---------------------------------------------------------------------------//
                 // Test circuit 1
                 //  i  | GATE | w_0 | w_1 | w_2 | q_add | q_mul |
@@ -116,9 +114,9 @@ namespace nil {
                     constexpr static const std::size_t table_columns = 
                         witness_columns + public_columns + constant_columns;
 
-                    typedef placeholder_params<FieldType, arithmetization_params_1> circuit_params;
+//                    typedef placeholder_params<FieldType, arithmetization_params_1> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
+                    circuit_description<FieldType, rows_log, permutation> test_circuit;
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
@@ -441,6 +439,145 @@ namespace nil {
                     std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints = {lookup_constraint};
                     plonk_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(0, lookup_constraints);
                     // test_circuit.lookup_gates.push_back(lookup_gate);
+                    return test_circuit;
+                }
+*/
+                //---------------------------------------------------------------------------//
+                // Test circuit with empty commitment
+                //  i  | GATE | w_0 | w_1 | w_2 | public | q_add | q_mul |
+                //  0  |  --  |  x  |  y  |  z  |   p1   |   0   |   0   |
+                //  1  | ADD  |  x  |  y  |  z  |   0    |   1   |   0   |
+                // ... | ADD  |  x  |  y  |  z  |   0    |   1   |   0   |
+                // k-2 | MUL  |  x  |  y  |  z  |   0    |   0   |   1   |
+                // k-1 | MUL  |  x  |  y  |  z  |   0    |   0   |   1   |
+                //
+                // ADD: x + y = z, copy(prev(z), y)
+                // MUL: x * y + prev(x) = z, copy(p1, y)
+                //---------------------------------------------------------------------------//
+                constexpr static const std::size_t witness_columns_t = 3;
+                constexpr static const std::size_t public_columns_t = 1;
+                constexpr static const std::size_t constant_columns_t = 0;
+                constexpr static const std::size_t selector_columns_t = 2;
+
+                using arithmetization_params_t = plonk_arithmetization_params<witness_columns_t,
+                    public_columns_t, constant_columns_t, selector_columns_t>;
+
+                template<typename FieldType>
+                circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_t>, 4, 4> circuit_test_t() {
+                    using assigment_type = typename FieldType::value_type;
+
+                    constexpr static const std::size_t rows_log = 4;
+                    constexpr static const std::size_t permutation = 4;
+
+                    constexpr static const std::size_t witness_columns = witness_columns_t;
+                    constexpr static const std::size_t public_columns = public_columns_t;
+                    constexpr static const std::size_t constant_columns = constant_columns_t;
+                    constexpr static const std::size_t selector_columns = selector_columns_t;
+                    constexpr static const std::size_t table_columns = 
+                            witness_columns + public_columns + constant_columns;
+
+                    typedef placeholder_circuit_params<FieldType, arithmetization_params_t> circuit_params;
+
+                    circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
+
+                    std::array<std::vector<typename FieldType::value_type>, table_columns> table;
+
+                    std::vector<typename FieldType::value_type> q_add(test_circuit.table_rows);
+                    std::vector<typename FieldType::value_type> q_mul(test_circuit.table_rows);
+                    for (std::size_t j = 0; j < table_columns; j++) {
+                        table[j].resize(test_circuit.table_rows);
+                    }
+
+                    // init values
+                    typename FieldType::value_type one = FieldType::value_type::one();
+                    table[0][0] = algebra::random_element<FieldType>();
+                    table[1][0] = algebra::random_element<FieldType>();
+                    table[2][0] = algebra::random_element<FieldType>();
+                    table[3][0] = algebra::random_element<FieldType>();
+                    q_add[0] = FieldType::value_type::zero();
+                    q_mul[0] = FieldType::value_type::zero();
+
+                    // fill rows with ADD gate
+                    for (std::size_t i = 1; i < test_circuit.table_rows - 5; i++) {
+                        table[0][i] = algebra::random_element<FieldType>();
+                        table[1][i] = table[2][i - 1];
+                        table[2][i] = table[0][i] + table[1][i];
+                        table[3][i] = FieldType::value_type::zero();
+                        q_add[i] = one;
+                        q_mul[i] = FieldType::value_type::zero();
+
+                        plonk_variable<assigment_type> x(1, i, false, 
+                            plonk_variable<assigment_type>::column_type::witness);
+                        plonk_variable<assigment_type> y(2, i - 1, false, 
+                            plonk_variable<assigment_type>::column_type::witness);
+                        test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
+                    }
+
+                    // fill rows with MUL gate
+                    for (std::size_t i = test_circuit.table_rows - 5; i < test_circuit.table_rows - 3; i++) {
+                        table[0][i] = algebra::random_element<FieldType>();
+                        table[1][i] = table[3][0];
+                        table[2][i] = table[0][i] * table[1][i] + table[0][i - 1];
+                        table[3][i] = FieldType::value_type::zero();
+                        q_add[i] = FieldType::value_type::zero();
+                        q_mul[i] = one;
+
+                        plonk_variable<assigment_type> x(1, i, false, 
+                            plonk_variable<assigment_type>::column_type::witness);
+                        plonk_variable<assigment_type> y(0, 0, false, 
+                            plonk_variable<assigment_type>::column_type::public_input);
+                        test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
+                    }
+
+                    std::array<plonk_column<FieldType>, witness_columns> private_assignment;
+                    for (std::size_t i = 0; i < witness_columns; i++) {
+                        private_assignment[i] = table[i];
+                    }
+
+                    std::array<plonk_column<FieldType>, selector_columns> selectors_assignment;
+                    std::array<plonk_column<FieldType>, public_columns> public_input_assignment;
+                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment = {};
+
+                    selectors_assignment[0] = q_add;
+                    selectors_assignment[1] = q_mul;
+
+                    for (std::size_t i = 0; i < public_columns; i++) {
+                        public_input_assignment[i] = table[witness_columns + i];
+                    }
+                    test_circuit.table = plonk_assignment_table<FieldType, arithmetization_params_t>(
+                        plonk_private_assignment_table<FieldType, arithmetization_params_t>(private_assignment),
+                        plonk_public_assignment_table<FieldType, arithmetization_params_t>(
+                            public_input_assignment, constant_assignment, selectors_assignment));
+
+                    plonk_variable<assigment_type> w0(0, 0, true,
+                                                 plonk_variable<assigment_type>::column_type::witness);
+                    plonk_variable<assigment_type> w1(1, 0, true,
+                                                 plonk_variable<assigment_type>::column_type::witness);
+                    plonk_variable<assigment_type> w2(2, 0, true,
+                                                 plonk_variable<assigment_type>::column_type::witness);
+                    plonk_variable<assigment_type> w0_prev(0, -1, true,
+                                                 plonk_variable<assigment_type>::column_type::witness);
+
+                    plonk_constraint<FieldType> add_constraint;
+                    add_constraint += w0;
+                    add_constraint += w1;
+                    add_constraint -= w2;
+
+                    std::vector<plonk_constraint<FieldType>> add_gate_costraints {add_constraint};
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> add_gate(0, add_gate_costraints);
+                    test_circuit.gates.push_back(add_gate);
+
+                    plonk_constraint<FieldType> mul_constraint;
+                    typename plonk_constraint<FieldType>::term_type w0_term(w0);
+                    typename plonk_constraint<FieldType>::term_type w1_term(w1); 
+                    mul_constraint += w0_term * w1_term;
+                    mul_constraint -= w2;
+                    mul_constraint += w0_prev;
+
+                    std::vector<plonk_constraint<FieldType>> mul_gate_costraints {mul_constraint};
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> mul_gate(1, mul_gate_costraints);
+                    test_circuit.gates.push_back(mul_gate);
+
                     return test_circuit;
                 }
             }    // namespace snark

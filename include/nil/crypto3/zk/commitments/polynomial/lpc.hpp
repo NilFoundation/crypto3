@@ -37,14 +37,160 @@
 #include <nil/crypto3/container/merkle/proof.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-//#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace commitments {
-                
+            namespace commitments {                                
+                template<typename LPCScheme>
+                class lpc_commitment_scheme:public polys_evaluator<typename LPCScheme::params_type, typename LPCScheme::commitment_type>{
+                public:
+                    using field_type = typename LPCScheme::field_type;
+                    using params_type = typename LPCScheme::params_type;
+                    using precommitment_type = typename LPCScheme::precommitment_type;
+                    using commitment_type = typename LPCScheme::commitment_type;
+                    using fri_type = typename LPCScheme::fri_type;
+                    using proof_type = typename LPCScheme::proof_type;
+                    using transcript_type = typename LPCScheme::transcript_type;
+                private:
+                    std::map<std::size_t, precommitment_type> _trees;
+                    typename fri_type::params_type _fri_params;
+                public:
+                    lpc_commitment_scheme(const typename fri_type::params_type &fri_params){
+                        _fri_params = fri_params;
+                    }
+                    commitment_type commit(std::size_t index){
+                        this->state_commited(index);
+                        _trees[index] = nil::crypto3::zk::algorithms::precommit<fri_type>(this->_polys[index], _fri_params.D[0], _fri_params.step_list.front());
+                        return _trees[index].root();
+                    }
+
+                    proof_type proof_eval(transcript_type &transcript){
+                        this->eval_polys();
+                        BOOST_ASSERT(this->_points.size() == this->_polys.size());
+                        BOOST_ASSERT(this->_points.size() == this->_z.get_batches_num());
+
+                        for( auto const&it: this->_trees){
+                            transcript(it.second.root());
+                        }
+
+                        // Prepare z-s and combined_Q;
+                        auto theta = transcript.template challenge<field_type>();
+                        math::polynomial_dfs<typename field_type::value_type> combined_Q_dfs(
+                            0, _fri_params.D[0]->size(), field_type::value_type::zero()
+                        );
+
+                        bool first = true;
+                        // prepare U and V
+                        for(auto const &it: this->_polys){
+                            auto b_ind = it.first;
+                            BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
+                            BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
+                            for( std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++){
+                                // All evaluation points are filled successfully.
+                                auto points = this->_points[b_ind][poly_ind];
+                                BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
+
+                                math::polynomial<typename field_type::value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
+                                math::polynomial<typename field_type::value_type> U =  this->get_U(b_ind, poly_ind);
+
+                                math::polynomial_dfs<typename field_type::value_type> U_dfs(0, _fri_params.D[0]->size());
+                                U_dfs.from_coefficients(U);
+
+                                math::polynomial<typename field_type::value_type> g_normal(this->_polys[b_ind][poly_ind].coefficients());
+                                math::polynomial<typename field_type::value_type> Q = g_normal - this->get_U(b_ind, poly_ind);
+                                math::polynomial<typename field_type::value_type> one = {1};
+                                Q = Q / this->get_V(this->_points[b_ind][poly_ind]);
+                                math::polynomial_dfs<typename field_type::value_type> Q_dfs(0, _fri_params.D[0]->size());
+                                Q_dfs.from_coefficients(Q);
+
+                                if (first) {
+                                    first = false;
+                                    combined_Q_dfs = Q_dfs;
+                                } else {
+                                    combined_Q_dfs *= theta;
+                                    combined_Q_dfs += Q_dfs;
+                                }
+                            }
+                        }
+
+                        precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
+                            combined_Q_dfs,
+                            _fri_params.D[0], 
+                            _fri_params.step_list.front()
+                        );
+
+                        typename fri_type::proof_type fri_proof = nil::crypto3::zk::algorithms::proof_eval<
+                            fri_type, math::polynomial_dfs<typename field_type::value_type>
+                        >(
+                            this->_polys,
+                            combined_Q_dfs, 
+                            this->_trees,
+                            combined_Q_precommitment, 
+                            this->_fri_params, 
+                            transcript
+                        );
+                        return proof_type({this->_z, fri_proof});
+                    }
+
+                    bool verify_eval(
+                        const proof_type &proof,
+                        const std::map<std::size_t, commitment_type> &commitments,
+                        transcript_type &transcript
+                    ) {
+                        this->_z = proof.z;
+                        for( auto const &it: commitments){
+                            transcript(commitments.at(it.first));
+                        }
+
+                        // List of unique eval points set. [id=>points]
+                        auto unique_points = this->get_unique_points_list();
+                        // Point identifier for each polynomial. poly=>id
+                        typename std::map<std::size_t, std::vector<std::size_t>> eval_map = this->get_eval_map(unique_points);
+                        // combined U for each polynomials with id eval points. id=>eval_points.
+                        typename std::vector<math::polynomial<typename field_type::value_type>> combined_U;
+                        // V for each polynoial
+                        typename std::vector<math::polynomial<typename field_type::value_type>> denominators;
+
+                        typename field_type::value_type theta = transcript.template challenge<field_type>();
+
+                        combined_U.resize(unique_points.size());
+                        denominators.resize(unique_points.size());
+                        // For each eval_point compute combined_U
+                        for(std::size_t point_index = 0; point_index < unique_points.size(); point_index++ ){
+                            // Compute V
+                            denominators[point_index] = this->get_V(unique_points[point_index]);
+                            combined_U[point_index] = {0};
+
+                            for( auto const &it: this->_points){
+                                auto k = it.first;
+                                for( std::size_t i = 0; i < proof.z.get_batch_size(k); i++ ){
+                                    combined_U[point_index] =  combined_U[point_index] * theta;
+                                    if(eval_map[k][i] == point_index){
+                                        combined_U[point_index] = combined_U[point_index] + this->get_U(k,i);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!nil::crypto3::zk::algorithms::verify_eval<fri_type>(
+                            proof.fri_proof,
+                            _fri_params, 
+                            commitments,
+                            theta,
+                            eval_map,
+                            combined_U,
+                            denominators,
+                            transcript
+                        )) {
+                            return false;
+                        }
+                        return true;
+                    }
+                };
+
                 template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda,
                          std::size_t R, std::size_t M, std::size_t BatchesNum>
                 struct list_polynomial_commitment_params {
@@ -81,7 +227,14 @@ namespace nil {
                         LPCParams::m,
                         LPCParams::batches_num
                 > {
-
+                    using fri_type = typename detail::basic_batched_fri<
+                        FieldType, 
+                        typename LPCParams::merkle_hash_type,
+                        typename LPCParams::transcript_hash_type,
+                        LPCParams::lambda, 
+                        LPCParams::m,
+                        LPCParams::batches_num
+                    >;
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
                     constexpr static const std::size_t lambda = LPCParams::lambda;
@@ -114,7 +267,7 @@ namespace nil {
                         }
                         typedef std::vector<std::vector<typename FieldType::value_type>> z_type;
 
-                        std::array<z_type, batches_num> z;
+                        eval_storage<field_type> z;
                         typename basic_fri::proof_type fri_proof;
                     };
                 };
@@ -134,11 +287,10 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams>
                 using list_polynomial_commitment = batched_list_polynomial_commitment<FieldType, LPCParams>;
-
             }    // namespace commitments
 
             namespace algorithms {
-                template<
+/*                template<
                     typename LPC,
                     typename ContainerType,    // TODO: check for value_type == std::vector<typename
                                                // LPC::field_type::value_type>?
@@ -176,13 +328,13 @@ namespace nil {
                             z[k][polynom_index].resize(evaluation_point.size());
 
                             for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
-
+                        
                                 z[k][polynom_index][point_index] = g[k][polynom_index].evaluate(
-                                    evaluation_point[point_index]);    // transform to point-representation
+                                    evaluation_point[point_index]
+                                );    // transform to point-representation
 
                                 U_interpolation_points[point_index] =
-                                    std::make_pair(evaluation_point[point_index],
-                                                z[k][polynom_index][point_index]);    // prepare points for interpolation
+                                    std::make_pair(evaluation_point[point_index], z[k][polynom_index][point_index]);    // prepare points for interpolation
                             }
 
                             math::polynomial<typename LPC::field_type::value_type> Q;
@@ -384,7 +536,7 @@ namespace nil {
                             }
                         }
                     }
-
+                    
                     combined_U.resize(unique_eval_points.size());
                     denominators.resize(unique_eval_points.size());
                     for(std::size_t point_index = 0; point_index < unique_eval_points.size(); point_index++ ){
@@ -406,15 +558,7 @@ namespace nil {
                             for( std::size_t i = 0; i < proof.z[k].size(); i++ ){
                                 combined_U[point_index] = combined_U[point_index] * theta;
                                 if(evals_map[ind] == point_index){
-                                    BOOST_ASSERT(proof.z[k][i].size() == unique_eval_points[point_index].size());
-                                    for( std::size_t xi_index = 0; xi_index < unique_eval_points[point_index].size(); xi_index++ ){
-                                        U_interpolation_points[xi_index] = std::make_pair(
-                                            unique_eval_points[point_index][xi_index],
-                                            proof.z[k][i][xi_index]
-                                        );
-                                    }
-                                    math::polynomial<typename LPC::field_type::value_type> U = math::lagrange_interpolation(U_interpolation_points);
-                                    combined_U[point_index] = combined_U[point_index] + math::lagrange_interpolation(U_interpolation_points);
+                                    combined_U[point_index] = combined_U[point_index] + get_U();
                                 }
                                 ind++;
                             }
@@ -435,7 +579,7 @@ namespace nil {
                     }
                     return true;
                 }
-
+*/
             }    // namespace algorithms
         }        // namespace zk
     }            // namespace crypto3

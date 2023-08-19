@@ -36,6 +36,43 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template<
+                    typename FieldType, 
+                    typename ArithmetizationParams, 
+                    typename TranscriptHashType = hashes::keccak_1600<512>
+                >
+                struct placeholder_circuit_params{
+                    constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
+                    constexpr static const std::size_t public_input_columns = ArithmetizationParams::public_input_columns;
+                    constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
+                    constexpr static const std::size_t selector_columns = ArithmetizationParams::selector_columns;
+
+                    constexpr static const typename FieldType::value_type delta =
+                        algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;                    
+
+                    using transcript_hash_type = TranscriptHashType;
+                    using arithmetization_params = ArithmetizationParams;
+                    using field_type = FieldType;
+                };
+
+                template<typename CircuitParams, typename CommitmentScheme>
+                struct placeholder_params{
+                    constexpr static const std::size_t witness_columns = CircuitParams::witness_columns;
+                    constexpr static const std::size_t public_input_columns = CircuitParams::public_input_columns;
+                    constexpr static const std::size_t constant_columns = CircuitParams::constant_columns;
+                    constexpr static const std::size_t selector_columns = CircuitParams::selector_columns;
+
+                    using field_type = typename CircuitParams::field_type;
+
+                    constexpr static const typename field_type::value_type delta = CircuitParams::delta;
+
+                    using transcript_hash_type = typename CircuitParams::transcript_hash_type;
+                    using arithmetization_params = typename CircuitParams::arithmetization_params;
+
+                    using commitment_scheme_type = CommitmentScheme;
+                    using commitment_scheme_params_type = typename CommitmentScheme::params_type;
+                };
+/*
                 template<typename FieldType, typename ArithmetizationParams,
                          typename MerkleTreeHashType = hashes::keccak_1600<512>,
                          typename TranscriptHashType = hashes::keccak_1600<512>, 
@@ -70,7 +107,7 @@ namespace nil {
 
                     using runtime_size_commitment_scheme_type =
                         commitments::batched_lpc<FieldType, batched_commitment_params_type>;
-                };
+                };*/
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

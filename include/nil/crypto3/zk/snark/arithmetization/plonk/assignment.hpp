@@ -203,6 +203,10 @@ namespace nil {
                 public:
                     using private_table_type = plonk_private_table<FieldType, ArithmetizationParams, ColumnType>;
                     using public_table_type = plonk_public_table<FieldType, ArithmetizationParams, ColumnType>;
+                    using witnesses_container_type = typename private_table_type::witnesses_container_type;
+                    using public_input_container_type = typename public_table_type::public_input_container_type;
+                    using constant_container_type = typename public_table_type::constant_container_type;
+                    using selector_container_type = typename public_table_type::selector_container_type;
 
                 protected:
                     private_table_type _private_table;
@@ -229,6 +233,22 @@ namespace nil {
 
                     const ColumnType& selector(std::uint32_t index) const {
                         return _public_table.selector(index);
+                    }
+
+                    const witnesses_container_type& witnesses() const {
+                        return _private_table.witnesses();
+                    }
+
+                    const public_input_container_type& public_inputs() const {
+                        return _public_table.public_inputs();
+                    }
+
+                    const constant_container_type& constants() const {
+                        return _public_table.constants();
+                    }
+
+                    const selector_container_type& selectors() const {
+                        return _public_table.selectors();
                     }
 
                     const ColumnType& operator[](std::uint32_t index) const {
