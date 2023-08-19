@@ -43,9 +43,11 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace commitments {                                
-                template<typename LPCScheme>
-                class lpc_commitment_scheme:public polys_evaluator<typename LPCScheme::params_type, typename LPCScheme::commitment_type>{
+            namespace commitments { 
+
+                // Placeholder-friendly class.
+                template<typename LPCScheme, typename PolynomialType = typename math::polynomial_dfs<typename LPCScheme::params_type::field_type::value_type>>
+                class lpc_commitment_scheme:public polys_evaluator<typename LPCScheme::params_type, typename LPCScheme::commitment_type, PolynomialType>{
                 public:
                     using field_type = typename LPCScheme::field_type;
                     using params_type = typename LPCScheme::params_type;
@@ -54,6 +56,7 @@ namespace nil {
                     using fri_type = typename LPCScheme::fri_type;
                     using proof_type = typename LPCScheme::proof_type;
                     using transcript_type = typename LPCScheme::transcript_type;
+                    using poly_type = PolynomialType;
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
                     typename fri_type::params_type _fri_params;
@@ -78,55 +81,81 @@ namespace nil {
 
                         // Prepare z-s and combined_Q;
                         auto theta = transcript.template challenge<field_type>();
-                        math::polynomial_dfs<typename field_type::value_type> combined_Q_dfs(
-                            0, _fri_params.D[0]->size(), field_type::value_type::zero()
-                        );
+                        poly_type combined_Q;
+                        if constexpr (std::is_same<math::polynomial_dfs<typename field_type::value_type>, PolynomialType>::value
+                        ) {
+                            bool first = true;
+                            // prepare U and V
+                            for(auto const &it: this->_polys){
+                                auto b_ind = it.first;
+                                BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
+                                BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
+                                for( std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++){
+                                    // All evaluation points are filled successfully.
+                                    auto points = this->_points[b_ind][poly_ind];
+                                    BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
 
-                        bool first = true;
-                        // prepare U and V
-                        for(auto const &it: this->_polys){
-                            auto b_ind = it.first;
-                            BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
-                            BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
-                            for( std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++){
-                                // All evaluation points are filled successfully.
-                                auto points = this->_points[b_ind][poly_ind];
-                                BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
+                                    math::polynomial<typename field_type::value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
+                                    math::polynomial<typename field_type::value_type> U =  this->get_U(b_ind, poly_ind);
 
-                                math::polynomial<typename field_type::value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
-                                math::polynomial<typename field_type::value_type> U =  this->get_U(b_ind, poly_ind);
+                                    math::polynomial_dfs<typename field_type::value_type> U_dfs(0, _fri_params.D[0]->size());
+                                    U_dfs.from_coefficients(U);
 
-                                math::polynomial_dfs<typename field_type::value_type> U_dfs(0, _fri_params.D[0]->size());
-                                U_dfs.from_coefficients(U);
+                                    math::polynomial<typename field_type::value_type> g_normal(this->_polys[b_ind][poly_ind].coefficients());
+                                    math::polynomial<typename field_type::value_type> Q = g_normal - this->get_U(b_ind, poly_ind);
+                                    Q = Q / this->get_V(this->_points[b_ind][poly_ind]);
+                                    math::polynomial_dfs<typename field_type::value_type> Q_dfs(0, _fri_params.D[0]->size());
+                                    Q_dfs.from_coefficients(Q);
 
-                                math::polynomial<typename field_type::value_type> g_normal(this->_polys[b_ind][poly_ind].coefficients());
-                                math::polynomial<typename field_type::value_type> Q = g_normal - this->get_U(b_ind, poly_ind);
-                                math::polynomial<typename field_type::value_type> one = {1};
-                                Q = Q / this->get_V(this->_points[b_ind][poly_ind]);
-                                math::polynomial_dfs<typename field_type::value_type> Q_dfs(0, _fri_params.D[0]->size());
-                                Q_dfs.from_coefficients(Q);
+                                    if (first) {
+                                        first = false;
+                                        combined_Q = Q_dfs;
+                                    } else {
+                                        combined_Q *= theta;
+                                        combined_Q += Q_dfs;
+                                    }
+                                }
+                            }
+                        } else {
+                            bool first = true;
+                            // prepare U and V
+                            for(auto const &it: this->_polys){
+                                auto b_ind = it.first;
+                                BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
+                                BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
+                                for( std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++){
+                                    // All evaluation points are filled successfully.
+                                    auto points = this->_points[b_ind][poly_ind];
+                                    BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
 
-                                if (first) {
-                                    first = false;
-                                    combined_Q_dfs = Q_dfs;
-                                } else {
-                                    combined_Q_dfs *= theta;
-                                    combined_Q_dfs += Q_dfs;
+                                    math::polynomial<typename field_type::value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
+                                    math::polynomial<typename field_type::value_type> U =  this->get_U(b_ind, poly_ind);
+
+                                    math::polynomial<typename field_type::value_type> g_normal = this->_polys[b_ind][poly_ind];
+                                    math::polynomial<typename field_type::value_type> Q = g_normal - U;
+                                    Q = Q / V;
+                                    if (first) {
+                                        first = false;
+                                        combined_Q = Q;
+                                    } else {
+                                        combined_Q *= theta;
+                                        combined_Q += Q;
+                                    }
                                 }
                             }
                         }
 
                         precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
-                            combined_Q_dfs,
+                            combined_Q,
                             _fri_params.D[0], 
                             _fri_params.step_list.front()
                         );
 
                         typename fri_type::proof_type fri_proof = nil::crypto3::zk::algorithms::proof_eval<
-                            fri_type, math::polynomial_dfs<typename field_type::value_type>
+                            fri_type, poly_type
                         >(
                             this->_polys,
-                            combined_Q_dfs, 
+                            combined_Q, 
                             this->_trees,
                             combined_Q_precommitment, 
                             this->_fri_params, 

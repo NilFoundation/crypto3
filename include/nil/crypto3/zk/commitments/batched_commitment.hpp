@@ -25,6 +25,9 @@
 #ifndef CRYPTO3_ZK_STUB_PLACEHOLDER_COMMITMENT_SCHEME_HPP
 #define CRYPTO3_ZK_STUB_PLACEHOLDER_COMMITMENT_SCHEME_HPP
 
+#include <set>
+#include <map>
+
 #include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
@@ -42,14 +45,15 @@ namespace nil {
                     using field_type = FieldType;
                 };
 
-                template<typename ParamsType, typename TranscriptType> 
+                // Placeholder commitment scheme works with polynomial_dfs
+                template<typename ParamsType, typename TranscriptType, typename PolynomialType = typename math::polynomial_dfs<typename ParamsType::field_type::value_type>> 
                 class polys_evaluator{
                 public:
                     using params_type = ParamsType;
                     using commitment_type = typename ParamsType::commitment_type;
                     using field_type = typename ParamsType::field_type;
                     using transcript_type = TranscriptType;
-                    using poly_type = typename math::polynomial_dfs<typename field_type::value_type>;
+                    using poly_type = PolynomialType;
 
                     struct proof_type{
                         eval_storage<field_type> z;
@@ -58,7 +62,7 @@ namespace nil {
                     eval_storage<field_type> _z;
                     polys_evaluator(){}
                 protected:
-                    std::map<std::size_t, std::vector<math::polynomial_dfs<typename field_type::value_type>>> _polys;
+                    std::map<std::size_t, std::vector<poly_type>> _polys;
                     std::map<std::size_t, bool> _locked; // _locked[batch] is true after it is commited
                     std::map<std::size_t, std::vector<std::vector<typename field_type::value_type>>> _points;
                 protected:

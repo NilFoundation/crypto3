@@ -192,13 +192,14 @@ namespace nil {
 
             namespace algorithms {
                 template<typename FRI,
-                         typename std::enable_if<
-                             std::is_base_of<
-                                commitments::detail::basic_batched_fri<
-                                    typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                    typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
-                                FRI>::value,
-                             bool>::type = true>
+                    typename std::enable_if<
+                        std::is_base_of<
+                        commitments::detail::basic_batched_fri<
+                            typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                            typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
+                        FRI>::value,
+                        bool
+                    >::type = true>
                 static typename FRI::commitment_type commit(const typename FRI::precommitment_type &P) {
                     return P.root();
                 }
@@ -747,9 +748,9 @@ namespace nil {
                         std::tie(s, s_indices) = calculate_s<FRI>(x, x_index, fri_params.step_list[0], fri_params.D[0]);
                         auto correct_order_idx = get_correct_order<FRI>(x_index, domain_size, fri_params.step_list[0], s_indices);
 
-
                         // Check initial proof.
-                        for( std::size_t k = 0; k < FRI::batches_num; k++ ){
+                        for( auto const it: query_proof.initial_proof ){
+                            auto k = it.first;
                             if (query_proof.initial_proof.at(k).p.root() != commitments.at(k) ) {
                                 return false;
                             }
