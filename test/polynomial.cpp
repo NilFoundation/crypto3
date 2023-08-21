@@ -183,7 +183,6 @@ void test_division(
     a1 = a;
     a1 %= b;
     BOOST_CHECK_EQUAL(R_ans, a1);
-
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_division) {
@@ -200,6 +199,13 @@ BOOST_AUTO_TEST_CASE(polynomial_division_horner_long_second) {
 
 BOOST_AUTO_TEST_CASE(polynomial_division_horner_long_equal) {
     test_division({2, 0, 3, 2, 2}, {-2, 0, 0, 0, 1}, {2}, {6, 0, 3, 2});
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_division_on_zero_degree_polys) {
+    test_division({0, 1}, {1}, {0, 1}, {0});
+    test_division({0, 4}, {2}, {0, 2}, {0});
+    test_division({2, 0, 3, 2, 2}, {1}, {2, 0, 3, 2, 2}, {0});
+    test_division({4, 0, 4, 2, 2}, {2}, {2, 0, 2, 1, 1}, {0});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
