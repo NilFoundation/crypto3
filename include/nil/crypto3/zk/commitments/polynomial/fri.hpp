@@ -66,18 +66,15 @@ namespace nil {
                         typename TranscriptHashType,
                         std::size_t Lambda,
                         std::size_t M,
-                        std::size_t BatchesNum
-                    >
+                        std::size_t BatchesNum>
                 struct fri : public detail::basic_batched_fri<FieldType,
-                    MerkleTreeHashType,
-                    TranscriptHashType,
-                    Lambda, M, BatchesNum
-                > {
-                    using basic_fri = detail::basic_batched_fri<FieldType,
                         MerkleTreeHashType,
                         TranscriptHashType,
-                        Lambda, M, BatchesNum
-                    >;
+                        Lambda, M, BatchesNum> {
+                    using basic_fri = detail::basic_batched_fri<FieldType,
+                            MerkleTreeHashType,
+                            TranscriptHashType,
+                            Lambda, M, BatchesNum>;
                     constexpr static const std::size_t m = basic_fri::m;
                     constexpr static const std::size_t batches_num = basic_fri::batches_num;
 
@@ -143,10 +140,10 @@ namespace nil {
                     std::vector<math::polynomial<typename FRI::field_type::value_type>> combined_V = {{1}};
 
                     return verify_eval<typename FRI::basic_fri>(
-                        proof, fri_params, t_roots,
-                        FRI::basic_fri::field_type::value_type::one(),
-                        evals_map, combined_U, combined_V, 
-                        transcript
+                            proof, fri_params, t_roots,
+                            FRI::basic_fri::field_type::value_type::one(),
+                            evals_map, combined_U, combined_V,
+                            transcript
                     );
                 }
             }    // namespace algorithms

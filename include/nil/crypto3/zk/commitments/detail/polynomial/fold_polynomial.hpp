@@ -48,8 +48,8 @@ namespace nil {
 
                     template<typename FieldType>
                     math::polynomial<typename FieldType::value_type>
-                        fold_polynomial(math::polynomial<typename FieldType::value_type> &f,
-                                        typename FieldType::value_type alpha) {
+                    fold_polynomial(math::polynomial<typename FieldType::value_type> &f,
+                                    typename FieldType::value_type alpha) {
 
                         std::size_t d = f.degree();
                         if (d % 2 == 0) {
@@ -67,10 +67,10 @@ namespace nil {
 
                     template<typename FieldType>
                     math::polynomial_dfs<typename FieldType::value_type>
-                        fold_polynomial(math::polynomial_dfs<typename FieldType::value_type> &f,
-                                        const typename FieldType::value_type &alpha,
-                                        std::shared_ptr<math::evaluation_domain<FieldType>>
-                                            domain) {
+                    fold_polynomial(math::polynomial_dfs<typename FieldType::value_type> &f,
+                                    const typename FieldType::value_type &alpha,
+                                    std::shared_ptr<math::evaluation_domain<FieldType>>
+                                    domain) {
 
                         std::size_t d = f.degree();
 
@@ -78,7 +78,7 @@ namespace nil {
                         //  + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in
                         //  range(len(codeword)//2)]
                         math::polynomial_dfs<typename FieldType::value_type> f_folded(
-                            domain->size() / 2 - 1, domain->size() / 2, FieldType::value_type::zero());
+                                domain->size() / 2 - 1, domain->size() / 2, FieldType::value_type::zero());
 
                         typename FieldType::value_type two_inversed = 2;
                         two_inversed = two_inversed.inversed();

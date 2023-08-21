@@ -47,8 +47,10 @@
 #include <nil/crypto3/algebra/marshalling.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
+
+using namespace nil::crypto3::math;
 
 using namespace nil::crypto3;
 

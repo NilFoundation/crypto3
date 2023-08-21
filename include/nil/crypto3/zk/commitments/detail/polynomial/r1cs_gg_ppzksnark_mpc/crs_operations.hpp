@@ -17,9 +17,9 @@ namespace nil {
                 namespace detail {
                     template<typename CurveType>
                     typename snark::r1cs_gg_ppzksnark<CurveType>::keypair_type
-                        make_r1cs_gg_ppzksnark_keypair_from_powers_of_tau(
+                    make_r1cs_gg_ppzksnark_keypair_from_powers_of_tau(
                             const typename snark::r1cs_gg_ppzksnark<CurveType>::constraint_system_type
-                                &constraint_system,
+                            &constraint_system,
                             const powers_of_tau_result<CurveType> &powers_of_tau_result) {
                         using curve_type = CurveType;
                         using scalar_field_type = typename curve_type::scalar_field_type;
@@ -38,7 +38,7 @@ namespace nil {
                         r1cs_copy.swap_AB_if_beneficial();
 
                         qap_instance<scalar_field_type> qap =
-                            reductions::r1cs_to_qap<scalar_field_type>::instance_map(r1cs_copy);
+                                reductions::r1cs_to_qap<scalar_field_type>::instance_map(r1cs_copy);
 
                         BOOST_ASSERT_MSG(powers_of_tau_result.coeffs_g1.size() == qap.domain->m,
                                          "powers_of_tau_result size does not match the constraint system");
@@ -56,18 +56,18 @@ namespace nil {
                         std::vector<kc_value_type> b_kc(qap.num_variables + 1, kc_value_type::zero());
 
                         for (std::size_t i = 0; i < qap.num_variables + 1; ++i) {
-                            for (auto [lag, coeff] : qap.A_in_Lagrange_basis[i]) {
+                            for (auto [lag, coeff]: qap.A_in_Lagrange_basis[i]) {
                                 a_g1[i] = a_g1[i] + coeff * powers_of_tau_result.coeffs_g1[lag];
                                 beta_a_alpha_b_c[i] =
-                                    beta_a_alpha_b_c[i] + coeff * powers_of_tau_result.beta_coeffs_g1[lag];
+                                        beta_a_alpha_b_c[i] + coeff * powers_of_tau_result.beta_coeffs_g1[lag];
                             }
-                            for (auto [lag, coeff] : qap.B_in_Lagrange_basis[i]) {
+                            for (auto [lag, coeff]: qap.B_in_Lagrange_basis[i]) {
                                 b_kc[i] = b_kc[i] + coeff * kc_value_type(powers_of_tau_result.coeffs_g2[lag],
                                                                           powers_of_tau_result.coeffs_g1[lag]);
                                 beta_a_alpha_b_c[i] =
-                                    beta_a_alpha_b_c[i] + coeff * powers_of_tau_result.alpha_coeffs_g1[lag];
+                                        beta_a_alpha_b_c[i] + coeff * powers_of_tau_result.alpha_coeffs_g1[lag];
                             }
-                            for (auto [lag, coeff] : qap.C_in_Lagrange_basis[i]) {
+                            for (auto [lag, coeff]: qap.C_in_Lagrange_basis[i]) {
                                 beta_a_alpha_b_c[i] = beta_a_alpha_b_c[i] + coeff * powers_of_tau_result.coeffs_g1[lag];
                             }
                         }
@@ -86,7 +86,7 @@ namespace nil {
                         container::accumulation_vector<g1_type> gamma_ABC(std::move(gamma_ABC_g1_0),
                                                                           std::move(gamma_ABC_g1_values));
                         typename proving_scheme_type::verification_key_type vk(
-                            alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC);
+                                alpha_g1_beta_g2, gamma_g2, delta_g2, gamma_ABC);
 
                         commitments::knowledge_commitment_vector<g2_type, g1_type> B_query(std::move(b_kc));
                         std::vector<g1_value_type> H_query(powers_of_tau_result.h.begin(),
@@ -105,7 +105,7 @@ namespace nil {
                                                                           std::move(L_query),
                                                                           std::move(r1cs_copy));
 
-                        typename proving_scheme_type::keypair_type keypair {std::move(pk), std::move(vk)};
+                        typename proving_scheme_type::keypair_type keypair{std::move(pk), std::move(vk)};
 
                         return keypair;
                     }
@@ -114,11 +114,11 @@ namespace nil {
                     void transform_keypair(typename snark::r1cs_gg_ppzksnark<CurveType>::keypair_type &keypair,
                                            const r1cs_gg_ppzksnark_mpc_private_key<CurveType> &private_key) {
                         auto delta_inv = private_key.delta.inversed();
-                        for (auto &g : keypair.first.H_query) {
+                        for (auto &g: keypair.first.H_query) {
                             g = g * delta_inv;
                         }
 
-                        for (auto &g : keypair.first.L_query) {
+                        for (auto &g: keypair.first.L_query) {
                             g = g * delta_inv;
                         }
 

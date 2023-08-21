@@ -34,7 +34,9 @@ namespace nil {
                     typedef detail::powers_of_tau_result<curve_type> result_type;
                     typedef proof_of_knowledge<curve_type> proof_of_knowledge_scheme_type;
 
-                    enum parameter_personalization { tau_personalization, alpha_personalization, beta_personalization };
+                    enum parameter_personalization {
+                        tau_personalization, alpha_personalization, beta_personalization
+                    };
 
                     // The result of this function is considered toxic wast
                     // and should thus be destroyed
@@ -44,7 +46,7 @@ namespace nil {
                         typename scalar_field_type::value_type alpha = algebra::random_element<scalar_field_type>(rng);
                         typename scalar_field_type::value_type beta = algebra::random_element<scalar_field_type>(rng);
 
-                        return private_key_type {std::move(tau), std::move(alpha), std::move(beta)};
+                        return private_key_type{std::move(tau), std::move(alpha), std::move(beta)};
                     }
 
                     static auto rng_from_beacon(const std::vector<std::uint8_t> &beacon) {
@@ -68,13 +70,13 @@ namespace nil {
                                                       RNG &&rng = boost::random_device()) {
                         std::vector<std::uint8_t> transcript = compute_transcript(before);
                         auto tau_pok = proof_of_knowledge_scheme_type::proof_eval(
-                            private_key.tau, transcript, tau_personalization, rng);
+                                private_key.tau, transcript, tau_personalization, rng);
                         auto alpha_pok = proof_of_knowledge_scheme_type::proof_eval(
-                            private_key.alpha, transcript, alpha_personalization, rng);
+                                private_key.alpha, transcript, alpha_personalization, rng);
                         auto beta_pok = proof_of_knowledge_scheme_type::proof_eval(
-                            private_key.beta, transcript, beta_personalization, rng);
+                                private_key.beta, transcript, beta_personalization, rng);
 
-                        return public_key_type {std::move(tau_pok), std::move(alpha_pok), std::move(beta_pok)};
+                        return public_key_type{std::move(tau_pok), std::move(alpha_pok), std::move(beta_pok)};
                     }
 
                     static bool verify_eval(const public_key_type &public_key,
@@ -83,11 +85,12 @@ namespace nil {
                         std::vector<std::uint8_t> transcript = compute_transcript(before);
 
                         auto tau_g2_s = proof_of_knowledge_scheme_type::compute_g2_s(
-                            public_key.tau_pok.g1_s, public_key.tau_pok.g1_s_x, transcript, tau_personalization);
+                                public_key.tau_pok.g1_s, public_key.tau_pok.g1_s_x, transcript, tau_personalization);
                         auto alpha_g2_s = proof_of_knowledge_scheme_type::compute_g2_s(
-                            public_key.alpha_pok.g1_s, public_key.alpha_pok.g1_s_x, transcript, alpha_personalization);
+                                public_key.alpha_pok.g1_s, public_key.alpha_pok.g1_s_x, transcript,
+                                alpha_personalization);
                         auto beta_g2_s = proof_of_knowledge_scheme_type::compute_g2_s(
-                            public_key.beta_pok.g1_s, public_key.beta_pok.g1_s_x, transcript, beta_personalization);
+                                public_key.beta_pok.g1_s, public_key.beta_pok.g1_s_x, transcript, beta_personalization);
 
                         // Verify the proofs of knowledge of tau, alpha and beta
                         if (!proof_of_knowledge_scheme_type::verify_eval(public_key.tau_pok, tau_g2_s)) {
@@ -167,8 +170,8 @@ namespace nil {
                     static std::vector<std::uint8_t> serialize_accumulator(const accumulator_type &acc) {
                         using endianness = nil::marshalling::option::little_endian;
                         auto filled_val =
-                            nil::crypto3::marshalling::types::fill_powers_of_tau_accumulator<accumulator_type,
-                                                                                             endianness>(acc);
+                                nil::crypto3::marshalling::types::fill_powers_of_tau_accumulator<accumulator_type,
+                                        endianness>(acc);
                         std::vector<std::uint8_t> blob(filled_val.length());
                         auto it = std::begin(blob);
                         nil::marshalling::status_type status = filled_val.write(it, blob.size());

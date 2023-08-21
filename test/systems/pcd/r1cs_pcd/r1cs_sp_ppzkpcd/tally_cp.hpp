@@ -37,10 +37,7 @@
 #ifndef CRYPTO3_ZK_TALLY_CP_HPP
 #define CRYPTO3_ZK_TALLY_CP_HPP
 
-#include <nil/crypto3/zk/snark/components/basic_components.hpp>
-
 #include <nil/crypto3/zk/snark/systems/pcd/r1cs_pcd/compliance_predicate.hpp>
-#include <nil/crypto3/zk/snark/systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 
 namespace nil {
     namespace crypto3 {

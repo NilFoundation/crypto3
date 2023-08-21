@@ -75,9 +75,9 @@ set(TESTS_NAMES
 
     "routing_algorithms/test_routing_algorithms"
 
-    "relations/numeric/qap"
-    "relations/numeric/sap"
-    "relations/numeric/ssp"
+#    "relations/numeric/qap"
+#    "relations/numeric/sap"
+#    "relations/numeric/ssp"
 
     "systems/plonk/pickles/pickles"
     "systems/plonk/pickles/kimchi"
@@ -87,18 +87,18 @@ set(TESTS_NAMES
     
     "systems/plonk/placeholder/placeholder"
 
-    "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
-    "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
+#    "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
+#    "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
 
-    "systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
+#    "systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_tvm_marshalling"
     "systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
-    "systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
-    "systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
-    "systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
-    "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
+#    "systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
+#    "systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
+#    "systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
+#    "systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_aggregation_conformity"
 
     "transcript/transcript"

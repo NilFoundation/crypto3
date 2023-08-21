@@ -42,7 +42,7 @@ namespace nil {
                         pok_type delta_pok;
 
                         r1cs_gg_ppzksnark_mpc_public_key(g1_value_type delta_after, pok_type delta_pok) :
-                            delta_after(delta_after), delta_pok(delta_pok) {
+                                delta_after(delta_after), delta_pok(delta_pok) {
                         }
                     };
                 }    // namespace detail
