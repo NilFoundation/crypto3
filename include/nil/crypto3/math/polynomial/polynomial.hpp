@@ -59,19 +59,37 @@ namespace nil {
                 }
 
                 explicit polynomial(size_type n) : val(n) {
+                    if (val.empty()) {
+                        val.push_back(0);
+                    }
                 }
+
                 explicit polynomial(size_type n, const allocator_type& a) : val(n, a) {
+                    if (val.empty()) {
+                        val.push_back(0);
+                    }
                 }
 
                 polynomial(size_type n, const value_type& x) : val(n, x) {
+                    if (val.empty()) {
+                        val.push_back(0);
+                    }
                 }
+
                 polynomial(size_type n, const value_type& x, const allocator_type& a) : val(n, x, a) {
                 }
                 template<typename InputIterator>
                 polynomial(InputIterator first, InputIterator last) : val(first, last) {
+                    if (val.empty()) {
+                        val.push_back(0);
+                    }
                 }
+
                 template<typename InputIterator>
                 polynomial(InputIterator first, InputIterator last, const allocator_type& a) : val(first, last, a) {
+                    if (val.empty()) {
+                        val.push_back(0);
+                    }
                 }
 
                 ~polynomial() = default;
@@ -100,11 +118,15 @@ namespace nil {
                 }
 
                 explicit polynomial(const container_type &c) : val(c) {
-
+                    if (val.empty()) {
+                        val.push_back(0);
+                    }
                 }
 
                 explicit polynomial(container_type &&c) : val(c) {
-
+                    if (val.empty()) {
+                        val.push_back(0);
+                    }
                 }
 
                 polynomial& operator=(const polynomial& x) {
@@ -146,7 +168,7 @@ namespace nil {
                 }
 
                 void assign(size_type n, const_reference u) {
-                    return val.assign(n, u);
+                    val.assign(n, u);
                 }
 
                 void assign(std::initializer_list<value_type> il) {

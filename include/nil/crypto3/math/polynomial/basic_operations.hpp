@@ -223,7 +223,7 @@ namespace nil {
             }
 
             /**
-             * Perform the standard Euclidean Division algorithm.
+             * Perform the standard Euclidean Division algorithm. We can not assume that q or r are empty.
              * Input: Polynomial A, Polynomial B, where A / B
              * Output: Polynomial Q, Polynomial R, such that A = (Q * B) + R.
              */
@@ -235,18 +235,29 @@ namespace nil {
 
                 std::size_t d = b.size() - 1; /* Degree of B */
 
-                if (b.back() == value_type::one() && is_zero(b.begin() + 1, b.end() - 1) && a.size() >= b.size()) {
+                // Special case when B has degree 0.
+                if (d == 0) {
+                    value_type c = b[0].inversed();
+                    q.resize(a.size());
+                    std::transform(
+                            std::begin(a), std::end(a), std::begin(q), [&c](const value_type& value) {return value * c;});
+                    // We will always have no reminder here.
+                    r.resize(1);
+                    r[0] = 0;
+                }
+                // Special case when B = X^N + C.
+                else if (b.back() == value_type::one() && is_zero(b.begin() + 1, b.end() - 1) && a.size() >= b.size()) {
                     q = Range(a.size() - b.size() + 1, value_type::zero());
                     r = Range(a.begin(), a.end() - (a.size() - b.size() + 1));
 
-                    value_type x = -b[0];
-                    auto end = a.end() - 1;
+                    value_type c = -b[0];
+                    auto end = --a.end();
                     for (std::size_t t = q.size(); t != 0; --t, --end) {
                         q[t - 1] += *end;
                         if (t - 1 >= d) {
-                            q[t - 1 - d] = q[t - 1] * x;
+                            q[t - 1 - d] = q[t - 1] * c;
                         } else {
-                            r[t - 1] += q[t - 1] * x;
+                            r[t - 1] += q[t - 1] * c;
                         }
                     }
                     condense(r);
