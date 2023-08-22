@@ -36,8 +36,7 @@
 #include <cstdlib>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/arithmetization/variable.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/linear_combination.hpp>
+#include <nil/crypto3/zk/math/linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -56,7 +55,7 @@ namespace nil {
                  * A USCS constraint is used to construct a USCS constraint system (see below).
                  */
                 template<typename FieldType>
-                using uscs_constraint = linear_combination<FieldType>;
+                using uscs_constraint = math::linear_combination<FieldType>;
 
                 /************************* USCS variable assignment **************************/
 

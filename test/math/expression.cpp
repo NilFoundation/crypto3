@@ -27,6 +27,7 @@
 #include <string>
 #include <random>
 #include <iostream>
+#include <set>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -37,6 +38,7 @@
 
 #include <nil/crypto3/zk/math/expression.hpp>
 #include <nil/crypto3/zk/math/expression_visitors.hpp>
+#include <nil/crypto3/zk/math/expression_evaluator.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 using namespace nil::crypto3;
@@ -49,7 +51,7 @@ BOOST_AUTO_TEST_CASE(expression_to_non_linear_combination_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);
@@ -59,13 +61,11 @@ BOOST_AUTO_TEST_CASE(expression_to_non_linear_combination_test) {
     expression<variable_type> expr = (w0 + w1) * (w2 + w3);
    
     expression_to_non_linear_combination_visitor<variable_type> visitor;
-    auto comb = visitor.convert(expr);
+    non_linear_combination<variable_type> result = visitor.convert(expr);
+    non_linear_combination<variable_type> expected({w0 * w2, w0 * w3, w1 * w2, w1 * w3});
  
-    BOOST_CHECK_EQUAL(comb.terms.size(), 4);
-    BOOST_CHECK_EQUAL(comb.terms[0], w0 * w2);
-    BOOST_CHECK_EQUAL(comb.terms[1], w0 * w3);
-    BOOST_CHECK_EQUAL(comb.terms[2], w1 * w2);
-    BOOST_CHECK_EQUAL(comb.terms[3], w1 * w3);
+    // We may get the terms in a different order due to changes in the code, and that's fine.
+    BOOST_CHECK_EQUAL(result, expected);
 }
 
 BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
 
     expression<variable_type> expr = (w0 + w1) * (w2 + w3);
    
-    expression_evaluator<variable_type, variable_type::assignment_type> evaluator(
+    expression_evaluator<variable_type> evaluator(
         expr,
         [&w0, &w1, &w2, &w3](const variable_type& var) {
             if (var == w0) return variable_type::assignment_type(1);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(expression_max_degree_visitor_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(expression_for_each_variable_visitor_test) {
     // setup
     using curve_type = algebra::curves::pallas;
     using FieldType = typename curve_type::base_field_type;
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<FieldType>;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
     variable_type w0(0, 0, variable_type::column_type::witness);
     variable_type w1(3, -1, variable_type::column_type::public_input);

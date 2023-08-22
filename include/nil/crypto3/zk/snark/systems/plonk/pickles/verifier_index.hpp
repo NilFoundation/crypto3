@@ -27,7 +27,7 @@
 #ifndef CRYPTO3_ZK_PLONK_BATCHED_PICKLES_VERIFIER_INDEXER_HPP
 #define CRYPTO3_ZK_PLONK_BATCHED_PICKLES_VERIFIER_INDEXER_HPP
 
-#include <nil/crypto3/hash/detail/poseidon/kimchi_constants.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_constants.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kimchi_pedersen.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/alphas.hpp>
@@ -52,8 +52,8 @@ namespace nil {
                 // hashes::detail::poseidon_constants_kimchi<base_field_type> fq_sponge_params;
                 template<
                     typename CurveType, 
-                    typename PoseidonKimchiScalarConstants = hashes::detail::poseidon_constants_kimchi<typename CurveType::scalar_field_type>,
-                    typename PoseidonKimchiBaseConstants = hashes::detail::poseidon_constants_kimchi<typename CurveType::base_field_type>,
+                    typename PoseidonKimchiScalarConstants = hashes::detail::poseidon_constants<nil::crypto3::hashes::detail::mina_poseidon_policy<typename CurveType::scalar_field_type>>,
+                    typename PoseidonKimchiBaseConstants = hashes::detail::poseidon_constants<nil::crypto3::hashes::detail::mina_poseidon_policy<typename CurveType::base_field_type>>,
                     std::size_t WiresAmount = kimchi_constant::COLUMNS, 
                     std::size_t Permuts = kimchi_constant::PERMUTES
                 >

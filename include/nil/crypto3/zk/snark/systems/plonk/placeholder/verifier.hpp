@@ -120,7 +120,7 @@ namespace nil {
                                 auto key = std::make_tuple(
                                     i,
                                     rotation,
-                                    plonk_variable<FieldType>::column_type::witness);
+                                    plonk_variable<typename FieldType::value_type>::column_type::witness);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[0][i][j];
                                 ++j;
                             }
@@ -134,7 +134,7 @@ namespace nil {
                                 auto key = std::make_tuple(
                                     i,
                                     rotation,
-                                    plonk_variable<FieldType>::column_type::public_input);
+                                    plonk_variable<typename FieldType::value_type>::column_type::public_input);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[0][witness_columns + i][j];
                                 ++j;
                             }
@@ -147,7 +147,7 @@ namespace nil {
                                 auto key = std::make_tuple(
                                     i,
                                     rotation,
-                                    plonk_variable<FieldType>::column_type::constant);
+                                    plonk_variable<typename FieldType::value_type>::column_type::constant);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[3][i + permutation_size*2][j];
                                 ++j;
                             }
@@ -160,7 +160,7 @@ namespace nil {
                                 auto key = std::make_tuple(
                                     i,
                                     rotation,
-                                    plonk_variable<FieldType>::column_type::selector);
+                                    plonk_variable<typename FieldType::value_type>::column_type::selector);
                                 columns_at_y[key] = proof.eval_proof.combined_value.z[3][i + permutation_size*2 + constant_columns][j];
                                 ++j;
                             }

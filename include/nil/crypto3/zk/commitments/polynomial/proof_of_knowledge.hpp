@@ -92,7 +92,7 @@ namespace nil {
                         std::copy(std::cbegin(g1_s_x_blob), std::cend(g1_s_x_blob), std::back_inserter(g1_s_x_blob));
 
                         std::vector<std::uint8_t> hash =
-                            nil::crypto3::hash<hashes::blake2b<256>>(personalization_transcript_g1s_g1sx);
+                                nil::crypto3::hash<hashes::blake2b<256>>(personalization_transcript_g1s_g1sx);
 
                         // this is unsecure as it's only using the first byte,
                         // it should be chacha which is currently broken
@@ -106,7 +106,7 @@ namespace nil {
                     static std::vector<std::uint8_t> serialize_g1_uncompressed(const g1_value_type &g) {
                         using endianness = nil::marshalling::option::little_endian;
                         auto filled_val =
-                            nil::crypto3::marshalling::types::fill_fast_curve_element<g1_type, endianness>(g);
+                                nil::crypto3::marshalling::types::fill_fast_curve_element<g1_type, endianness>(g);
                         std::vector<std::uint8_t> blob(filled_val.length());
                         auto it = std::begin(blob);
                         nil::marshalling::status_type status = filled_val.write(it, blob.size());

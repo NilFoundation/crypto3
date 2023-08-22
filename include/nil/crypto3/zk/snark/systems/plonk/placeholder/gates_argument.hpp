@@ -42,8 +42,9 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/math/expression.hpp>
+#include <nil/crypto3/zk/math/expression_evaluator.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -53,6 +54,7 @@ namespace nil {
                 plonk_polynomial_dfs_table<FieldType, ArithmetizationParams>
                     resize(const plonk_polynomial_dfs_table<FieldType, ArithmetizationParams> &table,
                                             std::uint32_t new_size) {
+                    PROFILE_PLACEHOLDER_SCOPE("gate_argument_assignments_resizing_time");
 
                     auto public_inputs = table.public_table().public_inputs();
                     for (auto& public_input : public_inputs) {
@@ -65,9 +67,12 @@ namespace nil {
                     }
 
                     auto selectors = table.public_table().selectors();
-                    for (auto& selector : selectors) {
-                        selector.resize(new_size);
-                    }
+                    // Save memory by not resizing the selectors.
+                    // They are used only once in gate argument, so we can resize them
+                    // as needed.
+                    //for (auto& selector : selectors) {
+                    //    selector.resize(new_size);
+                    //}
 
                     auto witnesses = table.private_table().witnesses();
                     for (auto& witness : witnesses) {
@@ -89,12 +94,15 @@ namespace nil {
 
                     typedef typename ParamsType::transcript_hash_type transcript_hash_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
+                    using polynomial_dfs_type = math::polynomial_dfs<typename FieldType::value_type>;
+                    using variable_type = plonk_variable<typename FieldType::value_type>;
+                    using polynomial_dfs_variable_type = plonk_variable<polynomial_dfs_type>;
 
                     typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
                     constexpr static const std::size_t argument_size = 1;
 
-                    static inline std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size>
+                    static inline std::array<polynomial_dfs_type, argument_size>
                         prove_eval(
                             const typename policy_type::constraint_system_type &constraint_system,
                             const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
@@ -105,33 +113,89 @@ namespace nil {
                             transcript_type& transcript) {
                         PROFILE_PLACEHOLDER_SCOPE("gate_argument_time");
 
-                        std::uint32_t extended_domain_size = original_domain->m * std::pow(2, ceil(std::log2(max_gates_degree)));
+                        std::uint32_t extended_domain_size = original_domain->m * 
+                            std::pow(2, ceil(std::log2(max_gates_degree)));
                         
                         const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             extended_column_polynomials = resize(column_polynomials, extended_domain_size);
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
-                        std::array<math::polynomial_dfs<typename FieldType::value_type>, argument_size> F;
-                        F[0] = math::polynomial_dfs<typename FieldType::value_type>(0, extended_domain_size, FieldType::value_type::zero());
+                        auto value_type_to_polynomial_dfs = [&assignments=extended_column_polynomials](
+                            const typename variable_type::assignment_type& coeff) {
+                                return polynomial_dfs_type(0, 1, coeff);
+                            };
+
+                        bool is_final_expression_zero = true;
+                        math::expression<polynomial_dfs_variable_type> expr; 
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
+                        // Every constraint has variable type 'variable_type', but we want it to use
+                        // 'polynomial_dfs_variable_type' instead. The only difference is the coefficient type
+                        // inside a term. We want the coefficients to be dfs polynomials here.
+                        math::expression_variable_type_converter<variable_type, polynomial_dfs_variable_type> converter(
+                            value_type_to_polynomial_dfs);
+
                         const auto& gates = constraint_system.gates();
                         for (const auto& gate: gates) {
-                            math::polynomial_dfs<typename FieldType::value_type> gate_result(
-                                0, extended_domain_size, FieldType::value_type::zero());
+                            bool is_gate_result_zero = true;
+                            math::expression<polynomial_dfs_variable_type> gate_result; 
 
                             for (const auto& constraint : gate.constraints) {
-                                gate_result = gate_result +
-                                              constraint.evaluate(extended_column_polynomials, original_domain) * theta_acc;
+                                if (is_gate_result_zero) {
+                                    gate_result = converter.convert(constraint) * value_type_to_polynomial_dfs(theta_acc);
+                                    is_gate_result_zero = false;
+                                }
+                                else
+                                {
+                                    gate_result += converter.convert(constraint) * value_type_to_polynomial_dfs(theta_acc);
+                                }
                                 theta_acc *= theta;
                             }
 
-                            gate_result = gate_result * extended_column_polynomials.selector(gate.selector_index);
+                            gate_result *= polynomial_dfs_variable_type(
+                                gate.selector_index, 0, false, polynomial_dfs_variable_type::column_type::selector);
 
-                            F[0] += gate_result;
+                            if (is_final_expression_zero) {
+                                expr = gate_result;
+                                is_final_expression_zero = false;
+                            }
+                            else {
+                                expr += gate_result;
+                            }
                         }
+
+                        auto get_var_value = [
+                            &domain=original_domain, &assignments=extended_column_polynomials]
+                            (const polynomial_dfs_variable_type &var) {
+                                polynomial_dfs_type assignment;
+                                switch (var.type) {
+                                    case polynomial_dfs_variable_type::column_type::witness:
+                                        assignment = assignments.witness(var.index);
+                                        break;
+                                    case polynomial_dfs_variable_type::column_type::public_input:
+                                        assignment = assignments.public_input(var.index);
+                                        break;
+                                    case polynomial_dfs_variable_type::column_type::constant:
+                                        assignment = assignments.constant(var.index);
+                                        break;
+                                    case polynomial_dfs_variable_type::column_type::selector:
+                                        assignment = assignments.selector(var.index);
+                                        break;
+                                }
+
+                                if (var.rotation != 0) {
+                                    assignment = math::polynomial_shift(assignment, var.rotation, domain->m);
+                                }
+                                return assignment;
+                            };
+
+                        math::cached_expression_evaluator<polynomial_dfs_variable_type> evaluator(
+                            expr, get_var_value);
+
+                        std::array<polynomial_dfs_type, argument_size> F;
+                        F[0] = evaluator.evaluate();
 
                         return F;
                     }
@@ -155,9 +219,9 @@ namespace nil {
                                 theta_acc *= theta;
                             }
 
-                            std::tuple<std::size_t, int, typename plonk_variable<FieldType>::column_type> selector_key =
+                            std::tuple<std::size_t, int, typename plonk_variable<typename FieldType::value_type>::column_type> selector_key =
                                 std::make_tuple(gate.selector_index, 0,
-                                                plonk_variable<FieldType>::column_type::selector);
+                                                plonk_variable<typename FieldType::value_type>::column_type::selector);
 
                             gate_result = gate_result * evaluations[selector_key];
 

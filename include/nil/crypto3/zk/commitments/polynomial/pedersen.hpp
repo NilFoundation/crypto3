@@ -61,6 +61,7 @@ namespace nil {
 
                         private_key() : s(0), t(0) {
                         }
+
                         private_key(evaluation_type a, evaluation_type b) : s(a), t(b) {
                         }
                     };
@@ -129,7 +130,7 @@ namespace nil {
                         }
 
                         std::vector<evaluation_type> s_i =
-                            poly_eval(params, f_coeffs);    // pair (s_i[j], t_i[j]) is given exclusively
+                                poly_eval(params, f_coeffs);    // pair (s_i[j], t_i[j]) is given exclusively
                         std::vector<evaluation_type> t_i = poly_eval(params, g_coeffs);    // to party number j
                         for (int i = 0; i < params.n; ++i) {
                             prf.pk.push_back(private_key(s_i[i], t_i[i]));

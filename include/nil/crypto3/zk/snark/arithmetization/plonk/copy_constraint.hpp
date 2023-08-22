@@ -35,7 +35,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                using plonk_copy_constraint = std::pair<plonk_variable<FieldType>, plonk_variable<FieldType>>;
+                using plonk_copy_constraint = std::pair<plonk_variable<typename FieldType::value_type>, plonk_variable<typename FieldType::value_type>>;
 
             }    // namespace snark
         }        // namespace zk

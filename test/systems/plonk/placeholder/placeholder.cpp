@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabl
         std::size_t i_global_index = i;
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
+            auto key = std::make_tuple(i, rotation, plonk_variable<typename FieldType::value_type>::column_type::witness);
             columns_at_y[key] = polynomial_table.witness(i).evaluate(y * circuit.omega.pow(rotation));
         }
     }
@@ -406,7 +406,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabl
                                      placeholder_test_params_lookups::public_input_columns + i;
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
+            auto key = std::make_tuple(i, rotation, plonk_variable<typename FieldType::value_type>::column_type::constant);
 
             columns_at_y[key] = polynomial_table.constant(i).evaluate(y * circuit.omega.pow(rotation));
         }
@@ -418,7 +418,7 @@ BOOST_AUTO_TEST_CASE(placeholder_lookup_argument_test, *boost::unit_test::disabl
                                      placeholder_test_params_lookups::public_input_columns + i;
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
+            auto key = std::make_tuple(i, rotation, plonk_variable<typename FieldType::value_type>::column_type::selector);
 
             columns_at_y[key] = polynomial_table.selector(i).evaluate(y * circuit.omega.pow(rotation));
         }
@@ -506,7 +506,7 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
         std::size_t i_global_index = i;
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::witness);
+            auto key = std::make_tuple(i, rotation, plonk_variable<typename FieldType::value_type>::column_type::witness);
             columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
         }
     }
@@ -516,7 +516,7 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
 
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::public_input);
+            auto key = std::make_tuple(i, rotation, plonk_variable<typename FieldType::value_type>::column_type::public_input);
 
             columns_at_y[key] = polynomial_table.public_input(i).evaluate(y * omega.pow(rotation));
         }
@@ -527,7 +527,7 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
             placeholder_test_params::witness_columns + placeholder_test_params::public_input_columns + i;
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::constant);
+            auto key = std::make_tuple(i, rotation, plonk_variable<typename FieldType::value_type>::column_type::constant);
 
             columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
         }
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
                                      placeholder_test_params::public_input_columns + i;
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
-            auto key = std::make_tuple(i, rotation, plonk_variable<FieldType>::column_type::selector);
+            auto key = std::make_tuple(i, rotation, plonk_variable<typename FieldType::value_type>::column_type::selector);
 
             columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
         }

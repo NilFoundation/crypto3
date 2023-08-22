@@ -37,8 +37,7 @@
 
 #include <vector>
 
-#include <nil/crypto3/zk/snark/arithmetization/variable.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/linear_combination.hpp>
+#include <nil/crypto3/zk/math/linear_combination.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -65,8 +64,8 @@ namespace nil {
                 struct bacs_gate {
                     typedef FieldType field_type;
 
-                    linear_combination<FieldType> lhs;
-                    linear_combination<FieldType> rhs;
+                    math::linear_combination<FieldType> lhs;
+                    math::linear_combination<FieldType> rhs;
 
                     variable<FieldType> output;
                     bool is_circuit_output;

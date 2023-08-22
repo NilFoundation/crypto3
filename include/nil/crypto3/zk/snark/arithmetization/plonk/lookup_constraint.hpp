@@ -35,7 +35,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename VariableType = plonk_variable<FieldType>>
+                template<typename FieldType, typename VariableType = plonk_variable<typename FieldType::value_type>>
                 class plonk_lookup_constraint {
                 public:
                     using field_type = FieldType;

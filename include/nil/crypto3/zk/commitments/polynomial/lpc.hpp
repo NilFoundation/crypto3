@@ -44,9 +44,9 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
-                
+
                 template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda,
-                         std::size_t R, std::size_t M, std::size_t BatchesNum>
+                        std::size_t R, std::size_t M, std::size_t BatchesNum>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -73,14 +73,13 @@ namespace nil {
                 struct batched_list_polynomial_commitment;
 
                 template<typename FieldType, typename LPCParams>
-                struct batched_list_polynomial_commitment: public detail::basic_batched_fri<
-                        FieldType, 
+                struct batched_list_polynomial_commitment : public detail::basic_batched_fri<
+                        FieldType,
                         typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda, 
+                        LPCParams::lambda,
                         LPCParams::m,
-                        LPCParams::batches_num
-                > {
+                        LPCParams::batches_num> {
 
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
@@ -95,9 +94,8 @@ namespace nil {
                     typedef typename containers::merkle_proof<merkle_hash_type, 2> merkle_proof_type;
 
                     using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
-                        typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda, LPCParams::m, LPCParams::batches_num
-                    >;
+                            typename LPCParams::transcript_hash_type,
+                            LPCParams::lambda, LPCParams::m, LPCParams::batches_num>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
@@ -109,9 +107,11 @@ namespace nil {
                         bool operator==(const proof_type &rhs) const {
                             return fri_proof == rhs.fri_proof && z == rhs.z;
                         }
+
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
+
                         typedef std::vector<std::vector<typename FieldType::value_type>> z_type;
 
                         std::array<z_type, batches_num> z;
@@ -121,16 +121,16 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams>
                 using batched_lpc = batched_list_polynomial_commitment<
-                    FieldType, commitments::list_polynomial_commitment_params<
-                        typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda, LPCParams::r,  LPCParams::m, LPCParams::batches_num
-                    >>;
+                        FieldType, commitments::list_polynomial_commitment_params<
+                                typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                                LPCParams::lambda, LPCParams::r, LPCParams::m, LPCParams::batches_num
+                        >>;
                 template<typename FieldType, typename LPCParams>
                 using lpc = batched_list_polynomial_commitment<
-                    FieldType, list_polynomial_commitment_params<
-                        typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda, LPCParams::r,  LPCParams::m, LPCParams::batches_num
-                    >>;
+                        FieldType, list_polynomial_commitment_params<
+                                typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                                LPCParams::lambda, LPCParams::r, LPCParams::m, LPCParams::batches_num
+                        >>;
 
                 template<typename FieldType, typename LPCParams>
                 using list_polynomial_commitment = batched_list_polynomial_commitment<FieldType, LPCParams>;
@@ -138,24 +138,23 @@ namespace nil {
             }    // namespace commitments
 
             namespace algorithms {
-                template<
-                    typename LPC,
-                    typename ContainerType,    // TODO: check for value_type == std::vector<typename
-                                               // LPC::field_type::value_type>?
-                    typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<
-                                                            typename LPC::field_type, typename LPC::lpc_params>,
-                                                            LPC>::value &&
+                template<typename LPC,
+                        typename ContainerType,    // TODO: check for value_type == std::vector<typename
+                        // LPC::field_type::value_type>?
+                        typename std::enable_if<std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                typename LPC::field_type, typename LPC::lpc_params>,
+                                LPC>::value &&
                                                 std::is_same_v<typename ContainerType::value_type,
-                                                               std::vector<typename LPC::field_type::value_type>>,
-                                            bool>::type = true>
+                                                        std::vector<typename LPC::field_type::value_type>>,
+                                bool>::type = true>
                 static typename LPC::proof_type proof_eval(
-                    const std::array<ContainerType, LPC::basic_fri::batches_num> &evaluation_points,
-                    const std::array<typename LPC::precommitment_type, LPC::basic_fri::batches_num> &precommitments,
-                    std::array<std::vector<math::polynomial<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &g,
-                    const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
-                ) {
-                    for(std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
+                        const std::array<ContainerType, LPC::basic_fri::batches_num> &evaluation_points,
+                        const std::array<typename LPC::precommitment_type, LPC::basic_fri::batches_num> &precommitments,
+                        std::array<std::vector<math::polynomial<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &g,
+                        const typename LPC::basic_fri::params_type &fri_params,
+                        typename LPC::basic_fri::transcript_type &transcript) {
+
+                    for (std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
                         transcript(commit<typename LPC::basic_fri>(precommitments[i]));
                     }
                     typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
@@ -178,15 +177,16 @@ namespace nil {
                             for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
 
                                 z[k][polynom_index][point_index] = g[k][polynom_index].evaluate(
-                                    evaluation_point[point_index]);    // transform to point-representation
+                                        evaluation_point[point_index]);    // transform to point-representation
 
                                 U_interpolation_points[point_index] =
-                                    std::make_pair(evaluation_point[point_index],
-                                                z[k][polynom_index][point_index]);    // prepare points for interpolation
+                                        std::make_pair(evaluation_point[point_index],
+                                                       z[k][polynom_index][point_index]);    // prepare points for interpolation
                             }
 
                             math::polynomial<typename LPC::field_type::value_type> Q;
-                            math::polynomial<typename LPC::field_type::value_type> U = math::lagrange_interpolation(U_interpolation_points);
+                            math::polynomial<typename LPC::field_type::value_type> U = math::lagrange_interpolation(
+                                    U_interpolation_points);
 
                             Q = g[k][polynom_index] - U;
                             combined_U = combined_U * theta;
@@ -195,8 +195,8 @@ namespace nil {
                             math::polynomial<typename LPC::field_type::value_type> denominator_polynom = {1};
                             for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
                                 denominator_polynom =
-                                    denominator_polynom * math::polynomial<typename LPC::field_type::value_type> {
-                                                            -evaluation_point[point_index], 1};
+                                        denominator_polynom * math::polynomial<typename LPC::field_type::value_type>{
+                                                -evaluation_point[point_index], 1};
                             }
 
                             Q = Q / denominator_polynom;
@@ -209,45 +209,45 @@ namespace nil {
                     }
                     typename LPC::basic_fri::proof_type fri_proof;
                     typename LPC::precommitment_type combined_Q_precommitment =
-                    precommit<typename LPC::basic_fri>(combined_Q, fri_params.D[0], fri_params.step_list.front());
+                            precommit<typename LPC::basic_fri>(combined_Q, fri_params.D[0],
+                                                               fri_params.step_list.front());
 
                     fri_proof = proof_eval<typename LPC::basic_fri, math::polynomial<typename LPC::field_type::value_type>>(
                             g,
-                            combined_Q, 
+                            combined_Q,
                             precommitments,
-                            combined_Q_precommitment, 
-                            fri_params, 
+                            combined_Q_precommitment,
+                            fri_params,
                             transcript
                     );
                     return typename LPC::proof_type({z, fri_proof});
                 }
 
                 template<typename LPC, typename std::enable_if<
-                                            std::is_base_of<commitments::batched_list_polynomial_commitment<
-                                                                typename LPC::field_type, typename LPC::lpc_params>,
-                                                            LPC>::value,
-                                            bool>::type = true>
+                        std::is_base_of<commitments::batched_list_polynomial_commitment<
+                                typename LPC::field_type, typename LPC::lpc_params>,
+                                LPC>::value,
+                        bool>::type = true>
                 static typename LPC::proof_type proof_eval(
-                    std::array<std::vector<std::vector<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &evaluation_points,
-                    const std::array<typename LPC::precommitment_type, LPC::basic_fri::batches_num> &precommitments,
-                    std::array<std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &g,
-                    const typename LPC::basic_fri::params_type &fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
-                ) {
-                    for(std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
+                        std::array<std::vector<std::vector<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &evaluation_points,
+                        const std::array<typename LPC::precommitment_type, LPC::basic_fri::batches_num> &precommitments,
+                        std::array<std::vector<math::polynomial_dfs<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &g,
+                        const typename LPC::basic_fri::params_type &fri_params,
+                        typename LPC::basic_fri::transcript_type &transcript) {
+                    for (std::size_t i = 0; i < LPC::basic_fri::batches_num; i++) {
                         transcript(commit<typename LPC::basic_fri>(precommitments[i]));
                     }
-                    
+
                     // Prepare z-s and combined_Q;
                     typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
                     math::polynomial_dfs<typename LPC::field_type::value_type> combined_Q_dfs(
-                        0, fri_params.D[0]->size(), 
-                        LPC::field_type::value_type::zero()
+                            0, fri_params.D[0]->size(),
+                            LPC::field_type::value_type::zero()
                     );
 
 
                     std::array<typename LPC::proof_type::z_type, LPC::basic_fri::batches_num> z;
-                    
+
                     for (std::size_t k = 0; k < LPC::basic_fri::batches_num; k++) {
                         z[k].resize(g[k].size());
 
@@ -266,26 +266,31 @@ namespace nil {
                             U_interpolation_points.resize(evaluation_point.size());
                             z[k][polynom_index].resize(evaluation_point.size());
 
-                            math::polynomial<typename LPC::field_type::value_type> g_normal(g[k][polynom_index].coefficients());
+                            math::polynomial<typename LPC::field_type::value_type> g_normal(
+                                    g[k][polynom_index].coefficients());
 
                             math::polynomial<typename LPC::field_type::value_type> V = {1};
                             for (std::size_t point_index = 0; point_index < evaluation_point.size(); point_index++) {
                                 z[k][polynom_index][point_index] = g_normal.evaluate(evaluation_point[point_index]);
                                 U_interpolation_points[point_index] =
-                                    std::make_pair(evaluation_point[point_index],
-                                        z[k][polynom_index][point_index]
-                                );    // prepare points for interpolation
-                                V = V * math::polynomial<typename LPC::field_type::value_type>({-evaluation_point[point_index],1});
+                                        std::make_pair(evaluation_point[point_index],
+                                                       z[k][polynom_index][point_index]
+                                        );    // prepare points for interpolation
+                                V = V * math::polynomial<typename LPC::field_type::value_type>(
+                                        {-evaluation_point[point_index], 1});
                             }
                             math::polynomial<typename LPC::field_type::value_type> U =
-                                math::lagrange_interpolation(U_interpolation_points);
-                            math::polynomial_dfs<typename LPC::field_type::value_type> U_dfs(0, fri_params.D[0]->size());
+                                    math::lagrange_interpolation(U_interpolation_points);
+                            math::polynomial_dfs<typename LPC::field_type::value_type> U_dfs(0,
+                                                                                             fri_params.D[0]->size());
                             U_dfs.from_coefficients(U);
-                            math::polynomial_dfs<typename LPC::field_type::value_type> denominator_dfs(0, fri_params.D[0]->size());
+                            math::polynomial_dfs<typename LPC::field_type::value_type> denominator_dfs(0,
+                                                                                                       fri_params.D[0]->size());
 
                             math::polynomial<typename LPC::field_type::value_type> Q = g_normal - U;
                             Q = Q / V;
-                            math::polynomial_dfs<typename LPC::field_type::value_type> Q_dfs(0, fri_params.D[0]->size());
+                            math::polynomial_dfs<typename LPC::field_type::value_type> Q_dfs(0,
+                                                                                             fri_params.D[0]->size());
                             Q_dfs.from_coefficients(Q);
 
                             if (k == 0 && polynom_index == 0) {
@@ -299,33 +304,31 @@ namespace nil {
 
                     typename LPC::basic_fri::proof_type fri_proof;
                     typename LPC::precommitment_type combined_Q_precommitment = precommit<typename LPC::basic_fri>(
-                        combined_Q_dfs, 
-                        fri_params.D[0], 
-                        fri_params.step_list.front()
+                            combined_Q_dfs,
+                            fri_params.D[0],
+                            fri_params.step_list.front()
                     );
 
                     fri_proof = proof_eval<typename LPC::basic_fri, math::polynomial_dfs<typename LPC::field_type::value_type>>(
-                        g,
-                        combined_Q_dfs, 
-                        precommitments,
-                        combined_Q_precommitment, 
-                        fri_params, 
-                        transcript
+                            g,
+                            combined_Q_dfs,
+                            precommitments,
+                            combined_Q_precommitment,
+                            fri_params,
+                            transcript
                     );
                     return typename LPC::proof_type({z, fri_proof});
                 }
 
-                template<
-                    typename LPC
-                >
+                template<typename LPC>
                 static bool verify_eval(
-                    const std::array<std::vector<std::vector<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &evaluation_points,
-                    const typename LPC::proof_type &proof,
-                    const std::array<typename LPC::commitment_type, LPC::basic_fri::batches_num> &commitments,
-                    typename LPC::basic_fri::params_type fri_params,
-                    typename LPC::basic_fri::transcript_type &transcript = typename LPC::basic_fri::transcript_type()
-                ) {
-                    for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
+                        const std::array<std::vector<std::vector<typename LPC::field_type::value_type>>, LPC::basic_fri::batches_num> &evaluation_points,
+                        const typename LPC::proof_type &proof,
+                        const std::array<typename LPC::commitment_type, LPC::basic_fri::batches_num> &commitments,
+                        typename LPC::basic_fri::params_type fri_params,
+                        typename LPC::basic_fri::transcript_type &transcript) {
+
+                    for (std::size_t k = 0; k < LPC::basic_fri::batches_num; k++) {
                         transcript(commitments[k]);
                     }
 
@@ -336,49 +339,50 @@ namespace nil {
                     typename LPC::field_type::value_type theta = transcript.template challenge<typename LPC::field_type>();
 
                     std::size_t batch_size = 0;
-                    for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
-                        BOOST_ASSERT( evaluation_points[k].size() == proof.z[k].size() || evaluation_points[k].size() == 1);
+                    for (std::size_t k = 0; k < LPC::basic_fri::batches_num; k++) {
+                        BOOST_ASSERT(
+                                evaluation_points[k].size() == proof.z[k].size() || evaluation_points[k].size() == 1);
                         batch_size += proof.z[k].size();
                     }
                     evals_map.resize(batch_size);
 
                     std::size_t ind = 0;
                     bool found = false;
-                    for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
-                        if( evaluation_points[k].size() == 1) {
+                    for (std::size_t k = 0; k < LPC::basic_fri::batches_num; k++) {
+                        if (evaluation_points[k].size() == 1) {
                             bool found = false;
                             std::size_t eval_ind;
 
-                            for( std::size_t j = 0; j < unique_eval_points.size(); j++ ){
-                                if( unique_eval_points[j] == evaluation_points[k][0] ){
+                            for (std::size_t j = 0; j < unique_eval_points.size(); j++) {
+                                if (unique_eval_points[j] == evaluation_points[k][0]) {
                                     found = true;
                                     eval_ind = j;
                                     break;
                                 }
                             }
-                            if( !found ){
+                            if (!found) {
                                 unique_eval_points.push_back(evaluation_points[k][0]);
-                                eval_ind = unique_eval_points.size() - 1; 
+                                eval_ind = unique_eval_points.size() - 1;
                             }
-                            for( std::size_t i = 0; i < proof.z[k].size(); i++ ){
+                            for (std::size_t i = 0; i < proof.z[k].size(); i++) {
                                 BOOST_ASSERT(proof.z[k][i].size() == unique_eval_points[eval_ind].size());
                                 evals_map[ind] = eval_ind;
                                 ind++;
                             }
                         } else {
-                            for( std::size_t i = 0; i < proof.z[k].size(); i++ ){
+                            for (std::size_t i = 0; i < proof.z[k].size(); i++) {
                                 bool found = false;
                                 BOOST_ASSERT(proof.z[k][i].size() == evaluation_points[k][i].size());
-                                for( std::size_t j = 0; j < unique_eval_points.size(); j++ ){
-                                    if( unique_eval_points[j] == evaluation_points[k][i] ){
+                                for (std::size_t j = 0; j < unique_eval_points.size(); j++) {
+                                    if (unique_eval_points[j] == evaluation_points[k][i]) {
                                         evals_map[ind] = j;
                                         found = true;
                                         break;
                                     }
                                 }
-                                if( !found ){
+                                if (!found) {
                                     unique_eval_points.push_back(evaluation_points[k][i]);
-                                    evals_map[ind] = unique_eval_points.size() - 1; 
+                                    evals_map[ind] = unique_eval_points.size() - 1;
                                 }
                                 ind++;
                             }
@@ -387,53 +391,46 @@ namespace nil {
 
                     combined_U.resize(unique_eval_points.size());
                     denominators.resize(unique_eval_points.size());
-                    for(std::size_t point_index = 0; point_index < unique_eval_points.size(); point_index++ ){
+                    for (std::size_t point_index = 0; point_index < unique_eval_points.size(); point_index++) {
                         combined_U[point_index] = {0};
                         denominators[point_index] = {1};
                         std::vector<
-                            std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>
+                                std::pair<typename LPC::field_type::value_type, typename LPC::field_type::value_type>
                         > U_interpolation_points;
 
                         U_interpolation_points.resize(unique_eval_points[point_index].size());
-                        for( std::size_t xi_index = 0; xi_index < unique_eval_points[point_index].size(); xi_index++ ){
-                            denominators[point_index] = 
-                                denominators[point_index] * 
-                                math::polynomial<typename LPC::field_type::value_type>({-unique_eval_points[point_index][xi_index], 1});
+                        for (std::size_t xi_index = 0; xi_index < unique_eval_points[point_index].size(); xi_index++) {
+                            denominators[point_index] =
+                                    denominators[point_index] *
+                                    math::polynomial<typename LPC::field_type::value_type>(
+                                            {-unique_eval_points[point_index][xi_index], 1});
                         }
 
                         std::size_t ind = 0;
-                        for( std::size_t k = 0; k < LPC::basic_fri::batches_num; k++){
-                            for( std::size_t i = 0; i < proof.z[k].size(); i++ ){
+                        for (std::size_t k = 0; k < LPC::basic_fri::batches_num; k++) {
+                            for (std::size_t i = 0; i < proof.z[k].size(); i++) {
                                 combined_U[point_index] = combined_U[point_index] * theta;
-                                if(evals_map[ind] == point_index){
+                                if (evals_map[ind] == point_index) {
                                     BOOST_ASSERT(proof.z[k][i].size() == unique_eval_points[point_index].size());
-                                    for( std::size_t xi_index = 0; xi_index < unique_eval_points[point_index].size(); xi_index++ ){
+                                    for (std::size_t xi_index = 0;
+                                         xi_index < unique_eval_points[point_index].size(); xi_index++) {
                                         U_interpolation_points[xi_index] = std::make_pair(
-                                            unique_eval_points[point_index][xi_index],
-                                            proof.z[k][i][xi_index]
+                                                unique_eval_points[point_index][xi_index],
+                                                proof.z[k][i][xi_index]
                                         );
                                     }
-                                    math::polynomial<typename LPC::field_type::value_type> U = math::lagrange_interpolation(U_interpolation_points);
-                                    combined_U[point_index] = combined_U[point_index] + math::lagrange_interpolation(U_interpolation_points);
+                                    math::polynomial<typename LPC::field_type::value_type> U = math::lagrange_interpolation(
+                                            U_interpolation_points);
+                                    combined_U[point_index] = combined_U[point_index] +
+                                                              math::lagrange_interpolation(U_interpolation_points);
                                 }
                                 ind++;
                             }
                         }
                     }
 
-                    if (!verify_eval<typename LPC::basic_fri>(
-                        proof.fri_proof,
-                        fri_params, 
-                        commitments,
-                        theta,
-                        evals_map,
-                        combined_U,
-                        denominators,
-                        transcript
-                    )) {
-                        return false;
-                    }
-                    return true;
+                    return verify_eval<typename LPC::basic_fri>(proof.fri_proof, fri_params, commitments, theta,
+                                                                evals_map, combined_U, denominators, transcript);
                 }
 
             }    // namespace algorithms
