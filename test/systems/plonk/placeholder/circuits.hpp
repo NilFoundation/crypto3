@@ -440,6 +440,125 @@ namespace nil {
                     // test_circuit.lookup_gates.push_back(lookup_gate);
                     return test_circuit;
                 }
+
+                                //---------------------------------------------------------------------------//
+                // Test fibonacci circuit
+                //  i  | GATE | w_0     | public | q_add | 
+                //  0  |  --  |  f(0)   |   a    |   0   | 
+                //  1  | FIB  |  f(1)   |   b    |   1   | 
+                // ... | FIB  |         |   0    |   1   | 
+                // k-2 | FIB  |  f(k-2) |   0    |   0   | 
+                // k-1 |  --  |  f(k-1) |   0    |   0   | 
+                //
+                // public input is copy constrainted to f(0) and f(1)
+                // FIB: w_0(i-1) + w_0(i) == w_0(i+1)
+                //---------------------------------------------------------------------------//
+                constexpr static const std::size_t witness_columns_fib = 1;
+                constexpr static const std::size_t public_columns_fib = 1;
+                constexpr static const std::size_t constant_columns_fib = 0;
+                constexpr static const std::size_t selector_columns_fib = 1;
+
+                using arithmetization_params_fib = plonk_arithmetization_params<witness_columns_fib,
+                    public_columns_fib, constant_columns_fib, selector_columns_fib>;
+
+                template<typename FieldType, std::size_t rows_log>
+                circuit_description<FieldType, placeholder_params<FieldType,
+                    arithmetization_params_fib>, rows_log, 2> circuit_test_fib() {
+                    constexpr static const std::size_t permutation = 2;
+
+                    constexpr static const std::size_t witness_columns = witness_columns_fib;
+                    constexpr static const std::size_t public_columns = public_columns_fib;
+                    constexpr static const std::size_t constant_columns = constant_columns_fib;
+                    constexpr static const std::size_t selector_columns = selector_columns_fib;
+                    constexpr static const std::size_t table_columns = 
+                            witness_columns + public_columns + selector_columns;
+
+                    typedef placeholder_params<FieldType, arithmetization_params_fib> circuit_params;
+
+                    circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
+                    std::array<std::vector<typename FieldType::value_type>, table_columns> table;
+
+                    std::vector<typename FieldType::value_type> q_add(test_circuit.table_rows);
+                    std::vector<typename FieldType::value_type> q_mul(test_circuit.table_rows);
+                    for (std::size_t j = 0; j < table_columns; j++) {
+                        table[j].resize(test_circuit.table_rows);
+                    }
+
+                    // init values
+                    typename FieldType::value_type zero = FieldType::value_type::zero();
+                    typename FieldType::value_type one = FieldType::value_type::one();
+                    // witness
+                    table[0][0] = one;
+                    table[0][1] = one;
+
+                    // public input
+                    table[1][0] = one;
+                    table[1][1] = one;
+
+                    // selector
+                    table[2][0] = zero;
+                    table[2][0] = one;
+
+                    plonk_variable<FieldType> x0(0, 0, false, 
+                        plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> x1(0, 1, false, 
+                        plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> p0(1, 0, false, 
+                        plonk_variable<FieldType>::column_type::public_input);
+                    plonk_variable<FieldType> p1(1, 1, false, 
+                        plonk_variable<FieldType>::column_type::public_input);
+
+//                    test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x0, p0));
+//                    test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x1, p1));
+
+                    for (std::size_t i = 2; i < test_circuit.table_rows - 1; i++) {
+                        table[0][i] = table[0][i-2] + table[0][i-1];
+                        table[1][i] = zero;
+                        table[2][i] = one;
+                    }
+                    table[2][test_circuit.table_rows - 4] = zero;
+                    table[2][test_circuit.table_rows - 3] = zero;
+                    table[2][test_circuit.table_rows - 2] = zero;
+                    table[2][test_circuit.table_rows - 1] = zero;
+
+                    std::array<plonk_column<FieldType>, witness_columns> private_assignment;
+                    private_assignment[0] = table[0];
+
+                    std::array<plonk_column<FieldType>, selector_columns> selectors_assignment;
+                    std::array<plonk_column<FieldType>, public_columns> public_input_assignment;
+                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment = {};
+
+                    selectors_assignment[0] = table[2];
+
+                    public_input_assignment[0] = table[1];
+                    selectors_assignment[0] = table[2];
+
+                    test_circuit.table = plonk_assignment_table<FieldType, arithmetization_params_fib>(
+                        plonk_private_assignment_table<FieldType, arithmetization_params_fib>(private_assignment),
+                        plonk_public_assignment_table<FieldType, arithmetization_params_fib>(
+                            public_input_assignment, constant_assignment, selectors_assignment));
+                    std::cout << "table: Witness[0].size = " << test_circuit.table.witness(0).size() << std::endl;
+                    std::cout << "table: Public input[0].size = " << test_circuit.table.public_input(0).size() << std::endl;
+                    std::cout << "table: Selector[0].size = " << test_circuit.table.selector(0).size() << std::endl;
+
+                    plonk_variable<FieldType> w0(0, -1, true,
+                                                 plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> w1(0, 0, true,
+                                                 plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<FieldType> w2(0, 1, true,
+                                                 plonk_variable<FieldType>::column_type::witness);
+
+                    plonk_constraint<FieldType> fib_constraint;
+                    fib_constraint += w0;
+                    fib_constraint += w1;
+                    fib_constraint -= w2;
+
+                    std::vector<plonk_constraint<FieldType>> fib_costraints {fib_constraint};
+                    plonk_gate<FieldType, plonk_constraint<FieldType>> fib_gate(0, fib_costraints);
+                    test_circuit.gates.push_back(fib_gate);
+
+                    return test_circuit;
+                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
