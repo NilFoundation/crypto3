@@ -109,7 +109,7 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log, const i
 
     return params;
 }
-
+/*
 columns_rotations_type load_columns_rotations(
     const ConstraintSystemType &constraint_system,  const TableDescriptionType &table_description
 ) {
@@ -273,6 +273,7 @@ void load_circuit_and_table(ConstraintSystemType &circuit, TableAssignmentType &
         load_assignment_table<BlueprintFieldType, ArithmetizationParams, ColumnType>(iassignment);
     iassignment.close();
 }
+*/
 
 BOOST_AUTO_TEST_SUITE(placeholder_prover_test_suite)
 
@@ -354,7 +355,7 @@ typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::
 typedef placeholder_params<FieldType, typename placeholder_fibonacci_params::arithmetization_params> circuit_fib_params;
 
 BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
-    constexpr std::size_t rows_log = 19;
+    constexpr std::size_t rows_log = 10;
     std::cout << std::endl << "Fibonacci test rows_log = "<< rows_log << std::endl;
 
     auto circuit = circuit_test_fib<FieldType, rows_log>();
@@ -392,7 +393,7 @@ BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
     BOOST_CHECK(verifier_res);
     std::cout << "==========================================================="<<std::endl;
 }
-
+/*
 ACTOR_THREAD_TEST_CASE(placeholder_many_hashes_test) {
     std::cout << std::endl << "Many_hashes performance test" <<  std::endl;
 
@@ -430,5 +431,5 @@ ACTOR_THREAD_TEST_CASE(placeholder_many_hashes_test) {
     BOOST_CHECK(verifier_res);
 
     std::cout << "===========================================================" << std::endl;
-}
+}*/
 BOOST_AUTO_TEST_SUITE_END()

@@ -104,7 +104,7 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_params<FieldType, arithmetization_params_1>, 4, 3> circuit_test_1() {
-                    using assigment_type = typename FieldType::value_type;
+                    using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 3;
@@ -175,12 +175,12 @@ namespace nil {
                         plonk_public_assignment_table<FieldType, arithmetization_params_1>(
                             public_input_assignment, constant_assignment, selectors_assignment));
 
-                    plonk_variable<assigment_type> w0(0, 0,
-                                                 plonk_variable<assigment_type>::column_type::witness);
-                    plonk_variable<assigment_type> w1(0, 0,
-                                                 plonk_variable<assigment_type>::column_type::witness);
-                    plonk_variable<assigment_type> w2(0, 0,
-                                                 plonk_variable<assigment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w0(0, 0,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w1(0, 0,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w2(0, 0,
+                                                 plonk_variable<assignment_type>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint += w0;
@@ -225,7 +225,7 @@ namespace nil {
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_params<FieldType,
                     arithmetization_params_2>, 4, 4> circuit_test_2() {
-                    using assigment_type = typename FieldType::value_type;
+                    using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 4;
@@ -267,10 +267,10 @@ namespace nil {
                         q_add[i] = one;
                         q_mul[i] = FieldType::value_type::zero();
 
-                        plonk_variable<assigment_type> x(1, i, false, 
-                            plonk_variable<assigment_type>::column_type::witness);
-                        plonk_variable<assigment_type> y(2, i - 1, false, 
-                            plonk_variable<assigment_type>::column_type::witness);
+                        plonk_variable<assignment_type> x(1, i, false, 
+                            plonk_variable<assignment_type>::column_type::witness);
+                        plonk_variable<assignment_type> y(2, i - 1, false, 
+                            plonk_variable<assignment_type>::column_type::witness);
                         test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
@@ -283,10 +283,10 @@ namespace nil {
                         q_add[i] = FieldType::value_type::zero();
                         q_mul[i] = one;
 
-                        plonk_variable<assigment_type> x(1, i, false, 
-                            plonk_variable<assigment_type>::column_type::witness);
-                        plonk_variable<assigment_type> y(0, 0, false, 
-                            plonk_variable<assigment_type>::column_type::public_input);
+                        plonk_variable<assignment_type> x(1, i, false, 
+                            plonk_variable<assignment_type>::column_type::witness);
+                        plonk_variable<assignment_type> y(0, 0, false, 
+                            plonk_variable<assignment_type>::column_type::public_input);
                         test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
 
@@ -310,14 +310,14 @@ namespace nil {
                         plonk_public_assignment_table<FieldType, arithmetization_params_2>(
                             public_input_assignment, constant_assignment, selectors_assignment));
 
-                    plonk_variable<assigment_type> w0(0, 0, true,
-                                                 plonk_variable<assigment_type>::column_type::witness);
-                    plonk_variable<assigment_type> w1(1, 0, true,
-                                                 plonk_variable<assigment_type>::column_type::witness);
-                    plonk_variable<assigment_type> w2(2, 0, true,
-                                                 plonk_variable<assigment_type>::column_type::witness);
-                    plonk_variable<assigment_type> w0_prev(0, -1, true,
-                                                 plonk_variable<assigment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w0(0, 0, true,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w1(1, 0, true,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w2(2, 0, true,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w0_prev(0, -1, true,
+                                                 plonk_variable<assignment_type>::column_type::witness);
 
                     plonk_constraint<FieldType> add_constraint;
                     add_constraint += w0;
@@ -353,7 +353,7 @@ namespace nil {
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_params<FieldType,
                     arithmetization_params_3>, 4, 3> circuit_test_3() {
-                    using assigment_type = typename FieldType::value_type;
+                    using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
                     constexpr static const std::size_t permutation = 3;
@@ -419,19 +419,19 @@ namespace nil {
                         plonk_public_assignment_table<FieldType, arithmetization_params_3>(
                             public_input_assignment, constant_assignment, selectors_assignment));
 
-                    plonk_variable<assigment_type> w0(0, 0, true,
-                                                plonk_variable<assigment_type>::column_type::witness);
-                    plonk_variable<assigment_type> w1(1, 0, true,
-                                                plonk_variable<assigment_type>::column_type::witness);
-                    plonk_variable<assigment_type> w2(2, 0, true,
-                                                plonk_variable<assigment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w0(0, 0, true,
+                                                plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w1(1, 0, true,
+                                                plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w2(2, 0, true,
+                                                plonk_variable<assignment_type>::column_type::witness);
 
-                    plonk_variable<assigment_type> c0(0, 0, true,
-                                                plonk_variable<assigment_type>::column_type::constant);
-                    plonk_variable<assigment_type> c1(1, 0, true,
-                                                plonk_variable<assigment_type>::column_type::constant);
-                    plonk_variable<assigment_type> c2(2, 0, true,
-                                                plonk_variable<assigment_type>::column_type::constant);
+                    plonk_variable<assignment_type> c0(0, 0, true,
+                                                plonk_variable<assignment_type>::column_type::constant);
+                    plonk_variable<assignment_type> c1(1, 0, true,
+                                                plonk_variable<assignment_type>::column_type::constant);
+                    plonk_variable<assignment_type> c2(2, 0, true,
+                                                plonk_variable<assignment_type>::column_type::constant);
 
 
                     plonk_lookup_constraint<FieldType> lookup_constraint;
@@ -467,6 +467,8 @@ namespace nil {
                 template<typename FieldType, std::size_t rows_log>
                 circuit_description<FieldType, placeholder_params<FieldType,
                     arithmetization_params_fib>, rows_log, 2> circuit_test_fib() {
+                    using assignment_type = typename FieldType::value_type;
+
                     constexpr static const std::size_t permutation = 2;
 
                     constexpr static const std::size_t witness_columns = witness_columns_fib;
@@ -540,26 +542,27 @@ namespace nil {
                         plonk_private_assignment_table<FieldType, arithmetization_params_fib>(private_assignment),
                         plonk_public_assignment_table<FieldType, arithmetization_params_fib>(
                             public_input_assignment, constant_assignment, selectors_assignment));
-                    std::cout << "table: Witness[0].size = " << test_circuit.table.witness(0).size() << std::endl;
-                    std::cout << "table: Public input[0].size = " << test_circuit.table.public_input(0).size() << std::endl;
-                    std::cout << "table: Selector[0].size = " << test_circuit.table.selector(0).size() << std::endl;
 
-                    plonk_variable<FieldType> w0(0, -1, true,
-                                                 plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w1(0, 0, true,
-                                                 plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> w2(0, 1, true,
-                                                 plonk_variable<FieldType>::column_type::witness);
+                    plonk_variable<assignment_type> w0(0, -1, true,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w1(0, 0, true,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w2(0, 1, true,
+                                                 plonk_variable<assignment_type>::column_type::witness);
+
+                    typename plonk_constraint<FieldType>::term_type w0_term(w0);
+                    typename plonk_constraint<FieldType>::term_type w1_term(w1); 
+                    typename plonk_constraint<FieldType>::term_type w2_term(w2); 
 
                     plonk_constraint<FieldType> fib_constraint;
-                    fib_constraint += w0;
-                    fib_constraint += w1;
-                    fib_constraint -= w2;
+                    fib_constraint += w0_term;
+                    fib_constraint += w1_term;
+                    fib_constraint -= w2_term;
 
                     std::vector<plonk_constraint<FieldType>> fib_costraints {fib_constraint};
                     plonk_gate<FieldType, plonk_constraint<FieldType>> fib_gate(0, fib_costraints);
                     test_circuit.gates.push_back(fib_gate);
-
+ 
                     return test_circuit;
                 }
             }    // namespace snark
