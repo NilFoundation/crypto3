@@ -31,6 +31,8 @@
 
 #include <string>
 #include <random>
+#include <iostream>
+#include <fstream>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -61,6 +63,19 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+
+#include <nil/marshalling/status_type.hpp>
+#include <nil/marshalling/field_type.hpp>
+#include <nil/marshalling/endianness.hpp>
+
+#include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
+#include <nil/crypto3/marshalling/math/types/term.hpp>
+#include <nil/crypto3/marshalling/math/types/flat_expression.hpp>
+#include <nil/crypto3/marshalling/math/types/expression.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/copy_constraint.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/gate.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/constraint_system.hpp>
 
 #include "circuits.hpp"
 
@@ -109,171 +124,6 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log, const i
 
     return params;
 }
-/*
-columns_rotations_type load_columns_rotations(
-    const ConstraintSystemType &constraint_system,  const TableDescriptionType &table_description
-) {
-    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename ConstraintSystemType::field_type>;
-
-    columns_rotations_type result;
-    for (const auto& gate: constraint_system.gates()) {
-        for (const auto& constraint: gate.constraints) {
-            nil::actor::math::expression_for_each_variable_visitor<variable_type> visitor(
-                [&table_description, &result](const variable_type& var) {
-                    if (var.relative) {
-                        std::size_t column_index = table_description.global_index(var);
-                        result[column_index].insert(var.rotation);
-                    }
-                });
-            visitor.visit(constraint);
-        }
-    }
-
-    for (const auto& gate: constraint_system.lookup_gates()) {
-        for (const auto& constraint: gate.constraints) {
-            for (const auto& lookup_input: constraint.lookup_input) {
-                const auto& var = lookup_input.vars[0];
-                if (var.relative) {
-                    std::size_t column_index = table_description.global_index(var);
-                    result[column_index].insert(var.rotation);
-                }
-            }
-        }
-    }
-
-    for (std::size_t i = 0; i < ArithmetizationParams::total_columns; i++) {
-        result[i].insert(0);
-    }
-
-    return result;
-}
-
-bool read_buffer_from_file(std::ifstream &ifile, std::vector<std::uint8_t> &v) {
-    char c;
-    char c1;
-    uint8_t b;
-
-    ifile >> c;
-    if (c != '0')
-        return false;
-    ifile >> c;
-    if (c != 'x')
-        return false;
-    while (ifile) {
-        std::string str = "";
-        ifile >> c >> c1;
-        if (!isxdigit(c) || !isxdigit(c1))
-            return false;
-        str += c;
-        str += c1;
-        b = stoi(str, 0, 0x10);
-        v.push_back(b);
-    }
-    return true;
-}
-
-template<typename BlueprintFieldType, typename ArithmetizationParams, typename ColumnType>
-std::tuple<std::size_t, std::size_t,
-           nil::crypto3::zk::snark::plonk_table<BlueprintFieldType, ArithmetizationParams, ColumnType>>
-    load_assignment_table(std::istream &istr) {
-    using PrivateTableType =
-        nil::crypto3::zk::snark::plonk_private_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
-    using PublicTableType =
-        nil::crypto3::zk::snark::plonk_public_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
-    using TableAssignmentType =
-        nil::crypto3::zk::snark::plonk_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
-    std::size_t usable_rows;
-    std::size_t rows_amount;
-
-    typename PrivateTableType::witnesses_container_type witness;
-    typename PublicTableType::public_input_container_type public_input;
-    typename PublicTableType::constant_container_type constant;
-    typename PublicTableType::selector_container_type selector;
-
-    istr >> usable_rows;
-    istr >> rows_amount;
-
-    for (size_t i = 0; i < witness.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
-        ColumnType column;
-        typename BlueprintFieldType::integral_type num;
-        for (size_t j = 0; j < rows_amount; j++) {
-            istr >> num;
-            column.push_back(typename BlueprintFieldType::value_type(num));
-        }
-        witness[i] = column;
-    }
-
-    for (size_t i = 0; i < public_input.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
-        ColumnType column;
-        typename BlueprintFieldType::integral_type num;
-        for (size_t j = 0; j < rows_amount; j++) {
-            istr >> num;
-            column.push_back(typename BlueprintFieldType::value_type(num));
-        }
-        public_input[i] = column;
-    }
-
-    for (size_t i = 0; i < constant.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
-        ColumnType column;
-        typename BlueprintFieldType::integral_type num;
-        for (size_t j = 0; j < rows_amount; j++) {
-            istr >> num;
-            column.push_back(typename BlueprintFieldType::value_type(num));
-        }
-        constant[i] = column;
-    }
-    for (size_t i = 0; i < selector.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
-        ColumnType column;
-        typename BlueprintFieldType::integral_type num;
-        for (size_t j = 0; j < rows_amount; j++) {
-            istr >> num;
-            column.push_back(typename BlueprintFieldType::value_type(num));
-        }
-        selector[i] = column;
-    }
-    return std::make_tuple(
-        usable_rows, rows_amount,
-        TableAssignmentType(PrivateTableType(witness), PublicTableType(public_input, constant, selector)));
-}
-
-void load_circuit_and_table(ConstraintSystemType &circuit, TableAssignmentType &table, TableDescriptionType &table_description, std::string input_folder_path){
-    std::string ifile_path;
-    std::string iassignment_path;
-
-    ifile_path = input_folder_path + "/circuit.crct";
-    iassignment_path = input_folder_path + "/assignment.tbl";
-
-    std::ifstream ifile;
-    ifile.open(ifile_path);
-    if (!ifile.is_open()) {
-        std::cout << "Cannot find input file " << ifile_path << std::endl;
-        BOOST_ASSERT(false);
-    }
-    std::vector<std::uint8_t> v;
-    if (!read_buffer_from_file(ifile, v)) {
-        std::cout << "Cannot parse input file " << ifile_path << std::endl;
-        BOOST_ASSERT(false);
-    }
-    ifile.close();
-
-    value_marshalling_type marshalled_data;
-    auto read_iter = v.begin();
-    auto status = marshalled_data.read(read_iter, v.size());
-    circuit = nil::crypto3::marshalling::types::make_plonk_constraint_system<ConstraintSystemType, Endianness>(
-            marshalled_data);
-
-    std::ifstream iassignment;
-    iassignment.open(iassignment_path);
-    if (!iassignment) {
-        std::cout << "Cannot open " << iassignment_path << std::endl;
-        BOOST_ASSERT(false);
-    }
-
-    std::tie(table_description.usable_rows_amount, table_description.rows_amount, table) =
-        load_assignment_table<BlueprintFieldType, ArithmetizationParams, ColumnType>(iassignment);
-    iassignment.close();
-}
-*/
 
 BOOST_AUTO_TEST_SUITE(placeholder_prover_test_suite)
 
@@ -393,31 +243,231 @@ BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
     BOOST_CHECK(verifier_res);
     std::cout << "==========================================================="<<std::endl;
 }
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(placeholder_transpiler_suite)
+    using curve_type = nil::crypto3::algebra::curves::pallas;
+    using BlueprintFieldType = typename curve_type::base_field_type;
+    constexpr std::size_t WitnessColumns = 15;
+    constexpr std::size_t PublicInputColumns = 5;
+    constexpr std::size_t ConstantColumns = 5;
+    constexpr std::size_t SelectorColumns = 30;
+
+    using ArithmetizationParams =
+        nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns,
+                                                                SelectorColumns>;
+    using ConstraintSystemType =
+        nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using TableDescriptionType =
+        nil::crypto3::zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams>;
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+    using value_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystemType>;
+    using columns_rotations_type = std::array<std::set<int>, ArithmetizationParams::total_columns>;
+    using ColumnType = nil::crypto3::zk::snark::plonk_column<BlueprintFieldType>;
+    using TableAssignmentType =
+        nil::crypto3::zk::snark::plonk_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
+    const std::size_t Lambda = 2;
+    using Hash = nil::crypto3::hashes::keccak_1600<256>;
+    using placeholder_params_type =
+        nil::crypto3::zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, Hash, Hash, Lambda>;
+    using types = nil::crypto3::zk::snark::detail::placeholder_policy<BlueprintFieldType, placeholder_params_type>;
+    using FRIScheme =
+        typename nil::crypto3::zk::commitments::fri<BlueprintFieldType, typename placeholder_params_type::merkle_hash_type,
+                                                    typename placeholder_params_type::transcript_hash_type, Lambda, 2, 4>;
+    using FRIParamsType = typename FRIScheme::params_type;
+
+columns_rotations_type load_columns_rotations(
+    const ConstraintSystemType &constraint_system,  const TableDescriptionType &table_description
+) {
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename ConstraintSystemType::field_type::value_type>;
+
+    columns_rotations_type result;
+    for (const auto& gate: constraint_system.gates()) {
+        for (const auto& constraint: gate.constraints) {
+            nil::crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
+                [&table_description, &result](const variable_type& var) {
+                    if (var.relative) {
+                        std::size_t column_index = table_description.global_index(var);
+                        result[column_index].insert(var.rotation);
+                    }
+                });
+            visitor.visit(constraint);
+        }
+    }
+    // TODO update for lookups
 /*
-ACTOR_THREAD_TEST_CASE(placeholder_many_hashes_test) {
-    std::cout << std::endl << "Many_hashes performance test" <<  std::endl;
+    for (const auto& gate: constraint_system.lookup_gates()) {
+        for (const auto& constraint: gate.constraints) {
+            nil::crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
+                const auto& var = lookup_input.vars[0];
+                if (var.relative) {
+                    std::size_t column_index = table_description.global_index(var);
+                    result[column_index].insert(var.rotation);
+                }
+            }
+        }
+    }
+*/
+    for (std::size_t i = 0; i < ArithmetizationParams::total_columns; i++) {
+        result[i].insert(0);
+    }
+
+    return result;
+}
+
+bool read_buffer_from_file(std::ifstream &ifile, std::vector<std::uint8_t> &v) {
+    char c;
+    char c1;
+    uint8_t b;
+
+    ifile >> c;
+    if (c != '0')
+        return false;
+    ifile >> c;
+    if (c != 'x')
+        return false;
+    while (ifile) {
+        std::string str = "";
+        ifile >> c >> c1;
+        if (!isxdigit(c) || !isxdigit(c1))
+            return false;
+        str += c;
+        str += c1;
+        b = stoi(str, 0, 0x10);
+        v.push_back(b);
+    }
+    return true;
+}
+
+std::tuple<std::size_t, std::size_t,
+           nil::crypto3::zk::snark::plonk_table<BlueprintFieldType, ArithmetizationParams, ColumnType>>
+    load_assignment_table(std::istream &istr) {
+    using PrivateTableType =
+        nil::crypto3::zk::snark::plonk_private_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
+    using PublicTableType =
+        nil::crypto3::zk::snark::plonk_public_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
+    using TableAssignmentType =
+        nil::crypto3::zk::snark::plonk_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
+    std::size_t usable_rows;
+    std::size_t rows_amount;
+
+    typename PrivateTableType::witnesses_container_type witness;
+    typename PublicTableType::public_input_container_type public_input;
+    typename PublicTableType::constant_container_type constant;
+    typename PublicTableType::selector_container_type selector;
+
+    istr >> usable_rows;
+    istr >> rows_amount;
+
+    for (size_t i = 0; i < witness.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+        ColumnType column;
+        typename BlueprintFieldType::integral_type num;
+        for (size_t j = 0; j < rows_amount; j++) {
+            istr >> num;
+            column.push_back(typename BlueprintFieldType::value_type(num));
+        }
+        witness[i] = column;
+    }
+
+    for (size_t i = 0; i < public_input.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+        ColumnType column;
+        typename BlueprintFieldType::integral_type num;
+        for (size_t j = 0; j < rows_amount; j++) {
+            istr >> num;
+            column.push_back(typename BlueprintFieldType::value_type(num));
+        }
+        public_input[i] = column;
+    }
+
+    for (size_t i = 0; i < constant.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+        ColumnType column;
+        typename BlueprintFieldType::integral_type num;
+        for (size_t j = 0; j < rows_amount; j++) {
+            istr >> num;
+            column.push_back(typename BlueprintFieldType::value_type(num));
+        }
+        constant[i] = column;
+    }
+    for (size_t i = 0; i < selector.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+        ColumnType column;
+        typename BlueprintFieldType::integral_type num;
+        for (size_t j = 0; j < rows_amount; j++) {
+            istr >> num;
+            column.push_back(typename BlueprintFieldType::value_type(num));
+        }
+        selector[i] = column;
+    }
+    return std::make_tuple(
+        usable_rows, rows_amount,
+        TableAssignmentType(PrivateTableType(witness), PublicTableType(public_input, constant, selector)));
+}
+
+void load_circuit_and_table(ConstraintSystemType &circuit, TableAssignmentType &table, TableDescriptionType &table_description, std::string input_folder_path){
+    std::string ifile_path;
+    std::string iassignment_path;
+
+    ifile_path = input_folder_path + "/circuit.crct";
+    iassignment_path = input_folder_path + "/assignment.tbl";
+
+    std::ifstream ifile;
+    ifile.open(ifile_path);
+    if (!ifile.is_open()) {
+        std::cout << "Cannot find input file " << ifile_path << std::endl;
+        BOOST_ASSERT(false);
+    }
+    std::vector<std::uint8_t> v;
+    if (!read_buffer_from_file(ifile, v)) {
+        std::cout << "Cannot parse input file " << ifile_path << std::endl;
+        BOOST_ASSERT(false);
+    }
+    ifile.close();
+
+    value_marshalling_type marshalled_data;
+    auto read_iter = v.begin();
+    auto status = marshalled_data.read(read_iter, v.size());
+    circuit = nil::crypto3::marshalling::types::make_plonk_constraint_system<ConstraintSystemType, Endianness>(
+            marshalled_data);
+
+    std::ifstream iassignment;
+    iassignment.open(iassignment_path);
+    if (!iassignment) {
+        std::cout << "Cannot open " << iassignment_path << std::endl;
+        BOOST_ASSERT(false);
+    }
+
+    std::tie(table_description.usable_rows_amount, table_description.rows_amount, table) =
+        load_assignment_table(iassignment);
+    iassignment.close();
+}
+
+BOOST_AUTO_TEST_CASE(placeholder_merkle_tree_poseidon_test) {
+    std::cout << std::endl << "Merkle tree poseidon performance test" <<  std::endl;
 
     ConstraintSystemType constraint_system;
     TableAssignmentType assignment_table;
     TableDescriptionType table_description;
 
-    load_circuit_and_table(constraint_system, assignment_table, table_description, "../libs/actor/zk/test/systems/plonk/placeholder/data/many_hashes");
+    load_circuit_and_table(constraint_system, assignment_table, table_description, "../libs/actor/zk/test/systems/plonk/placeholder/data/merkle_tree_poseidon");
     auto columns_rotations = load_columns_rotations(constraint_system, table_description);
 
     std::size_t table_rows_log = std::ceil(std::log2(table_description.rows_amount));
     auto fri_params = create_fri_params<FRIScheme, BlueprintFieldType>(table_rows_log);
     std::size_t permutation_size =
         table_description.witness_columns + table_description.public_input_columns + table_description.constant_columns;
+    std::cout << "table_rows_log = " << table_rows_log << std::endl;
 
     typename nil::crypto3::zk::snark::placeholder_public_preprocessor<
         BlueprintFieldType, placeholder_params_type>::preprocessed_data_type public_preprocessed_data =
         nil::crypto3::zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params_type>::process(
-            constraint_system, assignment_table.public_table(), table_description, fri_params, permutation_size).get();
+            constraint_system, assignment_table.public_table(), table_description, fri_params, permutation_size);
+    std::cout << "max_gates_degree = " << public_preprocessed_data.common_data.max_gates_degree << std::endl;
+
     typename nil::crypto3::zk::snark::placeholder_private_preprocessor<
         BlueprintFieldType, placeholder_params_type>::preprocessed_data_type private_preprocessed_data =
         nil::crypto3::zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params_type>::process(
             constraint_system, assignment_table.private_table(), table_description, fri_params
-        ).get();
+        );
         
     using ProofType = nil::crypto3::zk::snark::placeholder_proof<BlueprintFieldType, placeholder_params_type>;
     ProofType proof = nil::crypto3::zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params_type>::process(
@@ -431,5 +481,48 @@ ACTOR_THREAD_TEST_CASE(placeholder_many_hashes_test) {
     BOOST_CHECK(verifier_res);
 
     std::cout << "===========================================================" << std::endl;
-}*/
+}
+
+BOOST_AUTO_TEST_CASE(placeholder_many_hashes_test) {
+    std::cout << std::endl << "Many_hashes performance test" <<  std::endl;
+
+    ConstraintSystemType constraint_system;
+    TableAssignmentType assignment_table;
+    TableDescriptionType table_description;
+
+    load_circuit_and_table(constraint_system, assignment_table, table_description, "../libs/actor/zk/test/systems/plonk/placeholder/data/many_hashes");
+    auto columns_rotations = load_columns_rotations(constraint_system, table_description);
+
+    std::size_t table_rows_log = std::ceil(std::log2(table_description.rows_amount));
+    auto fri_params = create_fri_params<FRIScheme, BlueprintFieldType>(table_rows_log);
+    std::size_t permutation_size =
+        table_description.witness_columns + table_description.public_input_columns + table_description.constant_columns;
+    std::cout << "table_rows_log = " << table_rows_log << std::endl;
+
+    typename nil::crypto3::zk::snark::placeholder_public_preprocessor<
+        BlueprintFieldType, placeholder_params_type>::preprocessed_data_type public_preprocessed_data =
+        nil::crypto3::zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params_type>::process(
+            constraint_system, assignment_table.public_table(), table_description, fri_params, permutation_size);
+    std::cout << "max_gates_degree = " << public_preprocessed_data.common_data.max_gates_degree << std::endl;
+
+    typename nil::crypto3::zk::snark::placeholder_private_preprocessor<
+        BlueprintFieldType, placeholder_params_type>::preprocessed_data_type private_preprocessed_data =
+        nil::crypto3::zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params_type>::process(
+            constraint_system, assignment_table.private_table(), table_description, fri_params
+        );
+        
+    using ProofType = nil::crypto3::zk::snark::placeholder_proof<BlueprintFieldType, placeholder_params_type>;
+    ProofType proof = nil::crypto3::zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params_type>::process(
+        public_preprocessed_data, private_preprocessed_data, table_description, constraint_system, assignment_table,
+        fri_params);
+
+    bool verifier_res =
+        nil::crypto3::zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params_type>::process(
+            public_preprocessed_data, proof, constraint_system, fri_params);
+
+    BOOST_CHECK(verifier_res);
+
+    std::cout << "===========================================================" << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
