@@ -25,10 +25,10 @@ jobs:
           rm -rf ./.??* || true
 
       - name: Checkout suite
-        ref:  67-new-commitment-scheme-interface
         uses: actions/checkout@v3
         with:
           repository: ${{ env.SUITE_REPO }}
+          ref:  67-new-commitment-scheme-interface
           submodules: recursive
 
       - name: Checkout source code
