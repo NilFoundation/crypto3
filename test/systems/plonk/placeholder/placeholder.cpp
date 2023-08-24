@@ -384,6 +384,7 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
         plonk_polynomial_dfs_table<field_type, typename placeholder_test_params::arithmetization_params>(
             preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript(init_blob);
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(init_blob);
 
