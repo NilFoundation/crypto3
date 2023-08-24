@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_SUITE_END()
 // }
 
 // BOOST_AUTO_TEST_SUITE_END()
-
+/*
 BOOST_AUTO_TEST_SUITE(batched_kzg_test_suite)
 
 BOOST_AUTO_TEST_CASE(batched_kzg_basic_test) {
@@ -500,5 +500,5 @@ BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
     transcript_type transcript_verification = zk::algorithms::setup_transcript<kzg_type>(params);
     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()

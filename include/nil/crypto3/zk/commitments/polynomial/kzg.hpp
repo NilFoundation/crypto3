@@ -50,6 +50,8 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
+#include <nil/crypto3/zk/commitments/batched_commitment.hpp>
+
 using namespace nil::crypto3::math;
 
 using namespace nil::crypto3;
@@ -58,7 +60,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
-
                 /**
                  * @brief The KZG Polynomial Commitment with Fiat-Shamir heuristic.
                  *
@@ -68,6 +69,219 @@ namespace nil {
                  * Aniket Kate, Gregory M. Zaverucha, and Ian Goldberg,
                  * <https://www.iacr.org/archive/asiacrypt2010/6477178/6477178.pdf>
                  */
+                // Placeholder-friendly class
+                template<typename KZGScheme, typename PolynomialType = typename math::polynomial_dfs<typename KZGScheme::field_type::value_type>>
+                class kzg_commitment_scheme:public polys_evaluator<typename KZGScheme::params_type, typename KZGScheme::commitment_type, PolynomialType>{
+                public:
+                    using curve_type = typename KZGScheme::curve_type;
+                    using field_type = typename KZGScheme::field_type;
+                    using params_type = typename KZGScheme::params_type;
+
+                    // This should be marshallable and transcriptable type
+                    using commitment_type = typename KZGScheme::commitment_type;
+                    using transcript_type = typename KZGScheme::transcript_type;
+                    using poly_type = PolynomialType;
+                    using proof_type = typename KZGScheme::proof_type;
+                private:
+                    params_type _params;
+                    std::map<std::size_t, commitment_type> _commitments;
+                    std::map<std::size_t, std::vector<typename KZGScheme::commitment_key_type>> _ind_commitments;
+                    std::vector<typename KZGScheme::scalar_value_type> _merged_points;
+                protected:
+                    typename KZGScheme::verification_key_type commit_g2(typename math::polynomial<typename KZGScheme::scalar_value_type> poly) {
+                        BOOST_ASSERT(poly.size() <= _params.verification_key.size());
+                        auto result = algebra::multiexp<typename KZGScheme::multiexp_method>(_params.verification_key.begin(),
+                                        _params.verification_key.begin() + poly.size(), poly.begin(), poly.end(), 1);
+                        return result;
+                    }
+
+                    void merge_eval_points(){
+                        std::set<typename KZGScheme::scalar_value_type> set;
+                        for( auto const &it:this->_points){
+                            auto k = it.first;
+                            for (std::size_t i = 0; i < this->_points[k].size(); ++i) {
+                                set.insert(this->_points[k][i].begin(), this->_points[k][i].end());
+                            }
+                        }
+                        _merged_points = std::vector<typename  KZGScheme::scalar_value_type>(set.begin(), set.end());
+                    }
+
+                    typename math::polynomial<typename KZGScheme::scalar_value_type>
+                    set_difference_polynom(
+                        std::vector<typename KZGScheme::scalar_value_type> merged_points,
+                        std::vector<typename KZGScheme::scalar_value_type> points
+                    ) {
+                        std::sort(merged_points.begin(), merged_points.end());
+                        std::sort(points.begin(), points.end());
+                        std::vector<typename KZGScheme::scalar_value_type> result;
+                        std::set_difference(merged_points.begin(), merged_points.end(), points.begin(), points.end(), std::back_inserter(result));
+                        if (result.size() == 0) {
+                            return typename math::polynomial<typename KZGScheme::scalar_value_type>({{1}});
+                        }
+                        BOOST_ASSERT(this->get_V(result) * this->get_V(points) == this->get_V(merged_points));
+                        return this->get_V(result);
+                    }
+
+                    typename KZGScheme::commitment_key_type commit_one(const poly_type &poly) {
+                        if constexpr (std::is_same<math::polynomial_dfs<typename field_type::value_type>, PolynomialType>::value) {
+                            auto poly_normal = poly.coefficients();
+                            BOOST_ASSERT(poly_normal.size() <= _params.commitment_key.size());
+                            return algebra::multiexp<typename KZGScheme::multiexp_method>(_params.commitment_key.begin(),
+                                _params.commitment_key.begin() + poly_normal.size(), poly_normal.begin(), poly_normal.end(), 1);
+                        }
+                        else {
+                            BOOST_ASSERT(poly.size() <= _params.commitment_key.size());
+                            return algebra::multiexp<typename KZGScheme::multiexp_method>(_params.commitment_key.begin(),
+                                _params.commitment_key.begin() + poly.size(), poly.begin(), poly.end(), 1);
+                        }
+                    }
+
+                    // TODO join two commit_one functions
+                    typename KZGScheme::commitment_key_type commit_one(const math::polynomial<typename field_type::value_type> &poly_normal) {
+                        BOOST_ASSERT(poly_normal.size() <= _params.commitment_key.size());
+                        return algebra::multiexp<typename KZGScheme::multiexp_method>(_params.commitment_key.begin(),
+                            _params.commitment_key.begin() + poly_normal.size(), poly_normal.begin(), poly_normal.end(), 1);
+                    }
+
+                    void update_transcript(std::size_t batch_ind, typename KZGScheme::transcript_type &transcript) {
+                        std::vector<std::uint8_t> byteblob(KZGScheme::scalar_blob_size);
+                        // Push commitments to transcript
+                        transcript(_commitments[batch_ind]);
+
+                        //Push evaluation points to transcript
+                        for( std::size_t i = 0; i < this->_z.get_batch_size(batch_ind); i++){
+                            for( std::size_t j = 0; j < this->_z.get_poly_points_number(batch_ind, i); j++){
+                                KZGScheme::bincode::template field_element_to_bytes<std::vector<std::uint8_t>::iterator>(this->_z.get(batch_ind, i, j), byteblob.begin(), byteblob.end());
+                                transcript(byteblob);
+                            }
+                        }
+
+                        // Push U polynomials to transcript
+                        for (std::size_t i = 0; i < this->_points[batch_ind].size(); i++) {
+                            auto poly = this->get_U(batch_ind, i);
+                            for (std::size_t j = 0; j < poly.size(); ++j) {
+                                KZGScheme::bincode::template field_element_to_bytes<std::vector<std::uint8_t>::iterator>(
+                                    poly[j], byteblob.begin(), byteblob.end()
+                                );
+                                transcript(byteblob);
+                            }
+                        }
+                    }
+                public:
+                    kzg_commitment_scheme(params_type kzg_params) : _params(kzg_params) {}
+
+                    commitment_type commit(std::size_t index){
+                        this->_ind_commitments[index] = {};
+                        this->state_commited(index);
+                        std::vector<std::uint8_t> result = {};
+                        for (std::size_t i = 0; i < this->_polys[index].size(); ++i) {
+                            BOOST_ASSERT(this->_polys[index][i].size() <= _params.commitment_key.size());
+                            auto single_commitment = commit_one(this->_polys[index][i]);
+                            this->_ind_commitments[index].push_back(single_commitment);
+                            auto single_commitment_bytes = KZGScheme::serializer::point_to_octets(single_commitment);
+                            
+                            result.insert(result.end(), single_commitment_bytes.begin(), single_commitment_bytes.end());
+                        }
+                        _commitments[index] = result;
+
+
+                        return result;
+                    }
+
+                    void setup(transcript_type &transcript){
+                        std::cout << "KZG setup transcript" << std::endl;
+                    }
+
+                    proof_type proof_eval(transcript_type &transcript){
+                        this->eval_polys();
+                        this->merge_eval_points();
+
+                        for( auto const it: this->_commitments ){
+                            auto k = it.first;
+                            update_transcript(k, transcript);
+                        }
+
+                        auto gamma = transcript.template challenge<typename KZGScheme::curve_type::scalar_field_type>();
+                        auto factor = KZGScheme::scalar_value_type::one();
+                        typename math::polynomial<typename KZGScheme::scalar_value_type> accum = {0};
+
+                        for( auto const &it: this->_polys ){
+                            auto k = it.first;
+                            for (std::size_t i = 0; i < this->_z.get_batch_size(k); ++i) {
+                                accum = accum + 
+                                    factor * (math::polynomial<typename KZGScheme::scalar_value_type>(this->_polys[k][i].coefficients()) - this->get_U(k, i))/this->get_V(this->_points[k][i]);
+                                factor = factor * gamma;
+                            }
+                        }
+                        
+                        //verify without pairing. It's only for debug
+                        /*{
+                            typename math::polynomial<typename KZGScheme::scalar_value_type> right_side({{0}});
+                            factor = KZGScheme::scalar_value_type::one();
+                            for( auto const &it: this->_polys ){
+                                auto k = it.first;
+                                for (std::size_t i = 0; i < this->_points[k].size(); ++i) {
+                                    right_side = right_side + (factor * (math::polynomial<typename KZGScheme::scalar_value_type>(this->_polys[k][i].coefficients()) - this->get_U(k, i)) * 
+                                        set_difference_polynom(this->_merged_points, this->_points[k][i]));
+                                    factor = factor * gamma;
+                                }
+                            }
+                            assert(accum * this->get_V(this->_merged_points) == right_side);
+                        }*/
+                        return {this->_z, commit_one(accum)};
+                    }
+
+                    bool verify_eval(
+                        const proof_type &proof,
+                        const std::map<std::size_t, commitment_type> &commitments,
+                        transcript_type &transcript
+                    ){
+                        this->merge_eval_points();
+                        this->_commitments = commitments;
+                        this->_z = proof.z;
+
+                        for( auto const it: this->_commitments ){
+                            auto k = it.first;
+                            update_transcript(k, transcript);
+                        }
+
+                        auto gamma = transcript.template challenge<typename KZGScheme::curve_type::scalar_field_type>();
+                        auto factor = KZGScheme::scalar_value_type::one();
+                        auto left_side_accum = KZGScheme::gt_value_type::one();
+
+                        for( const auto &it: this->_commitments){
+                            auto k = it.first;
+                            for (std::size_t i = 0; i < this->_points.at(k).size(); ++i) {
+                                std::vector<std::uint8_t> byteblob(KZGScheme::g1_blob_size);
+
+                                for( std::size_t j = 0; j < KZGScheme::g1_blob_size; j++){
+                                    byteblob[j] = this->_commitments.at(k)[i * KZGScheme::g1_blob_size + j];
+                                }
+                                auto i_th_commitment = KZGScheme::serializer::octets_to_g1_point(byteblob); 
+                                auto U_commit = commit_one(this->get_U(k,i));
+                                auto poly_commit = factor*(i_th_commitment - U_commit);
+
+                                auto result_bytes = KZGScheme::serializer::point_to_octets(poly_commit);
+                                auto left_side_pairing = nil::crypto3::algebra::pair_reduced<curve_type>(
+                                    factor*(i_th_commitment - U_commit), 
+                                    commit_g2(set_difference_polynom(_merged_points, this->_points.at(k)[i]))
+                                );
+
+                                left_side_accum = left_side_accum * left_side_pairing;
+                                factor = factor * gamma;
+                            }
+                        }
+
+                        auto right_side_pairing = algebra::pair_reduced<typename KZGScheme::curve_type>(
+                            proof.kzg_proof, 
+                            commit_g2(this->get_V(this->_merged_points))
+                        );
+
+                        return left_side_accum == right_side_pairing;
+                    }
+                };
+
+
                 template<typename CurveType>
                 struct kzg {
 
@@ -83,6 +297,9 @@ namespace nil {
                     using proof_type = commitment_type;
 
                     struct params_type {
+                        using commitment_type = typename curve_type::template g1_type<>::value_type;
+                        using field_type = typename curve_type::scalar_field_type;
+
                         commitment_key_type commitment_key;
                         verification_key_type verification_key;
                         params_type() {}
@@ -196,7 +413,6 @@ namespace nil {
             } // namespace algorithms
 
             namespace commitments {
-
                 /**
                  * @brief Based on the KZG Commitment from [KZG10].
                  *
@@ -206,9 +422,81 @@ namespace nil {
                  * Dan Boneh, Justin Drake, Ben Fisch,
                  * <https://eprint.iacr.org/2020/081.pdf>
                  */
-                template<typename CurveType, typename TranscriptHashType, std::size_t BatchSize>
+                template<typename CurveType, typename TranscriptHashType>
                 struct batched_kzg {
+                    typedef CurveType curve_type;
+                    typedef TranscriptHashType transcript_hash_type;
+                    typedef typename curve_type::gt_type::value_type gt_value_type;
 
+                    using multiexp_method = typename algebra::policies::multiexp_method_BDLO12;
+                    using field_type = typename curve_type::scalar_field_type;
+                    using scalar_value_type = typename curve_type::scalar_field_type::value_type;
+                    using commitment_key_type = typename curve_type::template g1_type<>::value_type;
+                    using verification_key_type = typename curve_type::template g2_type<>::value_type;
+                    using batch_of_polynomials_type = std::vector<typename math::polynomial<scalar_value_type>>;
+                    using evals_type = std::vector<std::vector<scalar_value_type>>;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
+                    using serializer = typename nil::marshalling::curve_element_serializer<curve_type>;
+                    using commitment_type = std::vector<std::uint8_t>;
+
+                    struct proof_type {
+                        eval_storage<field_type> z;
+                        commitment_key_type      kzg_proof;
+                    };
+
+
+                    const static std::size_t scalar_blob_size = field_type::arity * (field_type::modulus_bits / 8 + (field_type::modulus_bits % 8 ? 1 : 0));
+                    const static std::size_t g1_blob_size = 96;
+                    const static std::size_t g2_blob_size = 192;
+                    using bincode = typename nil::marshalling::bincode::field<field_type>;
+
+                    struct params_type {
+                        using commitment_type = std::vector<std::uint8_t>;
+                        using field_type = typename curve_type::scalar_field_type;
+
+                        std::vector<commitment_key_type> commitment_key;
+                        std::vector<verification_key_type> verification_key;
+                        params_type() {};
+                        params_type(std::size_t d, std::size_t t) {
+                            auto alpha = algebra::random_element<typename curve_type::scalar_field_type>();
+                            commitment_key.resize(d);
+                            verification_key.resize(t + 1);
+                            auto alpha_comm = commitment_key_type::one();
+                            for (std::size_t i = 0; i < d; ++i) {
+                                commitment_key[i] = alpha_comm;
+                                alpha_comm = alpha * alpha_comm;
+                            }
+                            auto alpha_ver = verification_key_type::one();
+                            for (std::size_t i = 0; i <= t; ++i) {
+                                verification_key[i] = alpha_ver;
+                                alpha_ver = alpha * alpha_ver;
+                            }
+                        }
+                        params_type(std::size_t d, std::size_t t, scalar_value_type alpha) {
+                            commitment_key.resize(d);
+                            verification_key.resize(t + 1);
+                            auto alpha_comm = commitment_key_type::one();
+                            for (std::size_t i = 0; i < d; ++i) {
+                                commitment_key[i] = alpha_comm;
+                                alpha_comm = alpha * alpha_comm;
+                            }
+                            auto alpha_ver = verification_key_type::one();
+                            for (std::size_t i = 0; i <= t; ++i) {
+                                verification_key[i] = alpha_ver;
+                                alpha_ver = alpha * alpha_ver;
+                            }
+                        }
+                        params_type(std::vector<commitment_key_type> commitment_key, std::vector<verification_key_type> verification_key) :
+                                    commitment_key(commitment_key), verification_key(verification_key) {};
+                        params_type operator=(const params_type &other) {
+                            commitment_key = other.commitment_key;
+                            verification_key = other.verification_key;
+                            return *this;
+                        }
+                    };
+                };
+/*              template<typename CurveType, typename TranscriptHashType, std::size_t BatchSize>
+                struct batched_kzg {
                     typedef CurveType curve_type;
                     typedef TranscriptHashType transcript_hash_type;
                     constexpr static const std::size_t batch_size = BatchSize;
@@ -290,11 +578,11 @@ namespace nil {
                             return *this;
                         }
                     };
-                };
+                };*/
             } // namespace commitments
 
             namespace algorithms {
-                template<typename KZG,
+/*              template<typename KZG,
                          typename std::enable_if<
                              std::is_base_of<
                                  commitments::batched_kzg<typename KZG::curve_type,
@@ -365,7 +653,7 @@ namespace nil {
                          typename std::enable_if<
                              std::is_base_of<
                                  commitments::batched_kzg<typename KZG::curve_type,
-                                 typename KZG::transcript_hash_type, KZG::batch_size>,
+                                 typename KZG::transcript_hash_type>,
                                  KZG>::value,
                              bool>::type = true>
                 static typename KZG::commitment_type commit(const typename KZG::params_type &params, 
@@ -376,17 +664,17 @@ namespace nil {
                 }
 
                 template<typename KZG,
-                         typename std::enable_if<
-                             std::is_base_of<
-                                 commitments::batched_kzg<typename KZG::curve_type,
-                                 typename KZG::transcript_hash_type, KZG::batch_size>,
-                                 KZG>::value,
-                             bool>::type = true>
-                static std::array<typename KZG::commitment_type, KZG::batch_size>
+                    typename std::enable_if<
+                        std::is_base_of<
+                            commitments::batched_kzg<typename KZG::curve_type, typename KZG::transcript_hash_type>,
+                            KZG>::value,
+                        bool>::type = true>
+                static typename KZG::commitment_type
                     commit(const typename KZG::params_type &params, 
-                            const std::array<typename math::polynomial<typename KZG::scalar_value_type>, KZG::batch_size> &polys) {
-                    std::array<typename KZG::commitment_type, KZG::batch_size> commitments;
-                    for (std::size_t i = 0; i < KZG::batch_size; ++i) {
+                            const std::vector<typename KZG::poly_type> &polys) {
+                    typename KZG::commitment_type commitments;
+                    commitments.resize(polys.size());
+                    for (std::size_t i = 0; i < polys.size(); ++i) {
                         BOOST_ASSERT(polys[i].size() <= params.commitment_key.size());
                         commitments[i] = commit<KZG>(params, polys[i]);
                     }
@@ -404,7 +692,7 @@ namespace nil {
                                                             typename math::polynomial<typename KZG::scalar_value_type> poly) {
                     BOOST_ASSERT(poly.size() <= params.verification_key.size());
                     auto result = algebra::multiexp<typename KZG::multiexp_method>(params.verification_key.begin(),
-                                    params.verification_key.begin() + poly.size(), poly.begin(), poly.end(), 1);
+-                                    params.verification_key.begin() + poly.size(), poly.begin(), poly.end(), 1);
                     return result;
                 }
 
@@ -539,7 +827,7 @@ namespace nil {
                     
                     return left_side_pairing == right_side_pairing;
                     // return true;
-                }
+                }*/
             } // namespace algorithms
         }         // namespace zk
     }             // namespace crypto3

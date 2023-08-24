@@ -135,13 +135,14 @@ namespace nil {
                         _points[index].resize(_polys[index].size());
                     }
                     void eval_polys(){
-                        for(auto it = _polys.begin(); it != _polys.end(); ++it){
-                            _z.set_batch_size(it->first, it->second.size());
-                            BOOST_ASSERT(it->second.size() == _points.at(it->first).size() || _points.at(it->first).size() == 1);
-                            for( std::size_t i = 0; i < it->second.size(); i++ ){
-                                _z.set_poly_points_number(it->first, i, _points.at(it->first)[i].size());
-                                for(std::size_t j = 0; j < _points.at(it->first)[i].size(); j++){
-                                    _z.set(it->first, i, j, it->second[i].evaluate(_points.at(it->first)[i][j]));
+                        for(auto const &it : _polys){
+                            auto k = it.first;
+                            _z.set_batch_size(k, it.second.size());
+                            BOOST_ASSERT(it.second.size() == _points.at(k).size() || _points.at(k).size() == 1);
+                            for( std::size_t i = 0; i < it.second.size(); i++ ){
+                                _z.set_poly_points_number(k, i, _points.at(k)[i].size());
+                                for(std::size_t j = 0; j < _points.at(k)[i].size(); j++){
+                                    _z.set(k, i, j, it.second[i].evaluate(_points.at(k)[i][j]));
                                 }
                             }
                         } 

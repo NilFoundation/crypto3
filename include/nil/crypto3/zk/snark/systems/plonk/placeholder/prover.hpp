@@ -154,7 +154,7 @@ namespace nil {
                             _polynomial_table,
                             _commitment_scheme,
                             transcript);
-
+                        
                         _proof.v_perm_commitment = permutation_argument.permutation_poly_commitment;
 
                         _F_dfs[0] = std::move(permutation_argument.F_dfs[0]);
@@ -191,8 +191,7 @@ namespace nil {
                             preprocessed_public_data.common_data.lagrange_0.evaluate(_proof.eval_proof.challenge);
                         generate_evaluation_points();
 
-                        _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
-                        
+                        _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
                         return _proof;
                     }
 

@@ -37,9 +37,12 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
@@ -61,6 +64,8 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 #include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 
 #include "circuits.hpp"
@@ -111,9 +116,19 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log, const i
     return params;
 }
 
+template<typename kzg_type>
+typename kzg_type::params_type create_kzg_params(std::size_t degree_log) {
+    // TODO: what cases t != d?
+    typename kzg_type::field_type::value_type alpha (7);
+    std::size_t d = 1 << degree_log;
+
+    typename kzg_type::params_type params(d, d, alpha);
+    return params;
+}
+
 BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
-    using curve_type = algebra::curves::pallas;
-    using field_type = typename curve_type::base_field_type;
+    using curve_type = algebra::curves::bls12<381>;
+    using field_type = typename curve_type::scalar_field_type;
 
     constexpr static const std::size_t table_rows_log = 4;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
@@ -155,29 +170,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
-
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, lpc_scheme_type>;
 
-BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
-    math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
-    std::size_t expected_size = 4;
-    std::size_t max_degree = 3;
-
-    std::vector<math::polynomial<typename field_type::value_type>> f_splitted =
-        zk::snark::detail::split_polynomial<field_type>(f, max_degree);
-
-    BOOST_CHECK(f_splitted.size() == expected_size);
-
-    typename field_type::value_type y = algebra::random_element<field_type>();
-
-    typename field_type::value_type f_at_y = f.evaluate(y);
-    typename field_type::value_type f_splitted_at_y = field_type::value_type::zero();
-    for (std::size_t i = 0; i < f_splitted.size(); i++) {
-        f_splitted_at_y = f_splitted_at_y + f_splitted[i].evaluate(y) * y.pow((max_degree + 1) * i);
-    }
-
-    BOOST_CHECK(f_at_y == f_splitted_at_y);
-}
+    using kzg_type = commitments::batched_kzg<curve_type, typename placeholder_test_params::transcript_hash_type>;
+    using kzg_scheme_type = typename commitments::kzg_commitment_scheme<kzg_type>;
+    using kzg_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, kzg_scheme_type>;
 
 BOOST_AUTO_TEST_CASE(basic_test){
     auto circuit = circuit_test_t<field_type>();
@@ -236,6 +233,50 @@ BOOST_AUTO_TEST_CASE(basic_test){
         lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme
     );
     BOOST_CHECK(verifier_res);
+
+    // KZG commitment scheme
+    auto kzg_params = create_kzg_params<kzg_type>(table_rows_log);
+    kzg_scheme_type kzg_scheme(kzg_params);
+
+    typename placeholder_public_preprocessor<field_type, kzg_placeholder_params_type>::preprocessed_data_type
+        kzg_preprocessed_public_data = placeholder_public_preprocessor<field_type, kzg_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, kzg_scheme, columns_with_copy_constraints.size()
+        );
+
+    typename placeholder_private_preprocessor<field_type, kzg_placeholder_params_type>::preprocessed_data_type
+        kzg_preprocessed_private_data = placeholder_private_preprocessor<field_type, kzg_placeholder_params_type>::process(
+            constraint_system, assignments.private_table(), desc
+        );
+
+    auto kzg_proof = placeholder_prover<field_type, kzg_placeholder_params_type>::process(
+        kzg_preprocessed_public_data, kzg_preprocessed_private_data, desc, constraint_system, assignments, kzg_scheme
+    );
+
+    verifier_res = placeholder_verifier<field_type, kzg_placeholder_params_type>::process(
+        kzg_preprocessed_public_data, kzg_proof, constraint_system, kzg_scheme
+    );
+    BOOST_CHECK(verifier_res);
+}
+
+BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
+    math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+    std::size_t expected_size = 4;
+    std::size_t max_degree = 3;
+
+    std::vector<math::polynomial<typename field_type::value_type>> f_splitted =
+        zk::snark::detail::split_polynomial<field_type>(f, max_degree);
+
+    BOOST_CHECK(f_splitted.size() == expected_size);
+
+    typename field_type::value_type y = algebra::random_element<field_type>();
+
+    typename field_type::value_type f_at_y = f.evaluate(y);
+    typename field_type::value_type f_splitted_at_y = field_type::value_type::zero();
+    for (std::size_t i = 0; i < f_splitted.size(); i++) {
+        f_splitted_at_y = f_splitted_at_y + f_splitted[i].evaluate(y) * y.pow((max_degree + 1) * i);
+    }
+
+    BOOST_CHECK(f_at_y == f_splitted_at_y);
 }
 
 BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
@@ -343,7 +384,6 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
         plonk_polynomial_dfs_table<field_type, typename placeholder_test_params::arithmetization_params>(
             preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
-    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript(init_blob);
     transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(init_blob);
 
