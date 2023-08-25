@@ -74,6 +74,47 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
+template<typename CommitmentSchemeParamsType, typename TranscriptType>
+class dummy_commitment_scheme_type:public nil::crypto3::zk::commitments::polys_evaluator<CommitmentSchemeParamsType, TranscriptType>{
+private:
+public:
+    using params_type = CommitmentSchemeParamsType;
+    using commitment_type = typename params_type::commitment_type;
+    using field_type = typename params_type::field_type;
+    using transcript_type = TranscriptType;
+
+    struct proof_type{
+        nil::crypto3::zk::commitments::eval_storage<field_type> z;
+    };
+
+    void setup(TranscriptType &preprocessed_transript){
+    }
+
+    proof_type proof_eval(
+        transcript_type &transcript
+    ){
+        this->eval_polys();
+        return proof_type({this->_z});
+    }
+
+    commitment_type commit(
+        std::size_t index
+    ){
+        this->state_commited(index);
+        std::vector<std::uint8_t> arr = {std::uint8_t(index)};
+
+        return commitment_type(arr);
+    }
+
+    bool verify_eval(
+        const proof_type &proof,
+        const std::map<std::size_t, commitment_type> &commitments,
+        transcript_type &transcript
+    ) const {
+        return true;
+    }
+};
+
 inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
     using dist_type = std::uniform_int_distribution<int>;
     static std::random_device random_engine;
@@ -156,7 +197,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
 
     using commitment_scheme_params_type = nil::crypto3::zk::commitments::commitment_scheme_params_type<field_type, std::vector<std::uint8_t>>;
-    using commitment_scheme_type = nil::crypto3::zk::commitments::polys_evaluator<commitment_scheme_params_type, transcript_type>;
+    using commitment_scheme_type = dummy_commitment_scheme_type<commitment_scheme_params_type, transcript_type>;
     using placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, commitment_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, placeholder_params_type>;
 
@@ -189,12 +230,15 @@ BOOST_AUTO_TEST_CASE(basic_test){
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
+    bool verifier_res;
+
     // Dummy commitment scheme
     commitment_scheme_type commitment_scheme;
+    transcript_type dummy_transcript;
 
     typename placeholder_public_preprocessor<field_type, placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, commitment_scheme, columns_with_copy_constraints.size()
+            constraint_system, assignments.public_table(), desc, commitment_scheme, columns_with_copy_constraints.size(), dummy_transcript
         );
 
     typename placeholder_private_preprocessor<field_type, placeholder_params_type>::preprocessed_data_type
@@ -203,21 +247,22 @@ BOOST_AUTO_TEST_CASE(basic_test){
         );
 
     auto proof = placeholder_prover<field_type, placeholder_params_type>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, commitment_scheme
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, commitment_scheme, dummy_transcript
     );
 
-    bool verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
-        preprocessed_public_data, proof, constraint_system, commitment_scheme
+    verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
+        preprocessed_public_data, proof, constraint_system, commitment_scheme, dummy_transcript
     );
     BOOST_CHECK(verifier_res);
 
     // LPC commitment scheme
     typename lpc_type::fri_type::params_type fri_params = create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
     lpc_scheme_type lpc_scheme(fri_params);
+    transcript_type lpc_transcript;
 
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), lpc_transcript
         );
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
@@ -226,21 +271,22 @@ BOOST_AUTO_TEST_CASE(basic_test){
         );
 
     auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme
+        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, lpc_transcript
     );
 
     verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme
+        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme, lpc_transcript
     );
     BOOST_CHECK(verifier_res);
 
     // KZG commitment scheme
     auto kzg_params = create_kzg_params<kzg_type>(table_rows_log);
     kzg_scheme_type kzg_scheme(kzg_params);
+    transcript_type  kzg_transcript;
 
     typename placeholder_public_preprocessor<field_type, kzg_placeholder_params_type>::preprocessed_data_type
         kzg_preprocessed_public_data = placeholder_public_preprocessor<field_type, kzg_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, kzg_scheme, columns_with_copy_constraints.size()
+            constraint_system, assignments.public_table(), desc, kzg_scheme, columns_with_copy_constraints.size(), kzg_transcript
         );
 
     typename placeholder_private_preprocessor<field_type, kzg_placeholder_params_type>::preprocessed_data_type
@@ -249,11 +295,11 @@ BOOST_AUTO_TEST_CASE(basic_test){
         );
 
     auto kzg_proof = placeholder_prover<field_type, kzg_placeholder_params_type>::process(
-        kzg_preprocessed_public_data, kzg_preprocessed_private_data, desc, constraint_system, assignments, kzg_scheme
+        kzg_preprocessed_public_data, kzg_preprocessed_private_data, desc, constraint_system, assignments, kzg_scheme, kzg_transcript
     );
 
     verifier_res = placeholder_verifier<field_type, kzg_placeholder_params_type>::process(
-        kzg_preprocessed_public_data, kzg_proof, constraint_system, kzg_scheme
+        kzg_preprocessed_public_data, kzg_proof, constraint_system, kzg_scheme, kzg_transcript
     );
     BOOST_CHECK(verifier_res);
 }
@@ -297,9 +343,11 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_polynomials_test) {
     typename lpc_type::fri_type::params_type fri_params = create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
     lpc_scheme_type lpc_scheme(fri_params);
 
+    transcript_type transcript;
+
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), transcript
         );
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
@@ -370,9 +418,11 @@ BOOST_AUTO_TEST_CASE(placeholder_permutation_argument_test) {
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
+    transcript_type transcript;
+
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), transcript
         );
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
@@ -437,9 +487,12 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
     auto fri_params = create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
     lpc_scheme_type lpc_scheme(fri_params);
 
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    transcript_type transcript(init_blob);
+
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), transcript
         );
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
@@ -451,11 +504,8 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
         plonk_polynomial_dfs_table<field_type, typename placeholder_test_params::arithmetization_params>(
             preprocessed_private_data.private_polynomial_table, preprocessed_public_data.public_polynomial_table);
 
-    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript(
-        init_blob);
-    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript(
-        init_blob);
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> prover_transcript = transcript;
+    transcript::fiat_shamir_heuristic_sequential<placeholder_test_params::transcript_hash_type> verifier_transcript = transcript;
 
     std::array<math::polynomial_dfs<typename field_type::value_type>, 1> prover_res =
         placeholder_gates_argument<field_type, lpc_placeholder_params_type>::prove_eval(
@@ -562,6 +612,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3_test_suite)
         placeholder_test_params::m, 4
     >;
 
+    using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
+
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
 
@@ -583,19 +635,20 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test) {
     lpc_scheme_type lpc_scheme(fri_params);
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+    transcript_type transcript;
 
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), transcript);
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_private_data = placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.private_table(), desc);
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme);
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, transcript);
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, proof, constraint_system, lpc_scheme);
+        preprocessed_public_data, proof, constraint_system, lpc_scheme, transcript);
     BOOST_CHECK(verifier_res);
 }
 BOOST_AUTO_TEST_SUITE_END()

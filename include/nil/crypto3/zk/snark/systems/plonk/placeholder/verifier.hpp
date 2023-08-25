@@ -125,12 +125,12 @@ namespace nil {
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         const placeholder_proof<FieldType, ParamsType> &proof,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
-                        commitment_scheme_type commitment_scheme
+                        commitment_scheme_type commitment_scheme,
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript
                     ) {    
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
-                        std::vector<std::uint8_t> transcript_init {};
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(transcript_init);
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript = preprocessed_transcript;
 
                         // 3. append witness commitments to transcript
                         transcript(proof.variable_values_commitment);

@@ -60,6 +60,7 @@ namespace nil {
                     using params_type = ParamsType;
                     using commitment_scheme_type = typename params_type::commitment_scheme_type;
                     using commitment_type = typename commitment_scheme_type::commitment_type;
+                    using transcript_type = typename commitment_scheme_type::transcript_type;
 
                 public:
                     struct preprocessed_data_type {
@@ -160,15 +161,15 @@ namespace nil {
                         plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>  public_polynomial_table;
 
                         // S_sigma
-                        std::vector<polynomial_dfs_type> permutation_polynomials;
+                        std::vector<polynomial_dfs_type>                                    permutation_polynomials;
                         // S_id
-                        std::vector<polynomial_dfs_type> identity_polynomials;
+                        std::vector<polynomial_dfs_type>                                    identity_polynomials;
 
                         polynomial_dfs_type q_last;    // TODO: move to common data
                         polynomial_dfs_type q_blind;
 
-                        public_commitments_type public_commitments;
-                        common_data_type        common_data;
+                        public_commitments_type                                             public_commitments;
+                        common_data_type                                                    common_data;
                     };
 
                 private:
@@ -406,7 +407,8 @@ namespace nil {
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description,
                         typename ParamsType::commitment_scheme_type &commitment_scheme,
-                        std::size_t columns_with_copy_constraints
+                        std::size_t columns_with_copy_constraints,
+                        transcript_type &transcript
                     ) {
     
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder public preprocessor");
@@ -479,6 +481,8 @@ namespace nil {
                         typename preprocessed_data_type::common_data_type common_data (
                             public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree
                         );
+
+                        commitment_scheme.setup(transcript);
 
                         preprocessed_data_type preprocessed_data({
                             public_polynomial_table, sigma_perm_polys,

@@ -188,8 +188,7 @@ namespace nil {
                         return result;
                     }
 
-                    void setup(transcript_type &transcript){
-                        std::cout << "KZG setup transcript" << std::endl;
+                    void setup(transcript_type& transcript){
                     }
 
                     proof_type proof_eval(transcript_type &transcript){

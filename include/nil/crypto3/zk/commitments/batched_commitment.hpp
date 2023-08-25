@@ -55,10 +55,6 @@ namespace nil {
                     using transcript_type = TranscriptType;
                     using poly_type = PolynomialType;
 
-                    struct proof_type{
-                        eval_storage<field_type> z;
-                    };
-
                     eval_storage<field_type> _z;
                     polys_evaluator(){}
                 protected:
@@ -148,7 +144,8 @@ namespace nil {
                         } 
                     }
                 public:
-                    void setup(transcript_type &transcript){}
+                    //void setup(std::string &init_blob){init_blob += " world!";}
+                    //void setup(transcript_type &transcript){std::cout << "Setup with transcript" << std::endl;}
 
                     void append_to_batch(std::size_t index, const poly_type& poly){
                         if( _locked.find(index) == _locked.end() ) _locked[index] = false;
@@ -195,30 +192,6 @@ namespace nil {
                         }
                         _points[batch_id].resize(batch_size);
                         _locked[batch_id] = true;
-                    }
-
-                    commitment_type commit(
-                        std::size_t index
-                    ){
-                        state_commited(index);
-                        std::vector<std::uint8_t> arr = {std::uint8_t(index)};
-
-                        return commitment_type(arr);
-                    }
-
-                    proof_type proof_eval(
-                        transcript_type &transcript
-                    ){
-                        eval_polys();
-                        return proof_type({_z});
-                    }
-
-                    bool verify_eval(
-                        const proof_type &proof,
-                        const std::map<std::size_t, commitment_type> &commitments,
-                        transcript_type &transcript
-                    ) const {
-                        return true;
                     }
                 };
 

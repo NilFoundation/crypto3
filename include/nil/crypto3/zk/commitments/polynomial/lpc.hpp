@@ -64,6 +64,10 @@ namespace nil {
                     lpc_commitment_scheme(const typename fri_type::params_type &fri_params){
                         _fri_params = fri_params;
                     }
+
+                    void setup(transcript_type& transcript){
+                    }
+
                     commitment_type commit(std::size_t index){
                         this->state_commited(index);
                         _trees[index] = nil::crypto3::zk::algorithms::precommit<fri_type>(this->_polys[index], _fri_params.D[0], _fri_params.step_list.front());
@@ -285,6 +289,7 @@ namespace nil {
                     using field_type = FieldType;
                     using polynomials_values_type = typename basic_fri::polynomials_values_type;
                     using params_type = typename basic_fri::params_type;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<typename LPCParams::transcript_hash_type>;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {

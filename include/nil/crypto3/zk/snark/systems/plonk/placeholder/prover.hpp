@@ -102,11 +102,13 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
-                        commitment_scheme_type commitment_scheme) { 
+                        commitment_scheme_type commitment_scheme, 
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript
+                    ) { 
 
                         auto prover = placeholder_prover<FieldType, ParamsType>(
                             preprocessed_public_data, preprocessed_private_data, table_description,
-                            constraint_system, assignments, commitment_scheme);
+                            constraint_system, assignments, commitment_scheme, preprocessed_transcript);
                         return prover.process();
                     }
 
@@ -116,7 +118,9 @@ namespace nil {
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
-                        const commitment_scheme_type &commitment_scheme) 
+                        const commitment_scheme_type &commitment_scheme,
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> &preprocessed_transcript
+                    ) 
                             : preprocessed_public_data(preprocessed_public_data)
                             , preprocessed_private_data(preprocessed_private_data)
                             , table_description(table_description)
@@ -126,7 +130,7 @@ namespace nil {
                             , _polynomial_table(preprocessed_private_data.private_polynomial_table,
                                                 preprocessed_public_data.public_polynomial_table) 
                             , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
-                            , transcript(std::vector<std::uint8_t>())
+                            , transcript(preprocessed_transcript)
                     {
                         // 1. Add circuit definition to transcript
                         // transcript(short_description); 
