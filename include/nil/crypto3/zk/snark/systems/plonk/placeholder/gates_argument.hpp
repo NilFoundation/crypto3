@@ -77,7 +77,6 @@ namespace nil {
                         std::size_t extended_domain_size,
                         std::unordered_map<polynomial_dfs_variable_type, polynomial_dfs_type>& variable_values_out) {
 
-std::cout << "building for " << expr << std::endl;
                         std::unordered_map<polynomial_dfs_variable_type, size_t> variable_counts;
 
                         math::expression_for_each_variable_visitor<polynomial_dfs_variable_type> visitor(
@@ -122,7 +121,6 @@ std::cout << "building for " << expr << std::endl;
                             std::shared_ptr<math::evaluation_domain<FieldType>> original_domain,
                             std::uint32_t max_gates_degree,
                             transcript_type& transcript) {
-std::cout << "Running gate argument.\n";
                         PROFILE_PLACEHOLDER_SCOPE("gate_argument_time");
 
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
@@ -164,8 +162,9 @@ std::cout << "Running gate argument.\n";
                                 theta_acc *= theta;
                                 // +1 stands for the selector multiplication.
                                 size_t constraint_degree = visitor.compute_max_degree(constraint) + 1;
-                                for (size_t i = extended_domain_sizes.size() - 1; i >= 0; --i) {
-                                    if (degree_limits[i] >= constraint_degree) {
+                                for (int i = extended_domain_sizes.size() - 1; i >= 0; --i) {
+                                    // Whatever the degree of term is, add it to the maximal degree expression.
+                                    if (degree_limits[i] >= constraint_degree || i == 0) {
                                         gate_results[i] += next_term;
                                         break;
                                     }
