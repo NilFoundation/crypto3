@@ -596,6 +596,56 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_basic_test) {
     BOOST_CHECK(verifier_res);
 }
 
+BOOST_AUTO_TEST_CASE(placeholder_public_input_test) {
+    auto random_input = algebra::random_element<FieldType>();
+    auto circuit = circuit_test_2<FieldType>(random_input);
+
+    using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
+
+    //    typedef commitments::list_polynomial_commitment<FieldType,
+    //        circuit_2_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type> lpc_type;
+
+    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
+
+    plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
+
+    desc.rows_amount = table_rows;
+    desc.usable_rows_amount = usable_rows;
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
+                                                                   circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
+            constraint_system, assignments.public_table(), desc, fri_params, columns_with_copy_constraints.size());
+
+    typename placeholder_private_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<FieldType, circuit_2_params>::process(
+            constraint_system, assignments.private_table(), desc, fri_params);
+
+    auto proof = placeholder_prover<FieldType, circuit_2_params>::process(
+        preprocessed_public_data, preprocessed_private_data, desc,
+        constraint_system, assignments, fri_params);
+
+    std::array<std::vector<typename FieldType::value_type>,1> public_input = {{{random_input, 0, 1}}};
+    bool verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params, public_input);
+    BOOST_CHECK(verifier_res);
+
+    std::array<std::vector<typename FieldType::value_type>,1> wrong_public_input = {{{1, 0, 1}}};
+    verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params, wrong_public_input);
+    BOOST_CHECK(!verifier_res);
+
+    verifier_res = placeholder_verifier<FieldType, circuit_2_params>::process(
+        preprocessed_public_data, proof, constraint_system, fri_params);
+    BOOST_CHECK(verifier_res);
+}
+
 BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test, *boost::unit_test::disabled()) {
     auto circuit = circuit_test_3<FieldType>();
 
