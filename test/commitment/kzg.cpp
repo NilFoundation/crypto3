@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_SUITE_END()
 // }
 
 // BOOST_AUTO_TEST_SUITE_END()
-/*
+
 BOOST_AUTO_TEST_SUITE(batched_kzg_test_suite)
 
 BOOST_AUTO_TEST_CASE(batched_kzg_basic_test) {
@@ -424,37 +424,40 @@ BOOST_AUTO_TEST_CASE(batched_kzg_basic_test) {
 
     typedef hashes::sha2<256> transcript_hash_type;
     const std::size_t batch_size = 1;
-    typedef zk::commitments::batched_kzg<curve_type, transcript_hash_type, batch_size> kzg_type;
+    typedef zk::commitments::batched_kzg<curve_type, transcript_hash_type, math::polynomial<scalar_value_type>> kzg_type;
     typedef typename kzg_type::transcript_type transcript_type;
 
-    typename kzg_type::batch_of_polynomials_type polys = {{{{1, 2, 3, 4, 5, 6, 7, 8}},}};
+    typename kzg_type::batch_of_polynomials_type polys = {{{1, 2, 3, 4, 5, 6, 7, 8}}};
 
     scalar_value_type alpha = 7;
     std::size_t d = 8;
     std::size_t t = 8;
     auto params = typename kzg_type::params_type(d, t, alpha);
 
-    std::array<std::vector<scalar_value_type>, batch_size> S = {{{101, 2, 3},}};
-    std::vector<scalar_value_type> T = zk::algorithms::merge_eval_points<kzg_type>(S);
-    auto rs = zk::algorithms::create_evals_polys<kzg_type>(polys, S);
+    std::vector<std::vector<scalar_value_type>> eval_points = {{{101, 2, 3},}};
+    std::vector<scalar_value_type> merged_eval_points = zk::algorithms::merge_eval_points<kzg_type>(eval_points);
+    auto rs = zk::algorithms::create_evals_polys<kzg_type>(polys, eval_points);
+
     BOOST_CHECK(rs.size() == batch_size);
     for (std::size_t i = 0; i < batch_size; ++i) {
-        for (auto s : S[i]) {
+        for (auto s : eval_points[i]) {
             BOOST_CHECK(polys[i].evaluate(s) == rs[i].evaluate(s));
         }
+
     }
     auto commits = zk::algorithms::commit<kzg_type>(params, polys);
-    auto pk = typename kzg_type::public_key_type(commits, T, S, rs);
+    auto pk = typename kzg_type::public_key_type(commits, merged_eval_points, eval_points, rs);
 
-    transcript_type transcript = zk::algorithms::setup_transcript<kzg_type>(params);
+    transcript_type transcript;
+    zk::algorithms::setup_transcript<kzg_type>(params, transcript);
     auto proof = zk::algorithms::proof_eval<kzg_type>(params, polys, pk, transcript);
 
-    transcript_type transcript_verification = zk::algorithms::setup_transcript<kzg_type>(params);
+    transcript_type transcript_verification;
+    zk::algorithms::setup_transcript<kzg_type>(params, transcript);
     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 }
 
 BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
-
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::base_field_type::value_type base_value_type;
     typedef typename curve_type::base_field_type base_field_type;
@@ -462,8 +465,7 @@ BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
 
     typedef hashes::sha2<256> transcript_hash_type;
-    const std::size_t batch_size = 4;
-    typedef zk::commitments::batched_kzg<curve_type, transcript_hash_type, batch_size> kzg_type;
+    typedef zk::commitments::batched_kzg<curve_type, transcript_hash_type, math::polynomial<scalar_value_type>> kzg_type;
     typedef typename kzg_type::transcript_type transcript_type;
 
     scalar_value_type alpha = 7;
@@ -472,11 +474,11 @@ BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
     typename kzg_type::batch_of_polynomials_type polys = {{{{1, 2, 3, 4, 5, 6, 7, 8}},
                                                         {{11, 12, 13, 14, 15, 16, 17, 18}},
                                                         {{21, 22, 23, 24, 25, 26, 27, 28}},
-                                                        {{31, 32, 33, 34, 35, 36, 37, 38}},}};
+                                                        {{31, 32, 33, 34, 35, 36, 37, 38}}}};
 
     auto params = typename kzg_type::params_type(8, 8, alpha);
 
-    std::array<std::vector<scalar_value_type>, batch_size> S = {{{101, 2, 3}, {102, 2, 3}, {1, 3}, {101, 4}}};
+    std::vector<std::vector<scalar_value_type>> S = {{{101, 2, 3}, {102, 2, 3}, {1, 3}, {101, 4}}};
     std::vector<scalar_value_type> T = zk::algorithms::merge_eval_points<kzg_type>(S);
     {
         std::vector<scalar_value_type> T_check = {1, 2, 3, 4, 101, 102};
@@ -484,8 +486,8 @@ BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
         BOOST_CHECK(T == T_check);
     }
     auto rs = zk::algorithms::create_evals_polys<kzg_type>(polys, S);
-    BOOST_CHECK(rs.size() == batch_size);
-    for (std::size_t i = 0; i < batch_size; ++i) {
+    BOOST_CHECK(rs.size() == polys.size());
+    for (std::size_t i = 0; i < polys.size(); ++i) {
         BOOST_CHECK(rs[i].degree() < polys[i].degree());
         for (auto s : S[i]) {
             BOOST_CHECK(polys[i].evaluate(s) == rs[i].evaluate(s));
@@ -494,12 +496,13 @@ BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
     auto commits = zk::algorithms::commit<kzg_type>(params, polys);
     auto pk = typename kzg_type::public_key_type(commits, T, S, rs);
 
-    transcript_type transcript = zk::algorithms::setup_transcript<kzg_type>(params);
+    transcript_type transcript;
+    zk::algorithms::setup_transcript<kzg_type>(params, transcript);
     auto proof = zk::algorithms::proof_eval<kzg_type>(params, polys, pk, transcript);
 
-    transcript_type transcript_verification = zk::algorithms::setup_transcript<kzg_type>(params);
+    transcript_type transcript_verification;
+    zk::algorithms::setup_transcript<kzg_type>(params, transcript_verification);
     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-*/

@@ -45,6 +45,7 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/detail/column_polynomial.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/constraint_system.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -355,35 +356,7 @@ namespace nil {
 
                         return q_blind;
                     }
-/*
-                    static inline typename preprocessed_data_type::public_precommitments_type precommitments(
-                        const plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
-                            &public_table,
-                        std::vector<polynomial_dfs_type> &id_perm_polys,
-                        std::vector<polynomial_dfs_type> &sigma_perm_polys,
-                        std::array<polynomial_dfs_type, 2> &q_last_q_blind,
-                        const typename ParamsType::commitment_params_type &commitment_params) {
-
-                        std::vector<polynomial_dfs_type> fixed_polys = id_perm_polys;
-                        fixed_polys.insert( fixed_polys.end(), sigma_perm_polys.begin(), sigma_perm_polys.end() );
-                        for (std::size_t i = 0; i < public_table.constants().size(); i ++){
-                            fixed_polys.push_back(public_table.constants()[i]);
-                        }
-                        for (std::size_t i = 0; i < public_table.selectors().size(); i ++){
-                            fixed_polys.push_back(public_table.selectors()[i]);
-                        }
-                        fixed_polys.push_back(q_last_q_blind[0]);
-                        fixed_polys.push_back(q_last_q_blind[1]);
-                        
-                        typename fixed_values_commitment_scheme_type::precommitment_type fixed_values_precommitment =
-                            algorithms::precommit<fixed_values_commitment_scheme_type>(
-                                fixed_polys, commitment_params.D[0],
-                                commitment_params.step_list[0]);
-
-                        return typename preprocessed_data_type::public_precommitments_type {
-                            fixed_values_precommitment};
-                    }
-*/
+ 
                     static inline typename preprocessed_data_type::public_commitments_type commitments(
                         const plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> &public_table,
                         std::vector<polynomial_dfs_type> &id_perm_polys,
@@ -481,6 +454,8 @@ namespace nil {
                         typename preprocessed_data_type::common_data_type common_data (
                             public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree
                         );
+
+                        // Push circuit description to transcript
 
                         commitment_scheme.setup(transcript);
 
