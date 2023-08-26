@@ -83,7 +83,7 @@ void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
 
 template<typename ValueType, std::size_t N>
 typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::array<ValueType, N>>>::type
-    generate_random_data(std::size_t leaf_number) {
+generate_random_data(std::size_t leaf_number) {
     std::vector<std::array<ValueType, N>> v;
     for (std::size_t i = 0; i < leaf_number; ++i) {
         std::array<ValueType, N> leaf;
@@ -101,7 +101,7 @@ void test_merkle_proof(std::size_t tree_depth) {
     using merkle_tree_type = nil::crypto3::containers::merkle_tree<Hash, Arity>;
     using merkle_proof_type = nil::crypto3::containers::merkle_proof<Hash, Arity>;
     using merkle_proof_marshalling_type =
-        types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
+            types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
 
     std::size_t leafs_number = std::pow(Arity, tree_depth);
     auto data = generate_random_data<std::uint8_t, LeafSize>(leafs_number);
@@ -130,27 +130,27 @@ void test_merkle_proof(std::size_t tree_depth) {
 
 BOOST_AUTO_TEST_SUITE(marshalling_merkle_proof_test_suite)
 
-BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_test) {
-    std::srand(std::time(0));
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(10);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2, 300>(15);
-}
+    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_test) {
+        std::srand(std::time(0));
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(10);
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2, 300>(15);
+    }
 
 // TODO: fix test case for arity 3
-BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_3_test) {
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 3>(5);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 3>(5);
-}
+    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_3_test) {
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 3>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 3>(5);
+    }
 
-BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_4_test) {
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 4>(5);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 4>(5);
-}
+    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_4_test) {
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 4>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 4>(5);
+    }
 
-BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_5_test) {
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 5>(5);
-    test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 5>(5);
-}
+    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_5_test) {
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 5>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 5>(5);
+    }
 
 BOOST_AUTO_TEST_SUITE_END()

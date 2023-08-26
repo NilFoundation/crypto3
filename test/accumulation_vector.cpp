@@ -74,13 +74,14 @@ void test_accumulation_vector(nil::crypto3::container::accumulation_vector<Group
     std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using accumulation_vector_type =
-        types::accumulation_vector<nil::marshalling::field_type<Endianness>, nil::crypto3::container::accumulation_vector<GroupType>>;
+            types::accumulation_vector<nil::marshalling::field_type<Endianness>, nil::crypto3::container::accumulation_vector<GroupType>>;
 
     accumulation_vector_type filled_val =
-        types::fill_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(val);
+            types::fill_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(val);
 
     nil::crypto3::container::accumulation_vector<GroupType> constructed_val =
-        types::make_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(filled_val);
+            types::make_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(
+                    filled_val);
     BOOST_CHECK(val == constructed_val);
 
     std::size_t unitblob_size = filled_val.length();
@@ -100,7 +101,8 @@ void test_accumulation_vector(nil::crypto3::container::accumulation_vector<Group
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     nil::crypto3::container::accumulation_vector<GroupType> constructed_val_read =
-        types::make_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(test_val_read);
+            types::make_accumulation_vector<nil::crypto3::container::accumulation_vector<GroupType>, Endianness>(
+                    test_val_read);
 
     BOOST_CHECK(val == constructed_val_read);
 }
@@ -119,18 +121,18 @@ void test_accumulation_vector() {
             rest.push_back(nil::crypto3::algebra::random_element<GroupType>());
         }
         test_accumulation_vector<Endianness>(
-            nil::crypto3::container::accumulation_vector<GroupType>(std::move(first), std::move(rest)));
+                nil::crypto3::container::accumulation_vector<GroupType>(std::move(first), std::move(rest)));
     }
 }
 
 BOOST_AUTO_TEST_SUITE(sparse_vector_test_suite)
 
-BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_be) {
-    std::cout << "BLS12-381 g1 group accumulation vector big-endian test started" << std::endl;
-    test_accumulation_vector<nil::crypto3::algebra::curves::bls12<381>::g1_type<>, nil::marshalling::option::big_endian,
-                             5>();
-    std::cout << "BLS12-381 g1 group accumulation vector big-endian test finished" << std::endl;
-}
+    BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_be) {
+        std::cout << "BLS12-381 g1 group accumulation vector big-endian test started" << std::endl;
+        test_accumulation_vector<nil::crypto3::algebra::curves::bls12<381>::g1_type<>, nil::marshalling::option::big_endian,
+                5>();
+        std::cout << "BLS12-381 g1 group accumulation vector big-endian test finished" << std::endl;
+    }
 
 // BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_le) {
 //     std::cout << "BLS12-381 g1 group accumulation vector little-endian test started" << std::endl;
@@ -140,12 +142,12 @@ BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g1_be) {
 //     std::cout << "BLS12-381 g1 group accumulation vector little-endian test finished" << std::endl;
 // }
 
-BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g2_be) {
-    std::cout << "BLS12-381 g2 group accumulation vector big-endian test started" << std::endl;
-    test_accumulation_vector<nil::crypto3::algebra::curves::bls12<381>::g2_type<>, nil::marshalling::option::big_endian,
-                             5>();
-    std::cout << "BLS12-381 g2 group accumulation vector big-endian test finished" << std::endl;
-}
+    BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g2_be) {
+        std::cout << "BLS12-381 g2 group accumulation vector big-endian test started" << std::endl;
+        test_accumulation_vector<nil::crypto3::algebra::curves::bls12<381>::g2_type<>, nil::marshalling::option::big_endian,
+                5>();
+        std::cout << "BLS12-381 g2 group accumulation vector big-endian test finished" << std::endl;
+    }
 
 // BOOST_AUTO_TEST_CASE(sparse_vector_bls12_381_g2_le) {
 //     std::cout << "BLS12-381 g2 group accumulation vector little-endian test started" << std::endl;

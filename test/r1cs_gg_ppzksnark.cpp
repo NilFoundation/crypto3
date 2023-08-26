@@ -70,7 +70,7 @@ bool test_r1cs_gg_ppzksnark() {
     std::cout << "R1CS generation started." << std::endl;
 
     zk::snark::r1cs_example<scalar_field_type> example =
-        zk::snark::generate_r1cs_example_with_binary_input<scalar_field_type>(num_constraints, input_size);
+            zk::snark::generate_r1cs_example_with_binary_input<scalar_field_type>(num_constraints, input_size);
 
     std::cout << "R1CS generation finished." << std::endl;
 
@@ -81,29 +81,29 @@ bool test_r1cs_gg_ppzksnark() {
     std::cout << "Starting prover" << std::endl;
 
     const typename scheme_type::proof_type proof =
-        zk::prove<scheme_type>(keypair.first, example.primary_input, example.auxiliary_input);
+            zk::prove<scheme_type>(keypair.first, example.primary_input, example.auxiliary_input);
 
     using verification_key_marshalling_type =
-        types::r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>,
-                                                  typename scheme_type::verification_key_type>;
+            types::r1cs_gg_ppzksnark_verification_key<nil::marshalling::field_type<Endianness>,
+                    typename scheme_type::verification_key_type>;
 
     verification_key_marshalling_type filled_verification_key_val =
-        types::fill_r1cs_gg_ppzksnark_verification_key<typename scheme_type::verification_key_type, Endianness>(
-            keypair.second);
+            types::fill_r1cs_gg_ppzksnark_verification_key<typename scheme_type::verification_key_type, Endianness>(
+                    keypair.second);
 
     using proof_marshalling_type =
-        types::r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, typename scheme_type::proof_type>;
+            types::r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, typename scheme_type::proof_type>;
 
     proof_marshalling_type filled_proof_val =
-        types::fill_r1cs_gg_ppzksnark_proof<typename scheme_type::proof_type, Endianness>(proof);
+            types::fill_r1cs_gg_ppzksnark_proof<typename scheme_type::proof_type, Endianness>(proof);
 
     using primary_input_marshalling_type =
-        types::r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<Endianness>,
-                                               typename scheme_type::primary_input_type>;
+            types::r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<Endianness>,
+                    typename scheme_type::primary_input_type>;
 
     primary_input_marshalling_type filled_primary_input_val =
-        types::fill_r1cs_gg_ppzksnark_primary_input<typename scheme_type::primary_input_type, Endianness>(
-            example.primary_input);
+            types::fill_r1cs_gg_ppzksnark_primary_input<typename scheme_type::primary_input_type, Endianness>(
+                    example.primary_input);
 
     std::cout << "Marshalling types filled." << std::endl;
 
@@ -114,7 +114,7 @@ bool test_r1cs_gg_ppzksnark() {
     auto write_iter = verification_key_byteblob.begin();
 
     typename nil::marshalling::status_type status =
-        filled_verification_key_val.write(write_iter, verification_key_byteblob.size());
+            filled_verification_key_val.write(write_iter, verification_key_byteblob.size());
 
     std::vector<unit_type> proof_byteblob;
     proof_byteblob.resize(filled_proof_val.length(), 0x00);
@@ -137,8 +137,8 @@ bool test_r1cs_gg_ppzksnark() {
     status = val_verification_key_read.read(read_iter, verification_key_byteblob.size());
 
     typename scheme_type::verification_key_type constructed_val_verification_key_read =
-        types::make_r1cs_gg_ppzksnark_verification_key<typename scheme_type::verification_key_type, Endianness>(
-            val_verification_key_read);
+            types::make_r1cs_gg_ppzksnark_verification_key<typename scheme_type::verification_key_type, Endianness>(
+                    val_verification_key_read);
 
     proof_marshalling_type val_proof_read;
 
@@ -146,7 +146,7 @@ bool test_r1cs_gg_ppzksnark() {
     status = val_proof_read.read(read_iter, proof_byteblob.size());
 
     typename scheme_type::proof_type constructed_val_proof_read =
-        types::make_r1cs_gg_ppzksnark_proof<typename scheme_type::proof_type, Endianness>(val_proof_read);
+            types::make_r1cs_gg_ppzksnark_proof<typename scheme_type::proof_type, Endianness>(val_proof_read);
 
     primary_input_marshalling_type val_primary_input_read;
 
@@ -154,24 +154,24 @@ bool test_r1cs_gg_ppzksnark() {
     status = val_primary_input_read.read(read_iter, primary_input_byteblob.size());
 
     typename scheme_type::primary_input_type constructed_val_primary_input_read =
-        types::make_r1cs_gg_ppzksnark_primary_input<typename scheme_type::primary_input_type, Endianness>(
-            val_primary_input_read);
+            types::make_r1cs_gg_ppzksnark_primary_input<typename scheme_type::primary_input_type, Endianness>(
+                    val_primary_input_read);
 
     bool ans = zk::verify<scheme_type>(constructed_val_verification_key_read, constructed_val_primary_input_read,
-                                              constructed_val_proof_read);
+                                       constructed_val_proof_read);
 
     return ans;
 }
 
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_test_suite)
 
-BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_bls12_381_be) {
-    std::cout << "BLS12-381 r1cs_gg_ppzksnark big-endian test started" << std::endl;
-    bool res =
-        test_r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>, nil::marshalling::option::big_endian>();
-    BOOST_CHECK(res);
-    std::cout << "BLS12-381 r1cs_gg_ppzksnark big-endian test finished" << std::endl;
-}
+    BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_bls12_381_be) {
+        std::cout << "BLS12-381 r1cs_gg_ppzksnark big-endian test started" << std::endl;
+        bool res =
+                test_r1cs_gg_ppzksnark<nil::crypto3::algebra::curves::bls12<381>, nil::marshalling::option::big_endian>();
+        BOOST_CHECK(res);
+        std::cout << "BLS12-381 r1cs_gg_ppzksnark big-endian test finished" << std::endl;
+    }
 
 // BOOST_AUTO_TEST_CASE(proof_bls12_381_le) {
 //     std::cout << "BLS12-381 r1cs_gg_ppzksnark proof little-endian test started" << std::endl;
