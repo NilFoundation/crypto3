@@ -219,6 +219,180 @@ namespace nil {
 
             };
 
+            // If a given expression is a multiplication of multiple subexpressions, 
+            // returns a vector of those multiplier expressions. 
+            template<typename VariableType>
+            class expression_multipliers_visitor 
+                : public boost::static_visitor<std::vector<math::expression<VariableType>>> {
+            public:
+                expression_multipliers_visitor() {}
+
+                std::vector<math::expression<VariableType>> visit(
+                        const math::expression<VariableType>& expr) {
+                    return boost::apply_visitor(*this, expr.get_expr());
+                }
+
+                std::vector<math::expression<VariableType>> operator()(
+                        const math::term<VariableType>& term) {
+                    std::vector<math::expression<VariableType>> result;
+                    std::vector<VariableType> vars = term.get_vars();
+                    if (vars.size() <= 1) {
+                        result.push_back(term);
+                    } else {
+                        // Divide the term into separate expressions for each variable.
+                        result.push_back(math::term<VariableType>({vars[0]}, term.get_coeff()));
+                        for (size_t i = 1; i < vars.size(); ++i) {
+                            result.push_back(math::term<VariableType>(vars[i]));
+                        }
+                    }
+                    return result;
+                }
+
+                std::vector<math::expression<VariableType>> operator()(
+                        const math::pow_operation<VariableType>& pow) {
+                    // We may consider changing this, but not now.
+                    return {pow};
+                }
+
+                std::vector<math::expression<VariableType>> operator()(
+                        const math::binary_arithmetic_operation<VariableType>& op) {
+                   switch (op.get_op()) {
+                        case ArithmeticOperator::ADD:
+                        case ArithmeticOperator::SUB:
+                            return {op};
+                        case ArithmeticOperator::MULT:
+                            std::vector<math::expression<VariableType>> left =
+                                boost::apply_visitor(*this, op.get_expr_left().get_expr());
+                            std::vector<math::expression<VariableType>> right =
+                                boost::apply_visitor(*this, op.get_expr_right().get_expr());
+                            left.insert(left.end(), std::make_move_iterator(right.begin()),
+                                std::make_move_iterator(right.end()));
+                            return left;
+                    }
+                }
+            };
+
+
+            // Balances the degrees of subexpressions of an expression as much as possible.
+            // for example (x1 * (x2 * (x3 * (x4 * (x5 + x6))))) is more balanced as (x1 * (x2 * x3)) * (x4 * (x5 + x6))))).
+            template<typename VariableType>
+            class expression_balancing_visitor
+                : public boost::static_visitor<math::expression<VariableType>> {
+            public:
+                expression_balancing_visitor() {}
+
+                math::expression<VariableType> balance(
+                        const math::expression<VariableType>& expr) {
+                    return boost::apply_visitor(*this, expr.get_expr());
+                }
+
+                math::expression<VariableType> operator()(
+                        const math::term<VariableType>& term) {
+                    // Divide the term into multiple multiplications.
+                    if (term.get_vars().size() < 4) {
+                        return term;
+                    }
+                    std::vector<VariableType> vars = term.get_vars();
+                    math::term<VariableType> left(
+                        std::vector<VariableType>(vars.begin(), vars.begin() + vars.size() / 2),
+                        term.get_coeff());
+                    math::term<VariableType> right(
+                        std::vector<VariableType>(vars.begin() + vars.size() / 2, vars.end()));
+                    return math::binary_arithmetic_operation<VariableType>(
+                        this->operator()(left), this->operator()(right),
+                        ArithmeticOperator::MULT);
+                }
+
+                math::expression<VariableType> operator()(
+                        const math::pow_operation<VariableType>& pow) {
+                    // We may consider changing this, but not now. Most of the time it's just one variable inside.
+                    return math::pow_operation<VariableType>(
+                        boost::apply_visitor(*this, pow.get_expr().get_expr()), pow.get_power());
+                }
+
+                // Divides the multipliers into 2 subsets, with close to equal degrees, then 
+                // recursively does the same for the subsets.
+                math::expression<VariableType> balanced_product(
+                    const std::vector<math::expression<VariableType>>& multipliers) {
+                    // If it's 1 or 2 multipliers, we can't balance anything, just return the product.
+                    if (multipliers.size() <= 2) {
+                        math::expression<VariableType> result = multipliers[0];
+                        for (int i = 1; i < multipliers.size(); ++i)
+                            result *= multipliers[i];
+                        return result;
+                    }
+                    // Divide multipliers into 2 subsets. 
+                    std::vector<uint32_t> degrees;
+                    expression_max_degree_visitor<VariableType> degree_vis;
+                    for (const auto& expr: multipliers) {
+                        degrees.push_back(degree_vis.compute_max_degree(expr));
+                    } 
+                    uint32_t total_degree = std::accumulate(degrees.begin(), degrees.end(), 0);
+
+                    // Run a knapsack algorithm to split degrees in half.
+                    std::vector<std::vector<bool>> d(multipliers.size());
+                    d[0].resize(total_degree / 2 + 1);
+                    d[0][0] = true;
+                    if (degrees[0] <= total_degree / 2) {
+                        d[0][degrees[0]] = true;
+                    }
+                    for (int i = 1; i < multipliers.size(); ++i) {
+                        d[i] = d[i-1];
+                        for (int j = degrees[i]; j <= total_degree / 2; ++j) {
+                            if (d[i-1][j - degrees[i]])
+                                d[i][j] = true;
+                        }
+                    }
+                    std::vector<math::expression<VariableType>> left, right;
+                    int j = total_degree / 2;
+                    for (; j >= 0; --j) {
+                        if (d[multipliers.size() - 1][j])
+                            break;
+                    }
+                    for (int i = multipliers.size() - 1; i >= 0; --i) {
+                        if (i == 0) {
+                            left.push_back(multipliers[0]);
+                        } else if (j == 0) {
+                            right.push_back(multipliers[i]);
+                        } else {
+                            if (degrees[i] >= j && d[i-1][j - degrees[i]]) {
+                                j -= degrees[i];
+                                left.push_back(multipliers[i]);
+                            } else {
+                                right.push_back(multipliers[i]);
+                            }
+                        }
+                    }
+                    return balanced_product(left) * balanced_product(right);
+                }
+
+                math::expression<VariableType> operator()(
+                        const math::binary_arithmetic_operation<VariableType>& op) {
+                    // We still need to make the calls for left and right, to balance those
+                    // subexpressions inside them.
+                    math::expression<VariableType> left =
+                        boost::apply_visitor(*this, op.get_expr_left().get_expr());
+                    math::expression<VariableType> right =
+                        boost::apply_visitor(*this, op.get_expr_right().get_expr());
+                    switch (op.get_op()) {
+                        case ArithmeticOperator::ADD:
+                            return left + right;
+                        case ArithmeticOperator::SUB:
+                            return left - right;
+                        case ArithmeticOperator::MULT:
+                            // Get all the multipliers going down the tree.
+                            expression_multipliers_visitor<VariableType> multipliers_visitor;
+                            std::vector<math::expression<VariableType>> multipliers = 
+                                multipliers_visitor.visit(left);
+                            std::vector<math::expression<VariableType>> right_multipliers = 
+                                multipliers_visitor.visit(right);
+                            multipliers.insert(multipliers.end(), std::make_move_iterator(right_multipliers.begin()),
+                                std::make_move_iterator(right_multipliers.end()));
+                            return balanced_product(multipliers);
+                    }
+                }
+            };
+
         }    // namespace math
     }    // namespace crypto3
 }    // namespace nil

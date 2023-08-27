@@ -187,6 +187,11 @@ namespace nil {
                         std::array<polynomial_dfs_type, argument_size> F;
 
                         for (size_t i = 0; i < extended_domain_sizes.size(); ++i) {
+                            // Balance the expressions before evaluation.
+                            math::expression_balancing_visitor<polynomial_dfs_variable_type> balancer;
+std::cout << "Before: " << expressions[i] << std::endl;
+                            expressions[i] = balancer.balance(expressions[i]);
+std::cout << "After: " << expressions[i] << std::endl;
                             build_variable_value_map(expressions[i], column_polynomials, original_domain,
                                 extended_domain_sizes[i], variable_values[i]);
 
