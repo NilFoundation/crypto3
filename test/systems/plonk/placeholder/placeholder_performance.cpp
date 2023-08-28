@@ -49,6 +49,7 @@
 #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
@@ -76,12 +77,14 @@
 #include <nil/crypto3/marshalling/zk/types/plonk/copy_constraint.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/gate.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/constraint_system.hpp>
+#include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
 
 #include "circuits.hpp"
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
+
 
 inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
     using dist_type = std::uniform_int_distribution<int>;
@@ -174,8 +177,8 @@ struct placeholder_test_params_lookups {
 };
 
 struct placeholder_fibonacci_params {
-    using merkle_hash_type = nil::crypto3::hashes::keccak_1600<512>;
-    using transcript_hash_type = nil::crypto3::hashes::keccak_1600<512>;
+    using merkle_hash_type = hashes::keccak_1600<512>;
+    using transcript_hash_type = nil::crypto3::hashes::sha2<256>;
 
     constexpr static const std::size_t witness_columns = 1;
     constexpr static const std::size_t public_input_columns = 1;
@@ -185,7 +188,7 @@ struct placeholder_fibonacci_params {
     using arithmetization_params =
         plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
-    constexpr static const std::size_t lambda = 40;
+    constexpr static const std::size_t lambda = 1;
     constexpr static const std::size_t r = 4;
     constexpr static const std::size_t m = 2;
 };
@@ -202,19 +205,80 @@ typedef commitments::fri<
 
 typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
 typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params> circuit_3_params;
-typedef placeholder_params<FieldType, typename placeholder_fibonacci_params::arithmetization_params> circuit_fib_params;
+typedef placeholder_params<FieldType, typename placeholder_fibonacci_params::arithmetization_params,         
+    placeholder_fibonacci_params::merkle_hash_type,
+    placeholder_fibonacci_params::transcript_hash_type,
+    placeholder_fibonacci_params::lambda,
+    placeholder_fibonacci_params::r,
+    placeholder_fibonacci_params::m,
+    4
+> circuit_fib_params;
+
+typedef commitments::fri<
+    FieldType, 
+    placeholder_fibonacci_params::merkle_hash_type,
+    placeholder_fibonacci_params::transcript_hash_type,
+    placeholder_fibonacci_params::lambda,
+    placeholder_fibonacci_params::m,
+    4
+> fibonacci_fri_type;
+
+BOOST_AUTO_TEST_CASE(small_merkle_tree_test) {
+    std::cout << "Small merkle tree test" << std::endl;
+
+    constexpr std::size_t rows_log = 3;
+    constexpr std::size_t expand_factor = 4;
+    constexpr std::size_t r = rows_log - 1;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(rows_log + expand_factor, r);
+
+    typedef commitments::lpc<
+        FieldType, 
+        circuit_fib_params::batched_commitment_params_type
+    > lpc_type;
+
+    std::vector<math::polynomial_dfs<typename FieldType::value_type>> batch1 = {};
+    math::polynomial_dfs<typename FieldType::value_type> witness1(7, {1,1,2,3,5,8,13,0});
+    batch1.push_back(witness1);
+    auto tree1 = algorithms::precommit<lpc_type>(batch1, D[0], 1);
+    std::cout << "tree.root() = " << tree1.root() << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(small_merkle_tree_test2) {
+    std::cout << std::endl << "Small merkle tree test" << std::endl;
+
+    constexpr std::size_t rows_log = 3;
+    constexpr std::size_t expand_factor = 4;
+    constexpr std::size_t r = rows_log - 1;
+    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+        math::calculate_domain_set<FieldType>(rows_log + expand_factor, r);
+
+    typedef commitments::lpc<
+        FieldType, 
+        circuit_fib_params::batched_commitment_params_type
+    > lpc_type;
+
+    std::vector<math::polynomial_dfs<typename FieldType::value_type>> batch1 = {};
+    math::polynomial_dfs<typename FieldType::value_type> witness1(7, {1,1,2,3,5,8,13,0});
+    batch1.push_back(witness1);
+    auto tree1 = algorithms::precommit<lpc_type>(batch1, D[0], 7);
+    std::cout << "tree.root() = " << tree1.root() << std::endl;
+}
 
 BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
-    constexpr std::size_t rows_log = 10;
+    constexpr std::size_t rows_log = 3;
     std::cout << std::endl << "Fibonacci test rows_log = "<< rows_log << std::endl;
 
     auto circuit = circuit_test_fib<FieldType, rows_log>();
 
     using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_fib_params>;
 
-    typedef commitments::lpc<FieldType, circuit_fib_params::batched_commitment_params_type> lpc_type;
+    typedef commitments::lpc<
+        FieldType, 
+        circuit_fib_params::batched_commitment_params_type
+    > lpc_type;
 
-    typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(rows_log);
+    auto fri_params = create_fri_params<fibonacci_fri_type, FieldType>(rows_log);
 
     plonk_table_description<FieldType, typename circuit_fib_params::arithmetization_params> desc;
 
