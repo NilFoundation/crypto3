@@ -223,11 +223,11 @@ typedef commitments::fri<
     4
 > fibonacci_fri_type;
 
-BOOST_AUTO_TEST_CASE(small_merkle_tree_test) {
-    std::cout << "Small merkle tree test" << std::endl;
+BOOST_AUTO_TEST_CASE(small_merkle_tree_test1) {
+    std::cout << std::endl << "Small merkle tree test" << std::endl;
 
     constexpr std::size_t rows_log = 3;
-    constexpr std::size_t expand_factor = 4;
+    constexpr std::size_t expand_factor = 1;
     constexpr std::size_t r = rows_log - 1;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(rows_log + expand_factor, r);
@@ -241,27 +241,6 @@ BOOST_AUTO_TEST_CASE(small_merkle_tree_test) {
     math::polynomial_dfs<typename FieldType::value_type> witness1(7, {1,1,2,3,5,8,13,0});
     batch1.push_back(witness1);
     auto tree1 = algorithms::precommit<lpc_type>(batch1, D[0], 1);
-    std::cout << "tree.root() = " << tree1.root() << std::endl;
-}
-
-BOOST_AUTO_TEST_CASE(small_merkle_tree_test2) {
-    std::cout << std::endl << "Small merkle tree test" << std::endl;
-
-    constexpr std::size_t rows_log = 3;
-    constexpr std::size_t expand_factor = 4;
-    constexpr std::size_t r = rows_log - 1;
-    std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        math::calculate_domain_set<FieldType>(rows_log + expand_factor, r);
-
-    typedef commitments::lpc<
-        FieldType, 
-        circuit_fib_params::batched_commitment_params_type
-    > lpc_type;
-
-    std::vector<math::polynomial_dfs<typename FieldType::value_type>> batch1 = {};
-    math::polynomial_dfs<typename FieldType::value_type> witness1(7, {1,1,2,3,5,8,13,0});
-    batch1.push_back(witness1);
-    auto tree1 = algorithms::precommit<lpc_type>(batch1, D[0], 7);
     std::cout << "tree.root() = " << tree1.root() << std::endl;
 }
 
