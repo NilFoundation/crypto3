@@ -29,6 +29,7 @@
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_GATES_ARGUMENT_HPP
 
 #include <unordered_map>
+#include <iostream>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/shift.hpp>
@@ -85,8 +86,11 @@ namespace nil {
                         });
 
                         visitor.visit(expr);
-
+int resized_count = 0;
                         for (const auto& [var, count]: variable_counts) {
+                            // We may have variable values in required sizes in some cases.
+                            if (variable_values_out.find(var) != variable_values_out.end())
+                                continue;
                             polynomial_dfs_type assignment;
                             switch (var.type) {
                                 case polynomial_dfs_variable_type::column_type::witness:
@@ -108,9 +112,11 @@ namespace nil {
                             }
                             if (count > 1) {
                                 assignment.resize(extended_domain_size);
+                                resized_count++;
                             }
                             variable_values_out[var] = assignment;
                         }
+std::cout << "========> Resized " << resized_count << " poly to size " << extended_domain_size << std::endl;
                     }
 
                     static inline std::array<polynomial_dfs_type, argument_size>
@@ -123,6 +129,9 @@ namespace nil {
                             transcript_type& transcript) {
                         PROFILE_PLACEHOLDER_SCOPE("gate_argument_time");
 
+                        // max_gates_degree that comes from the outside does not take into account multiplication
+                        // by selector.
+                        ++max_gates_degree;
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
                         auto value_type_to_polynomial_dfs = [](
@@ -132,12 +141,14 @@ namespace nil {
 
                         std::vector<std::uint32_t> extended_domain_sizes;
                         std::vector<std::uint32_t> degree_limits;
-                        degree_limits.push_back(std::pow(2, ceil(std::log2(max_gates_degree))));
-                        extended_domain_sizes.push_back(original_domain->m * degree_limits[0]);
-                        degree_limits.push_back(degree_limits[0] / 2);
-                        extended_domain_sizes.push_back(extended_domain_sizes[0] / 2);
-                        //degree_limits.push_back(degree_limits[0] / 4);
-                        //extended_domain_sizes.push_back(extended_domain_sizes[0] / 4);
+                        std::uint32_t max_degree = std::pow(2, ceil(std::log2(max_gates_degree)));
+                        std::uint32_t max_domain_size = original_domain->m * max_degree;
+
+                        // We intentionally compute expressions with highest degree in half the required size.
+                        degree_limits.push_back(max_degree);
+                        extended_domain_sizes.push_back(max_domain_size / 2);
+                        degree_limits.push_back(max_degree / 2);
+                        extended_domain_sizes.push_back(max_domain_size / 2);
 
                         std::vector<math::expression<polynomial_dfs_variable_type>> expressions(extended_domain_sizes.size()); 
 
@@ -181,8 +192,7 @@ namespace nil {
                         }
 
                         // Variable values resized to extended_domain_size and extended_domain_size/4 respectively.
-                        std::vector<std::unordered_map<polynomial_dfs_variable_type, polynomial_dfs_type>> variable_values(
-                            extended_domain_sizes.size());
+                        std::unordered_map<polynomial_dfs_variable_type, polynomial_dfs_type> variable_values;
 
                         std::array<polynomial_dfs_type, argument_size> F;
 
@@ -192,11 +202,14 @@ namespace nil {
 std::cout << "Before: " << expressions[i] << std::endl;
                             expressions[i] = balancer.balance(expressions[i]);
 std::cout << "After: " << expressions[i] << std::endl;
+                            if (extended_domain_sizes[i] != extended_domain_sizes[i-1]) {
+                                variable_values.clear();
+                            }
                             build_variable_value_map(expressions[i], column_polynomials, original_domain,
-                                extended_domain_sizes[i], variable_values[i]);
+                                extended_domain_sizes[i], variable_values);
 
                             math::cached_expression_evaluator<polynomial_dfs_variable_type> evaluator(
-                                expressions[i], [&assignments=variable_values[i]](const polynomial_dfs_variable_type &var) {
+                                expressions[i], [&assignments=variable_values](const polynomial_dfs_variable_type &var) {
                                     return assignments[var];
                             });
                             

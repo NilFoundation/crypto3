@@ -350,12 +350,12 @@ namespace nil {
                             break;
                     }
                     for (int i = multipliers.size() - 1; i >= 0; --i) {
-                        if (i == 0) {
-                            left.push_back(multipliers[0]);
-                        } else if (j == 0) {
+                        if (j == 0) {
                             right.push_back(multipliers[i]);
+                        } else if (i == 0) {
+                            left.push_back(multipliers[0]);
                         } else {
-                            if (degrees[i] >= j && d[i-1][j - degrees[i]]) {
+                            if (degrees[i] <= j && d[i-1][j - degrees[i]]) {
                                 j -= degrees[i];
                                 left.push_back(multipliers[i]);
                             } else {
