@@ -256,6 +256,9 @@ BOOST_AUTO_TEST_CASE(small_merkle_tree_test1) {
     }
     auto tree = containers::make_merkle_tree<typename lpc_type::merkle_tree_hash_type, lpc_type::m>(y_data.begin(), y_data.end());
     std::cout << "Simple tree root = "<< tree.root() << std::endl;
+
+    auto proof = typename lpc_type::merkle_proof_type(tree, 0);
+    BOOST_CHECK(proof.validate(y_data[0]));
 }
 
 BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
