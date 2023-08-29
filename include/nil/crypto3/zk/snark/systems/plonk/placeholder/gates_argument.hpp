@@ -86,7 +86,6 @@ namespace nil {
                         });
 
                         visitor.visit(expr);
-int resized_count = 0;
                         for (const auto& [var, count]: variable_counts) {
                             // We may have variable values in required sizes in some cases.
                             if (variable_values_out.find(var) != variable_values_out.end())
@@ -112,11 +111,9 @@ int resized_count = 0;
                             }
                             if (count > 1) {
                                 assignment.resize(extended_domain_size);
-                                resized_count++;
                             }
                             variable_values_out[var] = assignment;
                         }
-std::cout << "========> Resized " << resized_count << " poly to size " << extended_domain_size << std::endl;
                     }
 
                     static inline std::array<polynomial_dfs_type, argument_size>
@@ -144,9 +141,8 @@ std::cout << "========> Resized " << resized_count << " poly to size " << extend
                         std::uint32_t max_degree = std::pow(2, ceil(std::log2(max_gates_degree)));
                         std::uint32_t max_domain_size = original_domain->m * max_degree;
 
-                        // We intentionally compute expressions with highest degree in half the required size.
                         degree_limits.push_back(max_degree);
-                        extended_domain_sizes.push_back(max_domain_size / 2);
+                        extended_domain_sizes.push_back(max_domain_size);
                         degree_limits.push_back(max_degree / 2);
                         extended_domain_sizes.push_back(max_domain_size / 2);
 
@@ -191,26 +187,19 @@ std::cout << "========> Resized " << resized_count << " poly to size " << extend
                             }
                         }
 
-                        // Variable values resized to extended_domain_size and extended_domain_size/4 respectively.
                         std::unordered_map<polynomial_dfs_variable_type, polynomial_dfs_type> variable_values;
-
                         std::array<polynomial_dfs_type, argument_size> F;
 
                         for (size_t i = 0; i < extended_domain_sizes.size(); ++i) {
-                            // Balance the expressions before evaluation.
-                            math::expression_balancing_visitor<polynomial_dfs_variable_type> balancer;
-std::cout << "Before: " << expressions[i] << std::endl;
-                            expressions[i] = balancer.balance(expressions[i]);
-std::cout << "After: " << expressions[i] << std::endl;
-                            if (extended_domain_sizes[i] != extended_domain_sizes[i-1]) {
+                            if (i != 0 && extended_domain_sizes[i] != extended_domain_sizes[i-1]) {
                                 variable_values.clear();
                             }
                             build_variable_value_map(expressions[i], column_polynomials, original_domain,
                                 extended_domain_sizes[i], variable_values);
 
                             math::cached_expression_evaluator<polynomial_dfs_variable_type> evaluator(
-                                expressions[i], [&assignments=variable_values](const polynomial_dfs_variable_type &var) {
-                                    return assignments[var];
+                                expressions[i], [&assignments=variable_values, domain_size=extended_domain_sizes[i]](const polynomial_dfs_variable_type &var) {
+                                return assignments[var];
                             });
                             
                             F[0] += evaluator.evaluate();
@@ -234,7 +223,7 @@ std::cout << "After: " << expressions[i] << std::endl;
                             typename FieldType::value_type gate_result = {0};
 
                             for (const auto& constraint : gate.constraints) {
-                                gate_result = gate_result + constraint.evaluate(evaluations) * theta_acc;
+                                gate_result += constraint.evaluate(evaluations) * theta_acc;
                                 theta_acc *= theta;
                             }
 
@@ -242,7 +231,7 @@ std::cout << "After: " << expressions[i] << std::endl;
                                 std::make_tuple(gate.selector_index, 0,
                                                 plonk_variable<typename FieldType::value_type>::column_type::selector);
 
-                            gate_result = gate_result * evaluations[selector_key];
+                            gate_result *= evaluations[selector_key];
 
                             F[0] += gate_result;
                         }
