@@ -226,7 +226,7 @@ typedef commitments::fri<
 BOOST_AUTO_TEST_CASE(small_merkle_tree_test1) {
     std::cout << std::endl << "Small merkle tree test" << std::endl;
 
-    constexpr std::size_t rows_log = 3;
+    constexpr std::size_t rows_log = 2;
     constexpr std::size_t expand_factor = 1;
     constexpr std::size_t r = rows_log - 1;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
@@ -238,10 +238,24 @@ BOOST_AUTO_TEST_CASE(small_merkle_tree_test1) {
     > lpc_type;
 
     std::vector<math::polynomial_dfs<typename FieldType::value_type>> batch1 = {};
-    math::polynomial_dfs<typename FieldType::value_type> witness1(7, {1,1,2,3,5,8,13,0});
-    batch1.push_back(witness1);
-    auto tree1 = algorithms::precommit<lpc_type>(batch1, D[0], 1);
-    std::cout << "tree.root() = " << tree1.root() << std::endl;
+    math::polynomial_dfs<typename FieldType::value_type> poly(3, {1,1,2,3, 5, 8, 13, 21});
+    batch1.push_back(poly);
+
+    std::size_t domain_size = D[0]->size();
+    std::size_t leafs_number = domain_size / 2;
+    std::vector<std::vector<std::uint8_t>> y_data(
+            leafs_number,
+            std::vector<std::uint8_t>(2 * lpc_type::field_element_type::length()
+    ));
+    for (std::size_t x_index = 0; x_index < leafs_number; x_index++) {
+        auto write_iter = y_data[x_index].begin();
+        typename lpc_type::field_element_type y_val0(poly[x_index * 2]);
+        y_val0.write(write_iter, lpc_type::field_element_type::length());
+        typename lpc_type::field_element_type y_val1(poly[x_index * 2 + 1]);
+        y_val1.write(write_iter, lpc_type::field_element_type::length());
+    }
+    auto tree = containers::make_merkle_tree<typename lpc_type::merkle_tree_hash_type, lpc_type::m>(y_data.begin(), y_data.end());
+    std::cout << "Simple tree root = "<< tree.root() << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
