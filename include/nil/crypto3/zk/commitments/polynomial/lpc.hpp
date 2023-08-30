@@ -60,12 +60,15 @@ namespace nil {
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
                     typename fri_type::params_type _fri_params;
+                    typename field_type::value_type _etha;
+                    std::map<std::size_t, bool> _batch_fixed;
                 public:
                     lpc_commitment_scheme(const typename fri_type::params_type &fri_params){
                         _fri_params = fri_params;
                     }
 
                     void setup(transcript_type& transcript){
+                        auto etha = transcript.template challenge<field_type>();
                     }
 
                     commitment_type commit(std::size_t index){
@@ -74,7 +77,17 @@ namespace nil {
                         return _trees[index].root();
                     }
 
+                    // Should be done after commitment.
+                    void mark_batch_as_fixed(std::size_t index){
+                        _batch_fixed[index] = true;
+                    }
+
                     proof_type proof_eval(transcript_type &transcript){
+                        for( auto const&it: _batch_fixed){
+                            if(it.second){
+                                this->append_eval_point(it.first, _etha);
+                            }
+                        }
                         this->eval_polys();
                         BOOST_ASSERT(this->_points.size() == this->_polys.size());
                         BOOST_ASSERT(this->_points.size() == this->_z.get_batches_num());
@@ -173,6 +186,11 @@ namespace nil {
                         const std::map<std::size_t, commitment_type> &commitments,
                         transcript_type &transcript
                     ) {
+                        for( auto const&it: _batch_fixed){
+                            if(it.second){
+                                this->append_eval_point(it.first, _etha);
+                            }
+                        }
                         this->_z = proof.z;
                         for( auto const &it: commitments){
                             transcript(commitments.at(it.first));

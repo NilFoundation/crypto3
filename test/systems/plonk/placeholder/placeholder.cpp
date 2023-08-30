@@ -90,6 +90,9 @@ public:
     void setup(TranscriptType &preprocessed_transript){
     }
 
+    void mark_batch_as_fixed(std::size_t batch_id){
+    }
+
     proof_type proof_eval(
         transcript_type &transcript
     ){
@@ -652,4 +655,3 @@ BOOST_AUTO_TEST_CASE(placeholder_prover_lookup_test) {
     BOOST_CHECK(verifier_res);
 }
 BOOST_AUTO_TEST_SUITE_END()
-

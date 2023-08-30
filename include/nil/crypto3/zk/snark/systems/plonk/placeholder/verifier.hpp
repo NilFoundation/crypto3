@@ -127,7 +127,7 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         commitment_scheme_type commitment_scheme,
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript
-                    ) {    
+                    ) {  
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript = preprocessed_transcript;

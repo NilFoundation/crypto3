@@ -691,6 +691,10 @@ namespace nil {
                         }
                     }
                 public:
+                    // Interface function. Isn't useful here.
+                    void mark_batch_as_fixed(std::size_t index){
+                    }
+
                     kzg_commitment_scheme(params_type kzg_params) : _params(kzg_params) {}
 
                     // Differs from static, because we pack the result into byte blob.

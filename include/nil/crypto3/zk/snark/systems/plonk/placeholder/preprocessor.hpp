@@ -371,7 +371,9 @@ namespace nil {
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, q_last_q_blind[0]);
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, q_last_q_blind[1]);
 
-                        return typename preprocessed_data_type::public_commitments_type({commitment_scheme.commit(FIXED_VALUES_BATCH)});
+                        auto result = typename preprocessed_data_type::public_commitments_type({commitment_scheme.commit(FIXED_VALUES_BATCH)});
+                        commitment_scheme.mark_batch_as_fixed(FIXED_VALUES_BATCH);
+                        return result;
                     }
 
                     static inline preprocessed_data_type process(
@@ -385,6 +387,7 @@ namespace nil {
                     ) {
     
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder public preprocessor");
+                        commitment_scheme.setup(transcript);
 
                         std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = table_description.usable_rows_amount;
@@ -451,13 +454,14 @@ namespace nil {
                         std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
+                        // Push fixed values and marshalled circuit to transcript.
+                        transcript(public_commitments.fixed_values);
+
                         typename preprocessed_data_type::common_data_type common_data (
                             public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree
                         );
 
                         // Push circuit description to transcript
-
-                        commitment_scheme.setup(transcript);
 
                         preprocessed_data_type preprocessed_data({
                             public_polynomial_table, sigma_perm_polys,
