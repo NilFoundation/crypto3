@@ -75,7 +75,9 @@ namespace nil {
                             for (int i = 0; i < multipliers.size() / 2; ++i) {
                                 multipliers[i] = multipliers[2 * i] * multipliers[2 * i + 1];
                             }
-
+                            if (multipliers.size() % 2 != 0) {
+                                multipliers[multipliers.size() / 2] = multipliers[multipliers.size() - 1];
+                            }
                             // Delete the second half.
                             multipliers.resize(multipliers.size() / 2 + multipliers.size() % 2);
                         }
