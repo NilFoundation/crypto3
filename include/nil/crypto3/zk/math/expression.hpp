@@ -129,6 +129,11 @@ namespace nil {
                 expression<VariableType> operator-(const expression<VariableType>& other) const;
                 expression<VariableType> operator*(const expression<VariableType>& other) const;
 
+           
+                bool is_empty() const { 
+                    return *this == term<VariableType>(assignment_type::zero());
+                }
+
                 // Used for testing purposes. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
                 bool operator==(const expression<VariableType>& other) const;
                 bool operator!=(const expression<VariableType>& other) const;
@@ -215,6 +220,10 @@ namespace nil {
                 term(term<VariableType>&& other) = default;
                 term<VariableType>& operator=(const term<VariableType>& other) = default;
                 term<VariableType>& operator=(term<VariableType>&& other) = default;
+
+                bool is_zero() const { 
+                    return coeff == assignment_type::zero();
+                }
 
                 // This operator will also allow multiplication with VariableType and assignment_type
                 // via an implicit conversion to term.
@@ -399,6 +408,9 @@ namespace nil {
             /*********** Member function bodies for class 'term' *******************************/
             template<typename VariableType>
             term<VariableType> term<VariableType>::operator*(const term<VariableType> &other) const {
+                if (this->is_zero() || other.is_zero())
+                    return term<VariableType>();
+
                 term<VariableType> result(this->vars);
                 std::copy(other.vars.begin(), other.vars.end(), std::back_inserter(result.vars));
                 result.coeff = other.coeff * this->coeff;
@@ -408,6 +420,7 @@ namespace nil {
 
             template<typename VariableType>
             expression<VariableType> term<VariableType>::operator+(const term<VariableType> &other) const {
+
                 return expression<VariableType>(*this) + other;
             }
 
@@ -441,7 +454,11 @@ namespace nil {
             template<typename VariableType>
             expression<VariableType>& expression<VariableType>::operator+=(
                     const expression<VariableType>& other) {
-                expr = binary_arithmetic_operation<VariableType>(*this, other, ArithmeticOperator::ADD);
+                if (this->is_empty())
+                    *this = other;
+                else if (!other.is_empty()) {
+                    expr = binary_arithmetic_operation<VariableType>(*this, other, ArithmeticOperator::ADD);
+                }
                 update_hash();
                 return *this;
             }
@@ -457,7 +474,11 @@ namespace nil {
             template<typename VariableType>
             expression<VariableType>& expression<VariableType>::operator*=(
                     const expression<VariableType>& other) {
-                expr = binary_arithmetic_operation<VariableType>(*this, other, ArithmeticOperator::MULT);
+                if (this->is_empty() || other.is_empty()) {
+                    *this = expression<VariableType>();
+                } else {
+                    expr = binary_arithmetic_operation<VariableType>(*this, other, ArithmeticOperator::MULT);
+                }
                 update_hash();
                 return *this;
             }
@@ -465,7 +486,12 @@ namespace nil {
             template<typename VariableType>
             expression<VariableType> expression<VariableType>::operator+(
                     const expression<VariableType>& other) const {
-                return binary_arithmetic_operation<VariableType>(*this, other, ArithmeticOperator::ADD);
+                if (this->is_empty())
+                    return other;
+                if (other.is_empty())
+                    return *this;
+                return binary_arithmetic_operation<VariableType>(
+                    *this, other, ArithmeticOperator::ADD);
             }
     
             template<typename VariableType>
@@ -477,6 +503,9 @@ namespace nil {
             template<typename VariableType>
             expression<VariableType> expression<VariableType>::operator*(
                     const expression<VariableType>& other) const {
+                if (this->is_empty() || other.is_empty())
+                    return expression<VariableType>();
+
                 return binary_arithmetic_operation<VariableType>(*this, other, ArithmeticOperator::MULT);
             }
 
