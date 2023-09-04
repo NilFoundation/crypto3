@@ -244,7 +244,7 @@ namespace nil {
                 };
 
                 template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda,
-                        std::size_t R, std::size_t M, std::size_t BatchesNum>
+                        std::size_t R, std::size_t M>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -252,7 +252,6 @@ namespace nil {
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t r = R;
                     constexpr static const std::size_t m = M;
-                    constexpr static const std::size_t batches_num = BatchesNum;
                 };
                 /**
                  * @brief Based on the FRI Commitment description from \[RedShift].
@@ -276,23 +275,20 @@ namespace nil {
                         typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
                         LPCParams::lambda,
-                        LPCParams::m,
-                        LPCParams::batches_num
+                        LPCParams::m
                 > {
                     using fri_type = typename detail::basic_batched_fri<
                         FieldType, 
                         typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
                         LPCParams::lambda, 
-                        LPCParams::m,
-                        LPCParams::batches_num
+                        LPCParams::m
                     >;
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
                     constexpr static const std::size_t lambda = LPCParams::lambda;
                     constexpr static const std::size_t r = LPCParams::r;
                     constexpr static const std::size_t m = LPCParams::m;
-                    constexpr static const std::size_t batches_num = LPCParams::batches_num;
                     constexpr static const bool is_const_size = LPCParams::is_const_size;
 
                     typedef LPCParams lpc_params;
@@ -301,7 +297,7 @@ namespace nil {
 
                     using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
                             typename LPCParams::transcript_hash_type,
-                            LPCParams::lambda, LPCParams::m, LPCParams::batches_num>;
+                            LPCParams::lambda, LPCParams::m>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
@@ -331,13 +327,13 @@ namespace nil {
                 using batched_lpc = batched_list_polynomial_commitment<
                         FieldType, commitments::list_polynomial_commitment_params<
                                 typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                LPCParams::lambda, LPCParams::r, LPCParams::m, LPCParams::batches_num
+                                LPCParams::lambda, LPCParams::r, LPCParams::m
                         >>;
                 template<typename FieldType, typename LPCParams>
                 using lpc = batched_list_polynomial_commitment<
                         FieldType, list_polynomial_commitment_params<
                                 typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                LPCParams::lambda, LPCParams::r, LPCParams::m, LPCParams::batches_num
+                                LPCParams::lambda, LPCParams::r, LPCParams::m
                         >>;
 
                 template<typename FieldType, typename LPCParams>

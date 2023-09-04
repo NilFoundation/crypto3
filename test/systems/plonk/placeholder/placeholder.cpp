@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
         placeholder_test_params::r,
-        placeholder_test_params::m, 4
+        placeholder_test_params::m
     >;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
@@ -620,7 +620,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3_test_suite)
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
         placeholder_test_params::r,
-        placeholder_test_params::m, 4
+        placeholder_test_params::m
     >;
 
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;

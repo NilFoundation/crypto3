@@ -67,12 +67,11 @@ namespace nil {
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
                     template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                            std::size_t Lambda, std::size_t M, std::size_t BatchesNum>
+                            std::size_t Lambda, std::size_t M>
                     struct basic_batched_fri {
                         BOOST_STATIC_ASSERT_MSG(M == 2, "unsupported m value!");
 
                         constexpr static const std::size_t m = M;
-                        constexpr static const std::size_t batches_num = BatchesNum;
                         constexpr static const std::size_t lambda = Lambda;
 
                         typedef FieldType field_type;
@@ -106,8 +105,7 @@ namespace nil {
                             using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
 
                             bool operator==(const params_type &rhs) const {
-                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D &&
-                                       batches_num == rhs.batches_num;
+                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D;
                             }
 
                             bool operator!=(const params_type &rhs) const {
@@ -116,17 +114,15 @@ namespace nil {
 
                             // TODO: Better if we can construct params_type from any batch size to another
                             params_type(
-                                    const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, M, BatchesNum>::params_type &obj) {
+                                    const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, M>::params_type &obj) {
                                 r = obj.r;
                                 max_degree = obj.max_degree;
                                 D = obj.D;
                                 step_list = obj.step_list;
-                                batches_num = obj.batches_num;
                             }
 
                             params_type() {};
 
-                            std::size_t batches_num;
                             std::size_t r;
                             std::size_t max_degree;
                             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
@@ -197,7 +193,7 @@ namespace nil {
                         std::is_base_of<
                         commitments::detail::basic_batched_fri<
                             typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                            typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
+                            typename FRI::transcript_hash_type, FRI::lambda, FRI::m>,
                         FRI>::value,
                         bool
                     >::type = true>
@@ -210,7 +206,7 @@ namespace nil {
                                 std::is_base_of<
                                         commitments::detail::basic_batched_fri<
                                                 typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
+                                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m>,
                                         FRI>::value,
                                 bool>::type = true>
                 static std::array<typename FRI::commitment_type, list_size>
@@ -235,7 +231,7 @@ namespace nil {
                                                 typename FRI::field_type,
                                                 typename FRI::merkle_tree_hash_type,
                                                 typename FRI::transcript_hash_type,
-                                                FRI::lambda, FRI::m, FRI::batches_num>,
+                                                FRI::lambda, FRI::m>,
                                         FRI>::value,
                                 bool>::type = true>
                 static typename FRI::precommitment_type
@@ -293,7 +289,7 @@ namespace nil {
                                         commitments::detail::basic_batched_fri<
                                                 typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                                 typename FRI::transcript_hash_type,
-                                                FRI::lambda, FRI::m, FRI::batches_num>,
+                                                FRI::lambda, FRI::m>,
                                         FRI>::value,
                                 bool>::type = true>
                 static typename FRI::precommitment_type
@@ -313,7 +309,7 @@ namespace nil {
                                 std::is_base_of<
                                         commitments::detail::basic_batched_fri<
                                                 typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m, FRI::batches_num>,
+                                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m>,
                                         FRI>::value,
                                 bool>::type = true>
                 static typename std::enable_if<
@@ -386,7 +382,7 @@ namespace nil {
                                         commitments::detail::basic_batched_fri<
                                                 typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                                 typename FRI::transcript_hash_type,
-                                                FRI::lambda, FRI::m, FRI::batches_num>,
+                                                FRI::lambda, FRI::m>,
                                         FRI>::value,
                                 bool>::type = true>
                 static typename std::enable_if<
@@ -566,7 +562,8 @@ namespace nil {
 
                     // Think about resizing polynomials. Problems with const.
                     if constexpr (std::is_same<math::polynomial_dfs<typename FRI::field_type::value_type>, PolynomialType>::value) {
-                        for( std::size_t k = 0; k < FRI::batches_num; k++ ){
+                        for( auto const &it:g ){
+                            auto k = it.first;
                             for (int i = 0; i < g[k].size(); ++i ){
                                 // If LPC works properly this if is never executed.
                                 if (g[k][i].size() != fri_params.D[0]->size()) {
