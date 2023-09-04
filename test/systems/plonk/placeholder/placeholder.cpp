@@ -228,7 +228,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
     using kzg_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, kzg_scheme_type>;
 
 BOOST_AUTO_TEST_CASE(basic_test){
-    auto circuit = circuit_test_t<field_type>();
+    auto pi0 = nil::crypto3::algebra::random_element<field_type>();
+    auto circuit = circuit_test_t<field_type>(pi0);
 
     plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
     desc.rows_amount = table_rows;
@@ -264,6 +265,28 @@ BOOST_AUTO_TEST_CASE(basic_test){
         preprocessed_public_data, proof, constraint_system, commitment_scheme, dummy_transcript
     );
     BOOST_CHECK(verifier_res);
+
+    // Public inputs checks
+    // Completely correct public input
+    typename placeholder_params_type::public_input_type public_input = {{{pi0, 0, 1}}};
+    verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
+        preprocessed_public_data, proof, constraint_system, commitment_scheme, dummy_transcript, public_input
+    );
+    BOOST_CHECK(verifier_res);
+
+    // Completely correct zeroes after it are not important
+    public_input =  {{{pi0, 0, 1, 0}}};
+    verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
+        preprocessed_public_data, proof, constraint_system, commitment_scheme, dummy_transcript, public_input
+    );
+    BOOST_CHECK(verifier_res);
+
+    // Incorrect public input
+    public_input =  {{{pi0, 1}}};
+    verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
+        preprocessed_public_data, proof, constraint_system, commitment_scheme, dummy_transcript, public_input
+    );    
+    BOOST_CHECK(!verifier_res);
 
     // LPC commitment scheme
     typename lpc_type::fri_type::params_type fri_params = create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);

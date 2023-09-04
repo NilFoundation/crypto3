@@ -51,6 +51,7 @@ namespace nil {
 
                     using arithmetization_params = ArithmetizationParams;
                     using field_type = FieldType;
+                    using public_input_type = std::array<std::vector<typename field_type::value_type>, arithmetization_params::public_input_columns>;
                 };
 
                 template<typename CircuitParams, typename CommitmentScheme>
@@ -67,6 +68,7 @@ namespace nil {
                     using arithmetization_params = typename CircuitParams::arithmetization_params;
                     using commitment_scheme_type = CommitmentScheme;
                     using commitment_scheme_params_type = typename CommitmentScheme::params_type;
+                    using public_input_type = typename CircuitParams::public_input_type;
 
                     using transcript_hash_type = typename CommitmentScheme::transcript_hash_type;
                 };

@@ -126,8 +126,36 @@ namespace nil {
                         const placeholder_proof<FieldType, ParamsType> &proof,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         commitment_scheme_type commitment_scheme,
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript,
+                        const std::array<std::vector<typename FieldType::value_type>, ParamsType::arithmetization_params::public_input_columns> public_input
+                    ){
+                        // TODO: process rotations for public input.
+                        auto omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
+                        auto challenge = proof.eval_proof.challenge;
+                        auto numerator = challenge.pow(preprocessed_public_data.common_data.rows_amount) - FieldType::value_type::one();
+                        numerator = numerator / (typename FieldType::value_type(preprocessed_public_data.common_data.rows_amount));
+
+                        for( std::size_t i = 0; i < ParamsType::arithmetization_params::public_input_columns; ++i ){
+                            typename FieldType::value_type value = FieldType::value_type::zero();
+                            auto omega_pow = FieldType::value_type::one();
+                            for( std::size_t j = 0; j < public_input[i].size(); ++j ){
+                                value += (public_input[i][j] * omega_pow) / (challenge - omega_pow);
+                                omega_pow = omega_pow * omega;
+                            }
+                            value *= numerator;
+                            if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, ParamsType::arithmetization_params::witness_columns + i, 0) ) 
+                                return false;
+                        }
+                        return process(preprocessed_public_data, proof, constraint_system, commitment_scheme, preprocessed_transcript);
+                    }
+                    
+                    static inline bool process(
+                        const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
+                        const placeholder_proof<FieldType, ParamsType> &proof,
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
+                        commitment_scheme_type commitment_scheme,
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript
-                    ) {  
+                    ) {                        
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript = preprocessed_transcript;

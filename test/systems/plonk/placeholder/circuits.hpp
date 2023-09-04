@@ -99,7 +99,8 @@ namespace nil {
                     public_columns_t, constant_columns_t, selector_columns_t>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_t>, 4, 4> circuit_test_t() {
+                circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_t>, 4, 4> 
+                circuit_test_t(typename FieldType::value_type pi0 = FieldType::value_type::zero()) {
                     using assigment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
@@ -129,7 +130,7 @@ namespace nil {
                     table[0][0] = algebra::random_element<FieldType>();
                     table[1][0] = algebra::random_element<FieldType>();
                     table[2][0] = algebra::random_element<FieldType>();
-                    table[3][0] = algebra::random_element<FieldType>();
+                    table[3][0] = pi0;
                     q_add[0] = FieldType::value_type::zero();
                     q_mul[0] = FieldType::value_type::zero();
 
@@ -164,6 +165,8 @@ namespace nil {
                             plonk_variable<assigment_type>::column_type::public_input);
                         test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x, y));
                     }
+                    table[3][1] = FieldType::value_type::zero();
+                    table[3][2] = FieldType::value_type::one();
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
