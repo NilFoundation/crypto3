@@ -623,6 +623,7 @@ namespace nil {
                     // This should be marshallable and transcriptable type
                     using commitment_type = typename KZGScheme::commitment_type;
                     using transcript_type = typename KZGScheme::transcript_type;
+                    using transcript_hash_type = typename KZGScheme::transcript_hash_type;
                     using poly_type = PolynomialType;
                     using proof_type = typename KZGScheme::proof_type;
                 private:

@@ -56,6 +56,7 @@ namespace nil {
                     using fri_type = typename LPCScheme::fri_type;
                     using proof_type = typename LPCScheme::proof_type;
                     using transcript_type = typename LPCScheme::transcript_type;
+                    using transcript_hash_type = typename LPCScheme::transcript_hash_type;
                     using poly_type = PolynomialType;
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
@@ -308,6 +309,7 @@ namespace nil {
                     using polynomials_values_type = typename basic_fri::polynomials_values_type;
                     using params_type = typename basic_fri::params_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<typename LPCParams::transcript_hash_type>;
+                    using transcript_hash_type = typename LPCParams::transcript_hash_type;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {

@@ -62,6 +62,7 @@ namespace nil {
                     using commitment_scheme_type = typename params_type::commitment_scheme_type;
                     using commitment_type = typename commitment_scheme_type::commitment_type;
                     using transcript_type = typename commitment_scheme_type::transcript_type;
+                    using transcript_hash_type = typename commitment_scheme_type::transcript_hash_type;
 
                 public:
                     struct preprocessed_data_type {
@@ -455,6 +456,18 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         // Push fixed values and marshalled circuit to transcript.
+                        using Endianness = nil::marshalling::option::big_endian;
+                        using TTypeBase = nil::marshalling::field_type<Endianness>;
+                        using ConstraintSystem = plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>;
+                        using value_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
+                        auto filled_val = nil::crypto3::marshalling::types::fill_plonk_constraint_system<ConstraintSystem, Endianness>(constraint_system);
+                        std::vector<std::uint8_t> cv;
+                        cv.resize(filled_val.length(), 0x00);
+                        auto write_iter = cv.begin();
+                        nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+                        typename transcript_hash_type::digest_type circuit_hash = hash<transcript_hash_type>(cv);
+
+                        transcript(circuit_hash);
                         transcript(public_commitments.fixed_values);
 
                         typename preprocessed_data_type::common_data_type common_data (

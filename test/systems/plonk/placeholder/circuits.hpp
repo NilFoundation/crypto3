@@ -41,7 +41,6 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
-#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
@@ -57,7 +56,6 @@ namespace nil {
 
                     constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
                     constexpr static const std::size_t public_columns = ParamsType::public_input_columns;
-                    using transcript_hash_type = typename ParamsType::transcript_hash_type;
 
                 public:
                     const std::size_t table_rows = 1 << rows_log;

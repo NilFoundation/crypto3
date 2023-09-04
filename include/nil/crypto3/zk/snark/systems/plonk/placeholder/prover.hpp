@@ -76,6 +76,7 @@ namespace nil {
                     constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
                     constexpr static const std::size_t constant_columns = ParamsType::constant_columns;
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
                     using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
 
@@ -103,7 +104,7 @@ namespace nil {
                             &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
                         commitment_scheme_type commitment_scheme, 
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript
+                        transcript_type preprocessed_transcript
                     ) { 
 
                         auto prover = placeholder_prover<FieldType, ParamsType>(
@@ -119,7 +120,7 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
                         const commitment_scheme_type &commitment_scheme,
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> &preprocessed_transcript
+                        transcript_type preprocessed_transcript
                     ) 
                             : preprocessed_public_data(preprocessed_public_data)
                             , preprocessed_private_data(preprocessed_private_data)

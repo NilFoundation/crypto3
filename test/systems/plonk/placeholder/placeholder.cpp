@@ -51,6 +51,7 @@
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
@@ -74,20 +75,21 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
-template<typename CommitmentSchemeParamsType, typename TranscriptType>
-class dummy_commitment_scheme_type:public nil::crypto3::zk::commitments::polys_evaluator<CommitmentSchemeParamsType, TranscriptType>{
+template<typename CommitmentSchemeParamsType, typename TranscriptHashType>
+class dummy_commitment_scheme_type:public nil::crypto3::zk::commitments::polys_evaluator<CommitmentSchemeParamsType, TranscriptHashType>{
 private:
 public:
     using params_type = CommitmentSchemeParamsType;
     using commitment_type = typename params_type::commitment_type;
     using field_type = typename params_type::field_type;
-    using transcript_type = TranscriptType;
+    using transcript_hash_type = TranscriptHashType;
+    using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
 
     struct proof_type{
         nil::crypto3::zk::commitments::eval_storage<field_type> z;
     };
 
-    void setup(TranscriptType &preprocessed_transript){
+    void setup(transcript_type &preprocessed_transript){
     }
 
     void mark_batch_as_fixed(std::size_t batch_id){
@@ -180,8 +182,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
     constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
+//        using merkle_hash_type = hashes::keccak_1600<512>;
+//        using transcript_hash_type = hashes::keccak_1600<512>;
+        using merkle_hash_type = hashes::sha2<256>;
+        using transcript_hash_type = hashes::sha2<256>;
 
         constexpr static const std::size_t witness_columns = 3;
         constexpr static const std::size_t public_input_columns = 1;
@@ -195,13 +199,16 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
         constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
-    using circuit_t_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
+    using circuit_t_params = placeholder_circuit_params<
+        field_type, 
+        typename placeholder_test_params::arithmetization_params
+    >;
 
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
 
     using commitment_scheme_params_type = nil::crypto3::zk::commitments::commitment_scheme_params_type<field_type, std::vector<std::uint8_t>>;
-    using commitment_scheme_type = dummy_commitment_scheme_type<commitment_scheme_params_type, transcript_type>;
-    using placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, commitment_scheme_type>;
+    using commitment_scheme_dummy_type = dummy_commitment_scheme_type<commitment_scheme_params_type, typename placeholder_test_params::transcript_hash_type>;
+    using placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, commitment_scheme_dummy_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, placeholder_params_type>;
 
     using lpc_params_type = commitments::list_polynomial_commitment_params<        
@@ -236,7 +243,7 @@ BOOST_AUTO_TEST_CASE(basic_test){
     bool verifier_res;
 
     // Dummy commitment scheme
-    commitment_scheme_type commitment_scheme;
+    commitment_scheme_dummy_type commitment_scheme;
     transcript_type dummy_transcript;
 
     typename placeholder_public_preprocessor<field_type, placeholder_params_type>::preprocessed_data_type
@@ -574,7 +581,6 @@ BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
 
     BOOST_CHECK(prover_res[0].evaluate(y) == verifier_res[0]);
 }
-
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit3_test_suite)
@@ -589,6 +595,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3_test_suite)
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
         using transcript_hash_type = hashes::keccak_1600<512>;
+//        using merkle_hash_type = hashes::sha2<256>;
+//        using transcript_hash_type = hashes::sha2<256>;
 
         constexpr static const std::size_t witness_columns = witness_columns_3;
         constexpr static const std::size_t public_input_columns = public_columns_3;

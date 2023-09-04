@@ -38,8 +38,7 @@ namespace nil {
             namespace snark {
                 template<
                     typename FieldType, 
-                    typename ArithmetizationParams, 
-                    typename TranscriptHashType = hashes::keccak_1600<512>
+                    typename ArithmetizationParams
                 >
                 struct placeholder_circuit_params{
                     constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
@@ -50,7 +49,6 @@ namespace nil {
                     constexpr static const typename FieldType::value_type delta =
                         algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;                    
 
-                    using transcript_hash_type = TranscriptHashType;
                     using arithmetization_params = ArithmetizationParams;
                     using field_type = FieldType;
                 };
@@ -66,11 +64,11 @@ namespace nil {
 
                     constexpr static const typename field_type::value_type delta = CircuitParams::delta;
 
-                    using transcript_hash_type = typename CircuitParams::transcript_hash_type;
                     using arithmetization_params = typename CircuitParams::arithmetization_params;
-
                     using commitment_scheme_type = CommitmentScheme;
                     using commitment_scheme_params_type = typename CommitmentScheme::params_type;
+
+                    using transcript_hash_type = typename CommitmentScheme::transcript_hash_type;
                 };
 /*
                 template<typename FieldType, typename ArithmetizationParams,
