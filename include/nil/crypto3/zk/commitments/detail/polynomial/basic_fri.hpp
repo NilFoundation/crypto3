@@ -45,6 +45,7 @@
 
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/fold_polynomial.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/proof_of_work.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -67,12 +68,15 @@ namespace nil {
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
                     template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                            std::size_t Lambda, std::size_t M>
+                            std::size_t Lambda, std::size_t M, bool UseGrinding, typename GrindingType = proof_of_work<TranscriptHashType>>
                     struct basic_batched_fri {
                         BOOST_STATIC_ASSERT_MSG(M == 2, "unsupported m value!");
 
                         constexpr static const std::size_t m = M;
                         constexpr static const std::size_t lambda = Lambda;
+
+                        constexpr static const bool use_grinding = UseGrinding;
+                        using grinding_type = GrindingType;
 
                         typedef FieldType field_type;
                         typedef MerkleTreeHashType merkle_tree_hash_type;
@@ -114,7 +118,8 @@ namespace nil {
 
                             // TODO: Better if we can construct params_type from any batch size to another
                             params_type(
-                                    const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, M>::params_type &obj) {
+                                const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, M, UseGrinding, GrindingType>::params_type &obj
+                            ) {
                                 r = obj.r;
                                 max_degree = obj.max_degree;
                                 D = obj.D;
@@ -138,9 +143,9 @@ namespace nil {
                                 return !(rhs == *this);
                             }
 
-                            polynomial_values_type y;                   // Values for the next round.
                             // For the last round it's final_polynomial's values
-                            merkle_proof_type p;                        // Merkle proof(values[i-1], T_i)
+                            polynomial_values_type               y;                         // Values for the next round.
+                            merkle_proof_type                    p;                         // Merkle proof(values[i-1], T_i)
                         };
 
                         struct initial_proof_type {
@@ -182,6 +187,7 @@ namespace nil {
                             std::vector<commitment_type>                        fri_roots;        // 0,..step_list.size()
                             math::polynomial<typename field_type::value_type>   final_polynomial;
                             std::array<query_proof_type, lambda>                query_proofs;     // 0...lambda - 1
+                            typename GrindingType::output_type                  proof_of_work;
                         };
                     };
                 }    // namespace detail
@@ -193,7 +199,9 @@ namespace nil {
                         std::is_base_of<
                         commitments::detail::basic_batched_fri<
                             typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                            typename FRI::transcript_hash_type, FRI::lambda, FRI::m>,
+                            typename FRI::transcript_hash_type, FRI::lambda, FRI::m,
+                            FRI::use_grinding, typename FRI::grinding_type
+                        >,
                         FRI>::value,
                         bool
                     >::type = true>
@@ -202,13 +210,15 @@ namespace nil {
                 }
 
                 template<typename FRI, std::size_t list_size,
-                        typename std::enable_if<
-                                std::is_base_of<
-                                        commitments::detail::basic_batched_fri<
-                                                typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m>,
-                                        FRI>::value,
-                                bool>::type = true>
+                    typename std::enable_if<
+                        std::is_base_of<
+                            commitments::detail::basic_batched_fri<
+                                typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m,
+                                FRI::use_grinding, typename FRI::grinding_type
+                            >,
+                            FRI>::value,
+                        bool>::type = true>
                 static std::array<typename FRI::commitment_type, list_size>
                 commit(const std::array<typename FRI::precommitment_type, list_size> &P) {
 
@@ -225,15 +235,17 @@ namespace nil {
                 }
 
                 template<typename FRI,
-                        typename std::enable_if<
-                                std::is_base_of<
-                                        commitments::detail::basic_batched_fri<
-                                                typename FRI::field_type,
-                                                typename FRI::merkle_tree_hash_type,
-                                                typename FRI::transcript_hash_type,
-                                                FRI::lambda, FRI::m>,
-                                        FRI>::value,
-                                bool>::type = true>
+                    typename std::enable_if<
+                        std::is_base_of<
+                            commitments::detail::basic_batched_fri<
+                                typename FRI::field_type,
+                                typename FRI::merkle_tree_hash_type,
+                                typename FRI::transcript_hash_type,
+                                FRI::lambda, FRI::m,
+                                FRI::use_grinding, typename FRI::grinding_type
+                            >,
+                            FRI>::value,
+                        bool>::type = true>
                 static typename FRI::precommitment_type
                 precommit(math::polynomial_dfs<typename FRI::field_type::value_type> &f,
                           std::shared_ptr<math::evaluation_domain<typename FRI::field_type>> D,
@@ -289,7 +301,9 @@ namespace nil {
                                         commitments::detail::basic_batched_fri<
                                                 typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                                 typename FRI::transcript_hash_type,
-                                                FRI::lambda, FRI::m>,
+                                                FRI::lambda, FRI::m,
+                                                FRI::use_grinding, typename FRI::grinding_type
+                                        >,
                                         FRI>::value,
                                 bool>::type = true>
                 static typename FRI::precommitment_type
@@ -309,7 +323,8 @@ namespace nil {
                                 std::is_base_of<
                                         commitments::detail::basic_batched_fri<
                                                 typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m>,
+                                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m,
+                                                FRI::use_grinding, typename FRI::grinding_type>,
                                         FRI>::value,
                                 bool>::type = true>
                 static typename std::enable_if<
@@ -382,7 +397,8 @@ namespace nil {
                                         commitments::detail::basic_batched_fri<
                                                 typename FRI::field_type, typename FRI::merkle_tree_hash_type,
                                                 typename FRI::transcript_hash_type,
-                                                FRI::lambda, FRI::m>,
+                                                FRI::lambda, FRI::m,
+                                                FRI::use_grinding, typename FRI::grinding_type>,
                                         FRI>::value,
                                 bool>::type = true>
                 static typename std::enable_if<
@@ -544,8 +560,19 @@ namespace nil {
 
                     return correct_order_idx;
                 }
-                
-                template<typename FRI, typename PolynomialType>
+                 
+                //template<typename FRI, typename PolynomialType>
+
+                template<typename FRI, typename PolynomialType,
+                    typename std::enable_if<
+                            std::is_base_of<
+                                    commitments::detail::basic_batched_fri<
+                                            typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                                            typename FRI::transcript_hash_type,
+                                            FRI::lambda, FRI::m,
+                                            FRI::use_grinding, typename FRI::grinding_type>,
+                                    FRI>::value,
+                            bool>::type = true>
                 static typename FRI::proof_type proof_eval( 
                     std::map<std::size_t, std::vector<PolynomialType>> &g,
                     const PolynomialType combined_Q,
@@ -608,6 +635,12 @@ namespace nil {
                         final_polynomial = math::polynomial<typename FRI::field_type::value_type>(f.coefficients());
                     } else {
                         final_polynomial = f;
+                    }
+
+                    typename FRI::grinding_type::output_type proof_of_work;
+                    // Grinding
+                    if( FRI::use_grinding ){
+                        proof.proof_of_work = FRI::grinding_type::generate(transcript);
                     }
 
                     // Query phase
@@ -707,7 +740,10 @@ namespace nil {
                         query_proofs[query_id] = query_proof;
                     }
 
-                    return typename FRI::proof_type{fri_roots, final_polynomial, query_proofs};
+                    proof.fri_roots = fri_roots;
+                    proof.final_polynomial = final_polynomial;
+                    proof.query_proofs = query_proofs;
+                    return proof;//typename FRI::proof_type{fri_roots, final_polynomial, query_proofs};
                 }
 
                 template<typename FRI>
@@ -741,6 +777,9 @@ namespace nil {
                         }
                     }
 
+                    if(!FRI::grinding_type::verify(transcript, proof.proof_of_work)){
+                        return false;
+                    }
                     for (std::size_t query_id = 0; query_id < FRI::lambda; query_id++) {
                         const typename FRI::query_proof_type &query_proof = proof.query_proofs[query_id];
 

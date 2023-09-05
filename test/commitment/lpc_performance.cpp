@@ -26,6 +26,9 @@
 
 #define BOOST_TEST_MODULE lpc_test
 
+// Do it manually for all performance tests
+#define ZK_PLACEHOLDER_PROFILING_ENABLED
+
 #include <string>
 
 #include <boost/test/unit_test.hpp>
@@ -46,6 +49,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
@@ -129,14 +133,14 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
+    // It's important parameter
     constexpr static const std::size_t d = 1 << 24;
 
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, 1 > fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m, 1>
-        lpc_params_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
@@ -152,13 +156,19 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
     fri_params.max_degree = d - 1;
     fri_params.step_list = generate_random_step_list(r, 5);
 
-    typedef boost::random::independent_bits_engine<boost::random::mt19937,
-                                                   FieldType::modulus_bits,
-                                                   typename FieldType::value_type::integral_type>
-        random_polynomial_generator_type;
+
+    using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
+    lpc_scheme_type lpc_scheme_prover(fri_params);
+    lpc_scheme_type lpc_scheme_verifier(fri_params);
+
+    typedef boost::random::independent_bits_engine<
+        boost::random::mt19937,  FieldType::modulus_bits,
+        typename FieldType::value_type::integral_type
+    > random_polynomial_generator_type;
 
     std::vector<math::polynomial<typename FieldType::value_type>> res;
 
+    // Generate polys
     boost::random::random_device rd;     // Will be used to obtain a seed for the random number engine
     boost::random::mt19937 gen(rd());    // Standard mersenne_twister_engine seeded with rd()
     boost::random::uniform_int_distribution<> distrib(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
@@ -172,36 +182,32 @@ BOOST_AUTO_TEST_CASE(lpc_performance_test) {
         for (int j = 0; j < fri_params.max_degree + 1; j++) {
             poly[i] = typename FieldType::value_type(polynomial_element_gen());
         }
-        merkle_tree_type tree =
-            zk::algorithms::precommit<lpc_type>(poly, D[0], fri_params.step_list.front());    // phase_1: Commit
 
-        // TODO: take a point outside of the basic domain
-        std::vector<typename FieldType::value_type> point = {algebra::fields::arithmetic_params<FieldType>::multiplicative_generator};
-        std::vector<std::vector<typename FieldType::value_type>> evaluation_points = {
-            point
-        };
+        std::map<std::size_t, typename lpc_scheme_type::commitment_type> commitments;
+        {
+            PROFILE_PLACEHOLDER_SCOPE("polynomial commitment");
+            lpc_scheme_prover.append_to_batch(0,poly);
+            commitments[0] = lpc_scheme_prover.commit(0);        
+        }
 
+
+        typename lpc_scheme_type::proof_type proof;
         std::array<std::uint8_t, 96> x_data {};
-        zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+        {
+            PROFILE_PLACEHOLDER_SCOPE("proof generation");
+            lpc_scheme_prover.append_eval_point(0, algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+            zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
+            proof = lpc_scheme_prover.proof_eval(transcript);
+        }
+        
+        {
+            PROFILE_PLACEHOLDER_SCOPE("verification");
+            zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
+            lpc_scheme_verifier.set_batch_size(0, proof.z.get_batch_size(0));
 
-        std::array<std::vector<std::vector<typename FieldType::value_type>>,1> evaluation_points_batch = {
-            evaluation_points
-        };
-        std::array<merkle_tree_type, 1> tree_batch = {tree};
-
-        std::vector<math::polynomial<typename FieldType::value_type>> poly_vector = {poly};
-        std::array<std::vector<math::polynomial<typename FieldType::value_type>>, 1> poly_batch = {poly_vector};
-
-        auto proof = zk::algorithms::proof_eval<lpc_type>(
-            evaluation_points_batch, tree_batch, poly_batch, fri_params, transcript);    // phase_2: Prove
-
-        // verify
-        zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
-
-        std::array<typename fri_type::commitment_type, 1> commitment_batch = {tree.root()};
-        BOOST_CHECK(zk::algorithms::verify_eval<lpc_type>(
-            evaluation_points_batch, proof, commitment_batch, fri_params, transcript_verifier)
-        );    // phase_3: Verify
+            lpc_scheme_verifier.append_eval_point(0,  algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
+            BOOST_CHECK(lpc_scheme_verifier.verify_eval(proof, commitments, transcript_verifier));
+        }
     }
 }
 
