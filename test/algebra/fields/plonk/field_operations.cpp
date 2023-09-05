@@ -65,7 +65,7 @@ void test_add(std::vector<typename FieldType::value_type> public_input){
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::addition<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
+    using component_type = blueprint::components::addition<ArithmetizationType, BlueprintFieldType, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
@@ -104,7 +104,7 @@ void test_sub(std::vector<typename FieldType::value_type> public_input){
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::subtraction<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
+    using component_type = blueprint::components::subtraction<ArithmetizationType, BlueprintFieldType, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
@@ -143,7 +143,7 @@ void test_mul(std::vector<typename FieldType::value_type> public_input){
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::multiplication<ArithmetizationType, BlueprintFieldType, 3, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
+    using component_type = blueprint::components::multiplication<ArithmetizationType, BlueprintFieldType, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
@@ -183,10 +183,10 @@ void test_mul_by_const(std::vector<typename FieldType::value_type> public_input,
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::mul_by_constant<ArithmetizationType, BlueprintFieldType, 2>;
+    using component_type = blueprint::components::mul_by_constant<ArithmetizationType, BlueprintFieldType>;
 
     typename component_type::input_type instance_input = {
-        var(0, 0, false, var::column_type::public_input), y};
+        var(0, 0, false, var::column_type::public_input)};
 
     typename BlueprintFieldType::value_type expected_res = public_input[0] * y;
 
@@ -201,7 +201,7 @@ void test_mul_by_const(std::vector<typename FieldType::value_type> public_input,
             assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1},{0},{});
+    component_type component_instance({0, 1},{0},{},y);
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
 }
@@ -223,7 +223,7 @@ void test_div(std::vector<typename FieldType::value_type> public_input,
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::division<ArithmetizationType, BlueprintFieldType, 4, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
+    using component_type = blueprint::components::division<ArithmetizationType, BlueprintFieldType, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
@@ -254,7 +254,7 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::division_or_zero<ArithmetizationType, BlueprintFieldType, 5>;
+    using component_type = blueprint::components::division_or_zero<ArithmetizationType, BlueprintFieldType>;
 
     typename component_type::input_type instance_input = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};

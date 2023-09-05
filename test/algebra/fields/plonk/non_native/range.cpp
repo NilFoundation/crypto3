@@ -48,7 +48,7 @@ using namespace nil;
 template <typename BlueprintFieldType>
 void test_field_range(std::vector<typename BlueprintFieldType::value_type> public_input,
                       bool expected_to_pass){
-    
+
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
@@ -63,18 +63,18 @@ void test_field_range(std::vector<typename BlueprintFieldType::value_type> publi
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::range<ArithmetizationType,
-        typename crypto3::algebra::fields::curve25519_base_field, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;
+        typename crypto3::algebra::fields::curve25519_base_field, blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
 
     typename component_type::input_type instance_input = {input_var};
-    
-    auto result_check = [public_input](AssignmentType &assignment, 
+
+    auto result_check = [public_input](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
-            std::cout << "________________________________________________________________________\ninput: " << std::hex << std::endl; 
+            std::cout << "________________________________________________________________________\ninput: " << std::hex << std::endl;
             for (int i = 0; i < 4; i++){
                 std::cout << public_input[3-i].data << " ";
             }

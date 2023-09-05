@@ -33,6 +33,9 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/keccak.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/adaptor/hashed.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 
@@ -46,6 +49,8 @@
 #include "../../test_plonk_component.hpp"
 
 using namespace nil;
+using namespace nil::crypto3;
+using namespace nil::crypto3::accumulators;
 
 template <typename BlueprintFieldType>
 void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_input){
@@ -53,7 +58,7 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 5;
+    constexpr std::size_t SelectorColumns = 15;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -62,8 +67,8 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
-    using component_type = blueprint::components::sha512<ArithmetizationType, 9>;
-    
+    using component_type = blueprint::components::sha512<ArithmetizationType>;
+
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
 
@@ -84,12 +89,11 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
         var(0, 18, false, var::column_type::public_input), var(0, 19, false, var::column_type::public_input)};
     typename component_type::input_type instance_input = {{e_R_x, e_R_y}, {pk_x, pk_y}, M};
 
-
-    auto result_check = [](AssignmentType &assignment, 
+    auto result_check = [](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {};
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
-	
+
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
 }
 
@@ -133,7 +137,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512) {
                                                                          mask,
                                                                          mask,
                                                                          (mask >> 8)};
-    
+
 
     test_sha512<BlueprintFieldType>(public_input);
 }

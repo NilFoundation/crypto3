@@ -49,7 +49,7 @@ using namespace nil;
 template <typename CurveType>
 void test_unified_addition(std::vector<typename CurveType::base_field_type::value_type> public_input,
     typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type expected_res){
-    
+
     using curve_type = CurveType;
     using BlueprintFieldType = typename curve_type::base_field_type;
 
@@ -66,18 +66,18 @@ void test_unified_addition(std::vector<typename CurveType::base_field_type::valu
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::unified_addition<ArithmetizationType, curve_type, 11>;
+    using component_type = blueprint::components::unified_addition<ArithmetizationType, curve_type>;
 
     typename component_type::input_type instance_input = {
         {var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)},
         {var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)}};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
         #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
         std::cout << "unified_addition test: " << "\n";
-        std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n"; 
-        std::cout << "input   : " << public_input[2].data << " " << public_input[3].data << "\n"; 
+        std::cout << "input   : " << public_input[0].data << " " << public_input[1].data << "\n";
+        std::cout << "input   : " << public_input[2].data << " " << public_input[3].data << "\n";
         std::cout << "expected: " << expected_res.X.data << " " << expected_res.Y.data << "\n";
         std::cout << "real    : " << var_value(assignment, real_res.X).data << " " << var_value(assignment, real_res.Y).data << "\n\n";
         #endif
@@ -154,7 +154,7 @@ void test_unified_addition_random_data() {
     for (std::size_t i = 0; i < RandomTestsAmount; i++){
         P = generate_random_point();
         Q = generate_random_point();
-        
+
         if (Q.X == zero.X && Q.Y == zero.Y) {
             expected_res = P;
         } else {

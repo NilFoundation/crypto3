@@ -58,7 +58,7 @@ void test_sha256(std::vector<typename BlueprintFieldType::value_type> public_inp
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::sha256<ArithmetizationType, 9>;
+    using component_type = blueprint::components::sha256<ArithmetizationType>;
 
     std::array<var, 4> input_state_var = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
@@ -67,7 +67,7 @@ void test_sha256(std::vector<typename BlueprintFieldType::value_type> public_inp
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
 
     typename component_type::input_type instance_input = {input_state_var};
-    auto result_check = [expected_res](AssignmentType &assignment, 
+    auto result_check = [expected_res](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
             std::cout << std::hex << "real_res: " << var_value(assignment, real_res.output[0]).data << " " << var_value(assignment, real_res.output[1]).data << std::endl;
             assert(var_value(assignment, real_res.output[0]) == expected_res[0] && var_value(assignment, real_res.output[1]) == expected_res[1]);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_test0) {
     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(126);
 
     test_sha256<BlueprintFieldType>({s, s + 1, s + 2, s + 3}, {0xf5790a69d0a3f69cb85d0b5a233405fb_cppui255, 0xa47050b703fce590fd6585dd02b175f8_cppui255});
-    
+
     test_sha256<BlueprintFieldType>({
         0xf5a5fd42d16a20302798ef6ed309979b_cppui255, 0x43003d2320d9f0e8ea9831a92759fb4b_cppui255,
         0xdb56114e00fdd4c1f85c892bf35ac9a8_cppui255, 0x9289aaecb1ebd0a96cde606a748b5d71_cppui255},

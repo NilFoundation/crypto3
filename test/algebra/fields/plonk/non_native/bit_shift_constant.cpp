@@ -38,7 +38,9 @@
 
 #include <nil/blueprint/components/algebra/fields/plonk/bit_shift_constant.hpp>
 
-#include "test_plonk_component.hpp"
+#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
+
+#include "../../../../test_plonk_component.hpp"
 
 using namespace nil;
 
@@ -63,7 +65,7 @@ void test_bit_shift(typename BlueprintFieldType::value_type input,
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
 
-    using component_type = blueprint::components::bit_shift_constant<ArithmetizationType, WitnessesAmount>;
+    using component_type = blueprint::components::bit_shift_constant<ArithmetizationType>;
 
     typename component_type::input_type instance_input = {var(0, 0, false, var::column_type::public_input)};
 
@@ -78,22 +80,20 @@ void test_bit_shift(typename BlueprintFieldType::value_type input,
         }
     };
 
-    component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},
-                                                           {0}, {0}, BitsAmount, Shift, Mode)
-                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0},
-                                                           BitsAmount, Shift, Mode);
-
-    if (!(WitnessesAmount == 15 || WitnessesAmount == 9)) {
-        BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
+    std::array<std::uint32_t, WitnessColumns> witnesses;
+    for (std::uint32_t i = 0; i < WitnessColumns; i++) {
+        witnesses[i] = i;
     }
+
+    component_type component_instance = component_type(witnesses, std::array<std::uint32_t, 1>{0},
+                                                       std::array<std::uint32_t, 1>{0}, BitsAmount, Shift, Mode);
 
     if (expected_to_pass) {
         crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+            component_instance, public_input, result_check, instance_input, BitsAmount, Shift, Mode);
     } else {
         crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+            component_instance, public_input, result_check, instance_input, BitsAmount, Shift, Mode);
     }
 }
 

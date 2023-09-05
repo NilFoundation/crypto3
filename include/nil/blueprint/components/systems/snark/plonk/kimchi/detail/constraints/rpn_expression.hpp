@@ -40,7 +40,7 @@
 #include <nil/blueprint/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/exponentiation.hpp>
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
-#include <nil/blueprint/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+#include <nil/blueprint/components/hashes/poseidon/plonk/poseidon.hpp>
 
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/constraints/vanishes_on_last_4_rows.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/constraints/unnormalized_lagrange_basis.hpp>

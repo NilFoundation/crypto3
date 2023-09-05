@@ -39,14 +39,14 @@
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/reduction.hpp>
 
-#include "test_plonk_component.hpp"
+#include "../../../../test_plonk_component.hpp"
 
 using namespace nil;
 
 template <typename BlueprintFieldType>
 void test_reduction(std::vector<typename BlueprintFieldType::value_type> public_input,
         typename BlueprintFieldType::value_type expected_res){
-    
+
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
@@ -60,7 +60,7 @@ void test_reduction(std::vector<typename BlueprintFieldType::value_type> public_
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::reduction<ArithmetizationType, BlueprintFieldType, 9,
+    using component_type = blueprint::components::reduction<ArithmetizationType, BlueprintFieldType,
         blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 8> input_state_var = {
@@ -71,14 +71,14 @@ void test_reduction(std::vector<typename BlueprintFieldType::value_type> public_
 
     typename component_type::input_type instance_input = {input_state_var};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << std::hex << "___________________________________________________________________________________________________\ninput: ";
-            for (std::size_t i = 0; i < 8; i++) {    
+            for (std::size_t i = 0; i < 8; i++) {
                 std::cout << public_input[7-i].data << " ";
             }
-            std::cout << "\nexpected: " << expected_res.data << "\n"; 
+            std::cout << "\nexpected: " << expected_res.data << "\n";
             std::cout << "real    : " << var_value(assignment, real_res.output).data << std::endl;
             #endif
             assert(expected_res == var_value(assignment, real_res.output));
@@ -99,9 +99,9 @@ std::vector<typename FieldType::value_type> vector_from_extended_integral(typena
     std::vector<typename FieldType::value_type> pub_inp;
     for (std::size_t i = 0; i < 8; i++) {
         typename crypto3::algebra::curves::ed25519::scalar_field_type::extended_integral_type mask = 0xffffffffffffffff_cppui512;
-        typename FieldType::value_type current = typename FieldType::value_type((input >> (64*i)) & mask); 
+        typename FieldType::value_type current = typename FieldType::value_type((input >> (64*i)) & mask);
         pub_inp.push_back(current);
-    } 
+    }
     return pub_inp;
 }
 

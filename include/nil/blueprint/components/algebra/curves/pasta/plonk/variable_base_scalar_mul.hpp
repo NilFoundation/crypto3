@@ -25,8 +25,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_15_WIRES_HPP
-#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_15_WIRES_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_HPP
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -35,8 +35,11 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/manifest.hpp>
 
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/unified_addition.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -57,7 +60,7 @@ namespace nil {
 // |        |   W0   |   W1   |   W2    |   W3    |   W4    |   W5    |   W6    |   W7   |   W8   |   W9   |  W10   |  W11   |  W12   |  W13   |  W14   |
 // |‾row‾0‾‾|‾‾ calculating 2T ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾|
 // | row 1  |  T.X   |  T.Y   | P[0].X  | p[0].Y  |  n      | n_next  |         | P[1].X | P[1].Y | P[2].X | P[2].Y | P[3].X | P[3].Y | P[4].X | P[4].Y |
-// | row 2  | P[5].X | P[5].Y | bits[0] | bits[1] | bits[2] | bits[3] | bits[4] |   s0   |   s1   |   s2   |  s3    |  s4    |        |        |        | 
+// | row 2  | P[5].X | P[5].Y | bits[0] | bits[1] | bits[2] | bits[3] | bits[4] |   s0   |   s1   |   s2   |  s3    |  s4    |        |        |        |
 // | row 3  |  T.X   |  T.Y   | P[0].X  | p[0].Y  |  n      | n_next  |         | P[1].X | P[1].Y | P[2].X | P[2].Y | P[3].X | P[3].Y | P[4].X | P[4].Y |
 // | row 4  | P[5].X | P[5].Y | bits[5] | bits[6] | bits[7] | bits[8] | bits[9] |   s0   |   s1   |   s2   |  s3    |  s4    |        |        |        |
 // |        | ...                                                                                                                                       |
@@ -97,25 +100,54 @@ namespace nil {
                 };
                 ////////////////////////////////
 
-                template<typename ArithmetizationType, typename CurveType, std::uint32_t WitnessesAmount>
+                template<typename ArithmetizationType, typename CurveType>
                 class curve_element_variable_base_scalar_mul;
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
                 class curve_element_variable_base_scalar_mul<
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                    CurveType,
-                    15
-                >: public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0> {
+                    CurveType
+                >: public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                    using add_component =
-                        nil::blueprint::components::unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, 11>;
-
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0>;
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
                 public:
                     using var = typename component_type::var;
+                    using manifest_type = plonk_component_manifest;
+                    using add_component =
+                        nil::blueprint::components::unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType>;
+
+                    class gate_manifest_type : public component_gate_manifest {
+                    public:
+                        std::uint32_t gates_amount() const override {
+                            return curve_element_variable_base_scalar_mul::gates_amount;
+                        }
+                    };
+
+                    static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                           std::size_t lookup_column_amount) {
+                        static gate_manifest manifest =
+                            gate_manifest(gate_manifest_type())
+                            .merge_with(add_component::get_gate_manifest(witness_amount, lookup_column_amount));
+                        return manifest;
+                    }
+
+                    static manifest_type get_manifest() {
+                        static manifest_type manifest = manifest_type(
+                            std::shared_ptr<manifest_param>(new manifest_single_value_param(15)),
+                            true
+                        ).merge_with(add_component::get_manifest());
+                        return manifest;
+                    }
+
+                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                                 std::size_t lookup_column_amount) {
+                        return rows_amount;
+                    }
+
                     constexpr static const std::size_t mul_rows_amount = 102;
-                    constexpr static const std::size_t add_component_rows_amount = add_component::rows_amount;
+                    constexpr static const std::size_t add_component_rows_amount =
+                        add_component::get_rows_amount(11, 0);
                     constexpr static const std::size_t rows_amount = add_component_rows_amount + mul_rows_amount + 1;
                     constexpr static const std::size_t gates_amount = 3;
 
@@ -158,33 +190,35 @@ namespace nil {
 
                     template <typename ContainerType>
                     curve_element_variable_base_scalar_mul(ContainerType witness):
-                        component_type(witness, {}, {}){};
+                        component_type(witness, {}, {}, get_manifest()){};
 
                     template <typename WitnessContainerType, typename ConstantContainerType, typename PublicInputContainerType>
                     curve_element_variable_base_scalar_mul(WitnessContainerType witness, ConstantContainerType constant, PublicInputContainerType public_input):
-                        component_type(witness, constant, public_input){};
+                        component_type(witness, constant, public_input, get_manifest()){};
 
                     curve_element_variable_base_scalar_mul(std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
                                    std::initializer_list<typename component_type::constant_container_type::value_type> constants,
                                    std::initializer_list<typename component_type::public_input_container_type::value_type> public_inputs):
-                        component_type(witnesses, constants, public_inputs){};
+                        component_type(witnesses, constants, public_inputs, get_manifest()){};
                 };
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
                 using plonk_curve_element_variable_base_scalar_mul =
                     curve_element_variable_base_scalar_mul<
                         crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        CurveType,
-                        15
+                        CurveType
                     >;
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-                    typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type 
+                    typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
                         generate_assignments(
                             const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
                             assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
                             const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
                             const std::uint32_t start_row_index) {
+
+                        using add_component = typename plonk_curve_element_variable_base_scalar_mul<
+                            BlueprintFieldType, ArithmetizationParams, CurveType>::add_component;
 
                         typename BlueprintFieldType::value_type b = var_value(assignment, instance_input.b);
                         typename BlueprintFieldType::value_type b_high;
@@ -233,15 +267,15 @@ namespace nil {
                         typename BlueprintFieldType::value_type n_next = 0;
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                        unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
+                        add_component unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
-                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
+                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
                                         component.W(10)},{},{});
 
-                        typename unified_addition<ArithmetizationType, CurveType, 11>::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
+                        typename add_component::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
                                                                                {instance_input.T.x, instance_input.T.y}};
 
-                        typename unified_addition<ArithmetizationType, CurveType, 11>::result_type addition_res = 
+                        typename add_component::result_type addition_res =
                             generate_assignments(unified_addition_instance, assignment, addition_input, start_row_index);
 
 
@@ -304,16 +338,16 @@ namespace nil {
                         typename BlueprintFieldType::value_type u0, u1;
                         for (std::size_t i = component.aux_bits_start_row; i <= component.aux_bits_start_row + component.aux_bits_rows_amount - 3; i = i + 2) {
                             assignment.witness(component.W(6), i) = u_next;
-                            const std::size_t ind = 125 + ((i - component.aux_bits_start_row) / 2) * 6; 
+                            const std::size_t ind = 125 + ((i - component.aux_bits_start_row) / 2) * 6;
                             u0 = 4 * aux_bits[ind] + 2 * aux_bits[ind+1] + aux_bits[ind+2];
-                            u1 = 4 * aux_bits[ind+3] + 2 * aux_bits[ind+4] + aux_bits[ind+5]; 
+                            u1 = 4 * aux_bits[ind+3] + 2 * aux_bits[ind+4] + aux_bits[ind+5];
                             u_next = 64 * u_next + 8 * u0 + u1;
                             assignment.witness(component.W(12), i+1) = u0;
                             assignment.witness(component.W(13), i+1) = u1;
-                            assignment.witness(component.W(14), i+1) = u_next; 
+                            assignment.witness(component.W(14), i+1) = u_next;
                         }
                         assignment.witness(component.W(6), component.aux_bits_start_row + component.aux_bits_rows_amount - 2) = u_next;
-                        const std::size_t ind = 125 + (component.aux_bits_rows_amount / 2 - 1) * 6; 
+                        const std::size_t ind = 125 + (component.aux_bits_rows_amount / 2 - 1) * 6;
                         u0 = 4 * aux_bits[ind] + 2 * aux_bits[ind+1] + aux_bits[ind+2];
                         u1 = aux_bits[ind+3];
                         u_next = 16 * u_next + 2 * u0 + u1;
@@ -324,7 +358,7 @@ namespace nil {
                         assignment.witness(component.W(9), component.rows_amount - 1) = bits[0];
                         typename BlueprintFieldType::value_type e2 = 0;
                         typename BlueprintFieldType::value_type cur_pow = 1;
-                        for (std::size_t l = 130; l <= 254; l = l + 1) { 
+                        for (std::size_t l = 130; l <= 254; l = l + 1) {
                             e2 += + bits[254-l] * cur_pow;
                             cur_pow = cur_pow * 2;
                         }
@@ -371,13 +405,16 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-                    typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type 
+                    typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
                         generate_circuit(
                             const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
                             circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                             assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
                             const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type &instance_input,
                             const std::uint32_t start_row_index) {
+
+                        using add_component = typename plonk_curve_element_variable_base_scalar_mul<
+                            BlueprintFieldType, ArithmetizationParams, CurveType>::add_component;
 
                         generate_assignments_constants(component, bp, assignment, instance_input, start_row_index);
 
@@ -398,12 +435,12 @@ namespace nil {
                                                    start_row_index + component.aux_bits_start_row + component.aux_bits_rows_amount - 4, 2);
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                        typename unified_addition<ArithmetizationType, CurveType, 11>::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
+                        typename add_component::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
                                                                                {instance_input.T.x, instance_input.T.y}};
 
-                        unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
+                        add_component unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
-                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
+                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
                                         component.W(10)},{},{});
 
                         generate_circuit(unified_addition_instance, bp, assignment, addition_input, start_row_index);
@@ -421,7 +458,7 @@ namespace nil {
                             const std::size_t first_selector_index) {
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                        using var = typename curve_element_variable_base_scalar_mul<ArithmetizationType,  CurveType, 15>::var;
+                        using var = typename curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType>::var;
 
                         auto bit_check_1 = bp.add_bit_check(var(component.W(2), +1));
                         auto bit_check_2 = bp.add_bit_check(var(component.W(3), +1));
@@ -591,13 +628,13 @@ namespace nil {
                         *var(component.W(3), +1) - 1) * (var(component.W(5), +1) - component.shifted_minus_one));
                         auto constraint_19 = bp.add_constraint(((var(component.W(5), +1) - component.shifted_one)
                         *var(component.W(4), +1) - 1) * (var(component.W(5), +1) - component.shifted_one));
-                        auto constraint_20 = bp.add_constraint((var(component.W(8), +1)*var(component.W(2), +1)*var(component.W(0), 0)) + 
+                        auto constraint_20 = bp.add_constraint((var(component.W(8), +1)*var(component.W(2), +1)*var(component.W(0), 0)) +
                         ((var(component.W(5), +1) - component.shifted_minus_one)
                         *var(component.W(3), +1) - (var(component.W(5), +1) - component.shifted_one)
                         *var(component.W(4), +1))* ((var(component.W(5), +1) - component.shifted_minus_one)
                         *var(component.W(3), +1) - (var(component.W(5), +1) - component.shifted_one)
                         *var(component.W(4), +1)) * var(component.W(6), +1) - var(component.W(0), +1));
-                        auto constraint_21 = bp.add_constraint((var(component.W(8), +1)*var(component.W(2), +1)*var(component.W(1), 0)) + 
+                        auto constraint_21 = bp.add_constraint((var(component.W(8), +1)*var(component.W(2), +1)*var(component.W(1), 0)) +
                         ((var(component.W(5), +1) - component.shifted_minus_one)
                         *var(component.W(3), +1) - (var(component.W(5), +1) - component.shifted_one)
                         *var(component.W(4), +1)) * var(component.W(7), +1) - var(component.W(1), +1));
@@ -606,20 +643,20 @@ namespace nil {
                         (var(component.W(5), +1) - component.shifted_one)));
 
                         // additional range-check constraints:
-                        // check   u_0 = 3-bit chunk of aux  
+                        // check   u_0 = 3-bit chunk of aux
                         auto constraint_23 = bp.add_constraint(
                             var(component.W(12), 0) * (var(component.W(12), 0) - 1) * (var(component.W(12), 0) - 2) * (var(component.W(12), 0) - 3)
-                                * (var(component.W(12), 0) - 4) * (var(component.W(12), 0) - 5)  * (var(component.W(12), 0) - 6) * (var(component.W(12), 0) - 7)     
+                                * (var(component.W(12), 0) - 4) * (var(component.W(12), 0) - 5)  * (var(component.W(12), 0) - 6) * (var(component.W(12), 0) - 7)
                                                         );
-                        // check   u_1 = 1-bit chunk of aux 
+                        // check   u_1 = 1-bit chunk of aux
                         auto constraint_24 = bp.add_constraint(
-                            var(component.W(13), 0) * (var(component.W(13), 0) - 1)    
+                            var(component.W(13), 0) * (var(component.W(13), 0) - 1)
                                                         );
-                        // check  accumalator(u_i) 
+                        // check  accumalator(u_i)
                         auto constraint_25 = bp.add_constraint(
                             var(component.W(14), 0) - 16 * var(component.W(6), -1) - 2 * var(component.W(12), 0) - var(component.W(13), 0)
                                                         );
-                        // check   aux = z_{n-2} - t_p + 2^130     
+                        // check   aux = z_{n-2} - t_p + 2^130
                         auto constraint_28 = bp.add_constraint(var(component.W(9), 0) - (var(component.W(9), 0) ));
                         if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
                             constraint_28 = bp.add_constraint(
@@ -632,19 +669,19 @@ namespace nil {
                         }
                         // check   (bits[0] = 1) => accumalator(u_i) = aux
                         auto constraint_26 = bp.add_constraint(
-                            var(component.W(9), +1) * (var(component.W(14), 0) - var(component.W(12), +1)) 
+                            var(component.W(9), +1) * (var(component.W(14), 0) - var(component.W(12), +1))
                                                         );
                         // check   (bits[0] = 1) =>  V_130 = 2^124
                         auto constraint_27 = bp.add_constraint(
-                            var(component.W(9), +1) * (var(component.W(10), +1) - component.two.pow(124)) 
+                            var(component.W(9), +1) * (var(component.W(10), +1) - component.two.pow(124))
                                                         );
-                        
+
                         // check   b_high * 2^254 + b = accamulator(b_i) (mod p)
                         //         (b_high = 1) => b < 2^254
                         auto constraint_29 = bp.add_constraint(var(component.W(9), 0) - (var(component.W(9), 0) ));
                         if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
                             constraint_29 = bp.add_constraint(
-                                var(component.W(5), -1) - var(component.W(11), +1) - var(component.W(9), +1) * component.two.pow(254) 
+                                var(component.W(5), -1) - var(component.W(11), +1) - var(component.W(9), +1) * component.two.pow(254)
                                                             );
                         }
 
@@ -655,20 +692,20 @@ namespace nil {
                                      constraint_11, constraint_12, constraint_13, constraint_14, constraint_15,
                                      constraint_16, constraint_17, constraint_18, constraint_19, constraint_20,
                                      constraint_21, constraint_22,
-                                     constraint_23, constraint_24, constraint_25, constraint_26, constraint_27, 
+                                     constraint_23, constraint_24, constraint_25, constraint_26, constraint_27,
                                      constraint_28, constraint_29
                                      });
 
                         std::size_t selector_index_3 = first_selector_index + 2;
-                        // check   u_0 = 3-bit chunk of aux  
+                        // check   u_0 = 3-bit chunk of aux
                         constraint_1 = bp.add_constraint(
                             var(component.W(12), +1) * (var(component.W(12), +1) - 1) * (var(component.W(12), +1) - 2) * (var(component.W(12), +1) - 3)
-                                * (var(component.W(12), +1) - 4) * (var(component.W(12), +1) - 5)  * (var(component.W(12), +1) - 6) * (var(component.W(12), +1) - 7)     
+                                * (var(component.W(12), +1) - 4) * (var(component.W(12), +1) - 5)  * (var(component.W(12), +1) - 6) * (var(component.W(12), +1) - 7)
                                                         );
                         // check   u_1 = 3-bit chunk of aux
                         constraint_2 = bp.add_constraint(
                             var(component.W(13), +1) * (var(component.W(13), +1) - 1) * (var(component.W(13), +1) - 2) * (var(component.W(13), +1) - 3)
-                                * (var(component.W(13), +1) - 4) * (var(component.W(13), +1) - 5)  * (var(component.W(13), +1) - 6) * (var(component.W(13), +1) - 7)     
+                                * (var(component.W(13), +1) - 4) * (var(component.W(13), +1) - 5)  * (var(component.W(13), +1) - 6) * (var(component.W(13), +1) - 7)
                                                         );
                         // check   u_next = intermediate accumalator(u_i)
                         constraint_3 = bp.add_constraint(
@@ -688,15 +725,17 @@ namespace nil {
 
                         std::size_t j = start_row_index + component.add_component_rows_amount;
                         using var = typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                        using add_component = typename plonk_curve_element_variable_base_scalar_mul<
+                            BlueprintFieldType, ArithmetizationParams, CurveType>::add_component;
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                        
-                        unified_addition<ArithmetizationType, CurveType, 11> unified_addition_instance(
+
+                        add_component unified_addition_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
-                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9), 
+                                    component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
                                         component.W(10)},{},{});
 
-                        typename unified_addition<ArithmetizationType, CurveType, 11>::result_type addition_res(unified_addition_instance, start_row_index);
+                        typename add_component::result_type addition_res(unified_addition_instance, start_row_index);
 
                         bp.add_copy_constraint({{component.W(2), (std::int32_t)(j), false}, addition_res.X});
                         bp.add_copy_constraint({{component.W(3), (std::int32_t)(j), false}, addition_res.Y});
@@ -772,4 +811,4 @@ namespace nil {
     }   // namespace blueprint
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_15_WIRES_HPP
+#endif    // CRYPTO3_ZK_BLUEPRINT_PLONK_CURVE_ELEMENT_VARIABLE_BASE_SCALAR_MUL_COMPONENT_HPP

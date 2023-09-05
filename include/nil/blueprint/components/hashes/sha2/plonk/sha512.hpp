@@ -32,6 +32,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/manifest.hpp>
 #include <nil/blueprint/components/hashes/sha2/plonk/sha512_process.hpp>
 //#include <nil/blueprint/components/hashes/sha2/plonk/decomposition.hpp>
 
@@ -39,32 +40,59 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class sha512;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class sha512<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 9>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 1, 0> {
+            class sha512<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>:
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
                 using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 1, 0>;
-
-                using sha512_process_component =  sha512_process<ArithmetizationType, 9, 1>;
-//                   using decomposition_component = 
-//                       decomposition<ArithmetizationType, BlueprintFieldType, W0, W1, W2, W3, W4, W5, W6, W7, W8>;
-
-            public: 
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+            public:
+                using sha512_process_component = sha512_process<ArithmetizationType>;
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return sha512::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest =
+                        gate_manifest(gate_manifest_type())
+                        .merge_with(sha512_process_component::get_gate_manifest(witness_amount, lookup_column_amount));
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    static manifest_type manifest = manifest_type(
+                        std::shared_ptr<nil::blueprint::manifest_param>(
+                            new nil::blueprint::manifest_single_value_param(9)),
+                        true
+                    ).merge_with(sha512_process_component::get_manifest());
+                    return manifest;
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return
+                        rows_amount_creating_input_words_component +
+                        sha512_process_component::get_rows_amount(witness_amount, lookup_column_amount) * 2 /* + 2 */;
+                }
 
                 constexpr static const std::size_t gates_amount = 5;
                 constexpr static const std::size_t rows_amount_creating_input_words_component = 15;
 //
-                constexpr static const std::size_t rows_amount =
-                    rows_amount_creating_input_words_component + sha512_process_component::rows_amount * 2 /* + 2 */;
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
 
                 struct var_ec_point {
-                    std::array<var, 4> x;    
-                    std::array<var, 4> y;    
+                    std::array<var, 4> x;
+                    std::array<var, 4> y;
                 };
 
                 struct input_type {
@@ -76,43 +104,49 @@ namespace nil {
                 struct result_type {
                     std::array<var, 8> output_state;
 
-                    result_type(const sha512 &component, const std::size_t &start_row_index) { 
-                        output_state = {var(component.W(0), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(1), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(2), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(3), start_row_index + rows_amount - 3, false),
-                                                           var(component.W(0), start_row_index + rows_amount - 1, false),
-                                                           var(component.W(1), start_row_index + rows_amount - 1, false),
-                                                           var(component.W(2), start_row_index + rows_amount - 1, false),
-                                                           var(component.W(3), start_row_index + rows_amount - 1, false)};
+                    result_type(const sha512 &component, const std::size_t &start_row_index) {
+                        output_state = {var(component.W(0), start_row_index + component.rows_amount - 3, false),
+                                        var(component.W(1), start_row_index + component.rows_amount - 3, false),
+                                        var(component.W(2), start_row_index + component.rows_amount - 3, false),
+                                        var(component.W(3), start_row_index + component.rows_amount - 3, false),
+                                        var(component.W(0), start_row_index + component.rows_amount - 1, false),
+                                        var(component.W(1), start_row_index + component.rows_amount - 1, false),
+                                        var(component.W(2), start_row_index + component.rows_amount - 1, false),
+                                        var(component.W(3), start_row_index + component.rows_amount - 1, false)};
                     }
                 };
 
                 template <typename ContainerType>
                     sha512(ContainerType witness):
-                        component_type(witness, {}, {}){};
+                        component_type(witness, {}, {}, get_manifest()){};
 
                     template <typename WitnessContainerType, typename ConstantContainerType, typename PublicInputContainerType>
                     sha512(WitnessContainerType witness, ConstantContainerType constant, PublicInputContainerType public_input):
-                        component_type(witness, constant, public_input){};
+                        component_type(witness, constant, public_input, get_manifest()){};
 
                     sha512(std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
                                    std::initializer_list<typename component_type::constant_container_type::value_type> constants,
                                    std::initializer_list<typename component_type::public_input_container_type::value_type> public_inputs):
-                        component_type(witnesses, constants, public_inputs){};
+                        component_type(witnesses, constants, public_inputs, get_manifest()){};
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            using plonk_sha512 = sha512<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 9>;
+            using plonk_sha512 = sha512<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                    ArithmetizationParams>>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::result_type 
+            typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::result_type
                 generate_circuit(
                     const plonk_sha512<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
                     const typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
                     const std::uint32_t start_row_index) {
+
+                    using component_type = plonk_sha512<BlueprintFieldType, ArithmetizationParams>;
+                    using sha512_process_component = typename component_type::sha512_process_component;
+                    using var = typename component_type::var;
 
                     auto selector_iterator = assignment.find_selector(component);
                     std::size_t first_selector_index;
@@ -131,7 +165,7 @@ namespace nil {
                     assignment.enable_selector(first_selector_index + 2, j + 7);
                     assignment.enable_selector(first_selector_index + 3, j + 10);
                     assignment.enable_selector(first_selector_index + 4, j + 13);
-/*
+
                     std::array<var, 16> input_words_vars_1;
 
                     for(std::size_t k = 0; k < 4; k++) {
@@ -140,7 +174,7 @@ namespace nil {
                         }
                     }
 
-                    std::array<var, 8> constants_var = {var(0, start_row_index, false, var::column_type::constant), 
+                    std::array<var, 8> constants_var = {var(0, start_row_index, false, var::column_type::constant),
                                                         var(0, start_row_index + 1, false, var::column_type::constant),
                                                         var(0, start_row_index + 2, false, var::column_type::constant),
                                                         var(0, start_row_index + 3, false, var::column_type::constant),
@@ -148,10 +182,14 @@ namespace nil {
                                                         var(0, start_row_index + 5, false, var::column_type::constant),
                                                         var(0, start_row_index + 6, false, var::column_type::constant),
                                                         var(0, start_row_index + 7, false, var::column_type::constant)};
-                    typename sha512_process_component::params_type sha_params = {constants_var, input_words_vars_1};
+                    sha512_process_component sha512_process_instance(
+                                {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
+                                    component.W(5), component.W(6), component.W(7), component.W(8)},{component.C(0)},{});
+                    typename sha512_process_component::input_type sha_params = {constants_var, input_words_vars_1};
                     j = j + 15;
-                    auto sha_output = sha512_process_component::generate_circuit(bp, assignment, sha_params, j).output_state;
-                    j += sha512_process_component::rows_amount;
+                    auto sha_output =
+                        generate_circuit(sha512_process_instance, bp, assignment, sha_params, j).output_state;
+                    j += sha512_process_instance.rows_amount;
 
                     // second chunk
                     std::array<var, 16> input_words_vars_2;
@@ -165,18 +203,16 @@ namespace nil {
                     }
                     input_words_vars_2[15] = var(0, start_row_index + 9, false, var::column_type::constant);
 
-                    
+
                     sha_params = {sha_output, input_words_vars_2};
-                    sha512_process_component::generate_circuit(bp, assignment, sha_params, j);
+                    generate_circuit(sha512_process_instance, bp, assignment, sha_params, j);
 
-*/
-
-                    generate_copy_constraints(component, bp, assignment, instance_input, start_row_index); 
+                    generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
                     return typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
                 }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::result_type 
+            typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::result_type
                 generate_assignments(
                     const plonk_sha512<BlueprintFieldType, ArithmetizationParams> &component,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
@@ -184,7 +220,7 @@ namespace nil {
                     const std::uint32_t start_row_index) {
 
                     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                    using var = typename sha512<ArithmetizationType, 9>::var;
+                    using var = typename sha512<ArithmetizationType>::var;
 
                     std::size_t row = start_row_index;
 
@@ -198,7 +234,7 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.R.y[1]).data),
                         typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.R.y[2]).data),
                         typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.R.y[3]).data),
-                        
+
                         typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A.x[0]).data),
                         typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A.x[1]).data),
                         typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A.x[2]).data),
@@ -245,7 +281,7 @@ namespace nil {
                     for (std::size_t i = 20; i < 31; ++i) {
                         input_words_values[i] = 0;
                     }
-                    input_words_values[31] = 1024 + 252; 
+                    input_words_values[31] = 1024 + 252;
 
 
                     std::array<typename BlueprintFieldType::integral_type, 77> range_chunks;
@@ -273,7 +309,7 @@ namespace nil {
                     range_chunks[0] = RAM[0] & mask22;
                     range_chunks[1] = (RAM[0] >> 22) & mask22;
                     range_chunks[2] = (RAM[0] >> 44) & mask20;
-                    range_chunks[3] = (RAM[0] >> 64) & 0b11; 
+                    range_chunks[3] = (RAM[0] >> 64) & 0b11;
 
                     assignment.witness(component.W(0), row_witness - 1) = RAM[0];
                     assignment.witness(component.W(0), row_witness - 0) = input_words_values[0];
@@ -297,10 +333,10 @@ namespace nil {
                     assignment.witness(component.W(3), row_witness + 1) = range_chunks[6];
                     assignment.witness(component.W(2), row_witness + 1) = range_chunks[7];
 
-                    
 
-                    
-                    
+
+
+
                     //  W4,1        W5,1                W5,0                  W5, -1
                     // 123456|7890123456789012.3456789012345678901234.5678901234567890123456
                     range_chunks[8] = (RAM[2]) & mask22;
@@ -315,8 +351,8 @@ namespace nil {
                     assignment.witness(component.W(5), row_witness + 1) = range_chunks[10];
                     assignment.witness(component.W(4), row_witness + 1) = range_chunks[11];
 
-                    
-                    
+
+
                     //     W7, 1              W7, 0                 W7, -1
                     // 1234567890123.4567890123456789012345.6789012345678901234567
                     range_chunks[12] = (RAM[3]) & mask22;
@@ -329,10 +365,10 @@ namespace nil {
                     assignment.witness(component.W(7), row_witness - 0) = range_chunks[13];
                     assignment.witness(component.W(7), row_witness + 1) = range_chunks[14];
 
-                    
+
 
                     row_witness += 3;
-                    
+
                     // W0,1      W1,1                  W1,0               W1,-1             W8,-1
                     // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
                     range_chunks[15] = (RAM[4]) & 1;
@@ -342,8 +378,8 @@ namespace nil {
                     range_chunks[19] = (RAM[4] >> 65) & 1;
 
                     assignment.witness(component.W(6), row_witness-3 + 1) = range_chunks[15];
-                    assignment.witness(component.W(8), row_witness - 1) = range_chunks[15];    
-                
+                    assignment.witness(component.W(8), row_witness - 1) = range_chunks[15];
+
 
                     assignment.witness(component.W(0), row_witness - 1) = RAM[4];
                     assignment.witness(component.W(0), row_witness - 0) = input_words_values[4];
@@ -352,14 +388,14 @@ namespace nil {
                     assignment.witness(component.W(1), row_witness + 1) = range_chunks[18];
                     assignment.witness(component.W(0), row_witness + 1) = range_chunks[19];
 
-                    
+
                     // W2,1       W3,1                  W3,0                  W3, -1
                     // 123|4567890123456789012.3456789012345678901234.5678901234567890123456
                     range_chunks[20] = (RAM[5]) & mask22;
                     range_chunks[21] = (RAM[5] >> 22) & mask22;
                     range_chunks[22] = (RAM[5] >> 44) & mask19;
                     range_chunks[23] = (RAM[5] >> 63) & 0b111;
-                   
+
                     assignment.witness(component.W(2), row_witness - 1) = RAM[5];
                     assignment.witness(component.W(2), row_witness - 0) = input_words_values[5];
                     assignment.witness(component.W(3), row_witness - 1) = range_chunks[20];
@@ -367,7 +403,7 @@ namespace nil {
                     assignment.witness(component.W(3), row_witness + 1) = range_chunks[22];
                     assignment.witness(component.W(2), row_witness + 1) = range_chunks[23];
 
-                    
+
 
                     //  W4,1        W5,1                W5,0                  W5, -1
                     // 12345|67890123456789012.3456789012345678901234.5678901234567890123456
@@ -383,7 +419,7 @@ namespace nil {
                     assignment.witness(component.W(5), row_witness + 1) = range_chunks[26];
                     assignment.witness(component.W(4), row_witness + 1) = range_chunks[27];
 
-                    
+
 
                     //     W7, 1              W7, 0                 W7, -1
                     // 1234567890123.4567890123456789012345.6789012345678901234567
@@ -399,14 +435,14 @@ namespace nil {
 
                     row_witness += 3;
 
-                    
 
-                    //          W0,1                    W1,1                  W1,0        W1,-1             
+
+                    //          W0,1                    W1,1                  W1,0        W1,-1
                     // |1234567890123456789012.3456789012345678901234.56789012345678901234|56
                     range_chunks[31] = RAM[8] & 0b11;
                     range_chunks[32] = (RAM[8] >> 2) & mask20;
                     range_chunks[33] = (RAM[8] >> 22) & mask22;
-                    range_chunks[34] = (RAM[8] >> 44) & mask22; 
+                    range_chunks[34] = (RAM[8] >> 44) & mask22;
 
                     assignment.witness(component.W(6), row_witness-3 + 1) = range_chunks[31];
 
@@ -417,7 +453,7 @@ namespace nil {
                     assignment.witness(component.W(1), row_witness + 1) = range_chunks[33];
                     assignment.witness(component.W(0), row_witness + 1) = range_chunks[34];
 
-                    
+
 
                     // W2,1       W3,1                  W3,0                  W3, -1
                     // 12|34567890123456789012.3456789012345678901234.5678901234567890123456
@@ -433,7 +469,7 @@ namespace nil {
                     assignment.witness(component.W(3), row_witness + 1) = range_chunks[37];
                     assignment.witness(component.W(2), row_witness + 1) = range_chunks[38];
 
-                    
+
 
                     // W4,1        W5,1                 W5,0                  W5, -1
                     // 1234|567890123456789012.3456789012345678901234.5678901234567890123456
@@ -449,7 +485,7 @@ namespace nil {
                     assignment.witness(component.W(5), row_witness + 1) = range_chunks[41];
                     assignment.witness(component.W(4), row_witness + 1) = range_chunks[42];
 
-                    
+
 
                     //     W7, 1              W7, 0                 W7, -1
                     // 1234567890123.4567890123456789012345.6789012345678901234567
@@ -465,7 +501,7 @@ namespace nil {
 
                     row_witness += 3;
 
-                    
+
                     //         W0,1                    W1,1                  W1,0        (W1,-1  &  W6,1-3)
                     // 1234567890123456789012.3456789012345678901234.5678901234567890123|456
                     range_chunks[46] = (RAM[12]) & 0b111;
@@ -481,9 +517,9 @@ namespace nil {
                     assignment.witness(component.W(1), row_witness - 0) = range_chunks[47];
                     assignment.witness(component.W(1), row_witness + 1) = range_chunks[48];
                     assignment.witness(component.W(0), row_witness + 1) = range_chunks[49];
-                    
 
-                    
+
+
                     // W2,1       W3,1                  W3,0                  W3, -1        W8, -1
                     // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
                     range_chunks[50] = (RAM[13]) & 1;
@@ -500,7 +536,7 @@ namespace nil {
                     assignment.witness(component.W(3), row_witness + 1) = range_chunks[53];
                     assignment.witness(component.W(2), row_witness + 1) = range_chunks[54];
 
-                    
+
 
 
                     // W4,1        W5,1                 W5,0                  W5, -1
@@ -517,7 +553,7 @@ namespace nil {
                     assignment.witness(component.W(5), row_witness + 1) = range_chunks[57];
                     assignment.witness(component.W(4), row_witness + 1) = range_chunks[58];
 
-                    
+
 
 
                     //     W7, 1              W7, 0                 W7, -1
@@ -534,11 +570,11 @@ namespace nil {
 
                     row_witness += 3;
 
-                    
 
-                    
+
+
                     //         W0,1                    W1,1                  W1,0        (W1,-1  &  W6,1-3)
-                    // 1234567890123456789012.3456789012345678901234.567890123456789012|3456 
+                    // 1234567890123456789012.3456789012345678901234.567890123456789012|3456
                     range_chunks[62] = (RAM[16]) & 0b1111;
                     range_chunks[63] = (RAM[16] >> 4) & mask18;
                     range_chunks[64] = (RAM[16] >> 22) & mask22;
@@ -553,13 +589,13 @@ namespace nil {
                     assignment.witness(component.W(1), row_witness + 1) = range_chunks[64];
                     assignment.witness(component.W(0), row_witness + 1) = range_chunks[65];
 
-                    
+
 
                     //           W2,1                    W3,1                  W3,0      W3, -1
                     // |1234567890123456789012.3456789012345678901234.56789012345678901234|56
                     range_chunks[66] = (RAM[17]) & 3;
                     range_chunks[67] = (RAM[17] >> 2) & mask20;
-                    range_chunks[68] = (RAM[17] >> 22) & mask22; 
+                    range_chunks[68] = (RAM[17] >> 22) & mask22;
                     range_chunks[69] = (RAM[17] >> 44) & mask22;
                     assignment.witness(component.W(2), row_witness - 1) = RAM[17];
                     assignment.witness(component.W(2), row_witness - 0) = input_words_values[17];
@@ -568,7 +604,7 @@ namespace nil {
                     assignment.witness(component.W(3), row_witness + 1) = range_chunks[68];
                     assignment.witness(component.W(2), row_witness + 1) = range_chunks[69];
 
-                    
+
 
 
                     // W4,1        W5,1                 W5,0                  W5, -1
@@ -585,7 +621,7 @@ namespace nil {
                     assignment.witness(component.W(5), row_witness + 1) = range_chunks[72];
                     assignment.witness(component.W(4), row_witness + 1) = range_chunks[73];
 
-                    
+
 
 
                     //     W7, 1              W7, 0                 W7, -1
@@ -601,7 +637,7 @@ namespace nil {
                     assignment.witness(component.W(7), row_witness + 1) = range_chunks[76];
                     assignment.witness(component.W(8), row_witness + 1) = 1;
 
-                    
+
 
 
                     std::array<var, 16> input_words_vars_1;
@@ -634,10 +670,10 @@ namespace nil {
                         0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
                         0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179};
                     for (int i = 0; i < 8; i++) {
-                        assignment.constant(component.C(0), start_row_index + i) = constants[i]; 
+                        assignment.constant(component.C(0), start_row_index + i) = constants[i];
                     }
 
-                    std::array<var, 8> constants_var = {var(component.C(0), start_row_index, false, var::column_type::constant), 
+                    std::array<var, 8> constants_var = {var(component.C(0), start_row_index, false, var::column_type::constant),
                                                         var(component.C(0), start_row_index + 1, false, var::column_type::constant),
                                                         var(component.C(0), start_row_index + 2, false, var::column_type::constant),
                                                         var(component.C(0), start_row_index + 3, false, var::column_type::constant),
@@ -647,14 +683,14 @@ namespace nil {
                                                         var(component.C(0), start_row_index + 7, false, var::column_type::constant)};
 
                     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                    typename sha512_process<ArithmetizationType, 9, 1>::input_type sha512_process_input = {constants_var, input_words_vars_1};
+                    typename sha512_process<ArithmetizationType>::input_type sha512_process_input = {constants_var, input_words_vars_1};
 
-                    sha512_process<ArithmetizationType, 9, 1> sha512_process_instance(
+                    sha512_process<ArithmetizationType> sha512_process_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8)},{component.C(0)},{});
-                    
-                    typename sha512_process<ArithmetizationType, 9, 1>::result_type sha_output = generate_assignments(sha512_process_instance, assignment, sha512_process_input, row);
-                    row += sha512_process<ArithmetizationType, 9, 1>::rows_amount;
+
+                    typename sha512_process<ArithmetizationType>::result_type sha_output = generate_assignments(sha512_process_instance, assignment, sha512_process_input, row);
+                    row += sha512_process_instance.rows_amount;
 
                     //TODO
 
@@ -693,9 +729,9 @@ namespace nil {
                                                          var(0, row + 23, false, var::column_type::constant)};
                     typename sha512_process_component::params_type sha_params2 = {sha_output.output_state,
                                                                                   input_words2_var}; */
-                    
+
                     sha_output = generate_assignments(sha512_process_instance, assignment, sha512_process_input, row);
-                    row += sha512_process<ArithmetizationType, 9, 1>::rows_amount;
+                    row += sha512_process_instance.rows_amount;
                     return typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
                 }
 
@@ -708,7 +744,7 @@ namespace nil {
                     const std::size_t first_selector_index) {
 
                     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                    using var = typename sha512<ArithmetizationType, 9>::var;
+                    using var = typename sha512<ArithmetizationType>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
 
@@ -777,12 +813,12 @@ namespace nil {
 
 
 
-                    //          W0,1                    W1,1                  W1,0        W1,-1             
+                    //          W0,1                    W1,1                  W1,0        W1,-1
                     // |1234567890123456789012.3456789012345678901234.56789012345678901234|56
                     auto constraint_ram_8 = bp.add_constraint(
                         var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (1 << 2) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44)));
                     auto constraint_word_8 = bp.add_constraint(
-                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 20) + var(component.W(0), 1) * (one << 42))); 
+                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 20) + var(component.W(0), 1) * (one << 42)));
 
                     // W2,1       W3,1                  W3,0                  W3, -1
                     // 12|34567890123456789012.3456789012345678901234.5678901234567890123456
@@ -839,14 +875,14 @@ namespace nil {
                     auto constraint_word_15 = bp.add_constraint(
                         var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 3) + var(component.W(7), 0) * (one << (3 + 22)) + var(component.W(7), 1) * (one << (3 + 44)) + var(component.W(6), 1) * (one << 60)));
 
-                    bp.add_gate(first_selector_index + 3, {constraint_ram_12, constraint_ram_13, constraint_ram_14, constraint_ram_15, constraint_word_12, constraint_word_13, constraint_word_14, constraint_word_15});  
+                    bp.add_gate(first_selector_index + 3, {constraint_ram_12, constraint_ram_13, constraint_ram_14, constraint_ram_15, constraint_word_12, constraint_word_13, constraint_word_14, constraint_word_15});
 
 
 
 
 
                     //         W0,1                    W1,1                  W1,0        (W1,-1  &  W6,1-3)
-                    // 1234567890123456789012.3456789012345678901234.567890123456789012|3456 
+                    // 1234567890123456789012.3456789012345678901234.567890123456789012|3456
                     auto constraint_ram_16 = bp.add_constraint(
                         var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 4) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44)));
                     auto constraint_word_16 = bp.add_constraint(
@@ -874,7 +910,7 @@ namespace nil {
                         var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 2) + var(component.W(7), 0) * (one << (2 + 22)) + var(component.W(7), 1) * (one << (2 + 44)) + var(component.W(8), 1) * (one << 60)));
 
                     bp.add_gate(first_selector_index + 4, {constraint_ram_16, constraint_ram_17, constraint_ram_18, constraint_ram_19, constraint_word_16, constraint_word_17, constraint_word_18, constraint_word_19});
-                     
+
                 }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -886,8 +922,8 @@ namespace nil {
                     const std::uint32_t start_row_index) {
 
                     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                    using var = typename sha512<ArithmetizationType, 9>::var;
-                    
+                    using var = typename sha512<ArithmetizationType>::var;
+
                     std::size_t row = start_row_index;
 
                     for(std::size_t i = 0; i < 4; i++) {

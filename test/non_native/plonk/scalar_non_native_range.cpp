@@ -61,7 +61,7 @@ void test_scalar_non_native_range(std::vector<typename BlueprintFieldType::value
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::scalar_non_native_range<ArithmetizationType, ed25519_type, 9>;
+    using component_type = blueprint::components::scalar_non_native_range<ArithmetizationType, ed25519_type>;
 
     typename component_type::input_type instance_input = {var(0, 0, false, var::column_type::public_input)};
 

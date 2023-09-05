@@ -44,7 +44,7 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/detail/limbs.hpp>
 
-#include "test_plonk_component.hpp"
+#include "../../../test_plonk_component.hpp"
 
 template <typename BlueprintFieldType>
 void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public_input,
@@ -60,7 +60,7 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using component_type = nil::blueprint::components::from_limbs<ArithmetizationType, 3>;
+    using component_type = nil::blueprint::components::from_limbs<ArithmetizationType>;
 	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     var x(0, 0, false, var::column_type::public_input);
@@ -99,7 +99,7 @@ void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_i
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
-    using component_type = nil::blueprint::components::to_limbs<ArithmetizationType, 15>;
+    using component_type = nil::blueprint::components::to_limbs<ArithmetizationType>;
 	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     var x(0, 0, false, var::column_type::public_input);

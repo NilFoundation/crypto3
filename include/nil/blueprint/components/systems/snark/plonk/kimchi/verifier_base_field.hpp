@@ -33,7 +33,7 @@
 #include <nil/blueprint/components/algebra/fields/plonk/field_operations.hpp>
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/multi_scalar_mul_15_wires.hpp>
-#include <nil/blueprint/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/variable_base_scalar_mul.hpp>
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/unified_addition.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/types/commitment.hpp>
 #include <nil/blueprint/components/systems/snark/plonk/kimchi/batch_verify_base_field.hpp>

@@ -42,8 +42,8 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
-#include "test_plonk_component.hpp"
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/variable_base_scalar_mul.hpp>
+#include "../../../test_plonk_component.hpp"
 
 #include "../../zk/include/nil/crypto3/zk/snark/systems/plonk/placeholder/profiling.hpp"
 
@@ -62,25 +62,17 @@ typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates:
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
-	using component_type = nil::blueprint::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType, 15>;
+	using component_type = nil::blueprint::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType>;
 
 	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
 	component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{0},{});
-	
+
 	auto result_check = [&expected, public_input](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
 			typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type R;
 			R.X = var_value(assignment, real_res.X);
 			R.Y = var_value(assignment, real_res.Y);
-
-			#ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
-		    std::cout << std::hex;
-	        std::cout << "_________________________________________________________________________________________________________________________________________________\n"; 
-			std::cout << "var base scal mul: (" << public_input[0].data << " " << public_input[1].data << ") * " << public_input[2].data << "\n";
-			std::cout << "expected:" << expected.X.data << " " << expected.Y.data << "\n";
-			std::cout << "real    :" << R.X.data << " " << R.Y.data << "\n";
-			#endif
 
 			assert(expected.X == R.X);
 			assert(expected.Y - R.Y == 0); // not (expected.Y == R.Y) because of issue https://github.com/NilFoundation/crypto3-multiprecision/issues/38

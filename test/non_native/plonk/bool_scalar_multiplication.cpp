@@ -71,7 +71,7 @@ void test_bool_scalar_multiplication(const std::vector<typename BlueprintFieldTy
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type =
-        blueprint::components::bool_scalar_multiplication<ArithmetizationType, NonNativeCurveType, 9,
+        blueprint::components::bool_scalar_multiplication<ArithmetizationType, NonNativeCurveType,
                                                           blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> T_x = {
@@ -84,7 +84,7 @@ void test_bool_scalar_multiplication(const std::vector<typename BlueprintFieldTy
     typename component_type::input_type instance_input = {{T_x, T_y}, var(0, 8, false, var::column_type::public_input)};
 
     auto result_check = [&expected_res, &public_input, &expected_to_pass](AssignmentType &assignment,
-                                                       typename component_type::result_type &real_res) { 
+                                                       typename component_type::result_type &real_res) {
 #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
         std::array<typename BlueprintFieldType::value_type, 4> x, y, expected_x, expected_y, real_x, real_y;
         for (std::size_t i = 0; i < 4; i++) {

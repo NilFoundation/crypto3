@@ -51,9 +51,9 @@
 using namespace nil;
 
 template <typename BlueprintFieldType, typename NonNativeFieldType>
-void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_input, 
+void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_input,
         std::array<typename BlueprintFieldType::value_type, 4> expected_res){
-    
+
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
@@ -68,7 +68,7 @@ void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::addition<ArithmetizationType,
-        NonNativeFieldType, 9, blueprint::basic_non_native_policy<BlueprintFieldType>>;
+        NonNativeFieldType, blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_a = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
@@ -79,36 +79,8 @@ void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_
 
     typename component_type::input_type instance_input = {input_var_a, input_var_b};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
-            #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
-        std::array<typename BlueprintFieldType::value_type, 4> x, y, expected_chunks, real_chunks;
-        for (std::size_t i = 0; i < 4; i++) {
-            x[i] = public_input[i];
-            y[i] = public_input[i+4];
-            expected_chunks[i] = expected_res[i];
-            real_chunks[i] = var_value(assignment, real_res.output[i]);
-        }
-
-        std::cout << std::hex;
-
-        std::cout << "_________________________________________________________________________________________________________________________________________________\n"; 
-        std::cout << "input   : "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << x[3-i].data << " ";}
-        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(x).data << ")\n";
-
-        std::cout << "          "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << y[3-i].data << " ";}
-        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(y).data << ")\n";
-
-        std::cout << "expected: "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << expected_chunks[3-i].data << " ";}
-        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(expected_chunks).data << ")\n";
-
-        std::cout << "real    : "; 
-        for (std::size_t i = 0; i < 4; i++) {std::cout << real_chunks[3-i].data << " ";}
-        std::cout << "(" << glue_non_native<BlueprintFieldType, NonNativeFieldType>(real_chunks).data << ")\n";
-        #endif
 
         for (std::size_t i = 0; i < 4; i++) {
             assert(expected_res[i] == var_value(assignment, real_res.output[i]));

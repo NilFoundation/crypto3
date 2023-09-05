@@ -38,7 +38,7 @@
 
 #include <nil/blueprint/components/hashes/sha2/plonk/decomposition.hpp>
 
-#include "test_plonk_component.hpp"
+#include "../../test_plonk_component.hpp"
 
 using namespace nil;
 
@@ -60,21 +60,20 @@ void test_decomposition(std::vector<typename BlueprintFieldType::value_type> pub
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
-    using component_type = blueprint::components::decomposition<ArithmetizationType,
-        BlueprintFieldType, 9>;
+    using component_type = blueprint::components::decomposition<ArithmetizationType, BlueprintFieldType>;
 
     std::array<var, 2> input_state_var = {var(0, 0, false, var::column_type::public_input),
                                           var(0, 1, false, var::column_type::public_input)};
 
     typename component_type::input_type instance_input = {input_state_var};
 
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+    auto result_check = [&expected_res](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
             for (std::size_t i = 0; i < real_res.output.size(); i++){
                 assert(expected_res[i] == var_value(assignment, real_res.output[i]));
             }
     };
-    auto result_check_to_fail = [&expected_res](AssignmentType &assignment, 
+    auto result_check_to_fail = [&expected_res](AssignmentType &assignment,
         typename component_type::result_type &real_res) { };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
@@ -131,7 +130,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_test0) {
         {0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255},
         calculate_decomposition<field_type>({0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255}),
         true);
-    
+
     test_decomposition<field_type>(
         {0, 0},
         calculate_decomposition<field_type>({0, 0}),
@@ -146,7 +145,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_test0) {
 BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_must_fail) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
 
-    typename field_type::value_type bad = 0x100000000000000000000000000000000_cppui255; 
+    typename field_type::value_type bad = 0x100000000000000000000000000000000_cppui255;
 
     test_decomposition<field_type>(
         {0, bad},

@@ -38,7 +38,7 @@ namespace nil {
         namespace components {
 
             template<typename ArithmetizationType, typename CurveType, typename Ed25519Type,
-                std::uint32_t WitnessesAmount, typename NonNativePolicyType>
+                     typename NonNativePolicyType>
             class complete_addition;
 
             template<typename BlueprintFieldType,
@@ -47,34 +47,72 @@ namespace nil {
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     CurveType,
                     Ed25519Type,
-                    9,
                     basic_non_native_policy<BlueprintFieldType>>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 9, 1, 0> {
+                public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                constexpr static const std::uint32_t WitnessesAmount = 9;
-                constexpr static const std::uint32_t ConstantsAmount = 1;
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, ConstantsAmount, 0>;
-
+                constexpr static std::size_t rows_amount_internal(std::size_t witness_amount) {
+                    return
+                        2 * non_native_range_component::get_rows_amount(witness_amount, 0) +
+                        8 * multiplication_component::get_rows_amount(witness_amount, 0) +
+                        3 * addition_component::get_rows_amount(witness_amount, 0) +
+                        subtraction_component::get_rows_amount(witness_amount, 0);
+                }
             public:
                 using var = typename component_type::var;
+                using manifest_type = typename component_type::manifest_type;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return complete_addition::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest =
+                        gate_manifest(gate_manifest_type())
+                        .merge_with(
+                            non_native_range_component::get_gate_manifest(witness_amount, lookup_column_amount))
+                        .merge_with(multiplication_component::get_gate_manifest(witness_amount, lookup_column_amount))
+                        .merge_with(addition_component::get_gate_manifest(witness_amount, lookup_column_amount))
+                        .merge_with(subtraction_component::get_gate_manifest(witness_amount, lookup_column_amount));
+
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    static manifest_type manifest = manifest_type(
+                        std::shared_ptr<manifest_param>(new manifest_single_value_param(9)),
+                        true
+                    ).merge_with(multiplication_component::get_manifest())
+                     .merge_with(addition_component::get_manifest())
+                     .merge_with(subtraction_component::get_manifest())
+                     .merge_with(non_native_range_component::get_manifest());
+                    return manifest;
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return rows_amount_internal(witness_amount);
+                }
 
                 typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                     ArithmetizationType;
 
                 using non_native_range_component = components::range<
-                    ArithmetizationType, typename Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                    ArithmetizationType, typename Ed25519Type::base_field_type, non_native_policy_type>;
                 using multiplication_component = multiplication<
-                    ArithmetizationType, typename Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                    ArithmetizationType, typename Ed25519Type::base_field_type, non_native_policy_type>;
                 using addition_component = addition<
-                    ArithmetizationType, typename Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                    ArithmetizationType, typename Ed25519Type::base_field_type, non_native_policy_type>;
                 using subtraction_component = subtraction<
-                    ArithmetizationType, typename Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                    ArithmetizationType, typename Ed25519Type::base_field_type, non_native_policy_type>;
 
-                constexpr static const std::size_t rows_amount =
-                    2 * non_native_range_component::rows_amount + 8 * multiplication_component::rows_amount +
-                    3 * addition_component::rows_amount + subtraction_component::rows_amount;
+                const std::size_t rows_amount = rows_amount_internal(this->witness_amount());
 
                 constexpr static const std::size_t gates_amount = 0;
 
@@ -100,28 +138,28 @@ namespace nil {
                                     var(component.W(1), start_row_index, false),
                                     var(component.W(2), start_row_index, false),
                                     var(component.W(3), start_row_index, false)};
-                        output.y = {var(component.W(0), start_row_index + non_native_range_component::rows_amount, false),
-                                    var(component.W(1), start_row_index + non_native_range_component::rows_amount, false),
-                                    var(component.W(2), start_row_index + non_native_range_component::rows_amount, false),
-                                    var(component.W(3), start_row_index + non_native_range_component::rows_amount, false)};
+                        std::size_t non_native_range_component_rows_amount =
+                            non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                        output.y = {
+                            var(component.W(0), start_row_index + non_native_range_component_rows_amount, false),
+                            var(component.W(1), start_row_index + non_native_range_component_rows_amount, false),
+                            var(component.W(2), start_row_index + non_native_range_component_rows_amount, false),
+                            var(component.W(3), start_row_index + non_native_range_component_rows_amount, false)};
                     }
                 };
-
-                template<typename ContainerType>
-                complete_addition(ContainerType witness) : component_type(witness, {}, {}) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 complete_addition(WitnessContainerType witness, ConstantContainerType constant,
                          PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 complete_addition(std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
                          std::initializer_list<typename component_type::constant_container_type::value_type>
                              constants,
                          std::initializer_list<typename component_type::public_input_container_type::value_type>
                              public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
@@ -129,7 +167,6 @@ namespace nil {
                 crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 CurveType,
                 typename crypto3::algebra::curves::ed25519,
-                9,
                 basic_non_native_policy<BlueprintFieldType>>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
@@ -150,13 +187,13 @@ namespace nil {
                     using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
                     using non_native_range_component = components::range<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using multiplication_component = multiplication<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using addition_component = addition<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using subtraction_component = subtraction<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
 
                     non_native_range_component non_native_range_instance(
                         {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
@@ -251,7 +288,7 @@ namespace nil {
 
                     generate_assignments(non_native_range_instance, assignment,
                         typename non_native_range_component::input_type({P_x}), row);
-                    row += non_native_range_component::rows_amount;
+                    row += non_native_range_instance.rows_amount;
 
                     assignment.witness(component.W(1), row) = y3[1];
                     assignment.witness(component.W(0), row) = y3[0];
@@ -265,42 +302,42 @@ namespace nil {
 
                     generate_assignments(non_native_range_instance, assignment,
                         typename non_native_range_component::input_type({P_y}), row);
-                    row += non_native_range_component::rows_amount;
+                    row += non_native_range_instance.rows_amount;
 
                     typename multiplication_component::result_type t0 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({T_x, R_y}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type t1 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({T_y, R_x}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type t2 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({T_x, R_x}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type t3 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({T_y, R_y}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename addition_component::result_type z0 = generate_assignments(
                         addition_instance, assignment,
                         typename addition_component::input_type({t0.output, t1.output}), row);
-                    row += addition_component::rows_amount;
+                    row += addition_instance.rows_amount;
 
                     typename addition_component::result_type z1 = generate_assignments(
                         addition_instance, assignment,
                         typename addition_component::input_type({t2.output, t3.output}), row);
-                    row += addition_component::rows_amount;
+                    row += addition_instance.rows_amount;
 
                     typename multiplication_component::result_type z2 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({t0.output, t1.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename Ed25519Type::base_field_type::integral_type d =
                         typename Ed25519Type::base_field_type::integral_type(
@@ -313,27 +350,27 @@ namespace nil {
                     typename multiplication_component::result_type k0 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({d_var_array, z2.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type k1 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({P_x, k0.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type k2 = generate_assignments(
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({P_y, k0.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename addition_component::result_type k3 = generate_assignments(
                         addition_instance, assignment,
                         typename addition_component::input_type({P_x, k1.output}), row);
-                    row += addition_component::rows_amount;
+                    row += addition_instance.rows_amount;
 
                     typename subtraction_component::result_type k4 = generate_assignments(
                         subtraction_instance, assignment,
                         typename subtraction_component::input_type({P_y, k2.output}), row);
-                    row += subtraction_component::rows_amount;
+                    row += subtraction_instance.rows_amount;
 
                     return typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
                 }
@@ -357,13 +394,13 @@ namespace nil {
                     using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
                     using non_native_range_component = components::range<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using multiplication_component = multiplication<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using addition_component = addition<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using subtraction_component = subtraction<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
 
                     non_native_range_component non_native_range_instance(
                         {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
@@ -390,7 +427,7 @@ namespace nil {
 
                     generate_circuit(non_native_range_instance, bp, assignment,
                         typename non_native_range_component::input_type({P_x}), row);
-                    row += non_native_range_component::rows_amount;
+                    row += non_native_range_instance.rows_amount;
 
                     std::array<var, 4> P_y = {
                         var(component.W(0), row),
@@ -400,7 +437,7 @@ namespace nil {
 
                     generate_circuit(non_native_range_instance, bp, assignment,
                         typename non_native_range_component::input_type({P_y}), row);
-                    row += non_native_range_component::rows_amount;
+                    row += non_native_range_instance.rows_amount;
 
                     std::array<var, 4> R_x = instance_input.R.x;
                     std::array<var, 4> R_y = instance_input.R.y;
@@ -410,37 +447,37 @@ namespace nil {
                     typename multiplication_component::result_type t0 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({T_x, R_y}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type t1 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({T_y, R_x}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type t2 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({T_x, R_x}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type t3 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({T_y, R_y}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename addition_component::result_type z0 = generate_circuit(
                         addition_instance, bp, assignment,
                         typename addition_component::input_type({t0.output, t1.output}), row);
-                    row += addition_component::rows_amount;
+                    row += addition_instance.rows_amount;
 
                     typename addition_component::result_type z1 = generate_circuit(
                         addition_instance, bp, assignment,
                         typename addition_component::input_type({t2.output, t3.output}), row);
-                    row += addition_component::rows_amount;
+                    row += addition_instance.rows_amount;
 
                     typename multiplication_component::result_type z2 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({t0.output, t1.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     std::array<var, 4> d_var_array = {var(component.C(0), row + 4, false, var::column_type::constant),
                                                       var(component.C(0), row + 5, false, var::column_type::constant),
@@ -450,27 +487,27 @@ namespace nil {
                     typename multiplication_component::result_type k0 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({d_var_array, z2.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type k1 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({P_x, k0.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename multiplication_component::result_type k2 = generate_circuit(
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({P_y, k0.output}), row);
-                    row += multiplication_component::rows_amount;
+                    row += multiplication_instance.rows_amount;
 
                     typename addition_component::result_type k3 = generate_circuit(
                         addition_instance, bp, assignment,
                         typename addition_component::input_type({P_x, k1.output}), row);
-                    row += addition_component::rows_amount;
+                    row += addition_instance.rows_amount;
 
                     typename subtraction_component::result_type k4 = generate_circuit(
                         subtraction_instance, bp, assignment,
                         typename subtraction_component::input_type({P_y, k2.output}), row);
-                    row += subtraction_component::rows_amount;
+                    row += subtraction_instance.rows_amount;
 
                     generate_constants(component, bp, assignment, instance_input, start_row_index);
                     generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
@@ -491,22 +528,26 @@ namespace nil {
 
                     using component_type = plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
 
-                    row += component_type::non_native_range_component::rows_amount;
-                    row += component_type::non_native_range_component::rows_amount;
-                    row += component_type::multiplication_component::rows_amount;
-                    row += component_type::multiplication_component::rows_amount;
-                    row += component_type::multiplication_component::rows_amount;
-                    row += component_type::multiplication_component::rows_amount;
+                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
 
                     for (std::size_t i = 0; i < 4; i++) {
                         bp.add_copy_constraint({{component.W(i), (std::int32_t)(row + 2), false},
-                                                {component.W(i), (std::int32_t)(start_row_index + component_type::rows_amount - 4 - 2), false}});
+                                                {component.W(i),
+                                                 (std::int32_t)(start_row_index + component.rows_amount - 4 - 2),
+                                                 false}});
                     }
-                    row += component_type::addition_component::rows_amount;
+                    row += component_type::addition_component::get_rows_amount(component.witness_amount(), 0);
 
                     for (std::size_t i = 0; i < 4; i++) {
                         bp.add_copy_constraint({{component.W(i), (std::int32_t)(row + 2), false},
-                                                {component.W(i), (std::int32_t)(start_row_index + component_type::rows_amount - 2), false}});
+                                                {component.W(i),
+                                                 (std::int32_t)(start_row_index + component.rows_amount - 2),
+                                                 false}});
                     }
                 }
 
@@ -529,23 +570,23 @@ namespace nil {
                     using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
                     using non_native_range_component = components::range<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using multiplication_component = multiplication<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using addition_component = addition<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
                     using subtraction_component = subtraction<
-                        ArithmetizationType, Ed25519Type::base_field_type, 9, non_native_policy_type>;
+                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
 
-                    row += non_native_range_component::rows_amount;
-                    row += non_native_range_component::rows_amount;
-                    row += multiplication_component::rows_amount;
-                    row += multiplication_component::rows_amount;
-                    row += multiplication_component::rows_amount;
-                    row += multiplication_component::rows_amount;
-                    row += addition_component::rows_amount;
-                    row += addition_component::rows_amount;
-                    row += multiplication_component::rows_amount;
+                    row += non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                    row += non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += addition_component::get_rows_amount(component.witness_amount(), 0);
+                    row += addition_component::get_rows_amount(component.witness_amount(), 0);
+                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
 
                     typename Ed25519Type::base_field_type::integral_type base = 1;
                     typename Ed25519Type::base_field_type::integral_type mask = (base << 66) - 1;

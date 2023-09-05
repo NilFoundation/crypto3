@@ -30,6 +30,8 @@
 #define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELD_EXPONENTIATION_HPP
 
 #include <cmath>
+#include <string>
+#include <sstream>
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -38,6 +40,8 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/manifest.hpp>
+#include <nil/blueprint/detail/get_component_id.hpp>
 
 namespace nil {
         namespace blueprint {
@@ -45,7 +49,7 @@ namespace nil {
 
                 // Input: exponent, base \in Fp
                 // Output: base**exponent
-                template<typename ArithmetizationType, typename FieldType, std::size_t ExponentSize, std::uint32_t WitnessesAmount>
+                template<typename ArithmetizationType, typename FieldType, std::size_t ExponentSize>
                 class exponentiation;
 
                 // clang-format off
@@ -63,32 +67,78 @@ namespace nil {
                 class exponentiation<
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                     BlueprintFieldType,
-                    ExponentSize,
-                    15
+                    ExponentSize
                 >:
-                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0> {
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0>;
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
-
-                    constexpr static const std::size_t witness_amount = 15;
                     constexpr static const std::size_t reserved_witnesses = 2;    // base, accumulated_n
+
+                    static std::size_t intermediate_results_per_row_intenal(std::size_t witness_amount) {
+                        return (witness_amount - reserved_witnesses) / (bits_per_intermediate_result + 1);
+                    }
+
+                    static std::size_t bits_per_row_internal(std::size_t witness_amount) {
+                        return intermediate_results_per_row_intenal(witness_amount) * bits_per_intermediate_result;
+                    }
+
+                    static std::size_t main_rows_amount_internal(std::size_t witness_amount) {
+                        return (ExponentSize + bits_per_row_internal(witness_amount) - 1) /
+                                bits_per_row_internal(witness_amount);
+                    }
+
+                    static std::size_t padded_exponent_size_internal(std::size_t witness_amount) {
+                        return main_rows_amount_internal(witness_amount) * bits_per_row_internal(witness_amount);
+                    }
+
+                    static std::size_t rows_amount_internal(std::size_t witness_amount) {
+                        return main_rows_amount_internal(witness_amount) + 1;
+                    }
                 public:
                     using var = typename component_type::var;
+                    using manifest_type = plonk_component_manifest;
+
+                    class gate_manifest_type : public component_gate_manifest {
+                    public:
+                        std::uint32_t gates_amount() const override {
+                            return exponentiation::gates_amount;
+                        }
+                    };
+
+                    static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                           std::size_t lookup_column_amount) {
+                        static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                        return manifest;
+                    }
+
+
+                    static manifest_type get_manifest() {
+                        static manifest_type manifest = manifest_type(
+                            std::shared_ptr<manifest_param>(new manifest_single_value_param(15)),
+                            true
+                        );
+                        return manifest;
+                    }
+
+                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                                 std::size_t lookup_column_amount) {
+                        return rows_amount_internal(witness_amount);
+                    }
+
                     constexpr static const std::size_t intermediate_start = 0 + reserved_witnesses;
                     constexpr static const std::size_t bits_per_intermediate_result =
                         2;    // defines
                               // max degree of the constraints
                               // 2 ** bits_per_intermediate_result
-                    constexpr static const std::size_t intermediate_results_per_row =
-                        (witness_amount - reserved_witnesses) / (bits_per_intermediate_result + 1);
-                    constexpr static const std::size_t bits_per_row =
-                        intermediate_results_per_row * bits_per_intermediate_result;
-                    constexpr static const std::size_t main_rows = (ExponentSize + bits_per_row - 1) / bits_per_row;
-                    constexpr static const std::size_t padded_exponent_size = main_rows * bits_per_row;
+                    const std::size_t intermediate_results_per_row =
+                        intermediate_results_per_row_intenal(this->witness_amount());
+                    const std::size_t bits_per_row =
+                        bits_per_row_internal(this->witness_amount());
+                    const std::size_t main_rows = main_rows_amount_internal(this->witness_amount());
+                    const std::size_t padded_exponent_size = padded_exponent_size_internal(this->witness_amount());
 
-                    constexpr static const std::size_t rows_amount = 1 + main_rows;
+                    const std::size_t rows_amount = rows_amount_internal(this->witness_amount());
                     constexpr static const std::size_t gates_amount = 1;
-
                     struct input_type {
                         var base;
                         var exponent;
@@ -98,48 +148,51 @@ namespace nil {
                         var output = var(0, 0);
 
                         result_type(const exponentiation &component, input_type &params, std::size_t start_row_index) {
-                            output = var(component.W(intermediate_start + intermediate_results_per_row - 1),
-                                         start_row_index + rows_amount - 1, false);
+                            output = var(component.W(intermediate_start + component.intermediate_results_per_row - 1),
+                                         start_row_index + component.rows_amount - 1, false);
                         }
 
                         result_type(const exponentiation &component, std::size_t start_row_index) {
-                            output = var(component.W(intermediate_start + intermediate_results_per_row - 1),
-                                         start_row_index + rows_amount - 1, false);
+                            output = var(component.W(intermediate_start + component.intermediate_results_per_row - 1),
+                                         start_row_index + component.rows_amount - 1, false);
                         }
                     };
 
-                    template <typename ContainerType>
-                        exponentiation(ContainerType witness):
-                            component_type(witness, {}, {}){};
+                    nil::blueprint::detail::blueprint_component_id_type get_component_id(
+                            const component_type& component) {
+                        std::stringstream id;
+
+                        id << ExponentSize;
+                        return id.str();
+                    }
 
                     template <typename WitnessContainerType, typename ConstantContainerType, typename PublicInputContainerType>
                         exponentiation(WitnessContainerType witness, ConstantContainerType constant, PublicInputContainerType public_input):
-                            component_type(witness, constant, public_input){};
+                            component_type(witness, constant, public_input, get_manifest()){};
 
                     exponentiation(
                         std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
                         std::initializer_list<typename component_type::constant_container_type::value_type> constants,
                         std::initializer_list<typename component_type::public_input_container_type::value_type> public_inputs):
-                            component_type(witnesses, constants, public_inputs){};
+                            component_type(witnesses, constants, public_inputs, get_manifest()){};
 
                 };
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize, std::uint32_t WitnessesAmount>
+                template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize>
                 using plonk_exponentiation =
                     exponentiation<
                         crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                         BlueprintFieldType,
-                        ExponentSize,
-                        15
+                        ExponentSize
                     >;
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize>
-                    typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::result_type
+                    typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::result_type
                         generate_circuit(
-                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15> &component,
+                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::input_type instance_input,
+                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::input_type &instance_input,
                         const std::uint32_t start_row_index) {
                         auto selector_iterator = assignment.find_selector(component);
                         std::size_t first_selector_index;
@@ -156,31 +209,32 @@ namespace nil {
                         generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
                         generate_assignments_constants(component, bp, assignment, instance_input, first_selector_index);
 
-                        return typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::result_type(component, start_row_index);
+                        return typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::result_type(component, start_row_index);
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize>
-                    typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::result_type
+                    typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::result_type
                         generate_assignments(
-                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15> &component,
+                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize> &component,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::input_type instance_input,
+                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::input_type &instance_input,
                         const std::uint32_t start_row_index) {
 
                         using component_type = plonk_exponentiation<BlueprintFieldType, ArithmetizationParams,
-                                                                    ExponentSize, 15>;
+                                                                    ExponentSize>;
                         typename BlueprintFieldType::value_type base = var_value(assignment, instance_input.base);
                         typename BlueprintFieldType::value_type exponent = var_value(assignment, instance_input.exponent);
 
                         typename BlueprintFieldType::integral_type integral_exp =
                             typename BlueprintFieldType::integral_type(exponent.data);
 
-                        std::array<bool, component_type::padded_exponent_size> bits = {false};
                         // {
                         //     nil::marshalling::status_type status;
                         //     std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
                         //     std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
                         // }
+
+                        std::vector<bool> bits(component.padded_exponent_size, false);
                         {
                             std::vector<bool> bbb;
                             auto data = exponent.data;
@@ -188,11 +242,11 @@ namespace nil {
                                 bbb.push_back((data - (data >> 1 << 1)) != 0);
                                 data = data >> 1;
                             }
-                            for (int i = 1; i < component_type::padded_exponent_size - bbb.size(); ++i) {
+                            for (int i = 1; i < component.padded_exponent_size - bbb.size(); ++i) {
                                 bits[i] = false;
                             }
                             for (int i = 0; i < bbb.size(); ++i) {
-                                bits[component_type::padded_exponent_size - 1 - i] = bbb[i];
+                                bits[component.padded_exponent_size - 1 - i] = bbb[i];
                             }
                         }
 
@@ -217,7 +271,7 @@ namespace nil {
                                     // wierd stuff is here for oracles scalar
                                     // std::cout<<"column_idx "<<column_idx<<" row "<<row<<" value "<<bits[current_bit]<<std::endl;
 
-                                    intermediate_exponent = 2 * intermediate_exponent + bits[current_bit];
+                                    intermediate_exponent = 2 * intermediate_exponent + (bits[current_bit] ? 1 : 0);
 
                                     acc1 = acc1 * acc1;
                                     if (bits[current_bit]) {
@@ -233,19 +287,19 @@ namespace nil {
                             assignment.witness(component.W(1), row) = accumulated_n;
                         }
 
-                        return typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::result_type(component, start_row_index);
+                        return typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::result_type(component, start_row_index);
 
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize>
-                        void generate_gates(
-                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15> &component,
+                    void generate_gates(
+                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::input_type instance_input,
+                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::input_type instance_input,
                         const std::size_t first_selector_index) {
 
-                    	using var = typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::var;
+                    	using var = typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::var;
 
                         typename BlueprintFieldType::value_type exponent_shift = 2;
                         exponent_shift = power(exponent_shift, component.bits_per_row);
@@ -288,14 +342,14 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize>
-                        void generate_copy_constraints(
-                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15> &component,
+                    void generate_copy_constraints(
+                        const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::input_type instance_input,
+                        const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::input_type &instance_input,
                         const std::uint32_t start_row_index) {
 
-                       	using var = typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::var;
+                       	using var = typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::var;
 
                         var zero(component.W(0), start_row_index, false, var::column_type::constant);
                         var one(component.W(0), start_row_index + 1, false, var::column_type::constant);
@@ -314,16 +368,16 @@ namespace nil {
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, std::size_t ExponentSize>
                         void generate_assignments_constants(
-                            const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15> &component,
+                            const plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize> &component,
                             circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                             assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                            const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize, 15>::input_type instance_input,
+                            const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::input_type &instance_input,
                             const std::uint32_t start_row_index) {
 
                             std::size_t row = start_row_index;
-                            assignment.constant(component.W(0), row) = 0;
+                            assignment.constant(component.C(0), row) = 0;
                             row++;
-                            assignment.constant(component.W(0), row) = 1;
+                            assignment.constant(component.C(0), row) = 1;
                             row++;
                 }
             }    // namespace components

@@ -37,7 +37,7 @@
 
 #include <map>
 
-#include "test_plonk_component.hpp"
+#include "../../../../test_plonk_component.hpp"
 
 using namespace nil;
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<field_type, ArithmetizationParams>; \
     using AssignmentType = blueprint::assignment<ArithmetizationType>; \
     using hash_type = crypto3::hashes::keccak_1600<256>; \
-    using component_type = ComponentType<ArithmetizationType, WitnessColumns>; \
+    using component_type = ComponentType<ArithmetizationType>; \
     constexpr std::size_t Lambda = 1;
 
 

@@ -38,9 +38,7 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/logic_and_flag.hpp>
 
-#include <map>
-
-#include "test_plonk_component.hpp"
+#include "../../../test_plonk_component.hpp"
 
 template<typename BlueprintFieldType, std::uint32_t WitnessColumns>
 auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> public_input) {
@@ -56,7 +54,7 @@ auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> pu
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using component_type = nil::blueprint::components::logic_and_flag<ArithmetizationType, WitnessColumns>;
+    using component_type = nil::blueprint::components::logic_and_flag<ArithmetizationType>;
     using var = typename component_type::var;
 
     std::array<std::uint32_t, WitnessColumns> witnesses;

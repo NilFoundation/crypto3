@@ -43,7 +43,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include "test_plonk_component.hpp"
+#include "../../../../test_plonk_component.hpp"
 
 using nil::blueprint::components::detail::comparison_mode;
 
@@ -63,7 +63,7 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using component_type = nil::blueprint::components::comparison_flag<ArithmetizationType, WitnessesAmount>;
+    using component_type = nil::blueprint::components::comparison_flag<ArithmetizationType>;
 	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
 
@@ -103,25 +103,23 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
         assert(var_value(assignment, real_res.flag) == expected_result);
     };
 
-    component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0},
-                                                           {0}, R, Mode)
-                                      : WitnessesAmount == 9 ? component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0},
-                                                                              R, Mode)
-                                                             : component_type({0, 1, 2}, {0}, {0}, R, Mode);
-
-    if (!(WitnessesAmount == 15 || WitnessesAmount == 9 || WitnessesAmount == 3)) {
-        BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
+    std::array<std::uint32_t, WitnessesAmount> witnesses;
+    for (std::uint32_t i = 0; i < WitnessesAmount; i++) {
+        witnesses[i] = i;
     }
+
+    component_type component_instance =
+        component_type(witnesses, std::array<std::uint32_t, 1>{0}, std::array<std::uint32_t, 1>{0}, R, Mode);
 
     if (!CustomAssignments) {
         if (expected_to_pass) {
             nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+                component_instance, public_input, result_check, instance_input, R, Mode);
         } else {
             nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
                                                  hash_type, Lambda>(
-                                                    boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+                                                    component_instance, public_input, result_check, instance_input,
+                                                    R, Mode);
         }
     } else {
         // Currently, the only custom assignment test here is for failure
@@ -130,8 +128,8 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
 
         nil::crypto3::test_component_to_fail_custom_assignments<component_type, BlueprintFieldType,
                 ArithmetizationParams, hash_type, Lambda>(
-                        boost::get<component_type>(component_instance), public_input, result_check,
-                        custom_assignment, instance_input);
+                        component_instance, public_input, result_check,
+                        custom_assignment, instance_input, R, Mode);
     }
 }
 

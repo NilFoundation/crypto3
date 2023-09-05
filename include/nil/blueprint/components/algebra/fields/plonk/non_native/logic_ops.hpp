@@ -44,25 +44,46 @@ namespace nil {
                 The following logical operations do NOT perform any checks on the input values.
             */
 
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class logic_not;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_not<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 2>
+            class logic_not<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
                                                                                                 BlueprintFieldType,
                                                                                                 ArithmetizationParams>,
-                                                           2, 1> {
-
-                constexpr static const std::uint32_t WitnessesAmount = 2;
+                                                           1> {
 
                 using component_type =
                     boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                         ArithmetizationParams>, 2, 1>;
+                                         ArithmetizationParams>, 1>;
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return logic_not::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    return component_type::get_manifest();
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                }
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 2> &witnesses) const {
@@ -74,13 +95,13 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_not(ContainerType witness) : component_type(witness) {};
+                logic_not(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 logic_not(WitnessContainerType witness, ConstantContainerType constant,
                                PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 logic_not(std::initializer_list<typename component_type::witness_container_type::value_type>
                                witnesses,
@@ -88,29 +109,50 @@ namespace nil {
                                constants,
                            std::initializer_list<typename component_type::public_input_container_type::value_type>
                                public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
 
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class logic_and;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_and<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>
+            class logic_and<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
                                                                                                 BlueprintFieldType,
                                                                                                 ArithmetizationParams>,
-                                                           3, 2> {
-
-                constexpr static const std::uint32_t WitnessesAmount = 3;
+                                                           2> {
 
                 using component_type =
                     boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                         ArithmetizationParams>, 3, 2>;
+                                         ArithmetizationParams>, 2>;
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return logic_and::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    return component_type::get_manifest();
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                }
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -122,13 +164,13 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_and(ContainerType witness) : component_type(witness) {};
+                logic_and(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 logic_and(WitnessContainerType witness, ConstantContainerType constant,
                                PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 logic_and(std::initializer_list<typename component_type::witness_container_type::value_type>
                                witnesses,
@@ -136,29 +178,50 @@ namespace nil {
                                constants,
                            std::initializer_list<typename component_type::public_input_container_type::value_type>
                                public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
 
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class logic_or;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_or<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>
+            class logic_or<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                             : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
                                                                                                 BlueprintFieldType,
                                                                                                 ArithmetizationParams>,
-                                                           3, 2> {
-
-                constexpr static const std::uint32_t WitnessesAmount = 3;
+                                                           2> {
 
                 using component_type =
                     boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                         ArithmetizationParams>, 3, 2>;
+                                         ArithmetizationParams>, 2>;
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return logic_or::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    return component_type::get_manifest();
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                }
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -170,13 +233,13 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_or(ContainerType witness) : component_type(witness) {};
+                logic_or(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 logic_or(WitnessContainerType witness, ConstantContainerType constant,
                                PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 logic_or(std::initializer_list<typename component_type::witness_container_type::value_type>
                                witnesses,
@@ -184,29 +247,50 @@ namespace nil {
                                constants,
                            std::initializer_list<typename component_type::public_input_container_type::value_type>
                                public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
 
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class logic_xor;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_xor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>
+            class logic_xor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
                                                                                                 BlueprintFieldType,
                                                                                                 ArithmetizationParams>,
-                                                           3, 2> {
-
-                constexpr static const std::uint32_t WitnessesAmount = 3;
+                                                           2> {
 
                 using component_type =
                     boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                         ArithmetizationParams>, 3, 2>;
+                                         ArithmetizationParams>, 2>;
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return logic_xor::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    return component_type::get_manifest();
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                }
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -218,13 +302,13 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_xor(ContainerType witness) : component_type(witness) {};
+                logic_xor(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 logic_xor(WitnessContainerType witness, ConstantContainerType constant,
                                PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 logic_xor(std::initializer_list<typename component_type::witness_container_type::value_type>
                                 witnesses,
@@ -232,29 +316,52 @@ namespace nil {
                                 constants,
                             std::initializer_list<typename component_type::public_input_container_type::value_type>
                                 public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
 
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class logic_nand;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_nand<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>
+            class logic_nand<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
                                                                                                 BlueprintFieldType,
                                                                                                 ArithmetizationParams>,
-                                                           3, 2> {
+                                                           2> {
 
                 constexpr static const std::uint32_t WitnessesAmount = 3;
 
                 using component_type =
                     boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                         ArithmetizationParams>, 3, 2>;
+                                         ArithmetizationParams>, 2>;
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return logic_nand::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    return component_type::get_manifest();
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                }
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -266,13 +373,13 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_nand(ContainerType witness) : component_type(witness) {};
+                logic_nand(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 logic_nand(WitnessContainerType witness, ConstantContainerType constant,
                                PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 logic_nand(std::initializer_list<typename component_type::witness_container_type::value_type>
                                 witnesses,
@@ -280,28 +387,49 @@ namespace nil {
                                 constants,
                            std::initializer_list<typename component_type::public_input_container_type::value_type>
                                 public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class logic_nor;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_nor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>
+            class logic_nor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
                                                                                                 BlueprintFieldType,
                                                                                                 ArithmetizationParams>,
-                                                           3, 2> {
-
-                constexpr static const std::uint32_t WitnessesAmount = 3;
+                                                           2> {
 
                 using component_type =
                     boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                         ArithmetizationParams>, 3, 2>;
+                                         ArithmetizationParams>, 2>;
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return logic_nor::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    return component_type::get_manifest();
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                }
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -313,13 +441,13 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_nor(ContainerType witness) : component_type(witness) {};
+                logic_nor(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 logic_nor(WitnessContainerType witness, ConstantContainerType constant,
                                PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 logic_nor(std::initializer_list<typename component_type::witness_container_type::value_type>
                                 witnesses,
@@ -327,7 +455,7 @@ namespace nil {
                                 constants,
                           std::initializer_list<typename component_type::public_input_container_type::value_type>
                                 public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
         }    // namespace components
     }        // namespace blueprint

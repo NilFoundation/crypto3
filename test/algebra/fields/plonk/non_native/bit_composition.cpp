@@ -65,7 +65,7 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-    using component_type = blueprint::components::bit_composition<ArithmetizationType, WitnessColumns>;
+    using component_type = blueprint::components::bit_composition<ArithmetizationType>;
 
     assert(bits.size() == BitsAmount);
 
@@ -84,16 +84,14 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
         instance_input.bits[i] = var(0, i, false, var::column_type::public_input);
     }
 
-    component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0},
-                                                           {0}, BitsAmount, CheckInput, Mode)
-                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0},
-                                                            BitsAmount, CheckInput, Mode);
-
-    if (!(WitnessesAmount == 15 || WitnessesAmount == 9)) {
-        BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
+    std::array<std::uint32_t, WitnessColumns> witnesses;
+    for (std::uint32_t i = 0; i < WitnessColumns; i++) {
+        witnesses[i] = i;
     }
 
+    component_type component_instance = component_type(witnesses, std::array<std::uint32_t, 1>{0},
+                                                       std::array<std::uint32_t, 1>{0},
+                                                       BitsAmount, CheckInput, Mode);
     // Sanity check.
     assert(BitsAmount + component_instance.padding_bits_amount() + component_instance.sum_bits_amount() ==
            WitnessColumns * component_instance.rows_amount);
@@ -108,10 +106,10 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
     if (!CustomAssignments) {
         if (expected_to_pass) {
             crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, bits, result_check, instance_input);
+                component_instance, bits, result_check, instance_input, BitsAmount, CheckInput);
         } else {
             crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, bits, result_check, instance_input);
+                component_instance, bits, result_check, instance_input, BitsAmount, CheckInput);
         }
     } else {
         auto custom_assignments = crypto3::generate_patched_assignments<BlueprintFieldType,
@@ -119,7 +117,7 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
         crypto3::test_component_to_fail_custom_assignments<
             component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
                 (component_instance, bits, result_check,
-                 custom_assignments, instance_input);
+                 custom_assignments, instance_input, BitsAmount, CheckInput);
     }
 }
 

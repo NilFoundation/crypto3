@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
-    using component_type = blueprint::components::sha256_process<ArithmetizationType, 9, 1>;
+    using component_type = blueprint::components::sha256_process<ArithmetizationType>;
 
     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(29);
     std::array<typename ArithmetizationType::field_type::value_type, 24> public_input = {
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     }
 
     for(std::size_t i = 16; i < 64; i ++){
-        typename BlueprintFieldType::integral_type s0 = ((message_schedule_array[i - 15] >> 7)|((message_schedule_array[i - 15] << (32 - 7)) 
+        typename BlueprintFieldType::integral_type s0 = ((message_schedule_array[i - 15] >> 7)|((message_schedule_array[i - 15] << (32 - 7))
         & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data))) ^
         ((message_schedule_array[i - 15] >> 18)|((message_schedule_array[i - 15] << (32 - 18))
         & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)))
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
         & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(32) - 1).data)))
          ^ (message_schedule_array[i - 2] >> 10);
         message_schedule_array[i] = (message_schedule_array[i - 16] + s0 + s1 + message_schedule_array[i - 7])%
-        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data); 
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data);
 
     }
     typename ArithmetizationType::field_type::integral_type a =
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
         std::vector<std::size_t> sizes = {32};
         std::size_t base = 7;
 
-        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> e_s = 
+        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> e_s =
         component_type::split_and_sparse(e_bits, sizes, base);
 
         std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> f_s =
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     std::array<typename BlueprintFieldType::integral_type, 8> result_state = {(a + typename ArithmetizationType::field_type::integral_type(public_input[0].data))%
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data),
     (b + typename ArithmetizationType::field_type::integral_type(public_input[1].data))%
-        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data), 
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data),
     (c + typename ArithmetizationType::field_type::integral_type(public_input[2].data))%
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data),
     (d + typename ArithmetizationType::field_type::integral_type(public_input[3].data))%
@@ -197,11 +197,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data),
     (h + typename ArithmetizationType::field_type::integral_type(public_input[7].data))%
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(32).data)};
-    auto result_check = [result_state](AssignmentType &assignment, 
+    auto result_check = [result_state](AssignmentType &assignment,
         component_type::result_type &real_res) {
             for (std::size_t i = 0; i < 8; i++) {
                 assert(result_state[i] == typename ArithmetizationType::field_type::integral_type(
-                    var_value(assignment, real_res.output_state[i]).data)); 
+                    var_value(assignment, real_res.output_state[i]).data));
             }
     };
     typename component_type::input_type instance_input = {input_state_var, input_words_var};

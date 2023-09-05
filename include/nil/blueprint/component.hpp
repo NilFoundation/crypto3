@@ -26,10 +26,13 @@
 #ifndef CRYPTO3_BLUEPRINT_COMPONENT_HPP
 #define CRYPTO3_BLUEPRINT_COMPONENT_HPP
 
+#include <string>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
-
 #include <nil/blueprint/detail/get_component_id.hpp>
+#include <nil/blueprint/manifest.hpp>
+#include <nil/blueprint/assert.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -42,16 +45,16 @@ namespace nil {
             template<typename ArithmetizationType>
             class component{};
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
-                std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
+            template<typename BlueprintFieldType, typename ArithmetizationParams,
+                     std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
             class plonk_component:
                 public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> {
             protected:
 
-                using witness_container_type = std::array<std::uint32_t, WitnessAmount>;
+                using witness_container_type = std::vector<std::uint32_t>;
                 using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
                 using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
-
+                using manifest_type = nil::blueprint::plonk_component_manifest;
             public:
 
                 witness_container_type _W;
@@ -67,7 +70,7 @@ namespace nil {
                  * @param[in] internal witness signed index. For -1, last witness assumed.
                  */
                 typename witness_container_type::value_type W(std::int32_t index) const {
-                    return _W[(WitnessAmount + index)%WitnessAmount];
+                    return _W[(_W.size() + index) % _W.size()];
                 }
 
                 /**
@@ -104,10 +107,13 @@ namespace nil {
                 template <typename WitnessContainerType, typename ConstantContainerType,
                     typename PublicInputContainerType>
                 plonk_component(WitnessContainerType witness, ConstantContainerType constant,
-                        PublicInputContainerType public_input) {
-                    std::copy_n(std::make_move_iterator(witness.begin()), WitnessAmount, _W.begin());
+                        PublicInputContainerType public_input, const manifest_type &manifest) {
+                    _W.resize(witness.size());
+                    std::copy_n(std::make_move_iterator(witness.begin()), witness.size(), _W.begin());
                     std::copy_n(std::make_move_iterator(constant.begin()), ConstantAmount, _C.begin());
                     std::copy_n(std::make_move_iterator(public_input.begin()), PublicInputAmount, _PI.begin());
+
+                    BLUEPRINT_RELEASE_ASSERT(manifest.check_manifest(*this));
                 }
 
                 std::size_t witness_amount() const {
@@ -160,7 +166,6 @@ namespace nil {
 
                 virtual detail::blueprint_component_id_type get_id() const { return std::string(""); };
             };
-
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil

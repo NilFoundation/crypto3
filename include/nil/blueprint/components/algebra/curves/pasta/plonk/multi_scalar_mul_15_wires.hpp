@@ -38,7 +38,7 @@
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/types.hpp>
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/unified_addition.hpp>
-#include <nil/blueprint/components/algebra/curves/pasta/plonk/variable_base_scalar_mul_15_wires.hpp>
+#include <nil/blueprint/components/algebra/curves/pasta/plonk/variable_base_scalar_mul.hpp>
 
 namespace nil {
     namespace crypto3 {

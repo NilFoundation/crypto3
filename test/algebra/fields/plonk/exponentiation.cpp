@@ -60,7 +60,7 @@ void test_exponentiation(std::vector<typename FieldType::value_type> public_inpu
     using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
-	using component_type = nil::blueprint::components::exponentiation<ArithmetizationType, BlueprintFieldType, exp_size, 15>;
+	using component_type = nil::blueprint::components::exponentiation<ArithmetizationType, BlueprintFieldType, exp_size>;
 
 	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 

@@ -73,7 +73,6 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
         ArithmetizationType,
         CurveType,
         Ed25519Type,
-        WitnessColumns,
         nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_Xa = {
@@ -127,9 +126,9 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
     };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {});
-
+    // 253 is the default bits_amount
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+        component_instance, public_input, result_check, instance_input, 253);
 }
 
 template <typename CurveType>
@@ -154,7 +153,6 @@ void test_mul_per_bit(){
         ArithmetizationType,
         CurveType,
         ed25519_type,
-        WitnessColumns,
         nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_Xa = {
@@ -239,7 +237,7 @@ void test_doubling(){
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::doubling<ArithmetizationType,
-        CurveType, ed25519_type, WitnessColumns,
+        CurveType, ed25519_type,
         nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_Xa = {
@@ -301,7 +299,7 @@ void test_complete_addition(){
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::complete_addition<ArithmetizationType,
-        CurveType, ed25519_type, WitnessColumns,
+        CurveType, ed25519_type,
         nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_Xa = {

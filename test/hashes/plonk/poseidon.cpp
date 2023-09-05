@@ -38,7 +38,7 @@
 
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
-#include <nil/blueprint/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+#include <nil/blueprint/components/hashes/poseidon/plonk/poseidon.hpp>
 
 #include <nil/crypto3/hash/poseidon.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
@@ -66,7 +66,7 @@ void test_poseidon(std::vector<typename BlueprintFieldType::value_type> public_i
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     using component_type =
-        blueprint::components::poseidon<ArithmetizationType, FieldType, 15>;
+        blueprint::components::poseidon<ArithmetizationType, FieldType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     constexpr std::size_t Lambda = 5;
@@ -80,14 +80,14 @@ void test_poseidon(std::vector<typename BlueprintFieldType::value_type> public_i
         std::cout << "input[" << i << "]   : " << public_input[i].data << "\n";
     }
     #endif
-    
-    auto result_check = [&expected_res](AssignmentType &assignment, 
+
+    auto result_check = [&expected_res](AssignmentType &assignment,
         typename component_type::result_type &real_res) {
 
         for (std::uint32_t i = 0; i < component_type::state_size; i++){
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "expected[" << i << "]: " << expected_res[i].data << "\n";
-            std::cout << "real[" << i << "]    : " << var_value(assignment, real_res.output_state[i]).data << "\n"; 
+            std::cout << "real[" << i << "]    : " << var_value(assignment, real_res.output_state[i]).data << "\n";
             #endif
             assert(expected_res[i] == var_value(assignment, real_res.output_state[i]));
         }
@@ -100,14 +100,18 @@ void test_poseidon(std::vector<typename BlueprintFieldType::value_type> public_i
 }
 
 template<typename FieldType>
-std::vector<typename FieldType::value_type> calculate_expected_poseidon(typename std::vector<typename FieldType::value_type> a) {
-    using poseidon_policy = crypto3::hashes::detail::base_poseidon_policy<FieldType, 2, 1, 7, 55, 0, true>;
-    using poseidon_functions_t = crypto3::hashes::detail::poseidon_functions<poseidon_policy>;
-    typename poseidon_functions_t::state_type poseidon_state({a[0], a[1], a[2]});
-    poseidon_functions_t::permute(poseidon_state);
+std::vector<typename FieldType::value_type> calculate_expected_poseidon(const typename std::vector<typename FieldType::value_type> &a) {
+    using poseidon_policy = nil::crypto3::hashes::detail::mina_poseidon_policy<FieldType>;
+    using permutation_type = nil::crypto3::hashes::detail::poseidon_permutation<poseidon_policy>;
+    using state_type = typename permutation_type::state_type;
 
-    std::vector<typename FieldType::value_type> expected = {poseidon_state[0], poseidon_state[1], poseidon_state[2]};
-    return expected;
+    state_type state;
+    std::copy(a.begin(), a.end(), state.begin());
+    permutation_type::permute(state);
+
+    std::vector<typename FieldType::value_type> result(3);
+    std::copy(state.begin(), state.end(), result.begin());
+    return result;
 }
 
 template<typename FieldType>

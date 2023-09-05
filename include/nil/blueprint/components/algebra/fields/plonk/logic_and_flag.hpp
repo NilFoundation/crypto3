@@ -30,6 +30,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/manifest.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -47,23 +48,62 @@ namespace nil {
              *  Let p = xy; Then there exists v such that vp=f.
              *  If p=0, then v=0, so f. Otherwise, v = p.inverse() and f = 1
              * */
-            template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+            template<typename ArithmetizationType>
             class logic_and_flag;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
-            class logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                                 WitnessesAmount>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0> {
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            class logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
 
                 using component_type =
-                    plonk_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount, 0, 0>;
+                    plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
                 using value_type = typename BlueprintFieldType::value_type;
 
+                constexpr static std::size_t rows_amount_internal(std::size_t witness_amount) {
+                    return witness_amount == 2 ? 3 : (witness_amount < 5 ? 2 : 1);
+                }
             public:
                 using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
 
-                const std::size_t gates_amount = 1;
-                const std::size_t rows_amount = WitnessesAmount == 2 ? 3 : (WitnessesAmount < 5 ? 2 : 1);
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::size_t witness_amount;
+                    static const std::size_t clamp_val = 5;
+
+                    gate_manifest_type(std::size_t witness_amount_)
+                        : witness_amount(std::min(witness_amount_, clamp_val)) {}
+
+                    std::uint32_t gates_amount() const override {
+                        return logic_and_flag::gates_amount;
+                    }
+
+                    bool operator<(const component_gate_manifest *other) const override {
+                        return witness_amount < dynamic_cast<const gate_manifest_type*>(other)->witness_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount));
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    static manifest_type manifest = manifest_type(
+                        std::shared_ptr<manifest_param>(new manifest_range_param(2, 6)),
+                        false
+                    );
+                    return manifest;
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return rows_amount_internal(witness_amount);
+                }
+
+                constexpr static const std::size_t gates_amount = 1;
+                const std::size_t rows_amount = rows_amount_internal(component_type::witness_amount());
 
                 struct input_type {
                     var x;
@@ -74,22 +114,23 @@ namespace nil {
                     var output;
 
                     result_type(const logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                                 ArithmetizationParams>,
-                                                     WitnessesAmount> &component,
+                                                                                                 ArithmetizationParams>
+                                                    > &component,
                                 std::uint32_t start_row_index) {
                         output =
-                            var(component.W(WitnessesAmount - 1), start_row_index + component.rows_amount - 1, false);
+                            var(component.W(component.witness_amount() - 1),
+                                            start_row_index + component.rows_amount - 1, false);
                     }
                 };
 
                 template<typename ContainerType>
-                logic_and_flag(ContainerType witness) : component_type(witness, {}, {}) {};
+                logic_and_flag(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 logic_and_flag(WitnessContainerType witness, ConstantContainerType constant,
                                PublicInputContainerType public_input) :
-                    component_type(witness, constant, public_input) {};
+                    component_type(witness, constant, public_input, get_manifest()) {};
 
                 logic_and_flag(std::initializer_list<typename component_type::witness_container_type::value_type>
                                    witnesses,
@@ -97,28 +138,26 @@ namespace nil {
                                    constants,
                                std::initializer_list<typename component_type::public_input_container_type::value_type>
                                    public_inputs) :
-                    component_type(witnesses, constants, public_inputs) {};
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
             using plonk_logic_and_flag_component =
-                logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                               WitnessesAmount>;
+                logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
-            typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                    WitnessesAmount>::result_type
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::result_type
                 generate_assignments(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>
+                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>
                         &component,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                         &assignment,
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                                  WitnessesAmount>::input_type &instance_input,
+                    const typename plonk_logic_and_flag_component<BlueprintFieldType,
+                                                                  ArithmetizationParams>::input_type &instance_input,
                     const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
-                std::size_t witness_amount = WitnessesAmount;
+                std::size_t witness_amount = component.witness_amount();
 
                 std::array<typename BlueprintFieldType::value_type, 5> t;
                 t[0] = var_value(assignment, instance_input.x);
@@ -140,26 +179,25 @@ namespace nil {
                 assignment.witness(component.W(witness_amount - 1), row + component.rows_amount - 1) = t[4];
 
                 return
-                    typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                            WitnessesAmount>::result_type(component, start_row_index);
+                    typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::result_type
+                        (component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
             void generate_gates(
-                const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>
+                const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
-                const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                              WitnessesAmount>::input_type &instance_input,
+                const typename plonk_logic_and_flag_component<BlueprintFieldType,
+                                                              ArithmetizationParams>::input_type &instance_input,
                 const std::uint32_t first_selector_index) {
 
-                using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                                    WitnessesAmount>::var;
+                using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::var;
 
                 std::size_t offset = component.rows_amount == 3 ? -1 : 0;
-                std::size_t witness_amount = WitnessesAmount;
+                std::size_t witness_amount = component.witness_amount();
 
                 std::array<std::pair<std::size_t, std::size_t>, 4> wl;
 
@@ -187,36 +225,34 @@ namespace nil {
                 bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
             void generate_copy_constraints(
-                const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>
+                const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
-                const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                              WitnessesAmount>::input_type &instance_input,
+                const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::input_type
+                    &instance_input,
                 const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
-                using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                                    WitnessesAmount>::var;
+                using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::var;
 
                 bp.add_copy_constraint({var(component.W(0), row, false), instance_input.x});
                 bp.add_copy_constraint({var(component.W(1), row, false), instance_input.y});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessesAmount>
-            typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                    WitnessesAmount>::result_type
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::result_type
                 generate_circuit(
-                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams, WitnessesAmount>
+                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>
                         &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                         &assignment,
-                    const typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                                  WitnessesAmount>::input_type &instance_input,
+                    const typename plonk_logic_and_flag_component<BlueprintFieldType,
+                                                                  ArithmetizationParams>::input_type &instance_input,
                     const std::uint32_t start_row_index) {
 
                 auto selector_iterator = assignment.find_selector(component);
@@ -235,8 +271,8 @@ namespace nil {
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
                 return
-                    typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams,
-                                                            WitnessesAmount>::result_type(component, start_row_index);
+                    typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::result_type
+                        (component, start_row_index);
             }
         }    // namespace components
     }        // namespace blueprint

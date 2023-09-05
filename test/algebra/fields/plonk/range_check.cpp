@@ -44,7 +44,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
-#include "test_plonk_component.hpp"
+#include "../../../test_plonk_component.hpp"
 
 template<typename BlueprintFieldType>
 std::size_t clz(typename BlueprintFieldType::value_type value) {
@@ -76,7 +76,7 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using component_type = nil::blueprint::components::range_check<ArithmetizationType, WitnessesAmount>;
+    using component_type = nil::blueprint::components::range_check<ArithmetizationType>;
 	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
 
@@ -93,23 +93,22 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
     auto result_check = [](AssignmentType &assignment, typename component_type::result_type &real_res) {};
     const bool expected_to_pass = input < value_type(2).pow(R);
 
-    component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0},
-                                                           {0}, R)
-                                          : component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0}, R);
-
-    if (!(WitnessesAmount == 15 || WitnessesAmount == 9)) {
-        BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
+    std::array<std::uint32_t, WitnessesAmount> witnesses;
+    for (std::uint32_t i = 0; i < WitnessesAmount; i++) {
+        witnesses[i] = i;
     }
+
+    component_type component_instance = component_type(witnesses, std::array<std::uint32_t, 1>({0}),
+                                                       std::array<std::uint32_t, 1>({0}), R);
 
     if (!CustomAssignments) {
         if (expected_to_pass) {
             nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+                component_instance, public_input, result_check, instance_input, R);
         } else {
             nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
                                                  hash_type, Lambda>(
-                                                    boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+                                                    component_instance, public_input, result_check, instance_input, R);
         }
     } else {
         auto custom_assignment = nil::crypto3::generate_patched_assignments<
@@ -118,13 +117,13 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
         if (expected_to_pass) {
             nil::crypto3::test_component_custom_assignments<component_type, BlueprintFieldType, ArithmetizationParams,
                     hash_type, Lambda>(
-                        boost::get<component_type>(component_instance), public_input,
-                        result_check, custom_assignment, instance_input);
+                        component_instance, public_input,
+                        result_check, custom_assignment, instance_input, R);
         } else {
             nil::crypto3::test_component_to_fail_custom_assignments<component_type, BlueprintFieldType,
                     ArithmetizationParams, hash_type, Lambda>(
-                            boost::get<component_type>(component_instance), public_input, result_check,
-                            custom_assignment, instance_input);
+                            component_instance, public_input, result_check,
+                            custom_assignment, instance_input, R);
         }
     }
 }

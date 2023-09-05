@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
-    using component_type = blueprint::components::sha512_process<ArithmetizationType, 9, 1>;
+    using component_type = blueprint::components::sha512_process<ArithmetizationType>;
 
     typename BlueprintFieldType::value_type s = typename BlueprintFieldType::value_type(2).pow(59);
     std::array<typename ArithmetizationType::field_type::value_type, 24> public_input = {0x6a09e667f3bcc908_cppui64,
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
         message_schedule_array[i] = typename BlueprintFieldType::integral_type(public_input[8 + i].data);
     }
     for(std::size_t i = 16; i < 80; i ++){
-        typename BlueprintFieldType::integral_type s0 = ((message_schedule_array[i - 15] >> 1)|((message_schedule_array[i - 15] << (64 - 1)) 
+        typename BlueprintFieldType::integral_type s0 = ((message_schedule_array[i - 15] >> 1)|((message_schedule_array[i - 15] << (64 - 1))
         & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data))) ^
         ((message_schedule_array[i - 15] >> 8)|((message_schedule_array[i - 15] << (64 - 8))
         & typename BlueprintFieldType::integral_type((typename BlueprintFieldType::value_type(2).pow(64) - 1).data)))
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
     std::array<typename BlueprintFieldType::integral_type, 8> result_state = {(a + typename ArithmetizationType::field_type::integral_type(public_input[0].data))%
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (b + typename ArithmetizationType::field_type::integral_type(public_input[1].data))%
-        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data), 
+        typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (c + typename ArithmetizationType::field_type::integral_type(public_input[2].data))%
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (d + typename ArithmetizationType::field_type::integral_type(public_input[3].data))%
@@ -203,10 +203,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha512_process) {
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data),
     (h + typename ArithmetizationType::field_type::integral_type(public_input[7].data))%
         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data)};
-    auto result_check = [result_state](AssignmentType &assignment, 
+    auto result_check = [result_state](AssignmentType &assignment,
         component_type::result_type &real_res) {
             for (std::size_t i = 0; i < 8; i++) {
-                assert(result_state[i] == typename ArithmetizationType::field_type::integral_type(var_value(assignment, real_res.output_state[i]).data)); 
+                assert(result_state[i] == typename ArithmetizationType::field_type::integral_type(var_value(assignment, real_res.output_state[i]).data));
             }
     };
     typename component_type::input_type instance_input = {input_state_var, input_words_var};

@@ -44,7 +44,7 @@
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/division_remainder.hpp>
 
-#include "test_plonk_component.hpp"
+#include "../../../../test_plonk_component.hpp"
 
 template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R,
          bool CheckInputs, bool CustomAssignments = false >
@@ -66,7 +66,7 @@ auto test_division_remainder(typename BlueprintFieldType::value_type x,
     using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using value_type = typename BlueprintFieldType::value_type;
     using integral_type = typename BlueprintFieldType::integral_type;
-    using component_type = nil::blueprint::components::division_remainder<ArithmetizationType, WitnessesAmount>;
+    using component_type = nil::blueprint::components::division_remainder<ArithmetizationType>;
 
     var x_var(0, 0, false, var::column_type::public_input),
         y_var(0, 1, false, var::column_type::public_input);
@@ -89,25 +89,23 @@ auto test_division_remainder(typename BlueprintFieldType::value_type x,
         assert(expected_result_remainder == var_value(assignment, real_res.remainder));
     };
 
-    component_type component_instance = WitnessesAmount == 15 ?
-                                            component_type({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0},
-                                                           {0}, R, CheckInputs)
-                                      : WitnessesAmount == 9 ? component_type({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {0},
-                                                                              R, CheckInputs)
-                                                             : component_type({0, 1, 2}, {0}, {0}, R, CheckInputs);
-
-    if (!(WitnessesAmount == 15 || WitnessesAmount == 9 || WitnessesAmount == 3)) {
-        BOOST_ASSERT_MSG(false, "Please add support for WitnessesAmount that you passed here!") ;
+    std::array<std::uint32_t, WitnessesAmount> witnesses;
+    for (std::uint32_t i = 0; i < WitnessesAmount; i++) {
+        witnesses[i] = i;
     }
+
+    component_type component_instance =
+        component_type(witnesses, std::array<std::uint32_t, 1>{0}, std::array<std::uint32_t, 1>{0}, R, CheckInputs);
 
     if (!CustomAssignments) {
         if (expected_to_pass) {
             nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+                component_instance, public_input, result_check, instance_input, R, CheckInputs);
         } else {
             nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
                                                  hash_type, Lambda>(
-                                                    boost::get<component_type>(component_instance), public_input, result_check, instance_input);
+                                                    component_instance, public_input, result_check, instance_input,
+                                                    R, CheckInputs);
         }
     } else {
         auto custom_assignment = nil::crypto3::generate_patched_assignments<
@@ -115,8 +113,8 @@ auto test_division_remainder(typename BlueprintFieldType::value_type x,
 
         nil::crypto3::test_component_to_fail_custom_assignments<component_type, BlueprintFieldType,
                 ArithmetizationParams, hash_type, Lambda>(
-                        boost::get<component_type>(component_instance), public_input, result_check,
-                        custom_assignment, instance_input);
+                        component_instance, public_input, result_check,
+                        custom_assignment, instance_input, R, CheckInputs);
     }
 }
 

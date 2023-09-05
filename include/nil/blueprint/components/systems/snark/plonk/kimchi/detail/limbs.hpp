@@ -39,6 +39,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
+#include <nil/blueprint/manifest.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/range_check.hpp>
 
@@ -52,21 +53,47 @@ namespace nil {
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/oracle/src/sponge.rs#L87
                 // Input: x1 = [a_0, ..., a_63], x2 = [b_0, ..., b_63]
                 // Output: y = [a_0, ...., a_63, b_0, ..., b_63]
-                template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+                template<typename ArithmetizationType>
                 class from_limbs;
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                class from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>:
-                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 3, 0, 0> {
+                class from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>:
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
 
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 3, 0, 0>;
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
 
                 public:
-
                     using var = typename component_type::var;
+                    using manifest_type = plonk_component_manifest;
 
-                    constexpr static const std::size_t rows_amount = 1;
-                    constexpr static const std::size_t gates_amount = 1;
+                    class gate_manifest_type : public component_gate_manifest {
+                    public:
+                        std::uint32_t gates_amount() const override {
+                            return from_limbs::gates_amount;
+                        }
+                    };
+
+                    static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                           std::size_t lookup_column_amount) {
+                        static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                        return manifest;
+                    }
+
+                    static manifest_type get_manifest() {
+                        static manifest_type manifest = manifest_type(
+                            std::shared_ptr<manifest_param>(new manifest_single_value_param(3)),
+                            false
+                        );
+                        return manifest;
+                    }
+
+                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                                 std::size_t lookup_column_amount) {
+                        return 1;
+                    }
+
+                    const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                    static constexpr const std::size_t gates_amount = 1;
 
                     struct input_type {
                         var first_limb = var(0, 0, false);
@@ -87,22 +114,22 @@ namespace nil {
 
                     template <typename ContainerType>
                         from_limbs(ContainerType witness):
-                            component_type(witness, {}, {}){};
+                            component_type(witness, {}, {}, get_manifest()){};
 
                     template <typename WitnessContainerType, typename ConstantContainerType, typename PublicInputContainerType>
                         from_limbs(WitnessContainerType witness, ConstantContainerType constant, PublicInputContainerType public_input):
-                            component_type(witness, constant, public_input){};
+                            component_type(witness, constant, public_input, get_manifest()){};
 
                     from_limbs(
                         std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
                         std::initializer_list<typename component_type::constant_container_type::value_type> constants,
                         std::initializer_list<typename component_type::public_input_container_type::value_type> public_inputs):
-                            component_type(witnesses, constants, public_inputs){};
+                            component_type(witnesses, constants, public_inputs, get_manifest()){};
 
                 };
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                    using plonk_from_limbs = from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 3>;
+                    using plonk_from_limbs = from_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
                     typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::result_type
@@ -135,7 +162,7 @@ namespace nil {
                         generate_assignments(
                         const plonk_from_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                        const typename plonk_from_limbs<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
                         const std::uint32_t start_row_index) {
 
                         std::size_t row = start_row_index;
@@ -189,27 +216,59 @@ namespace nil {
                 // Input: x = [a_0, ...., a255]
                 // Output: y0 = [a_0, ..., a_63], y1 = [a_64, ..., a_127], y2 = [a_128, ..., a_191], y3 = [a_192, ...,
                 // a_255]
-                template<typename ArithmetizationType, std::uint32_t WitnessesAmount>
+                template<typename ArithmetizationType>
                 class to_limbs;
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                class to_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15>:
-                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0> {
+                class to_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>:
+                    public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 15, 1, 0>;
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
                     constexpr static const std::size_t chunk_size = 64;
                     using range_check_component = nil::blueprint::components::range_check<
-                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                        15>;
+                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
 
                 public:
                     using var = typename component_type::var;
+                    using manifest_type = plonk_component_manifest;
+
+                    class gate_manifest_type : public component_gate_manifest {
+                    public:
+                        std::uint32_t gates_amount() const override {
+                            return to_limbs::gates_amount;
+                        }
+                    };
+
+                    static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                           std::size_t lookup_column_amount) {
+                        static gate_manifest manifest =
+                            gate_manifest(gate_manifest_type())
+                            .merge_with(range_check_component::get_gate_manifest(witness_amount,
+                                                                                 lookup_column_amount,
+                                                                                 chunk_size));
+                        return manifest;
+                    }
+
+                    static manifest_type get_manifest() {
+                        static manifest_type manifest = manifest_type(
+                            std::shared_ptr<manifest_param>(new manifest_single_value_param(15)),
+                            false
+                        ).merge_with(range_check_component::get_manifest());
+                        return manifest;
+                    }
+
+                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                                 std::size_t lookup_column_amount) {
+                        return 1 + 2 * chunk_amount *
+                                   range_check_component::get_rows_amount(witness_amount, lookup_column_amount,
+                                                                          chunk_size);
+                    }
 
                     constexpr static const std::size_t chunk_size_public = chunk_size;
                     constexpr static const std::size_t chunk_amount = 4;
-                    constexpr static const std::size_t rows_amount =
-                        1 + 2 * chunk_amount * range_check_component::rows_amount;
+                    const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+
                     constexpr static const std::size_t gates_amount = 1;
 
                     struct input_type {
@@ -232,21 +291,21 @@ namespace nil {
 
                     template <typename ContainerType>
                         to_limbs(ContainerType witness):
-                            component_type(witness, {}, {}){};
+                            component_type(witness, {}, {}, get_manifest()){};
 
                     template <typename WitnessContainerType, typename ConstantContainerType, typename PublicInputContainerType>
                         to_limbs(WitnessContainerType witness, ConstantContainerType constant, PublicInputContainerType public_input):
-                            component_type(witness, constant, public_input){};
+                            component_type(witness, constant, public_input, get_manifest()){};
 
                     to_limbs(
                         std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
                         std::initializer_list<typename component_type::constant_container_type::value_type> constants,
                         std::initializer_list<typename component_type::public_input_container_type::value_type> public_inputs):
-                            component_type(witnesses, constants, public_inputs){};
+                            component_type(witnesses, constants, public_inputs, get_manifest()){};
                 };
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                    using plonk_to_limbs = to_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, 15>;
+                    using plonk_to_limbs = to_limbs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
                     typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::result_type
@@ -261,7 +320,7 @@ namespace nil {
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                         using component_type = plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>;
-                        range_check<ArithmetizationType, 15> range_check_instance(
+                        range_check<ArithmetizationType> range_check_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
                                         component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{},component_type::chunk_size_public);
@@ -309,7 +368,7 @@ namespace nil {
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
                     typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::result_type
-                        generate_assignments(
+                    generate_assignments(
                         const plonk_to_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
                         const typename plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
@@ -319,7 +378,7 @@ namespace nil {
 
                         using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                         using component_type = plonk_to_limbs<BlueprintFieldType, ArithmetizationParams>;
-                        range_check<ArithmetizationType, 15> range_check_instance(
+                        range_check<ArithmetizationType> range_check_instance(
                                 {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                                     component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
                                         component.W(10), component.W(11), component.W(12), component.W(13), component.W(14)},{component.C(0)},{},component_type::chunk_size_public);
@@ -394,7 +453,7 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                        void generate_gates(
+                    void generate_gates(
                         const plonk_to_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
@@ -437,7 +496,7 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams>
-                        void generate_copy_constraints(
+                    void generate_copy_constraints(
                         const plonk_to_limbs<BlueprintFieldType, ArithmetizationParams> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,

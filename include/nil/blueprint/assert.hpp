@@ -42,9 +42,12 @@ namespace nil {
     }    // namespace blueprint
 }    // namespace nil
 
+#define BLUEPRINT_RELEASE_ASSERT( expr ) \
+    ( (expr) ? (void)0 : nil::blueprint::detail::blueprint_assert( __LINE__, __FILE__, #expr))
+
 #ifdef BLUEPRINT_DEBUG_ENABLED
 #define BLUEPRINT_ASSERT( expr ) \
-    ( (expr) ? (void)0 : nil::blueprint::detail::blueprint_assert( __LINE__, __FILE__, #expr))
+    BLUEPRINT_RELEASE_ASSERT( expr )
 #else
 #define BLUEPRINT_ASSERT( expr ) ((void)0)
 #endif

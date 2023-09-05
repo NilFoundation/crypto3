@@ -38,7 +38,7 @@
 #include <nil/crypto3/zk/algorithms/allocate.hpp>
 #include <nil/crypto3/zk/algorithms/generate_circuit.hpp>
 
-#include <nil/blueprint/components/hashes/poseidon/plonk/poseidon_15_wires.hpp>
+#include <nil/blueprint/components/hashes/poseidon/plonk/poseidon.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/field_operations.hpp>
 
 namespace nil {

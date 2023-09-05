@@ -70,7 +70,6 @@ void test_field_mul(std::vector<typename BlueprintFieldType::value_type> public_
     using component_type =
         blueprint::components::multiplication<ArithmetizationType,
                                               NonNativeFieldType,
-                                              9,
                                               blueprint::basic_non_native_policy<BlueprintFieldType>>;
 
     std::array<var, 4> input_var_a = {

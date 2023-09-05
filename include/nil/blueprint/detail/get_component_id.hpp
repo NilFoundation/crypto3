@@ -40,7 +40,7 @@ namespace nil {
             blueprint_component_id_type get_component_id(const ComponentType& component) {
                 std::stringstream id;
 
-                id << typeid(component).name() << component.get_id();
+                id << typeid(component).name() << "_" << component.witness_amount() << "_" << component.get_id();
                 return id.str();
             }
         }    // namespace detail

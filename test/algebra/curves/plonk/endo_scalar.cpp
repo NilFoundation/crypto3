@@ -45,7 +45,7 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/endo_scalar.hpp>
 
-#include "test_plonk_component.hpp"
+#include "../../../test_plonk_component.hpp"
 
 template<typename CurveType>
 struct endo_scalar_params;
@@ -95,7 +95,7 @@ typename CurveType::scalar_field_type::value_type calculate_endo_scalar(typename
             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_scalar, status);
         assert(status == nil::marshalling::status_type::success);
         std::copy(bits_msb_all.end() - ScalarSize, bits_msb_all.end(), bits_msb.begin());
-                            
+
         for(std::size_t i = 0; i < 255 - ScalarSize; ++i) {
             assert(bits_msb_all[i] == false);
         }
@@ -148,14 +148,14 @@ void test_endo_scalar(std::vector<typename CurveType::scalar_field_type::value_t
     constexpr std::size_t Lambda = 40;
 	constexpr static const std::size_t num_bits = 128;
 
-    using component_type = nil::blueprint::components::endo_scalar<ArithmetizationType, CurveType, num_bits, 15>;
+    using component_type = nil::blueprint::components::endo_scalar<ArithmetizationType, CurveType>;
 
 	using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     var challenge_var(0, 0, false, var::column_type::public_input);
     typename component_type::input_type instance_input = {challenge_var};
 
-    auto result_check = [&expected_res, public_input](AssignmentType &assignment, 
+    auto result_check = [&expected_res, public_input](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
             std::cout << "endo_scalar input: " << std::hex << public_input[0].data << "\n";
@@ -166,7 +166,7 @@ void test_endo_scalar(std::vector<typename CurveType::scalar_field_type::value_t
             assert(expected_res == var_value(assignment, real_res.output));
     };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{},{});
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{},{},num_bits);
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
 }
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_endo_scalar_vesta) {
 	test_endo_scalar<curve_type>({challenge}, result);
 	test_endo_scalar<curve_type>({1}, calculate_endo_scalar<curve_type, 128>(1));
 	test_endo_scalar<curve_type>({0}, calculate_endo_scalar<curve_type, 128>(0));
-	test_endo_scalar<curve_type>({0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255}, 
+	test_endo_scalar<curve_type>({0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255},
         calculate_endo_scalar<curve_type, 128>(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255));
 
     nil::crypto3::random::algebraic_engine<curve_type::scalar_field_type> generate_random;
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_endo_scalar_pallas) {
 	test_endo_scalar<curve_type>({challenge}, calculate_endo_scalar<curve_type, 128>(challenge));
 	test_endo_scalar<curve_type>({1}, calculate_endo_scalar<curve_type, 128>(1));
 	test_endo_scalar<curve_type>({0}, calculate_endo_scalar<curve_type, 128>(0));
-	test_endo_scalar<curve_type>({0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255}, 
+	test_endo_scalar<curve_type>({0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255},
         calculate_endo_scalar<curve_type, 128>(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui255));
 
     nil::crypto3::random::algebraic_engine<curve_type::scalar_field_type> generate_random;
