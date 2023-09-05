@@ -68,7 +68,7 @@ namespace nil {
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
                     template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                            std::size_t Lambda, std::size_t M, bool UseGrinding, typename GrindingType = proof_of_work<TranscriptHashType>>
+                            std::size_t Lambda, std::size_t M, bool UseGrinding = false, typename GrindingType = proof_of_work<TranscriptHashType>>
                     struct basic_batched_fri {
                         BOOST_STATIC_ASSERT_MSG(M == 2, "unsupported m value!");
 
@@ -777,7 +777,7 @@ namespace nil {
                         }
                     }
 
-                    if(!FRI::grinding_type::verify(transcript, proof.proof_of_work)){
+                    if(FRI::use_grinding && !FRI::grinding_type::verify(transcript, proof.proof_of_work)){
                         return false;
                     }
                     for (std::size_t query_id = 0; query_id < FRI::lambda; query_id++) {
