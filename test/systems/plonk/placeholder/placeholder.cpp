@@ -182,10 +182,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_test_suite)
     constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
 
     struct placeholder_test_params {
-//        using merkle_hash_type = hashes::keccak_1600<512>;
-//        using transcript_hash_type = hashes::keccak_1600<512>;
-        using merkle_hash_type = hashes::sha2<256>;
-        using transcript_hash_type = hashes::sha2<256>;
+        using merkle_hash_type = hashes::keccak_1600<512>;
+        using transcript_hash_type = hashes::keccak_1600<512>;
 
         constexpr static const std::size_t witness_columns = 3;
         constexpr static const std::size_t public_input_columns = 1;
@@ -235,8 +233,7 @@ BOOST_AUTO_TEST_CASE(basic_test){
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                   circuit.lookup_gates);
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -650,7 +647,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3_test_suite)
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
-
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_3_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_3_params>;
 
