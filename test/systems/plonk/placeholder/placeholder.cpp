@@ -640,7 +640,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3_test_suite)
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
         placeholder_test_params::r,
-        placeholder_test_params::m
+        placeholder_test_params::m,
+        true
     >;
 
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;

@@ -244,7 +244,7 @@ namespace nil {
                 };
 
                 template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda,
-                        std::size_t R, std::size_t M>
+                        std::size_t R, std::size_t M, bool UseGrinding = false, typename GrindingType = proof_of_work<TranscriptHashType>>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
@@ -252,6 +252,8 @@ namespace nil {
                     constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t r = R;
                     constexpr static const std::size_t m = M;
+                    constexpr static const bool use_grinding = UseGrinding;
+                    typedef GrindingType grinding_type;
                 };
                 /**
                  * @brief Based on the FRI Commitment description from \[RedShift].
@@ -271,18 +273,22 @@ namespace nil {
 
                 template<typename FieldType, typename LPCParams>
                 struct batched_list_polynomial_commitment : public detail::basic_batched_fri<
-                        FieldType,
-                        typename LPCParams::merkle_hash_type,
-                        typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda,
-                        LPCParams::m
+                    FieldType,
+                    typename LPCParams::merkle_hash_type,
+                    typename LPCParams::transcript_hash_type,
+                    LPCParams::lambda,
+                    LPCParams::m,
+                    LPCParams::use_grinding,
+                    typename LPCParams::grinding_type
                 > {
                     using fri_type = typename detail::basic_batched_fri<
                         FieldType, 
                         typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
                         LPCParams::lambda, 
-                        LPCParams::m
+                        LPCParams::m,
+                        LPCParams::use_grinding,
+                        typename LPCParams::grinding_type
                     >;
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
@@ -297,7 +303,8 @@ namespace nil {
 
                     using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
                             typename LPCParams::transcript_hash_type,
-                            LPCParams::lambda, LPCParams::m>;
+                            LPCParams::lambda, LPCParams::m,
+                            LPCParams::use_grinding, typename LPCParams::grinding_type>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
@@ -327,13 +334,15 @@ namespace nil {
                 using batched_lpc = batched_list_polynomial_commitment<
                         FieldType, commitments::list_polynomial_commitment_params<
                                 typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                LPCParams::lambda, LPCParams::r, LPCParams::m
+                                LPCParams::lambda, LPCParams::r, LPCParams::m,
+                                LPCParams::use_grinding, typename LPCParams::grinding_type
                         >>;
                 template<typename FieldType, typename LPCParams>
                 using lpc = batched_list_polynomial_commitment<
                         FieldType, list_polynomial_commitment_params<
                                 typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                LPCParams::lambda, LPCParams::r, LPCParams::m
+                                LPCParams::lambda, LPCParams::r, LPCParams::m,
+                                LPCParams::use_grinding, typename LPCParams::grinding_type
                         >>;
 
                 template<typename FieldType, typename LPCParams>
