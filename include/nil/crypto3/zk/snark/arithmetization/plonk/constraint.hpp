@@ -105,17 +105,16 @@ namespace nil {
 
                     template<typename ArithmetizationParams>
                     math::polynomial<typename VariableType::assignment_type>
-                        evaluate(const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments,
-                                 std::shared_ptr<math::evaluation_domain<FieldType>>
-                                     domain) const {
-                        using polynomial_type = math::polynomial<typename VariableType::assignment_type>;
-                        using polynomial_variable_type = plonk_variable<polynomial_type>;
-
-                        math::expression_variable_type_converter<VariableType, polynomial_variable_type> converter;
-                        
-                        math::expression_evaluator<polynomial_variable_type> evaluator(
-                            converter.convert(*this),
-                            [&domain, &assignments](const VariableType &var) {
+                       evaluate(const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments,
+                                std::shared_ptr<math::evaluation_domain<FieldType>>
+                                    domain) const {
+                       using polynomial_type = math::polynomial<typename VariableType::assignment_type>;
+                       using polynomial_variable_type = plonk_variable<polynomial_type>;
+                       math::expression_variable_type_converter<VariableType, polynomial_variable_type> converter;
+                       
+                       math::expression_evaluator<polynomial_variable_type> evaluator(
+                           converter.convert(*this),                          
+                           [&domain, &assignments](const VariableType &var) {
                                 polynomial_type assignment;
                                 switch (var.type) {
                                     case VariableType::column_type::witness:

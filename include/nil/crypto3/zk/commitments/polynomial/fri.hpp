@@ -136,9 +136,9 @@ namespace nil {
                         FRI>::value,
                         bool>::type = true>
                 static bool verify_eval(
-                    typename FRI::basic_fri::proof_type &proof,
-                    typename FRI::basic_fri::commitment_type &t_root,
-                    typename FRI::basic_fri::params_type &fri_params,
+                    const typename FRI::basic_fri::proof_type &proof,
+                    const typename FRI::basic_fri::commitment_type &t_root,
+                    const typename FRI::basic_fri::params_type &fri_params,
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()
                 ) {
                     std::map<std::size_t, typename FRI::basic_fri::commitment_type> t_roots; t_roots[0] = {t_root};

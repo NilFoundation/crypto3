@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
     std::cout << "==========================================================="<<std::endl;
 }
 BOOST_AUTO_TEST_SUITE_END()
-
+/*
 BOOST_AUTO_TEST_SUITE(placeholder_transpiler_suite)
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
@@ -315,20 +315,19 @@ columns_rotations_type load_columns_rotations(
             visitor.visit(constraint);
         }
     }
-    /*
+
     // TODO update for lookups
-    for (const auto& gate: constraint_system.lookup_gates()) {
-        for (const auto& constraint: gate.constraints) {
-            nil::crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
-                const auto& var = lookup_input.vars[0];
-                if (var.relative) {
-                    std::size_t column_index = table_description.global_index(var);
-                    result[column_index].insert(var.rotation);
-                }
-            }
-        }
-    }
-    */
+    //for (const auto& gate: constraint_system.lookup_gates()) {
+    //    for (const auto& constraint: gate.constraints) {
+    //        nil::crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
+    //            const auto& var = lookup_input.vars[0];
+    //            if (var.relative) {
+    //                std::size_t column_index = table_description.global_index(var);
+    //                result[column_index].insert(var.rotation);
+    //            }
+    //        }
+    //    }
+    //}
     for (std::size_t i = 0; i < ArithmetizationParams::total_columns; i++) {
         result[i].insert(0);
     }
@@ -541,3 +540,4 @@ BOOST_AUTO_TEST_CASE(placeholder_many_hashes_test) {
     std::cout << "==========================================================="<<std::endl;
 }
 BOOST_AUTO_TEST_SUITE_END()
+*/

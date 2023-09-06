@@ -58,14 +58,15 @@ namespace nil {
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
-                    constexpr static const std::size_t lookup_parts = 5;
-                    constexpr static const std::size_t f_parts = 9;
+                    constexpr static const std::size_t lookup_parts = 6;
+                    constexpr static const std::size_t f_parts = 10;
 
                 public:
                     static void generate_evaluation_points(
                         commitment_scheme_type &_commitment_scheme,
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
-                        typename FieldType::value_type challenge
+                        typename FieldType::value_type challenge,
+                        bool _is_lookup_enabled
                     ) {
                         PROFILE_PLACEHOLDER_SCOPE("evaluation_points_generated_time");
 
@@ -88,8 +89,13 @@ namespace nil {
                             }
                         }
 
-                        _commitment_scheme.append_eval_point(PERMUTATION_BATCH, 0, challenge);
-                        _commitment_scheme.append_eval_point(PERMUTATION_BATCH, 0, challenge * _omega);
+                        _commitment_scheme.append_eval_point(PERMUTATION_BATCH, challenge);
+                        _commitment_scheme.append_eval_point(PERMUTATION_BATCH, challenge * _omega);
+
+                        if(_is_lookup_enabled){
+                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge);
+                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge * _omega);
+                        }
 
                         _commitment_scheme.append_eval_point(QUOTIENT_BATCH, challenge);
 
@@ -192,7 +198,8 @@ namespace nil {
                                 preprocessed_public_data, proof.eval_proof.challenge, f,
                                 proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 0, 0), 
                                 proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 0, 1),
-                                proof.v_perm_commitment, transcript);
+                                transcript
+                            );
 
                         typename policy_type::evaluation_map columns_at_y;
                         for (std::size_t i = 0; i < witness_columns; i++) {
@@ -249,35 +256,31 @@ namespace nil {
                         }
 
                         // 6. lookup argument
-                        bool use_lookup = constraint_system.lookup_gates().size() > 0;
+                        bool is_lookup_enabled = (constraint_system.lookup_gates().size() > 0);
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument;
-                        if (use_lookup) {
-                            for (std::size_t i = 0; i < lookup_parts; i++) {
-                                lookup_argument[i] = 0;
-                            }
-                            // lookup_argument = placeholder_lookup_argument<
-                            //     FieldType, permutation_commitment_scheme_type,
-                            //     ParamsType>::verify_eval(preprocessed_public_data, constraint_system.lookup_gates(),
-                            //                              proof.eval_proof.challenge, columns_at_y,
-                            //                              proof.eval_proof.lookups[1].z[0][0],
-                            //                              proof.eval_proof.lookups[1].z[0][1],
-                            //                              proof.eval_proof.lookups[2].z[0][0],
-                            //                              proof.eval_proof.lookups[0].z[0][0],
-                            //                              proof.eval_proof.lookups[0].z[0][1],
-                            //                              proof.input_perm_commitment, proof.value_perm_commitment,
-                            //                              proof.v_l_perm_commitment, transcript);
-                        } else {
-                            for (std::size_t i = 0; i < lookup_parts; i++) {
-                                lookup_argument[i] = 0;
-                            }
+                        if( is_lookup_enabled ){
+                            lookup_argument = placeholder_lookup_argument<
+                                FieldType, commitment_scheme_type,
+                                ParamsType
+                            >::verify_eval(
+                                preprocessed_public_data, 
+                                constraint_system.lookup_gates(),
+                                constraint_system.lookup_table(),
+                                proof.eval_proof.challenge, columns_at_y,
+                                proof.eval_proof.eval_proof.z.get(LOOKUP_BATCH),
+                                proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 1),
+                                proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 2),
+                                proof.lookup_commitment, transcript
+                            );
                         }
+                        transcript(proof.v_perm_commitment);
 
                         // 7. gate argument
                         std::array<typename FieldType::value_type, 1> gate_argument =
                             placeholder_gates_argument<FieldType, ParamsType>::verify_eval(
                                 constraint_system.gates(), columns_at_y, proof.eval_proof.challenge, transcript);
                         
-                        // 8. alphas computations
+                        // 8. alphas comfputations
                         std::array<typename FieldType::value_type, f_parts> alphas =
                             transcript.template challenges<FieldType, f_parts>();
 
@@ -289,23 +292,27 @@ namespace nil {
                             return false;
                         }
 
+
                         commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));                        
                         commitment_scheme.set_batch_size(PERMUTATION_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));                        
                         commitment_scheme.set_batch_size(QUOTIENT_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));                        
-                        generate_evaluation_points(commitment_scheme, preprocessed_public_data, challenge);
+                        if(is_lookup_enabled)
+                            commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));                        
+                        generate_evaluation_points(commitment_scheme, preprocessed_public_data, challenge, is_lookup_enabled);
 
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
                         std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments;
-                        commitments[0] = preprocessed_public_data.common_data.commitments.fixed_values;
-                        commitments[1] = proof.variable_values_commitment;
-                        commitments[2] = proof.v_perm_commitment;
-                        commitments[3] = proof.T_commitment;
+                        commitments[FIXED_VALUES_BATCH] = preprocessed_public_data.common_data.commitments.fixed_values;
+                        commitments[VARIABLE_VALUES_BATCH] = proof.variable_values_commitment;
+                        commitments[PERMUTATION_BATCH] = proof.v_perm_commitment;
+                        commitments[QUOTIENT_BATCH] = proof.T_commitment;
+                        if( is_lookup_enabled ){
+                            commitments[LOOKUP_BATCH] = proof.lookup_commitment;
+                        }
                         
-                        if (!commitment_scheme.verify_eval(
-                            proof.eval_proof.eval_proof, commitments, transcript
-                        )) {
+                        if (!commitment_scheme.verify_eval( proof.eval_proof.eval_proof, commitments, transcript )) {
                             return false;
                         }
 
@@ -319,7 +326,8 @@ namespace nil {
                         F[5] = lookup_argument[2];
                         F[6] = lookup_argument[3];
                         F[7] = lookup_argument[4];
-                        F[8] = gate_argument[0];
+                        F[8] = lookup_argument[5];
+                        F[9] = gate_argument[0];
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {
@@ -332,7 +340,7 @@ namespace nil {
                             T_consolidated = T_consolidated + proof.eval_proof.eval_proof.z.get(QUOTIENT_BATCH, i, 0) *
                                                                   challenge.pow((preprocessed_public_data.common_data.rows_amount) * i);
                         }
-
+//
                         // Z is polynomial -1, 0 ...., 0, 1
                         typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);                     
                         if (F_consolidated != Z_at_challenge * T_consolidated) {

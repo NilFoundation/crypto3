@@ -64,14 +64,12 @@ namespace nil {
                 protected:
                     math::polynomial<typename field_type::value_type> get_V(const std::vector<typename field_type::value_type> &points) const{
                         math::polynomial<typename field_type::value_type> V = {1};
-  //                      return V;
                         for( std::size_t xi_index = 0; xi_index < points.size(); xi_index++ ){
                             V = V * math::polynomial<typename field_type::value_type>({-points[xi_index], 1});
                         }
                         return V;
                     }
                     math::polynomial<typename field_type::value_type> get_U(std::size_t b_ind, std::size_t poly_ind) const{
-//                        return {0};
                         auto &points = _points.at(b_ind)[poly_ind];
                         BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
                         std::vector<std::pair<typename field_type::value_type,typename field_type::value_type>> U_interpolation_points;

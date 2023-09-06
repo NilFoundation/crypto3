@@ -25,31 +25,43 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_LOOKUP_CONSTRAINT_HPP
-#define CRYPTO3_ZK_PLONK_LOOKUP_CONSTRAINT_HPP
+#ifndef CRYPTO3_ZK_PLONK_LOOKUP_TABLE_HPP
+#define CRYPTO3_ZK_PLONK_LOOKUP_TABLE_HPP
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename VariableType = plonk_variable<typename FieldType::value_type>>
-                class plonk_lookup_constraint {
-                public:
-                    using field_type = FieldType;
-                    using variable_type = VariableType;
-                    using term = math::term<VariableType>;
-                    using constraint_type = plonk_constraint<FieldType>;
+                template<typename FieldType>
+                struct plonk_lookup_table {
+                    typedef FieldType field_type;
+                    typedef plonk_variable<typename FieldType::value_type> variable_type;
+                    using constraint = plonk_constraint<FieldType>;
 
-                    std::size_t table_id;
-                    std::vector<constraint_type> lookup_input;
+                    std::size_t tag_index;
+                    std::vector<variable_type> lookup_columns;
+
+                    plonk_lookup_table(std::size_t tag_index = 0) :
+                        lookup_columns(std::vector<variable_type>({})), tag_index(tag_index) {
+                    }
+
+                    plonk_lookup_table(const variable_type &variable, std::size_t tag_index = 0) :
+                        lookup_columns(std::vector<variable_type>({variable})), tag_index(tag_index) {
+                    }
+
+                    plonk_lookup_table(const std::vector<variable_type> &variables, std::size_t tag_index = 0) :
+                        lookup_columns(variables), tag_index(tag_index) {
+                    }
                 };
+
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_LOOKUP_CONSTRAINT_HPP
+#endif    // CRYPTO3_ZK_PLONK_GATE_HPP

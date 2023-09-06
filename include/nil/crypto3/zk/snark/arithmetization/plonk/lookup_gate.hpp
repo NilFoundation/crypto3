@@ -25,31 +25,39 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PLONK_LOOKUP_CONSTRAINT_HPP
-#define CRYPTO3_ZK_PLONK_LOOKUP_CONSTRAINT_HPP
+#ifndef CRYPTO3_ZK_PLONK_LOOKUP_GATE_HPP
+#define CRYPTO3_ZK_PLONK_LOOKUP_GATE_HPP
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename VariableType = plonk_variable<typename FieldType::value_type>>
-                class plonk_lookup_constraint {
-                public:
-                    using field_type = FieldType;
-                    using variable_type = VariableType;
-                    using term = math::term<VariableType>;
-                    using constraint_type = plonk_constraint<FieldType>;
+                template<typename FieldType, typename ConstraintType>
+                struct plonk_lookup_gate {
+                    typedef FieldType field_type;
+                    typedef ConstraintType constraint_type;
+                    typedef typename ConstraintType::variable_type variable_type;
 
-                    std::size_t table_id;
-                    std::vector<constraint_type> lookup_input;
+                    std::size_t tag_index;
+                    std::vector<ConstraintType> constraints;
+
+                    plonk_lookup_gate( std::size_t tag_index, const ConstraintType &constraint ) :
+                        constraints(std::vector<ConstraintType>({constraint})), tag_index(tag_index) {
+                    }
+
+                    plonk_lookup_gate( std::size_t tag_index, const std::vector<ConstraintType> &constraints) :
+                        constraints(constraints), tag_index(tag_index) {
+                    }
                 };
+
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ZK_PLONK_LOOKUP_CONSTRAINT_HPP
+#endif    // CRYPTO3_ZK_PLONK_GATE_HPP

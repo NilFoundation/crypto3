@@ -116,8 +116,8 @@ namespace nil {
                                 Z[0] = -FieldType::value_type::one();
                                 Z[Z.size()-1] = FieldType::value_type::one();
 
-                                // lagrange_0(in dfs form):  0,0,...,1,0,0,...,0
-                                lagrange_0[usable_rows] = FieldType::value_type::one();
+                                // lagrange_0(in dfs form):  1,0,...,0,0,0,...,0
+                                lagrange_0[0] = FieldType::value_type::one();
                             }
 
                             // Constructor for marshalling. Domain is regenerated.
@@ -137,8 +137,8 @@ namespace nil {
                                 Z[0] = -FieldType::value_type::one();
                                 Z[Z.size()-1] = FieldType::value_type::one();
 
-                                // lagrange_0:  0,0,...,1,0,0,...,0
-                                lagrange_0[usable_rows] = FieldType::value_type::one();
+                                // lagrange_0:  1, 0,...,0
+                                lagrange_0[0] = FieldType::value_type::one();
 
                                 basic_domain = math::make_evaluation_domain<FieldType>(rows);
                             }
@@ -300,7 +300,7 @@ namespace nil {
                                 } 
                             }
                         }
-
+                        
                         return result;
                     }
 
@@ -456,7 +456,7 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         // Push fixed values and marshalled circuit to transcript.
-                        using Endianness = nil::marshalling::option::big_endian;
+/*                      using Endianness = nil::marshalling::option::big_endian;
                         using TTypeBase = nil::marshalling::field_type<Endianness>;
                         using ConstraintSystem = plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>;
                         using value_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
@@ -467,7 +467,7 @@ namespace nil {
                         nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
                         typename transcript_hash_type::digest_type circuit_hash = hash<transcript_hash_type>(cv);
 
-                        transcript(circuit_hash);
+                        transcript(circuit_hash);*/
                         transcript(public_commitments.fixed_values);
 
                         typename preprocessed_data_type::common_data_type common_data (

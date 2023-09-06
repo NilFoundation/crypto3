@@ -36,9 +36,10 @@ namespace nil {
                 constexpr std::size_t VARIABLE_VALUES_BATCH = 1;
                 constexpr std::size_t PERMUTATION_BATCH =2;
                 constexpr std::size_t QUOTIENT_BATCH = 3;
+                constexpr std::size_t LOOKUP_BATCH = 4;
 
                 /**
-                 * A proof for the Placeholder cheme.
+                 * A proof for the Placeholder scheme.
                  *
                  * While the proof has a structure, externally one merely opaquely produces,
                  * serializes/deserializes, and verifies proofs. We only expose some information
@@ -72,9 +73,10 @@ namespace nil {
                     }
 
                     commitment_type variable_values_commitment;
+                    commitment_type lookup_commitment;
                     commitment_type v_perm_commitment;
-                    typename commitment_scheme_type::commitment_type T_commitment;
-                    typename commitment_scheme_type::commitment_type fixed_values_commitment;
+                    commitment_type T_commitment;
+                    commitment_type fixed_values_commitment;
 
                     evaluation_proof eval_proof;
 

@@ -50,6 +50,12 @@ namespace nil {
                     std::size_t get_poly_points_number(std::size_t batch_id, std::size_t poly_id) const{
                         return z.at(batch_id)[poly_id].size();
                     }
+                    std::vector<std::vector<typename FieldType::value_type>> get(std::size_t batch_id) const{
+                        return z.at(batch_id);
+                    }
+                    std::vector<typename FieldType::value_type> get(std::size_t batch_id, std::size_t poly_id) const{
+                        return z.at(batch_id)[poly_id];
+                    }
                     typename FieldType::value_type get(std::size_t batch_id, std::size_t poly_id, size_t point_id) const{
                         return z.at(batch_id)[poly_id][point_id];
                     }
