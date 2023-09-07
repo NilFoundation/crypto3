@@ -51,7 +51,7 @@ namespace nil {
 
                 typedef std::array<var, ratio> non_native_var_type;
                 typedef std::array<native_field_type::value_type, ratio> chopped_value_type;
-                
+
                 constexpr static const std::array<std::size_t, ratio> chunk_sizes = {66, 66, 66, 66};
 
 
@@ -60,15 +60,15 @@ namespace nil {
                     assert(i_th < ratio && "non-native type does not have that much chunks!");
                     native_field_type::extended_integral_type result = native_field_type::extended_integral_type(input.data);
                     native_field_type::integral_type base = 1;
-                    native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1; 
+                    native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1;
                     std::size_t shift = 0;
                     for (std::size_t i = 1; i <= i_th; i++) {
                         shift += chunk_sizes[i - 1];
                     }
-                    
+
                     return (result >> shift) & mask;
                 }
-                
+
 
                 static chopped_value_type chop_non_native(non_native_field_type::value_type input) {
                     chopped_value_type result;
@@ -103,13 +103,13 @@ namespace nil {
                                                       typename crypto3::algebra::curves::pallas::scalar_field_type> {
 
                 constexpr static const std::uint32_t ratio = 2;    // 254, 1 bits
-                using non_native_field_type = typename crypto3::algebra::curves::ed25519::base_field_type;
+                using non_native_field_type = typename crypto3::algebra::curves::pallas::scalar_field_type;
                 using native_field_type = typename crypto3::algebra::curves::pallas::base_field_type;
                 using var = crypto3::zk::snark::plonk_variable<native_field_type>;
 
                 typedef std::array<var, ratio> non_native_var_type;
                 typedef std::array<native_field_type::value_type, ratio> chopped_value_type;
-                
+
                 constexpr static const std::array<std::size_t, ratio> chunk_sizes = {254, 1};
 
 
@@ -118,15 +118,15 @@ namespace nil {
                     assert(i_th < ratio && "non-native type does not have that much chunks!");
                     native_field_type::extended_integral_type result = native_field_type::extended_integral_type(input.data);
                     native_field_type::integral_type base = 1;
-                    native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1; 
+                    native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1;
                     std::size_t shift = 0;
                     for (std::size_t i = 1; i <= i_th; i++) {
                         shift += chunk_sizes[i - 1];
                     }
-                    
+
                     return (result >> shift) & mask;
                 }
-                
+
 
                 static chopped_value_type chop_non_native(non_native_field_type::value_type input) {
                     chopped_value_type result;
