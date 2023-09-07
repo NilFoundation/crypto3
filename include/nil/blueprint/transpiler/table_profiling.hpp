@@ -81,7 +81,7 @@ namespace nil {
         template<typename FieldType, typename ArithmetizationParams>
         void profiling_assignment_table(
             const crypto3::zk::snark::plonk_assignment_table<FieldType, ArithmetizationParams>& assignments,
-            std::size_t usable_rows, 
+            std::uint32_t usable_rows,
             std::ostream &out = std::cout
         ) {
             out << usable_rows << std::endl;
@@ -109,7 +109,7 @@ namespace nil {
         }
 
         template<typename BlueprintFieldType, typename ArithmetizationParams, typename ColumnType>
-        std::tuple<std::size_t, std::size_t,
+        std::tuple<std::uint32_t, std::uint32_t,
                 nil::crypto3::zk::snark::plonk_table<BlueprintFieldType, ArithmetizationParams, ColumnType>>
             load_assignment_table(std::istream &istr) {
             using PrivateTableType =
@@ -118,8 +118,8 @@ namespace nil {
                 nil::crypto3::zk::snark::plonk_public_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
             using AssignmentTableType =
                 nil::crypto3::zk::snark::plonk_table<BlueprintFieldType, ArithmetizationParams, ColumnType>;
-            std::size_t usable_rows;
-            std::size_t rows_amount;
+            std::uint32_t usable_rows;
+            std::uint32_t rows_amount;
 
             typename PrivateTableType::witnesses_container_type witness;
             typename PublicTableType::public_input_container_type public_input;
@@ -129,39 +129,39 @@ namespace nil {
             istr >> usable_rows;
             istr >> rows_amount;
 
-            for (size_t i = 0; i < witness.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+            for (std::size_t i = 0; i < witness.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
                 ColumnType column;
                 typename BlueprintFieldType::integral_type num;
-                for (size_t j = 0; j < rows_amount; j++) {
+                for (std::uint32_t j = 0; j < rows_amount; j++) {
                     istr >> num;
                     column.push_back(typename BlueprintFieldType::value_type(num));
                 }
                 witness[i] = column;
             }
 
-            for (size_t i = 0; i < public_input.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+            for (std::size_t i = 0; i < public_input.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
                 ColumnType column;
                 typename BlueprintFieldType::integral_type num;
-                for (size_t j = 0; j < rows_amount; j++) {
+                for (std::uint32_t j = 0; j < rows_amount; j++) {
                     istr >> num;
                     column.push_back(typename BlueprintFieldType::value_type(num));
                 }
                 public_input[i] = column;
             }
 
-            for (size_t i = 0; i < constant.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+            for (std::size_t i = 0; i < constant.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
                 ColumnType column;
                 typename BlueprintFieldType::integral_type num;
-                for (size_t j = 0; j < rows_amount; j++) {
+                for (std::uint32_t j = 0; j < rows_amount; j++) {
                     istr >> num;
                     column.push_back(typename BlueprintFieldType::value_type(num));
                 }
                 constant[i] = column;
             }
-            for (size_t i = 0; i < selector.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
+            for (std::size_t i = 0; i < selector.size(); i++) {    // witnesses.size() == ArithmetizationParams.WitnessColumns
                 ColumnType column;
                 typename BlueprintFieldType::integral_type num;
-                for (size_t j = 0; j < rows_amount; j++) {
+                for (std::uint32_t j = 0; j < rows_amount; j++) {
                     istr >> num;
                     column.push_back(typename BlueprintFieldType::value_type(num));
                 }
