@@ -29,6 +29,8 @@
 #ifndef CRYPTO3_ZK_TEST_PLONK_CIRCUITS_HPP
 #define CRYPTO3_ZK_TEST_PLONK_CIRCUITS_HPP
 
+#define _RND_ algebra::random_element<FieldType>();
+
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -507,51 +509,20 @@ namespace nil {
                         table[j].resize(test_circuit.table_rows);
                     }
 
+                    srand(time(NULL));
                     // lookup inputs
                     typename FieldType::value_type one = FieldType::value_type::one();
                     typename FieldType::value_type zero = FieldType::value_type::zero();
-                    table[0][0] = rand() % 2 ? one : zero;
-                    table[1][0] = rand() % 2 ? one : zero;
-                    table[2][0] = table[0][0] * table[1][0];
+                    table[0] = {rand() % 2, rand() % 2, rand(), rand() % 2, rand() % 2, 0, 0, 0};
+                    table[1] = {rand() % 2, rand() % 2, rand(), rand() % 2, rand() % 2, 0, 0, 0};;
+                    table[2] = {table[0][0] * table[1][0], table[0][1] * table[1][1], table[0][2] * table[1][2], table[0][3] * table[1][3], table[0][4] * table[1][4], 0, 0, 0};
 
-                    table[0][1] = rand() % 2 ? one : zero;
-                    table[1][1] = rand() % 2 ? one : zero;
-                    table[2][1] = table[0][1] * table[1][1];
-
-                    table[0][2] = rand();
-                    table[1][2] = rand();
-                    table[2][2] = table[0][2] * table[1][2];
-
-                    table[0][3] = rand() % 2 ? one : zero;
-                    table[1][3] = rand() % 2 ? one : zero;
-                    table[2][3] = table[0][3] * table[1][3];
-
-                    table[0][4] = rand() % 2 ? one : zero;
-                    table[1][4] = rand() % 2 ? one : zero;
-                    table[2][4] = table[0][4] * table[1][4];
                     
                     //lookup values
                     // Reserved zero row for unselected lookup input rows                    
-                    table[3][0] = zero;
-                    table[4][0] = zero;
-                    table[5][0] = zero;
-
-                    table[3][1] = zero;
-                    table[4][1] = one;
-                    table[5][1] = zero;
-
-
-                    table[3][2] = one;
-                    table[4][2] = zero;
-                    table[5][2] = zero;
-
-                    table[3][3] = one;
-                    table[4][3] = one;
-                    table[5][3] = one;
-
-                    table[3][4] = zero;
-                    table[4][4] = zero;
-                    table[5][4] = zero;
+                    table[3] = {0, 0, 0, 1, 1, 0, 0, 0};
+                    table[4] = {0, 0, 1, 0, 1, 0, 0, 0};
+                    table[5] = {0, 0, 0, 0, 1, 0, 0, 0};
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
@@ -563,27 +534,16 @@ namespace nil {
                     std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
 
                     std::vector<typename FieldType::value_type> sel_lookup(test_circuit.table_rows);
-                    sel_lookup[0] = one;
-                    sel_lookup[1] = one;
-                    sel_lookup[2] = zero;
-                    sel_lookup[3] = one;
-                    sel_lookup[4] = one;
+                    sel_lookup ={1, 1, 0, 1, 1, 0, 0, 0};
                     selectors_assignment[0] = sel_lookup;
 
                     std::vector<typename FieldType::value_type> sel_gate0(test_circuit.table_rows);
-                    sel_gate0[0] = one;
-                    sel_gate0[1] = one;
-                    sel_gate0[2] = one;
-                    sel_gate0[3] = one;
-                    sel_gate0[4] = one;
+                    sel_gate0 = {1, 1, 1, 1, 1, 0, 0, 0};
                     selectors_assignment[1] = sel_gate0;
 
+
                     std::vector<typename FieldType::value_type> sel_lookup_table(test_circuit.table_rows);
-                    sel_lookup_table[0] = zero;
-                    sel_lookup_table[1] = one;
-                    sel_lookup_table[2] = one;
-                    sel_lookup_table[3] = one;
-                    sel_lookup_table[4] = one;
+                    sel_lookup_table = {0, 1, 1, 1, 1, 0, 0, 0};
                     selectors_assignment[2] = sel_lookup_table;
 
                     for (std::size_t i = 0; i < constant_columns; i++) {
@@ -613,18 +573,20 @@ namespace nil {
                     test_circuit.gates.push_back(mul_gate);
 
                     plonk_lookup_constraint<FieldType> lookup_constraint;
-                    lookup_constraint.table_id = 1;
                     lookup_constraint.lookup_input.push_back(w0);
                     lookup_constraint.lookup_input.push_back(w1);
                     lookup_constraint.lookup_input.push_back(w2);
+                    lookup_constraint.table_id = 1;
 
                     std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints = {lookup_constraint};
                     plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(0, lookup_constraints);
-//                    test_circuit.lookup_gates.push_back(lookup_gate);
+                    test_circuit.lookup_gates.push_back(lookup_gate);
 
-                    plonk_lookup_table<FieldType> lookup_table({c0, c1, c2}, 2);
-                    test_circuit.lookup_table = lookup_table;
+                    // Add constructor for lookup table
+                    plonk_lookup_table<FieldType> table1(3, 2); // 2 -- selector_id, 3 -- number of columns;
+                    table1.append_option({c0, c1, c2});
 
+                    test_circuit.lookup_tables.push_back(table1);
                     return test_circuit;
                 }
 

@@ -205,6 +205,7 @@ namespace nil {
                                     theta_acc *= theta;
                                 }
                                 v *= mask_assignment;
+                                auto reduced_v = reduce_dfs_polynomial_domain(v, basic_domain->m);
                                 lookup_value.push_back(v);
                             }
                         }
@@ -226,7 +227,6 @@ namespace nil {
                                     l += theta_acc * lookup_selector * evaluator.evaluate();
                                     theta_acc *= theta;
                                 }
-                                auto reduced_l = reduce_dfs_polynomial_domain(l, basic_domain->m);
                                 lookup_input.push_back(l);
                             }
                         }
