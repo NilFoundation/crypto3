@@ -58,13 +58,14 @@ namespace nil {
 
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
-                    constexpr static const std::size_t lookup_parts = 6;
-                    constexpr static const std::size_t f_parts = 10;
+                    constexpr static const std::size_t lookup_parts = 4;
+                    constexpr static const std::size_t f_parts = 8;
 
                 public:
                     static void generate_evaluation_points(
                         commitment_scheme_type &_commitment_scheme,
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
+                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         typename FieldType::value_type challenge,
                         bool _is_lookup_enabled
                     ) {
@@ -95,6 +96,7 @@ namespace nil {
                         if(_is_lookup_enabled){
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge * _omega);
+                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge * _omega.pow(preprocessed_public_data.common_data.usable_rows_amount));
                         }
 
                         _commitment_scheme.append_eval_point(QUOTIENT_BATCH, challenge);
@@ -108,6 +110,7 @@ namespace nil {
                         for( i = 0; i < start_index; i++){
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, challenge);
                         }
+
                         for (std::size_t ind = 0; 
                             ind < constant_columns + preprocessed_public_data.public_polynomial_table.selectors().size();
                             ind++, i++
@@ -265,11 +268,10 @@ namespace nil {
                             >::verify_eval(
                                 preprocessed_public_data, 
                                 constraint_system.lookup_gates(),
-                                constraint_system.lookup_table(),
+                                constraint_system.lookup_tables(),
                                 proof.eval_proof.challenge, columns_at_y,
                                 proof.eval_proof.eval_proof.z.get(LOOKUP_BATCH),
                                 proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 1),
-                                proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 2),
                                 proof.lookup_commitment, transcript
                             );
                         }
@@ -280,7 +282,6 @@ namespace nil {
                             placeholder_gates_argument<FieldType, ParamsType>::verify_eval(
                                 constraint_system.gates(), columns_at_y, proof.eval_proof.challenge, transcript);
                         
-                        // 8. alphas comfputations
                         std::array<typename FieldType::value_type, f_parts> alphas =
                             transcript.template challenges<FieldType, f_parts>();
 
@@ -288,17 +289,15 @@ namespace nil {
                         transcript(proof.T_commitment);
 
                         auto challenge = transcript.template challenge<FieldType>();
-                        if (challenge != proof.eval_proof.challenge) {
-                            return false;
-                        }
-
+                        BOOST_ASSERT(challenge == proof.eval_proof.challenge);
+                        //typename FieldType::value_type challenge = proof.eval_proof.challenge;
 
                         commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));                        
                         commitment_scheme.set_batch_size(PERMUTATION_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));                        
                         commitment_scheme.set_batch_size(QUOTIENT_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));                        
                         if(is_lookup_enabled)
                             commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));                        
-                        generate_evaluation_points(commitment_scheme, preprocessed_public_data, challenge, is_lookup_enabled);
+                        generate_evaluation_points(commitment_scheme, preprocessed_public_data, constraint_system, challenge, is_lookup_enabled);
 
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
@@ -325,9 +324,7 @@ namespace nil {
                         F[4] = lookup_argument[1];
                         F[5] = lookup_argument[2];
                         F[6] = lookup_argument[3];
-                        F[7] = lookup_argument[4];
-                        F[8] = lookup_argument[5];
-                        F[9] = gate_argument[0];
+                        F[7] = gate_argument[0];
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {

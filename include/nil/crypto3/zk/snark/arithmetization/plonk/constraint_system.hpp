@@ -58,12 +58,13 @@ namespace nil {
                     typedef std::vector<plonk_copy_constraint<FieldType>> copy_constraints_container_type;
                     typedef std::vector<plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates_container_type;
                     typedef plonk_lookup_table<FieldType> lookup_table_type;
+                    typedef std::vector<lookup_table_type> lookup_tables_type;
 
                 protected:
                     gates_container_type _gates;
                     copy_constraints_container_type _copy_constraints;
                     lookup_gates_container_type _lookup_gates;
-                    lookup_table_type _lookup_table;
+                    lookup_tables_type _lookup_tables;
                 public:
                     typedef FieldType field_type;
 
@@ -73,11 +74,11 @@ namespace nil {
                     plonk_constraint_system(const gates_container_type &gates,
                                             const copy_constraints_container_type &copy_constraints,
                                             const lookup_gates_container_type &lookup_gates,
-                                            const lookup_table_type &lookup_table) :
+                                            const lookup_tables_type &lookup_tables) :
                         _gates(gates),
                         _copy_constraints(copy_constraints), 
                         _lookup_gates(lookup_gates),
-                        _lookup_table(lookup_table)
+                        _lookup_tables(lookup_tables)
                     {
                     }
 
@@ -87,7 +88,7 @@ namespace nil {
                         _gates(gates),
                         _copy_constraints(copy_constraints), 
                         _lookup_gates(lookup_gates),
-                        _lookup_table({})
+                        _lookup_tables({})
                     {
                     }
 
@@ -120,8 +121,12 @@ namespace nil {
                         return _lookup_gates;
                     }
 
-                    const lookup_table_type &lookup_table() const {
-                        return _lookup_table;
+                    const lookup_tables_type &lookup_tables() const {
+                        return _lookup_tables;
+                    }
+
+                    const lookup_table_type &lookup_table(std::size_t table_id) const {
+                        return _lookup_tables[table_id];
                     }
                 };
             }    // namespace snark

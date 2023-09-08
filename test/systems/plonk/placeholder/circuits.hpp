@@ -72,7 +72,7 @@ namespace nil {
                     std::vector<plonk_copy_constraint<FieldType>> copy_constraints;
                     std::vector<plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates;
 
-                    plonk_lookup_table<FieldType> lookup_table;
+                    std::vector<plonk_lookup_table<FieldType>> lookup_tables;
 
                     circuit_description()
                         : domain(math::make_evaluation_domain<FieldType>(table_rows))
@@ -453,8 +453,11 @@ namespace nil {
                     plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(0, lookup_constraints);
                     test_circuit.lookup_gates.push_back(lookup_gate);
 
-                    test_circuit.lookup_table.tag_index = 1;
-                    test_circuit.lookup_table.lookup_columns = {c0, c1, c2};
+                    // Add constructor for lookup table
+                    plonk_lookup_table<FieldType> table1(3, 1); // 1 -- selector_id, 3 -- number of columns;
+                    table1.append_option({c0, c1, c2});
+
+                    test_circuit.lookup_tables.push_back(table1);
                     return test_circuit;
                 }
 

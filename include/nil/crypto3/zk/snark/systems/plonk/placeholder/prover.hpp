@@ -92,7 +92,7 @@ namespace nil {
                     constexpr static const std::size_t gate_parts = 1;
                     constexpr static const std::size_t permutation_parts = 3;
                     constexpr static const std::size_t lookup_parts = 6;
-                    constexpr static const std::size_t f_parts = 10;
+                    constexpr static const std::size_t f_parts = 8;
 
               public:
 
@@ -171,14 +171,12 @@ namespace nil {
                         _F_dfs[4] = std::move(lookup_argument_result.F_dfs[1]);
                         _F_dfs[5] = std::move(lookup_argument_result.F_dfs[2]);
                         _F_dfs[6] = std::move(lookup_argument_result.F_dfs[3]);
-                        _F_dfs[7] = std::move(lookup_argument_result.F_dfs[4]);
-                        _F_dfs[8] = std::move(lookup_argument_result.F_dfs[5]);
 
                         _proof.v_perm_commitment = _commitment_scheme.commit(PERMUTATION_BATCH);
                         transcript(_proof.v_perm_commitment);
 
                         // 6. circuit-satisfability
-                        _F_dfs[9] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
+                        _F_dfs[7] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
                             constraint_system, _polynomial_table,
                             preprocessed_public_data.common_data.basic_domain,
                             preprocessed_public_data.common_data.max_gates_degree,
@@ -199,9 +197,9 @@ namespace nil {
 
                         // 8. Run evaluation proofs
                         _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
+                        //_proof.eval_proof.challenge = typename FieldType::value_type(7);
 
-                        _proof.eval_proof.lagrange_0 =
-                            preprocessed_public_data.common_data.lagrange_0.evaluate(_proof.eval_proof.challenge);
+                        _proof.eval_proof.lagrange_0 = preprocessed_public_data.common_data.lagrange_0.evaluate(_proof.eval_proof.challenge);
                         generate_evaluation_points();
 
                         _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
@@ -256,12 +254,10 @@ namespace nil {
                             FieldType,
                             commitment_scheme_type,
                             ParamsType>::prover_lookup_result lookup_argument_result;
-                        lookup_argument_result.F_dfs[0] = polynomial_dfs_type(0, 0, FieldType::value_type::zero());
-                        lookup_argument_result.F_dfs[1] = polynomial_dfs_type(0, 0, FieldType::value_type::zero());
-                        lookup_argument_result.F_dfs[2] = polynomial_dfs_type(0, 0, FieldType::value_type::zero());
-                        lookup_argument_result.F_dfs[3] = polynomial_dfs_type(0, 0, FieldType::value_type::zero());
-                        lookup_argument_result.F_dfs[4] = polynomial_dfs_type(0, 0, FieldType::value_type::zero());
-                        lookup_argument_result.F_dfs[5] = polynomial_dfs_type(0, 0, FieldType::value_type::zero());
+                        lookup_argument_result.F_dfs[0] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
+                        lookup_argument_result.F_dfs[1] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
+                        lookup_argument_result.F_dfs[2] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
+                        lookup_argument_result.F_dfs[3] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
                         if( _is_lookup_enabled ){
                             lookup_argument_result = placeholder_lookup_argument< FieldType,  commitment_scheme_type, ParamsType>::prove_eval(
                                 constraint_system,
@@ -284,9 +280,7 @@ namespace nil {
                     void placeholder_debug_output() {
                         for (std::size_t i = 0; i < f_parts; i++) {
                             for (std::size_t j = 0; j < table_description.rows_amount; j++) {
-                                if (_F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(
-                                        j)) != FieldType::value_type::zero()) {
-                                    std::cout << "F_dfs[" << i << "] != 0 at j = " << j << std::endl;
+                                if (_F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != FieldType::value_type::zero()) {
                                 }
                             }
                         }
@@ -303,7 +297,6 @@ namespace nil {
                                 if (constraint_result.evaluate(
                                         preprocessed_public_data.common_data.basic_domain->get_domain_element(253)) !=
                                     FieldType::value_type::zero()) {
-                                    std::cout << "constraint " << j << " from gate " << i << "on row " << std::endl;
                                 }
                             }
                         }
@@ -336,9 +329,11 @@ namespace nil {
                         if(_is_lookup_enabled){
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * _omega);
+                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * _omega.pow(preprocessed_public_data.common_data.usable_rows_amount));
                         }
 
                         _commitment_scheme.append_eval_point(QUOTIENT_BATCH, _proof.eval_proof.challenge);
+
                         
                         // fixed values' rotations (table columns)
                         std::size_t i = 0;
@@ -348,6 +343,7 @@ namespace nil {
                         for( i = 0; i < start_index; i++){
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, _proof.eval_proof.challenge);
                         }
+
                         for (std::size_t ind = 0; 
                             ind < constant_columns + preprocessed_public_data.public_polynomial_table.selectors().size();
                             ind++, i++

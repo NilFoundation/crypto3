@@ -41,21 +41,19 @@ namespace nil {
                 struct plonk_lookup_table {
                     typedef FieldType field_type;
                     typedef plonk_variable<typename FieldType::value_type> variable_type;
-                    using constraint = plonk_constraint<FieldType>;
+                    using lookup_options_type = std::vector<std::vector<variable_type>>;
 
                     std::size_t tag_index;
-                    std::vector<variable_type> lookup_columns;
+                    std::size_t columns_number;
+                    lookup_options_type lookup_options;
 
-                    plonk_lookup_table(std::size_t tag_index = 0) :
-                        lookup_columns(std::vector<variable_type>({})), tag_index(tag_index) {
+                    plonk_lookup_table(std::size_t _columns_number, std::size_t _tag_index) :
+                        columns_number(_columns_number), tag_index(_tag_index) {
                     }
 
-                    plonk_lookup_table(const variable_type &variable, std::size_t tag_index = 0) :
-                        lookup_columns(std::vector<variable_type>({variable})), tag_index(tag_index) {
-                    }
-
-                    plonk_lookup_table(const std::vector<variable_type> &variables, std::size_t tag_index = 0) :
-                        lookup_columns(variables), tag_index(tag_index) {
+                    void append_option(const std::vector<variable_type> &variables){
+                        BOOST_CHECK(variables.size() == columns_number);
+                        lookup_options.push_back(variables);
                     }
                 };
 
