@@ -467,15 +467,15 @@ namespace nil {
                 //      b_i -- random binaries, 
                 //      r_i ordinary random numbers.
                 // One gate: w1*w2 - w3 = 0
-                // -------------------------------------------------------------------
+                // ----------------------------------------------------------------------------------
                 // | Selector Gate| Selector Lookup| W1 | W2 |   W3   |  Lookup_tag | L1 | L2 | L3 |
                 // -------------------------------------------------------------------
-                // |      1       |       1        | b1 | b2 |  b1*b2 |      0      | 0 |  0 |  0 | -- reserved for unselected rows
-                // |      1       |       1        | b3 | b4 |  b3*b4 |      1      | 0 |  0 |  0 |
-                // |      1       |       0        | r1 | r2 |  r1*r2 |      1      | 0 |  1 |  0 | -- unselected for lookups
-                // |      1       |       1        | b5 | b6 |  b5*b6 |      1      | 1 |  0 |  0 |
-                // |      1       |       1        | b7 | b8 |  b7*b8 |      1      | 1 |  1 |  1 |
-                // -------------------------------------------------------------------
+                // |      1       |       1        | b1 | b2 |  b1*b2 |      0      | 0  |  0 |  0 | -- reserved for unselected rows
+                // |      1       |       1        | b3 | b4 |  b3*b4 |      1      | 0  |  0 |  0 |
+                // |      1       |       0        | r1 | r2 |  r1*r2 |      1      | 0  |  1 |  0 | -- unselected for lookups
+                // |      1       |       1        | b5 | b6 |  b5*b6 |      1      | 1  |  0 |  0 |
+                // |      1       |       1        | b7 | b8 |  b7*b8 |      1      | 1  |  1 |  1 |
+                // ----------------------------------------------------------------------------------
 
                 constexpr static const std::size_t witness_columns_4= 3;
                 constexpr static const std::size_t public_columns_4 = 0;
@@ -849,6 +849,143 @@ namespace nil {
                     plonk_gate<FieldType, plonk_constraint<FieldType>> fib_gate(0, fib_costraints);
                     test_circuit.gates.push_back(fib_gate);
  
+                    return test_circuit;
+                }
+
+                // Long range check:
+                //      Table 1: Selector LT1 options L1
+                //      Table 2: Selector LT1 options L1 || L2 || L3
+                // Lookup gate1:
+                //      w1 \in Table 1
+                //      W2 \in Table 2
+                // Lookup gate2:
+                //      w1{-1} + w1 \in Table 2
+                // ---------------------------------------------------------------------------------
+                // |  s1 | s2 | W1 | W2    |  LT1 | L1 | L2 | L3 |      
+                // ---------------------------------------------------------------------------------
+                // |   1 |  0 | r1 | 7     |   0  | 0  |  0 |  0 | -- reserved for unselected rows
+                // |   1 |  1 | r2 | r1+r2 |   1  | 2  |  7 | 12 | -- reserved for unselected rows
+                // |   1 |  1 | r3 | r2+r3 |   1  | 3  |  8 | 12 |
+                // |   1 |  1 | r4 | r3+r4 |   1  | 4  |  9 | 12 | -- unselected for lookups
+                // |   1 |  1 | r5 | r4+r5 |   1  | 5  | 10 | 12 |
+                // |   1 |  1 | r6 | r5+r6 |   1  | 6  | 11 | 12 |
+                // ---------------------------------------------------------------------------------
+
+                constexpr static const std::size_t witness_columns_6= 2;
+                constexpr static const std::size_t public_columns_6 = 0;
+                constexpr static const std::size_t constant_columns_6 = 3;
+                constexpr static const std::size_t selector_columns_6 = 3;
+
+                using arithmetization_params_6 = plonk_arithmetization_params<witness_columns_6,
+                    public_columns_6, constant_columns_6, selector_columns_6>;
+
+                template<typename FieldType>
+                circuit_description<FieldType, placeholder_circuit_params<FieldType,
+                    arithmetization_params_6>, 3, 3> circuit_test_6() {
+                    using assignment_type = typename FieldType::value_type;
+
+                    constexpr static const std::size_t rows_log = 3;
+                    constexpr static const std::size_t permutation = 3;
+
+                    constexpr static const std::size_t witness_columns = witness_columns_6;
+                    constexpr static const std::size_t public_columns = public_columns_6;
+                    constexpr static const std::size_t constant_columns = constant_columns_6;
+                    constexpr static const std::size_t selector_columns = selector_columns_6;
+                    constexpr static const std::size_t table_columns = 
+                            witness_columns + public_columns + constant_columns + selector_columns;
+
+                    typedef placeholder_circuit_params<FieldType, arithmetization_params_6> circuit_params;
+
+                    circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
+
+                    std::array<std::vector<typename FieldType::value_type>, table_columns> table;
+                    for (std::size_t j = 0; j < table_columns; j++) {
+                        table[j].resize(test_circuit.table_rows);
+                    }
+
+                    srand(time(NULL));
+                    // lookup inputs
+                    typename FieldType::value_type one = FieldType::value_type::one();
+                    typename FieldType::value_type zero = FieldType::value_type::zero();
+                    table[0] = {rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, 0, 0};
+                    table[1] = {7, table[0][0] + table[0][1],  table[0][1] + table[0][2],  table[0][2] + table[0][3],  table[0][3] + table[0][4],  table[0][4] + table[0][5], 0, 0};;
+
+                    
+                    // selectors
+                    // Reserved zero row for unselected lookup input rows                    
+                    table[2] = {0, 1, 1, 1, 1, 1, 0, 0}; // LT1
+                    table[3] = {1, 1, 1, 1, 1, 1, 0, 0}; // For the first lookup gate
+                    table[4] = {0, 1, 1, 1, 1, 1, 0, 0}; // For the second lookup gate
+
+                    // Lookup values
+                    table[5] = {0,  2,  3,  4,  5,  6, 0, 0}; // L1
+                    table[6] = {0,  7,  8,  9, 10, 11, 0, 0}; // L2
+                    table[7] = {0, 12, 12, 12, 12, 12, 0, 0}; // L3
+
+                    std::array<plonk_column<FieldType>, witness_columns> private_assignment;
+                    for (std::size_t i = 0; i < witness_columns; i++) {
+                        private_assignment[i] = table[i];
+                    }
+
+                    std::array<plonk_column<FieldType>, selector_columns> selectors_assignment;
+                    std::array<plonk_column<FieldType>, public_columns> public_input_assignment = {};
+                    std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
+
+                    selectors_assignment[0] = table[2];
+                    selectors_assignment[1] = table[3];
+                    selectors_assignment[2] = table[4];
+
+                    for (std::size_t i = 0; i < constant_columns; i++) {
+                        constant_assignment[i] = table[witness_columns + selector_columns + i];
+                    }
+                    test_circuit.table = plonk_assignment_table<FieldType, arithmetization_params_6>(
+                        plonk_private_assignment_table<FieldType, arithmetization_params_6>(private_assignment),
+                        plonk_public_assignment_table<FieldType, arithmetization_params_6>(
+                            public_input_assignment, constant_assignment, selectors_assignment));
+
+                    plonk_variable<assignment_type> w0(  0, 0, true, plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w0_1(0,-1, true, plonk_variable<assignment_type>::column_type::witness);
+                    plonk_variable<assignment_type> w1(  1, 0, true, plonk_variable<assignment_type>::column_type::witness);
+
+                    plonk_variable<assignment_type> c0(0, 0, true, plonk_variable<assignment_type>::column_type::constant);
+                    plonk_variable<assignment_type> c1(1, 0, true, plonk_variable<assignment_type>::column_type::constant);
+                    plonk_variable<assignment_type> c2(2, 0, true, plonk_variable<assignment_type>::column_type::constant);
+
+                    plonk_lookup_constraint<FieldType> lookup_constraint1;
+                    lookup_constraint1.lookup_input.push_back(w0);
+                    lookup_constraint1.table_id = 1;
+
+                    plonk_lookup_constraint<FieldType> lookup_constraint2;
+                    lookup_constraint2.lookup_input.push_back(w1);
+                    lookup_constraint2.table_id = 2;
+
+                    std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints = {lookup_constraint1, lookup_constraint2};
+                    plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(1, lookup_constraints);
+                    test_circuit.lookup_gates.push_back(lookup_gate);
+
+
+                    plonk_lookup_constraint<FieldType> lookup_constraint3;
+                    plonk_constraint<FieldType> add_constraint;
+                    add_constraint += w0_1;
+                    add_constraint += w0;
+                    lookup_constraint3.lookup_input.push_back(add_constraint);
+                    lookup_constraint3.table_id = 2;
+
+                    std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints2 = {lookup_constraint3};
+                    plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate2(2, lookup_constraints2);
+                    test_circuit.lookup_gates.push_back(lookup_gate2);
+
+                    // Add constructor for lookup table
+                    plonk_lookup_table<FieldType> table1(1, 0); // 2 -- selector_id, 3 -- number of columns;
+                    table1.append_option({c0});
+                    test_circuit.lookup_tables.push_back(table1);
+
+                    plonk_lookup_table<FieldType> table2(1, 0); // 2 -- selector_id, 3 -- number of columns;
+                    table2.append_option({c0});
+                    table2.append_option({c1});
+                    table2.append_option({c2});
+                    test_circuit.lookup_tables.push_back(table2);
+
                     return test_circuit;
                 }
             }    // namespace snark

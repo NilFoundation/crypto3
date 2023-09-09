@@ -227,7 +227,7 @@ namespace nil {
                                     l += theta_acc * lookup_selector * evaluator.evaluate();
                                     theta_acc *= theta;
                                 }
-                                lookup_input.push_back(l);
+                               lookup_input.push_back(l);
                             }
                         }
                         // Lookup_input and lookup_value are ready
@@ -267,21 +267,23 @@ namespace nil {
                         std::size_t i1=0;
                         std::size_t j1=0;
                         typename FieldType::value_type prev(0);
+                        prev = typename FieldType::value_type(0);
                         for( std::size_t i = 0; i < reduced_value.size(); i++){
-                            prev = typename FieldType::value_type(0);
                             for( std::size_t j = 0; j < preprocessed_data.common_data.usable_rows_amount; j++){
                                 if(reduced_value[i][j] != prev){
                                     if(prev == FieldType::value_type::zero()) {
+                                        BOOST_ASSERT(j1 < preprocessed_data.common_data.usable_rows_amount);
                                         sorted[i1][j1] = prev;
                                         j1++;
-                                        if(j == preprocessed_data.common_data.usable_rows_amount){
+                                        if(j1 >= preprocessed_data.common_data.usable_rows_amount){
                                             i1++; j1 = 0;
                                         } 
                                     } else {
                                         for( std::size_t k = 0; k < sorting_map[prev]; k++){
+                                            BOOST_ASSERT(j1 < preprocessed_data.common_data.usable_rows_amount);
                                             sorted[i1][j1] = prev;
                                             j1++;
-                                            if(j1 == preprocessed_data.common_data.usable_rows_amount){
+                                            if(j1 >= preprocessed_data.common_data.usable_rows_amount){
                                                 i1++; j1 = 0;
                                             } 
                                         }
@@ -292,9 +294,10 @@ namespace nil {
                         }
                         if( prev != 0 ){
                             for( std::size_t k = 0; k < sorting_map[prev]; k++){
+                                //BOOST_ASSERT(j1 < preprocessed_data.common_data.usable_rows_amount);
                                 sorted[i1][j1] = prev;
                                 j1++;
-                                if(j1 == preprocessed_data.common_data.usable_rows_amount){
+                                if(j1 >= preprocessed_data.common_data.usable_rows_amount){
                                     i1++; j1 = 0;
                                 } 
                             }
