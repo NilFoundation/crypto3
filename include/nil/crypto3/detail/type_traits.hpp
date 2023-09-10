@@ -29,87 +29,310 @@
 #include <complex>
 #include <type_traits>
 
-#include <boost/tti/tti.hpp>
+#ifndef GENERATE_HAS_MEMBER_TYPE
+#define GENERATE_HAS_MEMBER_TYPE(Type)                                                                                 \
+    template<class T, typename Enable = void>                                                                          \
+    class HasMemberType_##Type {                                                                                       \
+    public:                                                                                                            \
+        static constexpr bool RESULT = false;                                                                          \
+    };                                                                                                                 \
+                                                                                                                       \
+    template<class T>                                                                                                  \
+    class HasMemberType_##Type<T, typename std::enable_if<std::is_class<T>::value || std::is_union<T>::value>::type> { \
+    private:                                                                                                           \
+        using Yes = char[2];                                                                                           \
+        using No = char[1];                                                                                            \
+                                                                                                                       \
+        struct Fallback {                                                                                              \
+            struct Type { };                                                                                           \
+        };                                                                                                             \
+        struct Derived : T, Fallback { };                                                                              \
+                                                                                                                       \
+        template<class U>                                                                                              \
+        static No &test(typename U::Type *);                                                                           \
+        template<typename U>                                                                                           \
+        static Yes &test(U *);                                                                                         \
+                                                                                                                       \
+    public:                                                                                                            \
+        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes);                                  \
+    };                                                                                                                 \
+                                                                                                                       \
+    template<class T>                                                                                                  \
+    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> { };
+#endif //GENERATE_HAS_MEMBER_TYPE
+
+#ifndef GENERATE_HAS_MEMBER
+#define GENERATE_HAS_MEMBER(member)                                                                                  \
+    template<class T, typename Enable = void>                                                                        \
+    class HasMember_##member {                                                                                       \
+    public:                                                                                                          \
+        static constexpr bool RESULT = false;                                                                        \
+    };                                                                                                               \
+                                                                                                                     \
+    template<class T>                                                                                                \
+    class HasMember_##member<T, typename std::enable_if<std::is_class<T>::value || std::is_union<T>::value>::type> { \
+    private:                                                                                                         \
+        using Yes = char[2];                                                                                         \
+        using No = char[1];                                                                                          \
+                                                                                                                     \
+        struct Fallback {                                                                                            \
+            int member;                                                                                              \
+        };                                                                                                           \
+        struct Derived : T, Fallback { };                                                                            \
+                                                                                                                     \
+        template<class U>                                                                                            \
+        static No &test(decltype(U::member) *);                                                                      \
+        template<typename U>                                                                                         \
+        static Yes &test(U *);                                                                                       \
+                                                                                                                     \
+    public:                                                                                                          \
+        static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes);                                \
+    };                                                                                                               \
+                                                                                                                     \
+    template<class T>                                                                                                \
+    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
+#endif //GENERATE_HAS_MEMBER
+
+#ifndef GENERATE_HAS_MEMBER_FUNCTION
+#define GENERATE_HAS_MEMBER_FUNCTION(Function, ...)                                  \
+                                                                                     \
+    template<typename T>                                                             \
+    struct has_##Function {                                                          \
+        struct Fallback {                                                            \
+            void Function(##__VA_ARGS__);                                            \
+        };                                                                           \
+                                                                                     \
+        struct Derived : Fallback { };                                               \
+                                                                                     \
+        template<typename C, C>                                                      \
+        struct ChT;                                                                  \
+                                                                                     \
+        template<typename C>                                                         \
+        static char (&f(ChT<void (Fallback::*)(##__VA_ARGS__), &C::Function> *))[1]; \
+                                                                                     \
+        template<typename C>                                                         \
+        static char (&f(...))[2];                                                    \
+                                                                                     \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                        \
+    };
+#endif //GENERATE_HAS_MEMBER_FUNCTION
+
+#ifndef GENERATE_HAS_MEMBER_CONST_FUNCTION
+#define GENERATE_HAS_MEMBER_CONST_FUNCTION(Function, ...)                                  \
+                                                                                           \
+    template<typename T>                                                                   \
+    struct has_##Function {                                                                \
+        struct Fallback {                                                                  \
+            void Function(##__VA_ARGS__) const;                                            \
+        };                                                                                 \
+                                                                                           \
+        struct Derived : Fallback { };                                                     \
+                                                                                           \
+        template<typename C, C>                                                            \
+        struct ChT;                                                                        \
+                                                                                           \
+        template<typename C>                                                               \
+        static char (&f(ChT<void (Fallback::*)(##__VA_ARGS__) const, &C::Function> *))[1]; \
+                                                                                           \
+        template<typename C>                                                               \
+        static char (&f(...))[2];                                                          \
+                                                                                           \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                              \
+    };
+#endif //GENERATE_HAS_MEMBER_CONST_FUNCTION
+
+#ifndef GENERATE_HAS_MEMBER_RETURN_FUNCTION
+#define GENERATE_HAS_MEMBER_RETURN_FUNCTION(Function, ReturnType, ...)                       \
+                                                                                             \
+    template<typename T>                                                                     \
+    struct has_##Function {                                                                  \
+        struct Dummy {                                                                       \
+            typedef void ReturnType;                                                         \
+        };                                                                                   \
+        typedef typename std::conditional<has_##ReturnType<T>::value, T, Dummy>::type TType; \
+        typedef typename TType::ReturnType type;                                             \
+                                                                                             \
+        struct Fallback {                                                                    \
+            type Function(##__VA_ARGS__);                                                    \
+        };                                                                                   \
+                                                                                             \
+        struct Derived : TType, Fallback { };                                                \
+                                                                                             \
+        template<typename C, C>                                                              \
+        struct ChT;                                                                          \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(ChT<type (Fallback::*)(##__VA_ARGS__), &C::Function> *))[1];         \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(...))[2];                                                            \
+                                                                                             \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                                \
+    };
+#endif //GENERATE_HAS_MEMBER_RETURN_FUNCTION
+
+#ifndef GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION
+#define GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(Function, ReturnType, ...)                 \
+                                                                                             \
+    template<typename T>                                                                     \
+    struct has_##Function {                                                                  \
+        struct Dummy {                                                                       \
+            typedef void ReturnType;                                                         \
+        };                                                                                   \
+        typedef typename std::conditional<has_##ReturnType<T>::value, T, Dummy>::type TType; \
+        typedef typename TType::ReturnType type;                                             \
+                                                                                             \
+        struct Fallback {                                                                    \
+            type Function(##__VA_ARGS__) const;                                              \
+        };                                                                                   \
+                                                                                             \
+        struct Derived : TType, Fallback { };                                                \
+                                                                                             \
+        template<typename C, C>                                                              \
+        struct ChT;                                                                          \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(ChT<type (Fallback::*)(##__VA_ARGS__) const, &C::Function> *))[1];   \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(...))[2];                                                            \
+                                                                                             \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                                \
+    };
+#endif //GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION
 
 namespace nil {
     namespace crypto3 {
         namespace detail {
-            BOOST_TTI_HAS_TYPE(iterator)
-            BOOST_TTI_HAS_TYPE(const_iterator)
+            //
+            // as C++20 is not used
+            //
+            template<class T>
+            struct unwrap_reference {
+                using type = T;
+            };
+            template<class U>
+            struct unwrap_reference<std::reference_wrapper<U>> {
+                using type = U &;
+            };
 
-            BOOST_TTI_HAS_TYPE(encoded_value_type)
-            BOOST_TTI_HAS_TYPE(encoded_block_type)
-            BOOST_TTI_HAS_TYPE(decoded_value_type)
-            BOOST_TTI_HAS_TYPE(decoded_block_type)
+            GENERATE_HAS_MEMBER_TYPE(iterator)
 
-            BOOST_TTI_HAS_TYPE(block_type)
-            BOOST_TTI_HAS_TYPE(digest_type)
-            BOOST_TTI_HAS_TYPE(key_type)
-            BOOST_TTI_HAS_TYPE(key_schedule_type)
-            BOOST_TTI_HAS_TYPE(word_type)
+            GENERATE_HAS_MEMBER_TYPE(const_iterator)
 
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(encoded_value_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(encoded_block_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(decoded_value_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(decoded_block_bits)
+            GENERATE_HAS_MEMBER_TYPE(encoded_value_type)
 
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(block_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(digest_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(key_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(min_key_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(max_key_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(key_schedule_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(word_bits)
+            GENERATE_HAS_MEMBER_TYPE(encoded_block_type)
 
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(rounds)
+            GENERATE_HAS_MEMBER_TYPE(decoded_value_type)
 
-            BOOST_TTI_HAS_MEMBER_FUNCTION(begin);
-            BOOST_TTI_HAS_MEMBER_FUNCTION(end);
+            GENERATE_HAS_MEMBER_TYPE(decoded_block_type)
 
-            BOOST_TTI_HAS_MEMBER_FUNCTION(encode);
-            BOOST_TTI_HAS_MEMBER_FUNCTION(decode);
+            GENERATE_HAS_MEMBER_TYPE(block_type)
 
-            BOOST_TTI_HAS_MEMBER_FUNCTION(encrypt);
-            BOOST_TTI_HAS_MEMBER_FUNCTION(decrypt);
+            GENERATE_HAS_MEMBER_TYPE(digest_type)
 
-            BOOST_TTI_HAS_FUNCTION(generate)
-            BOOST_TTI_HAS_FUNCTION(check)
+            GENERATE_HAS_MEMBER_TYPE(key_type)
 
-            BOOST_TTI_HAS_TYPE(extension_policy)
-            BOOST_TTI_HAS_TYPE(curve_type)
-            BOOST_TTI_HAS_TYPE(underlying_field_type)
-            BOOST_TTI_HAS_TYPE(value_type)
-            BOOST_TTI_HAS_TYPE(modulus_type)
-            BOOST_TTI_HAS_TYPE(base_field_type)
-            BOOST_TTI_HAS_TYPE(number_type)
-            BOOST_TTI_HAS_TYPE(scalar_field_type)
-            BOOST_TTI_HAS_TYPE(g1_type)
-            BOOST_TTI_HAS_TYPE(g2_type)
-            BOOST_TTI_HAS_TYPE(gt_type)
+            GENERATE_HAS_MEMBER_TYPE(key_schedule_type)
 
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(value_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(modulus_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(base_field_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(base_field_modulus)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(scalar_field_bits)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(scalar_field_modulus)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(arity)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(p)
-            BOOST_TTI_HAS_STATIC_MEMBER_DATA(q)
+            GENERATE_HAS_MEMBER_TYPE(word_type)
 
-            BOOST_TTI_HAS_FUNCTION(to_affine)
-            BOOST_TTI_HAS_FUNCTION(to_special)
-            BOOST_TTI_HAS_FUNCTION(is_special)
+            GENERATE_HAS_MEMBER(encoded_value_bits)
+
+            GENERATE_HAS_MEMBER(encoded_block_bits)
+
+            GENERATE_HAS_MEMBER(decoded_value_bits)
+
+            GENERATE_HAS_MEMBER(decoded_block_bits)
+
+            GENERATE_HAS_MEMBER(block_bits)
+
+            GENERATE_HAS_MEMBER(digest_bits)
+
+            GENERATE_HAS_MEMBER(key_bits)
+
+            GENERATE_HAS_MEMBER(min_key_bits)
+
+            GENERATE_HAS_MEMBER(max_key_bits)
+
+            GENERATE_HAS_MEMBER(key_schedule_bits)
+
+            GENERATE_HAS_MEMBER(word_bits)
+
+            GENERATE_HAS_MEMBER(rounds)
+
+            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
+
+            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
+
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, encoded_block_type);
+
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, decoded_block_type);
+
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type);
+
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type);
+
+            GENERATE_HAS_MEMBER_FUNCTION(generate)
+
+            GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
+
+            GENERATE_HAS_MEMBER_TYPE(extension_policy)
+
+            GENERATE_HAS_MEMBER_TYPE(curve_type)
+
+            GENERATE_HAS_MEMBER_TYPE(underlying_field_type)
+
+            GENERATE_HAS_MEMBER_TYPE(value_type)
+
+            GENERATE_HAS_MEMBER_TYPE(integral_type)
+
+            GENERATE_HAS_MEMBER_TYPE(base_field_type)
+
+            GENERATE_HAS_MEMBER_TYPE(number_type)
+
+            GENERATE_HAS_MEMBER_TYPE(scalar_field_type)
+
+            GENERATE_HAS_MEMBER_TYPE(g1_type)
+
+            GENERATE_HAS_MEMBER_TYPE(g2_type)
+
+            GENERATE_HAS_MEMBER_TYPE(gt_type)
+
+            GENERATE_HAS_MEMBER(value_bits)
+
+            GENERATE_HAS_MEMBER(modulus_bits)
+
+            GENERATE_HAS_MEMBER(base_field_bits)
+
+            GENERATE_HAS_MEMBER(base_field_modulus)
+
+            GENERATE_HAS_MEMBER(scalar_field_bits)
+
+            GENERATE_HAS_MEMBER(scalar_field_modulus)
+
+            GENERATE_HAS_MEMBER(arity)
+
+            GENERATE_HAS_MEMBER(p)
+
+            GENERATE_HAS_MEMBER(q)
+
+            GENERATE_HAS_MEMBER_FUNCTION(to_affine_coordinates)
+
+            GENERATE_HAS_MEMBER_FUNCTION(to_special)
+
+            GENERATE_HAS_MEMBER_FUNCTION(is_special)
 
             template<typename T>
             struct is_iterator {
                 static char test(...);
 
                 template<typename U, typename = typename std::iterator_traits<U>::difference_type,
-                         typename = typename std::iterator_traits<U>::pointer,
-                         typename = typename std::iterator_traits<U>::reference,
-                         typename = typename std::iterator_traits<U>::value_type,
-                         typename = typename std::iterator_traits<U>::iterator_category>
+                        typename = typename std::iterator_traits<U>::pointer,
+                        typename = typename std::iterator_traits<U>::reference,
+                        typename = typename std::iterator_traits<U>::value_type,
+                        typename = typename std::iterator_traits<U>::iterator_category>
                 static long test(U &&);
 
                 constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
@@ -117,20 +340,14 @@ namespace nil {
 
             template<typename Range>
             struct is_range {
-                static const bool value = has_type_iterator<Range>::value &&
-                                          has_member_function_begin<Range, typename Range::iterator>::value &&
-                                          has_member_function_end<Range, typename Range::iterator>::value;
+                static const bool value = has_begin<Range>::value && has_end<Range>::value;
             };
 
             template<typename Container>
             struct is_container {
                 static const bool value =
-                    has_type_iterator<Container>::value &&
-                    has_member_function_begin<Container, typename Container::iterator>::value &&
-                    has_member_function_end<Container, typename Container::iterator>::value &&
-                    has_type_const_iterator<Container>::value &&
-                    has_member_function_begin<Container, typename Container::const_iterator>::value &&
-                    has_member_function_end<Container, typename Container::const_iterator>::value;
+                        has_const_iterator<Container>::value && has_begin<Container>::value &&
+                        has_end<Container>::value;
             };
 
             template<typename T>
@@ -141,17 +358,15 @@ namespace nil {
                                           has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value &&
                                           has_encode<T>::value && has_decode<T>::value;
                 typedef T type;
+
             };
 
             template<typename T>
             struct is_block_cipher {
-                static const bool value =
-                    has_type_word_type<T>::value && has_static_member_data_word_bits<T, const std::size_t>::value &&
-                    has_type_block_type<T>::value && has_static_member_data_block_bits<T, const std::size_t>::value &&
-                    has_type_key_type<T>::value && has_static_member_data_key_bits<T, const std::size_t>::value &&
-                    has_static_member_data_rounds<T, const std::size_t>::value &&
-                    has_member_function_encrypt<T, typename T::block_type>::value &&
-                    has_member_function_decrypt<T, typename T::block_type>::value;
+                static const bool value = has_word_type<T>::value && has_word_bits<T>::value &&
+                                          has_block_type<T>::value && has_block_bits<T>::value &&
+                                          has_key_type<T>::value && has_key_bits<T>::value && has_rounds<T>::value &&
+                                          has_encrypt<T>::value && has_decrypt<T>::value;
                 typedef T type;
             };
 
@@ -176,8 +391,7 @@ namespace nil {
                 static two test_construction_params(...);
 
             public:
-                static const bool value = has_type_digest_type<T>::value &&
-                                          has_static_member_data_digest_bits<T, const std::size_t>::value &&
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
                                           sizeof(test_construction_type<T>(0)) == sizeof(one) &&
                                           sizeof(test_construction_params<T>(0)) == sizeof(one);
                 typedef T type;
@@ -185,77 +399,67 @@ namespace nil {
 
             template<typename T>
             struct is_mac {
-                static const bool value =
-                    has_type_digest_type<T>::value && has_static_member_data_digest_bits<T, const std::size_t>::value &&
-                    has_type_block_type<T>::value && has_static_member_data_block_bits<T, const std::size_t>::value &&
-                    has_type_key_type<T>::value && has_static_member_data_key_bits<T, const std::size_t>::value;
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          has_block_type<T>::value && has_block_bits<T>::value &&
+                                          has_key_type<T>::value && has_key_bits<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_kdf {
-                static const bool value =
-                    has_type_digest_type<T>::value && has_static_member_data_digest_bits<T, const std::size_t>::value &&
-                    has_type_key_type<T>::value && has_static_member_data_max_key_bits<T, const std::size_t>::value &&
-                    has_static_member_data_min_key_bits<T, const std::size_t>::value;
-
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          has_key_type<T>::value && has_max_key_bits<T>::value &&
+                                          has_min_key_bits<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_passhash {
-                static const bool value = has_function_generate<T, void>::value && has_function_check<T, bool>::value;
+                static const bool value = has_generate<T>::value && has_check<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_curve {
-                static const bool value = has_static_member_data_base_field_bits<T, const std::size_t>::value &&
-                                          has_type_base_field_type<T>::value && has_type_number_type<T>::value &&
-
-                                          has_static_member_data_scalar_field_bits<T, const std::size_t>::value &&
-                                          has_type_scalar_field_type<T>::value && has_type_g1_type<T>::value &&
-                                          has_type_g2_type<T>::value && has_type_gt_type<T>::value &&
-                                          has_type_number_type<T>::value &&
-                                          has_static_member_data_p<T, const typename T::number_type>::value &&
-                                          has_static_member_data_q<T, const typename T::number_type>::value;
+                static const bool value = has_base_field_bits<T>::value && has_base_field_type<T>::value &&
+                                          has_number_type<T>::value && has_base_field_modulus<T>::value &&
+                                          has_scalar_field_bits<T>::value && has_scalar_field_type<T>::value &&
+                                          has_scalar_field_modulus<T>::value && has_g1_type<T>::value &&
+                                          has_g2_type<T>::value && has_gt_type<T>::value && has_p<T>::value &&
+                                          has_q<T>::value;
                 typedef T type;
             };
 
-            // TODO: we should add some other params to curve group policy to identify it more clearly
-            template<typename T>
+            template<typename T> //TODO: we should add some other params to curve group policy to identify it more clearly
             struct is_curve_group {
-                static const bool value = has_type_value_type<T>::value && has_type_underlying_field_type<T>::value &&
-                                          has_static_member_data_value_bits<T, const std::size_t>::value &&
-                                          has_type_curve_type<T>::value;
+                static const bool value = has_value_type<T>::value && has_underlying_field_type<T>::value &&
+                                          has_value_bits<T>::value && has_curve_type<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_field {
-                static const bool value =
-                    has_type_value_type<T>::value && has_static_member_data_value_bits<T, const std::size_t>::value &&
-                    has_type_modulus_type<T>::value &&
-                    has_static_member_data_modulus_bits<T, const std::size_t>::value &&
-                    has_type_number_type<T>::value && has_static_member_data_arity<T, const std::size_t>::value;
+                static const bool value = has_value_type<T>::value && has_value_bits<T>::value &&
+                                          has_integral_type<T>::value && has_modulus_bits<T>::value &&
+                                          has_number_type<T>::value && has_arity<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_extended_field {
-                static const bool value = has_type_value_type<T>::value &&
-                                          has_static_member_data_value_bits<T, const std::size_t>::value &&
-                                          has_type_modulus_type<T>::value &&
-                                          has_static_member_data_modulus_bits<T, const std::size_t>::value &&
-                                          has_type_number_type<T>::value &&
-                                          has_type_extension_policy<T>::value;
+                static const bool value = has_value_type<T>::value && has_value_bits<T>::value &&
+                                          has_integral_type<T>::value && has_modulus_bits<T>::value &&
+                                          has_number_type<T>::value && has_arity<T>::value &&
+                                          has_extension_policy<T>::value;
                 typedef T type;
             };
 
             template<typename T>
-            struct is_complex : std::false_type { };
+            struct is_complex : std::false_type {
+            };
             template<typename T>
-            struct is_complex<std::complex<T>> : std::true_type { };
+            struct is_complex<std::complex<T>> : std::true_type {
+            };
             template<typename T>
             constexpr bool is_complex_v = is_complex<T>::value;
 

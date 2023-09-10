@@ -139,15 +139,15 @@ void check_eddsa(
     BOOST_CHECK(etalon_sig == sig);
     BOOST_CHECK(static_cast<bool>(verify<scheme_type>(msg, sig, private_key)));
     // TODO: add checks after catching exceptions in marshalling will be fixed
-    // auto wrong_sig = sig;
-    // wrong_sig[1] = 0;
-    // BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
-    // wrong_sig[1] = sig[1];
-    // wrong_sig[33] = 0;
-    // BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
-    // wrong_sig[1] = 0;
-    // wrong_sig[33] = 0;
-    // BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
+    auto wrong_sig = sig;
+    wrong_sig[1] = 0;
+    BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
+    wrong_sig[1] = sig[1];
+    wrong_sig[33] = 0;
+    BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
+    wrong_sig[1] = 0;
+    wrong_sig[33] = 0;
+    BOOST_CHECK(!static_cast<bool>(verify<scheme_type>(msg, wrong_sig, private_key)));
 }
 
 BOOST_AUTO_TEST_SUITE(eddsa_conformity_test_suite)
