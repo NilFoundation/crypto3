@@ -255,6 +255,7 @@ namespace nil {
                         }
                         for( std::size_t i = 0; i < reduced_input.size(); i++){
                             for( std::size_t j = 0; j < preprocessed_data.common_data.usable_rows_amount; j++){
+                                // This assert means that every value \in keys of sorting_map = set of values of reduced_value
                                 BOOST_ASSERT(sorting_map.find(reduced_input[i][j]) != sorting_map.end());
                                 sorting_map[reduced_input[i][j]]++; 
                             }
