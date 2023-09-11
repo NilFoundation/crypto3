@@ -11,57 +11,11 @@ on:
 env:
   SUITE_REPO: "NilFoundation/crypto3"
   LIB_NAME: "blueprint"
-  CACHE_NAME: "checkout-job-cache"
+  CACHE_NAME: "blueprint-job-cache"
 
 jobs:
-  checkout:
-    runs-on: [self-hosted, tests-runner]
-    steps:
-      - name: Cleanup # TODO - move to scripts on runner
-        run: |
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-
-      - name: Checkout suite
-        uses: actions/checkout@v3
-        with:
-          repository: ${{ env.SUITE_REPO }}
-          submodules: recursive
-
-      - name: Checkout source code
-        uses: actions/checkout@v3
-        with:
-          path: ./libs/${{ env.LIB_NAME }}
-          submodules: recursive
-
-      - name: Cmake and build
-        env:
-          CMAKE_ARGS: "
-            -DCMAKE_BUILD_TYPE=Debug
-            -DBUILD_SHARED_LIBS=FALSE
-            -DBUILD_TESTS=TRUE
-            "
-        run: |
-          mkdir build
-          cd build
-          cmake ${{ env.CMAKE_ARGS }} ..
-
-      - name: Archive build results
-        run: |
-          touch ${{ env.CACHE_NAME }}.tar.gz
-          tar -czf ${{ env.CACHE_NAME }}.tar.gz --exclude=${{ env.CACHE_NAME }}.tar.gz .
-
-      - name: Cache archived job output
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.CACHE_NAME }}
-          path: ${{ env.CACHE_NAME }}.tar.gz
-          retention-days: 1
-
-
   run_tests:
-    runs-on: [self-hosted]
-    needs: [checkout]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -101,29 +55,52 @@ jobs:
             blueprint_algebra_fields_plonk_sqrt_test,
           ]  # Tests to execute
     steps:
-      - name: Cleanup # TODO - move to scripts on runner
-        run: |
-          rm -rf ./* || true
-          rm -rf ./.??* || true
+      - uses: cachix/install-nix-action@v23
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Upload checkout job cache
-        uses: actions/download-artifact@v3
+      - name: Checkout suite
+        uses: actions/checkout@v3
         with:
-          name: ${{ env.CACHE_NAME }}
+          repository: ${{ env.SUITE_REPO }}
+          submodules: recursive
+          fetch-depth: 0
 
-      - name: Extract artifacts
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          path: ./libs/${{ env.LIB_NAME }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Configure Nix
         run: |
-          tar -xf ${{ env.CACHE_NAME }}.tar.gz
-          rm ${{ env.CACHE_NAME }}.tar.gz
+          mkdir -p ~/.config/nix
+          echo "extra-experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
+
+      - name: Cmake and build
+        env:
+          CMAKE_ARGS: "
+            -DCMAKE_CXX_STANDARD=17
+            -DCMAKE_BUILD_TYPE=Debug
+            -DBUILD_SHARED_LIBS=TRUE
+            -DBUILD_TESTS=TRUE
+            -DCMAKE_C_COMPILER=clang
+            -DCMAKE_CXX_COMPILER=clang++
+            "
+        run: |
+          mkdir build
+          nix develop ./libs/blueprint -c cmake -B build ${{ env.CMAKE_ARGS }} .
 
       - name: Build
         working-directory: ./build
-        run: cmake --build . -t ${{ matrix.target }}
+        run: nix develop ../libs/blueprint -c cmake --build . -t ${{ matrix.target }}
 
       - name: Run test
         working-directory: ./build
-        run: |
-          cd libs/${{ env.LIB_NAME }}/test
-          COLOR='\033[0;33m'
-          echo -e "${COLOR}${{ matrix.target }}"
-          ./${{ matrix.target }}
+        run:
+          nix develop ../libs/blueprint -c bash -c "
+          cd libs/${{ env.LIB_NAME }}/test &&
+          COLOR='\033[0;33m' &&
+          echo -e "${COLOR}${{ matrix.target }}" &&
+          ./${{ matrix.target }}"
