@@ -74,12 +74,24 @@ namespace nil {
                     chopped_value_type result;
                     for (std::size_t i = 0; i < ratio; i++) {
                         result[i] = get_i_th_chunk(input, i);
-
                     }
-
                     return result;
-
                 }
+
+                static non_native_field_type::value_type glue_non_native(chopped_value_type input) {
+                    non_native_field_type::value_type result;
+                    native_field_type::integral_type integral_input;
+                    result = non_native_field_type::value_type(native_field_type::integral_type(input[0].data));
+                    for (std::size_t i = 1; i < ratio; i++) {
+                        std::size_t shift = 0;
+                        for (std::size_t j = 0; j < i; j++) {
+                            shift += chunk_sizes[j];
+                        }
+                        result += non_native_field_type::value_type(native_field_type::integral_type(input[i].data) << shift);
+                    }
+                    return result;
+                }
+
             };
 
             /*
@@ -132,12 +144,24 @@ namespace nil {
                     chopped_value_type result;
                     for (std::size_t i = 0; i < ratio; i++) {
                         result[i] = get_i_th_chunk(input, i);
-
                     }
-
                     return result;
-
                 }
+
+                static non_native_field_type::value_type glue_non_native(chopped_value_type input) {
+                    non_native_field_type::value_type result;
+                    native_field_type::integral_type integral_input;
+                    result = non_native_field_type::value_type(native_field_type::integral_type(input[0].data));
+                    for (std::size_t i = 1; i < ratio; i++) {
+                        std::size_t shift = 0;
+                        for (std::size_t j = 0; j < i; j++) {
+                            shift += chunk_sizes[j];
+                        }
+                        result += non_native_field_type::value_type(native_field_type::integral_type(input[i].data) << shift);
+                    }
+                    return result;
+                }
+
             };
 
             /*
