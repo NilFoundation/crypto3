@@ -69,16 +69,16 @@ namespace nil {
                         }
 
                         static value_type one () {
-                            return make_value(0, 1);
+                            return make_value(
+                                0x216936d3cd6e53fec0a4e231fdd6dc5c692cc7609525a7b2c9562d608f25d51a_cppui256,
+                                0x6666666666666666666666666666666666666666666666666666666666666658_cppui256
+                                );
                         }
 
                         static value_type zero () {
-                            return make_value(0, 0);
+                            return make_value(0, 1);
                         }
 
-                        static bool is_zero (value_type const &value) {
-                            return true;
-                        }
 #else
                         using value_type = curve_element<params_type, Form, Coordinates>;
 #endif
