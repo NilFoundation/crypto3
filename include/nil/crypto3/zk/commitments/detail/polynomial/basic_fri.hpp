@@ -175,6 +175,9 @@ namespace nil {
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
+//                                if( FRI::use_grinding && proof_of_work != rhs.proof_of_work ){
+//                                    return false;
+//                                }
                                 return fri_roots == rhs.fri_roots &&
                                        query_proofs == rhs.query_proofs &&
                                        final_polynomial == rhs.final_polynomial;
@@ -190,6 +193,11 @@ namespace nil {
                             typename GrindingType::output_type                  proof_of_work;
                         };
                     };
+                    template <typename FRI>
+                    constexpr bool use_grinding()
+                    {
+                        return FRI::use_grinding;
+                    }
                 }    // namespace detail
             }        // namespace commitments
 
@@ -197,12 +205,13 @@ namespace nil {
                 template<typename FRI,
                     typename std::enable_if<
                         std::is_base_of<
-                        commitments::detail::basic_batched_fri<
-                            typename FRI::field_type, typename FRI::merkle_tree_hash_type,
-                            typename FRI::transcript_hash_type, FRI::lambda, FRI::m,
-                            FRI::use_grinding, typename FRI::grinding_type
-                        >,
-                        FRI>::value,
+                            commitments::detail::basic_batched_fri<
+                                typename FRI::field_type, typename FRI::merkle_tree_hash_type,
+                                typename FRI::transcript_hash_type, FRI::lambda, FRI::m,
+                                FRI::use_grinding, typename FRI::grinding_type
+                            >,
+                            FRI
+                        >::value,
                         bool
                     >::type = true>
                 static typename FRI::commitment_type commit(const typename FRI::precommitment_type &P) {
@@ -673,7 +682,7 @@ namespace nil {
                                     if constexpr (std::is_same<
                                             math::polynomial_dfs<typename FRI::field_type::value_type>,
                                             PolynomialType>::value
-                                            ) {
+                                    ) {
                                         initial_proof[k].values[polynomial_index][j][0] = g[k][polynomial_index][s_indices[j][0]];
                                         initial_proof[k].values[polynomial_index][j][1] = g[k][polynomial_index][s_indices[j][1]];
                                     } else {
