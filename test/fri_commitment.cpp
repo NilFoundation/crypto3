@@ -425,7 +425,7 @@ struct test_initializer {
 BOOST_TEST_GLOBAL_FIXTURE(test_initializer);
 
 BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
-    static constexpr std::size_t lambda = 1;
+    static constexpr std::size_t lambda = 40;
     static constexpr std::size_t m = 2;
 
     using curve_type = nil::crypto3::algebra::curves::bls12<381>;

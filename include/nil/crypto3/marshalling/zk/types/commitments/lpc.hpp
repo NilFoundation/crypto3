@@ -54,19 +54,30 @@ namespace nil {
                     using lpc_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-                        // lpc::proof::z is std::array<std::vector<std::vector>>, batches_num>
+                        // batch_info. 
+                        // We'll check is it good for current EVM instance
                         nil::marshalling::types::array_list<
                             TTypeBase,
-                            nil::marshalling::types::array_list<
-                                TTypeBase,
-                                nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPC::field_type::value_type>,
-                                nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
-                            >,
-                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
+                            nil::marshalling::types::integral<TTypeBase, uint8_t>,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                        >,
+
+                        // evaluation_points_num. 
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            nil::marshalling::types::integral<TTypeBase, uint8_t>,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                        >,
+
+                        // All z-s are placed into plain line lpc::proof::z
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            field_element<TTypeBase, typename LPC::basic_fri::field_type::value_type>,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >,
 
                         // One fri proof
-                        fri_proof<TTypeBase, typename LPC::basic_fri>
+                        typename fri_proof<TTypeBase, typename LPC::basic_fri>::type
                     >
                 >;
 
@@ -75,34 +86,53 @@ namespace nil {
                 fill_lpc_proof( const typename LPC::proof_type &proof ){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
+                    nil::crypto3::marshalling::types::batch_info_type batch_info;
+
                     nil::marshalling::types::array_list<
                         TTypeBase,
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPC::field_type::value_type>,
-                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
-                        >,
-                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>> 
-                    > filled_z;
-
-                    for( size_t j = 0; j < LPC::basic_fri::batches_num; j++){
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPC::field_type::value_type>,
-                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
-                        > filled;
-
-                        for( size_t i = 0; i < proof.z[j].size(); i++){
-                            filled.value().push_back(
-                                fill_field_element_vector<typename LPC::field_type::value_type, Endianness>(proof.z[j][i])
-                            );
-                        }
-                        filled_z.value().push_back(filled);
+                        nil::marshalling::types::integral<TTypeBase, uint8_t>,
+                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                    > filled_batch_info;
+                    auto batches = proof.z.get_batches();
+                    for( std::size_t i = 0; i < batches.size(); i++ ){
+                        batch_info[batches[i]] = proof.z.get_batch_size(batches[i]);
+                        filled_batch_info.value().push_back(nil::marshalling::types::integral<TTypeBase, uint8_t>(batches[i]));
+                        filled_batch_info.value().push_back(nil::marshalling::types::integral<TTypeBase, uint8_t>(proof.z.get_batch_size(batches[i])));
                     }
 
-                    auto filled_fri_proof = fill_fri_proof<Endianness, typename LPC::basic_fri>(proof.fri_proof);
+                    nil::marshalling::types::array_list<
+                        TTypeBase,
+                        nil::marshalling::types::integral<TTypeBase, uint8_t>,
+                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                    > filled_eval_points_num;
+                    for( std::size_t i = 0; i < batches.size(); i++ ){
+                        for( std::size_t j = 0; j < proof.z.get_batch_size(batches[i]); j++ ){
+                            filled_eval_points_num.value().push_back(
+                                nil::marshalling::types::integral<TTypeBase, uint8_t>(proof.z.get_poly_points_number(batches[i], j))
+                            );
+                        }
+                    }
+
+                    std::vector<typename LPC::basic_fri::field_type::value_type> z_val;
+                    for( std::size_t i = 0; i < batches.size(); i++ ){
+                        for(std::size_t j = 0; j < proof.z.get_batch_size(batches[i]); j++ ){
+                            for(std::size_t k = 0; k < proof.z.get_poly_points_number(batches[i], j); k++ ){
+                                z_val.push_back(proof.z.get(batches[i], j, k));
+                            }
+                        }
+                    }
+                    nil::marshalling::types::array_list<
+                        TTypeBase,
+                        field_element<TTypeBase, typename LPC::basic_fri::field_type::value_type>,
+                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                    > filled_z = fill_field_element_vector<typename LPC::basic_fri::field_type::value_type, Endianness>(z_val);
+
+                    typename fri_proof<TTypeBase, typename LPC::basic_fri>::type filled_fri_proof = fill_fri_proof<Endianness, typename LPC::basic_fri>(
+                        proof.fri_proof, batch_info
+                    );
+
                     return lpc_proof<TTypeBase, LPC>(
-                        std::tuple( filled_z, filled_fri_proof )
+                        std::tuple( filled_batch_info, filled_eval_points_num, filled_z, filled_fri_proof)
                     );
                 }
 
@@ -111,20 +141,41 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     typename LPC::proof_type proof;
+                    typename nil::crypto3::marshalling::types::batch_info_type batch_info;
+                    std::vector<std::uint8_t> eval_points_num;
 
-                    auto filled_z = std::get<0>(filled_proof.value());
-                    for(size_t k = 0; k < LPC::basic_fri::batches_num; k++ ){
-                        auto filled = filled_z.value()[k];
-                        for( size_t i = 0; i < filled.value().size(); i ++){
-                            proof.z[k].push_back(make_field_element_vector<typename LPC::field_type::value_type, Endianness>(filled.value()[i]));
+                    auto filled_batch_info = std::get<0>(filled_proof.value()).value();
+                    for( std::size_t i = 0; i < filled_batch_info.size(); i+=2 ){
+                        batch_info[filled_batch_info[i].value()] = filled_batch_info[i+1].value();
+                        proof.z.set_batch_size(filled_batch_info[i].value(), filled_batch_info[i+1].value());
+                    }
+
+                    auto filled_eval_points_num = std::get<1>(filled_proof.value()).value();
+                    std::size_t cur = 0;
+                    for( const auto &it:batch_info){
+                        for( std::size_t i = 0; i < it.second; i++ ){
+                            proof.z.set_poly_points_number(it.first, i, filled_eval_points_num[cur].value());
+                            cur++;
                         }
                     }
 
-                    proof.fri_proof = make_fri_proof<Endianness, typename LPC::basic_fri>(std::get<1>(filled_proof.value()));
+                    auto filled_z = std::get<2>(filled_proof.value()).value();
+                    cur = 0;
+                    for( const auto &it:batch_info){
+                        for( std::size_t i = 0; i < it.second; i++ ){
+                            for( std::size_t j = 0; j < proof.z.get_poly_points_number(it.first, i); j++ ){
+                                proof.z.set(it.first, i, j, filled_z[cur].value());
+                                cur++;
+                            }
+                        }
+                    }
+
+                    proof.fri_proof = make_fri_proof<Endianness, typename LPC::basic_fri>(std::get<3>(filled_proof.value()), batch_info);
                     return proof;
                 }
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
 }    // namespace nil
+
 #endif    // CRYPTO3_MARSHALLING_LPC_COMMITMENT_HPP
