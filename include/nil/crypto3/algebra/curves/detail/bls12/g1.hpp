@@ -61,6 +61,29 @@ namespace nil {
                             field_type::value_bits + 1;    ///< size of the base field in bits
 #ifdef __ZKLLVM__
                         typedef __zkllvm_curve_bls12381 value_type;
+
+                        static_assert(Version == 381 && "zkllvm works with 381 version");
+
+                        static value_type make_value(
+                            typename field_type::value_type affine_one_X,
+                            typename field_type::value_type affine_one_Y) {
+                            return __builtin_assigner_bls12381_curve_init(affine_one_X, affine_one_Y);
+                        }
+
+                        static value_type one () {
+                            return make_value(
+                                0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB_cppui381,
+                                0x8B3F481E3AAA0F1A09E30ED741D8AE4FCF5E095D5D00AF600DB18CB2C04B3EDD03CC744A2888AE40CAA232946C5E7E1_cppui380
+                                );
+                        }
+
+                        static value_type zero () {
+                            return make_value(
+                                0,
+                                1
+                                );
+                        }
+
 #else
                         using value_type = curve_element<params_type, Form, Coordinates>;
 #endif
