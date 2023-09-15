@@ -199,7 +199,6 @@ namespace nil {
                         _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
                         //_proof.eval_proof.challenge = typename FieldType::value_type(7);
 
-                        _proof.eval_proof.lagrange_0 = preprocessed_public_data.common_data.lagrange_0.evaluate(_proof.eval_proof.challenge);
                         generate_evaluation_points();
 
                         _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        

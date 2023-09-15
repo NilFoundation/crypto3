@@ -50,19 +50,18 @@ namespace nil {
                     typedef FieldType field_type;
                     typedef ParamsType params_type;
 
+                    using circuit_params_type = typename ParamsType::circuit_params_type;
                     using commitment_scheme_type = typename ParamsType::commitment_scheme_type;
                     using commitment_type = typename commitment_scheme_type::commitment_type;
 
                     struct evaluation_proof {
-                        // TODO: remove both of these away.
+                        // TODO: remove it!
                         typename FieldType::value_type challenge;
-                        typename FieldType::value_type lagrange_0;
 
                         typename commitment_scheme_type::proof_type eval_proof;
 
                         bool operator==(const evaluation_proof &rhs) const {
-                            return challenge == rhs.challenge && lagrange_0 == rhs.lagrange_0 &&
-                                    eval_proof == rhs.eval_proof;
+                            return challenge == rhs.challenge && eval_proof == rhs.eval_proof;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);

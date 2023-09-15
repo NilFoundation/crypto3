@@ -54,6 +54,7 @@ namespace nil {
                     using precommitment_type = typename LPCScheme::precommitment_type;
                     using commitment_type = typename LPCScheme::commitment_type;
                     using fri_type = typename LPCScheme::fri_type;
+                    using basic_fri = typename LPCScheme::fri_type;
                     using proof_type = typename LPCScheme::proof_type;
                     using transcript_type = typename LPCScheme::transcript_type;
                     using transcript_hash_type = typename LPCScheme::transcript_hash_type;

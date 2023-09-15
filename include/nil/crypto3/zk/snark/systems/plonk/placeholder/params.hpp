@@ -71,6 +71,7 @@ namespace nil {
                     using public_input_type = typename CircuitParams::public_input_type;
 
                     using transcript_hash_type = typename CommitmentScheme::transcript_hash_type;
+                    using circuit_params_type = CircuitParams;
                 };
 /*
                 template<typename FieldType, typename ArithmetizationParams,

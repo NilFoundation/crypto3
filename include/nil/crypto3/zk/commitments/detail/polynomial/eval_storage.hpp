@@ -52,6 +52,14 @@ namespace nil {
                         }
                         return batches;
                     }
+                    std::map<std::size_t, std::size_t> get_batch_info() const{
+                        std::map<std::size_t, std::size_t> batch_info;
+
+                        for(auto it = z.begin(); it != z.end(); ++it){
+                            batch_info[it->first] = it->second.size();
+                        }
+                        return batch_info;
+                    }
                     std::size_t get_batches_num() const{
                         return z.size();
                     }
