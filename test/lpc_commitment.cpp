@@ -432,7 +432,7 @@ struct test_initializer {
     }
 };
 
-BOOST_AUTO_TEST_SUITE(marshalling_random_test_suite)
+BOOST_AUTO_TEST_SUITE(marshalling_random)
     // setup
     static constexpr std::size_t lambda = 40;
     static constexpr std::size_t m = 2;
@@ -455,7 +455,7 @@ BOOST_AUTO_TEST_SUITE(marshalling_random_test_suite)
     >;
     using LPC = typename nil::crypto3::zk::commitments::batched_list_polynomial_commitment<field_type, lpc_params_type>;
 
-BOOST_FIXTURE_TEST_CASE(marshalling_lpc_random_test, test_initializer) {
+BOOST_FIXTURE_TEST_CASE(lpc_proof_test, test_initializer) {
     auto proof = generate_random_lpc_proof<LPC>(
             final_polynomial_degree, 5,
             generate_random_step_list(r, 4, test_global_rnd_engine),
@@ -467,7 +467,7 @@ BOOST_FIXTURE_TEST_CASE(marshalling_lpc_random_test, test_initializer) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(marshalling_real_lpc_proofs)
+BOOST_AUTO_TEST_SUITE(marshalling_real)
     // Setup common types.
     using Endianness = nil::marshalling::option::big_endian;
     using curve_type = nil::crypto3::algebra::curves::vesta;
@@ -476,7 +476,7 @@ BOOST_AUTO_TEST_SUITE(marshalling_real_lpc_proofs)
     using transcript_hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using merkle_tree_type = typename containers::merkle_tree<merkle_hash_type, 2>;
 
-BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_initializer){
+BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     // Setup types.
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
