@@ -537,7 +537,6 @@ BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_fixture){
     lpc_scheme_verifier.append_eval_point(2, point);
     lpc_scheme_verifier.append_eval_point(3, point);
     BOOST_CHECK(lpc_scheme_verifier.verify_eval(proof, commitments, transcript_verifier));
-    exit(0);
 
     // Check transcript state    
     typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();

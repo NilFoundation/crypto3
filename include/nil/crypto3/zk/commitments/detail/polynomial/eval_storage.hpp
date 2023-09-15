@@ -37,9 +37,20 @@ namespace nil {
                 private:
                     std::map<std::size_t, std::vector<std::vector<typename FieldType::value_type>>> z;
                 public:
+                    bool operator==(const eval_storage& other) const{
+                        return this->z == other.z;
+                    }
                     eval_storage &operator=(const eval_storage& other){
                         this->z = other.z;
                         return *this;
+                    }
+                    std::vector<std::size_t> get_batches() const{
+                        std::vector<std::size_t> batches;
+
+                        for(auto it = z.begin(); it != z.end(); ++it){
+                            batches.push_back(it->first);
+                        }
+                        return batches;
                     }
                     std::size_t get_batches_num() const{
                         return z.size();
