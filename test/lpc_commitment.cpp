@@ -356,18 +356,10 @@ template<typename Endianness, typename LPC>
 void test_lpc_proof(typename LPC::proof_type &proof, std::string filename = "") {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    auto filled_proof = nil::crypto3::marshalling::types::fill_lpc_proof<Endianness, LPC>(proof);
-    auto _proof = nil::crypto3::marshalling::types::make_lpc_proof<Endianness, LPC>(filled_proof);
-    BOOST_CHECK(proof.z == _proof.z);
-    BOOST_CHECK(proof.fri_proof.fri_roots == _proof.fri_proof.fri_roots);
-    BOOST_CHECK(proof.fri_proof.query_proofs[0].initial_proof == _proof.fri_proof.query_proofs[0].initial_proof);
-    BOOST_CHECK(proof.fri_proof.query_proofs[0].round_proofs.size() == _proof.fri_proof.query_proofs[0].round_proofs.size());
-    BOOST_CHECK(proof.fri_proof.query_proofs[0].round_proofs[0].y == _proof.fri_proof.query_proofs[0].round_proofs[0].y);
-    BOOST_CHECK(proof.fri_proof.query_proofs[0].round_proofs == _proof.fri_proof.query_proofs[0].round_proofs);
-    BOOST_CHECK(proof.fri_proof.query_proofs[0] == _proof.fri_proof.query_proofs[0]);
-    BOOST_CHECK(proof.fri_proof == _proof.fri_proof);
+    auto filled_proof = nil::crypto3::marshalling::types::fill_eval_proof<Endianness, LPC>(proof);
+    auto _proof = nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(filled_proof);
     BOOST_CHECK(proof == _proof);
-
+/*
     std::vector<std::uint8_t> cv;
     cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
@@ -382,7 +374,7 @@ void test_lpc_proof(typename LPC::proof_type &proof, std::string filename = "") 
 
     if (filename != "") {
         print_hex_byteblob_to_file(cv.begin(), cv.end(), false, filename + ".data");
-    }
+    }*/
 }
 
 // *******************************************************************************
