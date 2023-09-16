@@ -276,70 +276,7 @@ typename FRI::proof_type generate_random_fri_proof(
     res.final_polynomial = generate_random_polynomial<typename FRI::field_type>(d, alg_rnd);
     return res;
 }
- 
-// Test data structures marshalling functions
-/*
-template<typename Endianness, typename FRI>
-void test_fri_round_proof(typename FRI::round_proof_type &proof) {
-    auto filled_proof = nil::crypto3::marshalling::types::fill_fri_round_proof<Endianness, FRI>(proof);
-    auto _proof = nil::crypto3::marshalling::types::make_fri_round_proof<Endianness, FRI>(filled_proof);
-    BOOST_CHECK(proof == _proof);
 
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_proof.length(), 0x00);
-    auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
-
-    nil::crypto3::marshalling::types::fri_round_proof<TTypeBase, FRI> test_val_read;
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-    typename FRI::round_proof_type constructed_val_read = nil::crypto3::marshalling::types::make_fri_round_proof<Endianness, FRI>(
-            test_val_read);
-    BOOST_CHECK(proof == constructed_val_read);
-}
-
-template<typename Endianness, typename FRI>
-void test_fri_initial_proof(typename FRI::initial_proof_type &proof) {
-    auto filled_proof = nil::crypto3::marshalling::types::fill_fri_initial_proof<Endianness, FRI>(proof);
-    auto _proof = nil::crypto3::marshalling::types::make_fri_initial_proof<Endianness, FRI>(filled_proof);
-    BOOST_CHECK(proof == _proof);
-
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_proof.length(), 0x00);
-    auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
-
-    nil::crypto3::marshalling::types::fri_initial_proof<TTypeBase, FRI> test_val_read;
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-    typename FRI::initial_proof_type constructed_val_read = nil::crypto3::marshalling::types::make_fri_initial_proof<Endianness, FRI>(
-            test_val_read);
-    BOOST_CHECK(proof == constructed_val_read);
-}
-
-
-template<typename Endianness, typename FRI>
-void test_fri_query_proof(typename FRI::query_proof_type &proof) {
-    auto filled_proof = nil::crypto3::marshalling::types::fill_fri_query_proof<Endianness, FRI>(proof);
-    auto _proof = nil::crypto3::marshalling::types::make_fri_query_proof<Endianness, FRI>(filled_proof);
-    BOOST_CHECK(proof == _proof);
-
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_proof.length(), 0x00);
-    auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
-
-    nil::crypto3::marshalling::types::fri_query_proof<TTypeBase, FRI> test_val_read;
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-    typename FRI::query_proof_type constructed_val_read = nil::crypto3::marshalling::types::make_fri_query_proof<Endianness, FRI>(
-            test_val_read);
-    BOOST_CHECK(proof == constructed_val_read);
-}
-*/
 template<typename Endianness, typename FRI>
 void test_fri_proof(typename FRI::proof_type &proof, typename nil::crypto3::marshalling::types::batch_info_type batch_info) {
     using TTypeBase = nil::marshalling::field_type<Endianness>;

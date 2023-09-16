@@ -49,23 +49,16 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-// TODO add lookups processing
-                template<typename TTypeBase, typename Proof,
-//                         typename = typename std::enable_if<
-//                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
-//                                                     typename Proof::field_type, typename Proof::params_type>>::value,
-//                             bool>::type,
-                         typename... TOptions>
+                // This should be different for different commitment schemes!
+                template<typename TTypeBase, typename Proof>
                 using placeholder_evaluation_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // typename FieldType::value_type challenge
                         field_element<TTypeBase, typename Proof::field_type::value_type>,
-                        // typename FieldType::value_type lagrange_0
-                        field_element<TTypeBase, typename Proof::field_type::value_type>,
 
-                        //typename Proof::commitment_scheme_type::proof_type combined_value;
-                        lpc_proof<TTypeBase, typename Proof::commitment_scheme_type>
+                        //typename Proof::commitment_scheme_type::eval_proof;
+                        typename eval_proof<TTypeBase, typename Proof::commitment_scheme_type>::type
                     >
                 >;
 
@@ -82,16 +75,13 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     field_marhsalling_type filled_challenge = field_marhsalling_type(proof.challenge);
 
-                    // typename FieldType::value_type lagrange_0
-                    field_marhsalling_type filled_lagrange_0 = field_marhsalling_type(proof.lagrange_0);
-
-                    // typename commitment_scheme_type::proof_type combined_value;
-                    auto filled_combined_value =
-                        fill_lpc_proof<Endianness, typename Proof::commitment_scheme_type>(proof.combined_value);
+                    // typename commitment_scheme_type::proof_type eval_proof;
+                    auto filled_eval_proof =
+                        fill_eval_proof<Endianness, typename Proof::commitment_scheme_type>(proof.eval_proof);
 
                     return placeholder_evaluation_proof<TTypeBase, Proof>(std::make_tuple(
-                        filled_challenge, filled_lagrange_0, 
-                        filled_combined_value
+                        filled_challenge,
+                        filled_eval_proof
                     ));
                 }
 
@@ -105,12 +95,9 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     proof.challenge = std::get<0>(filled_proof.value()).value();
 
-                    // typename FieldType::value_type lagrange_0
-                    proof.lagrange_0 = std::get<1>(filled_proof.value()).value();
-
                     // typename commitment_scheme_type::proof_type combined_value
-                    proof.combined_value = make_lpc_proof<Endianness, typename Proof::commitment_scheme_type>(
-                        std::get<2>(filled_proof.value()));
+                    proof.eval_proof = make_eval_proof<Endianness, typename Proof::commitment_scheme_type>(
+                        std::get<1>(filled_proof.value()));
                     
                     return proof;
                 }
