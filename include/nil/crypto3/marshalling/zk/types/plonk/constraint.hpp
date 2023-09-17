@@ -70,7 +70,7 @@ namespace nil {
                     return make_expression<typename PlonkConstraint::base_type, Endianness>(filled_constr);
                 }
 
-                /*********************** Plonk lookup constraint ****************************/
+                // *********************** Plonk lookup constraint ****************************/
                 template<typename TTypeBase, typename PlonkLookupConstraint>
                 using plonk_lookup_constraint = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<                  
@@ -114,64 +114,11 @@ namespace nil {
                     ));
                 }
 
-                template<typename PlonkLookupConstraint, typename Endianness,  typename = typename std::enable_if<
-                             std::is_same<PlonkLookupConstraint, nil::crypto3::zk::snark::plonk_lookup_constraint<
-                                                               typename PlonkLookupConstraint::field_type,
-                                                               typename PlonkLookupConstraint::variable_type>>::value>::type>
-                PlonkLookupConstraint make_plonk_constraint(
-                    const plonk_lookup_constraint<nil::marshalling::field_type<Endianness>, PlonkLookupConstraint> &filled_constr
-                ) {
-                    PlonkLookupConstraint lookup_constraint;
-                    auto filled_lookup_input = std::get<0>(filled_constr.value());
-                    for(size_t i = 0; i < filled_lookup_input.value().size(); i++){
-                        lookup_constraint.lookup_input.emplace_back(
-                            make_term<typename PlonkLookupConstraint::term, Endianness>(
-                                filled_lookup_input.value().at(i)
-                            )
-                        );
-                    }
-                    lookup_constraint.lookup_value = make_variables<typename PlonkLookupConstraint::variable_type, Endianness>(
-                        std::get<1>(filled_constr.value())
-                    );
-
-                    return lookup_constraint;
-                }
-
-                /*********************** Plonk gates constraints  ****************************/
-                /*                 Universal interface for gates marshalling                 */
-                /*****************************************************************************/
-                
-                //TODO maybe it can be implemented in a better way
-
-                template <typename TTypeBase, typename Constraint, typename T=void > 
-                struct plonk_gate_constraint_base_type;
-
-                template <typename TTypeBase, typename Constraint> 
-                struct plonk_gate_constraint_base_type< TTypeBase, Constraint, nil::crypto3::zk::snark::plonk_constraint<
-                    typename Constraint::field_type,
-                    typename Constraint::variable_type
-                >>
-                {
-                    using type = plonk_constraint<TTypeBase, Constraint>;
-                };
-
-                template <typename TTypeBase, typename Constraint> 
-                struct plonk_gate_constraint_base_type< TTypeBase, Constraint, nil::crypto3::zk::snark::plonk_lookup_constraint<
-                    typename Constraint::field_type,
-                    typename Constraint::variable_type
-                >>
-                {
-                    using type = plonk_lookup_constraint<TTypeBase, Constraint>;
-                };
-
-                template <typename TTypeBase, typename Constraint> 
-                using plonk_gate_constraint = plonk_gate_constraint_base_type<TTypeBase, Constraint, Constraint>;
-
                 /*********************** Universal vector of plonk constraints as input to gate ****************************/
                 template<typename TTypeBase, typename Constraint>
                 using plonk_constraints = nil::marshalling::types::array_list<
                     TTypeBase, 
-                    typename plonk_gate_constraint<TTypeBase, Constraint>::type,
+                    plonk_constraint<TTypeBase, Constraint>,
                     nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                 >;
 

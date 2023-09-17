@@ -46,7 +46,7 @@ namespace nil {
                 template<typename TTypeBase, typename Variable, typename = void>
                 struct variable;
                 
-                /********************************* plonk_variable ***************************/
+                //********************************* plonk_variable ***************************/
                 template<typename TTypeBase, typename AssignmentType>
                 struct variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<AssignmentType>> {
                     using type = nil::marshalling::types::bundle<
@@ -59,7 +59,8 @@ namespace nil {
                             // bool relative
                             nil::marshalling::types::integral<TTypeBase, bool>,
                             // enum column_type : std::uint8_t { witness, public_input, constant, selector } type
-                            nil::marshalling::types::integral<TTypeBase, std::uint8_t>>>;
+                            nil::marshalling::types::integral<TTypeBase, std::uint8_t>>
+                        >;
                 };
 
                 template<typename Variable, typename Endianness>
@@ -93,7 +94,7 @@ namespace nil {
                                     typename Variable::column_type(std::get<3>(filled_var.value()).value()));
                 }
 
-                /****************** vector of plonk_variable *************************/
+                //****************** vector of plonk_variable *************************/
                 template<typename TTypeBase, typename AssignmentType>
                 using variables = nil::marshalling::types::array_list<
                     TTypeBase, 

@@ -44,8 +44,7 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
-                template<
-                    typename TTypeBase, typename PlonkGate>
+                template<typename TTypeBase, typename PlonkGate>
                 using plonk_gate = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<
                         // std::size_t selector_index
@@ -53,10 +52,7 @@ namespace nil {
                         // std::vector<plonk_constraint<FieldType>> constraints
                         nil::marshalling::types::array_list<
                             TTypeBase, 
-                            typename nil::crypto3::marshalling::types::plonk_gate_constraint<
-                                TTypeBase, 
-                                typename PlonkGate::constraint_type
-                            >::type,
+                            plonk_constraint<TTypeBase, typename PlonkGate::constraint_type>,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>
                             >
                         >
@@ -68,8 +64,8 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using result_type = plonk_gate<TTypeBase, PlonkGate>;
                     using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
-                    using constraint_marshalling_type =
-                        typename plonk_gate_constraint<TTypeBase, typename PlonkGate::constraint_type>::type;
+
+                    using constraint_marshalling_type = plonk_constraint<TTypeBase, typename PlonkGate::constraint_type>;
                     using constraint_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, constraint_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<size_t_marshalling_type>>;
@@ -77,22 +73,25 @@ namespace nil {
                     constraint_vector_marshalling_type filled_constraints;
                     for (const auto &constr : gate.constraints) {
                         filled_constraints.value().push_back(
-                            fill_plonk_constraint<typename PlonkGate::constraint_type, Endianness>(constr));
+                            fill_plonk_constraint<typename PlonkGate::constraint_type, Endianness>(constr)
+                        );
                     }
 
-                    return result_type(
-                        std::make_tuple(size_t_marshalling_type(gate.selector_index), filled_constraints));
+                    return result_type(std::make_tuple(size_t_marshalling_type(gate.selector_index), filled_constraints));
                 }
 
                 template<typename PlonkGate, typename Endianness>
                 PlonkGate make_plonk_gate(
                     const plonk_gate<nil::marshalling::field_type<Endianness>, PlonkGate> &filled_gate) {
+                        
                     std::size_t selector_index = std::get<0>(filled_gate.value()).value();
                     std::vector<typename PlonkGate::constraint_type> constraints;
+
                     for (auto i = 0; i < std::get<1>(filled_gate.value()).value().size(); i++) {
                         constraints.emplace_back(make_plonk_constraint<typename PlonkGate::constraint_type, Endianness>(
                             std::get<1>(filled_gate.value()).value().at(i)));
                     }
+
                     return {selector_index, constraints};
                 }
 

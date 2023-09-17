@@ -21,7 +21,7 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
-                /*********************** Plonk copy constraint ****************************/
+                // *********************** Plonk copy constraint **************************** //
                 template<typename TTypeBase, typename FieldType> 
                     using plonk_copy_constraint = nil::marshalling::types::bundle<TTypeBase, std::tuple<
                         typename variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>>::type, 
@@ -59,7 +59,7 @@ namespace nil {
                 }
 
 
-                /*********************** Plonk copy constraints ****************************/
+                // *********************** Plonk copy constraints **************************** //
                 template<typename TTypeBase, typename FieldType>
                 using plonk_copy_constraints = nil::marshalling::types::array_list<
                     TTypeBase, 
