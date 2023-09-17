@@ -25,6 +25,8 @@
 #ifndef PROOF_OF_WORK_HPP
 #define PROOF_OF_WORK_HPP
 
+#include <boost/property_tree/ptree.hpp>
+
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
@@ -38,6 +40,12 @@ namespace nil {
                     using transcript_hash_type = TranscriptHashType;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
                     using output_type = OutType;
+
+                    static inline boost::property_tree::ptree get_params(){
+                        boost::property_tree::ptree params;
+                        params.put("mask", mask);
+                        return params;
+                    }
 
                     static inline OutType generate(transcript_type &transcript){
                         output_type proof_of_work = std::rand();

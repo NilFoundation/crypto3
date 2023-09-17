@@ -242,6 +242,36 @@ namespace nil {
                         }
                         return true;
                     }
+
+                    boost::property_tree::ptree get_params() const{
+                        boost::property_tree::ptree params;
+                        params.put("type", "LPC");
+                        params.put("r", _fri_params.r);
+                        params.put("m", fri_type::m);
+                        params.put("lambda", fri_type::lambda);
+                        params.put("max_degree", _fri_params.max_degree);
+                        
+                        boost::property_tree::ptree step_list_node;
+                        for( std::size_t j = 0; j < _fri_params.step_list.size(); j++){
+                            boost::property_tree::ptree step_node;
+                            step_node.put("", _fri_params.step_list[j]);
+                            step_list_node.push_back(std::make_pair("", step_node));
+                        }
+                        params.add_child("step_list", step_list_node);
+
+                        boost::property_tree::ptree D_omegas_node;
+                        for(std::size_t j = 0; j < _fri_params.D.size(); j++){
+                            boost::property_tree::ptree D_omega_node;
+                            D_omega_node.put("", _fri_params.D[j]->get_domain_element(1));
+                            D_omegas_node.push_back(std::make_pair("", D_omega_node));
+                        }
+                        params.add_child("D_omegas", D_omegas_node);
+
+                        if( fri_type::use_grinding ){
+                            params.add_child("grinding_params", fri_type::grinding_type::get_params());
+                        }
+                        return params;
+                    }
                 };
 
                 template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda,

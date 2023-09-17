@@ -28,6 +28,9 @@
 #include <set>
 #include <map>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 #include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
@@ -142,8 +145,10 @@ namespace nil {
                         } 
                     }
                 public:
-                    //void setup(std::string &init_blob){init_blob += " world!";}
-                    //void setup(transcript_type &transcript){std::cout << "Setup with transcript" << std::endl;}
+                    boost::property_tree::ptree get_params() const{
+                        boost::property_tree::ptree root;
+                        return root;
+                    }
 
                     void append_to_batch(std::size_t index, const poly_type& poly){
                         if( _locked.find(index) == _locked.end() ) _locked[index] = false;

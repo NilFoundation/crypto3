@@ -109,7 +109,7 @@ namespace nil {
                             using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
 
                             bool operator==(const params_type &rhs) const {
-                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D;
+                                return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D && step_list == rhs.step_list;
                             }
 
                             bool operator!=(const params_type &rhs) const {
