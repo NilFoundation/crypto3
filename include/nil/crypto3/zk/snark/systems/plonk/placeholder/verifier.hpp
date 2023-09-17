@@ -170,7 +170,7 @@ namespace nil {
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript = preprocessed_transcript;
 
                         // 3. append witness commitments to transcript
-                        transcript(proof.variable_values_commitment);
+                        transcript(proof.commitments.at(VARIABLE_VALUES_BATCH));
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
                         std::size_t permutation_size = (proof.eval_proof.eval_proof.z.get_batch_size(FIXED_VALUES_BATCH) - 2 - constant_columns - selector_columns) / 2;
@@ -268,10 +268,10 @@ namespace nil {
                                 proof.eval_proof.challenge, columns_at_y,
                                 proof.eval_proof.eval_proof.z.get(LOOKUP_BATCH),
                                 proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 1),
-                                proof.lookup_commitment, transcript
+                                proof.commitments.at(LOOKUP_BATCH), transcript
                             );
                         }
-                        transcript(proof.v_perm_commitment);
+                        transcript(proof.commitments.at(PERMUTATION_BATCH));
 
                         // 7. gate argument
                         std::array<typename FieldType::value_type, 1> gate_argument =
@@ -282,7 +282,7 @@ namespace nil {
                             transcript.template challenges<FieldType, f_parts>();
 
                         // 9. Evaluation proof check
-                        transcript(proof.T_commitment);
+                        transcript(proof.commitments.at(QUOTIENT_BATCH));
 
                         auto challenge = transcript.template challenge<FieldType>();
                         BOOST_ASSERT(challenge == proof.eval_proof.challenge);
@@ -298,15 +298,8 @@ namespace nil {
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
-                        std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments;
+                        std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments = proof.commitments;                        
                         commitments[FIXED_VALUES_BATCH] = preprocessed_public_data.common_data.commitments.fixed_values;
-                        commitments[VARIABLE_VALUES_BATCH] = proof.variable_values_commitment;
-                        commitments[PERMUTATION_BATCH] = proof.v_perm_commitment;
-                        commitments[QUOTIENT_BATCH] = proof.T_commitment;
-                        if( is_lookup_enabled ){
-                            commitments[LOOKUP_BATCH] = proof.lookup_commitment;
-                        }
-                        
                         if (!commitment_scheme.verify_eval( proof.eval_proof.eval_proof, commitments, transcript )) {
                             return false;
                         }

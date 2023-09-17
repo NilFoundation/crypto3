@@ -71,20 +71,12 @@ namespace nil {
                     placeholder_proof() {
                     }
 
-                    commitment_type variable_values_commitment;
-                    commitment_type lookup_commitment;
-                    commitment_type v_perm_commitment;
-                    commitment_type T_commitment;
-                    commitment_type fixed_values_commitment;
-
+                    std::map<std::size_t, commitment_type> commitments;
                     evaluation_proof eval_proof;
 
                     bool operator==(const placeholder_proof &rhs) const {
                         return
-                            variable_values_commitment == rhs.variable_values_commitment &&
-                            v_perm_commitment == rhs.v_perm_commitment &&
-                            T_commitment == rhs.T_commitment &&
-                            fixed_values_commitment == rhs.fixed_values_commitment &&
+                            commitments == rhs.commitments &&
                             eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const placeholder_proof &rhs) const {

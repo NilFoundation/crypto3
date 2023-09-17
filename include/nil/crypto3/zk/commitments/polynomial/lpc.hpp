@@ -59,6 +59,7 @@ namespace nil {
                     using transcript_type = typename LPCScheme::transcript_type;
                     using transcript_hash_type = typename LPCScheme::transcript_hash_type;
                     using poly_type = PolynomialType;
+                    using lpc = LPCScheme;
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
                     typename fri_type::params_type _fri_params;

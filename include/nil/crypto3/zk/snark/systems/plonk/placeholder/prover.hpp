@@ -143,14 +143,13 @@ namespace nil {
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time:");
 
                         // 2. Commit witness columns and public_input columns
-
                         _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table.witnesses());
                         _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table.public_inputs());
                         {
                             PROFILE_PLACEHOLDER_SCOPE("variable_values_precommit_time");
-                            _proof.variable_values_commitment = _commitment_scheme.commit(VARIABLE_VALUES_BATCH);
+                            _proof.commitments[VARIABLE_VALUES_BATCH] = _commitment_scheme.commit(VARIABLE_VALUES_BATCH);
                         }
-                        transcript(_proof.variable_values_commitment);
+                        transcript(_proof.commitments[VARIABLE_VALUES_BATCH]);
 
                         // 4. permutation_argument
                         auto permutation_argument = placeholder_permutation_argument<FieldType, ParamsType>::prove_eval(
@@ -172,8 +171,8 @@ namespace nil {
                         _F_dfs[5] = std::move(lookup_argument_result.F_dfs[2]);
                         _F_dfs[6] = std::move(lookup_argument_result.F_dfs[3]);
 
-                        _proof.v_perm_commitment = _commitment_scheme.commit(PERMUTATION_BATCH);
-                        transcript(_proof.v_perm_commitment);
+                        _proof.commitments[PERMUTATION_BATCH] = _commitment_scheme.commit(PERMUTATION_BATCH);
+                        transcript(_proof.commitments[PERMUTATION_BATCH]);
 
                         // 6. circuit-satisfability
                         _F_dfs[7] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
@@ -192,8 +191,8 @@ namespace nil {
                         std::vector<polynomial_dfs_type> T_splitted_dfs = 
                             quotient_polynomial_split_dfs();
 
-                        _proof.T_commitment = T_commit(T_splitted_dfs);
-                        transcript(_proof.T_commitment);
+                        _proof.commitments[QUOTIENT_BATCH] = T_commit(T_splitted_dfs);
+                        transcript(_proof.commitments[QUOTIENT_BATCH]);
 
                         // 8. Run evaluation proofs
                         _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
@@ -265,7 +264,7 @@ namespace nil {
                                 _commitment_scheme,
                                 transcript
                             );
-                            _proof.lookup_commitment = lookup_argument_result.lookup_commitment;
+                            _proof.commitments[LOOKUP_BATCH] = lookup_argument_result.lookup_commitment;
                         }
                         return lookup_argument_result;
                     }
