@@ -52,6 +52,35 @@ bool are_plonk_gates_equal(
     return true;
 }
 
+template<typename Field>
+bool are_lookup_constraints_equal(
+        const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &lhs,
+        const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &rhs) {
+    if (lhs.lookup_input.size() != rhs.lookup_input.size()) return false;
+    for (size_t i = 0; i < lhs.lookup_input.size(); i++) {
+        if (lhs.lookup_input[i] != rhs.lookup_input[i]) return false;
+    }
+
+    if( lhs.table_id != rhs.table_id ) return false;
+
+    return true;
+}
+
+template<typename Field>
+bool are_plonk_lookup_gates_equal(
+        const nil::crypto3::zk::snark::plonk_lookup_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
+        const nil::crypto3::zk::snark::plonk_lookup_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
+    if (lhs.tag_index != rhs.tag_index)
+        return false;
+    if (lhs.constraints.size() != rhs.constraints.size())
+        return false;
+    for (auto i = 0; i < lhs.constraints.size(); i++) {
+        if (!are_lookup_constraints_equal<Field>(lhs.constraints[i], rhs.constraints[i]))
+            return false;
+    }
+    return true;
+}
+
 template<typename ConstraintSystem>
 bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSystem &s2) {
     if (s1.gates().size() != s2.gates().size()) return false;
@@ -65,7 +94,12 @@ bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSy
         if (std::get<1>(s1.copy_constraints()[i]) != std::get<1>(s2.copy_constraints()[i])) return false;
     }
 
-    // TODO check lookup gates are equal
+    if (s1.lookup_gates().size() != s2.lookup_gates().size()) return false;
+    for (size_t i = 0; i < s1.lookup_gates().size(); i++) {
+        if (!are_plonk_lookup_gates_equal(s1.lookup_gates()[i], s2.lookup_gates()[i])) return false;
+    }
+
+    if(s1.lookup_tables() != s2.lookup_tables()) return false;
     return true;
 }
 
