@@ -34,6 +34,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <filesystem>
 #include <algorithm>
 
 #include <nil/marshalling/status_type.hpp>
@@ -194,13 +195,36 @@ void test_placeholder_proof(const ProofType &proof, std::string output_file = ""
     BOOST_CHECK(proof == constructed_val_read);
 }
 
+bool has_argv(std::string name){
+    bool result = false;
+    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc; i++) {
+        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
+            result = true;
+        }
+    }
+    return result;
+}
+
+template<typename Endianness, typename PlaceholderParams>
+void print_placeholder_proof_with_params(
+    const typename placeholder_public_preprocessor<typename PlaceholderParams::field_type, PlaceholderParams>::preprocessed_data_type &preprocessed_data,
+    const placeholder_proof<typename PlaceholderParams::field_type, PlaceholderParams> &proof,
+    const typename PlaceholderParams::commitment_scheme_type &commitment_scheme,
+    std::string folder_name
+){
+    std::filesystem::create_directory(folder_name);
+    test_placeholder_proof<Endianness, placeholder_proof<typename PlaceholderParams::field_type, PlaceholderParams>>(proof, folder_name + "/proof.bin");
+    print_placeholder_params<PlaceholderParams> (
+        preprocessed_data, commitment_scheme, folder_name + "/params.json", folder_name
+    );
+}
+
 template<typename fri_type, typename FieldType>
 typename fri_type::params_type create_fri_params(std::size_t degree_log, const int max_step = 1) {
     typename fri_type::params_type params;
     math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-    constexpr std::size_t expand_factor = 4;
-
+    std::size_t expand_factor = 4;
     std::size_t r = degree_log - 1;
 
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
@@ -250,7 +274,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
         transcript_hash_type, 
         placeholder_test_params::lambda, 
         placeholder_test_params::r,
-        placeholder_test_params::m
+        placeholder_test_params::m,
+        true
     >;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
@@ -290,9 +315,13 @@ BOOST_AUTO_TEST_CASE(prover_test) {
         lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, lpc_transcript
     );
 
-    test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
-        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof, "circuit1.bin");
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            lpc_preprocessed_public_data, 
+            lpc_proof, lpc_scheme, "circuit1"
+        );
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
     }
 }
 BOOST_AUTO_TEST_SUITE_END()
@@ -379,11 +408,13 @@ BOOST_AUTO_TEST_CASE(basic_test){
     auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
         lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, lpc_transcript
     );
-    test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
-        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
-            test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof, "circuit2.bin");
-        }
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            lpc_preprocessed_public_data, 
+            lpc_proof, lpc_scheme, "circuit2"
+        );
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
     }
 
 /*  verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
@@ -469,11 +500,13 @@ BOOST_AUTO_TEST_CASE(prover_test) {
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, transcript);
-    test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
-        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
-            test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, "circuit3.bin");
-        }
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            preprocessed_public_data, 
+            proof, lpc_scheme, "circuit3"
+        );
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
     }
     
 /*
@@ -561,11 +594,13 @@ BOOST_AUTO_TEST_CASE(prover_test) {
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, transcript);
 
-    test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
-        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
-            test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, "circuit4.bin");
-        }
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            preprocessed_public_data, 
+            proof, lpc_scheme, "circuit4"
+        );
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
     }
 
 //    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
@@ -652,11 +687,13 @@ BOOST_AUTO_TEST_CASE(prover_test) {
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, transcript
     );
-    test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
-        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
-            test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, "circuit6.bin");
-        }
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            preprocessed_public_data, 
+            proof, lpc_scheme, "circuit6"
+        );
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
     }
 //    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
 //        preprocessed_public_data, proof, constraint_system, lpc_scheme, transcript);
@@ -739,11 +776,13 @@ BOOST_AUTO_TEST_CASE(prover_test) {
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, transcript);
-    test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
-        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
-            test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, "circuit7.bin");
-        }
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            preprocessed_public_data, 
+            proof, lpc_scheme, "circuit7"
+        );
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
     }
 }
 BOOST_AUTO_TEST_SUITE_END()
