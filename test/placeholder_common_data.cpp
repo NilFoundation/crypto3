@@ -119,13 +119,86 @@ void test_placeholder_common_data(CommonDataType common_data) {
     BOOST_CHECK(common_data == constructed_val_read);
 }
 
-BOOST_AUTO_TEST_SUITE(marshalling_placeholder_common_data_test_2)
-// using curve_type = algebra::curves::bls12<381>;
-    using curve_type = algebra::curves::pallas;
-    using FieldType = typename curve_type::base_field_type;
+BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-// lpc params
-    constexpr static const std::size_t m = 2;
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+    using merkle_hash_type = hashes::keccak_1600<512>;
+    using transcript_hash_type = hashes::keccak_1600<512>;
+    constexpr static const std::size_t table_rows_log = 4;
+
+    struct placeholder_test_params {
+        constexpr static const std::size_t table_rows = 1 << table_rows_log;
+        constexpr static const std::size_t permutation_size = 4;
+        constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
+
+
+        constexpr static const std::size_t witness_columns = witness_columns_1;
+        constexpr static const std::size_t public_input_columns = public_columns_1;
+        constexpr static const std::size_t constant_columns = constant_columns_1;
+        constexpr static const std::size_t selector_columns = selector_columns_1;
+
+        using arithmetization_params =
+            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
+
+        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t r = table_rows_log - 1;
+        constexpr static const std::size_t m = 2;
+    };
+    typedef placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params> circuit_params;
+    using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
+
+    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+        merkle_hash_type,
+        transcript_hash_type, 
+        placeholder_test_params::lambda, 
+        placeholder_test_params::r,
+        placeholder_test_params::m,
+        true
+    >;
+
+    using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
+    using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
+    using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
+    using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
+
+BOOST_AUTO_TEST_CASE(prover_test) {
+    auto circuit = circuit_test_1<field_type>();
+
+    plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
+
+    desc.rows_amount = placeholder_test_params::table_rows;
+    desc.usable_rows_amount = placeholder_test_params::usable_rows;
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+
+    typename lpc_type::fri_type::params_type fri_params = create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
+    lpc_scheme_type lpc_scheme(fri_params);
+    transcript_type lpc_transcript;
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), lpc_transcript
+        );
+
+    test_placeholder_common_data<placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type::common_data_type>(
+        lpc_preprocessed_public_data.common_data
+    );
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    using curve_type = algebra::curves::bls12<381>;
+    using field_type = typename curve_type::scalar_field_type;
 
     constexpr static const std::size_t table_rows_log = 4;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
@@ -142,105 +215,59 @@ BOOST_AUTO_TEST_SUITE(marshalling_placeholder_common_data_test_2)
         constexpr static const std::size_t selector_columns = 2;
 
         using arithmetization_params =
-                plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
+            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
-        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
+    using circuit_t_params = placeholder_circuit_params<
+        field_type, 
+        typename placeholder_test_params::arithmetization_params
+    >;
 
-    struct placeholder_test_params_lookups {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
+    using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
 
-        constexpr static const std::size_t witness_columns = 3;
-        constexpr static const std::size_t public_input_columns = 0;
-        constexpr static const std::size_t constant_columns = 3;
-        constexpr static const std::size_t selector_columns = 1;
+    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+        typename placeholder_test_params::merkle_hash_type,
+        typename placeholder_test_params::transcript_hash_type, 
+        placeholder_test_params::lambda, 
+        placeholder_test_params::r,
+        placeholder_test_params::m
+    >;
 
-        using arithmetization_params =
-                plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
+    using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
+    using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
+    using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, lpc_scheme_type>;
 
-        constexpr static const std::size_t lambda = 40;
-        constexpr static const std::size_t r = table_rows_log - 1;
-        constexpr static const std::size_t m = 2;
-    };
+    using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
+    
+BOOST_AUTO_TEST_CASE(common_data_marshalling_test) {
+    auto pi0 = nil::crypto3::algebra::random_element<field_type>();
+    auto circuit = circuit_test_t<field_type>(pi0);
 
-    constexpr static const std::size_t table_columns =
-            placeholder_test_params::witness_columns + placeholder_test_params::public_input_columns;
+    plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
+    desc.rows_amount = table_rows;
+    desc.usable_rows_amount = usable_rows;
 
-    typedef commitments::fri<
-            FieldType,
-            placeholder_test_params::merkle_hash_type,
-            placeholder_test_params::transcript_hash_type,
-            placeholder_test_params::lambda, m, 4
-    > fri_type;
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    typedef placeholder_params<FieldType, typename placeholder_test_params::arithmetization_params> circuit_2_params;
-    typedef placeholder_params<FieldType, typename placeholder_test_params_lookups::arithmetization_params>
-            circuit_3_params;
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
+    bool verifier_res;
 
-    BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_2_params) {
-        circuit_description<FieldType, circuit_2_params, table_rows_log, permutation_size> circuit =
-                circuit_test_2<FieldType>();
+    // LPC commitment scheme
+    typename lpc_type::fri_type::params_type fri_params = create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
+    lpc_scheme_type lpc_scheme(fri_params);
+    transcript_type lpc_transcript;
 
-        using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_2_params>;
-
-//    typedef commitments::list_polynomial_commitment<FieldType,
-//        circuit_2_params::batched_commitment_params_type> lpc_type;
-        typedef commitments::lpc<FieldType, circuit_2_params::batched_commitment_params_type> lpc_type;
-
-        typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
-
-        plonk_table_description<FieldType, typename circuit_2_params::arithmetization_params> desc;
-
-        desc.rows_amount = table_rows;
-        desc.usable_rows_amount = usable_rows;
-
-        typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                       circuit.lookup_gates);
-        typename policy_type::variable_assignment_type assignments = circuit.table;
-
-        std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-
-        typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type
-                preprocessed_public_data =
-                placeholder_public_preprocessor<FieldType, circuit_2_params>::process(
-                        constraint_system, assignments.public_table(), desc,
-                        fri_params, columns_with_copy_constraints.size());
-
-        test_placeholder_common_data<typename placeholder_public_preprocessor<FieldType, circuit_2_params>::preprocessed_data_type::common_data_type>(
-                preprocessed_public_data.common_data);
-    }
-
-    BOOST_AUTO_TEST_CASE(marshalling_placeholder_common_data_with_circuit_3_params) {
-        circuit_description<FieldType, circuit_3_params, table_rows_log, 3> circuit = circuit_test_3<FieldType>();
-
-        constexpr std::size_t argument_size = 5;
-
-        using policy_type = zk::snark::detail::placeholder_policy<FieldType, circuit_3_params>;
-
-        typedef commitments::lpc<FieldType, circuit_3_params::batched_commitment_params_type> lpc_type;
-
-        typename fri_type::params_type fri_params = create_fri_params<fri_type, FieldType>(table_rows_log);
-
-        plonk_table_description<FieldType, typename circuit_3_params::arithmetization_params> desc;
-
-        desc.rows_amount = table_rows;
-        desc.usable_rows_amount = usable_rows;
-
-        typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
-                                                                       circuit.lookup_gates);
-        typename policy_type::variable_assignment_type assignments = circuit.table;
-
-        typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type
-                preprocessed_public_data =
-                placeholder_public_preprocessor<FieldType, circuit_3_params>::process(
-                        constraint_system, assignments.public_table(), desc, fri_params, 0);
-
-        test_placeholder_common_data<typename placeholder_public_preprocessor<FieldType, circuit_3_params>::preprocessed_data_type::common_data_type>(
-                preprocessed_public_data.common_data);
-    }
-
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), lpc_transcript
+        );
+    test_placeholder_common_data<placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type::common_data_type>(
+        lpc_preprocessed_public_data.common_data
+    );
+}
 BOOST_AUTO_TEST_SUITE_END()

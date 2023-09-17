@@ -47,36 +47,6 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                /******************* placeholder public commitments***************************/
-/*                template<typename TTypeBase, typename PublicCommitmentsType>
-                using public_commitments_type = nil::marshalling::types::bundle<
-                    TTypeBase,
-                    std::tuple<
-//                      typename constant_commitment_scheme_type::commitment_type fixed_values;
-                        typename merkle_node_value<TTypeBase, typename PublicCommitmentsType::params_type::commitment_params_type>::type
-                    >
-                >;
-
-                template <typename PublicCommitmentsType, typename Endianness>
-                public_commitments_type<nil::marshalling::field_type<Endianness>, PublicCommitmentsType>
-                fill_public_commitments(const PublicCommitmentsType &commitments){
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using result_type = public_commitments_type<nil::marshalling::field_type<Endianness>, PublicCommitmentsType>;
-
-                    return result_type(std::make_tuple(
-                        fill_merkle_node_value<typename PublicCommitmentsType::params_type::commitment_params_type, Endianness>(commitments.fixed_values)
-                    ));
-                }
-                
-                template <typename PublicCommitmentsType, typename Endianness>
-                PublicCommitmentsType
-                make_public_commitments(const public_commitments_type<nil::marshalling::field_type<Endianness>, PublicCommitmentsType> &filled_public_commitments){
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    PublicCommitmentsType result;
-                    result.fixed_values = make_merkle_node_value<typename PublicCommitmentsType::params_type::commitment_params_type, Endianness>(std::get<0>(filled_public_commitments.value()));
-                    return result;
-                }
-*/
                 /******************* placeholder common data *********************************/
                 template<typename TTypeBase, typename CommonDataType>
                 using placeholder_common_data = nil::marshalling::types::bundle<
@@ -84,7 +54,7 @@ namespace nil {
                     std::tuple<
 //                        std::shared_ptr<math::evaluation_domain<typename CommonDataType::field_type>> basic_domain;
 
-//                        typename CommonDataType::public_commitments_type commitments;
+//                      typename CommonDataType::public_commitments_type commitments;
                         typename merkle_node_value<TTypeBase, typename CommonDataType::commitments_type::params_type::runtime_size_commitment_scheme_type::commitment_type>::type,
 
 //                      std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> columns_rotations;

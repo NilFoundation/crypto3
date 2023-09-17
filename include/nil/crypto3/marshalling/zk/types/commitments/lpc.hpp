@@ -51,6 +51,44 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
+                template <typename TTypeBase, typename CommitmentSchemeType, 
+                    typename std::enable_if<
+                        std::is_same<
+                            CommitmentSchemeType, 
+                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
+                        >::value, bool
+                    >::type = true
+                >
+                struct commitment{
+                    using type = typename merkle_node_value< TTypeBase, typename CommitmentSchemeType::commitment_type>::type;
+                };
+
+                template <typename Endianness, typename CommitmentSchemeType, 
+                    typename std::enable_if<
+                        std::is_same<
+                            CommitmentSchemeType, 
+                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
+                        >::value, bool
+                    >::type = true
+                >
+                typename commitment<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type
+                fill_commitment(typename CommitmentSchemeType::commitment_type commitment){
+                    return fill_merkle_node_value<typename CommitmentSchemeType::commitment_type, Endianness>( commitment );
+                }
+                
+                template <typename Endianness, typename CommitmentSchemeType, 
+                    typename std::enable_if<
+                        std::is_same<
+                            CommitmentSchemeType, 
+                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
+                        >::value, bool
+                    >::type = true
+                >
+                typename CommitmentSchemeType::commitment_type
+                make_commitment(const typename commitment<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type &filled_commitment){
+                    return make_merkle_node_value<typename CommitmentSchemeType::commitment_type, Endianness>( filled_commitment );
+                }
+
                 // FOR LPC only because of basic_fri field
                 template <typename TTypeBase, typename LPC > 
                 struct eval_proof{
