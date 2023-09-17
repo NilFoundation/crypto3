@@ -167,10 +167,10 @@ namespace nil {
                         // S_id
                         std::vector<polynomial_dfs_type>                                    identity_polynomials;
 
-                        polynomial_dfs_type q_last;    // TODO: move to common data
+                        polynomial_dfs_type q_last;    
                         polynomial_dfs_type q_blind;
 
-                        public_commitments_type                                             public_commitments;
+                        //public_commitments_type                                             public_commitments; 
                         common_data_type                                                    common_data;
                     };
 
@@ -499,7 +499,7 @@ namespace nil {
                         preprocessed_data_type preprocessed_data({
                             public_polynomial_table, sigma_perm_polys,
                             id_perm_polys, q_last_q_blind[0], q_last_q_blind[1],
-                            public_commitments, common_data
+                            common_data
                         });
                         return preprocessed_data;
                     }
