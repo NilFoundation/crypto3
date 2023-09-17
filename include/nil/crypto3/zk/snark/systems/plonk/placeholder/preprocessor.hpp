@@ -82,9 +82,11 @@ namespace nil {
                         struct common_data_type {
                             using field_type = FieldType;
                             using columns_rotations_type = std::array<std::set<int>, ParamsType::arithmetization_params::total_columns>;
+                            using commitment_scheme_type = typename ParamsType::commitment_scheme_type;
+                            using commitments_type = public_commitments_type;
+
                             // marshalled
                             public_commitments_type commitments;
-
                             columns_rotations_type columns_rotations;
 
                             std::size_t rows_amount;
