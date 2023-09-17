@@ -47,6 +47,11 @@ namespace nil {
                     std::size_t columns_number;
                     lookup_options_type lookup_options;
 
+                    bool operator==(const plonk_lookup_table<FieldType> &other) const {
+                        return (tag_index == other.tag_index) && (columns_number == other.columns_number) &&
+                               (lookup_options == other.lookup_options);
+                    }
+
                     plonk_lookup_table(std::size_t _columns_number, std::size_t _tag_index) :
                         columns_number(_columns_number), tag_index(_tag_index) {
                     }
