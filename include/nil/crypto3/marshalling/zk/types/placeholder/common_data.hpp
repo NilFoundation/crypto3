@@ -47,17 +47,15 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                /******************* placeholder common data *********************************/
+                // ******************* placeholder common data ********************************* //
                 template<typename TTypeBase, typename CommonDataType>
                 using placeholder_common_data = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-//                        std::shared_ptr<math::evaluation_domain<typename CommonDataType::field_type>> basic_domain;
-
 //                      typename CommonDataType::public_commitments_type commitments;
-                        typename merkle_node_value<TTypeBase, typename CommonDataType::commitments_type::params_type::runtime_size_commitment_scheme_type::commitment_type>::type,
+                        typename commitment<TTypeBase, typename CommonDataType::commitment_scheme_type>::type,
 
-//                      std::array<std::vector<int>, ParamsType::arithmetization_params::TotalColumns> columns_rotations;
+//                      std::array<std::set<int>, ParamsType::arithmetization_params::TotalColumns> columns_rotations;
                         nil::marshalling::types::array_list <TTypeBase, 
                             nil::marshalling::types::array_list <TTypeBase, 
                                 nil::marshalling::types::integral<TTypeBase, int>,
@@ -77,13 +75,14 @@ namespace nil {
                     >
                 >;
 
-                template<typename CommonDataType, typename Endianness>
+                template<typename Endianness, typename CommonDataType>
                 placeholder_common_data<nil::marshalling::field_type<Endianness>, CommonDataType>
                 fill_placeholder_common_data(const CommonDataType &common_data){
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
-                    using FieldType = typename CommonDataType::field_type;
                     using result_type = placeholder_common_data<TTypeBase, CommonDataType>;
-                    using commitments_type = typename CommonDataType::commitments_type::params_type::runtime_size_commitment_scheme_type::commitment_type;
+
+                    result_type result;
+                    using FieldType = typename CommonDataType::field_type;
 
                     using array_int_marshalling_type = nil::marshalling::types::array_list <TTypeBase, 
                         nil::marshalling::types::integral<TTypeBase, int>,
@@ -105,7 +104,7 @@ namespace nil {
                     }
 
                     auto filled_commitments = 
-                    fill_merkle_node_value<commitments_type, Endianness>(
+                    fill_commitment<Endianness, typename CommonDataType::commitment_scheme_type>(
                         common_data.commitments.fixed_values
                     );
 
@@ -116,18 +115,18 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.usable_rows_amount),
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.max_gates_degree)
                     ));
+                    return result;
                 }
 
-                template<typename CommonDataType, typename Endianness>
+                template<typename Endianness, typename CommonDataType>
                 CommonDataType
                 make_placeholder_common_data(const  
                     placeholder_common_data<nil::marshalling::field_type<Endianness>, CommonDataType> &filled_common_data
                 ){
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using FieldType = typename CommonDataType::field_type;
-                    using commitments_type = typename CommonDataType::commitments_type::params_type::runtime_size_commitment_scheme_type::commitment_type;
 
-                    auto fixed_values = make_merkle_node_value<commitments_type, Endianness>(std::get<0>(filled_common_data.value()));
+                    auto fixed_values = make_commitment<Endianness, typename CommonDataType::commitment_scheme_type>(std::get<0>(filled_common_data.value()));
 
                     typename CommonDataType::columns_rotations_type columns_rotations;
                     for(size_t i = 0; i < std::get<1>(filled_common_data.value()).value().size(); i++){
@@ -143,6 +142,7 @@ namespace nil {
 
                     typename CommonDataType::commitments_type commitments;
                     commitments.fixed_values = fixed_values;
+                    
                     return CommonDataType(commitments, columns_rotations, rows_amount, usable_rows_amount, max_gates_degree);
                 }
             }    // namespace types
