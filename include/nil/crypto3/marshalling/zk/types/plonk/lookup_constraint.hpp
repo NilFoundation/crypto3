@@ -39,6 +39,7 @@
 
 #include <nil/crypto3/marshalling/math/types/term.hpp>
 #include <nil/crypto3/marshalling/math/types/expression.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
 
 namespace nil {
     namespace crypto3 {
