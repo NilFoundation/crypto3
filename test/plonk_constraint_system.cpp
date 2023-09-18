@@ -37,6 +37,28 @@ using namespace nil::crypto3::marshalling;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
+bool has_argv(std::string name){
+    bool result = false;
+    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc; i++) {
+        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
+            result = true;
+        }
+    }
+    return result;
+}
+
+template<typename TIter>
+void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
+    os << std::hex;
+    for (TIter it = iter_begin; it != iter_end; it++) {
+        os << std::setfill('0') << std::setw(2) << std::right << int(*it);
+    }
+    os << std::dec;
+    if (endl) {
+        os << std::endl;
+    }
+}
+
 template<typename Field>
 bool are_plonk_gates_equal(
         const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
@@ -104,7 +126,7 @@ bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSy
 }
 
 template<typename Endianness, typename ConstraintSystem>
-void test_constraint_system(ConstraintSystem val) {
+void test_constraint_system(ConstraintSystem val, std::string folder_name = "") {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using value_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
 
@@ -117,7 +139,6 @@ void test_constraint_system(ConstraintSystem val) {
 
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-    // print_byteblob(std::cout, cv.cbegin(), cv.cend());
     value_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
@@ -125,6 +146,14 @@ void test_constraint_system(ConstraintSystem val) {
     auto constructed_val_read = types::make_plonk_constraint_system<Endianness, ConstraintSystem>(test_val_read);
 
     BOOST_CHECK(are_constraint_systems_equal<ConstraintSystem>(val, constructed_val_read));
+
+    if(folder_name != "") {
+        std::ofstream out;
+        out.open(folder_name + "/circuit.crct");
+        out << "0x";
+        print_hex_byteblob(out, cv.begin(), cv.end(), false);
+        out.close();
+    }
 }
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
@@ -183,7 +212,10 @@ BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
+    if(has_argv("--print"))
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system, "circuit1");
+    else
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -247,7 +279,10 @@ BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
+    if(has_argv("--print"))
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system, "circuit2");
+    else
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -311,7 +346,10 @@ BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
     );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
+    if(has_argv("--print"))
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system, "circuit3");
+    else
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -376,7 +414,10 @@ BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
     );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
+    if(has_argv("--print"))
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system, "circuit4");
+    else
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -440,7 +481,10 @@ BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
         circuit.lookup_tables
     );
     typename policy_type::variable_assignment_type assignments = circuit.table;
-    test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
+    if(has_argv("--print"))
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system, "circuit6");
+    else
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -503,6 +547,9 @@ BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
     );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
+    if(has_argv("--print"))
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system, "circuit7");
+    else
+        test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
 }
 BOOST_AUTO_TEST_SUITE_END()
