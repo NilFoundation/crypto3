@@ -80,6 +80,15 @@ namespace nil {
                         struct verification_key{
                             typename transcript_hash_type::digest_type constraint_system_hash;
                             commitment_type                            fixed_values_commitment;
+
+                            bool operator==(const verification_key &rhs) const {
+                                return  constraint_system_hash == rhs.constraint_system_hash &&
+                                        fixed_values_commitment == rhs.fixed_values_commitment;
+                            }
+
+                            bool operator!=(const verification_key &rhs) const {
+                                return !(rhs == *this);
+                            }
                         };
 
                         // both prover and verifier use this data
@@ -89,6 +98,7 @@ namespace nil {
                             using columns_rotations_type = std::array<std::set<int>, ParamsType::arithmetization_params::total_columns>;
                             using commitment_scheme_type = typename ParamsType::commitment_scheme_type;
                             using commitments_type = public_commitments_type;
+                            using verification_key_type = verification_key;
 
                             // marshalled
                             public_commitments_type commitments;
