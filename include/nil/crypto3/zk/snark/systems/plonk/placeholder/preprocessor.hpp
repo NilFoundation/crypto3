@@ -29,6 +29,7 @@
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_PREPROCESSOR_HPP
 
 #include <set>
+#include <sstream>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
@@ -88,6 +89,13 @@ namespace nil {
 
                             bool operator!=(const verification_key &rhs) const {
                                 return !(rhs == *this);
+                            }
+
+                            std::string to_string() const{
+                                std::stringstream ss;
+
+                                ss << constraint_system_hash << fixed_values_commitment;
+                                return ss.str();
                             }
                         };
 

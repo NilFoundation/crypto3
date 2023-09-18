@@ -58,6 +58,7 @@ namespace nil {
                     root.put("rows_amount", preprocessed_data.common_data.rows_amount);
                     root.put("usable_rows_amount", preprocessed_data.common_data.usable_rows_amount);
                     root.put("omega", preprocessed_data.common_data.basic_domain->get_domain_element(1));
+                    root.put("verification_key", preprocessed_data.common_data.vk.to_string());
                     
                     boost::property_tree::ptree ar_params_node;
                     boost::property_tree::ptree witness_node;
