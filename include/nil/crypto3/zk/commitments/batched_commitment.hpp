@@ -73,7 +73,7 @@ namespace nil {
                         return V;
                     }
                     math::polynomial<typename field_type::value_type> get_U(std::size_t b_ind, std::size_t poly_ind) const{
-                        auto &points = _points.at(b_ind)[poly_ind];
+                        const auto &points = _points.at(b_ind)[poly_ind];
                         BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
                         std::vector<std::pair<typename field_type::value_type,typename field_type::value_type>> U_interpolation_points;
 
