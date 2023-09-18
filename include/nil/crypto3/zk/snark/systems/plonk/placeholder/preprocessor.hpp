@@ -94,7 +94,8 @@ namespace nil {
                             std::string to_string() const{
                                 std::stringstream ss;
 
-                                ss << constraint_system_hash << fixed_values_commitment;
+                                ss << constraint_system_hash <<" " <<fixed_values_commitment;
+                                std::cout << "Verification key:" << ss.str() << std::endl;
                                 return ss.str();
                             }
                         };

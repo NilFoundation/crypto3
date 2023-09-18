@@ -165,7 +165,8 @@ namespace nil {
                     ) {                        
                         // 1. Add circuit definition to transcript
                         // transcript(short_description); 
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript;
+                        std::vector<std::uint8_t> init_blob = {};
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
                         transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
                         commitment_scheme.setup(transcript);

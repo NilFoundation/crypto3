@@ -130,6 +130,7 @@ namespace nil {
                             , _polynomial_table(preprocessed_private_data.private_polynomial_table,
                                                 preprocessed_public_data.public_polynomial_table) 
                             , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
+                            , transcript(std::vector<std::uint8_t>())
                     {
                         // 1. Add circuit definition to transcript
                         // transcript(short_description); 
