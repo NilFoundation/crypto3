@@ -104,13 +104,12 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
-                        commitment_scheme_type commitment_scheme, 
-                        transcript_type preprocessed_transcript
+                        commitment_scheme_type commitment_scheme
                     ) { 
 
                         auto prover = placeholder_prover<FieldType, ParamsType>(
                             preprocessed_public_data, preprocessed_private_data, table_description,
-                            constraint_system, assignments, commitment_scheme, preprocessed_transcript);
+                            constraint_system, assignments, commitment_scheme);
                         return prover.process();
                     }
 
@@ -120,8 +119,7 @@ namespace nil {
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
-                        const commitment_scheme_type &commitment_scheme,
-                        transcript_type preprocessed_transcript
+                        const commitment_scheme_type &commitment_scheme
                     ) 
                             : preprocessed_public_data(preprocessed_public_data)
                             , preprocessed_private_data(preprocessed_private_data)
@@ -132,11 +130,14 @@ namespace nil {
                             , _polynomial_table(preprocessed_private_data.private_polynomial_table,
                                                 preprocessed_public_data.public_polynomial_table) 
                             , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
-                            , transcript(preprocessed_transcript)
                     {
                         // 1. Add circuit definition to transcript
                         // transcript(short_description); 
-                        //TODO: circuit_short_description marshalling
+                        transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
+                        transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
+
+                        // setup commitment scheme
+                        _commitment_scheme.setup(transcript);
                     }
 
                     placeholder_proof<FieldType, ParamsType> process() {

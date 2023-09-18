@@ -236,11 +236,10 @@ BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1};
 
     lpc_scheme_type lpc_scheme(fri_params);
-    transcript_type lpc_transcript;
 
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size(), lpc_transcript
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
         );
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
@@ -249,11 +248,11 @@ BOOST_AUTO_TEST_CASE(placeholder_large_fibonacci_test) {
         );
 
     auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme, lpc_transcript
+        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme
     );
 
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme, lpc_transcript
+        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme
     );
     BOOST_CHECK(verifier_res);
     std::cout << "==========================================================="<<std::endl;

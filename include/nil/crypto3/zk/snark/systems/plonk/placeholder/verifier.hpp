@@ -135,7 +135,6 @@ namespace nil {
                         const placeholder_proof<FieldType, ParamsType> &proof,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         commitment_scheme_type commitment_scheme,
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript,
                         const std::array<std::vector<typename FieldType::value_type>, ParamsType::arithmetization_params::public_input_columns> public_input
                     ){
                         // TODO: process rotations for public input.
@@ -155,19 +154,22 @@ namespace nil {
                             if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, ParamsType::arithmetization_params::witness_columns + i, 0) ) 
                                 return false;
                         }
-                        return process(preprocessed_public_data, proof, constraint_system, commitment_scheme, preprocessed_transcript);
+                        return process(preprocessed_public_data, proof, constraint_system, commitment_scheme);
                     }
                     
                     static inline bool process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         const placeholder_proof<FieldType, ParamsType> &proof,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
-                        commitment_scheme_type commitment_scheme,
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> preprocessed_transcript
+                        commitment_scheme_type commitment_scheme
                     ) {                        
                         // 1. Add circuit definition to transcript
-                        // transcript(short_description);
-                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript = preprocessed_transcript;
+                        // transcript(short_description); 
+                        transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript;
+                        transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
+                        transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
+                        commitment_scheme.setup(transcript);
+
 
                         // 3. append witness commitments to transcript
                         transcript(proof.commitments.at(VARIABLE_VALUES_BATCH));

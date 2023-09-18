@@ -77,6 +77,11 @@ namespace nil {
                             }
                         };
 
+                        struct verification_key{
+                            typename transcript_hash_type::digest_type constraint_system_hash;
+                            commitment_type                            fixed_values_commitment;
+                        };
+
                         // both prover and verifier use this data
                         // fields outside of the common_data_type are used by prover
                         struct common_data_type {
@@ -97,7 +102,7 @@ namespace nil {
                             polynomial_type Z;
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
                             std::uint32_t max_gates_degree;
-
+                            verification_key vk;
 
                             // Constructor with pregenerated domain
                             common_data_type(
@@ -106,14 +111,15 @@ namespace nil {
                                 std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows, 
-                                std::uint32_t max_gates_degree
+                                std::uint32_t max_gates_degree,
+                                verification_key vk
                             ):  basic_domain(D),
                                 lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()), 
                                 commitments(commts), 
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
-                                max_gates_degree(max_gates_degree
-                            ) {
+                                max_gates_degree(max_gates_degree), vk(vk)
+                            {
                                 // Z is polynomial -1, 0,..., 0, 1
                                 Z[0] = -FieldType::value_type::one();
                                 Z[Z.size()-1] = FieldType::value_type::one();
@@ -128,12 +134,13 @@ namespace nil {
                                 std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows, 
-                                std::uint32_t max_gates_degree
+                                std::uint32_t max_gates_degree,
+                                verification_key vk
                             ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()), 
                                 commitments(commts), 
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
-                                max_gates_degree(max_gates_degree) 
+                                max_gates_degree(max_gates_degree), vk(vk)
                             {
                                 // Z is polynomial -1, 0,..., 0, 1
                                 Z[0] = -FieldType::value_type::one();
@@ -155,7 +162,8 @@ namespace nil {
                                 basic_domain->size() == rhs.basic_domain->size() &&
                                 lagrange_0 == rhs.lagrange_0 &&
                                 Z == rhs.Z &&
-                                max_gates_degree == rhs.max_gates_degree;
+                                max_gates_degree == rhs.max_gates_degree && 
+                                vk == rhs.vk;
                             }
                             bool operator!=(const common_data_type &rhs) const {
                                 return !(rhs == *this);
@@ -172,8 +180,7 @@ namespace nil {
                         polynomial_dfs_type q_last;    
                         polynomial_dfs_type q_blind;
 
-                        //public_commitments_type                                             public_commitments; 
-                        common_data_type                                                    common_data;
+                        common_data_type                                                      common_data;
                     };
 
                 private:
@@ -405,12 +412,10 @@ namespace nil {
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description,
                         typename ParamsType::commitment_scheme_type &commitment_scheme,
-                        std::size_t columns_with_copy_constraints,
-                        transcript_type &transcript
+                        std::size_t columns_with_copy_constraints
                     ) {
     
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder public preprocessor");
-                        commitment_scheme.setup(transcript);
 
                         std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = table_description.usable_rows_amount;
@@ -478,22 +483,21 @@ namespace nil {
                             columns_rotations(constraint_system, table_description);
 
                         // Push fixed values and marshalled circuit to transcript.
-/*                      using Endianness = nil::marshalling::option::big_endian;
+                        using Endianness = nil::marshalling::option::big_endian;
                         using TTypeBase = nil::marshalling::field_type<Endianness>;
                         using ConstraintSystem = plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>;
                         using value_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
-                        auto filled_val = nil::crypto3::marshalling::types::fill_plonk_constraint_system<ConstraintSystem, Endianness>(constraint_system);
+                        auto filled_val = nil::crypto3::marshalling::types::fill_plonk_constraint_system<Endianness, ConstraintSystem>(constraint_system);
                         std::vector<std::uint8_t> cv;
                         cv.resize(filled_val.length(), 0x00);
                         auto write_iter = cv.begin();
                         nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
                         typename transcript_hash_type::digest_type circuit_hash = hash<transcript_hash_type>(cv);
 
-                        transcript(circuit_hash);*/
-                        transcript(public_commitments.fixed_values);
 
+                        typename preprocessed_data_type::verification_key vk = {circuit_hash, public_commitments.fixed_values};
                         typename preprocessed_data_type::common_data_type common_data (
-                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree
+                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree, vk
                         );
 
                         // Push circuit description to transcript
