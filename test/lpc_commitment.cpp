@@ -32,7 +32,6 @@
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/random/uniform_int.hpp>
 
 #include <iostream>
 #include <iomanip>
@@ -359,7 +358,7 @@ void test_lpc_proof(typename LPC::proof_type &proof, std::string filename = "") 
     auto filled_proof = nil::crypto3::marshalling::types::fill_eval_proof<Endianness, LPC>(proof);
     auto _proof = nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(filled_proof);
     BOOST_CHECK(proof == _proof);
-/*
+
     std::vector<std::uint8_t> cv;
     cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
@@ -374,7 +373,7 @@ void test_lpc_proof(typename LPC::proof_type &proof, std::string filename = "") 
 
     if (filename != "") {
         print_hex_byteblob_to_file(cv.begin(), cv.end(), false, filename + ".data");
-    }*/
+    }
 }
 
 // *******************************************************************************

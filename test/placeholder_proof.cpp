@@ -31,6 +31,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
+#include <regex>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -58,6 +59,7 @@
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/placeholder/proof.hpp>
 
@@ -240,14 +242,61 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log, const i
     return params;
 }
 
+// *******************************************************************************
+// * Randomness setup
+// *******************************************************************************/
+using dist_type = std::uniform_int_distribution<int>;
+std::size_t test_global_seed = 0;
+boost::random::mt11213b test_global_rnd_engine;
+template<typename FieldType>
+nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
+
+struct test_initializer {
+    // Enumerate all fields used in tests;
+    using field1_type = algebra::curves::pallas::base_field_type;
+
+    test_initializer() {
+        test_global_seed = 0;
+
+        for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
+            if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
+                if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
+                    std::random_device rd;
+                    test_global_seed = rd();
+                    std::cout << "Random seed = " << test_global_seed << std::endl;
+                    break;
+                }
+                if (std::regex_match(boost::unit_test::framework::master_test_suite().argv[i + 1],
+                                     std::regex(("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?")))) {
+                    test_global_seed = atoi(boost::unit_test::framework::master_test_suite().argv[i + 1]);
+                    break;
+                }
+            }
+        }
+
+        BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
+        test_global_rnd_engine = boost::random::mt11213b(test_global_seed);
+        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
+    }
+
+    void setup() {
+    }
+
+    void teardown() {
+    }
+
+    ~test_initializer() {
+    }
+};
+
 BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
-    using merkle_hash_type = hashes::keccak_1600<512>;
-    using transcript_hash_type = hashes::keccak_1600<512>;
+    using merkle_hash_type = hashes::keccak_1600<256>;
+    using transcript_hash_type = hashes::keccak_1600<256>;
     constexpr static const std::size_t table_rows_log = 4;
 
     struct placeholder_test_params {
@@ -285,8 +334,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
 
-BOOST_AUTO_TEST_CASE(prover_test) {
-    auto circuit = circuit_test_1<field_type>();
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
+    auto circuit = circuit_test_1<field_type>(test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -376,7 +425,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
 
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
     
-BOOST_AUTO_TEST_CASE(basic_test){
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
     auto pi0 = nil::crypto3::algebra::random_element<field_type>();
     auto circuit = circuit_test_t<field_type>(pi0);
 
@@ -468,7 +517,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(prover_test) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_3<field_type>();
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
@@ -560,7 +609,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(prover_test) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_4<field_type>();
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
@@ -652,7 +701,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(prover_test) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_6<field_type>();
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
@@ -742,7 +791,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(prover_test) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_7<field_type>();
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
