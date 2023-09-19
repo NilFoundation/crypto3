@@ -105,7 +105,7 @@ namespace nil {
                         // fixed values' rotations (table columns)
                         std::size_t i = 0;
                         std::size_t start_index = preprocessed_public_data.identity_polynomials.size() + 
-                            preprocessed_public_data.permutation_polynomials.size();
+                            preprocessed_public_data.permutation_polynomials.size() + 2;
 
                         for( i = 0; i < start_index; i++){
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, challenge);
@@ -126,8 +126,6 @@ namespace nil {
                                 );
                             }
                         }
-                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, challenge); i++;
-                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, challenge); i++;
                     }
                     
                     static inline bool process(
@@ -239,7 +237,7 @@ namespace nil {
                                     i,
                                     rotation,
                                     plonk_variable<typename FieldType::value_type>::column_type::constant);
-                                columns_at_y[key] = proof.eval_proof.eval_proof.z.get(FIXED_VALUES_BATCH, i + permutation_size*2, j);
+                                columns_at_y[key] = proof.eval_proof.eval_proof.z.get(FIXED_VALUES_BATCH, i + permutation_size*2 + 2, j);
                                 ++j;
                             }
                         }
@@ -252,7 +250,7 @@ namespace nil {
                                     i,
                                     rotation,
                                     plonk_variable<typename FieldType::value_type>::column_type::selector);
-                                columns_at_y[key] = proof.eval_proof.eval_proof.z.get(FIXED_VALUES_BATCH, i + permutation_size*2 + constant_columns, j);
+                                columns_at_y[key] = proof.eval_proof.eval_proof.z.get(FIXED_VALUES_BATCH, i + permutation_size*2 + 2 + constant_columns, j);
                                 ++j;
                             }
                         }

@@ -203,6 +203,7 @@ namespace nil {
                         generate_evaluation_points();
 
                         _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
+
                         return _proof;
                     }
 
@@ -338,12 +339,12 @@ namespace nil {
                         // fixed values' rotations (table columns)
                         std::size_t i = 0;
                         std::size_t start_index = preprocessed_public_data.identity_polynomials.size() + 
-                            preprocessed_public_data.permutation_polynomials.size();
+                            preprocessed_public_data.permutation_polynomials.size() + 2;
 
                         for( i = 0; i < start_index; i++){
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, _proof.eval_proof.challenge);
                         }
-
+                        
                         for (std::size_t ind = 0; 
                             ind < constant_columns + preprocessed_public_data.public_polynomial_table.selectors().size();
                             ind++, i++
@@ -359,8 +360,6 @@ namespace nil {
                                 );
                             }
                         }
-                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, _proof.eval_proof.challenge); i++;
-                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, _proof.eval_proof.challenge); i++;
                     }
 
                     std::vector<std::vector<typename FieldType::value_type>> compute_evaluation_points_public() {

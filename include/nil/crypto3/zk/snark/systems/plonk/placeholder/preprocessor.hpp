@@ -29,7 +29,9 @@
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_PREPROCESSOR_HPP
 
 #include <set>
+#include <iostream>
 #include <sstream>
+#include <string>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
@@ -301,7 +303,7 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description
                     ) {
-
+                        // Selectors are not rotated
                         std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> result;
 
                         for (auto & s : result) {
@@ -414,10 +416,10 @@ namespace nil {
                     ) {
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, id_perm_polys);
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, sigma_perm_polys);
-                        commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, public_table.constants());
-                        commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, public_table.selectors());
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, q_last_q_blind[0]);
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, q_last_q_blind[1]);
+                        commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, public_table.constants());
+                        commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, public_table.selectors());
 
                         auto result = typename preprocessed_data_type::public_commitments_type({commitment_scheme.commit(FIXED_VALUES_BATCH)});
                         commitment_scheme.mark_batch_as_fixed(FIXED_VALUES_BATCH);
