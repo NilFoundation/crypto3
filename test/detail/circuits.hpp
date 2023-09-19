@@ -105,7 +105,7 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_1>, 4, 4> circuit_test_1(
-                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
                 ) {
                     using assignment_type  = typename FieldType::value_type;
 

@@ -30,6 +30,9 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
+#include <nil/crypto3/random/algebraic_random_device.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
+
 #include "detail/circuits.hpp"
 
 using namespace nil::crypto3;

@@ -364,11 +364,11 @@ void test_lpc_proof(typename LPC::proof_type &proof, std::string filename = "") 
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
 
-    nil::crypto3::marshalling::types::lpc_proof<TTypeBase, LPC> test_val_read;
+    typename nil::crypto3::marshalling::types::eval_proof<TTypeBase, LPC>::type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     typename LPC::proof_type constructed_val_read =
-            nil::crypto3::marshalling::types::make_lpc_proof<Endianness, LPC>(test_val_read);
+            nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
 
     if (filename != "") {

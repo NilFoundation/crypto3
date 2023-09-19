@@ -30,6 +30,7 @@
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/placeholder/common_data.hpp>
 
