@@ -73,22 +73,12 @@ namespace nil {
 
                     plonk_constraint_system(const gates_container_type &gates,
                                             const copy_constraints_container_type &copy_constraints,
-                                            const lookup_gates_container_type &lookup_gates,
-                                            const lookup_tables_type &lookup_tables) :
+                                            const lookup_gates_container_type &lookup_gates = {},
+                                            const lookup_tables_type &lookup_tables = {}) :
                         _gates(gates),
                         _copy_constraints(copy_constraints), 
                         _lookup_gates(lookup_gates),
                         _lookup_tables(lookup_tables)
-                    {
-                    }
-
-                    plonk_constraint_system(const gates_container_type &gates,
-                                            const copy_constraints_container_type &copy_constraints,
-                                            const lookup_gates_container_type &lookup_gates) :
-                        _gates(gates),
-                        _copy_constraints(copy_constraints), 
-                        _lookup_gates(lookup_gates),
-                        _lookup_tables({})
                     {
                     }
 
