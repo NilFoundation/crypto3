@@ -683,8 +683,8 @@ namespace nil {
                                             math::polynomial_dfs<typename FRI::field_type::value_type>,
                                             PolynomialType>::value
                                     ) {
-                                        initial_proof[k].values[polynomial_index][j][0] = g[k][polynomial_index][s_indices[j][0]];
-                                        initial_proof[k].values[polynomial_index][j][1] = g[k][polynomial_index][s_indices[j][1]];
+                                        initial_proof[k].values[polynomial_index][j][0] = std::move(g[k][polynomial_index][s_indices[j][0]]);
+                                        initial_proof[k].values[polynomial_index][j][1] = std::move(g[k][polynomial_index][s_indices[j][1]]);
                                     } else {
                                         initial_proof[k].values[polynomial_index][j][0] = g[k][polynomial_index].evaluate(
                                                 s[j][0]);

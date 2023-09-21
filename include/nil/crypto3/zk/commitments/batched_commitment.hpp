@@ -151,7 +151,7 @@ namespace nil {
                     void append_to_batch(std::size_t index, const poly_type& poly){
                         if( _locked.find(index) == _locked.end() ) _locked[index] = false;
                         BOOST_ASSERT(!_locked[index]); // We cannot modify batch after commitment
-                        _polys[index].push_back(std::move(poly));
+                        _polys[index].push_back(poly);
                     }
 
                     template<typename container_type>
