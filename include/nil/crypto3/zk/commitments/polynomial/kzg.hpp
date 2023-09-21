@@ -97,7 +97,7 @@ namespace nil {
                             auto alpha_com = commitment_type::one();
                             for (std::size_t i = 0; i < d; i++) {
                                 commitment_key[i] = alpha_com;
-                                alpha_com = alpha * alpha_com;
+                                alpha_com = alpha*alpha_com;
                             }
                         }
                         params_type(std::size_t d, scalar_value_type alpha) {
@@ -106,7 +106,7 @@ namespace nil {
                             auto alpha_com = commitment_type::one();
                             for (std::size_t i = 0; i < d; i++) {
                                 commitment_key[i] = alpha_com;
-                                alpha_com = alpha * alpha_com;
+                                alpha_com = alpha *alpha_com;
                             }
                         }
                         params_type(single_commitment_type ck, verification_key_type vk) :
@@ -159,7 +159,7 @@ namespace nil {
                     if (r != typename KZG::scalar_value_type(0)) {
                         throw std::runtime_error("incorrect eval or point z");
                     }
-                    q = q / denominator_polynom;
+                    q /= denominator_polynom;
 
                     return commit<KZG>(params, q);
                 }
@@ -257,12 +257,12 @@ namespace nil {
                             auto alpha_comm = single_commitment_type::one();
                             for (std::size_t i = 0; i < d; ++i) {
                                 commitment_key[i] = alpha_comm;
-                                alpha_comm = alpha * alpha_comm;
+                                alpha_comm *= alpha;
                             }
                             auto alpha_ver = verification_key_type::one();
                             for (std::size_t i = 0; i <= t; ++i) {
                                 verification_key[i] = alpha_ver;
-                                alpha_ver = alpha * alpha_ver;
+                                alpha_ver *= alpha;
                             }
                         }
                         params_type(std::size_t d, std::size_t t, scalar_value_type alpha) {
@@ -321,10 +321,10 @@ namespace nil {
                     const typename KZG::params_type &params, 
                     typename KZG::transcript_type &transcript
                 ) {
-                    for (auto g1_elem : params.commitment_key) {
+                    for (const auto &g1_elem : params.commitment_key) {
                         transcript(KZG::serializer::point_to_octets(g1_elem));
                     }
-                    for (auto g2_elem : params.verification_key) {
+                    for (const auto &g2_elem : params.verification_key) {
                         transcript(KZG::serializer::point_to_octets(g2_elem));
                     }
                 }
@@ -339,16 +339,16 @@ namespace nil {
                                             typename KZG::transcript_type &transcript) {
                     std::vector<std::uint8_t> byteblob(KZG::scalar_blob_size);
 
-                    for (const auto commit : public_key.commits) {
+                    for (const auto &commit : public_key.commits) {
                         transcript(KZG::serializer::point_to_octets(commit));
                     }
-                    for (const auto S : public_key.S) {
+                    for (const auto &S : public_key.S) {
                         for (const auto s : S) {
                             KZG::bincode::template field_element_to_bytes<std::vector<std::uint8_t>::iterator>(s, byteblob.begin(), byteblob.end());
                             transcript(byteblob);
                         }
                     }
-                    for (const auto r : public_key.r) {
+                    for (const auto &r : public_key.r) {
                         for (std::size_t i = 0; i < r.size(); ++i) {
                             KZG::bincode::template field_element_to_bytes<std::vector<std::uint8_t>::iterator>(r[i], byteblob.begin(), byteblob.end());
                             transcript(byteblob);
@@ -503,7 +503,7 @@ namespace nil {
                     assert(S.size() > 0);
                     typename math::polynomial<typename KZG::scalar_value_type> Z = {-S[0], 1};
                     for (std::size_t i = 1; i < S.size(); ++i) {
-                        Z = Z * typename math::polynomial<typename KZG::scalar_value_type>({-S[i], 1});
+                        Z *= typename math::polynomial<typename KZG::scalar_value_type>({-S[i], 1});
                     }
                     return Z;
                 }
@@ -555,9 +555,9 @@ namespace nil {
                             assert(denom.evaluate(s) == 0);
                         }
                         assert(spare_poly % denom == typename math::polynomial<typename KZG::scalar_value_type>({{0}}));
-                        spare_poly = spare_poly / denom;
-                        accum = accum + spare_poly * factor;
-                        factor = factor * gamma;
+                        spare_poly /= denom;
+                        accum += spare_poly * factor;
+                        factor *= gamma;
                     }
 
                     //verify without pairing
@@ -738,9 +738,8 @@ namespace nil {
                         for( auto const &it: this->_polys ){
                             auto k = it.first;
                             for (std::size_t i = 0; i < this->_z.get_batch_size(k); ++i) {
-                                accum = accum + 
-                                    factor * (math::polynomial<typename KZGScheme::scalar_value_type>(this->_polys[k][i].coefficients()) - this->get_U(k, i))/this->get_V(this->_points[k][i]);
-                                factor = factor * gamma;
+                                accum += factor * (math::polynomial<typename KZGScheme::scalar_value_type>(this->_polys[k][i].coefficients()) - this->get_U(k, i))/this->get_V(this->_points[k][i]);
+                                factor *= gamma;
                             }
                         }
                         
