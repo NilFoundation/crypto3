@@ -183,7 +183,7 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_test, test_fixture) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -281,7 +281,7 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_skipping_layers_test, test_fixture) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -376,7 +376,7 @@ BOOST_FIXTURE_TEST_CASE(lpc_dfs_basic_test, test_fixture) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -471,7 +471,7 @@ BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_fixture){
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -563,7 +563,7 @@ BOOST_FIXTURE_TEST_CASE(lpc_different_hash_types_test, test_fixture) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 

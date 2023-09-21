@@ -153,7 +153,6 @@ struct placeholder_fibonacci_params {
         plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
     constexpr static const std::size_t lambda = 1;
-    constexpr static const std::size_t r = 4;
     constexpr static const std::size_t m = 2;
 };
 using circuit_fib_params = placeholder_circuit_params<
@@ -169,7 +168,6 @@ using lpc_params_type = commitments::list_polynomial_commitment_params<
     typename placeholder_fibonacci_params::merkle_hash_type,
     typename placeholder_fibonacci_params::transcript_hash_type, 
     placeholder_fibonacci_params::lambda, 
-    placeholder_fibonacci_params::r,
     placeholder_fibonacci_params::m
 >;
 

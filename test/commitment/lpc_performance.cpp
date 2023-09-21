@@ -136,12 +136,12 @@ BOOST_AUTO_TEST_CASE(step_list_1) {
 
     // It's important parameter
     constexpr static const std::size_t d = 1 << 24;
-
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
+
     constexpr static const std::size_t m = 2;
 
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>  lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE(step_list_3) {
     constexpr static const std::size_t m = 2;
 
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>  lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
@@ -318,12 +318,11 @@ BOOST_AUTO_TEST_CASE(step_list_5) {
 
     // It's important parameter
     constexpr static const std::size_t d = 1 << 24;
-
-    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
+    constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
 
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>  lpc_params_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
     typedef typename lpc_type::proof_type proof_type;
 
