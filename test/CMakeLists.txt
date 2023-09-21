@@ -68,6 +68,7 @@ set(TESTS_NAMES
         "placeholder_common_data"
         "plonk_gates"
         "plonk_constraint_system"
+        "plonk_assignment_table"
         "eddsa")
 
 foreach(TEST_NAME ${TESTS_NAMES})

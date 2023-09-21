@@ -72,64 +72,6 @@ void print_field_element(std::ostream &os,
     os << "[" << e.data[0].data << "," << e.data[1].data << "]" << std::endl;
 }
 
-template<typename Field>
-bool are_lookup_constraints_equal(
-        const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &lhs,
-        const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &rhs) {
-    if (lhs.lookup_input.size() != rhs.lookup_input.size()) return false;
-    for (size_t i = 0; i < lhs.lookup_input.size(); i++) {
-        if (lhs.lookup_input[i] != rhs.lookup_input[i]) return false;
-    }
-
-    if( lhs.table_id != rhs.table_id ) return false;
-
-    return true;
-}
-
-template<typename Field>
-bool are_plonk_gates_equal(
-        const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
-        const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
-    if (lhs.selector_index != rhs.selector_index)
-        return false;
-    if (lhs.constraints.size() != rhs.constraints.size())
-        return false;
-    for (auto i = 0; i < lhs.constraints.size(); i++) {
-        if (lhs.constraints[i] != rhs.constraints[i])
-            return false;
-    }
-    return true;
-}
-
-template<typename Field>
-bool are_plonk_lookup_gates_equal(
-        const nil::crypto3::zk::snark::plonk_lookup_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
-        const nil::crypto3::zk::snark::plonk_lookup_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
-    if (lhs.tag_index != rhs.tag_index)
-        return false;
-    if (lhs.constraints.size() != rhs.constraints.size())
-        return false;
-    for (auto i = 0; i < lhs.constraints.size(); i++) {
-        if (!are_lookup_constraints_equal<Field>(lhs.constraints[i], rhs.constraints[i]))
-            return false;
-    }
-    return true;
-}
-
-template<typename ValueType, std::size_t N>
-typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::array<ValueType, N>>>::type
-generate_random_data(std::size_t leaf_number) {
-    std::random_device rd;
-    std::vector<std::array<ValueType, N>> v;
-    for (std::size_t i = 0; i < leaf_number; ++i) {
-        std::array<ValueType, N> leaf;
-        std::generate(std::begin(leaf), std::end(leaf),
-                      [&]() { return rd() % (std::numeric_limits<ValueType>::max() + 1); });
-        v.emplace_back(leaf);
-    }
-    return v;
-}
-
 template<typename PlonkVariable>
 PlonkVariable generate_random_plonk_variable() {
     std::random_device r;
@@ -448,10 +390,7 @@ void test_plonk_lookup_constraints(std::size_t vars_n, std::size_t depth, std::s
 
     auto filled_val = types::fill_plonk_lookup_constraints<Endianness, constraint_type>(val);
     auto _val = types::make_plonk_lookup_constraints<Endianness, constraint_type>(filled_val);
-    BOOST_CHECK(val.size() == _val.size());
-    for (std::size_t i = 0; i < _val.size(); i++) {
-        BOOST_CHECK(are_lookup_constraints_equal(val[i], _val[i]));
-    }
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -465,10 +404,7 @@ void test_plonk_lookup_constraints(std::size_t vars_n, std::size_t depth, std::s
     BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_lookup_constraints<Endianness, constraint_type>(test_val_read);
 
-    BOOST_CHECK(val.size() == constructed_val_read.size());
-    for (std::size_t i = 0; i < val.size(); i++) {
-        BOOST_CHECK(are_lookup_constraints_equal(val[i], constructed_val_read[i]));
-    }
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -483,7 +419,7 @@ void test_plonk_lookup_constraint(std::size_t vars_n, std::size_t depth, std::si
 
     auto filled_val = types::fill_plonk_lookup_constraint<Endianness, value_type>(val);
     auto _val = types::make_plonk_lookup_constraint<Endianness, value_type>(filled_val);
-    BOOST_CHECK(are_lookup_constraints_equal(val, _val));
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -497,7 +433,7 @@ void test_plonk_lookup_constraint(std::size_t vars_n, std::size_t depth, std::si
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_lookup_constraint<Endianness, value_type>(test_val_read);
-    BOOST_CHECK(are_lookup_constraints_equal(val, constructed_val_read));
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -513,7 +449,7 @@ void test_plonk_gate(std::size_t vars_n, std::size_t terms_n, std::size_t constr
 
     auto filled_val = types::fill_plonk_gate<Endianness, value_type>(val);
     auto _val = types::make_plonk_gate<Endianness, value_type>(filled_val);
-    BOOST_CHECK(are_plonk_gates_equal(val, _val));
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -527,7 +463,7 @@ void test_plonk_gate(std::size_t vars_n, std::size_t terms_n, std::size_t constr
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_gate<Endianness, value_type>(test_val_read);
-    BOOST_CHECK(are_plonk_gates_equal(val, constructed_val_read));
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -543,7 +479,7 @@ void test_plonk_lookup_gate(std::size_t vars_n, std::size_t depth, std::size_t e
     auto val = generate_random_plonk_lookup_gate<Field>(vars_n, depth, expr_n, constr_n);
     auto filled_val = types::fill_plonk_lookup_gate<Endianness, value_type>(val);
     auto _val = types::make_plonk_lookup_gate<Endianness, value_type>(filled_val);
-    BOOST_CHECK(are_plonk_lookup_gates_equal(val, _val));
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -557,7 +493,7 @@ void test_plonk_lookup_gate(std::size_t vars_n, std::size_t depth, std::size_t e
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_lookup_gate<Endianness, value_type>(test_val_read);
-    BOOST_CHECK(are_plonk_lookup_gates_equal(val, constructed_val_read));
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -576,10 +512,7 @@ void test_plonk_gates(std::size_t vars_n, std::size_t depth, std::size_t constr_
 
     auto filled_val = types::fill_plonk_gates<Endianness, value_type>(val);
     auto _val = types::make_plonk_gates<Endianness, value_type>(filled_val);
-    BOOST_CHECK(val.size() == _val.size());
-    for (auto i = 0; i < val.size(); i++) {
-        BOOST_CHECK(are_plonk_gates_equal(val[i], _val[i]));
-    }
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -593,10 +526,7 @@ void test_plonk_gates(std::size_t vars_n, std::size_t depth, std::size_t constr_
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_gates<Endianness, value_type>(test_val_read);
-    BOOST_CHECK(val.size() == constructed_val_read.size());
-    for (auto i = 0; i < val.size(); i++) {
-        BOOST_CHECK(are_plonk_gates_equal(val[i], constructed_val_read[i]));
-    }
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>
@@ -615,10 +545,7 @@ void test_plonk_lookup_gates(std::size_t vars_n, std::size_t depth, std::size_t 
 
     auto filled_val = types::fill_plonk_lookup_gates<Endianness, value_type>(val);
     auto _val = types::make_plonk_lookup_gates<Endianness, value_type>(filled_val);
-    BOOST_CHECK(val.size() == _val.size());
-    for (auto i = 0; i < val.size(); i++) {
-        BOOST_CHECK(are_plonk_lookup_gates_equal(val[i], _val[i]));
-    }
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -632,10 +559,7 @@ void test_plonk_lookup_gates(std::size_t vars_n, std::size_t depth, std::size_t 
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_lookup_gates<Endianness, value_type>(test_val_read);
-    BOOST_CHECK(val.size() == constructed_val_read.size());
-    for (auto i = 0; i < val.size(); i++) {
-        BOOST_CHECK(are_plonk_lookup_gates_equal(val[i], constructed_val_read[i]));
-    }
+    BOOST_CHECK(val == constructed_val_read);
 }
 
 template<typename Field, typename Endianness>

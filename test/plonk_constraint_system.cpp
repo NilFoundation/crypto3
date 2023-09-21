@@ -4,6 +4,9 @@
 #include <iostream>
 #include <iomanip>
 #include <random>
+#include <regex>
+#include <fstream>
+#include <filesystem>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -62,72 +65,6 @@ void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool
     }
 }
 
-template<typename Field>
-bool are_plonk_gates_equal(
-        const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
-        const nil::crypto3::zk::snark::plonk_gate<Field, nil::crypto3::zk::snark::plonk_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
-    if (lhs.selector_index != rhs.selector_index)
-        return false;
-    if (lhs.constraints.size() != rhs.constraints.size())
-        return false;
-    for (auto i = 0; i < lhs.constraints.size(); i++) {
-        if (lhs.constraints[i] != rhs.constraints[i])
-            return false;
-    }
-    return true;
-}
-
-template<typename Field>
-bool are_lookup_constraints_equal(
-        const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &lhs,
-        const nil::crypto3::zk::snark::plonk_lookup_constraint<Field> &rhs) {
-    if (lhs.lookup_input.size() != rhs.lookup_input.size()) return false;
-    for (size_t i = 0; i < lhs.lookup_input.size(); i++) {
-        if (lhs.lookup_input[i] != rhs.lookup_input[i]) return false;
-    }
-
-    if( lhs.table_id != rhs.table_id ) return false;
-
-    return true;
-}
-
-template<typename Field>
-bool are_plonk_lookup_gates_equal(
-        const nil::crypto3::zk::snark::plonk_lookup_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &lhs,
-        const nil::crypto3::zk::snark::plonk_lookup_gate<Field, nil::crypto3::zk::snark::plonk_lookup_constraint<Field, nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>>> &rhs) {
-    if (lhs.tag_index != rhs.tag_index)
-        return false;
-    if (lhs.constraints.size() != rhs.constraints.size())
-        return false;
-    for (auto i = 0; i < lhs.constraints.size(); i++) {
-        if (!are_lookup_constraints_equal<Field>(lhs.constraints[i], rhs.constraints[i]))
-            return false;
-    }
-    return true;
-}
-
-template<typename ConstraintSystem>
-bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSystem &s2) {
-    if (s1.gates().size() != s2.gates().size()) return false;
-    for (size_t i = 0; i < s1.gates().size(); i++) {
-        if (!are_plonk_gates_equal(s1.gates()[i], s2.gates()[i])) return false;
-    }
-
-    if (s1.copy_constraints().size() != s2.copy_constraints().size()) return false;
-    for (size_t i = 0; i < s1.copy_constraints().size(); i++) {
-        if (std::get<0>(s1.copy_constraints()[i]) != std::get<0>(s2.copy_constraints()[i])) return false;
-        if (std::get<1>(s1.copy_constraints()[i]) != std::get<1>(s2.copy_constraints()[i])) return false;
-    }
-
-    if (s1.lookup_gates().size() != s2.lookup_gates().size()) return false;
-    for (size_t i = 0; i < s1.lookup_gates().size(); i++) {
-        if (!are_plonk_lookup_gates_equal(s1.lookup_gates()[i], s2.lookup_gates()[i])) return false;
-    }
-
-    if(s1.lookup_tables() != s2.lookup_tables()) return false;
-    return true;
-}
-
 template<typename Endianness, typename ConstraintSystem>
 void test_constraint_system(ConstraintSystem val, std::string folder_name = "") {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -135,7 +72,7 @@ void test_constraint_system(ConstraintSystem val, std::string folder_name = "") 
 
     auto filled_val = nil::crypto3::marshalling::types::fill_plonk_constraint_system<Endianness, ConstraintSystem>(val);
     auto _val = types::make_plonk_constraint_system<Endianness, ConstraintSystem>(filled_val);
-    BOOST_CHECK(are_constraint_systems_equal<ConstraintSystem>(val, _val));
+    BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -148,9 +85,10 @@ void test_constraint_system(ConstraintSystem val, std::string folder_name = "") 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_plonk_constraint_system<Endianness, ConstraintSystem>(test_val_read);
 
-    BOOST_CHECK(are_constraint_systems_equal<ConstraintSystem>(val, constructed_val_read));
+    BOOST_CHECK(val == constructed_val_read);
 
     if(folder_name != "") {
+        std::filesystem::create_directory(folder_name);
         std::ofstream out;
         out.open(folder_name + "/circuit.crct");
         out << "0x";
@@ -158,6 +96,53 @@ void test_constraint_system(ConstraintSystem val, std::string folder_name = "") 
         out.close();
     }
 }
+
+// *******************************************************************************
+// * Randomness setup
+// *******************************************************************************/
+using dist_type = std::uniform_int_distribution<int>;
+std::size_t test_global_seed = 0;
+boost::random::mt11213b test_global_rnd_engine;
+template<typename FieldType>
+nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
+
+struct test_initializer {
+    // Enumerate all fields used in tests;
+    using field1_type = algebra::curves::pallas::base_field_type;
+
+    test_initializer() {
+        test_global_seed = 0;
+
+        for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
+            if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
+                if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
+                    std::random_device rd;
+                    test_global_seed = rd();
+                    std::cout << "Random seed = " << test_global_seed << std::endl;
+                    break;
+                }
+                if (std::regex_match(boost::unit_test::framework::master_test_suite().argv[i + 1],
+                                     std::regex(("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?")))) {
+                    test_global_seed = atoi(boost::unit_test::framework::master_test_suite().argv[i + 1]);
+                    break;
+                }
+            }
+        }
+
+        BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
+        test_global_rnd_engine = boost::random::mt11213b(test_global_seed);
+        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
+    }
+
+    void setup() {
+    }
+
+    void teardown() {
+    }
+
+    ~test_initializer() {
+    }
+};
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using Endianness = nil::marshalling::option::big_endian;
@@ -204,7 +189,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
 
-BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
     auto circuit = circuit_test_1<field_type>();
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
@@ -271,7 +256,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
 
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
     
-BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
     auto pi0 = nil::crypto3::algebra::random_element<field_type>();
     auto circuit = circuit_test_t<field_type>(pi0);
 
@@ -333,7 +318,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
     auto circuit = circuit_test_3<field_type>();
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
@@ -401,7 +386,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
     auto circuit = circuit_test_4<field_type>();
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
@@ -469,7 +454,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
     auto circuit = circuit_test_6<field_type>();
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
@@ -535,7 +520,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(constraint_system_marshalling_test) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
     auto circuit = circuit_test_7<field_type>();
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 

@@ -77,6 +77,7 @@ jobs:
           marshalling_sparse_vector_test,
           marshalling_accumulation_vector_test,
           marshalling_plonk_constraint_system_test,
+          marshalling_plonk_assignment_table_test,
           marshalling_plonk_gates_test,
           marshalling_r1cs_gg_ppzksnark_primary_input_test,
           marshalling_r1cs_gg_ppzksnark_proof_test,
