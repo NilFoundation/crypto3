@@ -56,6 +56,10 @@ namespace nil {
                     plonk_gate(std::size_t selector_index, const std::vector<ConstraintType> &constraints) :
                         constraints(constraints), selector_index(selector_index) {
                     }
+                    
+                    bool operator==(const plonk_gate &other) const {
+                        return selector_index == other.selector_index && constraints == other.constraints;
+                    }
                 };
 
             }    // namespace snark

@@ -91,6 +91,10 @@ namespace nil {
                         return witnesses_amount();
                     }
 
+                    bool operator==(plonk_private_table<FieldType, ArithmetizationParams, ColumnType> const &other) const {
+                        return _witnesses == other._witnesses;
+                    }
+
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
 
@@ -191,6 +195,12 @@ namespace nil {
                                selectors_amount();
                     }
 
+                    bool operator==(plonk_public_table<FieldType, ArithmetizationParams, ColumnType> const &other) const {
+                        return _public_inputs == other._public_inputs &&
+                               _constants == other._constants &&
+                               _selectors == other._selectors;
+                    }
+
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
 
@@ -201,6 +211,9 @@ namespace nil {
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
                 class plonk_table {
                 public:
+                    using field_type = FieldType;
+                    using arithmetization_params = ArithmetizationParams;
+                    using column_type = ColumnType;
                     using private_table_type = plonk_private_table<FieldType, ArithmetizationParams, ColumnType>;
                     using public_table_type = plonk_public_table<FieldType, ArithmetizationParams, ColumnType>;
                     using witnesses_container_type = typename private_table_type::witnesses_container_type;
@@ -328,6 +341,10 @@ namespace nil {
                         }
 
                         return rows_amount;
+                    }
+
+                    bool operator==(plonk_table<FieldType, ArithmetizationParams, ColumnType> const &other) const {
+                        return _private_table == other._private_table && _public_table == other._public_table;
                     }
 
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(

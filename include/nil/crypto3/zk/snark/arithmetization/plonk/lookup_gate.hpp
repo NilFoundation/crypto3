@@ -53,6 +53,10 @@ namespace nil {
                     plonk_lookup_gate( std::size_t tag_index, const std::vector<ConstraintType> &constraints) :
                         constraints(constraints), tag_index(tag_index) {
                     }
+
+                    bool operator==(const plonk_lookup_gate &other) const {
+                        return tag_index == other.tag_index && constraints == other.constraints;
+                    }
                 };
 
             }    // namespace snark

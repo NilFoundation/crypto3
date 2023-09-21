@@ -118,6 +118,11 @@ namespace nil {
                     const lookup_table_type &lookup_table(std::size_t table_id) const {
                         return _lookup_tables[table_id];
                     }
+
+                    bool operator==(const plonk_constraint_system<FieldType, ArithmetizationParams> &other) const {
+                        return (this->_gates == other._gates) && (this->_copy_constraints == other._copy_constraints) &&
+                               (this->_lookup_gates == other._lookup_gates) && (this->_lookup_tables == other._lookup_tables);
+                    }
                 };
             }    // namespace snark
         }        // namespace zk
