@@ -169,7 +169,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
             plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
         constexpr static const std::size_t lambda = 40;
-        constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
     typedef placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params> circuit_params;
@@ -179,7 +178,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
         merkle_hash_type,
         transcript_hash_type, 
         placeholder_test_params::lambda, 
-        placeholder_test_params::r,
         placeholder_test_params::m,
         true
     >;
@@ -232,7 +230,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
             plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
         constexpr static const std::size_t lambda = 1;
-        constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
     using circuit_t_params = placeholder_circuit_params<
@@ -246,7 +243,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
-        placeholder_test_params::r,
         placeholder_test_params::m
     >;
 
@@ -298,7 +294,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
             plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
         constexpr static const std::size_t lambda = 40;
-        constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
 
@@ -308,7 +303,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
-        placeholder_test_params::r,
         placeholder_test_params::m,
         true
     >;
@@ -366,7 +360,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
             plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
         constexpr static const std::size_t lambda = 40;
-        constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
 
@@ -376,7 +369,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
-        placeholder_test_params::r,
         placeholder_test_params::m,
         true
     >;
@@ -434,7 +426,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
             plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
         constexpr static const std::size_t lambda = 40;
-        constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
 
@@ -444,7 +435,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
-        placeholder_test_params::r,
         placeholder_test_params::m,
         true
     >;
@@ -500,7 +490,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
             plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
 
         constexpr static const std::size_t lambda = 40;
-        constexpr static const std::size_t r = table_rows_log - 1;
         constexpr static const std::size_t m = 2;
     };
 
@@ -510,7 +499,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type, 
         placeholder_test_params::lambda, 
-        placeholder_test_params::r,
         placeholder_test_params::m,
         true
     >;

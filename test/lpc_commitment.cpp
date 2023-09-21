@@ -442,7 +442,7 @@ BOOST_AUTO_TEST_SUITE(marshalling_random)
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using FRI = typename nil::crypto3::zk::commitments::detail::basic_batched_fri<field_type, hash_type, hash_type, lambda, m>;
     using lpc_params_type = typename nil::crypto3::zk::commitments::list_polynomial_commitment_params<
-            hash_type, hash_type, r, lambda, m
+            hash_type, hash_type, lambda, m
     >;
     using LPC = typename nil::crypto3::zk::commitments::batched_list_polynomial_commitment<field_type, lpc_params_type>;
 
@@ -480,7 +480,7 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     typedef zk::commitments::fri<field_type, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, r, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<field_type, lpc_params_type> lpc_type;
 
