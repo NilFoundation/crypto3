@@ -192,8 +192,8 @@ namespace nil {
                                 g_poly = (S_id[i] * beta + pp);
                                 h_poly = (S_sigma[i] * beta  + pp);
                             } else {
-                                g_poly = g_poly * (S_id[i] * beta + pp);
-                                h_poly = h_poly * (S_sigma[i] * beta  + pp);
+                                g_poly *= (S_id[i] * beta + pp);
+                                h_poly *= (S_sigma[i] * beta  + pp);
                             }
                         }
 
