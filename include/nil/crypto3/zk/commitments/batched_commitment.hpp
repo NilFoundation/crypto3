@@ -87,18 +87,17 @@ namespace nil {
                     std::vector<std::vector<typename field_type::value_type>> get_unique_points_list() const{
                         std::vector<std::vector<typename field_type::value_type>> unique_points;
 
-                        for(auto const &it:_points){
-                            auto k = it.first;
-                            for( std::size_t i = 0; i < _points.at(k).size(); i++ ){
+                        for(auto const &[k, point]:_points){
+                            for( std::size_t i = 0; i < point.size(); i++ ){
                                 bool found = false;
                                 for( std::size_t j = 0; j < unique_points.size(); j++ ){
-                                    if( unique_points[j] == _points.at(k)[i] ){
+                                    if( unique_points[j] == point[i] ){
                                         found = true;
                                         break;
                                     }
                                 }
                                 if( !found ){
-                                    unique_points.push_back(_points.at(k)[i]);
+                                    unique_points.push_back(point[i]);
                                 }
                             }
                         }
@@ -108,13 +107,12 @@ namespace nil {
                     std::map<std::size_t, std::vector<std::size_t>> get_eval_map( const std::vector<std::vector<typename field_type::value_type>> unique_points ) const{
                         std::map<std::size_t, std::vector<std::size_t>> eval_map;
 
-                        for(auto const &it:_points){
-                            auto k = it.first;
+                        for(auto const &[k, point]:_points){
                             eval_map[k] = {};
-                            for( std::size_t i = 0; i < _points.at(k).size(); i++ ){
+                            for( std::size_t i = 0; i < point.size(); i++ ){
                                 bool found = false;
                                 for( std::size_t j = 0; j < unique_points.size(); j++ ){
-                                    if( unique_points[j] == _points.at(k)[i] ){
+                                    if( unique_points[j] == point[i] ){
                                         eval_map[k].push_back(j);
                                         found = true;
                                         break;
@@ -132,14 +130,14 @@ namespace nil {
                         _points[index].resize(_polys[index].size());
                     }
                     void eval_polys(){
-                        for(auto const &it : _polys){
-                            auto k = it.first;
-                            _z.set_batch_size(k, it.second.size());
-                            BOOST_ASSERT(it.second.size() == _points.at(k).size() || _points.at(k).size() == 1);
-                            for( std::size_t i = 0; i < it.second.size(); i++ ){
-                                _z.set_poly_points_number(k, i, _points.at(k)[i].size());
-                                for(std::size_t j = 0; j < _points.at(k)[i].size(); j++){
-                                    _z.set(k, i, j, it.second[i].evaluate(_points.at(k)[i][j]));
+                        for(auto const &[k, poly] : _polys){
+                            _z.set_batch_size(k, poly.size());
+                            auto const &point = _points.at(k);
+                            BOOST_ASSERT(poly.size() == point.size() || point.size() == 1);
+                            for( std::size_t i = 0; i < poly.size(); i++ ){
+                                _z.set_poly_points_number(k, i, point[i].size());
+                                for(std::size_t j = 0; j < point[i].size(); j++){
+                                    _z.set(k, i, j, poly[i].evaluate(point[i][j]));
                                 }
                             }
                         } 
