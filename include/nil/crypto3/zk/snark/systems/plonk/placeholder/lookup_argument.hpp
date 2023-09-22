@@ -125,6 +125,13 @@ namespace nil {
                         typename commitment_scheme_type::commitment_type lookup_commitment;
                     };
 
+                    // Each lookup table should fill full rectangle inside assignment table
+                    // Lookup tables may contain repeated values, but they shoul be placed into one
+                    // option one under another. 
+                    // Because of theta randomness compressed lookup tables' vectors for different table may contain
+                    // similar values only with negligible probability.
+                    // So similar values in compressed lookup tables vectors repeated values may be only in one column 
+                    // near each other.
                     static inline std::vector<math::polynomial_dfs<typename FieldType::value_type>> sort_polynomials(
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> reduced_input,
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> reduced_value, 
