@@ -193,14 +193,14 @@ namespace nil {
                         plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>  public_polynomial_table;
 
                         // S_sigma
-                        std::vector<polynomial_dfs_type>                                    permutation_polynomials;
+                        std::vector<polynomial_dfs_type>  permutation_polynomials;
                         // S_id
-                        std::vector<polynomial_dfs_type>                                    identity_polynomials;
+                        std::vector<polynomial_dfs_type>  identity_polynomials;
 
-                        polynomial_dfs_type q_last;    
-                        polynomial_dfs_type q_blind;
+                        polynomial_dfs_type               q_last;    
+                        polynomial_dfs_type               q_blind;
 
-                        common_data_type                                                      common_data;
+                        common_data_type                  common_data;
                     };
 
                 private:

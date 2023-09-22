@@ -216,12 +216,12 @@ namespace nil {
 
                         PROFILE_PLACEHOLDER_SCOPE("split_polynomial_dfs_conversion_time");
 
-                        std::vector<polynomial_dfs_type> T_splitted_dfs;
-                        T_splitted_dfs.resize(T_splitted.size());
+                        std::vector<polynomial_dfs_type> T_splitted_dfs(T_splitted.size());
                         for (std::size_t k = 0; k < T_splitted.size(); k++) {
                             T_splitted_dfs[k].from_coefficients(T_splitted[k]);
                         }
-                        return T_splitted_dfs;                    }
+                        return T_splitted_dfs;                    
+                    }
 
                     polynomial_type quotient_polynomial() {
                         PROFILE_PLACEHOLDER_SCOPE("quotient_polynomial_time");
