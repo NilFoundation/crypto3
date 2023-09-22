@@ -75,7 +75,7 @@ namespace nil {
                     const std::vector<typename FieldType::value_type> &get(std::size_t batch_id, std::size_t poly_id) const{
                         return z.at(batch_id)[poly_id];
                     }
-                    typename FieldType::value_type get(std::size_t batch_id, std::size_t poly_id, size_t point_id) const{
+                    const typename FieldType::value_type &get(std::size_t batch_id, std::size_t poly_id, size_t point_id) const{
                         return z.at(batch_id)[poly_id][point_id];
                     }
 
@@ -87,7 +87,7 @@ namespace nil {
                         z[batch_id][poly_id] = {};
                         z[batch_id][poly_id].resize(points_number);
                     }
-                    void set(std::size_t batch_id, std::size_t poly_id, size_t point_id, const typename FieldType::value_type value){
+                    void set(std::size_t batch_id, std::size_t poly_id, size_t point_id, const &typename FieldType::value_type value){
                         z[batch_id][poly_id][point_id] = value;
                     }
                 };
