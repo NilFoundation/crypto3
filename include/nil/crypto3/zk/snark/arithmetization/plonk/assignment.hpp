@@ -91,6 +91,10 @@ namespace nil {
                         return witnesses_amount();
                     }
 
+                    bool operator==(plonk_private_table<FieldType, ArithmetizationParams, ColumnType> const &other) const {
+                        return _witnesses == other._witnesses;
+                    }
+
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
 
@@ -191,6 +195,12 @@ namespace nil {
                                selectors_amount();
                     }
 
+                    bool operator==(plonk_public_table<FieldType, ArithmetizationParams, ColumnType> const &other) const {
+                        return _public_inputs == other._public_inputs &&
+                               _constants == other._constants &&
+                               _selectors == other._selectors;
+                    }
+
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
 
@@ -201,8 +211,15 @@ namespace nil {
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
                 class plonk_table {
                 public:
+                    using field_type = FieldType;
+                    using arithmetization_params = ArithmetizationParams;
+                    using column_type = ColumnType;
                     using private_table_type = plonk_private_table<FieldType, ArithmetizationParams, ColumnType>;
                     using public_table_type = plonk_public_table<FieldType, ArithmetizationParams, ColumnType>;
+                    using witnesses_container_type = typename private_table_type::witnesses_container_type;
+                    using public_input_container_type = typename public_table_type::public_input_container_type;
+                    using constant_container_type = typename public_table_type::constant_container_type;
+                    using selector_container_type = typename public_table_type::selector_container_type;
 
                 protected:
                     private_table_type _private_table;
@@ -229,6 +246,22 @@ namespace nil {
 
                     const ColumnType& selector(std::uint32_t index) const {
                         return _public_table.selector(index);
+                    }
+
+                    const witnesses_container_type& witnesses() const {
+                        return _private_table.witnesses();
+                    }
+
+                    const public_input_container_type& public_inputs() const {
+                        return _public_table.public_inputs();
+                    }
+
+                    const constant_container_type& constants() const {
+                        return _public_table.constants();
+                    }
+
+                    const selector_container_type& selectors() const {
+                        return _public_table.selectors();
                     }
 
                     const ColumnType& operator[](std::uint32_t index) const {
@@ -308,6 +341,10 @@ namespace nil {
                         }
 
                         return rows_amount;
+                    }
+
+                    bool operator==(plonk_table<FieldType, ArithmetizationParams, ColumnType> const &other) const {
+                        return _private_table == other._private_table && _public_table == other._public_table;
                     }
 
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(

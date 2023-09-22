@@ -32,9 +32,14 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                constexpr std::size_t FIXED_VALUES_BATCH = 0;
+                constexpr std::size_t VARIABLE_VALUES_BATCH = 1;
+                constexpr std::size_t PERMUTATION_BATCH =2;
+                constexpr std::size_t QUOTIENT_BATCH = 3;
+                constexpr std::size_t LOOKUP_BATCH = 4;
 
                 /**
-                 * A proof for the Placeholder cheme.
+                 * A proof for the Placeholder scheme.
                  *
                  * While the proof has a structure, externally one merely opaquely produces,
                  * serializes/deserializes, and verifies proofs. We only expose some information
@@ -45,21 +50,18 @@ namespace nil {
                     typedef FieldType field_type;
                     typedef ParamsType params_type;
 
-                    using commitment_scheme_type =
-                        typename ParamsType::runtime_size_commitment_scheme_type;
+                    using circuit_params_type = typename ParamsType::circuit_params_type;
+                    using commitment_scheme_type = typename ParamsType::commitment_scheme_type;
+                    using commitment_type = typename commitment_scheme_type::commitment_type;
 
                     struct evaluation_proof {
+                        // TODO: remove it!
                         typename FieldType::value_type challenge;
-                        typename FieldType::value_type lagrange_0;
 
-                        typename commitment_scheme_type::proof_type combined_value;
-                        std::vector<typename commitment_scheme_type::proof_type> lookups;
-
+                        typename commitment_scheme_type::proof_type eval_proof;
 
                         bool operator==(const evaluation_proof &rhs) const {
-                            return challenge == rhs.challenge && lagrange_0 == rhs.lagrange_0 &&
-                                    combined_value == rhs.combined_value &&
-                                   lookups == rhs.lookups;
+                            return challenge == rhs.challenge && eval_proof == rhs.eval_proof;
                         }
                         bool operator!=(const evaluation_proof &rhs) const {
                             return !(rhs == *this);
@@ -69,19 +71,12 @@ namespace nil {
                     placeholder_proof() {
                     }
 
-                    typename commitment_scheme_type::commitment_type variable_values_commitment;
-                    typename commitment_scheme_type::commitment_type v_perm_commitment;
-                    typename commitment_scheme_type::commitment_type T_commitment;
-                    typename commitment_scheme_type::commitment_type fixed_values_commitment;
-
+                    std::map<std::size_t, commitment_type> commitments;
                     evaluation_proof eval_proof;
 
                     bool operator==(const placeholder_proof &rhs) const {
-                        return /*witness_commitment == rhs.witness_commitment &&*/
-                            variable_values_commitment == rhs.variable_values_commitment &&
-                            v_perm_commitment == rhs.v_perm_commitment &&
-                            T_commitment == rhs.T_commitment &&
-                            fixed_values_commitment == rhs.fixed_values_commitment &&
+                        return
+                            commitments == rhs.commitments &&
                             eval_proof == rhs.eval_proof;
                     }
                     bool operator!=(const placeholder_proof &rhs) const {

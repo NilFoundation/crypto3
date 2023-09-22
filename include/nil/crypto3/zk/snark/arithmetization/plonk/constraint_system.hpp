@@ -42,6 +42,8 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_table.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -54,13 +56,15 @@ namespace nil {
                 struct plonk_constraint_system {
                     typedef std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates_container_type;
                     typedef std::vector<plonk_copy_constraint<FieldType>> copy_constraints_container_type;
-                    typedef std::vector<plonk_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates_container_type;
+                    typedef std::vector<plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates_container_type;
+                    typedef plonk_lookup_table<FieldType> lookup_table_type;
+                    typedef std::vector<lookup_table_type> lookup_tables_type;
 
                 protected:
                     gates_container_type _gates;
                     copy_constraints_container_type _copy_constraints;
                     lookup_gates_container_type _lookup_gates;
-
+                    lookup_tables_type _lookup_tables;
                 public:
                     typedef FieldType field_type;
 
@@ -69,9 +73,13 @@ namespace nil {
 
                     plonk_constraint_system(const gates_container_type &gates,
                                             const copy_constraints_container_type &copy_constraints,
-                                            const lookup_gates_container_type &lookup_gates) :
+                                            const lookup_gates_container_type &lookup_gates = {},
+                                            const lookup_tables_type &lookup_tables = {}) :
                         _gates(gates),
-                        _copy_constraints(copy_constraints), _lookup_gates(lookup_gates) {
+                        _copy_constraints(copy_constraints), 
+                        _lookup_gates(lookup_gates),
+                        _lookup_tables(lookup_tables)
+                    {
                     }
 
                     std::size_t num_gates() const {
@@ -101,6 +109,19 @@ namespace nil {
 
                     const lookup_gates_container_type &lookup_gates() const {
                         return _lookup_gates;
+                    }
+
+                    const lookup_tables_type &lookup_tables() const {
+                        return _lookup_tables;
+                    }
+
+                    const lookup_table_type &lookup_table(std::size_t table_id) const {
+                        return _lookup_tables[table_id];
+                    }
+
+                    bool operator==(const plonk_constraint_system<FieldType, ArithmetizationParams> &other) const {
+                        return (this->_gates == other._gates) && (this->_copy_constraints == other._copy_constraints) &&
+                               (this->_lookup_gates == other._lookup_gates) && (this->_lookup_tables == other._lookup_tables);
                     }
                 };
             }    // namespace snark

@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t batches_num = 1;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, batches_num> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, true> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -123,9 +123,8 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     // commit
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
-    std::array<std::vector<math::polynomial<typename FieldType::value_type>>, 1> fs;
-    fs[0].resize(1); fs[0][0] = f;
-    typename fri_type::merkle_tree_type tree = zk::algorithms::precommit<fri_type>(fs[0], params.D[0], params.step_list[0]);
+    
+    typename fri_type::merkle_tree_type tree = zk::algorithms::precommit<fri_type>(f, params.D[0], params.step_list[0]);
     auto root = zk::algorithms::commit<fri_type>(tree);
 
     // eval
