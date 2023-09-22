@@ -43,6 +43,7 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/eval_storage.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 
@@ -50,81 +51,91 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template < typename TTypeBase, typename LPC >                
-                    using lpc_proof = nil::marshalling::types::bundle<
-                    TTypeBase,
-                    std::tuple<
-                        // lpc::proof::z is std::array<std::vector<std::vector>>, batches_num>
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            nil::marshalling::types::array_list<
-                                TTypeBase,
-                                nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPC::field_type::value_type>,
-                                nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
-                            >,
-                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
-                        >,
+                template <typename TTypeBase, typename CommitmentSchemeType, 
+                    typename std::enable_if<
+                        std::is_same<
+                            CommitmentSchemeType, 
+                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
+                        >::value, bool
+                    >::type = true
+                >
+                struct commitment{
+                    using type = typename merkle_node_value< TTypeBase, typename CommitmentSchemeType::commitment_type>::type;
+                };
 
-                        // One fri proof
-                        fri_proof<TTypeBase, typename LPC::basic_fri>
-                    >
-                >;
+                template <typename Endianness, typename CommitmentSchemeType, 
+                    typename std::enable_if<
+                        std::is_same<
+                            CommitmentSchemeType, 
+                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
+                        >::value, bool
+                    >::type = true
+                >
+                typename commitment<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type
+                fill_commitment(typename CommitmentSchemeType::commitment_type commitment){
+                    return fill_merkle_node_value<typename CommitmentSchemeType::commitment_type, Endianness>( commitment );
+                }
+                
+                template <typename Endianness, typename CommitmentSchemeType, 
+                    typename std::enable_if<
+                        std::is_same<
+                            CommitmentSchemeType, 
+                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
+                        >::value, bool
+                    >::type = true
+                >
+                typename CommitmentSchemeType::commitment_type
+                make_commitment(const typename commitment<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type &filled_commitment){
+                    return make_merkle_node_value<typename CommitmentSchemeType::commitment_type, Endianness>( filled_commitment );
+                }
+
+                // FOR LPC only because of basic_fri field
+                template <typename TTypeBase, typename LPC > 
+                struct eval_proof{
+                    using type = nil::marshalling::types::bundle<
+                        TTypeBase,
+                        std::tuple<
+                            // Evaluation points storage z
+                            eval_storage<TTypeBase, typename LPC::field_type>,
+
+                            // One fri proof
+                            typename fri_proof<TTypeBase, typename LPC::basic_fri>::type
+                        >
+                    >;
+                };
 
                 template<typename Endianness, typename LPC>
-                lpc_proof<nil::marshalling::field_type<Endianness>, LPC> 
-                fill_lpc_proof( const typename LPC::proof_type &proof ){
+                typename eval_proof<nil::marshalling::field_type<Endianness>, LPC>::type 
+                fill_eval_proof( const typename LPC::proof_type &proof ){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    nil::marshalling::types::array_list<
-                        TTypeBase,
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPC::field_type::value_type>,
-                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
-                        >,
-                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>> 
-                    > filled_z;
+                    nil::crypto3::marshalling::types::batch_info_type batch_info = proof.z.get_batch_info();
 
-                    for( size_t j = 0; j < LPC::basic_fri::batches_num; j++){
-                        nil::marshalling::types::array_list<
-                            TTypeBase,
-                            nil::crypto3::marshalling::types::field_element_vector_type<TTypeBase, typename LPC::field_type::value_type>,
-                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, size_t>>
-                        > filled;
+                    auto filled_z = fill_eval_storage<Endianness, typename LPC::field_type>(proof.z);
 
-                        for( size_t i = 0; i < proof.z[j].size(); i++){
-                            filled.value().push_back(
-                                fill_field_element_vector<typename LPC::field_type::value_type, Endianness>(proof.z[j][i])
-                            );
-                        }
-                        filled_z.value().push_back(filled);
-                    }
+                    typename fri_proof<TTypeBase, typename LPC::basic_fri>::type filled_fri_proof = fill_fri_proof<Endianness, typename LPC::basic_fri>(
+                        proof.fri_proof, batch_info
+                    );
 
-                    auto filled_fri_proof = fill_fri_proof<Endianness, typename LPC::basic_fri>(proof.fri_proof);
-                    return lpc_proof<TTypeBase, LPC>(
-                        std::tuple( filled_z, filled_fri_proof )
+                    return typename eval_proof<TTypeBase, LPC>::type(
+                        std::tuple( filled_z, filled_fri_proof)
                     );
                 }
 
                 template<typename Endianness, typename LPC>
-                typename LPC::proof_type make_lpc_proof(const lpc_proof<nil::marshalling::field_type<Endianness>, LPC> &filled_proof){
+                typename LPC::proof_type make_eval_proof(const typename eval_proof<nil::marshalling::field_type<Endianness>, LPC>::type &filled_proof){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     typename LPC::proof_type proof;
 
-                    auto filled_z = std::get<0>(filled_proof.value());
-                    for(size_t k = 0; k < LPC::basic_fri::batches_num; k++ ){
-                        auto filled = filled_z.value()[k];
-                        for( size_t i = 0; i < filled.value().size(); i ++){
-                            proof.z[k].push_back(make_field_element_vector<typename LPC::field_type::value_type, Endianness>(filled.value()[i]));
-                        }
-                    }
+                    proof.z = make_eval_storage<Endianness, typename LPC::field_type>(std::get<0>(filled_proof.value()));
+                    auto batch_info = proof.z.get_batch_info();
+                    proof.fri_proof = make_fri_proof<Endianness, typename LPC::basic_fri>(std::get<1>(filled_proof.value()), batch_info);
 
-                    proof.fri_proof = make_fri_proof<Endianness, typename LPC::basic_fri>(std::get<1>(filled_proof.value()));
                     return proof;
                 }
             }    // namespace types
         }        // namespace marshalling
     }            // namespace crypto3
 }    // namespace nil
+
 #endif    // CRYPTO3_MARSHALLING_LPC_COMMITMENT_HPP

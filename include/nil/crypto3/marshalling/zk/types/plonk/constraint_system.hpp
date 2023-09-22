@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2022-2023 Elena Tatuzova <e.tatuzova@nil.foundation>
 //
 // MIT License
 //
@@ -38,9 +39,11 @@
 #include <nil/marshalling/options.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/lookup_gate.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/gate.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/copy_constraint.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/lookup_table.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -49,26 +52,29 @@ namespace nil {
                 template<typename TTypeBase, typename PlonkConstraintSystem>
                 using plonk_constraint_system = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<
-                        plonk_gates< TTypeBase, typename PlonkConstraintSystem::gates_container_type::value_type>, // gates
-                        plonk_copy_constraints<TTypeBase, typename PlonkConstraintSystem::field_type>, // constraint
-                        plonk_gates< TTypeBase, typename PlonkConstraintSystem::lookup_gates_container_type::value_type > // lookup gates
-                    > 
-                > ;
+                        plonk_gates< TTypeBase, typename PlonkConstraintSystem::gates_container_type::value_type >, // gates
+                        plonk_copy_constraints< TTypeBase, typename PlonkConstraintSystem::field_type >,              // copy constraints
+                        plonk_lookup_gates< TTypeBase, typename PlonkConstraintSystem::lookup_gates_container_type::value_type >,  // lookup constraints
+                        // If we don't have lookup gates, we don't need lookup tables
+                        plonk_lookup_tables< TTypeBase, typename PlonkConstraintSystem::lookup_tables_type::value_type >  // lookup tables
+                    >
+                >;
 
-                template<typename PlonkConstraintSystem, typename Endianness>
+                template<typename Endianness, typename PlonkConstraintSystem>
                 plonk_constraint_system<nil::marshalling::field_type<Endianness>, PlonkConstraintSystem>
                 fill_plonk_constraint_system(const PlonkConstraintSystem &system) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using result_type = plonk_constraint_system<TTypeBase, PlonkConstraintSystem>;
+                    using result_type = plonk_constraint_system<nil::marshalling::field_type<Endianness>, PlonkConstraintSystem>;
 
                     return result_type(std::make_tuple(
-                        fill_plonk_gates<typename PlonkConstraintSystem::gates_container_type::value_type, Endianness>(system.gates()),
-                        fill_plonk_copy_constraints<typename PlonkConstraintSystem::field_type,Endianness>(system.copy_constraints()),
-                        fill_plonk_gates<typename PlonkConstraintSystem::lookup_gates_container_type::value_type, Endianness>(system.lookup_gates())
+                        fill_plonk_gates<Endianness, typename PlonkConstraintSystem::gates_container_type::value_type>(system.gates()),
+                        fill_plonk_copy_constraints<Endianness, typename PlonkConstraintSystem::field_type>(system.copy_constraints()),
+                        fill_plonk_lookup_gates<Endianness, typename PlonkConstraintSystem::lookup_gates_container_type::value_type>(system.lookup_gates()),
+                        fill_plonk_lookup_tables<Endianness, typename PlonkConstraintSystem::lookup_tables_type::value_type>(system.lookup_tables())
                     ));
                 }  
 
-                template<typename PlonkConstraintSystem, typename Endianness>
+                template<typename Endianness, typename PlonkConstraintSystem>
                 PlonkConstraintSystem
                 make_plonk_constraint_system(
                     const plonk_constraint_system<nil::marshalling::field_type<Endianness>, PlonkConstraintSystem> &filled_system
@@ -76,9 +82,10 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     return PlonkConstraintSystem(
-                        make_plonk_gates<typename PlonkConstraintSystem::gates_container_type::value_type, Endianness>(std::get<0>(filled_system.value())),
-                        make_plonk_copy_constraints<typename PlonkConstraintSystem::field_type, Endianness>(std::get<1>(filled_system.value())),
-                        make_plonk_gates<typename PlonkConstraintSystem::lookup_gates_container_type::value_type, Endianness>(std::get<2>(filled_system.value()))
+                        make_plonk_gates<Endianness, typename PlonkConstraintSystem::gates_container_type::value_type>(std::get<0>(filled_system.value())),
+                        make_plonk_copy_constraints<Endianness, typename PlonkConstraintSystem::field_type>(std::get<1>(filled_system.value())),
+                        make_plonk_lookup_gates<Endianness, typename PlonkConstraintSystem::lookup_gates_container_type::value_type>(std::get<2>(filled_system.value())),
+                        make_plonk_lookup_tables<Endianness, typename PlonkConstraintSystem::lookup_tables_type::value_type>(std::get<3>(filled_system.value()))
                     );
                 }
             } //namespace types

@@ -49,23 +49,16 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-// TODO add lookups processing
-                template<typename TTypeBase, typename Proof,
-//                         typename = typename std::enable_if<
-//                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
-//                                                     typename Proof::field_type, typename Proof::params_type>>::value,
-//                             bool>::type,
-                         typename... TOptions>
+                // This should be different for different commitment schemes!
+                template<typename TTypeBase, typename Proof>
                 using placeholder_evaluation_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
                         // typename FieldType::value_type challenge
                         field_element<TTypeBase, typename Proof::field_type::value_type>,
-                        // typename FieldType::value_type lagrange_0
-                        field_element<TTypeBase, typename Proof::field_type::value_type>,
 
-                        //typename Proof::commitment_scheme_type::proof_type combined_value;
-                        lpc_proof<TTypeBase, typename Proof::commitment_scheme_type>
+                        //typename Proof::commitment_scheme_type::eval_proof;
+                        typename eval_proof<TTypeBase, typename Proof::commitment_scheme_type>::type
                     >
                 >;
 
@@ -82,16 +75,13 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     field_marhsalling_type filled_challenge = field_marhsalling_type(proof.challenge);
 
-                    // typename FieldType::value_type lagrange_0
-                    field_marhsalling_type filled_lagrange_0 = field_marhsalling_type(proof.lagrange_0);
-
-                    // typename commitment_scheme_type::proof_type combined_value;
-                    auto filled_combined_value =
-                        fill_lpc_proof<Endianness, typename Proof::commitment_scheme_type>(proof.combined_value);
+                    // typename commitment_scheme_type::proof_type eval_proof;
+                    auto filled_eval_proof =
+                        fill_eval_proof<Endianness, typename Proof::commitment_scheme_type>(proof.eval_proof);
 
                     return placeholder_evaluation_proof<TTypeBase, Proof>(std::make_tuple(
-                        filled_challenge, filled_lagrange_0, 
-                        filled_combined_value
+                        filled_challenge,
+                        filled_eval_proof
                     ));
                 }
 
@@ -105,40 +95,30 @@ namespace nil {
                     // typename FieldType::value_type challenge
                     proof.challenge = std::get<0>(filled_proof.value()).value();
 
-                    // typename FieldType::value_type lagrange_0
-                    proof.lagrange_0 = std::get<1>(filled_proof.value()).value();
-
                     // typename commitment_scheme_type::proof_type combined_value
-                    proof.combined_value = make_lpc_proof<Endianness, typename Proof::commitment_scheme_type>(
-                        std::get<2>(filled_proof.value()));
+                    proof.eval_proof = make_eval_proof<Endianness, typename Proof::commitment_scheme_type>(
+                        std::get<1>(filled_proof.value()));
                     
                     return proof;
                 }
 
                 template<typename TTypeBase, typename Proof,
-//                         typename = typename std::enable_if<
-//                             std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<
-//                                                     typename Proof::field_type, typename Proof::params_type>>::value,
-//                             bool>::type,
-                         typename... TOptions>
+                    typename std::enable_if<
+                        std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<typename Proof::field_type, typename Proof::params_type>>::value,
+                        bool
+                    >::type = true
+                >
                 using placeholder_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-                        // typename commitment_scheme_type::commitment_type variable_values_commitment
-                        typename merkle_node_value<
-                            TTypeBase, typename Proof::commitment_scheme_type::commitment_type>::type,
-
-                        //typename commitment_scheme_type::proof_type v_perm_commtiment;
-                        typename merkle_node_value<
-                            TTypeBase, typename Proof::commitment_scheme_type::commitment_type>::type,
-
-                        // typename commitment_scheme_type::commitment_type T_commitment
-                        typename merkle_node_value<
-                            TTypeBase, typename Proof::commitment_scheme_type::commitment_type>::type,
-                        
-                        // typename commitment_scheme_type::commitment_type fixed_values_commitment
-                        typename merkle_node_value<
-                            TTypeBase, typename Proof::commitment_scheme_type::commitment_type>::type,
+                        // typename commitment_scheme_type::commitment_type commitments
+                        // All of them are similar size. So no nil::marshalling::option needed
+                        // There won't be too many commitments. So uint8_t is enough for length
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            typename commitment<TTypeBase, typename Proof::commitment_scheme_type>::type,
+                            nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::uint8_t>>
+                        >,
 
                         // evaluation_proof eval_proof
                         placeholder_evaluation_proof<TTypeBase, Proof>
@@ -151,63 +131,40 @@ namespace nil {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    // typename commitment_scheme_type::commitment_type variable_values_commitment
-                    auto filled_variable_values_commitment =
-                        fill_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(proof.variable_values_commitment);
-
-                    // typename commitment_scheme_type::commitment_type v_perm_commitment
-                    auto filled_v_perm_commitment =
-                        fill_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(proof.v_perm_commitment);
-
-                    // typename commitment_scheme_type::commitment_type T_commitment
-                    auto filled_T_commitment =
-                        fill_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(proof.T_commitment);
-
-                    // typename commitment_scheme_type::commitment_type T_commitment
-                    auto filled_fixed_values_commitment =
-                        fill_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(proof.fixed_values_commitment);
+                    nil::marshalling::types::array_list<
+                        TTypeBase,
+                        typename commitment<TTypeBase, typename Proof::commitment_scheme_type>::type,
+                        nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::uint8_t>>
+                    > filled_commitments;
+                    for( const auto &it:proof.commitments){
+                        filled_commitments.value().push_back(
+                            fill_commitment<Endianness, typename Proof::commitment_scheme_type>(it.second)
+                        );
+                    }
 
                     return placeholder_proof<TTypeBase, Proof>(std::make_tuple(
-                        filled_variable_values_commitment,
-                        filled_v_perm_commitment,
-                        filled_T_commitment,
-                        filled_fixed_values_commitment,
+                        filled_commitments,
                         fill_placeholder_evaluation_proof<Endianness, Proof>(proof.eval_proof)
                     ));
                 }
 
                 template<typename Endianness, typename Proof>
                 Proof make_placeholder_proof( const placeholder_proof<nil::marshalling::field_type<Endianness>, Proof> &filled_proof) {
-
                     Proof proof;
-
-                    // typename ommitment_scheme_type::commitment_type variable_values_commitment
-                    proof.variable_values_commitment =
-                        make_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(std::get<0>(filled_proof.value()));
-
-                    // typename commitment_scheme_type::commitment_type v_perm_commitment
-                    proof.v_perm_commitment =
-                        make_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(std::get<1>(filled_proof.value()));
-
-                    // typename commitment_scheme_type::commitment_type T_commitment
-                    proof.T_commitment =
-                        make_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(std::get<2>(filled_proof.value()));
-
-                    // typename commitment_scheme_type::commitment_type fixed_values_commitment
-                    proof.fixed_values_commitment =
-                        make_merkle_node_value<typename Proof::commitment_scheme_type::commitment_type,
-                                               Endianness>(std::get<3>(filled_proof.value()));
 
                     // evaluation_proof eval_proof
                     proof.eval_proof =
-                        make_placeholder_evaluation_proof<Endianness, Proof>(std::get<4>(filled_proof.value()));
+                        make_placeholder_evaluation_proof<Endianness, Proof>(std::get<1>(filled_proof.value()));
+
+                    auto batch_info = proof.eval_proof.eval_proof.z.get_batch_info();
+
+                    std::size_t cur = 0;
+                    for( const auto &it:batch_info ){
+                        if( it.first == nil::crypto3::zk::snark::FIXED_VALUES_BATCH ) continue;
+                        proof.commitments[it.first] = make_commitment<Endianness, typename Proof::commitment_scheme_type>(
+                            std::get<0>(filled_proof.value()).value()[cur++]
+                        );
+                    }
 
                     return proof;
                 }
