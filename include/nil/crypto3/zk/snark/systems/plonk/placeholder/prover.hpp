@@ -198,12 +198,10 @@ namespace nil {
 
                         // 8. Run evaluation proofs
                         _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
-                        //_proof.eval_proof.challenge = typename FieldType::value_type(7);
 
                         generate_evaluation_points();
 
                         _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
-
                         return _proof;
                     }
 

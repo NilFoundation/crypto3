@@ -180,14 +180,15 @@ namespace nil {
                         for (std::size_t i = 0; i < permutation_size; i++) {
                             std::size_t zero_index = 0;
                             for (int v: preprocessed_public_data.common_data.columns_rotations[i]) {
-                                if (v == 0)
+                                if (v == 0){
                                     break;
+                                }
                                 zero_index++;
                             }
                             if (i < witness_columns + public_input_columns) {
                                 f[i] = proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH,i,zero_index);
                             } else if (i < witness_columns + public_input_columns + constant_columns) {
-                                std::size_t idx = i - witness_columns - public_input_columns + permutation_size*2;
+                                std::size_t idx = i - witness_columns - public_input_columns + permutation_size*2 + 2;
                                 f[i] = proof.eval_proof.eval_proof.z.get(FIXED_VALUES_BATCH,idx,zero_index);
                             }
                         }
@@ -287,7 +288,6 @@ namespace nil {
 
                         auto challenge = transcript.template challenge<FieldType>();
                         BOOST_ASSERT(challenge == proof.eval_proof.challenge);
-                        //typename FieldType::value_type challenge = proof.eval_proof.challenge;
 
                         commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));                        
                         commitment_scheme.set_batch_size(PERMUTATION_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));                        

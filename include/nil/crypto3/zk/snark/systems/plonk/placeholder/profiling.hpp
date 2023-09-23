@@ -65,7 +65,7 @@ namespace nil {
                     witness_node.put("", PlaceholderParams::witness_columns);
                     ar_params_node.push_back(std::make_pair("", witness_node));
                     boost::property_tree::ptree public_input_node;
-                    public_input_node.put("", PlaceholderParams::witness_columns);
+                    public_input_node.put("", PlaceholderParams::public_input_columns);
                     ar_params_node.push_back(std::make_pair("", public_input_node));
                     boost::property_tree::ptree constant_node;
                     constant_node.put("", PlaceholderParams::constant_columns);
