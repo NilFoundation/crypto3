@@ -284,7 +284,7 @@ namespace nil {
 			            visitor.visit(constraint);
                     }
                 }
-
+/*
                 for (const auto& gate: constraint_system.lookup_gates()) {
                     for (const auto& constraint: gate.constraints) {
                         for (const auto& lookup_input: constraint.lookup_input) {
@@ -296,7 +296,7 @@ namespace nil {
                         }
                     }
                 }
-
+*/
                 for (std::size_t i = 0; i < ArithmetizationParams::total_columns; i++) {
                     result[i].insert(0);
                 }
