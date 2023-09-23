@@ -126,13 +126,16 @@ bool are_constraint_systems_equal(const ConstraintSystem &s1, const ConstraintSy
 }
 
 template<typename Endianness, typename PlonkTable>
-void test_assignment_table(PlonkTable val, std::string folder_name = "") {
+void test_assignment_table(std::size_t usable_rows, PlonkTable val, std::string folder_name = "") {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using value_marshalling_type = nil::crypto3::marshalling::types::plonk_assignment_table<TTypeBase, PlonkTable>;
+    std::size_t _usable_rows;
 
-    auto filled_val = nil::crypto3::marshalling::types::fill_assignment_table<Endianness, PlonkTable>(val);
-    auto _val = types::make_assignment_table<Endianness, PlonkTable>(filled_val);
+    auto filled_val = nil::crypto3::marshalling::types::fill_assignment_table<Endianness, PlonkTable>(usable_rows, val);
+    PlonkTable _val;
+    std::tie(_usable_rows, _val) = types::make_assignment_table<Endianness, PlonkTable>(filled_val);
     BOOST_CHECK(val == _val);
+    BOOST_CHECK(usable_rows == _usable_rows);
 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_val.length(), 0x00);
@@ -143,9 +146,11 @@ void test_assignment_table(PlonkTable val, std::string folder_name = "") {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-    auto constructed_val_read = types::make_assignment_table<Endianness, PlonkTable>(test_val_read);
+    PlonkTable constructed_val_read;
+    std::tie(_usable_rows, constructed_val_read) = types::make_assignment_table<Endianness, PlonkTable>(test_val_read);
 
     BOOST_CHECK(val == constructed_val_read);
+    BOOST_CHECK(usable_rows == _usable_rows);
 
     if(folder_name != "") {
         std::filesystem::create_directory(folder_name);
@@ -259,9 +264,9 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments, "circuit1");
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit1");
     else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments);
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -324,9 +329,9 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments, "circuit2");
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit2");
     else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments);
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -389,9 +394,9 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments, "circuit3");
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit3");
     else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments);
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -455,9 +460,9 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments, "circuit4");
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit4");
     else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments);
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -520,9 +525,9 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_initializer) {
     );
     typename policy_type::variable_assignment_type assignments = circuit.table;
     if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments, "circuit6");
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit6");
     else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments);
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -584,8 +589,8 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments, "circuit7");
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit7");
     else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(assignments);
+        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
 }
 BOOST_AUTO_TEST_SUITE_END()
