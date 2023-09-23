@@ -1,3 +1,11 @@
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+
 cmake_minimum_required(VERSION 2.8.12)
 
 cmake_policy(SET CMP0028 NEW)
@@ -28,31 +36,14 @@ macro(cm_find_package NAME)
     endforeach()
 endmacro()
 
-cm_project(transpiler WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
+cm_project(transpiler WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 
 cm_find_package(CM)
 include(CMDeploy)
-include(FindPkgConfig)
 
-option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
-option(BUILD_EXAMPLES "Build examples" FALSE)
 
-if(UNIX AND BUILD_WITH_CCACHE)
-    find_program(CCACHE_FOUND ccache)
-    if(CCACHE_FOUND)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-    endif(CCACHE_FOUND)
-endif()
-
-if(UNIX AND BUILD_WITH_PROCPS)
-    find_package(Procps)
-endif()
-
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-    include/nil/crypto3/zk/blueprint/transpiler/profiling_plonk_circuit.hpp
-    include/nil/crypto3/zk/blueprint/transpiler/table_profiling.hpp)
+list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
@@ -67,6 +58,7 @@ add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
+
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
@@ -74,24 +66,16 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
                            ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      crypto3::algebra
-                      crypto3::block
-                      crypto3::blueprint
-                      crypto3::codec
-                      crypto3::math
-                      crypto3::multiprecision
-                      crypto3::pkpad
-                      crypto3::pubkey
-                      crypto3::random
-                      crypto3::zk
-
-                      marshalling::core
-                      marshalling::crypto3_algebra
-                      marshalling::crypto3_multiprecision
-                      marshalling::crypto3_zk
+                      ${CMAKE_WORKSPACE_NAME}::algebra
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision
+                      ${CMAKE_WORKSPACE_NAME}::zk
 
                       ${Boost_LIBRARIES})
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
+
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif()
