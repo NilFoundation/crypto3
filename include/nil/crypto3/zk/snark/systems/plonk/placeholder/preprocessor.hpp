@@ -303,7 +303,6 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description
                     ) {
-                        // Selectors are not rotated
                         std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> result;
 
                         for (auto & s : result) {
@@ -426,6 +425,7 @@ namespace nil {
                         return result;
                     }
 
+                    // TODO: columns_with_copy_constraints -- It should be extracted from constraint_system
                     static inline preprocessed_data_type process(
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
