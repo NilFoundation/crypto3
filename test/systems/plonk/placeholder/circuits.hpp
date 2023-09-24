@@ -104,7 +104,9 @@ namespace nil {
                     public_columns_1, constant_columns_1, selector_columns_1>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_1>, 4, 4> circuit_test_1() {
+                circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_1>, 4, 4> circuit_test_1(
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
+                ) {
                     using assignment_type  = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
@@ -131,17 +133,17 @@ namespace nil {
 
                     // init values
                     typename FieldType::value_type one = FieldType::value_type::one();
-                    table[0][0] = algebra::random_element<FieldType>();
-                    table[1][0] = algebra::random_element<FieldType>();
-                    table[2][0] = algebra::random_element<FieldType>();
+                    table[0][0] = alg_rnd();
+                    table[1][0] = alg_rnd();
+                    table[2][0] = alg_rnd();
 //                    table[3][0] = algebra::random_element<FieldType>();
                     q_add[0] = FieldType::value_type::zero();
                     q_mul[0] = FieldType::value_type::zero();
 
                     // fill rows with ADD gate
                     for (std::size_t i = 1; i < test_circuit.table_rows - 5; i++) {
-                        table[0][i] = algebra::random_element<FieldType>();
-                        table[1][i] = algebra::random_element<FieldType>();
+                        table[0][i] = alg_rnd();
+                        table[1][i] = alg_rnd();
                         table[2][i] = table[0][i] + table[1][i];
 //                        table[3][i] = FieldType::value_type::zero();
                         q_add[i] = one;
@@ -156,8 +158,8 @@ namespace nil {
 
                     // fill rows with MUL gate
                     for (std::size_t i = test_circuit.table_rows - 5; i < test_circuit.table_rows - 3; i++) {
-                        table[0][i] = algebra::random_element<FieldType>();
-                        table[1][i] = algebra::random_element<FieldType>();
+                        table[0][i] = alg_rnd();
+                        table[1][i] = alg_rnd();
                         table[2][i] = table[0][i] * table[1][i];
 //                        table[3][i] = FieldType::value_type::zero();
                         q_add[i] = FieldType::value_type::zero();

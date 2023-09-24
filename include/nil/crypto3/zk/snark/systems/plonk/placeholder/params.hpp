@@ -62,6 +62,7 @@ namespace nil {
                     constexpr static const std::size_t public_input_columns = CircuitParams::public_input_columns;
                     constexpr static const std::size_t constant_columns = CircuitParams::constant_columns;
                     constexpr static const std::size_t selector_columns = CircuitParams::selector_columns;
+                    constexpr static const std::size_t total_columns = witness_columns + public_input_columns + constant_columns + selector_columns;
 
                     using field_type = typename CircuitParams::field_type;
 
