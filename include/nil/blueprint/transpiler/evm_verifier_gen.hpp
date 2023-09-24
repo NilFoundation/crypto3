@@ -7,7 +7,6 @@
 #include <filesystem>
 
 #include <boost/algorithm/string.hpp> 
-
 #include <nil/blueprint/transpiler/modular_contracts_templates.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 
@@ -76,6 +75,78 @@ namespace nil {
             return result.str();
         }
 
+        template <typename PlaceholderParams>
+        std::map<nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>, std::size_t>
+        get_plonk_variable_indices(std::array<std::set<int>, PlaceholderParams::total_columns> col_rotations){
+            using variable_type = nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>;
+            std::map<variable_type, std::size_t> result;
+            std::size_t j = 0;
+            for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
+                for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
+                    variable_type v(i, rot, true, variable_type::column_type::constant);
+                    result[v] = j;
+                    std::cout << v << "=>" << j << std::endl;
+                    j++;
+                }
+                j++;
+            }
+            for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
+                for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
+                    variable_type v(i, rot, true, variable_type::column_type::selector);
+                    result[v] = j;
+                    std::cout << v << " => " << j << std::endl;
+                    j++;
+                }
+                j++;
+            }
+            for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
+                for(auto& rot: col_rotations[i]){
+                    variable_type v(i, rot, true, variable_type::column_type::witness);
+                    result[v] = j;
+                    std::cout << v << " => " << j << std::endl;
+                    j++;
+                }
+            }
+            for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
+                for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns]){
+                    variable_type v(i, rot, true, variable_type::column_type::public_input);
+                    result[v] = j;
+                    std::cout << v << " => " << j << std::endl;
+                    j++;
+                }
+            }
+            return result;
+        }
+
+        template <typename PlaceholderParams>
+        std::string constraint_computation_code(
+            const std::map<nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>, std::size_t> &var_indices,
+            const typename nil::crypto3::zk::snark::plonk_constraint<typename PlaceholderParams::field_type> &constraint
+        ){
+            using variable_type = nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>;
+            std::stringstream result;
+
+            crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
+            auto comb = visitor.convert(constraint);
+            result << "\t\tsum = 0;" << std::endl;
+            for( auto it = std::cbegin(comb); it != std::cend(comb); it++ ){
+                bool coeff_one = (it->get_coeff() == PlaceholderParams::field_type::value_type::one());
+                if(!coeff_one) result << "\t\tprod = " << it->get_coeff() << ";" << std::endl;
+                const auto &vars = it->get_vars();
+                for( auto it2 = std::cbegin(vars); it2 != std::cend(vars); it2++ ){
+                    const variable_type &v = *it2;
+                    if(coeff_one){
+                        coeff_one = false;
+                        result << "\t\tprod = basic_marshalling.get_uint256_be(blob, " << var_indices.at(v) * 0x20 << ");" << std::endl;
+                    } else{
+                        result << "\t\tprod = mulmod(prod, basic_marshalling.get_uint256_be(blob, " << var_indices.at(v) * 0x20 << "), modulus);" << std::endl;
+                    }
+                }
+                result << "\t\tsum = addmod(sum, prod, modulus);" << std::endl;
+            }
+            return result.str();
+        }
+
         template<typename PlaceholderParams> 
         void print_evm_verifier(
             const typename PlaceholderParams::constraint_system_type &constraint_system,
@@ -102,6 +173,27 @@ namespace nil {
 
             std::size_t quotient_offset = use_lookups? permutation_offset + 0x80: permutation_offset + 0x40;
 
+            auto var_indices = get_plonk_variable_indices<PlaceholderParams>(common_data.columns_rotations);
+
+            using variable_type = nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>;
+            std::stringstream gate_argument_code;    
+            gate_argument_code << "\t\tuint256 sum;" << std::endl;
+            gate_argument_code << "\t\tuint256 gate;" << std::endl;
+            gate_argument_code << "\t\tuint256 prod;" << std::endl;
+            gate_argument_code << "\t\tuint256 theta_acc=1;" << std::endl;
+            for(const auto &gate: constraint_system.gates()){
+                gate_argument_code << "\t\tgate = 0;" << std::endl;
+                for(const auto &constraint: gate.constraints){
+                    gate_argument_code << constraint_computation_code<PlaceholderParams>(var_indices, constraint);
+                    gate_argument_code << "\t\tgate = addmod(gate, mulmod(theta_acc, sum, modulus), modulus);" << std::endl;
+                    gate_argument_code << "\t\ttheta_acc = mulmod(theta_acc, theta, modulus);" << std::endl;
+                }
+                variable_type sel_var(gate.selector_index, 0, true, variable_type::column_type::selector);
+                std::cout << sel_var << "=>" << var_indices.at(sel_var) << std::endl;
+                gate_argument_code << "\t\tgate = mulmod(gate, basic_marshalling.get_uint256_be(blob, " << var_indices.at(sel_var) * 0x20 << "), modulus);" << std::endl;
+                gate_argument_code << "\t\tF = addmod(F, gate, modulus);" <<std::endl <<std::endl;
+            }
+
             // Prepare all necessary replacements
             transpiler_replacements reps;
             reps["$LOOKUP_LIBRARY_CALL$"] = use_lookups ? lookup_library_call :"        //No lookups";
@@ -121,6 +213,7 @@ namespace nil {
             reps["$ROWS_AMOUNT$"] = to_string(common_data.rows_amount);
             reps["$OMEGA$"] = to_string(common_data.basic_domain->get_domain_element(1));
             reps["$ZERO_INDICES$"] = zero_indices<PlaceholderParams>(common_data.columns_rotations);
+            reps["$GATE_ARGUMENT_COMPUTATION$"] = gate_argument_code.str();
 
             replace_and_print(modular_verifier_template, reps, folder_name + "/modular_verifier.sol");
             replace_and_print(modular_permutation_argument_library_template, reps, folder_name + "/permutation_argument.sol");

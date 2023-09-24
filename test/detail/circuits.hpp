@@ -1137,7 +1137,7 @@ namespace nil {
 
                     std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints = {lookup_constraint1};
                     plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(1, lookup_constraints);
-//                    test_circuit.lookup_gates.push_back(lookup_gate);
+                    test_circuit.lookup_gates.push_back(lookup_gate);
 
                     plonk_variable<assignment_type> w1(  1, 0, true, plonk_variable<assignment_type>::column_type::witness);
                     plonk_lookup_constraint<FieldType> lookup_constraint2;

@@ -59,7 +59,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
     address _commitment_contract_address;
     uint8   constant f_parts = 8;   // Individually on parts
     uint64  constant z_offset = $Z_OFFSET$;
-    uint64  constant table_offset = z_offset + 0x20 * 10;
+    uint64  constant table_offset = z_offset + 0x80 * $PERMUTATION_SIZE$ + 0x80;
     uint64  constant z_end = 0x35 * 0x20;
     uint64  constant rows_amount = $ROWS_AMOUNT$;
     uint256 constant omega = $OMEGA$;
@@ -134,7 +134,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         {
             //6. Gate argument
             console.log(table_points_num);
-            modular_gate_argument_$TEST_NAME$.verify(blob[table_offset:table_offset + (table_points_num << 5)], transcript.get_field_challenge(tr_state, modulus));
+            F[7] = modular_gate_argument_$TEST_NAME$.verify(blob[table_offset:table_offset + (table_points_num << 5)], transcript.get_field_challenge(tr_state, modulus));
         }
 
         // No public input gate
@@ -165,6 +165,10 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         }
 
         //9. Final check
+        console.log("F[0] = ", F[0]);
+        console.log("F[1] = ", F[1]);
+        console.log("F[2] = ", F[2]);
+        console.log("F[7] = ", F[7]);
         console.log("Gas for verification:", gas-gasleft());
     }
 }            
@@ -220,11 +224,6 @@ library modular_permutation_argument_$TEST_NAME${
         uint256 V_P_value = basic_marshalling.get_uint256_be(blob, table_values_offset + $PERMUTATION_TABLE_OFFSET$);
 
         console.log("Compute permutation argument");
-        console.log("beta = ", beta);
-        console.log("gamma = ", gamma);
-        console.log("V_P_value = ", V_P_value);
-        console.log("q_last = ", basic_marshalling.get_uint256_be(blob, special_selectors_offset));
-        console.log("q_blind = ", basic_marshalling.get_uint256_be(blob, special_selectors_offset + 0x40));
 
         uint256 h = 1;
         uint256 g = 1;
@@ -267,10 +266,6 @@ library modular_permutation_argument_$TEST_NAME${
             addmod(V_P_value, modulus-1, modulus),
             modulus
         );
-
-        console.log("F[0] = ", F[0]);
-        console.log("F[1] = ", F[1]);
-        console.log("F[2] = ", F[2]);
     }
 }            
         )";
@@ -350,8 +345,8 @@ library modular_lookup_argument_$TEST_NAME${
 //---------------------------------------------------------------------------//
 pragma solidity >=0.8.4;
 
-import "../../cryptography/transcript.sol";
 import "../../types.sol";
+import "../../basic_marshalling.sol";
 import "hardhat/console.sol";
 
 library modular_gate_argument_$TEST_NAME${
@@ -363,7 +358,7 @@ library modular_gate_argument_$TEST_NAME${
         uint256 theta
     ) internal view returns (uint256 F){
         console.log("Compute gate argument");
-        return 0;
+$GATE_ARGUMENT_COMPUTATION$
     }
 }        )";
 
