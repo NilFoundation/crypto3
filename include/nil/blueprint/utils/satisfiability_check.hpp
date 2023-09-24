@@ -52,7 +52,7 @@ namespace nil {
             const std::vector<crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType>> copy_constraints =
                         bp.copy_constraints();
 
-            const std::vector<crypto3::zk::snark::plonk_gate<BlueprintFieldType, crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>>> lookup_gates =
+            const std::vector<crypto3::zk::snark::plonk_lookup_gate<BlueprintFieldType, crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>>> lookup_gates =
                         bp.lookup_gates();
 
             for (std::size_t i = 0; i < gates.size(); i++) {
