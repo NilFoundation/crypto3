@@ -119,6 +119,20 @@ namespace nil {
                         return _lookup_tables[table_id];
                     }
 
+                    std::size_t sorted_lookup_columns_number() const {
+                        std::size_t result = 0;
+                        if(_lookup_gates.size() == 0){
+                            return 0;
+                        }   
+                        for(std::size_t i = 0; i < _lookup_gates.size(); ++i) {
+                            result += _lookup_gates[i].constraints.size();
+                        }
+                        for(std::size_t i = 0; i < _lookup_tables.size(); ++i) {
+                            result += _lookup_tables[i].lookup_options.size();
+                        }
+                        return result;
+                    }
+
                     bool operator==(const plonk_constraint_system<FieldType, ArithmetizationParams> &other) const {
                         return (this->_gates == other._gates) && (this->_copy_constraints == other._copy_constraints) &&
                                (this->_lookup_gates == other._lookup_gates) && (this->_lookup_tables == other._lookup_tables);
