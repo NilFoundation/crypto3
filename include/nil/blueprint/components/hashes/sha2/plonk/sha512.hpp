@@ -48,8 +48,10 @@ namespace nil {
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
                 using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                 using sha512_process_component = sha512_process<ArithmetizationType>;
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;

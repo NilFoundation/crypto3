@@ -70,8 +70,6 @@ namespace nil {
                                                                             ArithmetizationParams>>:
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
-
                 static std::size_t chunks_per_row_internal(std::size_t witness_amount) {
                     return witness_amount - reserved_columns;
                 }
@@ -105,6 +103,8 @@ namespace nil {
                 }
 
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
 

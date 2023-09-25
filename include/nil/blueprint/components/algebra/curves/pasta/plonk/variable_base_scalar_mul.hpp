@@ -109,9 +109,9 @@ namespace nil {
                     CurveType
                 >: public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
+                public:
                     using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
-                public:
                     using var = typename component_type::var;
                     using manifest_type = plonk_component_manifest;
                     using add_component =

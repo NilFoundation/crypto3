@@ -59,7 +59,6 @@ namespace nil {
             class logic_or_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                 : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
                 using value_type = typename BlueprintFieldType::value_type;
 
                 constexpr static std::size_t rows_amount_internal(std::size_t witness_amount) {
@@ -71,6 +70,8 @@ namespace nil {
                 }
 
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
 

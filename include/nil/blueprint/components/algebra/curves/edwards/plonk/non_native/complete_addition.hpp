@@ -50,8 +50,6 @@ namespace nil {
                     basic_non_native_policy<BlueprintFieldType>>:
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
-
                 constexpr static std::size_t rows_amount_internal(std::size_t witness_amount) {
                     return
                         2 * non_native_range_component::get_rows_amount(witness_amount, 0) +
@@ -60,6 +58,8 @@ namespace nil {
                         subtraction_component::get_rows_amount(witness_amount, 0);
                 }
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                 using var = typename component_type::var;
                 using manifest_type = typename component_type::manifest_type;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;

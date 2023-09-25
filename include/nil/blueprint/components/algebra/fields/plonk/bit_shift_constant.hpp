@@ -67,9 +67,6 @@ namespace nil {
                 crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                                  : public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                using component_type =
-                    plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
-
                 static std::size_t rows_amount_internal(std::size_t witness_amount, std::size_t bits_amount,
                                                  std::size_t shift, bit_shift_mode mode) {
                     return decomposition_component_type::get_rows_amount(witness_amount, 0, bits_amount) +
@@ -77,6 +74,9 @@ namespace nil {
                                 calculate_composition_bits_amount(bits_amount, shift, mode), false);
                 }
             public:
+                using component_type =
+                    plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                 using var = typename component_type::var;
                 using decomposition_component_type =
                     bit_decomposition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,

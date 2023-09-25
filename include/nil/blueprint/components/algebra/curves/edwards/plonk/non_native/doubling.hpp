@@ -53,9 +53,9 @@ namespace nil {
                 typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
                     ArithmetizationType;
 
+            public:
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
 
-            public:
                 using var = typename component_type::var;
                 using manifest_type = typename component_type::manifest_type;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;

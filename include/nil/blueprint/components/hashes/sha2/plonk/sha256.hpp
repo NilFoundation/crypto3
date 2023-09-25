@@ -49,10 +49,10 @@ namespace nil {
             class sha256<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                 : public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
+            public:
                 using component_type =
                     plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
-            public:
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
                 using sha256_process_type =

@@ -70,7 +70,6 @@ namespace nil {
                     ExponentSize
                 >:
                     public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
                     constexpr static const std::size_t reserved_witnesses = 2;    // base, accumulated_n
 
@@ -95,6 +94,8 @@ namespace nil {
                         return main_rows_amount_internal(witness_amount) + 1;
                     }
                 public:
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                     using var = typename component_type::var;
                     using manifest_type = plonk_component_manifest;
 

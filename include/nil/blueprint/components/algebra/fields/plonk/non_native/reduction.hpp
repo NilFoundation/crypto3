@@ -53,11 +53,12 @@ namespace nil {
                             basic_non_native_policy<BlueprintFieldType>>
                 : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
                 using operating_field_type = crypto3::algebra::fields::curve25519_scalar_field;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+
                 using var = typename component_type::var;using manifest_type = nil::blueprint::plonk_component_manifest;
 
                 class gate_manifest_type : public component_gate_manifest {

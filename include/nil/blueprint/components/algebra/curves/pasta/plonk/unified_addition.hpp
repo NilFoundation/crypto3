@@ -51,9 +51,8 @@ namespace nil {
 
                 static_assert(std::is_same<typename CurveType::base_field_type, BlueprintFieldType>::value);
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
-
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
