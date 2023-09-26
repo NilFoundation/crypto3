@@ -81,7 +81,6 @@ namespace nil {
                                                                                  ArithmetizationParams>> :
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
                 using value_type = typename BlueprintFieldType::value_type;
 
                 static std::size_t chunk_amount_internal(std::size_t bits_amount) {
@@ -132,6 +131,8 @@ namespace nil {
                 }
 
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
 

@@ -105,8 +105,6 @@ namespace nil {
                                                                               ArithmetizationParams>>:
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
-
                 static std::size_t comaprisons_per_gate_instance_internal(std::size_t witness_amount) {
                     return 1 + (witness_amount - 3) / 2;
                 }
@@ -147,6 +145,8 @@ namespace nil {
                 }
 
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
 

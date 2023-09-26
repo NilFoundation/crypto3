@@ -50,9 +50,9 @@ namespace nil {
                                 BlueprintFieldType>
                 : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
 
+            public:
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
 
-            public:
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
 

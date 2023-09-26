@@ -52,10 +52,11 @@ namespace nil {
             protected:
 
                 using witness_container_type = std::vector<std::uint32_t>;
-                using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
-                using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
             public:
+
+                using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
+                using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
 
                 witness_container_type _W;
                 constant_container_type _C;

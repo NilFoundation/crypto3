@@ -52,9 +52,9 @@ namespace nil {
                            FieldType>
                 : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
 
+            public:
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
 
-            public:
                 constexpr static const std::uint32_t state_size = 3;
                 constexpr static const std::uint32_t rounds_amount = 55;
 

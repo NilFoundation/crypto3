@@ -69,7 +69,6 @@ namespace nil {
                                                                                    ArithmetizationParams>> :
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
                 using value_type = typename BlueprintFieldType::value_type;
 
                 static bool needs_bonus_row_internal(std::size_t witness_amount, comparison_mode mode) {
@@ -85,6 +84,8 @@ namespace nil {
                 }
 
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                 using var = typename component_type::var;
 
                 using range_check_component_type =

@@ -55,9 +55,9 @@ namespace nil {
                 BlueprintFieldType>:
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
+            public:
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
-            public:
                 class gate_manifest_type : public component_gate_manifest {
                 public:
                     std::uint32_t gates_amount() const override {

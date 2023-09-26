@@ -64,11 +64,11 @@ namespace nil {
                                  : public bit_builder_component<crypto3::zk::snark::plonk_constraint_system<
                                                                     BlueprintFieldType, ArithmetizationParams>> {
 
+            public:
                 using component_type =
                     bit_builder_component<
-                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
 
-            public:
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
 

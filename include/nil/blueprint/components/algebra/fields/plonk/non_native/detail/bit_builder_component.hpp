@@ -97,8 +97,6 @@ namespace nil {
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                                     : public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
-
                     static std::size_t rows_amount_internal(std::size_t witness_amount,
                                                      std::size_t bits_amount, bool check_bits) {
                         std::size_t total_bits = bits_amount +
@@ -162,6 +160,8 @@ namespace nil {
                     }
 
                 public:
+                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+
                     using var = typename component_type::var;
                     using manifest_type = nil::blueprint::plonk_component_manifest;
 
