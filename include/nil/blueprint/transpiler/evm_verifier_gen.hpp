@@ -7,19 +7,16 @@
 #include <filesystem>
 
 #include <boost/algorithm/string.hpp> 
-#include <nil/blueprint/transpiler/modular_contracts_templates.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/blueprint/transpiler/templates/modular_verifier.hpp>
+#include <nil/blueprint/transpiler/templates/gate_argument.hpp>
+#include <nil/blueprint/transpiler/templates/permutation_argument.hpp>
+#include <nil/blueprint/transpiler/templates/lookup_argument.hpp>
+#include <nil/blueprint/transpiler/templates/commitment_scheme.hpp>
+#include <nil/blueprint/transpiler/lpc_scheme_gen.hpp>
+#include <nil/blueprint/transpiler/util.hpp>
 
 namespace nil {
     namespace blueprint {
-        using transpiler_replacements = std::map<std::string, std::string>;
-
-        template<typename T> std::string to_string(T val) {
-            std::stringstream strstr;
-            strstr << val;
-            return strstr.str();
-        }
-
         void replace_and_print(std::string input, transpiler_replacements reps, std::string output_file_name){
             std::string code = input;
 
@@ -85,7 +82,6 @@ namespace nil {
                 for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
                     variable_type v(i, rot, true, variable_type::column_type::constant);
                     result[v] = j;
-                    std::cout << v << "=>" << j << std::endl;
                     j++;
                 }
                 j++;
@@ -94,7 +90,6 @@ namespace nil {
                 for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
                     variable_type v(i, rot, true, variable_type::column_type::selector);
                     result[v] = j;
-                    std::cout << v << " => " << j << std::endl;
                     j++;
                 }
                 j++;
@@ -103,7 +98,6 @@ namespace nil {
                 for(auto& rot: col_rotations[i]){
                     variable_type v(i, rot, true, variable_type::column_type::witness);
                     result[v] = j;
-                    std::cout << v << " => " << j << std::endl;
                     j++;
                 }
             }
@@ -111,7 +105,6 @@ namespace nil {
                 for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns]){
                     variable_type v(i, rot, true, variable_type::column_type::public_input);
                     result[v] = j;
-                    std::cout << v << " => " << j << std::endl;
                     j++;
                 }
             }
@@ -151,6 +144,7 @@ namespace nil {
         void print_evm_verifier(
             const typename PlaceholderParams::constraint_system_type &constraint_system,
             const common_data_type<PlaceholderParams> &common_data,
+            const typename PlaceholderParams::commitment_scheme_type &lpc_scheme,
             std::size_t permutation_size,
             std::string folder_name
         ){
@@ -159,7 +153,7 @@ namespace nil {
 
             std::size_t z_offset = use_lookups ? 0xc9 : 0xa1;
             std::size_t special_selectors_offset = z_offset + permutation_size * 0x80;
-            std::size_t table_z_offset = special_selectors_offset + 0x80;
+            std::size_t table_z_offset = special_selectors_offset + 0xc0;
             std::size_t variable_values_offset = 0;
 
             for( std::size_t i = 0; i < PlaceholderParams::arithmetization_params::constant_columns + PlaceholderParams::arithmetization_params::selector_columns; i++){
@@ -189,10 +183,80 @@ namespace nil {
                     gate_argument_code << "\t\ttheta_acc = mulmod(theta_acc, theta, modulus);" << std::endl;
                 }
                 variable_type sel_var(gate.selector_index, 0, true, variable_type::column_type::selector);
-                std::cout << sel_var << "=>" << var_indices.at(sel_var) << std::endl;
-                gate_argument_code << "\t\tgate = mulmod(gate, basic_marshalling.get_uint256_be(blob, " << var_indices.at(sel_var) * 0x20 << "), modulus);" << std::endl;
-                gate_argument_code << "\t\tF = addmod(F, gate, modulus);" <<std::endl <<std::endl;
+                gate_argument_code << "\t\t\tgate = mulmod(gate, basic_marshalling.get_uint256_be(blob, " << var_indices.at(sel_var) * 0x20 << "), modulus);" << std::endl;
+                gate_argument_code << "\t\t\tF = addmod(F, gate, modulus);" <<std::endl <<std::endl;
             }
+
+            std::size_t j = 0;
+            std::stringstream lookup_argument_code;
+            lookup_argument_code << "\t\t\tuint256 sum;" << std::endl;
+            lookup_argument_code << "\t\t\tuint256 prod;" << std::endl;
+
+            for(const auto &gate: constraint_system.lookup_gates()){
+                variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
+                lookup_argument_code << "\t\t\tstate.selector_value=basic_marshalling.get_uint256_be(blob, " << var_indices.at(sel_var) * 0x20 << ");" << std::endl;
+                for( const auto &constraint: gate.constraints ){
+                    variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
+                    lookup_argument_code << 
+                        "\t\t\tl = mulmod( " << constraint.table_id << ",state.selector_value, modulus);" << std::endl;
+                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup constraints\", l);" << std::endl;
+                    lookup_argument_code << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
+                    for( const auto &expression:constraint.lookup_input ){
+                        lookup_argument_code << constraint_computation_code<PlaceholderParams>(var_indices, expression) << std::endl  << std::endl;
+                        lookup_argument_code << 
+                            "\t\t\tl = addmod( l, mulmod( mulmod(state.theta_acc, state.selector_value, modulus), sum, modulus), modulus);" << std::endl;
+//                        lookup_argument_code << "\t\t\tconsole.log(\"Lookup constraints\", l);" << std::endl;
+                        lookup_argument_code << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
+                    }
+                    lookup_argument_code << "state.g = mulmod(state.g, mulmod(addmod(1, state.beta, modulus), addmod(l,state.gamma, modulus), modulus), modulus);" << std::endl;
+                    lookup_argument_code << "\t\t\tconsole.log(\"g = \", state.g);" << std::endl;
+                    j++;
+                }
+            }
+
+            lookup_argument_code << std::endl;
+            j = 0;
+            std::size_t table_index = 1;
+            for(const auto &table: constraint_system.lookup_tables()){
+                variable_type sel_var(table.tag_index, 0, true, variable_type::column_type::selector);
+                variable_type shifted_sel_var(table.tag_index, 1, true, variable_type::column_type::selector);
+                lookup_argument_code << "\t\tstate.selector_value=basic_marshalling.get_uint256_be(blob, " << var_indices.at(sel_var) * 0x20 << ");" << std::endl;                    
+                lookup_argument_code << "\t\tstate.shifted_selector_value=basic_marshalling.get_uint256_be(blob, " << var_indices.at(shifted_sel_var) * 0x20 << ");" << std::endl;                    
+
+                for( const auto &option: table.lookup_options ){
+                    lookup_argument_code << 
+                        "\t\t\tl= mulmod( " << table_index << ", state.selector_value, modulus);" << std::endl;
+                    lookup_argument_code << 
+                        "\t\t\tstate.l_shifted = mulmod( " << table_index << ", state.shifted_selector_value, modulus);" << std::endl;
+//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup options\", l);" << std::endl;
+//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup shifted\", state.l_shifted);" << std::endl;
+                    lookup_argument_code << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
+                    for( const auto &var: option ){
+                        lookup_argument_code << 
+                            "\t\t\tl= addmod( l, mulmod(state.selector_value,  mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << var_indices.at(var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
+                        variable_type shifted_var = var;
+                        shifted_var.rotation = 1;
+                        lookup_argument_code << 
+                            "\t\t\tstate.l_shifted = addmod( state.l_shifted, mulmod(state.shifted_selector_value, mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << var_indices.at(shifted_var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
+                        lookup_argument_code << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
+//                        lookup_argument_code << "\t\t\tconsole.log(\"Lookup options\", l);" << std::endl;
+//                        lookup_argument_code << "\t\t\tconsole.log(\"Lookup shifted\", state.l_shifted);" << std::endl;
+                    }
+                    lookup_argument_code << 
+                        "\t\t\tl= mulmod( l, state.mask, modulus);" << std::endl;
+                    lookup_argument_code << 
+                        "\t\t\tstate.l_shifted = mulmod( state.l_shifted, state.shifted_mask, modulus);" << std::endl;
+//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup options\", l);" << std::endl;
+//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup shifted\", state.l_shifted);" << std::endl;
+                    lookup_argument_code << "\t\t\t state.g = mulmod(state.g, addmod( state.factor, addmod(l, mulmod(state.beta, state.l_shifted, modulus), modulus), modulus), modulus);" << std::endl;
+                    lookup_argument_code << "\t\t\t console.log(\"g = \", state.g);" << std::endl;
+                    j++;
+                }
+                table_index++;
+            }
+            lookup_argument_code << std::endl;
+
+            std::string commitment_code = generate_commitment_scheme_code<PlaceholderParams>(common_data, lpc_scheme);
 
             // Prepare all necessary replacements
             transpiler_replacements reps;
@@ -204,6 +268,8 @@ namespace nil {
             reps["$BATCHES_NUM$"] = use_lookups ? "5" :"4";
             reps["$EVAL_PROOF_OFFSET$"] = use_lookups ? "0xa1" :"0x79";
             reps["$SORTED_COLUMNS_NUMBER$"] = to_string(constraint_system.sorted_lookup_columns_number());
+            reps["$LOOKUP_OPTIONS_NUMBER$"] = to_string(constraint_system.lookup_options_num());
+            reps["$LOOKUP_CONSTRAINTS_NUMBER$"] = to_string(constraint_system.lookup_constraints_num());
             reps["$Z_OFFSET$"] = use_lookups ? "0xc9" :"0xa1";
             reps["$PERMUTATION_SIZE$"] = to_string(permutation_size);
             reps["$SPECIAL_SELECTORS_OFFSET$"] = to_string(special_selectors_offset);
@@ -214,12 +280,19 @@ namespace nil {
             reps["$OMEGA$"] = to_string(common_data.basic_domain->get_domain_element(1));
             reps["$ZERO_INDICES$"] = zero_indices<PlaceholderParams>(common_data.columns_rotations);
             reps["$GATE_ARGUMENT_COMPUTATION$"] = gate_argument_code.str();
+            reps["$LOOKUP_ARGUMENT_COMPUTATION$"] = lookup_argument_code.str();
+            reps["$COMMITMENT_CODE$"] = commitment_code;
+
+            commitment_scheme_replaces<PlaceholderParams>(reps, common_data, lpc_scheme, permutation_size, use_lookups);
 
             replace_and_print(modular_verifier_template, reps, folder_name + "/modular_verifier.sol");
             replace_and_print(modular_permutation_argument_library_template, reps, folder_name + "/permutation_argument.sol");
-            replace_and_print(modular_lookup_argument_library_template, reps, folder_name + "/lookup_argument.sol");
             replace_and_print(modular_gate_argument_library_template, reps, folder_name + "/gate_argument.sol");
             replace_and_print(modular_commitment_library_template, reps, folder_name + "/commitment.sol");
+            if(use_lookups)
+                replace_and_print(modular_lookup_argument_library_template, reps, folder_name + "/lookup_argument.sol");
+            else
+                replace_and_print(modular_dummy_lookup_argument_library_template, reps, folder_name + "/lookup_argument.sol");
         }
     }
 }
