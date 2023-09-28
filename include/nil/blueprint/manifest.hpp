@@ -49,6 +49,8 @@ namespace nil {
             class plonk_component;
         }    // namespace components
 
+        struct compiler_manifest;
+
         struct manifest_lookup_type {
             enum class type {
                 NONE,
@@ -156,25 +158,7 @@ namespace nil {
                 return t < lt.t;
             }
 
-            manifest_constant_type intersect(manifest_constant_type lt) const {
-                if (t == manifest_constant_type::type::UNSAT ||
-                    lt == manifest_constant_type::type::UNSAT) {
-
-                    return manifest_constant_type::type::UNSAT;
-                } else if (t == manifest_constant_type::type::NONE &&
-                           lt == manifest_constant_type::type::REQUIRED ||
-                           t == manifest_constant_type::type::REQUIRED &&
-                           lt == manifest_constant_type::type::NONE) {
-                    return manifest_constant_type::type::UNSAT;
-                } else if (t == manifest_constant_type::type::REQUIRED ||
-                           lt == manifest_constant_type::type::REQUIRED) {
-                    return manifest_constant_type::type::REQUIRED;
-                } else if (t == manifest_constant_type::type::NONE ||
-                           lt == manifest_constant_type::type::NONE) {
-                    return manifest_constant_type::type::NONE;
-                }
-                return manifest_constant_type::type::UNSAT;
-            }
+            manifest_constant_type intersect(const compiler_manifest &manifest) const;
 
             manifest_constant_type merge_with(manifest_constant_type lt) const {
                 if (t == manifest_constant_type::type::UNSAT ||
@@ -1027,6 +1011,14 @@ namespace nil {
                     new_lookup_size_for_column_amount
                 );
             }
+
+            // Checks if there is at least a single set of parameters which satisfies this manifest
+            bool is_satisfiable() const {
+                return witness_amount->is_satisfiable() &&
+                       constant_required != manifest_constant_type::type::UNSAT &&
+                       lookup_usage != manifest_lookup_type::type::UNSAT &&
+                       lookup_column_amount->is_satisfiable();
+            }
         };
 
         std::ostream& operator<<(std::ostream& os, const plonk_component_manifest &manifest) {
@@ -1046,7 +1038,7 @@ namespace nil {
         }
 
         // Describes the maximum values of parameters compiler is willing to give to a component.
-        struct compiler_manfiest {
+        struct compiler_manifest {
         private:
             using manifest_param_ptr = std::shared_ptr<manifest_param>;
 
@@ -1085,7 +1077,14 @@ namespace nil {
                 return max_lookup_columns;
             }
 
-            compiler_manfiest(std::uint32_t max_witness_columns, std::uint32_t max_lookup_columns,
+            // Intended to be used only in tests to put this into an std::map
+            bool operator<(const compiler_manifest &other) const {
+                return std::tie(max_witness_columns, max_lookup_columns, max_lookup_size, has_constant) <
+                       std::tie(other.max_witness_columns, other.max_lookup_columns, other.max_lookup_size,
+                                other.has_constant);
+            }
+
+            compiler_manifest(std::uint32_t max_witness_columns, std::uint32_t max_lookup_columns,
                               std::uint32_t max_lookup_size, bool has_constant)
                 : max_witness_columns(max_witness_columns),
                   max_lookup_columns(max_lookup_columns),
@@ -1102,7 +1101,8 @@ namespace nil {
                 manifest_lookup_type compiler_lookup_usage = max_lookup_columns > 0
                                                                   ? manifest_lookup_type::type::OPTIONAL
                                                                   : manifest_lookup_type::type::NONE;
-                manifest_lookup_type new_lookup_usage = component_manifest.lookup_usage.intersect(compiler_lookup_usage);
+                manifest_lookup_type new_lookup_usage =
+                    component_manifest.lookup_usage.intersect(compiler_lookup_usage);
                 plonk_component_manifest::lookup_size_func_type new_lookup_size_for_column_amount =
                     component_manifest.lookup_size_for_column_amount;
                 auto new_lookup_column_amount =
@@ -1129,13 +1129,25 @@ namespace nil {
 
                 return plonk_component_manifest(
                     component_manifest.witness_amount->intersect(witness_amount),
-                    component_manifest.constant_required.intersect(manifest_constant_type(has_constant ? 1 : 0)),
+                    component_manifest.constant_required.intersect(*this),
                     new_lookup_usage,
                     new_lookup_column_amount,
                     new_lookup_size_for_column_amount
                 );
             }
         };
+
+        manifest_constant_type manifest_constant_type::intersect(
+                const compiler_manifest &manifest) const {
+            if (t == manifest_constant_type::type::UNSAT ||
+                t == manifest_constant_type::type::REQUIRED && manifest.has_constant == false) {
+                return manifest_constant_type::type::UNSAT;
+            } else if (t == manifest_constant_type::type::REQUIRED && manifest.has_constant == true) {
+                return manifest_constant_type::type::REQUIRED;
+            } else {
+                return manifest_constant_type::type::NONE;
+            }
+        }
 
         // Base class for all component gate manifests
         class component_gate_manifest {

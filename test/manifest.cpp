@@ -227,16 +227,18 @@ BOOST_AUTO_TEST_CASE(test_manifest_iteration) {
     BOOST_ASSERT(k == expected_range.size());
 }
 
-template<typename TestType>
-void test_table_operation(const std::map<std::pair<TestType, TestType>, TestType> &test_table,
-                          const std::function<TestType(const TestType&, const TestType &)> &operation) {
+template<typename TestType1, typename TestType2 = TestType1>
+void test_table_operation(const std::map<std::pair<TestType1, TestType2>, TestType1> &test_table,
+                          const std::function<TestType1(const TestType1&, const TestType2&)> &operation) {
     for (auto test_case : test_table) {
         auto [type_1, type_2] = test_case.first;
         auto expected_result = test_case.second;
         auto result = operation(type_1, type_2);
         BOOST_ASSERT(result == expected_result);
-        result = operation(type_2, type_1);
-        BOOST_ASSERT(result == expected_result);
+        if constexpr (std::is_same_v<TestType1, TestType2>) {
+            auto second_result = operation(type_2, type_1);
+            BOOST_ASSERT(second_result == expected_result);
+        }
     }
 }
 
@@ -284,17 +286,20 @@ BOOST_AUTO_TEST_CASE(test_manifest_lookup_type_merge_with) {
 }
 
 BOOST_AUTO_TEST_CASE(test_manifest_constant_type_intersection) {
-    std::map<std::pair<manifest_constant_type, manifest_constant_type>, manifest_constant_type>
+    compiler_manifest
+        has_constant(0, 0, 0, true),
+        has_no_constant(0, 0, 0, false);
+    std::map<std::pair<manifest_constant_type, compiler_manifest>, manifest_constant_type>
             intersection_test_table = {
-        {{manifest_constant_type::type::UNSAT, manifest_constant_type::type::UNSAT}, manifest_constant_type::type::UNSAT},
-        {{manifest_constant_type::type::UNSAT, manifest_constant_type::type::NONE}, manifest_constant_type::type::UNSAT},
-        {{manifest_constant_type::type::UNSAT, manifest_constant_type::type::REQUIRED}, manifest_constant_type::type::UNSAT},
-        {{manifest_constant_type::type::NONE, manifest_constant_type::type::NONE}, manifest_constant_type::type::NONE},
-        {{manifest_constant_type::type::NONE, manifest_constant_type::type::REQUIRED}, manifest_constant_type::type::UNSAT},
-        {{manifest_constant_type::type::REQUIRED, manifest_constant_type::type::REQUIRED}, manifest_constant_type::type::REQUIRED},
+        {{manifest_constant_type::type::UNSAT, has_constant}, manifest_constant_type::type::UNSAT},
+        {{manifest_constant_type::type::UNSAT, has_no_constant}, manifest_constant_type::type::UNSAT},
+        {{manifest_constant_type::type::NONE, has_constant}, manifest_constant_type::type::NONE},
+        {{manifest_constant_type::type::NONE, has_no_constant}, manifest_constant_type::type::NONE},
+        {{manifest_constant_type::type::REQUIRED, has_constant}, manifest_constant_type::type::REQUIRED},
+        {{manifest_constant_type::type::REQUIRED, has_no_constant}, manifest_constant_type::type::UNSAT},
     };
-    std::function<manifest_constant_type(const manifest_constant_type&, const manifest_constant_type&)> test_intersect
-        = [](const manifest_constant_type &type_1, const manifest_constant_type &type_2) {
+    std::function<manifest_constant_type(const manifest_constant_type&, const compiler_manifest&)> test_intersect
+        = [](const manifest_constant_type &type_1, const compiler_manifest &type_2) {
             return type_1.intersect(type_2);
     };
 
@@ -372,7 +377,7 @@ bool check_manifest_equality(const plonk_component_manifest& manifest_1,
 }
 
 BOOST_AUTO_TEST_CASE(test_manifest_intersect) {
-    compiler_manfiest comp_manifest_1(9, 2, 32, false);
+    compiler_manifest comp_manifest_1(9, 2, 32, false);
     plonk_component_manifest manifest_1(
         std::make_shared<manifest_range_param>(3, 12, 3),
         manifest_constant_type::type::NONE,
@@ -418,7 +423,7 @@ BOOST_AUTO_TEST_CASE(test_manifest_intersect) {
         [](size_t) { return 0; });
     BOOST_ASSERT(check_manifest_equality(manifest_res_3, expected_res_3));
 
-    compiler_manfiest comp_manifest_2(20, 9, 32, true);
+    compiler_manifest comp_manifest_2(20, 9, 32, true);
     plonk_component_manifest manifest_4(
         std::make_shared<manifest_set_param>(std::set<std::uint32_t>{1, 2, 3, 11, 21, 22}),
         manifest_constant_type::type::REQUIRED,
