@@ -148,7 +148,15 @@ namespace nil {
             std::size_t permutation_size,
             std::string folder_name
         ){
-            std::cout << "Generating verifier " << folder_name << std::endl;
+            std::string test_name;
+            std::size_t found = folder_name.rfind("/");
+            if( found == std::string::npos ){
+                test_name = folder_name;
+            } else{
+                test_name = folder_name.substr(found + 1);
+            }
+            std::cout << "Generating verifier " << test_name << std::endl;
+
             bool use_lookups = constraint_system.lookup_gates().size() > 0;
 
             std::size_t z_offset = use_lookups ? 0xc9 : 0xa1;
@@ -251,7 +259,7 @@ namespace nil {
             // Prepare all necessary replacements
             transpiler_replacements reps;
             reps["$LOOKUP_LIBRARY_CALL$"] = use_lookups ? lookup_library_call :"        //No lookups";
-            reps["$TEST_NAME$"] = folder_name;
+            reps["$TEST_NAME$"] = test_name;
             reps["$MODULUS$"] = to_string(PlaceholderParams::field_type::modulus);
             reps["$VERIFICATION_KEY1$"] = "0x" + to_string(common_data.vk.constraint_system_hash);
             reps["$VERIFICATION_KEY2$"] = "0x" + to_string(common_data.vk.fixed_values_commitment);
