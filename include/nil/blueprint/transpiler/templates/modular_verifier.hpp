@@ -167,6 +167,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             transcript.update_transcript_b32_by_offset_calldata(tr_state, blob, 0x59);
         }
 
+        bool b = true;
         //8. Commitment scheme verify_eval
         {
             ICommitmentScheme commitment_scheme = ICommitmentScheme(_commitment_contract_address);
@@ -180,7 +181,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
                 blob[z_offset - 0x8:], commitments, xi, tr_state.current_challenge
             )) {
                 console.log("Error from commitment scheme!");
-                return;                
+                b = false;
             }
         }
 
@@ -198,7 +199,11 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
                 unchecked{i++;}
             }
             console.log("T_consolidated = ", T_consolidated);
-            if( F_consolidated == mulmod(T_consolidated, state.Z_at_xi, modulus) ) console.log("SUCCESS!");
+            if( F_consolidated != mulmod(T_consolidated, state.Z_at_xi, modulus) ) {
+                console.log("Error. Table does't satisfy constraint system");
+                b = false;
+            }
+            if(b) console.log("SUCCESS!"); else console.log("FAILURE!");
         }
 
         console.log("F[0] = ", state.F[0]);
