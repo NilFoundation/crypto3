@@ -242,7 +242,10 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_t>, 4, 4> 
-                circuit_test_t(typename FieldType::value_type pi0 = FieldType::value_type::zero()) {
+                circuit_test_t(
+                    typename FieldType::value_type pi0 = FieldType::value_type::zero(), 
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
+                ) {
                     using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
@@ -269,16 +272,16 @@ namespace nil {
 
                     // init values
                     typename FieldType::value_type one = FieldType::value_type::one();
-                    table[0][0] = algebra::random_element<FieldType>();
-                    table[1][0] = algebra::random_element<FieldType>();
-                    table[2][0] = algebra::random_element<FieldType>();
+                    table[0][0] = alg_rnd();
+                    table[1][0] = alg_rnd();
+                    table[2][0] = alg_rnd();
                     table[3][0] = pi0;
                     q_add[0] = FieldType::value_type::zero();
                     q_mul[0] = FieldType::value_type::zero();
 
                     // fill rows with ADD gate
                     for (std::size_t i = 1; i < test_circuit.table_rows - 5; i++) {
-                        table[0][i] = algebra::random_element<FieldType>();
+                        table[0][i] = alg_rnd();
                         table[1][i] = table[2][i - 1];
                         table[2][i] = table[0][i] + table[1][i];
                         table[3][i] = FieldType::value_type::zero();
@@ -294,7 +297,7 @@ namespace nil {
 
                     // fill rows with MUL gate
                     for (std::size_t i = test_circuit.table_rows - 5; i < test_circuit.table_rows - 3; i++) {
-                        table[0][i] = algebra::random_element<FieldType>();
+                        table[0][i] = alg_rnd();
                         table[1][i] = table[3][0];
                         table[2][i] = table[0][i] * table[1][i] + table[0][i - 1];
                         table[3][i] = FieldType::value_type::zero();
@@ -1137,7 +1140,7 @@ namespace nil {
 
                     std::vector<plonk_lookup_constraint<FieldType>> lookup_constraints = {lookup_constraint1};
                     plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>> lookup_gate(1, lookup_constraints);
-//                    test_circuit.lookup_gates.push_back(lookup_gate);
+                    test_circuit.lookup_gates.push_back(lookup_gate);
 
                     plonk_variable<assignment_type> w1(  1, 0, true, plonk_variable<assignment_type>::column_type::witness);
                     plonk_lookup_constraint<FieldType> lookup_constraint2;
