@@ -114,7 +114,8 @@ contract modular_commitment_scheme_$TEST_NAME$ {
 $POINTS_INITIALIZATION$
     }
 
-    function prepare_U_V(bytes calldata blob, commitment_state memory state, uint256 xi) internal view{        
+    function prepare_U_V(bytes calldata blob, commitment_state memory state, uint256 xi) internal view returns(bool result){        
+        result = true;
         uint64 ind = 0;
         prepare_eval_points(state.unique_eval_points, xi);
                 // Prepare denominators
@@ -151,7 +152,6 @@ $POINTS_INITIALIZATION$
                         addmod(state.unique_eval_points[ind][2], modulus - state.unique_eval_points[ind][0], modulus),
                         modulus
                     );
-                console.log("STATE 3 factor", state.factors[ind]);
                 state.denominators[ind][3] = 1;
                 state.denominators[ind][2] =
                     modulus - addmod(
@@ -181,6 +181,7 @@ $POINTS_INITIALIZATION$
                 state.denominators[ind][3] = mulmod(state.denominators[ind][3], state.factors[ind], modulus);
             } else {
                 console.log("UNPROCESSED length");
+                return false;
             }
             unchecked{ind++;}
         }
@@ -236,7 +237,7 @@ $POINTS_INITIALIZATION$
                             state.combined_U[ind][1] = addmod(state.combined_U[ind][1], tmp[1], modulus);
                             state.combined_U[ind][2] = addmod(state.combined_U[ind][2], tmp[2], modulus);
                         } else {
-                            require(false, "Unsupported eval points length");
+                            return false;
                         }
                     } 
                     offset += state.unique_eval_points[cur_point].length * 0x20;
@@ -250,10 +251,8 @@ $POINTS_INITIALIZATION$
 
     function compute_combined_Q(bytes calldata blob,commitment_state memory state) internal view returns(uint256[2] memory y){
         for(uint256 p = 0; p < unique_points; ){
-            console.log("Point size = ", state.unique_eval_points[p].length);
             uint256[2] memory tmp;
             uint256 offset = state.initial_data_offset - state.poly_num * 0x40; // Save initial data offset for future use;
-            console.logBytes(blob[offset: offset+0x20]);
             uint256 cur = 0;
             for(uint256 b = 0; b < batches_num;){
                 for(uint256 j = 0; j < state.batch_sizes[b];){
@@ -275,8 +274,6 @@ $POINTS_INITIALIZATION$
                 }
                 unchecked{b++;}
             }
-            console.log("Before U and V ", tmp[0]);
-            console.log("Before U and V ", tmp[1]);
             tmp[0] = mulmod(tmp[0], state.factors[p], modulus);
             tmp[1] = mulmod(tmp[1], state.factors[p], modulus);
             uint256 s = state.x;
@@ -284,12 +281,6 @@ $POINTS_INITIALIZATION$
             tmp[1] = addmod(tmp[1], modulus - polynomial.evaluate(state.combined_U[p], modulus - s, modulus), modulus);
             tmp[0] = mulmod(tmp[0], field.inverse_static(polynomial.evaluate(state.denominators[p], s, modulus), modulus), modulus);
             tmp[1] = mulmod(tmp[1], field.inverse_static(polynomial.evaluate(state.denominators[p], modulus - s, modulus), modulus), modulus);
-            console.log("Factor = ", state.factors[p] );
-            console.log("U[0]= ", mulmod( field.inverse_static(state.factors[p], modulus), polynomial.evaluate(state.combined_U[p], s, modulus), modulus));
-            console.log("U[1]= ", mulmod( field.inverse_static(state.factors[p], modulus), polynomial.evaluate(state.combined_U[p], modulus - s, modulus), modulus));
-            console.log("Denominator[0]= ", polynomial.evaluate(state.denominators[p], s, modulus));
-            console.log("Denominator[1]= ", polynomial.evaluate(state.denominators[p], modulus - s, modulus));
-            console.log("Point size", state.unique_eval_points[p].length);
             y[0] = addmod(y[0], tmp[0], modulus);
             y[1] = addmod(y[1], tmp[1], modulus);
             unchecked{p++;}
@@ -412,10 +403,8 @@ $POINTS_INITIALIZATION$
             ),
             modulus
         );
-        console.log("tmp = ", tmp);
         uint256 tmp1 = mulmod(colinear_value , 2, modulus);
         tmp1 = mulmod(tmp1 , x, modulus);
-        console.log("tmp1 = ", tmp1);
         if( tmp !=  tmp1 ){
             console.log("Colinear check failed");
             return false;
@@ -479,7 +468,6 @@ $POINTS_INITIALIZATION$
                 console.log("Initial points:", basic_marshalling.get_length(blob, offset));
                 offset += 0x8 + 0x20*basic_marshalling.get_length(blob, offset);
             }
-            console.logBytes32(bytes32(basic_marshalling.get_uint256_be(blob, offset)));
 
             unchecked{
                 state.round_data_offset = offset + 0x8;
@@ -488,7 +476,6 @@ $POINTS_INITIALIZATION$
                 console.log("Initial merkle proofs", basic_marshalling.get_length(blob, offset));
                 offset += 0x8;
             }
-            console.logBytes32(bytes32(basic_marshalling.get_uint256_be(blob, offset)));
             state.initial_proof_offset = offset; 
             for(uint8 i = 0; i < lambda;){
                 for(uint j = 0; j < batches_num;){
@@ -499,7 +486,6 @@ $POINTS_INITIALIZATION$
                 unchecked{i++;}
             }
             console.log("Round merkle proof:", basic_marshalling.get_length(blob, offset));
-            console.logBytes32(bytes32(basic_marshalling.get_uint256_be(blob, offset)));
             offset += 0x8;
             state.round_proof_offset = offset;
 
@@ -524,7 +510,7 @@ $POINTS_INITIALIZATION$
             return false;
         }
 
-        prepare_U_V(blob, state, challenge);
+        if( !prepare_U_V(blob, state, challenge) ) return false;
 
         state.leaf_data = new bytes(state.max_batch * 0x40 + 0x40);
         for(uint256 i = 0; i < lambda;){

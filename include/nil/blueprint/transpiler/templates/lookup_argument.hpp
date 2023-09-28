@@ -5,7 +5,7 @@
 
 namespace nil {
     namespace blueprint {
-        std::string lookup_library_call = R"(
+/*        std::string lookup_library_call = R"(
         {
             uint256 lookup_offset = table_offset + quotient_offset + uint256(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf])) * 0x20;
             uint256[4] memory lookup_argument;
@@ -22,7 +22,7 @@ namespace nil {
             F[6] = lookup_argument[3];
         }
         )";
-
+*/
         std::string modular_dummy_lookup_argument_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
 //---------------------------------------------------------------------------//
@@ -81,6 +81,7 @@ import "../../cryptography/transcript.sol";
 import "../../interfaces/modular_lookup_argument.sol";
 import "hardhat/console.sol";
 
+//contract modular_lookup_argument_$TEST_NAME$ is ILookupArgument{
 library modular_lookup_argument_$TEST_NAME${
     uint256 constant modulus = $MODULUS$;
     uint8 constant tables = 1;

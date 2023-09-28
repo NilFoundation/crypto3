@@ -5,6 +5,24 @@
 
 namespace nil {
     namespace blueprint {
+        std::string lookup_library_call = R"(
+        {
+            uint256 lookup_offset = table_offset + quotient_offset + uint256(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf])) * 0x20;
+            uint256[4] memory lookup_argument;
+            (lookup_argument, tr_state.current_challenge) = modular_lookup_argument_$TEST_NAME$.verify(
+                blob[special_selectors_offset: table_offset + quotient_offset], 
+                blob[lookup_offset:lookup_offset + sorted_columns * 0x20], 
+                basic_marshalling.get_uint256_be(blob, 0x81), 
+                state.l0,
+                tr_state.current_challenge
+            );
+            state.F[3] = lookup_argument[0];
+            state.F[4] = lookup_argument[1];
+            state.F[5] = lookup_argument[2];
+            state.F[6] = lookup_argument[3];
+        }
+        )";
+
         std::string modular_verifier_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
 //---------------------------------------------------------------------------//
@@ -58,8 +76,8 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
 
     function initialize(
 //        address permutation_argument_address,
-//        address lookup_argument_address, 
-//        address gate_argument_address,
+        address lookup_argument_address, 
+        address gate_argument_address,
         address commitment_contract_address
     ) public{
         console.log("Initialize");
@@ -68,9 +86,9 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         transcript.update_transcript_b32(tr_state, vk1);
         transcript.update_transcript_b32(tr_state, vk2);
 
-//      _gate_argument_address = gate_argument_address;
 //      _permutation_argument_address = permutation_argument_address;
-//      _lookup_argument_address = lookup_argument_address;
+        _lookup_argument_address = lookup_argument_address;
+        _gate_argument_address = gate_argument_address;
         _commitment_contract_address = commitment_contract_address;
 
         ICommitmentScheme commitment_scheme = ICommitmentScheme(commitment_contract_address);
@@ -78,20 +96,27 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         transcript_state = tr_state.current_challenge;
     }
 
+    struct verifier_state{
+        uint256 xi;
+        uint256 Z_at_xi;
+        uint256 l0;
+        uint256[f_parts] F;
+    }
+
     function verify(
         bytes calldata blob
     ) public view{
+        verifier_state memory state;
         uint256 gas = gasleft();
         uint256 xi = basic_marshalling.get_uint256_be(blob, $EVAL_PROOF_OFFSET$);
-        uint256 Z_at_xi = addmod(field.pow_small(xi, rows_amount, modulus), modulus-1, modulus);
-        uint256 l0 = mulmod(
-            Z_at_xi, 
+        state.Z_at_xi = addmod(field.pow_small(xi, rows_amount, modulus), modulus-1, modulus);
+        state.l0 = mulmod(
+            state.Z_at_xi, 
             field.inverse_static(mulmod(addmod(xi, modulus - 1, modulus), rows_amount, modulus), modulus), 
             modulus
         );
-        uint256[f_parts] memory F;
 
-        console.log("l0 = ", l0);
+        console.log("l0 = ", state.l0);
 
         //0. Check proof size
         // No direct public input
@@ -110,11 +135,11 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
                 blob[$Z_OFFSET$:$TABLE_Z_OFFSET$+$QUOTIENT_OFFSET$], 
                 transcript.get_field_challenge(tr_state, modulus), 
                 transcript.get_field_challenge(tr_state, modulus),
-                l0
+                state.l0
             );
-            F[0] = permutation_argument[0];
-            F[1] = permutation_argument[1];
-            F[2] = permutation_argument[2];
+            state.F[0] = permutation_argument[0];
+            state.F[1] = permutation_argument[1];
+            state.F[2] = permutation_argument[2];
         }
 
         $LOOKUP_LIBRARY_CALL$
@@ -124,7 +149,8 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
 
         {
             //6. Gate argument
-            F[7] = modular_gate_argument_$TEST_NAME$.verify(blob[table_offset:table_end_offset], transcript.get_field_challenge(tr_state, modulus));
+            IGateArgument modular_gate_argument = IGateArgument(_gate_argument_address);
+            state.F[7] = modular_gate_argument.verify(blob[table_offset:table_end_offset], transcript.get_field_challenge(tr_state, modulus));
         }
 
         // No public input gate
@@ -133,7 +159,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         {
             //7. Push quotient to transcript
             for( uint8 i = 0; i < f_parts;){
-                F_consolidated = addmod(F_consolidated, mulmod(F[i],transcript.get_field_challenge(tr_state, modulus), modulus), modulus);
+                F_consolidated = addmod(F_consolidated, mulmod(state.F[i],transcript.get_field_challenge(tr_state, modulus), modulus), modulus);
                 unchecked{i++;}
             }
             uint256 points_num = basic_marshalling.get_length(blob, $EVAL_PROOF_OFFSET$ + 0x20);
@@ -168,21 +194,21 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
                     mulmod(basic_marshalling.get_uint256_be(blob, table_offset + quotient_offset + i *0x20), factor, modulus), 
                     modulus
                 );
-                factor = mulmod(factor, Z_at_xi + 1, modulus);
+                factor = mulmod(factor, state.Z_at_xi + 1, modulus);
                 unchecked{i++;}
             }
             console.log("T_consolidated = ", T_consolidated);
-            if( F_consolidated == mulmod(T_consolidated, Z_at_xi, modulus) ) console.log("SUCCESS!");
+            if( F_consolidated == mulmod(T_consolidated, state.Z_at_xi, modulus) ) console.log("SUCCESS!");
         }
 
-        console.log("F[0] = ", F[0]);
-        console.log("F[1] = ", F[1]);
-        console.log("F[2] = ", F[2]);
-        console.log("F[3] = ", F[3]);
-        console.log("F[4] = ", F[4]);
-        console.log("F[5] = ", F[5]);
-        console.log("F[6] = ", F[6]);
-        console.log("F[7] = ", F[7]);
+        console.log("F[0] = ", state.F[0]);
+        console.log("F[1] = ", state.F[1]);
+        console.log("F[2] = ", state.F[2]);
+        console.log("F[3] = ", state.F[3]);
+        console.log("F[4] = ", state.F[4]);
+        console.log("F[5] = ", state.F[5]);
+        console.log("F[6] = ", state.F[6]);
+        console.log("F[7] = ", state.F[7]);
         console.log("F_consolidated = ", F_consolidated);
         console.log("Gas for verification:", gas-gasleft());
     }

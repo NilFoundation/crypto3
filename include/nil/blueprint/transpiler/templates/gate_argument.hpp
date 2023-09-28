@@ -26,16 +26,17 @@ pragma solidity >=0.8.4;
 
 import "../../types.sol";
 import "../../basic_marshalling.sol";
+import "../../interfaces/modular_gate_argument.sol";
 import "hardhat/console.sol";
 
-library modular_gate_argument_$TEST_NAME${
+contract modular_gate_argument_$TEST_NAME$ is IGateArgument{
     uint256 constant modulus = $MODULUS$;
 
     // Append commitments
     function verify(
         bytes calldata blob,
         uint256 theta
-    ) internal view returns (uint256 F){
+    ) external view returns (uint256 F){
         console.log("Compute gate argument");
 $GATE_ARGUMENT_COMPUTATION$
     }
