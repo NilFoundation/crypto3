@@ -110,6 +110,9 @@ namespace nil {
                         for( i = 0; i < start_index; i++){
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, challenge);
                         }
+                        // for special selectors
+                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 2, challenge * _omega);
+                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 1, challenge * _omega);
 
                         for (std::size_t ind = 0; 
                             ind < constant_columns + preprocessed_public_data.public_polynomial_table.selectors().size();

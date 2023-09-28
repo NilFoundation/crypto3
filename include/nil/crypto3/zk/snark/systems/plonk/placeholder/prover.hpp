@@ -202,6 +202,9 @@ namespace nil {
                         generate_evaluation_points();
 
                         _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
+
+                        std::size_t permutation_size = preprocessed_public_data.permutation_polynomials.size();
+
                         return _proof;
                     }
 
@@ -342,6 +345,10 @@ namespace nil {
                         for( i = 0; i < start_index; i++){
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, _proof.eval_proof.challenge);
                         }
+
+                        // For special selectors
+                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 2, _proof.eval_proof.challenge * _omega);
+                        _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 1, _proof.eval_proof.challenge * _omega);
                         
                         for (std::size_t ind = 0; 
                             ind < constant_columns + preprocessed_public_data.public_polynomial_table.selectors().size();

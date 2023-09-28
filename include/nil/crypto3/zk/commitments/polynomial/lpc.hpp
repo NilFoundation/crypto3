@@ -71,7 +71,7 @@ namespace nil {
                     }
 
                     void setup(transcript_type& transcript){
-                        auto etha = transcript.template challenge<field_type>();
+                        _etha = transcript.template challenge<field_type>();
                     }
 
                     commitment_type commit(std::size_t index){
@@ -242,6 +242,10 @@ namespace nil {
                             return false;
                         }
                         return true;
+                    }
+
+                    const typename fri_type::params_type &get_fri_params() const {
+                        return _fri_params;
                     }
 
                     boost::property_tree::ptree get_params() const{
