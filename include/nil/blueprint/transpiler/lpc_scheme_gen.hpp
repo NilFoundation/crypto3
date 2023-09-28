@@ -17,7 +17,7 @@ namespace nil {
             PlaceholderParams
         >::preprocessed_data_type::common_data_type;
         
-        std::string var_string (std::size_t j){
+        std::string rot_string (int j){
             if(j == 0) return "xi"; else 
             if(j == 1 ) return "mulmod(xi, omega, modulus)"; else 
             if(j == -1) return "mulmod(xi, inversed_omega, modulus)"; else 
@@ -39,21 +39,19 @@ namespace nil {
             std::vector<std::string> points;
 
             for(std::size_t i = 0; i < permutation_size*2; i++){
-                points.push_back("xi, etha, ");
+                points.push_back(rot_string(0) + "& _etha& ");
             }
-            unique_points.insert("etha, ");
-            points.push_back("xi, xi*omega, etha, ");
-            points.push_back("xi, xi*omega, etha, ");
-            unique_points.insert("xi, xi*omega, etha, ");
+            unique_points.insert(rot_string(0) + "& _etha& ");
+            points.push_back(rot_string(0) + "& "+ rot_string(1) + "& _etha& ");
+            points.push_back(rot_string(0) + "& "+ rot_string(1) + "& _etha& ");
+            unique_points.insert(rot_string(0) + "& "+ rot_string(1) + "& _etha& ");
 
             for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
                 std::stringstream str;
                 for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
-                    if(j == 0) str << "xi, "; else 
-                    if(j == 1 ) str << "xi*omega, "; else 
-                        str << "xi*omega^"<< j <<", ";
+                    str << rot_string(j) << "& ";
                 }
-                str << "etha, ";
+                str << "_etha& ";
                 unique_points.insert(str.str());
                 points.push_back(str.str());
             }
@@ -61,11 +59,9 @@ namespace nil {
             for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
                 std::stringstream str;
                 for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
-                    if(j == 0) str << "xi, "; else 
-                    if(j == 1 ) str << "xi*omega, "; else 
-                        str << "xi*omega^"<< j <<", ";
+                    str << rot_string(j) << "& ";
                 }
-                str << "etha, ";
+                str << "_etha& ";
                 unique_points.insert(str.str());
                 points.push_back(str.str());
             }
@@ -73,9 +69,7 @@ namespace nil {
             for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
                 std::stringstream str;
                 for(auto j:common_data.columns_rotations[i]){
-                    if(j == 0) str << "xi, ";else 
-                    if(j == 1 ) str << "xi*omega, "; else 
-                        str << "xi*omega^"<< j <<", ";
+                    str << rot_string(j) << "& ";
                 }
                 unique_points.insert(str.str());
                 points.push_back(str.str());
@@ -84,27 +78,25 @@ namespace nil {
             for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
                 std::stringstream str;
                 for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns]){
-                    if(j == 0) str << "xi, ";else 
-                    if(j == 1 ) str << "xi*omega, "; else 
-                        str << "xi*omega^"<< j <<", ";
+                    str << rot_string(j) << "& ";
                 }
                 unique_points.insert(str.str());
                 points.push_back(str.str());
             }
 
-            unique_points.insert("xi, xi*omega, ");//Permutation
-            unique_points.insert("xi, ");// Quotient
+            unique_points.insert(rot_string(0) + "& " + rot_string(1) + "& ");//Permutation
+            unique_points.insert(rot_string(0) + "& ");// Quotient
             if(use_lookups)
-                unique_points.insert("xi, xi*omega, xi*omega^" + to_string(common_data.rows_amount) + ", "); // Lookups
+                unique_points.insert(rot_string(0) + "& " + rot_string(1) + "& " + rot_string(common_data.usable_rows_amount) + "& "); // Lookups
 
             std::size_t permutation_point_id;
             std::size_t quotient_point_id;
             std::size_t lookup_point_id;
             std::size_t j = 0;
             for( const auto &unique_point:unique_points){
-                if( unique_point == "xi, ") quotient_point_id = j;
-                if( unique_point == "xi, xi*omega, xi*omega^" + to_string(common_data.rows_amount) + ", " ) lookup_point_id = j;
-                if( unique_point == "xi, xi*omega, " ) permutation_point_id = j;
+                if( unique_point == rot_string(0) + "& ") quotient_point_id = j;
+                if( unique_point == rot_string(0) + "& " + rot_string(1) + "& " + rot_string(common_data.usable_rows_amount) + "& " ) lookup_point_id = j;
+                if( unique_point == rot_string(0) + "& " + rot_string(1) + "& " ) permutation_point_id = j;
                 std::cout << unique_point << std::endl;
                 j++;
             }
@@ -121,6 +113,23 @@ namespace nil {
                 }
             }
             std::cout << points_ids.str() << std::endl;
+
+            std::stringstream points_initializer;
+            std::size_t i = 0;
+            for(const auto& point: unique_points){
+                points_initializer << "\t\t result[" << i << "] = new uint256[](" << std::count(point.begin(), point.end(), '&') << ");" << std::endl;
+                std::size_t prev = 0;
+                std::size_t found = point.find("& ");
+                std::size_t j = 0;
+                while (found!=std::string::npos){
+                    points_initializer << "\t\t result[" << i << "][" << j << "] = " << point.substr(prev, found-prev) << ";" << std::endl;
+                    prev = found + 2;
+                    found = point.find("& ",prev);
+                    j++;
+                }
+                i++;
+            }
+            std::cout << "points_initializer = " << points_initializer.str() << std::endl;
             
             auto fri_params = lpc_scheme.get_fri_params();
             replacements["$R$"] = to_string(fri_params.r);
@@ -134,6 +143,7 @@ namespace nil {
             replacements["$QUOTIENT_POINTS_ID$"] = to_string(quotient_point_id);
             replacements["$LOOKUP_POINTS_ID$"] = to_string(lookup_point_id);
             replacements["$POINTS_IDS$"] = points_ids.str();
+            replacements["$POINTS_INITIALIZATION$"] = points_initializer.str();
             if( PlaceholderParams::commitment_scheme_type::fri_type::use_grinding){
                 replacements["$GRINDING_CHECK$"] = modular_commitment_grinding_check_template;
             } else {

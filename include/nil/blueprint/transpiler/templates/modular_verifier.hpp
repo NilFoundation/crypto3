@@ -152,7 +152,10 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             }
             if(!commitment_scheme.verify_eval(
                 blob[z_offset - 0x8:], commitments, xi, tr_state.current_challenge
-            )) console.log("Error from commitment scheme!");
+            )) {
+                console.log("Error from commitment scheme!");
+                return;                
+            }
         }
 
         //9. Final check
