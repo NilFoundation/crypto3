@@ -97,7 +97,6 @@ namespace nil {
                 if( unique_point == rot_string(0) + "& ") quotient_point_id = j;
                 if( unique_point == rot_string(0) + "& " + rot_string(1) + "& " + rot_string(common_data.usable_rows_amount) + "& " ) lookup_point_id = j;
                 if( unique_point == rot_string(0) + "& " + rot_string(1) + "& " ) permutation_point_id = j;
-                std::cout << unique_point << std::endl;
                 j++;
             }
 
@@ -112,7 +111,6 @@ namespace nil {
                     j++;
                 }
             }
-            std::cout << points_ids.str() << std::endl;
 
             std::stringstream points_initializer;
             std::size_t i = 0;
@@ -129,7 +127,6 @@ namespace nil {
                 }
                 i++;
             }
-            std::cout << "points_initializer = " << points_initializer.str() << std::endl;
             
             auto fri_params = lpc_scheme.get_fri_params();
             replacements["$R$"] = to_string(fri_params.r);

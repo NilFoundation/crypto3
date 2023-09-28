@@ -37,7 +37,6 @@ contract modular_gate_argument_$TEST_NAME$ is IGateArgument{
         bytes calldata blob,
         uint256 theta
     ) external view returns (uint256 F){
-        console.log("Compute gate argument");
 $GATE_ARGUMENT_COMPUTATION$
     }
 }        )";

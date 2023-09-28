@@ -199,17 +199,14 @@ namespace nil {
                     variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
                     lookup_argument_code << 
                         "\t\t\tl = mulmod( " << constraint.table_id << ",state.selector_value, modulus);" << std::endl;
-                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup constraints\", l);" << std::endl;
                     lookup_argument_code << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
                     for( const auto &expression:constraint.lookup_input ){
                         lookup_argument_code << constraint_computation_code<PlaceholderParams>(var_indices, expression) << std::endl  << std::endl;
                         lookup_argument_code << 
                             "\t\t\tl = addmod( l, mulmod( mulmod(state.theta_acc, state.selector_value, modulus), sum, modulus), modulus);" << std::endl;
-//                        lookup_argument_code << "\t\t\tconsole.log(\"Lookup constraints\", l);" << std::endl;
                         lookup_argument_code << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
                     }
                     lookup_argument_code << "state.g = mulmod(state.g, mulmod(addmod(1, state.beta, modulus), addmod(l,state.gamma, modulus), modulus), modulus);" << std::endl;
-                    lookup_argument_code << "\t\t\tconsole.log(\"g = \", state.g);" << std::endl;
                     j++;
                 }
             }
@@ -228,8 +225,6 @@ namespace nil {
                         "\t\t\tl= mulmod( " << table_index << ", state.selector_value, modulus);" << std::endl;
                     lookup_argument_code << 
                         "\t\t\tstate.l_shifted = mulmod( " << table_index << ", state.shifted_selector_value, modulus);" << std::endl;
-//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup options\", l);" << std::endl;
-//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup shifted\", state.l_shifted);" << std::endl;
                     lookup_argument_code << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
                     for( const auto &var: option ){
                         lookup_argument_code << 
@@ -239,17 +234,12 @@ namespace nil {
                         lookup_argument_code << 
                             "\t\t\tstate.l_shifted = addmod( state.l_shifted, mulmod(state.shifted_selector_value, mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << var_indices.at(shifted_var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
                         lookup_argument_code << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
-//                        lookup_argument_code << "\t\t\tconsole.log(\"Lookup options\", l);" << std::endl;
-//                        lookup_argument_code << "\t\t\tconsole.log(\"Lookup shifted\", state.l_shifted);" << std::endl;
                     }
                     lookup_argument_code << 
                         "\t\t\tl= mulmod( l, state.mask, modulus);" << std::endl;
                     lookup_argument_code << 
                         "\t\t\tstate.l_shifted = mulmod( state.l_shifted, state.shifted_mask, modulus);" << std::endl;
-//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup options\", l);" << std::endl;
-//                    lookup_argument_code << "\t\t\tconsole.log(\"Lookup shifted\", state.l_shifted);" << std::endl;
                     lookup_argument_code << "\t\t\t state.g = mulmod(state.g, addmod( state.factor, addmod(l, mulmod(state.beta, state.l_shifted, modulus), modulus), modulus), modulus);" << std::endl;
-                    lookup_argument_code << "\t\t\t console.log(\"g = \", state.g);" << std::endl;
                     j++;
                 }
                 table_index++;

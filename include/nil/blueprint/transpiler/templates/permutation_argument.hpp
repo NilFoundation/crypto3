@@ -53,11 +53,9 @@ library modular_permutation_argument_$TEST_NAME${
         uint256 l0
     ) internal view returns (uint256[3] memory F){
         uint256 V_P_value = basic_marshalling.get_uint256_be(blob, table_values_offset + $PERMUTATION_TABLE_OFFSET$);
-
-        console.log("Compute permutation argument");
-
         uint256 h = 1;
         uint256 g = 1;
+        
         for(uint8 i = 0; i < permutation_size;){
             uint256 tmp = addmod(
                 gamma, 

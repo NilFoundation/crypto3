@@ -116,8 +116,6 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             modulus
         );
 
-        console.log("l0 = ", state.l0);
-
         //0. Check proof size
         // No direct public input
 
@@ -163,7 +161,6 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
                 unchecked{i++;}
             }
             uint256 points_num = basic_marshalling.get_length(blob, $EVAL_PROOF_OFFSET$ + 0x20);
-            console.log(points_num);
             transcript.update_transcript_b32_by_offset_calldata(tr_state, blob, 0x59);
         }
 
@@ -198,7 +195,6 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
                 factor = mulmod(factor, state.Z_at_xi + 1, modulus);
                 unchecked{i++;}
             }
-            console.log("T_consolidated = ", T_consolidated);
             if( F_consolidated != mulmod(T_consolidated, state.Z_at_xi, modulus) ) {
                 console.log("Error. Table does't satisfy constraint system");
                 b = false;
@@ -206,15 +202,6 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             if(b) console.log("SUCCESS!"); else console.log("FAILURE!");
         }
 
-        console.log("F[0] = ", state.F[0]);
-        console.log("F[1] = ", state.F[1]);
-        console.log("F[2] = ", state.F[2]);
-        console.log("F[3] = ", state.F[3]);
-        console.log("F[4] = ", state.F[4]);
-        console.log("F[5] = ", state.F[5]);
-        console.log("F[6] = ", state.F[6]);
-        console.log("F[7] = ", state.F[7]);
-        console.log("F_consolidated = ", F_consolidated);
         console.log("Gas for verification:", gas-gasleft());
     }
 }            

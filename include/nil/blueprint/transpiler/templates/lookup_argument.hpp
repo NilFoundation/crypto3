@@ -131,10 +131,6 @@ library modular_lookup_argument_$TEST_NAME${
             modulus
         );
 
-        console.log("mask", state.mask);
-        console.log("shifted_mask", state.shifted_mask);
-        console.log("V_L = ", state.V_L_value);
-
         types.transcript_data memory tr_state;
         tr_state.current_challenge = tr_state_before;
         {
@@ -147,7 +143,6 @@ library modular_lookup_argument_$TEST_NAME${
             state.beta = transcript.get_field_challenge(tr_state, modulus); //beta
             state.gamma = transcript.get_field_challenge(tr_state, modulus); //gamma
             state.factor = mulmod(addmod(1, state.beta, modulus), state.gamma, modulus);
-            console.log("Compute lookup argument");
 
 $LOOKUP_ARGUMENT_COMPUTATION$
         }
@@ -168,7 +163,6 @@ $LOOKUP_ARGUMENT_COMPUTATION$
                     ),
                     modulus
                 );
-                console.log("h = ", state.h);
                 unchecked{k++;}
             }
         }
@@ -196,7 +190,6 @@ $LOOKUP_ARGUMENT_COMPUTATION$
         }
         {
             for(uint64 i = 0; i < sorted_columns - 1;){
-                console.log("Sorted:", basic_marshalling.get_uint256_be(sorted, (i+1)*0x60));
                 state.beta = basic_marshalling.get_uint256_be(sorted, (i+1)*0x60); 
                 state.gamma = modulus - basic_marshalling.get_uint256_be(sorted, (i)*0x60 + 0x40);
                 F[3] = addmod(
@@ -218,7 +211,6 @@ $LOOKUP_ARGUMENT_COMPUTATION$
                 );
                 unchecked{i++;}
             }
-            console.log("Compute lookup argument");
         }
         tr_state_after = tr_state.current_challenge;
     }

@@ -7,9 +7,8 @@ namespace nil {
     namespace blueprint {
         std::string modular_commitment_grinding_check_template = R"(
         bytes calldata proof_of_work = blob[blob.length - 4:];
-        console.logBytes(proof_of_work);
         transcript.update_transcript(tr_state, proof_of_work);
-        console.log("Grinding result = ", transcript.get_integral_challenge_be(tr_state, 4));
+        transcript.get_integral_challenge_be(tr_state, 4);
             )";
 
         std::string modular_commitment_library_template = R"(
@@ -180,14 +179,13 @@ $POINTS_INITIALIZATION$
                 state.denominators[ind][2] = mulmod(state.denominators[ind][2], state.factors[ind], modulus);
                 state.denominators[ind][3] = mulmod(state.denominators[ind][3], state.factors[ind], modulus);
             } else {
-                console.log("UNPROCESSED length");
+                console.log("UNPROCESSED number of evaluation points");
                 return false;
             }
             unchecked{ind++;}
         }
 
         // Prepare combined U
-        console.log("Prepare U");
         for( uint256 ind = 0; ind < unique_points;){
             uint256[] memory point = state.unique_eval_points[ind];
             state.combined_U[ind] = new uint256[](state.unique_eval_points[ind].length);
@@ -290,11 +288,9 @@ $POINTS_INITIALIZATION$
     function initialize(
         bytes32 tr_state_before
     ) external returns(bytes32 tr_state_after){
-        console.log("commitment_scheme initialize ");
         types.transcript_data memory tr_state;
         tr_state.current_challenge = tr_state_before;
         _etha = transcript.get_field_challenge(tr_state, modulus);
-        console.log("etha = ", _etha);
         tr_state_after = tr_state.current_challenge;
     }
 
@@ -408,7 +404,7 @@ $POINTS_INITIALIZATION$
         if( tmp !=  tmp1 ){
             console.log("Colinear check failed");
             return false;
-        } else console.log("Colinear check validated");
+        }
         return true;
     }
 
@@ -425,17 +421,14 @@ $POINTS_INITIALIZATION$
             uint256 offset;
 
             if (challenge!= transcript.get_field_challenge(tr_state, modulus)) return false;
-            console.log("challenge = ", challenge);
 
             for(uint8 i = 0; i < batches_num;){
                 transcript.update_transcript_b32(tr_state, bytes32(commitments[i]));
                 unchecked{i++;}
             }
             state.theta = transcript.get_field_challenge(tr_state, modulus);
-            console.log("state. = ", challenge);
 
             state.points_num = basic_marshalling.get_length(blob, 0x0);
-            console.log("points_num = ", state.points_num);
             unchecked{
                 offset = 0x8 + state.points_num*0x20 + 0x8;
             }
@@ -443,10 +436,8 @@ $POINTS_INITIALIZATION$
                 state.batch_sizes[i] = uint64(uint8(blob[offset + 0x1]));
                 if( state.batch_sizes[i] > state.max_batch ) state.max_batch = state.batch_sizes[i];
                 state.poly_num += state.batch_sizes[i];
-                console.log("batch_sizes = ", state.batch_sizes[i]);
                 unchecked { i++; offset +=2;}
             }
-            console.log("poly_num = ", state.poly_num);
             unchecked{
                 offset += 0x8;
                 offset += state.poly_num;
@@ -456,7 +447,6 @@ $POINTS_INITIALIZATION$
             for( uint8 i = 0; i < r;){
                 transcript.update_transcript_b32(tr_state, bytes32(basic_marshalling.get_uint256_be(blob, offset + 0x8)));
                 state.alphas[i] = transcript.get_field_challenge(tr_state, modulus);
-                console.log("alpha = ", state.alphas[i]);
                 unchecked{i++; offset +=40; }
             }
 
@@ -465,15 +455,12 @@ $POINTS_INITIALIZATION$
             unchecked{
                 offset += 0x8 + r;
                 state.initial_data_offset = offset + 0x8;
-                console.log("Initial points:", basic_marshalling.get_length(blob, offset));
                 offset += 0x8 + 0x20*basic_marshalling.get_length(blob, offset);
             }
 
             unchecked{
                 state.round_data_offset = offset + 0x8;
-                console.log("Round points:", basic_marshalling.get_length(blob, offset));
                 offset += 0x8 + 0x20*basic_marshalling.get_length(blob, offset);
-                console.log("Initial merkle proofs", basic_marshalling.get_length(blob, offset));
                 offset += 0x8;
             }
             state.initial_proof_offset = offset; 
@@ -485,7 +472,6 @@ $POINTS_INITIALIZATION$
                 }
                 unchecked{i++;}
             }
-            console.log("Round merkle proof:", basic_marshalling.get_length(blob, offset));
             offset += 0x8;
             state.round_proof_offset = offset;
 
@@ -576,7 +562,6 @@ $POINTS_INITIALIZATION$
                     console.log("Round colinear check failed");
                     return false;
                 }
-                console.log("Round colinear check validated");
                 unchecked{state.j++; state.round_data_offset += 0x40;}
                 state.round_proof_offset = merkle_verifier.skip_merkle_proof_be(blob, state.round_proof_offset);
             }
