@@ -32,6 +32,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <map>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
@@ -126,16 +127,16 @@ namespace nil {
 
                             // Constructor with pregenerated domain
                             common_data_type(
-                                std::shared_ptr<math::evaluation_domain<FieldType>> D, 
-                                public_commitments_type commts, 
+                                std::shared_ptr<math::evaluation_domain<FieldType>> D,
+                                public_commitments_type commts,
                                 std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows, 
                                 std::uint32_t max_gates_degree,
                                 verification_key vk
                             ):  basic_domain(D),
-                                lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()), 
-                                commitments(commts), 
+                                lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()),
+                                commitments(commts),
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
                                 max_gates_degree(max_gates_degree), vk(vk)
@@ -150,7 +151,7 @@ namespace nil {
 
                             // Constructor for marshalling. Domain is regenerated.
                             common_data_type(
-                                public_commitments_type commts, 
+                                public_commitments_type commts,
                                 std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows, 
@@ -175,8 +176,8 @@ namespace nil {
                             // These operators are useful for marshalling
                             // They will be implemented with marshalling procedures implementation
                             bool operator==(const common_data_type &rhs) const {
-                                return rows_amount == rhs.rows_amount && 
-                                usable_rows_amount == rhs.usable_rows_amount && 
+                                return rows_amount == rhs.rows_amount &&
+                                usable_rows_amount == rhs.usable_rows_amount &&
                                 columns_rotations == rhs.columns_rotations &&
                                 commitments == rhs.commitments &&
                                 basic_domain->size() == rhs.basic_domain->size() &&
@@ -209,7 +210,7 @@ namespace nil {
                         std::size_t number
                     ) {
                         polynomial_dfs_type f(
-                            domain->size() - 1, 
+                            domain->size() - 1,
                             domain->size(),
                             FieldType::value_type::zero()
                         );
@@ -405,7 +406,7 @@ namespace nil {
 
                         return q_blind;
                     }
- 
+
                     static inline typename preprocessed_data_type::public_commitments_type commitments(
                         const plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> &public_table,
                         std::vector<polynomial_dfs_type> &id_perm_polys,
@@ -434,7 +435,6 @@ namespace nil {
                         typename ParamsType::commitment_scheme_type &commitment_scheme,
                         std::size_t columns_with_copy_constraints
                     ) {
-    
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder public preprocessor");
 
                         std::size_t N_rows = table_description.rows_amount;
@@ -451,7 +451,7 @@ namespace nil {
                         for (const auto& gate : constraint_system.lookup_gates()) {
                             for (const auto& constr : gate.constraints) {
                                 for (const auto& li : constr.lookup_input) {
-                                    max_gates_degree = std::max(max_gates_degree, 
+                                    max_gates_degree = std::max(max_gates_degree,
                                         lookup_visitor.compute_max_degree(li));
                                 }
                             }
@@ -514,18 +514,19 @@ namespace nil {
                         nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
                         typename transcript_hash_type::digest_type circuit_hash = hash<transcript_hash_type>(cv);
 
-
                         typename preprocessed_data_type::verification_key vk = {circuit_hash, public_commitments.fixed_values};
                         typename preprocessed_data_type::common_data_type common_data (
                             public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree, vk
                         );
 
                         // Push circuit description to transcript
-
                         preprocessed_data_type preprocessed_data({
-                            public_polynomial_table, sigma_perm_polys,
-                            id_perm_polys, q_last_q_blind[0], q_last_q_blind[1],
-                            common_data
+                            std::move(public_polynomial_table),
+                            std::move(sigma_perm_polys),
+                            std::move(id_perm_polys),
+                            std::move(q_last_q_blind[0]),
+                            std::move(q_last_q_blind[1]),
+                            std::move(common_data)
                         });
                         return preprocessed_data;
                     }
