@@ -80,6 +80,7 @@ jobs:
             path: libs/zk/test
           - target:  crypto3_zk_systems_plonk_plonk_constraint_test
             path: libs/zk/test
+
           - target: marshalling_fri_commitment_test
             path: libs/marshalling/zk/test
           - target: marshalling_lpc_commitment_test
@@ -98,6 +99,7 @@ jobs:
             path: libs/marshalling/zk/test
           - target: marshalling_r1cs_gg_ppzksnark_verification_key_test
             path: libs/marshalling/zk/test
+
           - target: algebra_curves_test
             path: libs/algebra/test
           - target: algebra_fields_test
@@ -106,6 +108,7 @@ jobs:
             path: libs/algebra/test
           - target: algebra_pairing_test
             path: libs/algebra/test
+
           - target: math_expression_test
             path: libs/math/test
           - target: math_lagrange_interpolation_test
@@ -118,6 +121,46 @@ jobs:
             path: libs/math/test
           - target: math_polynomial_view_test
             path: libs/math/test
+
+          - target: hash_blake2b_test
+            path: libs/hash/test
+          - target: hash_crc_test
+            path: libs/hash/test
+          - target: hash_find_group_hash_test
+            path: libs/hash/test
+          - target: hash_h2c_test
+            path: libs/hash/test
+          - target: hash_h2f_test
+            path: libs/hash/test
+          - target: hash_keccak_test
+            path: libs/hash/test
+          - target: hash_md4_test
+            path: libs/hash/test
+          - target: hash_md5_test
+            path: libs/hash/test
+          - target: hash_pack_test
+            path: libs/hash/test
+          - target: hash_pedersen_test
+            path: libs/hash/test
+          - target: hash_ripemd_test
+            path: libs/hash/test
+          - target: hash_sha1_test
+            path: libs/hash/test
+          - target: hash_sha2_test
+            path: libs/hash/test
+          - target: hash_sha3_test
+            path: libs/hash/test
+          - target: hash_sha_test
+            path: libs/hash/test
+          - target: hash_static_digest_test
+            path: libs/hash/test
+          - target: hash_tiger_test
+            path: libs/hash/test
+
+          # https://github.com/NilFoundation/crypto3-hash/issues/100
+          # - target: hash_reinforced_concrete_test
+          #  path: libs/hash/test
+
     steps:
       - name: Cleanup # TODO - move to scripts on runner
         run: |
