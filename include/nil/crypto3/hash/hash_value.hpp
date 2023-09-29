@@ -34,6 +34,7 @@
 #include <boost/array.hpp>
 
 #include <nil/crypto3/detail/pack.hpp>
+#include <boost/stacktrace.hpp>
 
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
@@ -49,7 +50,10 @@ namespace nil {
 
                     typedef typename accumulator_type::hash_type hash_type;
 
-                    ref_hash_impl(accumulator_set_type &&stream_hash) : accumulator_set(stream_hash) {
+                    // Having accumulator_set_type&& is an rvalue, NOT a universal reference.
+                    // ref_hash_impl will NOT accept rvalues for safety reasons.
+                    ref_hash_impl(accumulator_set_type &stream_hash)
+                        : accumulator_set(stream_hash) {
                     }
 
                     accumulator_set_type &accumulator_set;
@@ -63,8 +67,13 @@ namespace nil {
 
                     typedef typename accumulator_type::hash_type hash_type;
 
-                    value_hash_impl(accumulator_set_type &&stream_hash) :
-                        accumulator_set(std::forward<accumulator_set_type>(stream_hash)) {
+                    // Having accumulator_set_type&& is an rvalue, NOT a universal reference.
+                    value_hash_impl(accumulator_set_type &&stream_hash)
+                        : accumulator_set(std::move(stream_hash)) {
+                    }
+
+                    value_hash_impl(accumulator_set_type &stream_hash)
+                        : accumulator_set(stream_hash) {
                     }
 
                     mutable accumulator_set_type accumulator_set;
@@ -83,8 +92,21 @@ namespace nil {
                         result_type;
 
                     template<typename SinglePassRange>
-                    range_hash_impl(const SinglePassRange &range, accumulator_set_type &&ise) :
-                        HashStateImpl(std::forward<accumulator_set_type>(ise)) {
+                    range_hash_impl(const SinglePassRange &range, accumulator_set_type &ise)
+                            : HashStateImpl(ise) {
+                        process(range);
+                    }
+
+                    // Having accumulator_set_type&& is an rvalue, NOT a universal reference.
+                    template<typename SinglePassRange>
+                    range_hash_impl(const SinglePassRange &range, accumulator_set_type &&ise)
+                            : HashStateImpl(std::move(ise)) {
+                        process(range);
+                    }
+
+                    template<typename SinglePassRange>
+                    void process(const SinglePassRange &range)
+                    {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef
@@ -99,8 +121,20 @@ namespace nil {
                     }
 
                     template<typename InputIterator>
-                    range_hash_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise) :
-                        HashStateImpl(std::forward<accumulator_set_type>(ise)) {
+                    range_hash_impl(InputIterator first, InputIterator last, accumulator_set_type &ise)
+                            : HashStateImpl(ise) {
+                        process(first, last);
+                    }
+
+                    // Having accumulator_set_type&& is an rvalue, NOT a universal reference.
+                    template<typename InputIterator>
+                    range_hash_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise)
+                            : HashStateImpl(std::move(ise)) {
+                        process(first, last);
+                    }
+
+                    template<typename InputIterator>
+                    void process(InputIterator first, InputIterator last) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -164,7 +198,6 @@ namespace nil {
                         return std::to_string(
                             boost::accumulators::extract_result<accumulator_type>(this->accumulator_set));
                     }
-
 #endif
                 };
 
