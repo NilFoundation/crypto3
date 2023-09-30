@@ -93,8 +93,9 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         _gate_argument_address = gate_argument_address;
         _commitment_contract_address = commitment_contract_address;
 
-        ICommitmentScheme commitment_scheme = ICommitmentScheme(commitment_contract_address);
-        tr_state.current_challenge = commitment_scheme.initialize(tr_state.current_challenge);
+//        ICommitmentScheme commitment_scheme = ICommitmentScheme(commitment_contract_address);
+//        tr_state.current_challenge = commitment_scheme.initialize(tr_state.current_challenge);
+        tr_state.current_challenge = modular_commitment_scheme_$TEST_NAME$.initialize(tr_state.current_challenge);
         transcript_state = tr_state.current_challenge;
     }
 
@@ -169,14 +170,14 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         bool b = true;
         //8. Commitment scheme verify_eval
         {
-            ICommitmentScheme commitment_scheme = ICommitmentScheme(_commitment_contract_address);
+//            ICommitmentScheme commitment_scheme = ICommitmentScheme(_commitment_contract_address);
             uint256[5] memory commitments;
             commitments[0] = uint256(vk2);
             for(uint16 i = 1; i < $BATCHES_NUM$;){
                 commitments[i] = basic_marshalling.get_uint256_be(blob, 0x9 + (i-1)*(0x28));
                 unchecked{i++;}
             }
-            if(!commitment_scheme.verify_eval(
+            if(!modular_commitment_scheme_$TEST_NAME$.verify_eval(
                 blob[z_offset - 0x8:], commitments, xi, tr_state.current_challenge
             )) {
                 console.log("Error from commitment scheme!");

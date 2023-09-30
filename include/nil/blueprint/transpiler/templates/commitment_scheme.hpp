@@ -39,7 +39,7 @@ import "../../containers/merkle_verifier.sol";
 import "../../algebra/polynomial.sol";
 import "hardhat/console.sol";
 
-contract modular_commitment_scheme_$TEST_NAME$ {
+library modular_commitment_scheme_$TEST_NAME$ {
     uint256 constant modulus = $MODULUS$;
     uint64 constant batches_num = $BATCHES_NUM$;
     uint256 constant r = $R$;
@@ -53,7 +53,7 @@ contract modular_commitment_scheme_$TEST_NAME$ {
     uint256 constant lookup_point = $LOOKUP_POINTS_ID$;
     bytes constant   points_ids = hex"$POINTS_IDS$";
     uint256 constant omega = $OMEGA$;
-    uint256 _etha;
+    uint256 constant _etha = $ETHA$;
 
     struct commitment_state{
         bytes   leaf_data;
@@ -287,10 +287,11 @@ $POINTS_INITIALIZATION$
 
     function initialize(
         bytes32 tr_state_before
-    ) external returns(bytes32 tr_state_after){
+    ) internal returns(bytes32 tr_state_after){
         types.transcript_data memory tr_state;
         tr_state.current_challenge = tr_state_before;
-        _etha = transcript.get_field_challenge(tr_state, modulus);
+        uint256 etha = transcript.get_field_challenge(tr_state, modulus);
+        require(etha == _etha, "Wrong etha");
         tr_state_after = tr_state.current_challenge;
     }
 
@@ -413,7 +414,7 @@ $POINTS_INITIALIZATION$
         uint256[5] memory commitments,                   
         uint256 challenge,
         bytes32 transcript_state
-    ) external view returns (bool){
+    ) internal view returns (bool){
         types.transcript_data memory tr_state;
         tr_state.current_challenge = transcript_state;
         commitment_state memory state;

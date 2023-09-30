@@ -127,6 +127,12 @@ namespace nil {
                 }
                 i++;
             }
+
+            std::vector<std::uint8_t> init_blob = {};
+            nil::crypto3::zk::transcript::fiat_shamir_heuristic_sequential<typename PlaceholderParams::transcript_hash_type> transcript(init_blob);
+            transcript(common_data.vk.constraint_system_hash);
+            transcript(common_data.vk.fixed_values_commitment);
+            auto etha = transcript.template challenge<typename PlaceholderParams::field_type>();
             
             auto fri_params = lpc_scheme.get_fri_params();
             replacements["$R$"] = to_string(fri_params.r);
@@ -141,6 +147,7 @@ namespace nil {
             replacements["$LOOKUP_POINTS_ID$"] = to_string(lookup_point_id);
             replacements["$POINTS_IDS$"] = points_ids.str();
             replacements["$POINTS_INITIALIZATION$"] = points_initializer.str();
+            replacements["$ETHA$"] = to_string(etha);
             if( PlaceholderParams::commitment_scheme_type::fri_type::use_grinding){
                 replacements["$GRINDING_CHECK$"] = modular_commitment_grinding_check_template;
             } else {
