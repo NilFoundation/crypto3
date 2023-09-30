@@ -9,9 +9,11 @@ namespace nil {
         {
             uint256 lookup_offset = table_offset + quotient_offset + uint256(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf])) * 0x20;
             uint256[4] memory lookup_argument;
-            (lookup_argument, tr_state.current_challenge) = modular_lookup_argument_$TEST_NAME$.verify(
+            ILookupArgument lookup_contract = ILookupArgument(_lookup_argument_address);
+            (lookup_argument, tr_state.current_challenge) = lookup_contract.verify(
+//            (lookup_argument, tr_state.current_challenge) = modular_lookup_argument_$TEST_NAME$.verify(
                 blob[special_selectors_offset: table_offset + quotient_offset], 
-                blob[lookup_offset:lookup_offset + sorted_columns * 0x20], 
+                blob[lookup_offset:lookup_offset + sorted_columns * 0x60], 
                 basic_marshalling.get_uint256_be(blob, 0x81), 
                 state.l0,
                 tr_state.current_challenge

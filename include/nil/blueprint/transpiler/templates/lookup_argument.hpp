@@ -5,24 +5,6 @@
 
 namespace nil {
     namespace blueprint {
-/*        std::string lookup_library_call = R"(
-        {
-            uint256 lookup_offset = table_offset + quotient_offset + uint256(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf])) * 0x20;
-            uint256[4] memory lookup_argument;
-            (lookup_argument, tr_state.current_challenge) = modular_lookup_argument_$TEST_NAME$.verify(
-                blob[special_selectors_offset: table_offset + quotient_offset], 
-                blob[lookup_offset:lookup_offset + sorted_columns * 0x20], 
-                basic_marshalling.get_uint256_be(blob, 0x81), 
-                l0,
-                tr_state.current_challenge
-            );
-            F[3] = lookup_argument[0];
-            F[4] = lookup_argument[1];
-            F[5] = lookup_argument[2];
-            F[6] = lookup_argument[3];
-        }
-        )";
-*/
         std::string modular_dummy_lookup_argument_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
 //---------------------------------------------------------------------------//
@@ -81,8 +63,8 @@ import "../../cryptography/transcript.sol";
 import "../../interfaces/modular_lookup_argument.sol";
 import "hardhat/console.sol";
 
-//contract modular_lookup_argument_$TEST_NAME$ is ILookupArgument{
-library modular_lookup_argument_$TEST_NAME${
+contract modular_lookup_argument_$TEST_NAME$ is ILookupArgument{
+//library modular_lookup_argument_$TEST_NAME${
     uint256 constant modulus = $MODULUS$;
     uint8 constant tables = 1;
     uint8 constant sorted_columns = $SORTED_COLUMNS_NUMBER$;
@@ -115,7 +97,7 @@ library modular_lookup_argument_$TEST_NAME${
         uint256 lookup_commitment,
         uint256 l0,
         bytes32 tr_state_before // It's better than transfer all random values
-    ) internal view returns (uint256[4] memory F, bytes32 tr_state_after){
+    ) external view returns (uint256[4] memory F, bytes32 tr_state_after){
         bytes calldata blob = zvalues[0xc0:];
         lookup_state memory state;
         state.V_L_value = basic_marshalling.get_uint256_be(zvalues, 0xc0 + $PERMUTATION_TABLE_OFFSET$ + 0x40);
