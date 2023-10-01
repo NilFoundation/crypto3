@@ -21,10 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for PLONK unified addition component.
+// @file Declaration of PLONK table profiling util.
 //---------------------------------------------------------------------------//
-#ifndef __TRANSPILER_UTIL_HPP__
-#define __TRANSPILER_UTIL_HPP__
+
+#ifndef __LOOKUP_ARGUMENT_GEN_HPP__
+#define __LOOKUP_ARGUMENT_GEN_HPP__
 
 #include <string>
 #include <fstream>
@@ -32,17 +33,18 @@
 #include <filesystem>
 
 #include <boost/algorithm/string.hpp> 
+#include <nil/blueprint/transpiler/templates/modular_verifier.hpp>
+#include <nil/blueprint/transpiler/templates/gate_argument.hpp>
+#include <nil/blueprint/transpiler/templates/permutation_argument.hpp>
+#include <nil/blueprint/transpiler/templates/lookup_argument.hpp>
+#include <nil/blueprint/transpiler/templates/commitment_scheme.hpp>
+#include <nil/blueprint/transpiler/lpc_scheme_gen.hpp>
+#include <nil/blueprint/transpiler/util.hpp>
 
 namespace nil {
     namespace blueprint {
-        using transpiler_replacements = std::map<std::string, std::string>;
 
-        template<typename T> std::string to_string(T val) {
-            std::stringstream strstr;
-            strstr << val;
-            return strstr.str();
-        }
     }
 }
 
-#endif //__MODULAR_CONTRACTS_TEMPLATES_HPP__
+#endif //__LOOKUP_ARGUMENT_GEN_HPP__
