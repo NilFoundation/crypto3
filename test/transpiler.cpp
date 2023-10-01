@@ -234,12 +234,13 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
         );
 
-    nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+    auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
         constraint_system, 
         lpc_preprocessed_public_data.common_data, 
         lpc_scheme,
         columns_with_copy_constraints.size(),"circuit1"
-    ).print();
+    );
+    printer.print();
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -317,13 +318,14 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
         );
-    nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+    auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
         constraint_system, 
         lpc_preprocessed_public_data.common_data, 
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit2"
-    ).print();
+    );
+    printer.print();
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -391,13 +393,14 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
-    nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+    auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
         constraint_system, 
         preprocessed_public_data.common_data, 
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit3"
-    ).print();
+    );
+    printer.print();
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -463,13 +466,14 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
-    nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+    auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
         constraint_system, 
         preprocessed_public_data.common_data,
         lpc_scheme, 
         columns_with_copy_constraints.size(),
         "circuit4"
-    ).print();
+    );
+    printer.print();
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -537,13 +541,14 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
-    nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+    auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
         constraint_system, 
         preprocessed_public_data.common_data, 
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit6"
-    ).print();
+    );
+    printer.print();
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -611,12 +616,13 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
-    nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+    auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
         constraint_system, 
         preprocessed_public_data.common_data, 
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit7"
-    ).print();
+    );
+    printer.print();
 }
 BOOST_AUTO_TEST_SUITE_END()
