@@ -26,10 +26,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_MARSHALLING_TEST_PLONK_CIRCUITS_HPP
-#define CRYPTO3_ZK_MARSHALLING_TEST_PLONK_CIRCUITS_HPP
-
-#define _RND_ algebra::random_element<FieldType>();
+#ifndef MARSHALLING_ZK_TEST_PLONK_CIRCUITS_HPP
+#define MARSHALLING_ZK_TEST_PLONK_CIRCUITS_HPP
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -105,7 +103,8 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_1>, 4, 4> circuit_test_1(
-                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                    boost::random::mt11213b rnd = boost::random::mt11213b()
                 ) {
                     using assignment_type  = typename FieldType::value_type;
 
@@ -243,8 +242,9 @@ namespace nil {
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_t>, 4, 4> 
                 circuit_test_t(
-                    typename FieldType::value_type pi0 = FieldType::value_type::zero(), 
-                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
+                    typename FieldType::value_type pi0 = 0,
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                    boost::random::mt11213b rnd = boost::random::mt11213b()                    
                 ) {
                     using assignment_type = typename FieldType::value_type;
 
@@ -272,16 +272,16 @@ namespace nil {
 
                     // init values
                     typename FieldType::value_type one = FieldType::value_type::one();
-                    table[0][0] = alg_rnd();
-                    table[1][0] = alg_rnd();
-                    table[2][0] = alg_rnd();
+                    table[0][0] = algebra::random_element<FieldType>();
+                    table[1][0] = algebra::random_element<FieldType>();
+                    table[2][0] = algebra::random_element<FieldType>();
                     table[3][0] = pi0;
                     q_add[0] = FieldType::value_type::zero();
                     q_mul[0] = FieldType::value_type::zero();
 
                     // fill rows with ADD gate
                     for (std::size_t i = 1; i < test_circuit.table_rows - 5; i++) {
-                        table[0][i] = alg_rnd();
+                        table[0][i] = algebra::random_element<FieldType>();
                         table[1][i] = table[2][i - 1];
                         table[2][i] = table[0][i] + table[1][i];
                         table[3][i] = FieldType::value_type::zero();
@@ -297,7 +297,7 @@ namespace nil {
 
                     // fill rows with MUL gate
                     for (std::size_t i = test_circuit.table_rows - 5; i < test_circuit.table_rows - 3; i++) {
-                        table[0][i] = alg_rnd();
+                        table[0][i] = algebra::random_element<FieldType>();
                         table[1][i] = table[3][0];
                         table[2][i] = table[0][i] * table[1][i] + table[0][i - 1];
                         table[3][i] = FieldType::value_type::zero();
@@ -375,7 +375,10 @@ namespace nil {
                     public_columns_3, constant_columns_3, selector_columns_3>;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_3>, 3, 3> circuit_test_3() {
+                circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_3>, 3, 3> circuit_test_3(
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                    boost::random::mt11213b rnd = boost::random::mt11213b()
+                ) {
                     using assignment_type = typename FieldType::value_type;
                     using field_type = typename FieldType::value_type;
 
@@ -492,7 +495,10 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType,
-                    arithmetization_params_4>, 3, 3> circuit_test_4() {
+                    arithmetization_params_4>, 3, 3> circuit_test_4(
+                        typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                        boost::random::mt11213b rnd = boost::random::mt11213b()                    
+                    ) {
                     using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 3;
@@ -514,12 +520,11 @@ namespace nil {
                         table[j].resize(test_circuit.table_rows);
                     }
 
-                    srand(time(NULL));
                     // lookup inputs
                     typename FieldType::value_type one = FieldType::value_type::one();
                     typename FieldType::value_type zero = FieldType::value_type::zero();
-                    table[0] = {rand() % 2, rand() % 2, rand(), rand() % 2, rand() % 2, 0, 0, 0};
-                    table[1] = {rand() % 2, rand() % 2, rand(), rand() % 2, rand() % 2, 0, 0, 0};;
+                    table[0] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0, 0, 0};
+                    table[1] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0, 0, 0};;
                     table[2] = {table[0][0] * table[1][0], table[0][1] * table[1][1], table[0][2] * table[1][2], table[0][3] * table[1][3], table[0][4] * table[1][4], 0, 0, 0};
 
                     
@@ -886,7 +891,10 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType,
-                    arithmetization_params_6>, 3, 3> circuit_test_6() {
+                    arithmetization_params_6>, 3, 3> circuit_test_6(
+                        typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                        boost::random::mt11213b rnd = boost::random::mt11213b()
+                    ) {
                     using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 3;
@@ -908,11 +916,10 @@ namespace nil {
                         table[j].resize(test_circuit.table_rows);
                     }
 
-                    srand(time(NULL));
                     // lookup inputs
                     typename FieldType::value_type one = FieldType::value_type::one();
                     typename FieldType::value_type zero = FieldType::value_type::zero();
-                    table[0] = {rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, rand() % 5 + 2, 0, 0};
+                    table[0] = {rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, 0, 0};
                     table[1] = {7, table[0][0] + table[0][1],  table[0][1] + table[0][2],  table[0][2] + table[0][3],  table[0][3] + table[0][4],  table[0][4] + table[0][5], 0, 0};;
 
                     
@@ -1033,7 +1040,10 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType,
-                    arithmetization_params_7>, 4, 3> circuit_test_7() {
+                    arithmetization_params_7>, 4, 3> circuit_test_7(
+                        typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                        boost::random::mt11213b rnd = boost::random::mt11213b()
+                    ) {
                     using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
@@ -1055,12 +1065,11 @@ namespace nil {
                         table[j].resize(test_circuit.table_rows);
                     }
 
-                    srand(time(NULL));
                     // lookup inputs
                     typename FieldType::value_type one = FieldType::value_type::one();
                     typename FieldType::value_type zero = FieldType::value_type::zero();
 
-                    auto r = rand() % 8;
+                    auto r = rnd() % 7;
                     table[0] = std::vector<typename FieldType::value_type>(16);
                     std::size_t j = 0;
                     for( std::size_t i = 0; i < 7; i++){
@@ -1091,8 +1100,8 @@ namespace nil {
                     constant_assignment[2] = {0, 3, 3, 3, 2, 2, 2, 2,   6,   7,    7,    7,    7,    7, 0, 0 }; // Lookup tables
                     constant_assignment[3] = {0, 4, 4, 4, 4, 3, 3, 3,  64, 128,  128,  128,  128,  128, 0, 0 }; // Lookup tables
                     constant_assignment[4] = {0, 5, 5, 5, 5, 5, 4, 4,   1,   2,    4,    8,   16,   32, 0, 0 }; // Lookup tables
-                    constant_assignment[5] = {0, 6, 6, 6, 6, 6, 5, 5,  64, 128,  256,  512, 1024, 2048, 0, 0 }; // Lookup tables
-                    constant_assignment[6] = {0, 7, 7, 7, 7, 7, 7, 6,4096,8192,16384,16384,16384,16384, 0, 0 }; // Lookup tables
+                    constant_assignment[5] = {0, 6, 6, 6, 6, 6, 6, 5,  64, 128,  256,  512, 1024, 2048, 0, 0 }; // Lookup tables
+                    constant_assignment[6] = {0, 7, 7, 7, 7, 7, 7, 7,4096,8192,16384,16384,16384,16384, 0, 0 }; // Lookup tables
 
                     std::array<plonk_column<FieldType>, witness_columns> private_assignment;
                     for (std::size_t i = 0; i < witness_columns; i++) {
@@ -1185,4 +1194,4 @@ namespace nil {
 }    // namespace nil
 
 
-#endif    // CRYPTO3_MARSHALLING_ZK_TEST_PLONK_CIRCUITS_HPP
+#endif    // MARSHALLING_ZK_TEST_PLONK_CIRCUITS_HPP

@@ -520,7 +520,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_3<field_type>();
+    auto circuit = circuit_test_3<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -558,11 +558,11 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
     }
-    /*
+    
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, proof, constraint_system, lpc_scheme);
     BOOST_CHECK(verifier_res);
-    */
+    
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -610,7 +610,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_4<field_type>();
+    auto circuit = circuit_test_4<field_type>(test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -700,7 +700,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_6<field_type>();
+    auto circuit = circuit_test_6<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -790,7 +790,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_7<field_type>();
+    auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
     desc.rows_amount = table_rows;
