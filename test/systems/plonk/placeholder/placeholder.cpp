@@ -351,8 +351,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using kzg_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, kzg_scheme_type>;
 
 BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer){
-    auto pi0 = nil::crypto3::algebra::random_element<field_type>();
-    auto circuit = circuit_test_t<field_type>(pi0);
+    typename field_type::value_type pi0 = test_global_alg_rnd_engine<field_type>();
+    auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
     desc.rows_amount = table_rows;
