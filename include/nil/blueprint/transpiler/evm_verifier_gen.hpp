@@ -38,6 +38,7 @@
 #include <nil/blueprint/transpiler/templates/lookup_argument.hpp>
 #include <nil/blueprint/transpiler/templates/commitment_scheme.hpp>
 #include <nil/blueprint/transpiler/templates/external_gate.hpp>
+#include <nil/blueprint/transpiler/templates/external_lookup.hpp>
 #include <nil/blueprint/transpiler/lpc_scheme_gen.hpp>
 #include <nil/blueprint/transpiler/util.hpp>
 
@@ -52,7 +53,9 @@ namespace nil {
 
             using variable_type = nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>;
             using constraint_type = nil::crypto3::zk::snark::plonk_constraint<typename PlaceholderParams::field_type>;
+            using lookup_constraint_type = nil::crypto3::zk::snark::plonk_lookup_constraint<typename PlaceholderParams::field_type>;
             using gate_type = nil::crypto3::zk::snark::plonk_gate<typename PlaceholderParams::field_type, constraint_type>;
+            using lookup_gate_type = nil::crypto3::zk::snark::plonk_lookup_gate<typename PlaceholderParams::field_type, lookup_constraint_type>;
             using variable_indices_type = std::map<nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>, std::size_t>;
             using columns_rotations_type = std::array<std::set<int>, PlaceholderParams::total_columns>;
 
@@ -210,6 +213,19 @@ namespace nil {
                 out.close();
             }
 
+            void print_lookup_file(std::string lookup_computation_code, std::size_t lookup_id){
+                std::string result = modular_external_lookup_library_template;
+                boost::replace_all(result, "$TEST_NAME$", _test_name);
+                boost::replace_all(result, "$LOOKUP_LIB_ID$", to_string(lookup_id));
+                boost::replace_all(result, "$LOOKUP_ASSEMBLY_CODE$", lookup_computation_code);
+                boost::replace_all(result, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+
+                std::ofstream out;
+                out.open(_folder_name + "/lookup_" + to_string(lookup_id) + ".sol");
+                out <<result;
+                out.close();
+            }
+
             std::string gate_computation_code(const gate_type& gate){
                 std::stringstream out;
 
@@ -225,12 +241,48 @@ namespace nil {
                 return out.str();
             }
 
+            std::string lookup_computation_code(const lookup_gate_type& gate){
+                std::stringstream out;
+
+                variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
+                out << "\t\tselector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
+                out << "\t\tg = 1;" << std::endl;
+                for( const auto &constraint: gate.constraints ){
+                    variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
+                    out << "\t\tl = mulmod( " << constraint.table_id << ",selector_value, modulus);" << std::endl;
+                    out << "\t\ttheta_acc=theta;" << std::endl;
+                    for( const auto &expression:constraint.lookup_input ){
+                        out << constraint_computation_code(_var_indices, expression) << std::endl  << std::endl;
+                        out << "\t\tl = addmod( l, mulmod( mulmod(theta_acc, selector_value, modulus), sum, modulus), modulus);" << std::endl;
+                        out << "\t\ttheta_acc = mulmod(theta_acc, theta, modulus);" << std::endl;
+                    }
+                    out << "\t\tg = mulmod(g, mulmod(addmod(1, beta, modulus), addmod(l,gamma, modulus), modulus), modulus);" << std::endl;
+                }
+
+                return out.str();
+            }
+
             void print_gate_libs_list(std::vector<std::size_t> gate_ids){
                 std::ofstream out;
                 out.open(_folder_name + "/gate_libs_list.json");
                 out << "[" << std::endl;
                 for(std::size_t i=0; i < gate_ids.size(); i++){
                     out << "\"" << "gate_" << _test_name << "_" << gate_ids[i] << "\"";
+                    if(i < gate_ids.size() - 1){
+                        out << ",";
+                    }
+                    out << std::endl;
+                }
+                out << "]" << std::endl;
+                out.close();
+            }
+
+            void print_lookup_libs_list(std::vector<std::size_t> gate_ids){
+                std::ofstream out;
+                out.open(_folder_name + "/lookup_libs_list.json");
+                out << "[" << std::endl;
+                for(std::size_t i=0; i < gate_ids.size(); i++){
+                    out << "\"" << "lookup_" << _test_name << "_" << gate_ids[i] << "\"";
                     if(i < gate_ids.size() - 1){
                         out << ",";
                     }
@@ -259,29 +311,32 @@ namespace nil {
                     i++;
                 }
                 print_gate_libs_list(gate_ids);
-/*
-                gate_argument_str << "\t\tuint256 sum;" << std::endl;
-                gate_argument_str << "\t\tuint256 gate;" << std::endl;
-                gate_argument_str << "\t\tuint256 prod;" << std::endl;
-                gate_argument_str << "\t\tuint256 theta_acc=1;" << std::endl;
-                for(const auto &gate: _constraint_system.gates()){
-                    gate_argument_str << "\t\tgate = 0;" << std::endl;
-                    for(const auto &constraint: gate.constraints){
-                        gate_argument_str << constraint_computation_code(_var_indices, constraint);
-                        gate_argument_str << "\t\tgate = addmod(gate, mulmod(theta_acc, sum, modulus), modulus);" << std::endl;
-                        gate_argument_str << "\t\ttheta_acc = mulmod(theta_acc, theta, modulus);" << std::endl;
-                    }
-                    variable_type sel_var(gate.selector_index, 0, true, variable_type::column_type::selector);
-                    gate_argument_str << "\t\t\tgate = mulmod(gate, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << "), modulus);" << std::endl;
-                    gate_argument_str << "\t\t\tF = addmod(F, gate, modulus);" <<std::endl <<std::endl;
-                }*/
+
                 return gate_argument_str.str();
             }
 
             std::string print_lookup_argument(){
                 std::stringstream lookup_str;
                 std::size_t j = 0;
+                std::size_t i = 0;
+                std::size_t cur = 0;
+                std::vector<std::string> lookups_computation_code;
+                std::vector<std::size_t> lookup_ids;
 
+                for(const auto &lookup_gate: _constraint_system.lookup_gates()){
+                    std::string lookup_eval_string = lookup_call_template;
+                    boost::replace_all(lookup_eval_string, "$TEST_NAME$", _test_name);
+                    boost::replace_all(lookup_eval_string, "$LOOKUP_LIB_ID$", to_string(i));
+                    boost::replace_all(lookup_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                    lookup_str << lookup_eval_string;
+                    lookup_ids.push_back(i);
+                    _lookup_includes += "import \"./lookup_"  + to_string(i) + ".sol\"; \n";
+                    lookups_computation_code.push_back(lookup_computation_code(lookup_gate));
+                    print_lookup_file(lookups_computation_code[i], i);
+                    i++;
+                }
+                print_lookup_libs_list(lookup_ids);
+/*              
                 lookup_str << "\t\t\tuint256 sum;" << std::endl;
                 lookup_str << "\t\t\tuint256 prod;" << std::endl;
 
@@ -303,8 +358,8 @@ namespace nil {
                         j++;
                     }
                 }
-
                 lookup_str << std::endl;
+*/
                 j = 0;
                 std::size_t table_index = 1;
                 for(const auto &table: _constraint_system.lookup_tables()){
@@ -338,6 +393,7 @@ namespace nil {
                     table_index++;
                 }
                 lookup_str << std::endl;
+                
                 return lookup_str.str();
             }
         
@@ -373,6 +429,7 @@ namespace nil {
                 reps["$ZERO_INDICES$"] = zero_indices(_common_data.columns_rotations);
                 reps["$GATE_ARGUMENT_COMPUTATION$"] = gate_argument;
                 reps["$GATE_INCLUDES$"] = _gate_includes;
+                reps["$LOOKUP_INCLUDES$"] = _lookup_includes;
                 reps["$LOOKUP_ARGUMENT_COMPUTATION$"] = lookup_argument;
                 reps["$COMMITMENT_CODE$"] = commitment_code;
 
@@ -405,6 +462,7 @@ namespace nil {
             variable_indices_type _var_indices;
 
             std::string _gate_includes;
+            std::string _lookup_includes;
         };
     }
 }
