@@ -105,7 +105,8 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_1>, 4, 4> circuit_test_1(
-                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                    boost::random::mt11213b rnd = boost::random::mt11213b()
                 ) {
                     using assignment_type  = typename FieldType::value_type;
 
@@ -242,7 +243,11 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType, arithmetization_params_t>, 4, 4> 
-                circuit_test_t(typename FieldType::value_type pi0 = FieldType::value_type::zero()) {
+                circuit_test_t(
+                    typename FieldType::value_type pi0 = 0,
+                    typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
+                    boost::random::mt11213b rnd = boost::random::mt11213b()                    
+                ) {
                     using assignment_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t rows_log = 4;
