@@ -42,6 +42,18 @@ namespace nil {
             strstr << val;
             return strstr.str();
         }
+
+        void replace_and_print(std::string input, transpiler_replacements reps, std::string output_file_name){
+            std::string code = input;
+
+            for(const auto&[k,v]: reps){
+                boost::replace_all(code, k, v);
+            }
+            std::ofstream out;
+            out.open(output_file_name);
+            out << code;
+            out.close();
+        }
     }
 }
 

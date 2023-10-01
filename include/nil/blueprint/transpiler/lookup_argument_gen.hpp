@@ -43,7 +43,14 @@
 
 namespace nil {
     namespace blueprint {
-
+        template<typename PlaceholderParams> 
+        std::string print_lookup_argument(
+            const typename PlaceholderParams::constraint_system_type &constraint_system,
+            const common_data_type<PlaceholderParams> &common_data,
+            std::size_t permutation_size,
+            std::string folder_name
+        ){
+        }
     }
 }
 
