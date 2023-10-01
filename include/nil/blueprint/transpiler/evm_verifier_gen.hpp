@@ -148,6 +148,7 @@ namespace nil {
             std::size_t permutation_size,
             std::string folder_name
         ){
+            std::filesystem::create_directory(folder_name);
             std::string test_name;
             std::size_t found = folder_name.rfind("/");
             if( found == std::string::npos ){
