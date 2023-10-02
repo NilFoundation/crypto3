@@ -192,6 +192,9 @@ namespace nil {
 
                 _permutation_offset = _variable_values_offset;
                 for( std::size_t i = 0; i < PlaceholderParams::arithmetization_params::witness_columns + PlaceholderParams::arithmetization_params::public_input_columns; i++){
+                    if(i == PlaceholderParams::arithmetization_params::witness_columns){
+                        _public_input_offset = _permutation_offset;
+                    }
                     _permutation_offset += 0x20 * (_common_data.columns_rotations[i].size());
                 }
 
@@ -398,6 +401,7 @@ namespace nil {
                 reps["$PERMUTATION_SIZE$"] = to_string(_permutation_size);
                 reps["$SPECIAL_SELECTORS_OFFSET$"] = to_string(_special_selectors_offset);
                 reps["$TABLE_Z_OFFSET$"] = to_string(_table_z_offset);
+                reps["$PUBLIC_INPUT_OFFSET$"] = to_string(_public_input_offset);
                 reps["$PERMUTATION_TABLE_OFFSET$"] = to_string(_permutation_offset);
                 reps["$QUOTIENT_OFFSET$"] = to_string(_quotient_offset);
                 reps["$ROWS_AMOUNT$"] = to_string(_common_data.rows_amount);
@@ -435,6 +439,7 @@ namespace nil {
             std::size_t _variable_values_offset;
             std::size_t _permutation_offset;
             std::size_t _quotient_offset;
+            std::size_t _public_input_offset;
             variable_indices_type _var_indices;
 
             std::string _gate_includes;

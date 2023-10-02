@@ -580,7 +580,6 @@ $POINTS_INITIALIZATION$
             
             unchecked{i++;}
         }
-        console.log("EVALUATION PROOF verified");
         return true;
     }
 }        
