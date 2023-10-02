@@ -335,31 +335,7 @@ namespace nil {
                     print_lookup_file(lookups_computation_code[i], i);
                     i++;
                 }
-                print_lookup_libs_list(lookup_ids);
-/*              
-                lookup_str << "\t\t\tuint256 sum;" << std::endl;
-                lookup_str << "\t\t\tuint256 prod;" << std::endl;
-
-                for(const auto &gate: _constraint_system.lookup_gates()){
-                    variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
-                    lookup_str << "\t\t\tstate.selector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
-                    for( const auto &constraint: gate.constraints ){
-                        variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
-                        lookup_str << 
-                            "\t\t\tl = mulmod( " << constraint.table_id << ",state.selector_value, modulus);" << std::endl;
-                        lookup_str << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
-                        for( const auto &expression:constraint.lookup_input ){
-                            lookup_str << constraint_computation_code(_var_indices, expression) << std::endl  << std::endl;
-                            lookup_str << 
-                                "\t\t\tl = addmod( l, mulmod( mulmod(state.theta_acc, state.selector_value, modulus), sum, modulus), modulus);" << std::endl;
-                            lookup_str << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
-                        }
-                        lookup_str << "state.g = mulmod(state.g, mulmod(addmod(1, state.beta, modulus), addmod(l,state.gamma, modulus), modulus), modulus);" << std::endl;
-                        j++;
-                    }
-                }
-                lookup_str << std::endl;
-*/
+                if(_use_lookups) print_lookup_libs_list(lookup_ids);
                 j = 0;
                 std::size_t table_index = 1;
                 for(const auto &table: _constraint_system.lookup_tables()){
