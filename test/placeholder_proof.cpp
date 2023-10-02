@@ -468,12 +468,28 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
     }
-/*
+
+    std::size_t max_non_zero = 0;
+    for(std::size_t i = 0; i < assignments.public_input(0).size(); i++){
+        if( assignments.public_input(0)[i] != 0 ){
+            max_non_zero = i;
+        }
+    }
+
+    std::ofstream pi_stream;
+    pi_stream.open("circuit2/input.json");
+    pi_stream << "[" << std::endl;
+    for(std::size_t i = 0; i <= max_non_zero; i++ ){
+        if( i != 0 ) pi_stream << "," << std::endl;
+        pi_stream <<  "\t{\"field\": "<< assignments.public_input(0)[i] << " }";
+    }
+    pi_stream << std::endl << "]";
+    pi_stream.close();
+
     verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme 
     );
     BOOST_CHECK(verifier_res);
-    */
 }
 BOOST_AUTO_TEST_SUITE_END()
 
