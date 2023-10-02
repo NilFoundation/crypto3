@@ -97,7 +97,7 @@ namespace nil {
             }
 
             std::string zero_indices(columns_rotations_type col_rotations){
-                std::vector<std::uint16_t> zero_indices;
+                std::vector<std::size_t> zero_indices;
                 std::uint16_t fixed_values_points;
                 std::stringstream result;
 
@@ -106,9 +106,11 @@ namespace nil {
                 }
 
                 for(std::size_t i= 0; i < PlaceholderParams::total_columns; i++){
+                    std::cout << "i = " << i << std::endl;
                     std::size_t j = 0;
                     for(auto& rot: col_rotations[i]){
                         if(rot == 0){
+                            std::cout << "zero_index = " << j << std::endl;
                             zero_indices.push_back(j);
                             break;
                         }
@@ -119,6 +121,8 @@ namespace nil {
                 std::size_t i = 0;
                 for(; i < PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns; i++){
                     zero_indices[i] = (sum + zero_indices[i]) * 0x20;
+                    std::cout << "i = " << i << " offset = " << zero_indices[i] << std::endl;
+                    BOOST_ASSERT(zero_indices[i] < 0x10000);
                     sum += col_rotations[i].size();
                     result << std::hex << std::setfill('0') << std::setw(4) << zero_indices[i];
                 }
@@ -126,7 +130,9 @@ namespace nil {
                 sum = 0;
                 for(; i < PlaceholderParams::total_columns; i++){
                     zero_indices[i] = (sum + zero_indices[i]) * 0x20;
-                    sum += col_rotations[i].size();
+                    std::cout << "i = " << i << " offset = " << zero_indices[i] << std::endl;
+                    BOOST_ASSERT(zero_indices[i] < 0x10000);
+                    sum += col_rotations[i].size() + 1;
                     result << std::hex << std::setfill('0') << std::setw(4) << zero_indices[i];
                 }
                 return result.str();
