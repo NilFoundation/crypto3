@@ -1,9 +1,10 @@
 name: Set version
 
 on:
-  # Triggers the workflow on push to master branch
-  push:
-    branches: [ master ]
+  #Disabled because the workflow does not actually work with current runner permissions
+  #push:
+  #  branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   set_version:
