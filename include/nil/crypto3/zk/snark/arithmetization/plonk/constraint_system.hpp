@@ -120,17 +120,10 @@ namespace nil {
                     }
 
                     std::size_t sorted_lookup_columns_number() const {
-                        std::size_t result = 0;
                         if(_lookup_gates.size() == 0){
                             return 0;
                         }   
-                        for(std::size_t i = 0; i < _lookup_gates.size(); ++i) {
-                            result += _lookup_gates[i].constraints.size();
-                        }
-                        for(std::size_t i = 0; i < _lookup_tables.size(); ++i) {
-                            result += _lookup_tables[i].lookup_options.size();
-                        }
-                        return result;
+                        return lookup_options_num() + lookup_constraints_num();
                     }
 
                     std::size_t lookup_options_num() const {
