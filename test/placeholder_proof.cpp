@@ -254,7 +254,7 @@ nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
 struct test_initializer {
     // Enumerate all fields used in tests;
     using field1_type = algebra::curves::pallas::base_field_type;
-
+    using field2_type = algebra::curves::bls12<381>::scalar_field_type;
     test_initializer() {
         test_global_seed = 0;
 
@@ -277,6 +277,7 @@ struct test_initializer {
         BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
         test_global_rnd_engine = boost::random::mt11213b(test_global_seed);
         test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
+        test_global_alg_rnd_engine<field2_type> = nil::crypto3::random::algebraic_engine<field2_type>(test_global_seed);
     }
 
     void setup() {
@@ -371,6 +372,12 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
     }
+/*
+    auto verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
+        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme 
+    );
+    BOOST_CHECK(verifier_res);
+    */
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -387,8 +394,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
 
         constexpr static const std::size_t witness_columns = 3;
         constexpr static const std::size_t public_input_columns = 1;
@@ -422,8 +429,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
     
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
-    auto pi0 = nil::crypto3::algebra::random_element<field_type>();
-    auto circuit = circuit_test_t<field_type>(pi0);
+    auto pi0 = test_global_alg_rnd_engine<field_type>();
+    auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
     desc.rows_amount = table_rows;
@@ -462,10 +469,27 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
     }
 
-/*  verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme, lpc_transcript
+    std::size_t max_non_zero = 0;
+    for(std::size_t i = 0; i < assignments.public_input(0).size(); i++){
+        if( assignments.public_input(0)[i] != 0 ){
+            max_non_zero = i;
+        }
+    }
+
+    std::ofstream pi_stream;
+    pi_stream.open("circuit2/input.json");
+    pi_stream << "[" << std::endl;
+    for(std::size_t i = 0; i <= max_non_zero; i++ ){
+        if( i != 0 ) pi_stream << "," << std::endl;
+        pi_stream <<  "\t{\"field\": "<< assignments.public_input(0)[i] << " }";
+    }
+    pi_stream << std::endl << "]";
+    pi_stream.close();
+
+    verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
+        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme 
     );
-    BOOST_CHECK(verifier_res);*/
+    BOOST_CHECK(verifier_res);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -481,8 +505,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     constexpr static const std::size_t usable_rows = 4;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
 
         constexpr static const std::size_t witness_columns = witness_columns_3;
         constexpr static const std::size_t public_input_columns = public_columns_3;
@@ -512,7 +536,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_3<field_type>();
+    auto circuit = circuit_test_3<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -551,10 +575,10 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
     }
     
-/*
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, proof, constraint_system, lpc_scheme, transcript);
-    BOOST_CHECK(verifier_res);*/
+        preprocessed_public_data, proof, constraint_system, lpc_scheme);
+    BOOST_CHECK(verifier_res);
+    
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -571,8 +595,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     constexpr static const std::size_t usable_rows = 5;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
 
         constexpr static const std::size_t witness_columns = witness_columns_4;
         constexpr static const std::size_t public_input_columns = public_columns_4;
@@ -602,7 +626,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_4<field_type>();
+    auto circuit = circuit_test_4<field_type>(test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -661,8 +685,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     constexpr static const std::size_t usable_rows = 6;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
 
         constexpr static const std::size_t witness_columns = witness_columns_6;
         constexpr static const std::size_t public_input_columns = public_columns_6;
@@ -692,7 +716,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_6<field_type>();
+    auto circuit = circuit_test_6<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -731,9 +755,11 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
     }
-//    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-//        preprocessed_public_data, proof, constraint_system, lpc_scheme, transcript);
-//    BOOST_CHECK(verifier_res);
+/*
+    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data, proof, constraint_system, lpc_scheme);
+    BOOST_CHECK(verifier_res);
+    */
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -749,8 +775,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     constexpr static const std::size_t usable_rows = 14;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
 
         constexpr static const std::size_t witness_columns = witness_columns_7;
         constexpr static const std::size_t public_input_columns = public_columns_7;
@@ -780,7 +806,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_7<field_type>();
+    auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
     desc.rows_amount = table_rows;
