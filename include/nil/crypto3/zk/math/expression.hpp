@@ -42,7 +42,7 @@ namespace nil {
     namespace crypto3 {
         namespace math {
 
-            enum class ArithmeticOperator : std::uint8_t 
+            enum class ArithmeticOperator : std::uint8_t
             {
                 ADD = 0,
                 SUB = 1,
@@ -80,7 +80,7 @@ namespace nil {
                     boost::recursive_wrapper<binary_arithmetic_operation<VariableType>>
                     > expression_type;
 
-                expression() 
+                expression()
                     : expr(term<VariableType>(assignment_type::zero())) {
                     update_hash();
                 }
@@ -102,7 +102,7 @@ namespace nil {
                     update_hash();
                 }
 
-                // Every number type will be accepted here, 
+                // Every number type will be accepted here,
                 // if it can be converted to 'assignment_type'.
                 // This will include integral types and number<cpp_int_backend<...>>
                 template<class NumberType>
@@ -129,8 +129,8 @@ namespace nil {
                 expression<VariableType> operator-(const expression<VariableType>& other) const;
                 expression<VariableType> operator*(const expression<VariableType>& other) const;
 
-           
-                bool is_empty() const { 
+
+                bool is_empty() const {
                     return *this == term<VariableType>(assignment_type::zero());
                 }
 
@@ -159,15 +159,15 @@ namespace nil {
                         case 2:
                             hash = boost::get<binary_arithmetic_operation<VariableType>>(expr).get_hash();
                             break;
-                    } 
+                    }
                 }
 
             private:
-                // This is private, and we need to be very careful to make sure we recompute the hash value every time this 
+                // This is private, and we need to be very careful to make sure we recompute the hash value every time this
                 // is changed through a non-const function.
                 expression_type expr;
 
-                // We will store the hash value. This is faster that computing it 
+                // We will store the hash value. This is faster that computing it
                 // whenever it's needed, because we need to iterate over subexpressions to compute it.
                 std::size_t hash;
             };
@@ -175,7 +175,7 @@ namespace nil {
 
             /**
              * A Non-Linear term represents a formal expression of the form
-             * "coeff * w^{wire_index_1}_{rotation_1} * ... * w^{wire_index_k}_{rotation_k}", where 
+             * "coeff * w^{wire_index_1}_{rotation_1} * ... * w^{wire_index_k}_{rotation_k}", where
              * the values of w^{wire_index_1}_{rotation_1} can repeat.
              */
             template<typename VariableType>
@@ -193,7 +193,7 @@ namespace nil {
                     update_hash();
                 }
 
-                // Every number type will be accepted here, 
+                // Every number type will be accepted here,
                 // if it can be converted to 'assignment_type'.
                 // This will include integral types and number<cpp_int_backend<...>>
                 template<class NumberType>
@@ -202,16 +202,16 @@ namespace nil {
                 }
 
                 term(const std::vector<VariableType> &vars,
-                     const assignment_type &coeff) 
+                     const assignment_type &coeff)
                     : vars(vars)
-                    , coeff(coeff) 
+                    , coeff(coeff)
                 {
                     update_hash();
                 }
 
-                term(const std::vector<VariableType> &vars) 
+                term(const std::vector<VariableType> &vars)
                     : vars(vars)
-                    , coeff(assignment_type::one()) 
+                    , coeff(assignment_type::one())
                 {
                     update_hash();
                 }
@@ -221,7 +221,7 @@ namespace nil {
                 term<VariableType>& operator=(const term<VariableType>& other) = default;
                 term<VariableType>& operator=(term<VariableType>&& other) = default;
 
-                bool is_zero() const { 
+                bool is_zero() const {
                     return coeff == assignment_type::zero();
                 }
 
@@ -239,8 +239,8 @@ namespace nil {
 
                 // Used for debugging, to be able to see what's inside the term.
                 std::string to_string() const;
-                
-                // If variables repeat, in some cases we 
+
+                // If variables repeat, in some cases we
                 // want to be able to represent it as Product(var_i^power_i).
                 std::unordered_map<variable_type, int> to_unordered_map() const;
 
@@ -270,12 +270,12 @@ namespace nil {
                 }
 
             private:
-                // This is private, and we need to be very careful to make sure we recompute the hash value every time this 
+                // This is private, and we need to be very careful to make sure we recompute the hash value every time this
                 // is changed through a non-const function.
                 std::vector<variable_type> vars;
                 assignment_type coeff;
 
-                // We will store the hash value. This is faster that computing it 
+                // We will store the hash value. This is faster that computing it
                 // whenever it's needed, because we need to iterate over subexpressions to compute it.
                 std::size_t hash;
             };
@@ -285,8 +285,8 @@ namespace nil {
             {
             public:
                 typedef VariableType variable_type;
-                
-                pow_operation(const expression<VariableType>& expr, int power) 
+
+                pow_operation(const expression<VariableType>& expr, int power)
                     : expr(expr)
                     , power(power) {
                     update_hash();
@@ -320,16 +320,16 @@ namespace nil {
                 }
 
             private:
-                // This is private, and we need to be very careful to make sure we recompute the hash value every time this 
+                // This is private, and we need to be very careful to make sure we recompute the hash value every time this
                 // is changed through a non-const function.
                 expression<VariableType> expr;
                 int power;
 
-                // We will store the hash value. This is faster that computing it 
+                // We will store the hash value. This is faster that computing it
                 // whenever it's needed, because we need to iterate over subexpressions to compute it.
                 std::size_t hash;
-            }; 
- 
+            };
+
             // One of +, -, *, / operations. We build an expression tree using this class.
             template<typename VariableType>
             class binary_arithmetic_operation
@@ -338,10 +338,11 @@ namespace nil {
                 binary_arithmetic_operation(
                         const expression<VariableType>& expr_left,
                         const expression<VariableType>& expr_right,
-                        ArithmeticOperator op) 
+                        ArithmeticOperator op)
                     : expr_left(expr_left)
                     , expr_right(expr_right)
                     , op(op) {
+                    update_hash();
                 }
 
                 binary_arithmetic_operation(
@@ -384,7 +385,7 @@ namespace nil {
                 std::size_t get_hash() const {
                     return hash;
                 }
-                
+
                 void update_hash() {
                     std::size_t result = expr_left.get_hash();
                     boost::hash_combine(result, expr_right.get_hash());
@@ -393,16 +394,16 @@ namespace nil {
                 }
 
             private:
-                // This is private, and we need to be very careful to make sure we recompute the hash value every time this 
+                // This is private, and we need to be very careful to make sure we recompute the hash value every time this
                 // is changed through a non-const function.
                 expression<VariableType> expr_left;
                 expression<VariableType> expr_right;
                 ArithmeticOperator op;
 
-                // We will store the hash value. This is faster that computing it 
+                // We will store the hash value. This is faster that computing it
                 // whenever it's needed, because we need to iterate over subexpressions to compute it.
                 std::size_t hash;
- 
+
             };
 
             /*********** Member function bodies for class 'term' *******************************/
@@ -415,7 +416,7 @@ namespace nil {
                 std::copy(other.vars.begin(), other.vars.end(), std::back_inserter(result.vars));
                 result.coeff = other.coeff * this->coeff;
                 result.update_hash();
-                return result; 
+                return result;
             }
 
             template<typename VariableType>
@@ -431,9 +432,9 @@ namespace nil {
 
             template<typename VariableType>
             expression<VariableType> term<VariableType>::pow(const std::size_t power) const {
-                return pow_operation<VariableType>(*this, power); 
+                return pow_operation<VariableType>(*this, power);
             }
-            
+
             template<typename VariableType>
             term<VariableType> term<VariableType>::operator-() const {
                 return term<VariableType>(this->vars, -this->coeff);
@@ -443,7 +444,7 @@ namespace nil {
 
             template<typename VariableType>
             expression<VariableType> expression<VariableType>::pow(const std::size_t power) const {
-                return pow_operation<VariableType>(*this, power); 
+                return pow_operation<VariableType>(*this, power);
             }
 
             template<typename VariableType>
@@ -493,7 +494,7 @@ namespace nil {
                 return binary_arithmetic_operation<VariableType>(
                     *this, other, ArithmeticOperator::ADD);
             }
-    
+
             template<typename VariableType>
             expression<VariableType> expression<VariableType>::operator-(
                     const expression<VariableType>& other) const {
@@ -510,7 +511,7 @@ namespace nil {
             }
 
             /***** Operators for [VariableType or assignment_type or int] +-* term. **********************/
-            template<typename VariableType, typename LeftType, 
+            template<typename VariableType, typename LeftType,
                      typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_integral<LeftType>::value>>
             term<VariableType> operator*(
                     const LeftType &left,
@@ -518,7 +519,7 @@ namespace nil {
                 return term<VariableType>(left) * t;
             }
 
-            template<typename VariableType, typename LeftType, 
+            template<typename VariableType, typename LeftType,
                      typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator+(
                     const LeftType &left,
@@ -526,7 +527,7 @@ namespace nil {
                 return term<VariableType>(left) + t;
             }
 
-            template<typename VariableType, typename LeftType, 
+            template<typename VariableType, typename LeftType,
                      typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator-(
                     const LeftType &left,
@@ -535,7 +536,7 @@ namespace nil {
             }
 
             // Operators for [VariableType or assignment_type or int] +-* expression.
-            template<typename VariableType, typename LeftType, 
+            template<typename VariableType, typename LeftType,
                      typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_same<LeftType, term<VariableType>>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator*(
                     const LeftType &left,
@@ -543,7 +544,7 @@ namespace nil {
                 return expression<VariableType>(left) * exp;
             }
 
-            template<typename VariableType, typename LeftType, 
+            template<typename VariableType, typename LeftType,
                      typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_same<LeftType, term<VariableType>>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator+(
                     const LeftType &left,
@@ -551,7 +552,7 @@ namespace nil {
                 return expression<VariableType>(left) + exp;
             }
 
-            template<typename VariableType, typename LeftType, 
+            template<typename VariableType, typename LeftType,
                      typename = std::enable_if_t<std::is_same<LeftType, VariableType>::value || std::is_same<LeftType, typename VariableType::assignment_type>::value || std::is_same<LeftType, term<VariableType>>::value || std::is_integral<LeftType>::value>>
             expression<VariableType> operator-(
                     const LeftType &left,
@@ -682,7 +683,7 @@ namespace nil {
                     const binary_arithmetic_operation<VariableType>& other) const {
                 return !(*this == other);
             }
- 
+
             // Used for testing purposes and hashmaps. Checks for EXACT EQUALITY ONLY, no isomorphism!!!
             template<typename VariableType>
             bool expression<VariableType>::operator==(const expression<VariableType>& other) const {
