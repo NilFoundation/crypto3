@@ -109,6 +109,10 @@ namespace nil {
                 struct input_type {
                     var x;
                     var y;
+
+                    std::vector<var> all_vars() const {
+                        return {x, y};
+                    }
                 };
 
                 struct result_type {
@@ -122,10 +126,14 @@ namespace nil {
                             var(component.W(component.witness_amount() - 1),
                                             start_row_index + component.rows_amount - 1, false);
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output};
+                    }
                 };
 
                 template<typename ContainerType>
-                logic_and_flag(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
+                explicit logic_and_flag(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -185,15 +193,14 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_logic_and_flag_component<BlueprintFieldType,
-                                                              ArithmetizationParams>::input_type &instance_input,
-                const std::uint32_t first_selector_index) {
+                                                              ArithmetizationParams>::input_type &instance_input) {
 
                 using var = typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::var;
 
@@ -218,12 +225,12 @@ namespace nil {
                 auto _v = var(component.W(wl[3].first), wl[3].second);
                 auto _f = var(component.W(witness_amount - 1), offset + component.rows_amount - 1);
 
-                auto constraint_1 = bp.add_constraint(_p - _x * _y);            // p =x*y
-                auto constraint_2 = bp.add_constraint(_f * (_f - 1));           // f(f-1)=0
-                auto constraint_3 = bp.add_constraint(_f - _p * _v);            // f = pv
-                auto constraint_4 = bp.add_constraint((_v - _p) * (_f - 1));    // (v-p)(f-1)=0
+                auto constraint_1 = _p - _x * _y;            // p =x*y
+                auto constraint_2 = _f * (_f - 1);           // f(f-1)=0
+                auto constraint_3 = _f - _p * _v;            // f = pv
+                auto constraint_4 = (_v - _p) * (_f - 1);    // (v-p)(f-1)=0
 
-                bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
+                return bp.add_gate({constraint_1, constraint_2, constraint_3, constraint_4});
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -256,18 +263,9 @@ namespace nil {
                                                                   ArithmetizationParams>::input_type &instance_input,
                     const std::uint32_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
 
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
-
-                assignment.enable_selector(first_selector_index,
-                                           start_row_index + (component.rows_amount == 3 ? 1 : 0));
+                assignment.enable_selector(selector_index, start_row_index + (component.rows_amount == 3 ? 1 : 0));
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 

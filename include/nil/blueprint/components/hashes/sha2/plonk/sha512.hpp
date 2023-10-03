@@ -33,8 +33,8 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/manifest.hpp>
+#include <nil/blueprint/component_stretcher.hpp>
 #include <nil/blueprint/components/hashes/sha2/plonk/sha512_process.hpp>
-//#include <nil/blueprint/components/hashes/sha2/plonk/decomposition.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -101,6 +101,17 @@ namespace nil {
                     var_ec_point R;
                     var_ec_point A;
                     std::array<var, 4> M;
+
+                    std::vector<var> all_vars() const {
+                        std::vector<var> result;
+                        result.reserve(20);
+                        result.insert(result.end(), R.x.begin(), R.x.end());
+                        result.insert(result.end(), R.y.begin(), R.y.end());
+                        result.insert(result.end(), A.x.begin(), A.x.end());
+                        result.insert(result.end(), A.y.begin(), A.y.end());
+                        result.insert(result.end(), M.begin(), M.end());
+                        return result;
+                    }
                 };
 
                 struct result_type {
@@ -115,6 +126,13 @@ namespace nil {
                                         var(component.W(1), start_row_index + component.rows_amount - 1, false),
                                         var(component.W(2), start_row_index + component.rows_amount - 1, false),
                                         var(component.W(3), start_row_index + component.rows_amount - 1, false)};
+                    }
+
+                    std::vector<var> all_vars() const {
+                        std::vector<var> result;
+                        result.reserve(8);
+                        result.insert(result.end(), output_state.begin(), output_state.end());
+                        return result;
                     }
                 };
 
@@ -150,23 +168,17 @@ namespace nil {
                     using sha512_process_component = typename component_type::sha512_process_component;
                     using var = typename component_type::var;
 
-                    auto selector_iterator = assignment.find_selector(component);
-                    std::size_t first_selector_index;
+                    generate_assignments_constant(component, bp, assignment, instance_input, start_row_index);
 
-                    if (selector_iterator == assignment.selectors_end()){
-                        first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                        generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                    } else {
-                        first_selector_index = selector_iterator->second;
-                    }
+                    auto selector_indices = generate_gates(component, bp, assignment, instance_input);
 
                     std::size_t j = start_row_index;
 
-                    assignment.enable_selector(first_selector_index    , j + 1);
-                    assignment.enable_selector(first_selector_index + 1, j + 4);
-                    assignment.enable_selector(first_selector_index + 2, j + 7);
-                    assignment.enable_selector(first_selector_index + 3, j + 10);
-                    assignment.enable_selector(first_selector_index + 4, j + 13);
+                    assignment.enable_selector(selector_indices[0], j + 1);
+                    assignment.enable_selector(selector_indices[1], j + 4);
+                    assignment.enable_selector(selector_indices[2], j + 7);
+                    assignment.enable_selector(selector_indices[3], j + 10);
+                    assignment.enable_selector(selector_indices[4], j + 13);
 
                     std::array<var, 16> input_words_vars_1;
 
@@ -656,33 +668,25 @@ namespace nil {
                         input_words_vars_2[i] = var(component.W(2*i), row + 1 + 12, false);
                     }
 
-                    assignment.constant(component.C(0), start_row_index + 8) = 0;
-                    assignment.constant(component.C(0), start_row_index + 9) = 252 + 1024;
-
                     for (std::size_t i = 4; i < 15; i++) {
-                        input_words_vars_2[i] = var(component.C(0), start_row_index + 8, false, var::column_type::constant);
+                        input_words_vars_2[i] =
+                            var(component.C(0), start_row_index + 8, false, var::column_type::constant);
                     }
-                    input_words_vars_2[15] = var(component.C(0), start_row_index + 9, false, var::column_type::constant);
+                    input_words_vars_2[15] =
+                        var(component.C(0), start_row_index + 9, false, var::column_type::constant);
 
 
                     row = start_row_index + component.rows_amount_creating_input_words_component;
 
-
-                    std::array<typename BlueprintFieldType::value_type, 8> constants = {
-                        0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
-                        0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179};
-                    for (int i = 0; i < 8; i++) {
-                        assignment.constant(component.C(0), start_row_index + i) = constants[i];
-                    }
-
-                    std::array<var, 8> constants_var = {var(component.C(0), start_row_index, false, var::column_type::constant),
-                                                        var(component.C(0), start_row_index + 1, false, var::column_type::constant),
-                                                        var(component.C(0), start_row_index + 2, false, var::column_type::constant),
-                                                        var(component.C(0), start_row_index + 3, false, var::column_type::constant),
-                                                        var(component.C(0), start_row_index + 4, false, var::column_type::constant),
-                                                        var(component.C(0), start_row_index + 5, false, var::column_type::constant),
-                                                        var(component.C(0), start_row_index + 6, false, var::column_type::constant),
-                                                        var(component.C(0), start_row_index + 7, false, var::column_type::constant)};
+                    std::array<var, 8> constants_var = {
+                        var(component.C(0), start_row_index, false, var::column_type::constant),
+                        var(component.C(0), start_row_index + 1, false, var::column_type::constant),
+                        var(component.C(0), start_row_index + 2, false, var::column_type::constant),
+                        var(component.C(0), start_row_index + 3, false, var::column_type::constant),
+                        var(component.C(0), start_row_index + 4, false, var::column_type::constant),
+                        var(component.C(0), start_row_index + 5, false, var::column_type::constant),
+                        var(component.C(0), start_row_index + 6, false, var::column_type::constant),
+                        var(component.C(0), start_row_index + 7, false, var::column_type::constant)};
 
                     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                     typename sha512_process<ArithmetizationType>::input_type sha512_process_input = {constants_var, input_words_vars_1};
@@ -738,12 +742,12 @@ namespace nil {
                 }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::array<std::size_t, 5> generate_gates(
                     const plonk_sha512<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
-                    const std::size_t first_selector_index) {
+                    const typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::input_type
+                        &instance_input) {
 
                     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                     using var = typename sha512<ArithmetizationType>::var;
@@ -751,168 +755,173 @@ namespace nil {
                     typename BlueprintFieldType::integral_type one = 1;
 
 
-                    auto constraint_ram_0 = bp.add_constraint(
-                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 22) + var(component.W(1), 1) * (one << 44) + var(component.W(0), 1) * (one << 64)));
-                    auto constraint_word_0 = bp.add_constraint(
-                        var(component.W(0),  0) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 22) + var(component.W(1), 1) * (one << 44)));
+                    auto constraint_ram_0 =
+                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 22) + var(component.W(1), 1) * (one << 44) + var(component.W(0), 1) * (one << 64));
+                    auto constraint_word_0 =
+                        var(component.W(0),  0) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 22) + var(component.W(1), 1) * (one << 44));
 
                     // W2,1       W3,1                  W3,0                  W3, -1
                     // 1234|567890123456789012.3456789012345678901234.5678901234567890123456
 
-                    auto constraint_ram_1 = bp.add_constraint(
-                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 62)));
-                    auto constraint_word_1 = bp.add_constraint(
-                        var(component.W(2), 0) - (var(component.W(0), 1) + var(component.W(3), -1) * (one << 2) + var(component.W(3), 0) * (one << 24) + var(component.W(3), 1) * (one << 46)));
+                    auto constraint_ram_1 =
+                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 62));
+                    auto constraint_word_1 =
+                        var(component.W(2), 0) - (var(component.W(0), 1) + var(component.W(3), -1) * (one << 2) + var(component.W(3), 0) * (one << 24) + var(component.W(3), 1) * (one << 46));
 
                     //  W4,1        W5,1                W5,0                  W5, -1
                     // 123456|7890123456789012.3456789012345678901234.5678901234567890123456
-                    auto constraint_ram_2 = bp.add_constraint(
-                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 60)));
-                    auto constraint_word_2 = bp.add_constraint(
-                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (one << 4) + var(component.W(5), 0) * (one << (4 + 22)) + var(component.W(5), 1) * (one << (4 + 44))));
+                    auto constraint_ram_2 =
+                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 60));
+                    auto constraint_word_2 =
+                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (one << 4) + var(component.W(5), 0) * (one << (4 + 22)) + var(component.W(5), 1) * (one << (4 + 44)));
 
                     //     W7, 1              W7, 0                 W7, -1
                     // 1234567890123.4567890123456789012345.6789012345678901234567
 
-                    auto constraint_ram_3 = bp.add_constraint(
-                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44)));
-                    auto constraint_word_3 = bp.add_constraint(
-                        var(component.W(6),  0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 6) + var(component.W(7), 0) * (one << (6 + 22)) + var(component.W(7), 1) * (one << (6 + 44)) + var(component.W(6), 1) * (one << 63)));
+                    auto constraint_ram_3 =
+                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44));
+                    auto constraint_word_3 =
+                        var(component.W(6),  0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 6) + var(component.W(7), 0) * (one << (6 + 22)) + var(component.W(7), 1) * (one << (6 + 44)) + var(component.W(6), 1) * (one << 63));
 
-                    bp.add_gate(first_selector_index, {constraint_ram_0, constraint_ram_1, constraint_ram_2, constraint_ram_3, constraint_word_0, constraint_word_1, constraint_word_2, constraint_word_3});
+                    std::size_t selector_1 = bp.add_gate(
+                        {constraint_ram_0, constraint_ram_1, constraint_ram_2, constraint_ram_3, constraint_word_0,
+                         constraint_word_1, constraint_word_2, constraint_word_3});
 
                     // W0,1      W1,1                  W1,0               W1,-1             W8,-1
                     // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
-                    auto constraint_ram_4 = bp.add_constraint(
-                        var(component.W(0), -1) - (var(component.W(8), -1) + var(component.W(1), -1) * (1 << 1) + var(component.W(1), 0) * (one << 22) + var(component.W(1), 1) * (one << 44) + var(component.W(0), 1) * (one << 65)));
-                    auto constraint_word_4 = bp.add_constraint(
-                        var(component.W(0), 0) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << (22-1)) + var(component.W(1), 1) * (one << (22 + 22 - 1))));
+                    auto constraint_ram_4 =
+                        var(component.W(0), -1) - (var(component.W(8), -1) + var(component.W(1), -1) * (1 << 1) + var(component.W(1), 0) * (one << 22) + var(component.W(1), 1) * (one << 44) + var(component.W(0), 1) * (one << 65));
+                    auto constraint_word_4 =
+                        var(component.W(0), 0) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << (22-1)) + var(component.W(1), 1) * (one << (22 + 22 - 1)));
 
                     // W2,1       W3,1                  W3,0                  W3, -1
                     // 123|4567890123456789012.3456789012345678901234.5678901234567890123456
-                    auto constraint_ram_5 = bp.add_constraint(
-                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 63)));
-                    auto constraint_word_5 = bp.add_constraint(
-                        var(component.W(2), 0) - (var(component.W(0), 1) + var(component.W(3), -1) * (1 << 1) + var(component.W(3), 0) * (one << (22 + 1)) + var(component.W(3), 1) * (one << (44 + 1))));
+                    auto constraint_ram_5 =
+                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 63));
+                    auto constraint_word_5 =
+                        var(component.W(2), 0) - (var(component.W(0), 1) + var(component.W(3), -1) * (1 << 1) + var(component.W(3), 0) * (one << (22 + 1)) + var(component.W(3), 1) * (one << (44 + 1)));
 
                     //  W4,1        W5,1                W5,0                  W5, -1
                     // 12345|67890123456789012.3456789012345678901234.5678901234567890123456
-                    auto constraint_ram_6 = bp.add_constraint(
-                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 61)));
-                    auto constraint_word_6 = bp.add_constraint(
-                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (one << 3) + var(component.W(5), 0) * (one << (3 + 22)) + var(component.W(5), 1) * (one << (3 + 44))));
+                    auto constraint_ram_6 =
+                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 61));
+                    auto constraint_word_6 =
+                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (one << 3) + var(component.W(5), 0) * (one << (3 + 22)) + var(component.W(5), 1) * (one << (3 + 44)));
 
                     //     W7, 1              W7, 0                 W7, -1
                     // 1234567890123.4567890123456789012345.6789012345678901234567
-                    auto constraint_ram_7 = bp.add_constraint(
-                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44)));
-                    auto constraint_word_7 = bp.add_constraint(
-                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 5) + var(component.W(7), 0) * (one << (5 + 22)) + var(component.W(7), 1) * (one << (5 + 44)) + var(component.W(6), 1) * (one << 62)));
+                    auto constraint_ram_7 =
+                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44));
+                    auto constraint_word_7 =
+                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 5) + var(component.W(7), 0) * (one << (5 + 22)) + var(component.W(7), 1) * (one << (5 + 44)) + var(component.W(6), 1) * (one << 62));
 
-                    bp.add_gate(first_selector_index + 1, {constraint_ram_4, constraint_ram_5, constraint_ram_6, constraint_ram_7, constraint_word_4, constraint_word_5, constraint_word_6, constraint_word_7});
-
-
+                    std::size_t selector_2 = bp.add_gate(
+                        {constraint_ram_4, constraint_ram_5, constraint_ram_6, constraint_ram_7, constraint_word_4,
+                         constraint_word_5, constraint_word_6, constraint_word_7});
 
 
 
                     //          W0,1                    W1,1                  W1,0        W1,-1
                     // |1234567890123456789012.3456789012345678901234.56789012345678901234|56
-                    auto constraint_ram_8 = bp.add_constraint(
-                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (1 << 2) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44)));
-                    auto constraint_word_8 = bp.add_constraint(
-                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 20) + var(component.W(0), 1) * (one << 42)));
+                    auto constraint_ram_8 =
+                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (1 << 2) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44));
+                    auto constraint_word_8 =
+                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 20) + var(component.W(0), 1) * (one << 42));
 
                     // W2,1       W3,1                  W3,0                  W3, -1
                     // 12|34567890123456789012.3456789012345678901234.5678901234567890123456
-                    auto constraint_ram_9 = bp.add_constraint(
-                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 64)));
-                    auto constraint_word_9 = bp.add_constraint(
-                        var(component.W(2), 0) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44)));
+                    auto constraint_ram_9 =
+                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 64));
+                    auto constraint_word_9 =
+                        var(component.W(2), 0) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44));
 
                     // W4,1        W5,1                 W5,0                  W5, -1
                     // 1234|567890123456789012.3456789012345678901234.5678901234567890123456
-                    auto constraint_ram_10 = bp.add_constraint(
-                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 62)));
-                    auto constraint_word_10 = bp.add_constraint(
-                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (one << 2) + var(component.W(5), 0) * (one << 24) + var(component.W(5), 1) * (one << 46)));
+                    auto constraint_ram_10 =
+                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 62));
+                    auto constraint_word_10 =
+                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (one << 2) + var(component.W(5), 0) * (one << 24) + var(component.W(5), 1) * (one << 46));
 
                     //     W7, 1              W7, 0                 W7, -1
                     // 1234567890123.4567890123456789012345.6789012345678901234567
-                    auto constraint_ram_11 = bp.add_constraint(
-                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44)));
-                    auto constraint_word_11 = bp.add_constraint(
-                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 4) + var(component.W(7), 0) * (one << (4 + 22)) + var(component.W(7), 1) * (one << (4 + 44)) + var(component.W(6), 1) * (one << 61)));
+                    auto constraint_ram_11 =
+                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44));
+                    auto constraint_word_11 =
+                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 4) + var(component.W(7), 0) * (one << (4 + 22)) + var(component.W(7), 1) * (one << (4 + 44)) + var(component.W(6), 1) * (one << 61));
 
-                    bp.add_gate(first_selector_index + 2, {constraint_ram_8, constraint_ram_9, constraint_ram_10, constraint_ram_11,  constraint_word_8, constraint_word_9, constraint_word_10, constraint_word_11});
-
-
+                    std::size_t selector_3 = bp.add_gate(
+                        {constraint_ram_8, constraint_ram_9, constraint_ram_10, constraint_ram_11,  constraint_word_8,
+                         constraint_word_9, constraint_word_10, constraint_word_11});
 
 
 
                     //         W0,1                    W1,1                  W1,0        (W1,-1  &  W6,1-3)
                     // 1234567890123456789012.3456789012345678901234.5678901234567890123|456
-                    auto constraint_ram_12 = bp.add_constraint(
-                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 3) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44)));
-                    auto constraint_word_12 = bp.add_constraint(
-                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 19) + var(component.W(0), 1) * (one << (19+22)) + var(component.W(8), -1) * (one << 63)));
+                    auto constraint_ram_12 =
+                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 3) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44));
+                    auto constraint_word_12 =
+                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 19) + var(component.W(0), 1) * (one << (19+22)) + var(component.W(8), -1) * (one << 63));
 
                     // W2,1       W3,1                  W3,0                  W3, -1        W8, -1
                     // 1|234567890123456789012.3456789012345678901234.567890123456789012345|6
-                    auto constraint_ram_13 = bp.add_constraint(
-                        var(component.W(2), -1) - (var(component.W(8), -1) + var(component.W(3), -1) * (1 << 1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 65)));
-                    auto constraint_word_13 = bp.add_constraint(
-                        var(component.W(2), 0) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << (22-1)) + var(component.W(3), 1) * (one << (22 + 22 - 1))));
+                    auto constraint_ram_13 =
+                        var(component.W(2), -1) - (var(component.W(8), -1) + var(component.W(3), -1) * (1 << 1) + var(component.W(3), 0) * (one << 22) + var(component.W(3), 1) * (one << 44) + var(component.W(2), 1) * (one << 65));
+                    auto constraint_word_13 =
+                        var(component.W(2), 0) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << (22-1)) + var(component.W(3), 1) * (one << (22 + 22 - 1)));
 
                     // W4,1        W5,1                 W5,0                  W5, -1
                     // 123|4567890123456789012.3456789012345678901234.5678901234567890123456
-                    auto constraint_ram_14 = bp.add_constraint(
-                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 63)));
-                    auto constraint_word_14 = bp.add_constraint(
-                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (1 << 1) + var(component.W(5), 0) * (one << (22 + 1)) + var(component.W(5), 1) * (one << (44 + 1))));
+                    auto constraint_ram_14 =
+                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 63));
+                    auto constraint_word_14 =
+                        var(component.W(4), 0) - (var(component.W(2), 1) + var(component.W(5), -1) * (1 << 1) + var(component.W(5), 0) * (one << (22 + 1)) + var(component.W(5), 1) * (one << (44 + 1)));
 
                     //     W7, 1              W7, 0                 W7, -1
                     // 1234567890123.4567890123456789012345.6789012345678901234567
-                    auto constraint_ram_15 = bp.add_constraint(
-                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44)));
-                    auto constraint_word_15 = bp.add_constraint(
-                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 3) + var(component.W(7), 0) * (one << (3 + 22)) + var(component.W(7), 1) * (one << (3 + 44)) + var(component.W(6), 1) * (one << 60)));
+                    auto constraint_ram_15 =
+                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44));
+                    auto constraint_word_15 =
+                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 3) + var(component.W(7), 0) * (one << (3 + 22)) + var(component.W(7), 1) * (one << (3 + 44)) + var(component.W(6), 1) * (one << 60));
 
-                    bp.add_gate(first_selector_index + 3, {constraint_ram_12, constraint_ram_13, constraint_ram_14, constraint_ram_15, constraint_word_12, constraint_word_13, constraint_word_14, constraint_word_15});
-
-
+                    std::size_t selector_4 = bp.add_gate(
+                        {constraint_ram_12, constraint_ram_13, constraint_ram_14, constraint_ram_15,
+                         constraint_word_12, constraint_word_13, constraint_word_14, constraint_word_15});
 
 
 
                     //         W0,1                    W1,1                  W1,0        (W1,-1  &  W6,1-3)
                     // 1234567890123456789012.3456789012345678901234.567890123456789012|3456
-                    auto constraint_ram_16 = bp.add_constraint(
-                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 4) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44)));
-                    auto constraint_word_16 = bp.add_constraint(
-                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 18) + var(component.W(0), 1) * (one << (18+22)) + var(component.W(3), -1) * (one << 62)));
+                    auto constraint_ram_16 =
+                        var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(1), 0) * (one << 4) + var(component.W(1), 1) * (one << 22) + var(component.W(0), 1) * (one << 44));
+                    auto constraint_word_16 =
+                        var(component.W(0), 0) - (var(component.W(1), 0) + var(component.W(1), 1) * (one << 18) + var(component.W(0), 1) * (one << (18+22)) + var(component.W(3), -1) * (one << 62));
 
                     //           W2,1                    W3,1                  W3,0      W3, -1
                     // |1234567890123456789012.3456789012345678901234.56789012345678901234|56
-                    auto constraint_ram_17 = bp.add_constraint(
-                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 2) + var(component.W(3), 1) * (one << 22) + var(component.W(2), 1) * (one << 44)));
-                    auto constraint_word_17 = bp.add_constraint(
-                        var(component.W(2), 0) - (var(component.W(3), 0) + var(component.W(3), 1) * (one << 20) + var(component.W(2), 1) * (one << 42)));
+                    auto constraint_ram_17 =
+                        var(component.W(2), -1) - (var(component.W(3), -1) + var(component.W(3), 0) * (one << 2) + var(component.W(3), 1) * (one << 22) + var(component.W(2), 1) * (one << 44));
+                    auto constraint_word_17 =
+                        var(component.W(2), 0) - (var(component.W(3), 0) + var(component.W(3), 1) * (one << 20) + var(component.W(2), 1) * (one << 42));
 
                     // W4,1        W5,1                 W5,0                  W5, -1
                     // 12|34567890123456789012.3456789012345678901234.5678901234567890123456
-                    auto constraint_ram_18 = bp.add_constraint(
-                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 64)));
-                    auto constraint_word_18 = bp.add_constraint(
-                        var(component.W(4), 0) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44)));
+                    auto constraint_ram_18 =
+                        var(component.W(4), -1) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44) + var(component.W(4), 1) * (one << 64));
+                    auto constraint_word_18 =
+                        var(component.W(4), 0) - (var(component.W(5), -1) + var(component.W(5), 0) * (one << 22) + var(component.W(5), 1) * (one << 44));
 
                     //     W7, 1              W7, 0                 W7, -1
                     // 12345678901234.5678901234567890123456.7890123456789012345678
-                    auto constraint_ram_19 = bp.add_constraint(
-                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44)));
-                    auto constraint_word_19 = bp.add_constraint(
-                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 2) + var(component.W(7), 0) * (one << (2 + 22)) + var(component.W(7), 1) * (one << (2 + 44)) + var(component.W(8), 1) * (one << 60)));
+                    auto constraint_ram_19 =
+                        var(component.W(6), -1) - (var(component.W(7), -1) + var(component.W(7), 0) * (one << 22) + var(component.W(7), 1) * (one << 44));
+                    auto constraint_word_19 =
+                        var(component.W(6), 0) - (var(component.W(4), 1) + var(component.W(7), -1) * (one << 2) + var(component.W(7), 0) * (one << (2 + 22)) + var(component.W(7), 1) * (one << (2 + 44)) + var(component.W(8), 1) * (one << 60));
 
-                    bp.add_gate(first_selector_index + 4, {constraint_ram_16, constraint_ram_17, constraint_ram_18, constraint_ram_19, constraint_word_16, constraint_word_17, constraint_word_18, constraint_word_19});
+                    std::size_t selector_5 = bp.add_gate(
+                        {constraint_ram_16, constraint_ram_17, constraint_ram_18, constraint_ram_19,
+                         constraint_word_16, constraint_word_17, constraint_word_18, constraint_word_19});
 
+                    return {selector_1, selector_2, selector_3, selector_4, selector_5};
                 }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -945,6 +954,123 @@ namespace nil {
 
                 }
 
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            void generate_assignments_constant(
+                const plonk_sha512<BlueprintFieldType, ArithmetizationParams> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_sha512<BlueprintFieldType, ArithmetizationParams>::input_type
+                    &instance_input,
+                const std::size_t start_row_index) {
+
+                std::array<typename BlueprintFieldType::value_type, 8> constants = {
+                    0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
+                    0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179
+                };
+
+                for (int i = 0; i < 8; i++) {
+                    assignment.constant(component.C(0), start_row_index + i) = constants[i];
+                }
+                assignment.constant(component.C(0), start_row_index + 8) = 0;
+                assignment.constant(component.C(0), start_row_index + 9) = 252 + 1024;
+            }
+
+
+            template<typename ComponentType>
+            class input_type_converter;
+
+            template<typename ComponentType>
+            class result_type_converter;
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            class input_type_converter<plonk_sha512<BlueprintFieldType, ArithmetizationParams>> {
+
+                using component_type = plonk_sha512<BlueprintFieldType, ArithmetizationParams>;
+                using input_type = typename component_type::input_type;
+                using var = typename nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+            public:
+                static input_type convert(
+                    const input_type &input,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &assignment,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &tmp_assignment) {
+
+                    input_type new_input;
+                    for (std::size_t i = 0; i < input.R.x.size(); i++) {
+                        tmp_assignment.public_input(0, i) = var_value(assignment, input.R.x[i]);
+                        new_input.R.x[i] = var(0, i, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.R.y.size(); i++) {
+                        std::size_t new_index = input.R.x.size();
+                        tmp_assignment.public_input(0, i + new_index) = var_value(assignment, input.R.y[i]);
+                        new_input.R.y[i] = var(0, i + new_index, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.A.x.size(); i++) {
+                        std::size_t new_index = input.R.x.size() + input.R.y.size();
+                        tmp_assignment.public_input(0, i + new_index) = var_value(assignment, input.A.x[i]);
+                        new_input.A.x[i] = var(0, i + new_index, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.A.y.size(); i++) {
+                        std::size_t new_index = input.R.x.size() + input.R.y.size() + input.A.x.size();
+                        tmp_assignment.public_input(0, i + new_index) = var_value(assignment, input.A.y[i]);
+                        new_input.A.y[i] = var(0, i + new_index, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < 4; i++) {
+                        std::size_t new_index = input.R.x.size() + input.R.y.size() +
+                                                input.A.x.size() + input.A.y.size();
+                        tmp_assignment.public_input(0, i + new_index) = var_value(assignment, input.M[i]);
+                        new_input.M[i] = var(0, i + new_index, false, var::column_type::public_input);
+                    }
+
+                    return new_input;
+                }
+
+                static var deconvert_var(const input_type &input,
+                                         var variable) {
+                    BOOST_ASSERT(variable.type == var::column_type::public_input);
+                    if (variable.rotation < input.R.x.size()) {
+                        return input.R.x[variable.rotation];
+                    } else if (variable.rotation < input.R.x.size() + input.R.y.size()) {
+                        return input.R.y[variable.rotation - input.R.x.size()];
+                    } else if (variable.rotation < input.R.x.size() + input.R.y.size() + input.A.x.size()) {
+                        return input.A.x[variable.rotation - input.R.x.size() - input.R.y.size()];
+                    } else if (variable.rotation < input.R.x.size() + input.R.y.size() +
+                                                   input.A.x.size() + input.A.y.size()) {
+                        return input.A.y[variable.rotation - input.R.x.size() - input.R.y.size() - input.A.x.size()];
+                    } else {
+                        return input.M[variable.rotation - input.R.x.size() - input.R.y.size()
+                                                         - input.A.x.size() - input.A.y.size()];
+                    }
+                }
+            };
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            class result_type_converter<plonk_sha512<BlueprintFieldType, ArithmetizationParams>> {
+
+                using component_type = plonk_sha512<BlueprintFieldType, ArithmetizationParams>;
+                using result_type = typename component_type::result_type;
+                using input_type = typename component_type::input_type;
+                using stretcher_type = component_stretcher<BlueprintFieldType, ArithmetizationParams, component_type>;
+            public:
+                static result_type convert(const stretcher_type &component, const result_type old_result,
+                                           const input_type &instance_input, std::size_t start_row_index) {
+                    result_type new_result(component.component, start_row_index);
+
+                    for (std::size_t i = 0; i < 8; i++) {
+                        new_result.output_state[i] =
+                            component.move_var(
+                                old_result.output_state[i],
+                                start_row_index + component.line_mapping[old_result.output_state[i].rotation],
+                                instance_input);
+                    }
+
+                    return new_result;
+                }
+            };
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil

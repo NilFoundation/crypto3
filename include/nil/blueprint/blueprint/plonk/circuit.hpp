@@ -27,6 +27,8 @@
 #ifndef CRYPTO3_BLUEPRINT_CIRCUIT_PLONK_HPP
 #define CRYPTO3_BLUEPRINT_CIRCUIT_PLONK_HPP
 
+#include <map>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
@@ -34,12 +36,16 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
 namespace nil {
     namespace blueprint {
 
         template<typename ArithmetizationType, std::size_t... BlueprintParams>
         class circuit;
+
+        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        class assignment;
 
         template<typename BlueprintFieldType,
                  typename ArithmetizationParams>
@@ -51,6 +57,20 @@ namespace nil {
             typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                    ArithmetizationParams> ArithmetizationType;
 
+        private:
+            using gate_id_type = gate_id<BlueprintFieldType, ArithmetizationParams>;
+            using gate_selector_map = std::map<
+                gate_id_type,
+                std::size_t>;
+            using gate_type =
+                crypto3::zk::snark::plonk_gate<
+                    BlueprintFieldType,
+                    crypto3::zk::snark::plonk_constraint<BlueprintFieldType>>;
+            using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
+
+            gate_selector_map selector_map = {};
+            std::size_t next_selector_index = 0;
+
         public:
             typedef BlueprintFieldType blueprint_field_type;
 
@@ -58,53 +78,44 @@ namespace nil {
                     ArithmetizationParams> constraint_system) :
                     ArithmetizationType(constraint_system) { }
 
-            circuit() : ArithmetizationType() {
+            circuit() : ArithmetizationType() {}
+
+            #define gate_adder_macro \
+                gate_id_type gate_id = gate_id_type(args); \
+                auto it = selector_map.find(gate_id); \
+                if (it != selector_map.end()) { \
+                    return it->second; \
+                } else { \
+                    std::size_t selector_index = next_selector_index; \
+                    selector_map[gate_id] = selector_index; \
+                    this->_gates.emplace_back(selector_index, args); \
+                    next_selector_index++; \
+                    return selector_index; \
+                }
+
+            template <typename GateArguments>
+            std::size_t add_gate(const GateArguments &args) {
+                gate_adder_macro;
             }
 
-            // TODO: should put constraint in some storage and return its index
-            crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
-                add_constraint(const crypto3::zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
-                return constraint;
+            std::size_t add_gate(const std::initializer_list<constraint_type> &&args) {
+                gate_adder_macro;
             }
 
-            void add_gate(std::size_t selector_index,
-                          const crypto3::zk::snark::plonk_constraint<BlueprintFieldType> &constraint) {
-                this->_gates.emplace_back(selector_index, constraint);
-            }
-
-            void add_gate(std::size_t selector_index,
-                          const std::initializer_list<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> &constraints) {
-                this->_gates.emplace_back(selector_index, constraints);
-            }
-
-            void add_gate(crypto3::zk::snark::plonk_gate<BlueprintFieldType, crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> &gate) {
-                this->_gates.emplace_back(gate);
-            }
-
-            crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
-                add_bit_check(const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &bit_variable) {
-                return add_constraint(bit_variable * (bit_variable - 1));
-            }
+            #undef gate_adder_macro
 
             void add_copy_constraint(const crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
+                static std::size_t private_storage_index =
+                    assignment<crypto3::zk::snark::plonk_constraint_system<
+                        BlueprintFieldType, ArithmetizationParams>>::PRIVATE_STORAGE_INDEX;
                 if (copy_constraint.first == copy_constraint.second) {
                     return;
                 }
+                if (copy_constraint.first.index == private_storage_index ||
+                    copy_constraint.second.index == private_storage_index) {
+                    return;
+                }
                 this->_copy_constraints.emplace_back(copy_constraint);
-            }
-
-            crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>
-                add_lookup_constraint(std::vector<crypto3::math::term<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>> lookup_input,
-                std::vector<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>> lookup_value) {
-                crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType> lookup_constraint;
-                lookup_constraint.lookup_input = lookup_input;
-                lookup_constraint.lookup_value = lookup_value;
-                return lookup_constraint;
-            }
-
-            void add_lookup_gate(std::size_t selector_index,
-                          const std::initializer_list<crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>> &constraints) {
-                this->_lookup_gates.emplace_back(selector_index, constraints);
             }
 
             void export_circuit(std::ostream& os) const {

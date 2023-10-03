@@ -38,7 +38,6 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
 
@@ -130,6 +129,10 @@ namespace nil {
 
                     struct input_type {
                         var scalar;
+
+                        std::vector<var> all_vars() const {
+                            return {scalar};
+                        }
                     };
 
                     struct result_type {
@@ -138,13 +141,11 @@ namespace nil {
                             output = var(component.W(6), start_row_index + component.rows_amount - 1,
                                          false, var::column_type::witness);
                         }
-                    };
 
-                    nil::blueprint::detail::blueprint_component_id_type get_id() const override {
-                        std::stringstream ss;
-                        ss << scalar_size;
-                        return ss.str();
-                    }
+                        std::vector<var> all_vars() const {
+                            return {output};
+                        }
+                    };
 
                     template <typename ContainerType>
                         endo_scalar(ContainerType witness, std::size_t scalar_size_):
@@ -183,19 +184,12 @@ namespace nil {
                         const typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
                         const std::uint32_t start_row_index) {
 
-                        auto selector_iterator = assignment.find_selector(component);
-                        std::size_t first_selector_index;
-
-                        if (selector_iterator == assignment.selectors_end()) {
-                            first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                            generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                        } else {
-                            first_selector_index = selector_iterator->second;
-                        }
+                        std::array<std::size_t, 2> selector_indices =
+                            generate_gates(component, bp, assignment, instance_input);
 
                         std::size_t j = start_row_index;
-                        assignment.enable_selector(first_selector_index, j, j + component.rows_amount - 1);
-                        assignment.enable_selector(first_selector_index + 1, j + component.rows_amount - 1);
+                        assignment.enable_selector(selector_indices[0], j, j + component.rows_amount - 1);
+                        assignment.enable_selector(selector_indices[1], j + component.rows_amount - 1);
 
                         generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
@@ -281,18 +275,15 @@ namespace nil {
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-                        void generate_gates(
+                    std::array<std::size_t, 2> generate_gates(
                         const plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
-                        const std::size_t first_selector_index) {
+                        const typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input) {
 
                         using F = typename BlueprintFieldType::value_type;
-                        using var = typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
-
-                        std::size_t selector_index_1 = first_selector_index;
-                        std::size_t selector_index_2 = first_selector_index + 1;
+                        using var =
+                            typename plonk_endo_scalar<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
 
                         auto c_f = [](var x) {
                             return (F(11) * F(6).inversed()) * x + (-F(5) * F(2).inversed()) * x * x +
@@ -305,41 +296,52 @@ namespace nil {
                         };
 
                         auto constraint_1 =
-                            bp.add_constraint(var(component.W(7), 0) * (var(component.W(7), 0) - 1) * (var(component.W(7), 0) - 2) * (var(component.W(7), 0) - 3));
+                            var(component.W(7), 0) * (var(component.W(7), 0) - 1) *
+                            (var(component.W(7), 0) - 2) * (var(component.W(7), 0) - 3);
                         auto constraint_2 =
-                            bp.add_constraint(var(component.W(8), 0) * (var(component.W(8), 0) - 1) * (var(component.W(8), 0) - 2) * (var(component.W(8), 0) - 3));
+                            var(component.W(8), 0) *
+                            (var(component.W(8), 0) - 1) * (var(component.W(8), 0) - 2) * (var(component.W(8), 0) - 3);
                         auto constraint_3 =
-                            bp.add_constraint(var(component.W(9), 0) * (var(component.W(9), 0) - 1) * (var(component.W(9), 0) - 2) * (var(component.W(9), 0) - 3));
+                            var(component.W(9), 0) * (var(component.W(9), 0) - 1) *
+                            (var(component.W(9), 0) - 2) * (var(component.W(9), 0) - 3);
                         auto constraint_4 =
-                            bp.add_constraint(var(component.W(10), 0) * (var(component.W(10), 0) - 1) * (var(component.W(10), 0) - 2) * (var(component.W(10), 0) - 3));
+                            var(component.W(10), 0) * (var(component.W(10), 0) - 1) *
+                            (var(component.W(10), 0) - 2) * (var(component.W(10), 0) - 3);
                         auto constraint_5 =
-                            bp.add_constraint(var(component.W(11), 0) * (var(component.W(11), 0) - 1) * (var(component.W(11), 0) - 2) * (var(component.W(11), 0) - 3));
+                            var(component.W(11), 0) * (var(component.W(11), 0) - 1) *
+                            (var(component.W(11), 0) - 2) * (var(component.W(11), 0) - 3);
                         auto constraint_6 =
-                            bp.add_constraint(var(component.W(12), 0) * (var(component.W(12), 0) - 1) * (var(component.W(12), 0) - 2) * (var(component.W(12), 0) - 3));
+                            var(component.W(12), 0) * (var(component.W(12), 0) - 1) *
+                            (var(component.W(12), 0) - 2) * (var(component.W(12), 0) - 3);
                         auto constraint_7 =
-                            bp.add_constraint(var(component.W(13), 0) * (var(component.W(13), 0) - 1) * (var(component.W(13), 0) - 2) * (var(component.W(13), 0) - 3));
+                            var(component.W(13), 0) * (var(component.W(13), 0) - 1) *
+                            (var(component.W(13), 0) - 2) * (var(component.W(13), 0) - 3);
                         auto constraint_8 =
-                            bp.add_constraint(var(component.W(14), 0) * (var(component.W(14), 0) - 1) * (var(component.W(14), 0) - 2) * (var(component.W(14), 0) - 3));
-                        auto constraint_9 = bp.add_constraint(
+                            var(component.W(14), 0) * (var(component.W(14), 0) - 1) *
+                            (var(component.W(14), 0) - 2) * (var(component.W(14), 0) - 3);
+                        auto constraint_9 =
                             var(component.W(4), 0) - (256 * var(component.W(2), 0) + 128 * c_f(var(component.W(7), 0)) + 64 * c_f(var(component.W(8), 0)) +
                                           32 * c_f(var(component.W(9), 0)) + 16 * c_f(var(component.W(10), 0)) + 8 * c_f(var(component.W(11), 0)) +
-                                          4 * c_f(var(component.W(12), 0)) + 2 * c_f(var(component.W(13), 0)) + c_f(var(component.W(14), 0))));
-                        auto constraint_10 = bp.add_constraint(
+                                          4 * c_f(var(component.W(12), 0)) + 2 * c_f(var(component.W(13), 0)) + c_f(var(component.W(14), 0)));
+                        auto constraint_10 =
                             var(component.W(5), 0) - (256 * var(component.W(3), 0) + 128 * d_f(var(component.W(7), 0)) + 64 * d_f(var(component.W(8), 0)) +
                                           32 * d_f(var(component.W(9), 0)) + 16 * d_f(var(component.W(10), 0)) + 8 * d_f(var(component.W(11), 0)) +
-                                          4 * d_f(var(component.W(12), 0)) + 2 * d_f(var(component.W(13), 0)) + d_f(var(component.W(14), 0))));
-                        auto constraint_11 = bp.add_constraint(
+                                          4 * d_f(var(component.W(12), 0)) + 2 * d_f(var(component.W(13), 0)) + d_f(var(component.W(14), 0)));
+                        auto constraint_11 =
                             var(component.W(1), 0) - ((1 << 16) * var(component.W(0), 0) + (1 << 14) * var(component.W(7), 0) + (1 << 12) * var(component.W(8), 0) +
                                           (1 << 10) * var(component.W(9), 0) + (1 << 8) * var(component.W(10), 0) + (1 << 6) * var(component.W(11), 0) +
-                                          (1 << 4) * var(component.W(12), 0) + (1 << 2) * var(component.W(13), 0) + var(component.W(14), 0)));
+                                          (1 << 4) * var(component.W(12), 0) + (1 << 2) * var(component.W(13), 0) + var(component.W(14), 0));
 
-                        auto constraint_12 = bp.add_constraint(var(component.W(6), 0) - (component.endo_r * var(component.W(4), 0) + var(component.W(5), 0)));
+                        auto constraint_12 = var(component.W(6), 0) -
+                            (component.endo_r * var(component.W(4), 0) + var(component.W(5), 0));
 
-                        bp.add_gate(selector_index_2, {constraint_12});
+                        std::size_t selector_index_1 = bp.add_gate(
+                            {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                             constraint_7, constraint_8, constraint_9, constraint_10, constraint_11});
 
-                        bp.add_gate(selector_index_1,
-                                    {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
-                                     constraint_7, constraint_8, constraint_9, constraint_10, constraint_11});
+                        std::size_t selector_index_2 = bp.add_gate({constraint_12});
+
+                        return {selector_index_1, selector_index_2};
                     }
 
                     template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>

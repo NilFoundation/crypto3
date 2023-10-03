@@ -38,6 +38,7 @@
 #include <nil/blueprint/basic_non_native_policy.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
+#include <nil/blueprint/component_stretcher.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -97,15 +98,22 @@ namespace nil {
                 struct input_type {
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type
                         input;    // 66,66,66,57 bits
+
+                    std::vector<var> all_vars() const {
+                        return {input[0], input[1], input[2], input[3]};
+                    }
                 };
 
                 struct result_type {
-                    result_type(const range &component, std::uint32_t start_row_index) {
+                    result_type(const range &component, std::uint32_t start_row_index) {}
+
+                    std::vector<var> all_vars() const {
+                        return {};
                     }
                 };
 
                 template<typename ContainerType>
-                range(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
+                explicit range(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -201,49 +209,47 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_ed25519_range<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_ed25519_range<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
 
                 using var = typename plonk_ed25519_range<BlueprintFieldType, ArithmetizationParams>::var;
 
                 typename BlueprintFieldType::integral_type base = 1;
-                auto constraint_1 = bp.add_constraint(var(component.W(0), 0) -
-                                                      (var(component.W(4), 0) + var(component.W(5), 0) * (base << 22) +
-                                                       var(component.W(6), 0) * (base << 44)));
-                auto constraint_2 = bp.add_constraint(var(component.W(1), 0) -
-                                                      (var(component.W(7), 0) + var(component.W(0), +1) * (base << 22) +
-                                                       var(component.W(1), +1) * (base << 44)));
-                auto constraint_3 = bp.add_constraint(
+                auto constraint_1 =
+                    var(component.W(0), 0) - (var(component.W(4), 0) + var(component.W(5), 0) * (base << 22) +
+                                              var(component.W(6), 0) * (base << 44));
+                auto constraint_2 =
+                    var(component.W(1), 0) - (var(component.W(7), 0) + var(component.W(0), +1) * (base << 22) +
+                                              var(component.W(1), +1) * (base << 44));
+                auto constraint_3 =
                     var(component.W(2), 0) - (var(component.W(2), +1) + var(component.W(3), +1) * (base << 22) +
-                                              var(component.W(4), +1) * (base << 44)));
-                auto constraint_4 = bp.add_constraint(
+                                              var(component.W(4), +1) * (base << 44));
+                auto constraint_4 =
                     var(component.W(3), 0) - (var(component.W(5), +1) + var(component.W(6), +1) * (base << 21) +
-                                              var(component.W(7), +1) * (base << 42)));
+                                              var(component.W(7), +1) * (base << 42));
 
                 crypto3::zk::snark::plonk_constraint<BlueprintFieldType> sum =
                     var(component.W(5), 0) + var(component.W(6), 0) + var(component.W(7), 0) + var(component.W(0), +1) +
                     var(component.W(1), +1) + var(component.W(2), +1) + var(component.W(3), +1) +
                     var(component.W(4), +1) + var(component.W(5), +1) + var(component.W(6), +1) +
                     var(component.W(7), +1) - 2 * (base << 21) - 8 * (base << 22) - (base << 15) + 11;
-                auto constraint_5 = bp.add_constraint(sum * (var(component.W(8), 0) * sum - 1));
-                auto constraint_6 = bp.add_constraint(var(component.W(8), 0) * sum +
-                                                      (1 - var(component.W(8), 0) * sum) * var(component.W(8), +1) - 1);
+                auto constraint_5 = sum * (var(component.W(8), 0) * sum - 1);
+                auto constraint_6 =
+                    var(component.W(8), 0) * sum + (1 - var(component.W(8), 0) * sum) * var(component.W(8), +1) - 1;
 
-                bp.add_gate(first_selector_index,
-                            {
-                                constraint_1,
-                                constraint_2,
-                                constraint_3,
-                                constraint_4,
-                                constraint_5,
-                                constraint_6,
-                            });
+                return bp.add_gate({
+                    constraint_1,
+                    constraint_2,
+                    constraint_3,
+                    constraint_4,
+                    constraint_5,
+                    constraint_6,
+                });
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -275,21 +281,13 @@ namespace nil {
                     &instance_input,
                 const std::size_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 std::size_t j = start_row_index;
-                assignment.enable_selector(first_selector_index, j);
+                assignment.enable_selector(selector_index, j);
                 generate_copy_constraints(component, bp, assignment, instance_input, j);
                 return typename plonk_ed25519_range<BlueprintFieldType, ArithmetizationParams>::result_type(
                     component, start_row_index);
             }
-
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil

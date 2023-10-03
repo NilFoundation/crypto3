@@ -88,6 +88,12 @@ namespace nil {
 
                         input_type() = default;
                         input_type(std::initializer_list<var> input) : input(input) {};
+
+                        std::vector<var> all_vars() const {
+                            std::vector<var> result;
+                            result.insert(result.end(), input.begin(), input.end());
+                            return result;
+                        }
                     };
 
                     struct result_type {
@@ -100,10 +106,14 @@ namespace nil {
                                     const std::uint32_t start_row_index) {
                             output = var(component.W(ArgNum), start_row_index, false);
                         }
+
+                        std::vector<var> all_vars() const {
+                            return {output};
+                        }
                     };
 
                     template<typename ContainerType>
-                    boolean_op_component(ContainerType witness, manifest_type manifest) :
+                    explicit boolean_op_component(ContainerType witness, manifest_type manifest) :
                         component_type(witness, std::array<std::uint32_t, 0>(), std::array<std::uint32_t, 0>(),
                                        manifest) {};
 
@@ -161,7 +171,7 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams, ArgNum>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
@@ -170,8 +180,7 @@ namespace nil {
                     &assignment,
                 const typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
                                                           ArgNum>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
 
                 using var = typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
                                                                 ArgNum>::var;
@@ -180,8 +189,8 @@ namespace nil {
                 for (std::size_t col_idx = 0; col_idx < witnesses.size(); col_idx++) {
                     witnesses[col_idx] = var(component.W(col_idx), 0);
                 }
-                auto constraint = bp.add_constraint(component.op_constraint(witnesses));
-                bp.add_gate(first_selector_index, {constraint});
+                auto constraint = component.op_constraint(witnesses);
+                return bp.add_gate({constraint});
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
@@ -225,16 +234,9 @@ namespace nil {
                 using component_type = plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
                                                                   ArgNum>;
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
 
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
-                assignment.enable_selector(first_selector_index, start_row_index);
+                assignment.enable_selector(selector_index, start_row_index);
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 

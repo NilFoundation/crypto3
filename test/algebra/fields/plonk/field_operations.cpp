@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_unified_addition_test
+#define BOOST_TEST_MODULE blueprint_plonk_field_operations_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -328,7 +328,7 @@ constexpr static const std::size_t random_tests_amount = 10;
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_field_operations_test_vesta) {
-    using field_type =  typename crypto3::algebra::curves::vesta::base_field_type;
+    using field_type = typename crypto3::algebra::curves::vesta::base_field_type;
     field_operations_test<field_type, random_tests_amount>();
 }
 
@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_field_operations_test_pallas) {
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_field_operations_test_bls12) {
-    using field_type =  typename crypto3::algebra::fields::bls12_fr<381>;
+    using field_type = typename crypto3::algebra::fields::bls12_fr<381>;
     field_operations_test<field_type, random_tests_amount>();
 }
 

@@ -36,6 +36,7 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/component_stretcher.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/range.hpp>
 
 #include <nil/crypto3/random/algebraic_engine.hpp>
@@ -46,7 +47,7 @@
 using namespace nil;
 
 template <typename BlueprintFieldType>
-void test_field_range(std::vector<typename BlueprintFieldType::value_type> public_input,
+void test_field_range(const std::vector<typename BlueprintFieldType::value_type> &public_input,
                       bool expected_to_pass){
 
     constexpr std::size_t WitnessColumns = 9;
@@ -138,7 +139,6 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test_must_fail) {
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>(
         {0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255}, false
     );
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

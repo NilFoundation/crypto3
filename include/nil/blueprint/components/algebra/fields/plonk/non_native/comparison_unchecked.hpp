@@ -33,9 +33,8 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 
-#include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/comparison_mode.hpp>
+#include <nil/blueprint/components/algebra/fields/plonk/non_native/comparison_mode.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/range_check.hpp>
 
 #include <type_traits>
@@ -46,7 +45,6 @@
 namespace nil {
     namespace blueprint {
         namespace components {
-            using detail::comparison_mode;
 
             template<typename ArithmetizationType>
             class comparison_unchecked;
@@ -83,6 +81,13 @@ namespace nil {
                            1 + needs_bonus_row_internal(witness_amount, mode);
                 }
 
+                void check_params(std::size_t bits_amount, comparison_mode mode) const {
+                    BLUEPRINT_RELEASE_ASSERT(bits_amount > 0 && bits_amount < BlueprintFieldType::modulus_bits - 1);
+                    BLUEPRINT_RELEASE_ASSERT(mode == comparison_mode::LESS_THAN ||
+                                             mode == comparison_mode::GREATER_THAN ||
+                                             mode == comparison_mode::LESS_EQUAL ||
+                                             mode == comparison_mode::GREATER_EQUAL);
+                }
             public:
                 using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
 
@@ -159,17 +164,19 @@ namespace nil {
 
                 struct input_type {
                     var x, y;
+
+                    std::vector<var> all_vars() const {
+                        return {x, y};
+                    }
                 };
 
                 struct result_type {
                     result_type(const comparison_unchecked &component, std::size_t start_row_index) {}
-                };
 
-                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
-                    std::stringstream ss;
-                    ss << bits_amount << "_" << mode;
-                    return ss.str();
-                }
+                    std::vector<var> all_vars() const {
+                        return {};
+                    }
+                };
 
                 template <typename WitnessContainerType, typename ConstantContainerType,
                           typename PublicInputContainerType>
@@ -179,7 +186,10 @@ namespace nil {
                         component_type(witness, constant, public_input, get_manifest()),
                         bits_amount(bits_amount_),
                         mode(mode_),
-                        range_check(witness, constant, public_input, bits_amount_) {};
+                        range_check(witness, constant, public_input, bits_amount_) {
+
+                    check_params(bits_amount, mode);
+                 };
 
                 comparison_unchecked(
                     std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
@@ -190,7 +200,10 @@ namespace nil {
                             component_type(witnesses, constants, public_inputs, get_manifest()),
                             bits_amount(bits_amount_),
                             mode(mode_),
-                            range_check(witnesses, constants, public_inputs, bits_amount_) {};
+                            range_check(witnesses, constants, public_inputs, bits_amount_) {
+
+                        check_params(bits_amount, mode);
+                    };
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -199,7 +212,7 @@ namespace nil {
                                                                        ArithmetizationParams>>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -209,8 +222,7 @@ namespace nil {
                                                                        ArithmetizationParams>>
                     &assignment,
                 const typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
 
                 using var = typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
@@ -240,8 +252,7 @@ namespace nil {
                         BOOST_ASSERT_MSG(false, "FLAG mode is not supported, use comparison_flag component instead.");
                 }
 
-                gate_type gate = gate_type(first_selector_index, correctness_constraints);
-                bp.add_gate(gate);
+                return bp.add_gate(correctness_constraints);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -297,19 +308,11 @@ namespace nil {
                                  {var(component.W(2), start_row_index + component.range_check.rows_amount)},
                                  start_row_index);
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
-
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
 
                 std::size_t final_first_row = start_row_index + component.rows_amount - 1 -
-                                                 component.needs_bonus_row;
-                assignment.enable_selector(first_selector_index, final_first_row);
+                                              component.needs_bonus_row;
+                assignment.enable_selector(selector_index, final_first_row);
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 

@@ -52,6 +52,10 @@ endmacro()
 
 set(COMMON_TEST_FILES
     "manifest"
+    "detail/huang_lu"
+    "gate_id"
+    "utils/connectedness_check"
+    "private_input"
     )
 
 set(NON_NATIVE_TESTS_FILES
@@ -67,6 +71,7 @@ set(NON_NATIVE_TESTS_FILES
     "algebra/fields/plonk/non_native/comparison_checked"
     "algebra/fields/plonk/non_native/comparison_unchecked"
     "algebra/fields/plonk/non_native/comparison_flag"
+    "algebra/fields/plonk/non_native/equality_flag"
     "algebra/fields/plonk/non_native/division_remainder"
     "non_native/plonk/bool_scalar_multiplication"
     "non_native/plonk/add_mul_zkllvm_compatible"

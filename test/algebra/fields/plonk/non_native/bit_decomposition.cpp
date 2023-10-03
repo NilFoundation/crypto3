@@ -44,7 +44,7 @@
 
 using namespace nil;
 
-using mode = blueprint::components::detail::bit_composition_mode;
+using mode = blueprint::components::bit_composition_mode;
 
 template<typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::uint32_t BitsAmount, mode Mode,
          bool CustomAssignments = false>

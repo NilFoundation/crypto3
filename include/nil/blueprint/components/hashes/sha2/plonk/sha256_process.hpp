@@ -108,6 +108,14 @@ namespace nil {
                 struct input_type {
                     std::array<var, 8> input_state;
                     std::array<var, 16> input_words;
+
+                    std::vector<var> all_vars() const {
+                        std::vector<var> result;
+                        result.reserve(24);
+                        result.insert(result.end(), input_state.begin(), input_state.end());
+                        result.insert(result.end(), input_words.begin(), input_words.end());
+                        return result;
+                    }
                 };
 
                 struct result_type {
@@ -125,6 +133,13 @@ namespace nil {
                                         var(component.W(1), start_row_index + component.rows_amount - 1, false),
                                         var(component.W(2), start_row_index + component.rows_amount - 1, false),
                                         var(component.W(3), start_row_index + component.rows_amount - 1, false)};
+                    }
+
+                    std::vector<var> all_vars() const {
+                        std::vector<var> result;
+                        result.reserve(8);
+                        result.insert(result.end(), output_state.begin(), output_state.end());
+                        return result;
                     }
                 };
 
@@ -167,38 +182,37 @@ namespace nil {
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_sigma0_gates(
+                std::size_t generate_sigma0_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
-                    auto constraint_1 = bp.add_constraint(
+                    auto constraint_1 =
                         var(component.W(0), -1) -
                         (var(component.W(1), -1) + var(component.W(2), -1) * (one << 3) +
-                         var(component.W(3), -1) * (one << 7) + var(component.W(4), -1) * (one << 18)));
-                    auto constraint_2 = bp.add_constraint(
+                         var(component.W(3), -1) * (one << 7) + var(component.W(4), -1) * (one << 18));
+                    auto constraint_2 =
                         (var(component.W(1), -1) - 7) * (var(component.W(1), -1) - 6) * (var(component.W(1), -1) - 5) *
                         (var(component.W(1), -1) - 4) * (var(component.W(1), -1) - 3) * (var(component.W(1), -1) - 2) *
-                        (var(component.W(1), -1) - 1) * var(component.W(1), -1));
+                        (var(component.W(1), -1) - 1) * var(component.W(1), -1);
                     auto constraint_3 =
-                        bp.add_constraint(var(component.W(5), 0) + var(component.W(6), 0) * (1 << 28) +
+                        var(component.W(5), 0) + var(component.W(6), 0) * (1 << 28) +
                                           var(component.W(7), 0) * (one << 56) + var(component.W(8), 0) * (one << 60) -
                                           (var(component.W(2), 0) * (1 + (one << 56) + (one << 34)) +
                                            var(component.W(3), 0) * ((one << 8) + 1 + (one << 42)) +
                                            var(component.W(4), 0) * ((1 << 30) + (1 << 22) + 1) +
-                                           var(component.W(7), -1) * ((one << 50) + (1 << 28))));
+                                           var(component.W(7), -1) * ((one << 50) + (1 << 28)));
                     /*auto constraint_4 =
-                        bp.add_constraint((var(component.W(3), 0) - 3) * (var(component.W(3), 0) - 2) *
+                        (var(component.W(3), 0) - 3) * (var(component.W(3), 0) - 2) *
                     (var(component.W(3), 0) - 1) * var(component.W(3), 0)); auto constraint_5 =
-                        bp.add_constraint((var(component.W(8), 0) - 3) * (var(component.W(8), 0) - 2) *
+                        (var(component.W(8), 0) - 3) * (var(component.W(8), 0) - 2) *
                     (var(component.W(8), 0) - 1) * var(component.W(8), 0));*/
 
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
+                    return bp.add_gate({constraint_1, constraint_2, constraint_3});
 
                     /*auto lookup_constraint_1 = bp.add_lookup_constraint(
                         {var(component.W(1), -1), var(component.W(7), -1)},
@@ -236,36 +250,35 @@ namespace nil {
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_sigma1_gates(
+                std::size_t generate_sigma1_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
-                        bp.add_constraint(var(component.W(0), 0) -
+                        var(component.W(0), 0) -
                                           (var(component.W(1), 0) + var(component.W(2), 0) * (1 << 10) +
-                                           var(component.W(3), 0) * (1 << 17) + var(component.W(4), 0) * (1 << 19)));
-                    auto constraint_2 = bp.add_constraint((var(component.W(3), 0) - 3) * (var(component.W(3), 0) - 2) *
-                                                          (var(component.W(3), 0) - 1) * var(component.W(3), 0));
-                    auto constraint_3 = bp.add_constraint(
+                                           var(component.W(3), 0) * (1 << 17) + var(component.W(4), 0) * (1 << 19));
+                    auto constraint_2 = (var(component.W(3), 0) - 3) * (var(component.W(3), 0) - 2) *
+                                                          (var(component.W(3), 0) - 1) * var(component.W(3), 0);
+                    auto constraint_3 =
                         var(component.W(5), -1) + var(component.W(6), -1) * (one << 28) +
                         var(component.W(7), -1) * (one << 56) + var(component.W(8), -1) * (one << 60) -
                         (var(component.W(2), -1) * (1 + (one << 50) + (one << 46)) +
                          var(component.W(3), -1) * ((one << 14) + 1 + (one << 60)) +
                          var(component.W(4), -1) * ((one << 18) + (one << 4) + 1) +
-                         var(component.W(1), -1) * ((one << 30) + (1 << 26))));
+                         var(component.W(1), -1) * ((one << 30) + (1 << 26)));
                     /*auto constraint_4 =
-                        bp.add_constraint((var(component.W(7), 0) - 3) * (var(component.W(7), 0) - 2) *
+                        (var(component.W(7), 0) - 3) * (var(component.W(7), 0) - 2) *
                     (var(component.W(7), 0) - 1) * var(component.W(7), 0)); auto constraint_5 =
-                        bp.add_constraint((var(component.W(8), 0) - 3) * (var(component.W(8), 0) - 2) *
+                        (var(component.W(8), 0) - 3) * (var(component.W(8), 0) - 2) *
                     (var(component.W(8), 0) - 1) * var(component.W(8), 0));*/
 
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
+                    return bp.add_gate({constraint_1, constraint_2, constraint_3});
 
                     /*std::size_t selector_lookup_index = assignment.add_selector(j);
                     auto lookup_constraint_1 =
@@ -306,68 +319,66 @@ namespace nil {
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_message_scheduling_gates(
+                std::array<std::size_t, 3> generate_message_scheduling_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
-                    generate_sigma0_gates(component, bp, assignment, first_selector_index);
-                    std::size_t selector_index_1 = first_selector_index + 1;
+                    std::size_t sigma0_selector = generate_sigma0_gates(component, bp, assignment);
                     typename BlueprintFieldType::integral_type one = 1;
                     auto m = typename BlueprintFieldType::value_type(2).pow(32);
                     auto constraint_1 =
-                        bp.add_constraint(var(component.W(0), 0) + m * var(component.W(0), +1) -
+                        var(component.W(0), 0) + m * var(component.W(0), +1) -
                                           (var(component.W(0), -1) + var(component.W(1), -1) + var(component.W(1), 0) +
                                            var(component.W(2), 0) * (one << 14) + var(component.W(3), 0) * (one << 28) +
                                            var(component.W(4), 0) * (one << 30) + var(component.W(5), 0) +
                                            var(component.W(6), 0) * (one << 14) + var(component.W(7), 0) * (one << 28) +
-                                           var(component.W(8), 0) * (one << 30)));
+                                           var(component.W(8), 0) * (one << 30));
                     auto constraint_2 =
-                        bp.add_constraint((var(component.W(0), +1) - 3) * (var(component.W(0), +1) - 2) *
-                                          (var(component.W(0), +1) - 1) * var(component.W(0), +1));
-                    bp.add_gate(selector_index_1, {constraint_1, constraint_2});
-                    generate_sigma1_gates(component, bp, assignment, first_selector_index + 2);
+                        (var(component.W(0), +1) - 3) * (var(component.W(0), +1) - 2) *
+                                          (var(component.W(0), +1) - 1) * var(component.W(0), +1);
+                    std::size_t selector_1 = bp.add_gate({constraint_1, constraint_2});
+                    std::size_t sigma_1_selector = generate_sigma1_gates(component, bp, assignment);
+                    return {sigma0_selector, selector_1, sigma_1_selector};
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_Sigma0_gates(
+                std::size_t generate_Sigma0_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
-                        bp.add_constraint(var(component.W(0), +1) -
+                        var(component.W(0), +1) -
                                           (var(component.W(2), +1) + var(component.W(3), +1) * (1 << 2) +
-                                           var(component.W(4), +1) * (1 << 13) + var(component.W(5), +1) * (1 << 22)));
+                                           var(component.W(4), +1) * (1 << 13) + var(component.W(5), +1) * (1 << 22));
                     auto constraint_2 =
-                        bp.add_constraint(var(component.W(0), -1) -
+                        var(component.W(0), -1) -
                                           (var(component.W(2), 0) + var(component.W(3), 0) * (1 << 4) +
-                                           var(component.W(4), 0) * (1 << 26) + var(component.W(5), 0) * (one << 44)));
+                                           var(component.W(4), 0) * (1 << 26) + var(component.W(5), 0) * (one << 44));
                     auto constraint_3 =
-                        bp.add_constraint((var(component.W(2), +1) - 3) * (var(component.W(2), +1) - 2) *
-                                          (var(component.W(2), +1) - 1) * var(component.W(2), +1));
+                        (var(component.W(2), +1) - 3) * (var(component.W(2), +1) - 2) *
+                                          (var(component.W(2), +1) - 1) * var(component.W(2), +1);
                     auto constraint_4 =
-                        bp.add_constraint(var(component.W(0), 0) + var(component.W(1), 0) * (1 << 28) +
+                        var(component.W(0), 0) + var(component.W(1), 0) * (1 << 28) +
                                           var(component.W(6), 0) * (one << 56) + var(component.W(7), 0) * (one << 60) -
                                           (var(component.W(2), 0) * ((one << 38) + (1 << 20) + (one << 60)) +
                                            var(component.W(3), 0) * ((one << 42) + 1 + (1 << 24)) +
                                            var(component.W(4), 0) * ((1 << 22) + (one << 46) + 1) +
-                                           var(component.W(5), 0) * ((one << 40) + (1 << 18) + 1)));
+                                           var(component.W(5), 0) * ((one << 40) + (1 << 18) + 1));
                     /*auto constraint_5 =
-                        bp.add_constraint((var(component.W(6), 0) - 3) * (var(component.W(6), 0) - 2) *
+                        (var(component.W(6), 0) - 3) * (var(component.W(6), 0) - 2) *
                     (var(component.W(6), 0) - 1) * var(component.W(6), 0)); auto constraint_6 =
-                        bp.add_constraint((var(component.W(7), 0) - 3) * (var(component.W(7), 0) - 2) *
+                        (var(component.W(7), 0) - 3) * (var(component.W(7), 0) - 2) *
                     (var(component.W(7), 0) - 1) * var(component.W(7), 0));*/
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4});
+                    return bp.add_gate({constraint_1, constraint_2, constraint_3, constraint_4});
                     /*std::size_t selector_lookup_index = assignment.add_selector(start_row_index);
                     auto lookup_constraint_1 =
                         bp.add_lookup_constraint({var(component.W(3), +1) * 8}, {{0, 0, false,
@@ -407,12 +418,11 @@ namespace nil {
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_Sigma1_gates(
+                std::size_t generate_Sigma1_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
@@ -420,27 +430,27 @@ namespace nil {
                     typename BlueprintFieldType::value_type base7_value =
                         plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::base7;
                     auto constraint_1 =
-                        bp.add_constraint(var(component.W(0), -1) -
+                        var(component.W(0), -1) -
                                           (var(component.W(2), -1) + var(component.W(3), -1) * (1 << 6) +
-                                           var(component.W(4), -1) * (1 << 11) + var(component.W(5), -1) * (1 << 25)));
-                    auto constraint_2 = bp.add_constraint(
+                                           var(component.W(4), -1) * (1 << 11) + var(component.W(5), -1) * (1 << 25));
+                    auto constraint_2 =
                         var(component.W(0), 0) -
                         (var(component.W(1), -1) + var(component.W(2), 0) * base7_value.pow(6) +
-                         var(component.W(3), 0) * base7_value.pow(11) + var(component.W(4), 0) * base7_value.pow(25)));
-                    auto constraint_3 = bp.add_constraint(
+                         var(component.W(3), 0) * base7_value.pow(11) + var(component.W(4), 0) * base7_value.pow(25));
+                    auto constraint_3 =
                         var(component.W(5), 0) + var(component.W(6), 0) * base7_value.pow(14) +
                         var(component.W(7), 0) * base7_value.pow(28) + var(component.W(8), 0) * base7_value.pow(30) -
                         (var(component.W(2), 0) * (base7_value.pow(27) + base7_value.pow(13) + 1) +
                          var(component.W(3), 0) * (base7_value.pow(5) + 1 + base7_value.pow(18)) +
                          var(component.W(4), 0) * (base7_value.pow(19) + base7_value.pow(14) + 1) +
-                         var(component.W(1), -1) * (base7_value.pow(26) + base7_value.pow(21) + base7_value.pow(7))));
+                         var(component.W(1), -1) * (base7_value.pow(26) + base7_value.pow(21) + base7_value.pow(7)));
                     /*auto constraint_4 =
-                        bp.add_constraint((var(component.W(3), 0) - 3) * (var(component.W(3), 0) - 2) *
+                        (var(component.W(3), 0) - 3) * (var(component.W(3), 0) - 2) *
                     (var(component.W(3), 0) - 1) * var(component.W(3), 0)); auto constraint_5 =
-                        bp.add_constraint((var(component.W(4), 0) - 3) * (var(component.W(4), 0) - 2) *
+                        (var(component.W(4), 0) - 3) * (var(component.W(4), 0) - 2) *
                     (var(component.W(4), 0) - 1) * var(component.W(4), 0));*/
 
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
+                    return bp.add_gate({constraint_1, constraint_2, constraint_3});
 
                     /*std::size_t selector_lookup_index = assignment.add_selector(j);
                     auto lookup_constraint_1 =
@@ -481,21 +491,20 @@ namespace nil {
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_Maj_gates(
+                std::size_t generate_Maj_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
-                    auto constraint_1 = bp.add_constraint(
+                    auto constraint_1 =
                         var(component.W(0), 0) + var(component.W(1), 0) * (1 << 16) +
                         var(component.W(2), 0) * (one << 32) + var(component.W(3), 0) * (one << 48) -
-                        (var(component.W(0), +1) + var(component.W(1), +1) + var(component.W(4), +1)));
-                    bp.add_gate(first_selector_index, {constraint_1});
+                        (var(component.W(0), +1) + var(component.W(1), +1) + var(component.W(4), +1));
+                    return bp.add_gate({constraint_1});
 
                     /*std::size_t selector_lookup_index = assignment.add_selector(j);
                     auto lookup_constraint_1 = bp.add_lookup_constraint(
@@ -516,22 +525,21 @@ namespace nil {
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_Ch_gates(
+                std::size_t generate_Ch_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
                     typename BlueprintFieldType::value_type base7_value =
                         plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::base7;
-                    auto constraint_1 = bp.add_constraint(
+                    auto constraint_1 =
                         var(component.W(0), 0) + var(component.W(1), 0) * base7_value.pow(8) +
                         var(component.W(2), 0) * base7_value.pow(16) + var(component.W(3), 0) * base7_value.pow(24) -
-                        (var(component.W(0), -1) + 2 * var(component.W(1), -1) + 3 * var(component.W(0), +1)));
-                    bp.add_gate(first_selector_index, {constraint_1});
+                        (var(component.W(0), -1) + 2 * var(component.W(1), -1) + 3 * var(component.W(0), +1));
+                    return bp.add_gate({constraint_1});
                     /*std::size_t selector_lookup_index = assignment.add_selector(j);
                     auto lookup_constraint_1 = bp.add_lookup_constraint(
                         {var(component.W(5), +1), var(component.W(0), 0)},
@@ -551,70 +559,77 @@ namespace nil {
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_compression_gates(
+                std::array<std::size_t, 7> generate_compression_gates(
                     const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                        &assignment,
-                    const std::uint32_t first_selector_index) {
+                        &assignment) {
 
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
 
-                    generate_Sigma1_gates(component, bp, assignment, first_selector_index);
-                    generate_Ch_gates(component, bp, assignment, first_selector_index + 5);
+                    std::size_t sigma_1_selector = generate_Sigma1_gates(component, bp, assignment);
+                    std::size_t ch_selector = generate_Ch_gates(component, bp, assignment);
                     auto m = typename BlueprintFieldType::value_type(2).pow(32);
-                    auto constraint_1 = bp.add_constraint(
+                    auto constraint_1 =
                         var(component.W(4), +1) -
                         (var(component.W(2), 0) + var(component.W(5), -1) + var(component.W(6), -1) * (1 << 14) +
                          var(component.W(7), -1) * (1 << 28) + var(component.W(8), -1) * (1 << 30) +
                          var(component.W(5), 0) + var(component.W(6), 0) * (1 << 8) +
                          var(component.W(7), 0) * (1 << 16) + var(component.W(8), 0) * (1 << 24) +
-                         var(component.W(0), 0, true, var::column_type::constant) + var(component.W(3), 0)));
-                    auto constraint_2 = bp.add_constraint(var(component.W(4), 0) + m * var(component.W(4), -1) -
-                                                          (var(component.W(1), 0) + var(component.W(4), +1)));
-                    auto constraint_3 = bp.add_constraint(
+                         var(component.C(0), 0, true, var::column_type::constant) + var(component.W(3), 0));
+                    auto constraint_2 = var(component.W(4), 0) + m * var(component.W(4), -1) -
+                                                          (var(component.W(1), 0) + var(component.W(4), +1));
+                    auto constraint_3 =
                         (var(component.W(4), -1) - 5) * (var(component.W(4), -1) - 4) * (var(component.W(4), -1) - 3) *
-                        (var(component.W(4), -1) - 2) * (var(component.W(4), -1) - 1) * var(component.W(4), -1));
-                    bp.add_gate(first_selector_index + 2, {constraint_1, constraint_2, constraint_3});
-                    auto constraint_4 = bp.add_constraint(
+                        (var(component.W(4), -1) - 2) * (var(component.W(4), -1) - 1) * var(component.W(4), -1);
+                    std::size_t selector_2 = bp.add_gate({constraint_1, constraint_2, constraint_3});
+                    auto constraint_4 =
                         var(component.W(2), +1) + m * var(component.W(3), +1) -
                         (var(component.W(4), 0) + var(component.W(5), +1) + var(component.W(6), +1) * (1 << 14) +
                          var(component.W(7), +1) * (1 << 28) + var(component.W(8), +1) * (1 << 30) +
                          var(component.W(5), 0) + var(component.W(6), 0) * (1 << 8) +
-                         var(component.W(7), 0) * (1 << 16) + var(component.W(8), 0) * (1 << 24)));
-                    auto constraint_5 = bp.add_constraint(
+                         var(component.W(7), 0) * (1 << 16) + var(component.W(8), 0) * (1 << 24));
+                    auto constraint_5 =
                         (var(component.W(3), +1) - 6) * (var(component.W(3), +1) - 5) * (var(component.W(3), +1) - 4) *
                         (var(component.W(3), +1) - 3) * (var(component.W(3), +1) - 2) * (var(component.W(3), +1) - 1) *
-                        var(component.W(3), +1));
-                    bp.add_gate(first_selector_index + 3, {constraint_4, constraint_5});
-                    generate_Maj_gates(component, bp, assignment, first_selector_index + 4);
-                    generate_Sigma0_gates(component, bp, assignment, first_selector_index + 1);
+                        var(component.W(3), +1);
+                    std::size_t selector_3 = bp.add_gate({constraint_4, constraint_5});
+                    std::size_t maj_selector = generate_Maj_gates(component, bp, assignment);
+                    std::size_t sigma0_selector = generate_Sigma0_gates(component, bp, assignment);
 
-                    auto constraint_out_1 = bp.add_constraint(var(component.W(0), +1) + m * var(component.W(4), +1) -
-                                                              (var(component.W(0), 0) + var(component.W(4), 0)));
-                    auto constraint_out_2 = bp.add_constraint(var(component.W(1), +1) + m * var(component.W(5), +1) -
-                                                              (var(component.W(1), 0) + var(component.W(5), 0)));
-                    auto constraint_out_3 = bp.add_constraint(var(component.W(2), +1) + m * var(component.W(6), +1) -
-                                                              (var(component.W(2), 0) + var(component.W(6), 0)));
-                    auto constraint_out_4 = bp.add_constraint(var(component.W(3), +1) + m * var(component.W(7), +1) -
-                                                              (var(component.W(3), 0) + var(component.W(7), 0)));
+                    auto constraint_out_1 = var(component.W(0), +1) + m * var(component.W(4), +1) -
+                                                              (var(component.W(0), 0) + var(component.W(4), 0));
+                    auto constraint_out_2 = var(component.W(1), +1) + m * var(component.W(5), +1) -
+                                                              (var(component.W(1), 0) + var(component.W(5), 0));
+                    auto constraint_out_3 = var(component.W(2), +1) + m * var(component.W(6), +1) -
+                                                              (var(component.W(2), 0) + var(component.W(6), 0));
+                    auto constraint_out_4 = var(component.W(3), +1) + m * var(component.W(7), +1) -
+                                                              (var(component.W(3), 0) + var(component.W(7), 0));
 
-                    bp.add_gate(first_selector_index + 6,
-                                {constraint_out_1, constraint_out_2, constraint_out_3, constraint_out_4});
+                    std::size_t selector_6 =
+                        bp.add_gate({constraint_out_1, constraint_out_2, constraint_out_3, constraint_out_4});
+                    return {sigma_1_selector, sigma0_selector, selector_2, selector_3, maj_selector, ch_selector, selector_6};
                 }
             }    // namespace detail
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::array<std::size_t, 10> generate_gates(
                 const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
-                detail::generate_message_scheduling_gates(component, bp, assignment, first_selector_index);
-                detail::generate_compression_gates(component, bp, assignment, first_selector_index + 3);
+                    &instance_input) {
+                auto message_scheduling_selectors =
+                    detail::generate_message_scheduling_gates(component, bp, assignment);
+                auto compression_selectors = detail::generate_compression_gates(component, bp, assignment);
+
+                return {
+                    message_scheduling_selectors[0], message_scheduling_selectors[1], message_scheduling_selectors[2],
+                    compression_selectors[0], compression_selectors[1], compression_selectors[2],
+                    compression_selectors[3], compression_selectors[4], compression_selectors[5],
+                    compression_selectors[6]
+                };
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -626,6 +641,81 @@ namespace nil {
                 const typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
+
+                std::size_t row = start_row_index + 2;
+                using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
+
+                for (std::size_t i = 1; i <= 15; ++i) {
+                    bp.add_copy_constraint(
+                        {var(component.W(0), row + (i - 1) * 5 + 0, false), instance_input.input_words[i]});
+                }
+                for (std::size_t i = 9; i <= 15; ++i) {
+                    bp.add_copy_constraint(
+                        {var(component.W(0), row + (i - 9) * 5 + 1, false), instance_input.input_words[i]});
+                }
+                for (std::size_t i = 0; i <= 15; ++i) {
+                    bp.add_copy_constraint(
+                        {var(component.W(1), row + (i - 0) * 5 + 1, false), instance_input.input_words[i]});
+                }
+                for (std::size_t i = 14; i <= 15; ++i) {
+                    bp.add_copy_constraint(
+                        {var(component.W(0), row + (i - 14) * 5 + 4, false), instance_input.input_words[i]});
+                }
+
+                for (std::size_t round = 0; round < 48; round++) {
+                    if (round >= 2) {
+                        bp.add_copy_constraint({var(component.W(0), row + round * 5 + 4, false),
+                                                var(component.W(0), row + (round - 2) * 5 + 2, false)});
+                    }
+                    if (round >= 7) {
+                        bp.add_copy_constraint({var(component.W(0), row + round * 5 + 1, false),
+                                                var(component.W(0), row + (round - 7) * 5 + 2, false)});
+                    }
+                    if (round >= 15) {
+                        bp.add_copy_constraint({var(component.W(0), row + round * 5 + 0, false),
+                                                var(component.W(0), row + (round - 15) * 5 + 2, false)});
+                    }
+                    if (round >= 16) {
+                        bp.add_copy_constraint({var(component.W(1), row + round * 5 + 1, false),
+                                                var(component.W(0), row + (round - 16) * 5 + 2, false)});
+                    }
+                }
+                row = row + 240;
+
+                for (std::size_t round = 1; round < 64; round++) {
+                    bp.add_copy_constraint({var(component.W(0), row + round * 8 + 0, false),
+                                            var(component.W(4), row + (round - 1) * 8 + 3, false)});    // e = e_new
+                    bp.add_copy_constraint({var(component.W(0), row + round * 8 + 7, false),
+                                            var(component.W(2), row + (round - 1) * 8 + 5, false)});    // a = a_new
+
+                    bp.add_copy_constraint({var(component.W(1), row + round * 8 + 5, false),
+                                            var(component.W(0), row + (round - 1) * 8 + 5,
+                                                false)});    // sparse_values[1] = sparse_values[0]
+                    bp.add_copy_constraint({var(component.W(4), row + round * 8 + 5, false),
+                                            var(component.W(1), row + (round - 1) * 8 + 5,
+                                                false)});    // sparse_values[2] = sparse_values[1]
+                    bp.add_copy_constraint({var(component.W(1), row + round * 8 + 1, false),
+                                            var(component.W(0), row + (round - 1) * 8 + 1,
+                                                false)});    // sparse_values[5] = sparse_values[4]
+                    bp.add_copy_constraint({var(component.W(0), row + round * 8 + 3, false),
+                                            var(component.W(1), row + (round - 1) * 8 + 1,
+                                                false)});    // sparse_values[6] = sparse_values[5]
+                }
+
+                row = row + 512;
+
+                bp.add_copy_constraint({var(component.W(0), row - 1, false), var(component.W(5), row, false)});
+                bp.add_copy_constraint({var(component.W(0), row - 9, false), var(component.W(6), row, false)});
+                bp.add_copy_constraint({var(component.W(0), row - 17, false), var(component.W(7), row, false)});
+
+                bp.add_copy_constraint({var(component.W(0), row - 8, false), var(component.W(5), row + 2, false)});
+                bp.add_copy_constraint({var(component.W(0), row - 16, false), var(component.W(6), row + 2, false)});
+                bp.add_copy_constraint({var(component.W(0), row - 24, false), var(component.W(7), row + 2, false)});
+
+                for (std::size_t i = 0; i < 4; i++) {
+                    bp.add_copy_constraint({var(component.W(i), row, false), instance_input.input_state[i]});
+                    bp.add_copy_constraint({var(component.W(i), row + 2, false), instance_input.input_state[i + 4]});
+                }
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -642,27 +732,20 @@ namespace nil {
                 detail::generate_assignments_constant(component, bp, assignment, instance_input, start_row_index);
                 std::size_t j = start_row_index;
                 j = j + 2;
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
+                auto selector_indices = generate_gates(component, bp, assignment, instance_input);
 
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
-                assignment.enable_selector(first_selector_index, j + 1, j + 239, 5);
-                assignment.enable_selector(first_selector_index + 1, j + 2, j + 239, 5);
-                assignment.enable_selector(first_selector_index + 2, j + 4, j + 239, 5);
+                assignment.enable_selector(selector_indices[0], j + 1, j + 239, 5);
+                assignment.enable_selector(selector_indices[1], j + 2, j + 239, 5);
+                assignment.enable_selector(selector_indices[2], j + 4, j + 239, 5);
                 j = j + 240;
-                assignment.enable_selector(first_selector_index + 3, j + 1, j + 511, 8);
-                assignment.enable_selector(first_selector_index + 4, j + 6, j + 511, 8);
-                assignment.enable_selector(first_selector_index + 5, j + 3, j + 511, 8);
-                assignment.enable_selector(first_selector_index + 6, j + 4, j + 511, 8);
-                assignment.enable_selector(first_selector_index + 7, j + 4, j + 511, 8);
-                assignment.enable_selector(first_selector_index + 8, j + 2, j + 511, 8);
+                assignment.enable_selector(selector_indices[3], j + 1, j + 511, 8);
+                assignment.enable_selector(selector_indices[4], j + 6, j + 511, 8);
+                assignment.enable_selector(selector_indices[5], j + 3, j + 511, 8);
+                assignment.enable_selector(selector_indices[6], j + 4, j + 511, 8);
+                assignment.enable_selector(selector_indices[7], j + 4, j + 511, 8);
+                assignment.enable_selector(selector_indices[8], j + 2, j + 511, 8);
                 j = j + 512;
-                assignment.enable_selector(first_selector_index + 9, j, j + 2, 2);
+                assignment.enable_selector(selector_indices[9], j, j + 2, 2);
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
                 return typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::result_type(
                     component, start_row_index);

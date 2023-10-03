@@ -97,6 +97,12 @@ namespace nil {
 
                     var_ec_point T;
                     var k;
+
+                    std::vector<var> all_vars() const {
+                        return {T.x[0], T.x[1], T.x[2], T.x[3],
+                                T.y[0], T.y[1], T.y[2], T.y[3],
+                                k};
+                    }
                 };
 
                 struct result_type {
@@ -118,10 +124,15 @@ namespace nil {
                             var(component.W(7), start_row_index + 1, false),
                             var(component.W(8), start_row_index + 1, false)};
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output.x[0], output.x[1], output.x[2], output.x[3],
+                                output.y[0], output.y[1], output.y[2], output.y[3]};
+                    }
                 };
 
                 template <typename ContainerType>
-                bool_scalar_multiplication(ContainerType witness):
+                explicit bool_scalar_multiplication(ContainerType witness):
                     component_type(witness, {}, {}, get_manifest()){};
 
                 template <typename WitnessContainerType, typename ConstantContainerType,
@@ -177,7 +188,6 @@ namespace nil {
                 assignment.witness(component.W(6), row) = b * T_y_array[1];
                 assignment.witness(component.W(7), row) = b * T_y_array[2];
                 assignment.witness(component.W(8), row) = b * T_y_array[3];
-                std::array<var, 4> Q_y = {var(component.W(5), row), var(component.W(6), row), var(component.W(7), row), var(component.W(8), row)};
                 row++;
                 assignment.witness(component.W(0), row) = T_x_array[0];
                 assignment.witness(component.W(1), row) = T_x_array[1];
@@ -188,45 +198,43 @@ namespace nil {
                 assignment.witness(component.W(6), row) = b * T_x_array[1];
                 assignment.witness(component.W(7), row) = b * T_x_array[2];
                 assignment.witness(component.W(8), row) = b * T_x_array[3];
-                std::array<var, 4> Q_x = {var(component.W(5), row), var(component.W(6), row), var(component.W(7), row), var(component.W(8), row)};
 
                 return typename plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams>::result_type
                     (component, start_row_index);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
                 using var = typename plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams>::var;
 
-                auto constraint_9 = bp.add_constraint(
-                    var(component.W(4), 0)*( var(component.W(4), 0) - 1));
-                auto constraint_10 = bp.add_constraint(
-                    var(component.W(4), 0) - var(component.W(4), +1));
-                auto constraint_1 = bp.add_constraint(
-                    var(component.W(5), 0) - (var(component.W(0), 0) * var(component.W(4), 0) + (1 - var(component.W(4), 0))));
-                auto constraint_2 = bp.add_constraint(
-                    var(component.W(6), 0) - var(component.W(1), 0) * var(component.W(4), 0));
-                auto constraint_3 = bp.add_constraint(
-                    var(component.W(7), 0) - var(component.W(2), 0) * var(component.W(4), 0));
-                auto constraint_4 = bp.add_constraint(
-                    var(component.W(8), 0) - var(component.W(3), 0) * var(component.W(4), 0));
-                auto constraint_5 = bp.add_constraint(
-                    var(component.W(5), +1) - var(component.W(0), +1) * var(component.W(4), +1));
-                auto constraint_6 = bp.add_constraint(
-                    var(component.W(6), +1) - var(component.W(1), +1) * var(component.W(4), +1));
-                auto constraint_7 = bp.add_constraint(
-                    var(component.W(7), +1) - var(component.W(2), +1) * var(component.W(4), +1));
-                auto constraint_8 = bp.add_constraint(
-                    var(component.W(8), +1) - var(component.W(3), +1) * var(component.W(4), +1));
+                auto constraint_9 =
+                    var(component.W(4), 0) * ( var(component.W(4), 0) - 1);
+                auto constraint_10 =
+                    var(component.W(4), 0) - var(component.W(4), +1);
+                auto constraint_1 =
+                    var(component.W(5), 0) - (var(component.W(0), 0) * var(component.W(4), 0) + (1 - var(component.W(4), 0)));
+                auto constraint_2 =
+                    var(component.W(6), 0) - var(component.W(1), 0) * var(component.W(4), 0);
+                auto constraint_3 =
+                    var(component.W(7), 0) - var(component.W(2), 0) * var(component.W(4), 0);
+                auto constraint_4 =
+                    var(component.W(8), 0) - var(component.W(3), 0) * var(component.W(4), 0);
+                auto constraint_5 =
+                    var(component.W(5), +1) - var(component.W(0), +1) * var(component.W(4), +1);
+                auto constraint_6 =
+                    var(component.W(6), +1) - var(component.W(1), +1) * var(component.W(4), +1);
+                auto constraint_7 =
+                    var(component.W(7), +1) - var(component.W(2), +1) * var(component.W(4), +1);
+                auto constraint_8 =
+                    var(component.W(8), +1) - var(component.W(3), +1) * var(component.W(4), +1);
 
-                bp.add_gate(first_selector_index,
+                return bp.add_gate(
                     {constraint_9, constraint_10,
                     constraint_1, constraint_2, constraint_3, constraint_4,
                     constraint_5, constraint_6, constraint_7, constraint_8});
@@ -268,21 +276,15 @@ namespace nil {
                     const typename plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
                     const std::size_t start_row_index){
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 std::size_t row = start_row_index;
-                assignment.enable_selector(first_selector_index, row);
+                assignment.enable_selector(selector_index, row);
 
                 generate_copy_constraints(component, bp, assignment, instance_input, row);
 
-                return typename plonk_bool_scalar_multiplication<BlueprintFieldType, ArithmetizationParams>::result_type(
-                    component, start_row_index);
+                return typename plonk_bool_scalar_multiplication<BlueprintFieldType,
+                                                                 ArithmetizationParams>::result_type
+                            (component, start_row_index);
             }
 
         }    // namespace components

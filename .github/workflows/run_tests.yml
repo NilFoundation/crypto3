@@ -42,6 +42,7 @@ jobs:
             blueprint_algebra_fields_plonk_non_native_comparison_checked_test,
             blueprint_algebra_fields_plonk_non_native_comparison_unchecked_test,
             blueprint_algebra_fields_plonk_non_native_comparison_flag_test,
+            blueprint_algebra_fields_plonk_non_native_equality_flag_test,
             blueprint_algebra_fields_plonk_non_native_division_remainder_test,
             blueprint_non_native_plonk_scalar_non_native_range_test,
             blueprint_non_native_plonk_bool_scalar_multiplication_test,
@@ -53,6 +54,8 @@ jobs:
             blueprint_hashes_plonk_sha512_test,
             blueprint_algebra_fields_plonk_sqrt_test,
             blueprint_manifest_test,
+            blueprint_detail_huang_lu_test,
+            blueprint_private_input_test,
           ]  # Tests to execute
     steps:
       - uses: cachix/install-nix-action@v23

@@ -44,7 +44,7 @@
 
 using namespace nil;
 
-using nil::blueprint::components::detail::bit_shift_mode;
+using nil::blueprint::components::bit_shift_mode;
 
 template<typename BlueprintFieldType, std::uint32_t WitnessesAmount, std::size_t BitsAmount,
          std::uint32_t Shift, bit_shift_mode Mode>

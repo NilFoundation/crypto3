@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_unified_addition_test
+#define BOOST_TEST_MODULE blueprint_plonk_zkpm_evaluate_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_zkpm) {
     std::size_t domain_size = 1000;
     typename BlueprintFieldType::value_type x = algebra::random_element<BlueprintFieldType>();
     typename BlueprintFieldType::value_type group_gen_pow = group_gen.pow(domain_size - 3);
-    typename BlueprintFieldType::value_type expected_res = (x - group_gen_pow) * (x - group_gen_pow * group_gen) * 
+    typename BlueprintFieldType::value_type expected_res = (x - group_gen_pow) * (x - group_gen_pow * group_gen) *
                                                             (x - group_gen_pow * group_gen * group_gen);
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {group_gen, x, expected_res};

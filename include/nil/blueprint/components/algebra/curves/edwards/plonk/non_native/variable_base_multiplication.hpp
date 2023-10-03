@@ -38,8 +38,6 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            using detail::bit_shift_mode;
-
             template<typename ArithmetizationType, typename CurveType, typename Ed25519Type,
                      typename NonNativePolicyType>
             class variable_base_multiplication;
@@ -137,6 +135,10 @@ namespace nil {
 
                     var_ec_point T;
                     var k;
+
+                    std::vector<var> all_vars() const {
+                        return {T.x[0], T.x[1], T.x[2], T.x[3], T.y[0], T.y[1], T.y[2], T.y[3], k};
+                    }
                 };
 
                 struct result_type {
@@ -165,10 +167,16 @@ namespace nil {
                                     final_mul_per_bit_res.output.y[2],
                                     final_mul_per_bit_res.output.y[3]};
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output.x[0], output.x[1], output.x[2], output.x[3],
+                                output.y[0], output.y[1], output.y[2], output.y[3]};
+                    }
                 };
 
                 template<typename ContainerType>
-                variable_base_multiplication(ContainerType witness, std::uint32_t bits_amount, bit_shift_mode mode_) :
+                explicit variable_base_multiplication(ContainerType witness, std::uint32_t bits_amount,
+                                                      bit_shift_mode mode_) :
                     component_type(witness, {}, {}, get_manifest()),
                     decomposition_subcomponent(witness, bits_amount, bit_composition_mode::MSB),
                     mul_per_bit_subcomponent(witness),
@@ -313,6 +321,91 @@ namespace nil {
                     return typename plonk_ed25519_var_base_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
                 }
 
+            template<typename ComponentType>
+            class input_type_converter;
+
+            template<typename ComponentType>
+            class result_type_converter;
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            class input_type_converter<
+                plonk_ed25519_var_base_mul<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+
+                using component_type =
+                    plonk_ed25519_var_base_mul<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                using input_type = typename component_type::input_type;
+                using var = typename nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+            public:
+                static input_type convert(
+                    const input_type &input,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &assignment,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &tmp_assignment) {
+
+                    input_type new_input;
+                    for (std::size_t i = 0; i < input.T.x.size(); i++) {
+                        tmp_assignment.public_input(0, i) = var_value(assignment, input.T.x[i]);
+                        new_input.T.x[i] = var(0, i, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.T.y.size(); i++) {
+                        std::size_t new_idx = input.T.x.size() + i;
+                        tmp_assignment.public_input(0, new_idx) = var_value(assignment, input.T.y[i]);
+                        new_input.T.y[i] = var(0, new_idx, false, var::column_type::public_input);
+                    }
+                    tmp_assignment.public_input(0, input.T.x.size() + input.T.y.size()) =
+                        var_value(assignment, input.k);
+                    new_input.k = var(0, input.T.x.size() + input.T.y.size(),
+                                      false, var::column_type::public_input);
+
+                    return new_input;
+                }
+
+                static var deconvert_var(const input_type &input,
+                                         var variable) {
+                    BOOST_ASSERT(variable.type == var::column_type::public_input);
+                    if (variable.rotation < input.T.x.size()) {
+                        return input.T.x[variable.rotation];
+                    } else if (variable.rotation < input.T.x.size() + input.T.y.size()) {
+                        return input.T.y[variable.rotation - input.T.x.size()];
+                    } else {
+                        return input.k;
+                    }
+                }
+            };
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            class result_type_converter<
+                plonk_ed25519_var_base_mul<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+
+                using component_type =
+                    plonk_ed25519_var_base_mul<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                using input_type = typename component_type::input_type;
+                using result_type = typename component_type::result_type;
+                using stretcher_type = component_stretcher<BlueprintFieldType, ArithmetizationParams, component_type>;
+            public:
+                static result_type convert(const stretcher_type &component, const result_type old_result,
+                                           const input_type &instance_input, std::size_t start_row_index) {
+                    result_type new_result(component.component, start_row_index);
+
+                    for (std::size_t i = 0; i < 4; i++) {
+                        new_result.output.x[i] = component.move_var(
+                            old_result.output.x[i],
+                            start_row_index + component.line_mapping[old_result.output.x[i].rotation],
+                            instance_input
+                        );
+                        new_result.output.y[i] = component.move_var(
+                            old_result.output.y[i],
+                            start_row_index + component.line_mapping[old_result.output.y[i].rotation],
+                            instance_input
+                        );
+                    }
+
+                    return new_result;
+                }
+            };
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil

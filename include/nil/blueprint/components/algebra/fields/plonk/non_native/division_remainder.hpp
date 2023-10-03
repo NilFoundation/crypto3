@@ -33,7 +33,6 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/range_check.hpp>
 
@@ -169,6 +168,10 @@ namespace nil {
 
                 struct input_type {
                     var x, y;
+
+                    std::vector<var> all_vars() const {
+                        return {x, y};
+                    }
                 };
 
                 struct result_type {
@@ -182,13 +185,11 @@ namespace nil {
                         quotient = var(component.W(q_address.second), q_address.first);
                         remainder = var(component.W(r_address.second), r_address.first);
                     }
-                };
 
-                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
-                    std::stringstream ss;
-                    ss << bits_amount << "_" << check_inputs;
-                    return ss.str();
-                }
+                    std::vector<var> all_vars() const {
+                        return {quotient, remainder};
+                    }
+                };
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -222,7 +223,7 @@ namespace nil {
                                                                                ArithmetizationParams>>;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -232,8 +233,7 @@ namespace nil {
                                                                        ArithmetizationParams>>
                     &assignment,
                 const typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
 
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>;
                 using var = typename component_type::var;
@@ -254,8 +254,7 @@ namespace nil {
                 constraint_type y_minus_r_constraint = y - r - y_minus_r;
                 constraints.push_back(y_minus_r_constraint);
 
-                gate_type division_gate = gate_type(first_selector_index, constraints);
-                bp.add_gate(division_gate);
+                return bp.add_gate(constraints);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -300,8 +299,6 @@ namespace nil {
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
                 std::size_t row = start_row_index;
 
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>;
@@ -315,14 +312,9 @@ namespace nil {
                     q_address = component.get_var_address(var_address::Q, start_row_index),
                     y_minus_r_address = component.get_var_address(var_address::Y_MINUS_R, start_row_index);
 
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
 
-                assignment.enable_selector(first_selector_index, start_row_index);
+                assignment.enable_selector(selector_index, start_row_index);
                 row += 1 + component.needs_bonus_row;
 
                 generate_circuit(component.range_checks[0], bp, assignment,

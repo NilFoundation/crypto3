@@ -46,7 +46,7 @@
 
 #include "../../../../test_plonk_component.hpp"
 
-using nil::blueprint::components::detail::comparison_mode;
+using nil::blueprint::components::comparison_mode;
 
 template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R,
          comparison_mode Mode, bool CustomAssignments = false >

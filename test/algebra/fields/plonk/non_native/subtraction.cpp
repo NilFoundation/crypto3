@@ -50,8 +50,8 @@
 using namespace nil;
 
 template <typename BlueprintFieldType, typename NonNativeFieldType>
-void test_field_sub(std::vector<typename BlueprintFieldType::value_type> public_input,
-                    std::array<typename BlueprintFieldType::value_type, 4> expected_res){
+void test_field_sub(const std::vector<typename BlueprintFieldType::value_type> &public_input,
+                    const std::array<typename BlueprintFieldType::value_type, 4> &expected_res) {
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;

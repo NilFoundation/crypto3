@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_unified_addition_test
+#define BOOST_TEST_MODULE blueprint_plonk_prepare_scalars_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_prepare_scalars_vesta) {
 
     constexpr std::size_t InputSize = 5;
 
-    using component_type = zk::components::prepare_scalars<ArithmetizationType, curve_type, 
+    using component_type = zk::components::prepare_scalars<ArithmetizationType, curve_type,
         InputSize, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                             11, 12, 13, 14>;
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_prepare_scalars_vesta) {
     }
 
     typename component_type::params_type params = {
-        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input), 
+        var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input), var(0, 2, false, var::column_type::public_input),
             var(0, 3, false, var::column_type::public_input), var(0, 4, false, var::column_type::public_input)};
 
     auto result_check = [&expected_res](AssignmentType &assignment,

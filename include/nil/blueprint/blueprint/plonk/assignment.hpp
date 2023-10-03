@@ -27,20 +27,25 @@
 #define CRYPTO3_BLUEPRINT_ASSIGNMENT_PLONK_HPP
 
 #include <algorithm>
+#include <limits>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
 
 #include <nil/blueprint/component.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 #include <nil/blueprint/assert.hpp>
+#include <nil/blueprint/gate_id.hpp>
+#include <nil/blueprint/blueprint/plonk/circuit.hpp>
 
 namespace nil {
     namespace blueprint {
 
         template<typename ArithmetizationType, std::size_t... BlueprintParams>
         class assignment;
+
+        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        class circuit;
 
         template<typename BlueprintFieldType,
                 typename ArithmetizationParams>
@@ -56,25 +61,20 @@ namespace nil {
                     ArithmetizationParams> ArithmetizationType;
 
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-
-            using component_selector_map_type = std::map<
-                detail::blueprint_component_id_type,
-                std::size_t>;
-
-            component_selector_map_type selector_map;
+            using value_type = typename BlueprintFieldType::value_type;
 
             std::size_t next_selector_index = 0;
-
             std::uint32_t _allocated_rows = 0;
+            std::vector<value_type> _private_storage;
         public:
+            static constexpr const std::size_t PRIVATE_STORAGE_INDEX = std::numeric_limits<std::size_t>::max();
 
             assignment() :
                     crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
                             ArithmetizationParams>() {
             }
 
-            typename BlueprintFieldType::value_type &selector(std::size_t selector_index,
-                std::uint32_t row_index) {
+            value_type &selector(std::size_t selector_index, std::uint32_t row_index) {
 
                 assert(selector_index < this->_public_table._selectors.size());
 
@@ -84,37 +84,19 @@ namespace nil {
                 return this->_public_table._selectors[selector_index][row_index];
             }
 
-            typename component_selector_map_type::iterator selectors_end() {
-                return selector_map.end();
-            }
+            value_type selector(std::size_t selector_index, std::uint32_t row_index) const {
 
-            template<typename ComponentType>
-            typename component_selector_map_type::iterator find_selector(
-                ComponentType &component) {
+                assert(selector_index < this->_public_table._selectors.size());
+                assert(row_index < this->_public_table._selectors[selector_index].size());
 
-                return selector_map.find(detail::get_component_id(component));
-            }
-
-            template<typename ComponentType>
-            std::size_t allocate_selector(
-                ComponentType &component,
-                std::size_t selectors_amount) {
-
-                // if (next_selector_index >= this->_public_table._selectors.size()){
-                //     this->_public_table._selectors.resize(next_selector_index);
-                // }
-                std::size_t selector_index = next_selector_index;
-                selector_map[detail::get_component_id(component)] = selector_index;
-                next_selector_index += selectors_amount;
-                return selector_index;
+                return this->_public_table._selectors[selector_index][row_index];
             }
 
             std::uint32_t allocated_rows() const {
                 return _allocated_rows;
             }
 
-            void enable_selector(const std::size_t selector_index,
-                                 const std::size_t row_index) {
+            void enable_selector(const std::size_t selector_index, const std::size_t row_index) {
 
                 selector(selector_index, row_index) = BlueprintFieldType::value_type::one();
             }
@@ -130,47 +112,7 @@ namespace nil {
                 }
             }
 
-            std::size_t add_selector(const std::vector<std::size_t> row_indices) {
-
-                std::size_t max_row_index = *std::max_element(row_indices.begin(), row_indices.end());
-                crypto3::zk::snark::plonk_column<BlueprintFieldType> selector_column(max_row_index + 1,
-                                                                        BlueprintFieldType::value_type::zero());
-                for (std::size_t row_index: row_indices) {
-                    selector_column[row_index] = BlueprintFieldType::value_type::one();
-                }
-                this->_public_table._selectors[next_selector_index] = selector_column;
-                next_selector_index++;
-                return next_selector_index - 1;
-            }
-
-            std::size_t add_selector(std::size_t row_index) {
-                return add_selector(std::vector<std::size_t>({row_index}));
-            }
-
-            std::size_t add_selector(const std::initializer_list<std::size_t> &&row_start_indices,
-                                     const std::initializer_list<std::size_t> &&offsets) {
-
-                std::vector<std::size_t> row_indices(row_start_indices.size() *
-                                                     offsets.size());
-                std::vector<std::size_t>::iterator row_indices_iterator = row_indices.begin();
-
-                for (std::size_t start_row_index: row_start_indices) {
-                    for (std::size_t offset: offsets) {
-                        *row_indices_iterator = start_row_index + offset;
-                        row_indices_iterator++;
-                    }
-                }
-
-                return add_selector(row_indices);
-            }
-
-            std::size_t add_selector(const std::initializer_list<std::size_t> &&row_start_indices,
-                                     const std::size_t offset) {
-
-                return add_selector(row_start_indices, {offset});
-            }
-
-            typename BlueprintFieldType::value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
+            value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
                 BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
 
                 if (this->_private_table._witnesses[witness_index].size() <= row_index)
@@ -180,14 +122,14 @@ namespace nil {
                 return this->_private_table._witnesses[witness_index][row_index];
             }
 
-            typename BlueprintFieldType::value_type witness(std::uint32_t witness_index, std::uint32_t row_index) const {
+            value_type witness(std::uint32_t witness_index, std::uint32_t row_index) const {
                 BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
                 BLUEPRINT_ASSERT(row_index < this->_private_table._witnesses[witness_index].size());
 
                 return this->_private_table._witnesses[witness_index][row_index];
             }
 
-            typename BlueprintFieldType::value_type &public_input(
+            value_type &public_input(
                 std::uint32_t public_input_index, std::uint32_t row_index) {
 
                 BLUEPRINT_ASSERT(public_input_index < zk_type::public_inputs_amount());
@@ -198,7 +140,7 @@ namespace nil {
                 return this->_public_table._public_inputs[public_input_index][row_index];
             }
 
-            typename BlueprintFieldType::value_type public_input(
+            value_type public_input(
                 std::uint32_t public_input_index, std::uint32_t row_index) const {
 
                 BLUEPRINT_ASSERT(public_input_index < zk_type::public_inputs_amount());
@@ -207,7 +149,7 @@ namespace nil {
                 return zk_type::public_input(public_input_index)[row_index];
             }
 
-            typename BlueprintFieldType::value_type &constant(
+            value_type &constant(
                 std::uint32_t constant_index, std::uint32_t row_index) {
 
                 assert(constant_index < zk_type::constants_amount());
@@ -219,13 +161,39 @@ namespace nil {
                 return this->_public_table._constants[constant_index][row_index];
             }
 
-            typename BlueprintFieldType::value_type constant(
+            value_type constant(
                 std::uint32_t constant_index, std::uint32_t row_index) const {
 
                 BLUEPRINT_ASSERT(constant_index < zk_type::constants_amount());
                 BLUEPRINT_ASSERT(row_index < zk_type::constant_column_size(constant_index));
 
                 return zk_type::constant(constant_index)[row_index];
+            }
+
+            value_type private_storage(std::uint32_t storage_index) const {
+                BLUEPRINT_ASSERT(storage_index < _private_storage.size());
+                return _private_storage[storage_index];
+            }
+
+            value_type &private_storage(std::uint32_t storage_index) {
+                if (_private_storage.size() <= storage_index) {
+                    _private_storage.resize(storage_index + 1);
+                }
+                return _private_storage[storage_index];
+            }
+
+            // Not required to be called; get_private_storage will automatically resize
+            // But you might want to use this to clear
+            void resize_private_storage(std::uint32_t new_size) {
+                _private_storage.resize(new_size);
+            }
+
+            void clear_private_storage() {
+                _private_storage.clear();
+            }
+
+            std::size_t private_storage_size() const {
+                return _private_storage.size();
             }
 
             void export_table(std::ostream& os, bool wide_export = false) const {
@@ -302,16 +270,26 @@ namespace nil {
         template<typename BlueprintFieldType,
                 typename ArithmetizationParams>
         typename BlueprintFieldType::value_type var_value(
-                const crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
-                        ArithmetizationParams> &input_assignment,
+                const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                ArithmetizationParams>> &input_assignment,
                 const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &input_var) {
+            using var_column_type =
+                typename crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>::column_type;
+            using assignment_type =
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
+            // This SHOULD be handled by a separate variable type
+            // But adding a new variable type breaks assigner
+            // So we add a type without actually adding a type
+            if (input_var.index == assignment_type::PRIVATE_STORAGE_INDEX) {
+                return input_assignment.private_storage(input_var.rotation);
+            }
             switch(input_var.type){
-                case crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>::column_type::witness:
-                    return input_assignment.witness(input_var.index)[input_var.rotation];
-                case crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>::column_type::public_input:
-                    return input_assignment.public_input(input_var.index)[input_var.rotation];
+                case var_column_type::witness:
+                    return input_assignment.witness(input_var.index, input_var.rotation);
+                case var_column_type::public_input:
+                    return input_assignment.public_input(input_var.index, input_var.rotation);
                 default:
-                    return input_assignment.constant(input_var.index)[input_var.rotation];
+                    return input_assignment.constant(input_var.index, input_var.rotation);
             }
         }
 

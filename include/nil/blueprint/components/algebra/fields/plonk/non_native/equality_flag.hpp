@@ -1,9 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
-// Copyright (c) 2022 Alisa Cherniaeva <a.cherniaeva@nil.foundation>
-// Copyright (c) 2022 Polina Chernyshova <pockvokhbtra@nil.foundation>
+// Copyright (c) 2023 Dmitrii Tabalin <d.tabalin@nil.foundation>
 //
 // MIT License
 //
@@ -25,12 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for PLONK field element division component.
-// If divider is zero, component's result is zero either.
-//---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELD_DIVISION_OR_ZERO_HPP
-#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELD_DIVISION_OR_ZERO_HPP
+#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELD_EQUALITY_FLAG_HPP
+#define CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELD_EQUALITY_FLAG_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
@@ -44,12 +37,14 @@ namespace nil {
         namespace components {
 
             // Input: x, y \in Fp
-            // Output: z = x / y, if y != 0, else 0 z \in F_p
-            template<typename ArithmetizationType, typename FieldType>
-            class division_or_zero;
+            // Output: 1 iff x == y, 0 otherwise
+            // Output is reversed if inequality = true.
+            // Basically runs a slightly optimized copy of division-or-zero component on [x - y].
+            template<typename ArithmetizationType, typename BlueprintFieldType>
+            class equality_flag;
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            class equality_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 BlueprintFieldType>:
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
 
@@ -58,31 +53,42 @@ namespace nil {
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
+                    bool inequality;
+
+                    gate_manifest_type(bool inequality_) :inequality(inequality_) {}
+
                     std::uint32_t gates_amount() const override {
-                        return division_or_zero::gates_amount;
+                        return equality_flag::gates_amount;
+                    }
+
+                    bool operator<(gate_manifest_type const& other) const {
+                        return inequality < other.inequality;
                     }
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
-                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                                                       std::size_t lookup_column_amount,
+                                                       bool inequality) {
+                    gate_manifest manifest = gate_manifest(gate_manifest_type(inequality));
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                                                             std::size_t lookup_column_amount,
+                                                             bool inequality) {
                     return 1;
                 }
 
+                bool inequality;
                 constexpr static const std::size_t gates_amount = 1;
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0, inequality);
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
 
                 static manifest_type get_manifest() {
                     static manifest_type manifest = manifest_type(
-                        std::shared_ptr<manifest_param>(new manifest_single_value_param(5)),
+                        std::shared_ptr<manifest_param>(new manifest_single_value_param(4)),
                         false
                     );
                     return manifest;
@@ -99,12 +105,12 @@ namespace nil {
 
                 struct result_type {
                     var output = var(0, 0, false);
-                    result_type(const division_or_zero &component, std::uint32_t start_row_index) {
-                        output = var(component.W(2), start_row_index, false, var::column_type::witness);
+                    result_type(const equality_flag &component, std::uint32_t start_row_index) {
+                        output = var(component.W(3), start_row_index, false, var::column_type::witness);
                     }
 
-                    result_type(const division_or_zero &component, std::size_t start_row_index) {
-                        output = var(component.W(2), start_row_index, false, var::column_type::witness);
+                    result_type(const equality_flag &component, std::size_t start_row_index) {
+                        output = var(component.W(3), start_row_index, false, var::column_type::witness);
                     }
 
                     std::vector<var> all_vars() const {
@@ -112,100 +118,115 @@ namespace nil {
                     }
                 };
 
+
                 template <typename ContainerType>
-                division_or_zero(ContainerType witness):
-                    component_type(witness, {}, {}, get_manifest()){};
+                equality_flag(ContainerType witness, bool inequality_):
+                    component_type(witness, {}, {}, get_manifest()),
+                    inequality(inequality_)
+                    {};
 
                 template <typename WitnessContainerType, typename ConstantContainerType,
                     typename PublicInputContainerType>
-                division_or_zero(WitnessContainerType witness, ConstantContainerType constant,
-                        PublicInputContainerType public_input):
-                    component_type(witness, constant, public_input, get_manifest()){};
+                equality_flag(WitnessContainerType witness, ConstantContainerType constant,
+                        PublicInputContainerType public_input, bool inequality_):
+                    component_type(witness, constant, public_input, get_manifest()),
+                    inequality(inequality_)
+                    {};
 
-                division_or_zero(std::initializer_list<
+                equality_flag(std::initializer_list<
                         typename component_type::witness_container_type::value_type> witnesses,
                                std::initializer_list<
                         typename component_type::constant_container_type::value_type> constants,
                                std::initializer_list<
-                        typename component_type::public_input_container_type::value_type> public_inputs):
-                    component_type(witnesses, constants, public_inputs, get_manifest()){};
+                        typename component_type::public_input_container_type::value_type> public_inputs,
+                        bool inequality_):
+                    component_type(witnesses, constants, public_inputs, get_manifest()),
+                    inequality(inequality_)
+                    {};
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            using plonk_division_or_zero =
-                division_or_zero<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            using plonk_equality_flag =
+                equality_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
                 BlueprintFieldType>;
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::result_type
+            typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type
                 generate_assignments(
-                    const plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams> &component,
+                    const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                    const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                 const std::size_t j = start_row_index;
 
-                assignment.witness(component.W(0), j) = var_value(assignment, instance_input.x);
-                assignment.witness(component.W(1), j) = var_value(assignment, instance_input.y);
-                if (var_value(assignment, instance_input.y) != 0) {
-                    assignment.witness(component.W(2), j) = var_value(assignment, instance_input.x) /
-                        var_value(assignment, instance_input.y);
-                } else {
+                auto x_val = var_value(assignment, instance_input.x);
+                auto y_val = var_value(assignment, instance_input.y);
+                assignment.witness(component.W(0), j) = x_val;
+                assignment.witness(component.W(1), j) = y_val;
+                if (x_val == y_val) {
                     assignment.witness(component.W(2), j) = 0;
+                } else {
+                    assignment.witness(component.W(2), j) = 1 / (x_val - y_val);
                 }
-                assignment.witness(component.W(3), j) = (var_value(assignment, instance_input.y) == 0) ?
-                    0 : var_value(assignment, instance_input.y).inversed();
-                assignment.witness(component.W(4), j) = var_value(assignment, instance_input.y) * assignment.witness(component.W(3), j);
+                assignment.witness(component.W(3), j) = x_val == y_val ? !component.inequality : component.inequality;
 
-                return typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
+                return typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type(
+                        component, start_row_index);
             }
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
             std::size_t generate_gates(
-                const plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams> &component,
+                const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input) {
+                const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input) {
 
-                using var = typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::var;
+                using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
 
-                auto constraint_1 = var(component.W(1), 0) * var(component.W(3), 0) - var(component.W(4), 0);
-                auto constraint_2 = var(component.W(4), 0) * (var(component.W(4), 0) - 1);
-                auto constraint_3 = (var(component.W(3), 0) - var(component.W(1), 0)) * (var(component.W(4), 0) - 1);
-                auto constraint_4 = var(component.W(0), 0) * var(component.W(3), 0) - var(component.W(2), 0);
+                var x_var = var(component.W(0), 0),
+                    y_var = var(component.W(1), 0),
+                    inv_or_zero = var(component.W(2), 0),
+                    result = var(component.W(3), 0);
 
-                return bp.add_gate({constraint_1, constraint_2, constraint_3, constraint_4});
+                auto constraint_1 = result * (result - 1);
+                auto constraint_2 = (x_var - y_var) * inv_or_zero +
+                    (component.inequality ? constraint_type(-result) : constraint_type(result - 1));
+                auto constraint_3 = (inv_or_zero - (x_var - y_var)) *
+                    (component.inequality ? constraint_type(result - 1) : constraint_type(result));
+
+                return bp.add_gate({constraint_1, constraint_2, constraint_3});
             }
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
             void generate_copy_constraints(
-                const plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams> &component,
+                const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::var;
 
                 const std::size_t j = start_row_index;
                 var component_x = var(component.W(0), static_cast<int>(j), false);
                 var component_y = var(component.W(1), static_cast<int>(j), false);
                 bp.add_copy_constraint({instance_input.x, component_x});
-                bp.add_copy_constraint({component_y, instance_input.y});
+                bp.add_copy_constraint({instance_input.y, component_y});
             }
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::result_type
+            typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type
                 generate_circuit(
-                    const plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams> &component,
+                    const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
                     circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                    const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
                     const std::size_t start_row_index){
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
@@ -214,10 +235,11 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_division_or_zero<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
+                return typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type(
+                        component, start_row_index);
             }
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil
 
-#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELD_DIVISION_OR_ZERO_HPP
+#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_PLONK_FIELD_EQUALITY_FLAG_HPP

@@ -35,6 +35,7 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
+#include <nil/blueprint/component_stretcher.hpp>
 #include <nil/blueprint/basic_non_native_policy.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/range.hpp>
 
@@ -117,6 +118,10 @@ namespace nil {
                 struct input_type {
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type A;
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type B;
+
+                    std::vector<var> all_vars() const {
+                        return {A[0], A[1], A[2], A[3], B[0], B[1], B[2], B[3]};
+                    }
                 };
 
                 struct result_type {
@@ -128,10 +133,14 @@ namespace nil {
                                   var(component.W(5), start_row_index + component.rows_amount - 2, false),
                                   var(component.W(6), start_row_index + component.rows_amount - 2, false)};
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output[0], output[1], output[2], output[3]};
+                    }
                 };
 
                 template<typename ContainerType>
-                multiplication(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
+                explicit multiplication(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -309,14 +318,13 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
 
                 using ed25519_field_type = crypto3::algebra::fields::curve25519_base_field;
                 using var = typename plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>::var;
@@ -354,21 +362,21 @@ namespace nil {
                        var(component.W(1), -1) * var(component.W(6), -1) +
                        var(component.W(5), -1) * var(component.W(2), -1) + p[3] * var(component.W(8), -1) +
                        var(component.W(2), 0) * p[0] + p[1] * var(component.W(1), 0) + var(component.W(0), 0) * p[2];
-                auto constraint_1 = bp.add_constraint(
+                auto constraint_1 =
                     var(component.W(7), 0) * (base << 132) -
-                    (t[0] - var(component.W(3), 0) + t[1] * (base << 66) - var(component.W(4), 0) * (base << 66)));
-                auto constraint_2 = bp.add_constraint(var(component.W(8), 0) * (base << 125) -
+                    (t[0] - var(component.W(3), 0) + t[1] * (base << 66) - var(component.W(4), 0) * (base << 66));
+                auto constraint_2 = var(component.W(8), 0) * (base << 125) -
                                                       (t[2] - var(component.W(5), 0) + t[3] * (base << 66) -
-                                                       var(component.W(6), 0) * (base << 66) + var(component.W(7), 0)));
-                auto constraint_3 = bp.add_constraint(var(component.W(7), 0) -
+                                                       var(component.W(6), 0) * (base << 66) + var(component.W(7), 0));
+                auto constraint_3 = var(component.W(7), 0) -
                                                       (var(component.W(0), +1) + var(component.W(1), +1) * (1 << 22) +
                                                        var(component.W(2), +1) * (base << 44) +
-                                                       var(component.W(3), +1) * (base << 66)));
-                auto constraint_4 = bp.add_constraint(var(component.W(8), 0) -
+                                                       var(component.W(3), +1) * (base << 66));
+                auto constraint_4 = var(component.W(8), 0) -
                                                       (var(component.W(4), +1) + var(component.W(5), +1) * (1 << 22) +
                                                        var(component.W(6), +1) * (base << 44) +
-                                                       var(component.W(7), +1) * (base << 66)));
-                auto constraint_5 = bp.add_constraint(
+                                                       var(component.W(7), +1) * (base << 66));
+                auto constraint_5 =
                     (var(component.W(0), -1) + var(component.W(1), -1) * (base << 66) +
                      var(component.W(2), -1) * (base << 132) + var(component.W(3), -1) * (base << 198)) *
                         (var(component.W(4), -1) + var(component.W(5), -1) * (base << 66) +
@@ -377,12 +385,9 @@ namespace nil {
                       var(component.W(1), 0) * (base << 132) + var(component.W(2), 0) * (base << 198)) *
                          pasta_eddsa_p +
                      (var(component.W(3), 0) + var(component.W(4), 0) * (base << 66) +
-                      var(component.W(5), 0) * (base << 132) + var(component.W(6), 0) * (base << 198))));
+                      var(component.W(5), 0) * (base << 132) + var(component.W(6), 0) * (base << 198)));
 
-                bp.add_gate(first_selector_index,
-                            {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5
-
-                            });
+                return bp.add_gate({constraint_1, constraint_2, constraint_3, constraint_4, constraint_5});
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -423,16 +428,9 @@ namespace nil {
                 using component_type = plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>;
                 using range_type = typename component_type::range_type;
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 std::size_t j = start_row_index;
-                assignment.enable_selector(first_selector_index, j + 5);
+                assignment.enable_selector(selector_index, j + 5);
 
                 generate_copy_constraints(component, bp, assignment, instance_input, j);
 
@@ -446,20 +444,89 @@ namespace nil {
                                                     {}, {});
 
                 typename range_type::input_type non_range_input_q = {
-                    var(component.W(8), j + 4), var(component.W(0), j + 5), var(component.W(1), j + 5),
-                    var(component.W(2), j + 5)};
+                    var(component.W(8), j + 4, false), var(component.W(0), j + 5, false),
+                    var(component.W(1), j + 5, false), var(component.W(2), j + 5, false)};
 
                 generate_circuit(range_component_instance, bp, assignment, non_range_input_q, j);
 
                 typename range_type::input_type non_range_input_r = {
-                    var(component.W(3), j + 5), var(component.W(4), j + 5), var(component.W(5), j + 5),
-                    var(component.W(6), j + 5)};
+                    var(component.W(3), j + 5, false), var(component.W(4), j + 5, false),
+                    var(component.W(5), j + 5, false), var(component.W(6), j + 5, false)};
 
                 generate_circuit(range_component_instance, bp, assignment, non_range_input_r, j + 2);
 
                 return typename component_type::result_type(component, start_row_index);
             }
 
+            template<typename ComponentType>
+            class input_type_converter;
+
+            template<typename ComponentType>
+            class result_type_converter;
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            class input_type_converter<plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>> {
+
+                using component_type = plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>;
+                using input_type = typename component_type::input_type;
+                using var = typename nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+            public:
+                static input_type convert(
+                    const input_type &input,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &assignment,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &tmp_assignment) {
+
+                    input_type new_input;
+                    for (std::size_t i = 0; i < input.A.size(); i++) {
+                        tmp_assignment.public_input(0, i) = var_value(assignment, input.A[i]);
+                        new_input.A[i] = var(0, i, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.B.size(); i++) {
+                        std::size_t new_idx = input.A.size() + i;
+                        tmp_assignment.public_input(0, new_idx) = var_value(assignment, input.B[i]);
+                        new_input.B[i] = var(0, new_idx, false, var::column_type::public_input);
+                    }
+
+                    return new_input;
+                }
+
+                static var deconvert_var(const input_type &input,
+                                         var variable) {
+                    BOOST_ASSERT(variable.type == var::column_type::public_input);
+                    if (variable.rotation < input.A.size()) {
+                        return input.A[variable.rotation];
+                    } else {
+                        return input.B[variable.rotation - input.A.size()];
+                    }
+                }
+            };
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            class result_type_converter<plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>> {
+
+                using component_type = plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>;
+                using input_type = typename component_type::input_type;
+                using result_type = typename component_type::result_type;
+                using stretcher_type = component_stretcher<BlueprintFieldType, ArithmetizationParams, component_type>;
+            public:
+                static result_type convert(const stretcher_type &component, const result_type old_result,
+                                           const input_type &instance_input, std::size_t start_row_index) {
+                    result_type new_result(component.component, start_row_index);
+
+                    for (std::size_t i = 0; i < new_result.output.size(); i++) {
+                        new_result.output[i] = component.move_var(
+                            old_result.output[i],
+                            start_row_index + component.line_mapping[old_result.output[i].rotation],
+                            instance_input);
+                    }
+
+                    return new_result;
+                }
+            };
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil

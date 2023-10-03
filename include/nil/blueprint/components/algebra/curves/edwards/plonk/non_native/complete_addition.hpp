@@ -124,6 +124,11 @@ namespace nil {
 
                     var_ec_point T;
                     var_ec_point R;
+
+                    std::vector<var> all_vars() const {
+                        return {T.x[0], T.x[1], T.x[2], T.x[3], T.y[0], T.y[1], T.y[2], T.y[3],
+                                R.x[0], R.x[1], R.x[2], R.x[3], R.y[0], R.y[1], R.y[2], R.y[3]};
+                    }
                 };
 
                 struct result_type {
@@ -145,6 +150,11 @@ namespace nil {
                             var(component.W(1), start_row_index + non_native_range_component_rows_amount, false),
                             var(component.W(2), start_row_index + non_native_range_component_rows_amount, false),
                             var(component.W(3), start_row_index + non_native_range_component_rows_amount, false)};
+                    }
+
+                    std::vector<var> all_vars() const {
+                        return {output.x[0], output.x[1], output.x[2], output.x[3],
+                                output.y[0], output.y[1], output.y[2], output.y[3]};
                     }
                 };
 
@@ -281,10 +291,10 @@ namespace nil {
                     assignment.witness(component.W(2), row) = x3[2];
                     assignment.witness(component.W(3), row) = x3[3];
                     std::array<var, 4> P_x = {
-                        var(component.W(0), row),
-                        var(component.W(1), row),
-                        var(component.W(2), row),
-                        var(component.W(3), row)};
+                        var(component.W(0), row, false),
+                        var(component.W(1), row, false),
+                        var(component.W(2), row, false),
+                        var(component.W(3), row, false)};
 
                     generate_assignments(non_native_range_instance, assignment,
                         typename non_native_range_component::input_type({P_x}), row);
@@ -295,10 +305,10 @@ namespace nil {
                     assignment.witness(component.W(2), row) = y3[2];
                     assignment.witness(component.W(3), row) = y3[3];
                     std::array<var, 4> P_y = {
-                        var(component.W(0), row),
-                        var(component.W(1), row),
-                        var(component.W(2), row),
-                        var(component.W(3), row)};
+                        var(component.W(0), row, false),
+                        var(component.W(1), row, false),
+                        var(component.W(2), row, false),
+                        var(component.W(3), row, false)};
 
                     generate_assignments(non_native_range_instance, assignment,
                         typename non_native_range_component::input_type({P_y}), row);
@@ -420,20 +430,20 @@ namespace nil {
 
                     std::size_t row = start_row_index;
                     std::array<var, 4> P_x = {
-                        var(component.W(0), row),
-                        var(component.W(1), row),
-                        var(component.W(2), row),
-                        var(component.W(3), row)};
+                        var(component.W(0), row, false),
+                        var(component.W(1), row, false),
+                        var(component.W(2), row, false),
+                        var(component.W(3), row, false)};
 
                     generate_circuit(non_native_range_instance, bp, assignment,
                         typename non_native_range_component::input_type({P_x}), row);
                     row += non_native_range_instance.rows_amount;
 
                     std::array<var, 4> P_y = {
-                        var(component.W(0), row),
-                        var(component.W(1), row),
-                        var(component.W(2), row),
-                        var(component.W(3), row)};
+                        var(component.W(0), row, false),
+                        var(component.W(1), row, false),
+                        var(component.W(2), row, false),
+                        var(component.W(3), row, false)};
 
                     generate_circuit(non_native_range_instance, bp, assignment,
                         typename non_native_range_component::input_type({P_y}), row);
@@ -516,90 +526,184 @@ namespace nil {
                 }
 
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-                void generate_copy_constraints(
-                    const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
-                    const std::uint32_t start_row_index) {
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            void generate_copy_constraints(
+                const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                const std::uint32_t start_row_index) {
 
-                    std::size_t row = start_row_index;
+                std::size_t row = start_row_index;
 
-                    using component_type = plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                using component_type = plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
 
-                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
 
-                    for (std::size_t i = 0; i < 4; i++) {
-                        bp.add_copy_constraint({{component.W(i), (std::int32_t)(row + 2), false},
-                                                {component.W(i),
-                                                 (std::int32_t)(start_row_index + component.rows_amount - 4 - 2),
-                                                 false}});
-                    }
-                    row += component_type::addition_component::get_rows_amount(component.witness_amount(), 0);
-
-                    for (std::size_t i = 0; i < 4; i++) {
-                        bp.add_copy_constraint({{component.W(i), (std::int32_t)(row + 2), false},
-                                                {component.W(i),
-                                                 (std::int32_t)(start_row_index + component.rows_amount - 2),
-                                                 false}});
-                    }
+                for (std::size_t i = 0; i < 4; i++) {
+                    bp.add_copy_constraint({{component.W(i), (std::int32_t)(row + 2), false},
+                                            {component.W(i),
+                                                (std::int32_t)(start_row_index + component.rows_amount - 4 - 2),
+                                                false}});
                 }
+                row += component_type::addition_component::get_rows_amount(component.witness_amount(), 0);
+
+                for (std::size_t i = 0; i < 4; i++) {
+                    bp.add_copy_constraint({{component.W(i), (std::int32_t)(row + 2), false},
+                                            {component.W(i),
+                                                (std::int32_t)(start_row_index + component.rows_amount - 2),
+                                                false}});
+                }
+            }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
             void generate_constants(
-                    const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
-                    const std::uint32_t start_row_index) {
+                const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
+                const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                const std::uint32_t start_row_index) {
 
-                    std::size_t row = start_row_index;
-                    using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
+                std::size_t row = start_row_index;
+                using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
-                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
-                        ArithmetizationType;
+                typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    ArithmetizationType;
 
-                    using var = typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                using var = typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
 
-                    using Ed25519Type = typename crypto3::algebra::curves::ed25519;
+                using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
-                    using non_native_range_component = components::range<
-                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
-                    using multiplication_component = multiplication<
-                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
-                    using addition_component = addition<
-                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
-                    using subtraction_component = subtraction<
-                        ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
+                using non_native_range_component = components::range<
+                    ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
+                using multiplication_component = multiplication<
+                    ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
+                using addition_component = addition<
+                    ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
+                using subtraction_component = subtraction<
+                    ArithmetizationType, Ed25519Type::base_field_type, non_native_policy_type>;
 
-                    row += non_native_range_component::get_rows_amount(component.witness_amount(), 0);
-                    row += non_native_range_component::get_rows_amount(component.witness_amount(), 0);
-                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += addition_component::get_rows_amount(component.witness_amount(), 0);
-                    row += addition_component::get_rows_amount(component.witness_amount(), 0);
-                    row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                row += non_native_range_component::get_rows_amount(component.witness_amount(), 0);
+                row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                row += addition_component::get_rows_amount(component.witness_amount(), 0);
+                row += addition_component::get_rows_amount(component.witness_amount(), 0);
+                row += multiplication_component::get_rows_amount(component.witness_amount(), 0);
 
-                    typename Ed25519Type::base_field_type::integral_type base = 1;
-                    typename Ed25519Type::base_field_type::integral_type mask = (base << 66) - 1;
+                typename Ed25519Type::base_field_type::integral_type base = 1;
+                typename Ed25519Type::base_field_type::integral_type mask = (base << 66) - 1;
 
-                    typename Ed25519Type::base_field_type::integral_type d =
-                        typename Ed25519Type::base_field_type::integral_type(
-                            0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3_cppui256);
-                    assignment.constant(component.C(0), row + 4) = d & mask;
-                    assignment.constant(component.C(0), row + 5) = (d >> 66) & mask;
-                    assignment.constant(component.C(0), row + 6) = (d >> 132) & mask;
-                    assignment.constant(component.C(0), row + 7) = (d >> 198) & mask;
+                typename Ed25519Type::base_field_type::integral_type d =
+                    typename Ed25519Type::base_field_type::integral_type(
+                        0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3_cppui256);
+                assignment.constant(component.C(0), row + 4) = d & mask;
+                assignment.constant(component.C(0), row + 5) = (d >> 66) & mask;
+                assignment.constant(component.C(0), row + 6) = (d >> 132) & mask;
+                assignment.constant(component.C(0), row + 7) = (d >> 198) & mask;
+            }
+
+            template<typename ComponentType>
+            class input_type_converter;
+
+            template<typename ComponentType>
+            class result_type_converter;
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            class input_type_converter<
+                plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+
+                using component_type =
+                    plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                using input_type = typename component_type::input_type;
+                using var = typename nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+            public:
+                static input_type convert(
+                    const input_type &input,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &assignment,
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                           ArithmetizationParams>>
+                        &tmp_assignment) {
+
+                    input_type new_input;
+
+                    for (std::size_t i = 0; i < input.T.x.size(); i++) {
+                        tmp_assignment.public_input(0, i) = var_value(assignment, input.T.x[i]);
+                        new_input.T.x[i] = var(0, i, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.T.y.size(); i++) {
+                        std::size_t new_idx = input.T.x.size() + i;
+                        tmp_assignment.public_input(0, new_idx) = var_value(assignment, input.T.y[i]);
+                        new_input.T.y[i] = var(0, new_idx, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.R.x.size(); i++) {
+                        std::size_t new_idx = input.T.x.size() + input.T.y.size() + i;
+                        tmp_assignment.public_input(0, new_idx) = var_value(assignment, input.R.x[i]);
+                        new_input.R.x[i] = var(0, new_idx, false, var::column_type::public_input);
+                    }
+                    for (std::size_t i = 0; i < input.R.y.size(); i++) {
+                        std::size_t new_idx = input.T.x.size() + input.T.y.size() + input.R.x.size() + i;
+                        tmp_assignment.public_input(0, new_idx) = var_value(assignment, input.R.y[i]);
+                        new_input.R.y[i] = var(0, new_idx, false, var::column_type::public_input);
+                    }
+
+                    return new_input;
                 }
 
+                static var deconvert_var(const input_type &input,
+                                         var variable) {
+                    BOOST_ASSERT(variable.type == var::column_type::public_input);
+                    if (variable.rotation < input.T.x.size()) {
+                        return input.T.x[variable.rotation];
+                    } else if (variable.rotation < input.T.x.size() + input.T.y.size()) {
+                        return input.T.y[variable.rotation - input.T.x.size()];
+                    } else if (variable.rotation < input.T.x.size() + input.T.y.size() + input.R.x.size()) {
+                        return input.R.x[variable.rotation - input.T.x.size() - input.T.y.size()];
+                    } else {
+                        return input.R.y[variable.rotation - input.T.x.size() - input.T.y.size() - input.R.x.size()];
+                    }
+                }
+            };
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            class result_type_converter<
+                plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+
+                using component_type =
+                    plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                using input_type = typename component_type::input_type;
+                using result_type = typename component_type::result_type;
+                using stretcher_type = component_stretcher<BlueprintFieldType, ArithmetizationParams, component_type>;
+            public:
+                static result_type convert(const stretcher_type &component, const result_type old_result,
+                                           const input_type &instance_input, std::size_t start_row_index) {
+                    result_type new_result(component.component, start_row_index);
+
+                    for (std::size_t i = 0; i < 4; i++) {
+                        new_result.output.x[i] = component.move_var(
+                            old_result.output.x[i],
+                            start_row_index + component.line_mapping[old_result.output.x[i].rotation],
+                            instance_input
+                        );
+                        new_result.output.y[i] = component.move_var(
+                            old_result.output.y[i],
+                            start_row_index + component.line_mapping[old_result.output.y[i].rotation],
+                            instance_input
+                        );
+                    }
+
+                    return new_result;
+                }
+            };
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil

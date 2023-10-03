@@ -22,7 +22,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE blueprint_plonk_unified_addition_test
+#define BOOST_TEST_MODULE blueprint_plonk_oracles_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -85,10 +85,10 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
 
 }
 
-template <typename BlueprintFieldType>
-void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_input,
-    std::vector<typename BlueprintFieldType::value_type> expected_res){
-    constexpr std::size_t WitnessColumns = 15;
+template <typename BlueprintFieldType, bool Stretched = false >
+void test_to_limbs(const std::vector<typename BlueprintFieldType::value_type> &public_input,
+                   const std::vector<typename BlueprintFieldType::value_type> &expected_res){
+    constexpr std::size_t WitnessColumns = 15 * (Stretched ? 2 : 1);
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 2;
@@ -122,7 +122,29 @@ void test_to_limbs(std::vector<typename BlueprintFieldType::value_type> public_i
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    if constexpr (Stretched) {
+        using stretched_component_type = nil::blueprint::components::component_stretcher<
+            BlueprintFieldType,
+            ArithmetizationParams,
+            component_type>;
+
+        stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
+
+        nil::crypto3::test_component<stretched_component_type, BlueprintFieldType,
+                                     ArithmetizationParams, hash_type, Lambda>
+            (stretched_instance, public_input, result_check, instance_input);
+    } else {
+        nil::crypto3::test_component<component_type, BlueprintFieldType,
+                                     ArithmetizationParams, hash_type, Lambda>
+            (component_instance, public_input, result_check, instance_input);
+    }
+}
+
+template <typename BlueprintFieldType>
+void test_to_limbs_with_stretching(const std::vector<typename BlueprintFieldType::value_type> &public_input,
+                                   const std::vector<typename BlueprintFieldType::value_type> &expected_res) {
+    test_to_limbs<BlueprintFieldType, false>(public_input, expected_res);
+    test_to_limbs<BlueprintFieldType, true>(public_input, expected_res);
 }
 
 
@@ -154,13 +176,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_from_limbs_pallas) {
 
 template<typename FieldType>
 void test_to_limbs_specific_data(){
-    test_to_limbs<FieldType>({0x1D42ED837696F2A777E7C1FF0436D46E96878B624ECDE039732E37AFCD409C88_cppui256},
+    test_to_limbs_with_stretching<FieldType>({0x1D42ED837696F2A777E7C1FF0436D46E96878B624ECDE039732E37AFCD409C88_cppui256},
     {0x732E37AFCD409C88_cppui256, 0x96878B624ECDE039_cppui256, 0x77E7C1FF0436D46E_cppui256, 0x1D42ED837696F2A7_cppui256});
 
-    test_to_limbs<FieldType>({0xE826DABA538B6DF0000000000000000FB812F513D0FCC04106CB4BD3F32FAD3_cppui256},
+    test_to_limbs_with_stretching<FieldType>({0xE826DABA538B6DF0000000000000000FB812F513D0FCC04106CB4BD3F32FAD3_cppui256},
     {0x106CB4BD3F32FAD3_cppui256, 0xFB812F513D0FCC04_cppui256, 0x0_cppui256, 0xE826DABA538B6DF_cppui256});
 
-    test_to_limbs<FieldType>({0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui256},
+    test_to_limbs_with_stretching<FieldType>({0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui256},
     {0xFFFFFFFFFFFFFFFF_cppui256, 0xFFFFFFFFFFFFFFFF_cppui256, 0xFFFFFFFFFFFFFFFF_cppui256, 0x3FFFFFFFFFFFFFFF_cppui256});
 
 }
@@ -169,7 +191,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_vesta) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     test_to_limbs_specific_data<field_type>();
 
-    test_to_limbs<field_type>({0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui255}, //-1 vesta
+    test_to_limbs_with_stretching<field_type>({0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui255}, //-1 vesta
     {0x992d30ed00000000_cppui256, 0x224698fc094cf91b_cppui256, 0x0000000000000000_cppui256, 0x4000000000000000_cppui256});
 }
 
@@ -177,7 +199,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_pallas) {
     using field_type = nil::crypto3::algebra::curves::pallas::scalar_field_type;
     test_to_limbs_specific_data<field_type>();
 
-    test_to_limbs<field_type>({0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000000_cppui256}, //-1 pallas
+    test_to_limbs_with_stretching<field_type>({0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000000_cppui256}, //-1 pallas
     {0x8c46eb2100000000_cppui256, 0x224698fc0994a8dd_cppui256, 0x0000000000000000_cppui256, 0x4000000000000000_cppui256});
 }
 
@@ -185,7 +207,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_to_limbs_bls12) {
     using field_type = nil::crypto3::algebra::fields::bls12_fr<381>;
     test_to_limbs_specific_data<field_type>();
 
-    test_to_limbs<field_type>({0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000_cppui256}, //-1 bls12<381>
+    test_to_limbs_with_stretching<field_type>({0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000000_cppui256}, //-1 bls12<381>
     {0xffffffff00000000_cppui256, 0x53bda402fffe5bfe_cppui256, 0x3339d80809a1d805_cppui256, 0x73eda753299d7d48_cppui256});
 }
 

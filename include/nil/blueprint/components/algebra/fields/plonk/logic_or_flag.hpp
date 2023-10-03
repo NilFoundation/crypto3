@@ -117,6 +117,10 @@ namespace nil {
                 struct input_type {
                     var x;
                     var y;
+
+                    std::vector<var> all_vars() const {
+                        return {x, y};
+                    }
                 };
 
                 struct result_type {
@@ -130,10 +134,14 @@ namespace nil {
                             var(component.W(component.witness_amount() - 1),
                                 start_row_index + component.rows_amount - 1, false);
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output};
+                    }
                 };
 
                 template<typename ContainerType>
-                logic_or_flag(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
+                explicit logic_or_flag(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -193,17 +201,18 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::vector<std::size_t> generate_gates(
                 const plonk_logic_or_flag_component<BlueprintFieldType, ArithmetizationParams>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_logic_or_flag_component<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::uint32_t first_selector_index) {
+                    &instance_input) {
 
                 using var = typename plonk_logic_or_flag_component<BlueprintFieldType, ArithmetizationParams>::var;
+
+                std::vector<std::size_t> selector_indices;
 
                 std::size_t offset = component.rows_amount == 3 ? -1 : 0;
                 std::size_t witness_amount = component.witness_amount();
@@ -227,27 +236,29 @@ namespace nil {
                      _fy = var(component.W(wl[5].first), wl[5].second),
                      _f = var(component.W(witness_amount - 1), offset + component.rows_amount - 1);
 
-                auto constraint_1 = bp.add_constraint(_fx - _x * _vx);            // fx =x*vx
-                auto constraint_2 = bp.add_constraint(_fy - _y * _vy);            // fy =y*vy
+                auto constraint_1 = _fx - _x * _vx;            // fx =x*vx
+                auto constraint_2 = _fy - _y * _vy;            // fy =y*vy
 
-                auto constraint_3 = bp.add_constraint(_fx * (_fx - 1));           // fx(fx-1)=0
-                auto constraint_4 = bp.add_constraint(_fy * (_fy - 1));           // fy(fy-1)=0
+                auto constraint_3 = _fx * (_fx - 1);           // fx(fx-1)=0
+                auto constraint_4 = _fy * (_fy - 1);           // fy(fy-1)=0
 
-                auto constraint_5 = bp.add_constraint((_vx - _x) * (_fx - 1));    // (vx-x)(fx-1)=0
-                auto constraint_6 = bp.add_constraint((_vy - _y) * (_fy - 1));    // (vy-y)(fy-1)=0
+                auto constraint_5 = (_vx - _x) * (_fx - 1);    // (vx-x)(fx-1)=0
+                auto constraint_6 = (_vy - _y) * (_fy - 1);    // (vy-y)(fy-1)=0
 
                 if (witness_amount == 2) {
                     _fx = var(component.W(wl[4].first), 0), _fy = var(component.W(wl[5].first), 0),
                     _f = var(component.W(witness_amount - 1), +1);
-                    auto constraint_7 = bp.add_constraint(_f - _fx - _fy + _fx * _fy);    // f = f_x + f_y - f_x*f_y
-                    bp.add_gate(first_selector_index,
-                                {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6});
-                    bp.add_gate(first_selector_index + 1, {constraint_7});
+                    auto constraint_7 = _f - _fx - _fy + _fx * _fy;    // f = f_x + f_y - f_x*f_y
+                    selector_indices.push_back(bp.add_gate(
+                        {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6}));
+                    selector_indices.push_back(bp.add_gate({constraint_7}));
                 } else {
-                    auto constraint_7 = bp.add_constraint(_f - _fx - _fy + _fx * _fy);    // f = f_x + f_y - f_x*f_y
-                    bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3, constraint_4,
-                                                       constraint_5, constraint_6, constraint_7});
+                    auto constraint_7 = _f - _fx - _fy + _fx * _fy;    // f = f_x + f_y - f_x*f_y
+                    selector_indices.push_back(bp.add_gate(
+                        {constraint_1, constraint_2, constraint_3, constraint_4, constraint_5, constraint_6,
+                         constraint_7}));
                 }
+                return selector_indices;
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -280,19 +291,16 @@ namespace nil {
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
-
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
-                assignment.enable_selector(first_selector_index,
+                std::vector<std::size_t> selector_indices =
+                    generate_gates(component, bp, assignment, instance_input);
+                assignment.enable_selector(selector_indices[0],
                                            start_row_index + (component.rows_amount == 3 ? 1 : 0));
                 if (component.witness_amount() == 2) {
-                    assignment.enable_selector(first_selector_index + 1, start_row_index + 2);
+                    if (selector_indices.size() != 2) {
+                        std::cerr << "Internal error: logic_or_flag component returned the wrong selector amount."
+                                  << std::endl;
+                    }
+                    assignment.enable_selector(selector_indices[1], start_row_index + 2);
                 }
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);

@@ -62,18 +62,18 @@ namespace nil {
             //          verifier index (public data)
             // Output: oracles result, scalar field part
             //      (https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L457-L468)
-            template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
+            template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType,
                 typename KimchiCommitmentParamsType, std::size_t... WireIndexes>
             class oracles_scalar;
 
-            template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
+            template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,
                      typename KimchiCommitmentParamsType, std::size_t W0, std::size_t W1,
                      std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                      std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                      std::size_t W13, std::size_t W14>
             class oracles_scalar<
                 snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
-                CurveType, KimchiParamsType, KimchiCommitmentParamsType, 
+                CurveType, KimchiParamsType, KimchiCommitmentParamsType,
                 W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                 using BlueprintFieldType = typename CurveType::scalar_field_type;
@@ -95,7 +95,7 @@ namespace nil {
                     zk::components::exponentiation<ArithmetizationType, 256, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                                                    W10, W11, W12, W13, W14>;
                 using mul_component = zk::components::multiplication<ArithmetizationType, W0, W1, W2>;
-                
+
                 using alpha_powers_component = zk::components::element_powers<ArithmetizationType, KimchiParamsType::alpha_powers_n, 0, 1, 2, 3,
                                                                       4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14>;
 
@@ -107,40 +107,40 @@ namespace nil {
                                                                 W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 using public_eval_component =
-                        zk::components::public_evaluations<ArithmetizationType, 
+                        zk::components::public_evaluations<ArithmetizationType,
                                                     KimchiParamsType::public_input_size, W0, W1, W2, W3,
                                                     W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 using prev_chal_evals_component =
-                        zk::components::prev_chal_evals<ArithmetizationType, 
+                        zk::components::prev_chal_evals<ArithmetizationType,
                                                     KimchiCommitmentParamsType, W0, W1, W2, W3,
                                                     W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
-                                    
+
                 using combined_proof_evals_component =
-                        zk::components::combine_proof_evals<ArithmetizationType, 
+                        zk::components::combine_proof_evals<ArithmetizationType,
                                                     KimchiParamsType, W0, W1, W2, W3,
                                                     W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 using ft_eval_component =
                         zk::components::ft_eval<ArithmetizationType, CurveType,
                                                     KimchiParamsType, W0, W1, W2, W3,
-                                                    W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
-                                    
+                                                    W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                 using cip_component = zk::components::oracles_cip<ArithmetizationType,
                                                     KimchiParamsType, W0, W1, W2, W3,
-                                                    W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>; 
-                
+                                                    W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
+
                 using transcript_type = kimchi_transcript<ArithmetizationType, CurveType, KimchiParamsType,
                                     W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10,
                                     W11, W12, W13, W14>;
 
-            
+
 
                 using proof_binding = typename zk::components::binding<ArithmetizationType,
                     BlueprintFieldType, KimchiParamsType>;
 
                 constexpr static const std::size_t eval_points_amount = 2;
-                using prev_chal_output = 
+                using prev_chal_output =
                         std::array<std::array<var, KimchiCommitmentParamsType::split_poly_eval_size>, eval_points_amount>;
 
                 constexpr static std::size_t rows() {
@@ -181,7 +181,7 @@ namespace nil {
                     // TODO: check on empty public_input
                     // public_eval
                     row += public_eval_component::rows_amount;
-                    
+
                     row += transcript_type::absorb_evaluations_rows;
                     row += transcript_type::absorb_evaluations_rows;
 
@@ -194,7 +194,7 @@ namespace nil {
 
                     // u_challenge
                     row += transcript_type::challenge_rows;
-                    
+
                     row += endo_scalar_component::rows_amount;
 
                     // powers_of_eval_points_for_chunks
@@ -222,7 +222,7 @@ namespace nil {
                 constexpr static const std::size_t gates_amount = 0;
 
                 struct params_type {
-                    
+
 
                     kimchi_verifier_index_scalar<BlueprintFieldType> &verifier_index;
                     kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
@@ -232,7 +232,7 @@ namespace nil {
                     params_type(kimchi_verifier_index_scalar<BlueprintFieldType> &_verifier_index,
                         kimchi_proof_scalar<BlueprintFieldType, KimchiParamsType,
                             KimchiCommitmentParamsType::eval_rounds> &_proof,
-                        typename proof_binding::fq_sponge_output &_fq_output) : 
+                        typename proof_binding::fq_sponge_output &_fq_output) :
                                                     verifier_index(_verifier_index),
                                                     proof(_proof),
                                                     fq_output(_fq_output) {}
@@ -289,9 +289,9 @@ namespace nil {
 
                     var beta = params.fq_output.beta;
                     var gamma = params.fq_output.gamma;
-                    
-                    
-                    var joint_combiner; 
+
+
+                    var joint_combiner;
                     if (KimchiParamsType::circuit_params::use_lookup &&
                         KimchiParamsType::circuit_params::joint_lookup) {
                         joint_combiner = endo_scalar_component::generate_circuit(bp, assignment,
@@ -326,18 +326,18 @@ namespace nil {
                        {zeta, params.verifier_index.omega}, row).output;
                     row += mul_component::rows_amount;
 
-                    var zeta_omega_pow_n = 
-                        exponentiation_component::generate_circuit(bp, assignment, 
+                    var zeta_omega_pow_n =
+                        exponentiation_component::generate_circuit(bp, assignment,
                         {zeta_omega, domain_size}, row).output;
                     row += exponentiation_component::rows_amount;
 
                     std::array<var, KimchiParamsType::alpha_powers_n> alpha_powers =
-                        alpha_powers_component::generate_circuit(bp, assignment, 
+                        alpha_powers_component::generate_circuit(bp, assignment,
                         {alpha, one}, row).output;
                     row += alpha_powers_component::rows_amount;
 
                     std::array<var, KimchiParamsType::public_input_size> omega_powers =
-                        pi_powers_component::generate_circuit(bp, assignment, 
+                        pi_powers_component::generate_circuit(bp, assignment,
                         {params.verifier_index.omega, one}, row).output;
                     row += pi_powers_component::rows_amount;
 
@@ -349,9 +349,9 @@ namespace nil {
                     // TODO: check on empty public_input
                     std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
                     std::array<var, eval_points_amount> public_eval = public_eval_component::generate_circuit(bp,
-                        assignment, {zeta_pow_n, zeta_omega_pow_n, 
+                        assignment, {zeta_pow_n, zeta_omega_pow_n,
                                     pi,
-                                    lagrange_denominators, 
+                                    lagrange_denominators,
                                     omega_powers,
                                     domain_size, one, zero}, row).output;
                     row += public_eval_component::rows_amount;
@@ -392,17 +392,17 @@ namespace nil {
                                          .output;
                     row += exponentiation_component::rows_amount;
 
-                    
+
                     std::array<prev_chal_output, KimchiParamsType::prev_challenges_size> prev_challenges_evals;
 
                     for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; i++) {
                         std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
                             params.proof.prev_challenges[i];
-                        prev_challenges_evals[i] = 
+                        prev_challenges_evals[i] =
                             prev_chal_evals_component::generate_circuit(bp, assignment,
-                                {prev_challenges, 
+                                {prev_challenges,
                                 {{zeta, zeta_omega}},
-                                powers_of_eval_points_for_chunks, 
+                                powers_of_eval_points_for_chunks,
                                 one, zero}, row).output;
                         row += prev_chal_evals_component::rows_amount;
                     }
@@ -411,7 +411,7 @@ namespace nil {
                         eval_points_amount> combined_evals;
                     for (std::size_t i = 0; i < eval_points_amount; i++) {
                         combined_evals[i] = combined_proof_evals_component::generate_circuit(
-                            bp, assignment, {params.proof.proof_evals[i], 
+                            bp, assignment, {params.proof.proof_evals[i],
                             powers_of_eval_points_for_chunks[i]}, row).output;
                         row += combined_proof_evals_component::rows_amount;
                     }
@@ -420,7 +420,7 @@ namespace nil {
                         eval_points_amount> evals = params.proof.proof_evals;
                     var ft_eval0 = ft_eval_component::generate_circuit(
                         bp,
-                        assignment, 
+                        assignment,
                         {params.verifier_index,
                         zeta_pow_n,
                         alpha_powers,
@@ -437,7 +437,7 @@ namespace nil {
                     //cip
                     var cip = cip_component::generate_circuit(bp,
                         assignment,
-                        {v, 
+                        {v,
                         u,
                         ft_eval0,
                         params.proof.ft_eval,
@@ -448,7 +448,7 @@ namespace nil {
                     row += cip_component::rows_amount;
 
                     generate_copy_constraints(bp, assignment, params, start_row_index);
-                    
+
                     typename result_type::random_oracles random_oracles = {
                         alpha,
                         zeta,
@@ -468,7 +468,7 @@ namespace nil {
                         zeta_pow_n,
                         ft_eval0,
                         combined_evals,
-                        cip, 
+                        cip,
                         {zeta, zeta_omega}
                     };
                 }
@@ -487,7 +487,7 @@ namespace nil {
                     var beta = params.fq_output.beta;
                     var gamma = params.fq_output.gamma;
 
-                    var joint_combiner; 
+                    var joint_combiner;
                     if (KimchiParamsType::circuit_params::use_lookup &&
                         KimchiParamsType::circuit_params::joint_lookup) {
                         joint_combiner = endo_scalar_component::generate_assignments(assignment,
@@ -519,7 +519,7 @@ namespace nil {
                         assignment, {zeta, n}, row).output;
                     row += exponentiation_component::rows_amount;
 
-                    var zeta_omega = mul_component::generate_assignments(assignment, {zeta, 
+                    var zeta_omega = mul_component::generate_assignments(assignment, {zeta,
                         params.verifier_index.omega}, row).output;
                     row += mul_component::rows_amount;
 
@@ -532,24 +532,24 @@ namespace nil {
                     row += alpha_powers_component::rows_amount;
 
                     std::array<var, KimchiParamsType::public_input_size> omega_powers =
-                        pi_powers_component::generate_assignments(assignment, 
+                        pi_powers_component::generate_assignments(assignment,
                         {params.verifier_index.omega, one}, row).output;
                     row += pi_powers_component::rows_amount;
 
-                    std::array<var, eval_points_amount * KimchiParamsType::public_input_size> lagrange_denominators = 
+                    std::array<var, eval_points_amount * KimchiParamsType::public_input_size> lagrange_denominators =
                                 lagrange_denominators_component::generate_assignments(assignment,
                                 {zeta, zeta_omega, omega_powers, one}, row).output;
                     row += lagrange_denominators_component::rows_amount;
 
                     std::array<var, KimchiParamsType::public_input_size> pi = params.proof.public_input;
                     std::array<var, eval_points_amount> public_eval = public_eval_component::generate_assignments(
-                        assignment, {zeta_pow_n, zeta_omega_pow_n, 
+                        assignment, {zeta_pow_n, zeta_omega_pow_n,
                                     pi,
-                                    lagrange_denominators, 
+                                    lagrange_denominators,
                                     omega_powers,
                                     n, one, zero}, row).output;
                     row += public_eval_component::rows_amount;
-                    
+
                     transcript.absorb_evaluations_assignment(
                         assignment, public_eval[0], params.proof.proof_evals[0], row);
                     row += transcript_type::absorb_evaluations_rows;
@@ -576,7 +576,7 @@ namespace nil {
                         exponentiation_component::generate_assignments(
                             assignment, {zeta, max_poly_size}, row).output,
                         exponentiation_component::generate_assignments(
-                            assignment, {zeta_omega, max_poly_size}, 
+                            assignment, {zeta_omega, max_poly_size},
                             row + exponentiation_component::rows_amount).output
                     };
                     row += 2 * exponentiation_component::rows_amount;
@@ -586,11 +586,11 @@ namespace nil {
                     for (std::size_t i = 0; i < KimchiParamsType::prev_challenges_size; i++) {
                         std::array<var, KimchiCommitmentParamsType::eval_rounds> prev_challenges =
                             params.proof.prev_challenges[i];
-                        prev_challenges_evals[i] = 
+                        prev_challenges_evals[i] =
                             prev_chal_evals_component::generate_assignments(assignment,
-                                {prev_challenges, 
+                                {prev_challenges,
                                 {{zeta, zeta_omega}},
-                                powers_of_eval_points_for_chunks, 
+                                powers_of_eval_points_for_chunks,
                                 one, zero}, row).output;
                         row += prev_chal_evals_component::rows_amount;
                     }
@@ -599,7 +599,7 @@ namespace nil {
                         eval_points_amount> combined_evals;
                     for (std::size_t i = 0; i < eval_points_amount; i++) {
                         combined_evals[i] = combined_proof_evals_component::generate_assignments(
-                            assignment, {params.proof.proof_evals[i], 
+                            assignment, {params.proof.proof_evals[i],
                             powers_of_eval_points_for_chunks[i]}, row).output;
                         row += combined_proof_evals_component::rows_amount;
                     }
@@ -607,7 +607,7 @@ namespace nil {
                     std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
                         eval_points_amount> evals = params.proof.proof_evals;
                     var ft_eval0 = ft_eval_component::generate_assignments(
-                        assignment, 
+                        assignment,
                         {params.verifier_index,
                         zeta_pow_n,
                         alpha_powers,
@@ -624,7 +624,7 @@ namespace nil {
                     //cip
                     var cip = cip_component::generate_assignments(
                         assignment,
-                        {v, 
+                        {v,
                         u,
                         ft_eval0,
                         params.proof.ft_eval,
@@ -670,7 +670,7 @@ namespace nil {
                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                               const params_type &params,
                                               std::size_t component_start_row = 0) {
-                    
+
                 }
 
                 static void

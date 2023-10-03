@@ -34,7 +34,6 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp>
 
@@ -44,7 +43,7 @@
 #include <string>
 
 using nil::blueprint::components::detail::bit_builder_component;
-using nil::blueprint::components::detail::bit_composition_mode;
+using nil::blueprint::components::bit_composition_mode;
 
 namespace nil {
     namespace blueprint {
@@ -64,6 +63,10 @@ namespace nil {
                                  : public bit_builder_component<crypto3::zk::snark::plonk_constraint_system<
                                                                     BlueprintFieldType, ArithmetizationParams>> {
 
+                void check_params(std::size_t bits_amount, bit_composition_mode mode) const {
+                    BLUEPRINT_RELEASE_ASSERT(bits_amount > 0 && bits_amount < BlueprintFieldType::modulus_bits);
+                    BLUEPRINT_RELEASE_ASSERT(mode == bit_composition_mode::LSB || mode == bit_composition_mode::MSB);
+                }
             public:
                 using component_type =
                     bit_builder_component<
@@ -104,6 +107,10 @@ namespace nil {
 
                 struct input_type {
                     var input;
+
+                    std::vector<var> all_vars() const {
+                        return {input};
+                    }
                 };
 
                 struct result_type {
@@ -122,19 +129,19 @@ namespace nil {
                             output[i] = var(component.W(pos.second), pos.first, false);
                         }
                     }
+
+                    std::vector<var> all_vars() const {
+                        return output;
+                    }
                 };
 
-                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
-                    std::stringstream ss;
-                    ss << mode << "_" << this->bits_amount;
-                    return ss.str();
-                }
-
                 template<typename ContainerType>
-                bit_decomposition(ContainerType witness, std::uint32_t bits_amount,
-                                  bit_composition_mode mode_) :
+                explicit bit_decomposition(ContainerType witness, std::uint32_t bits_amount,
+                                           bit_composition_mode mode_) :
                                         component_type(witness, get_manifest(), bits_amount, true),
-                                        mode(mode_) {};
+                                        mode(mode_) {
+                    check_params(bits_amount, mode);
+                };
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -142,7 +149,10 @@ namespace nil {
                                   PublicInputContainerType public_input, std::uint32_t bits_amount,
                                   bit_composition_mode mode_) :
                     component_type(witness, constant, public_input, get_manifest(), bits_amount, true),
-                    mode(mode_) {};
+                    mode(mode_) {
+
+                    check_params(bits_amount, mode);
+                };
 
                 bit_decomposition(
                     std::initializer_list<typename component_type::witness_container_type::value_type>
@@ -153,7 +163,10 @@ namespace nil {
                         public_inputs,
                     std::uint32_t bits_amount, bit_composition_mode mode_) :
                     component_type(witnesses, constants, public_inputs, get_manifest(), bits_amount, true),
-                    mode(mode_) {};
+                    mode(mode_) {
+
+                    check_params(bits_amount, mode);
+                };
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -211,8 +224,7 @@ namespace nil {
                 std::size_t padding = 0;
                 for (; padding < component.padding_bits_amount(); padding++) {
                     auto bit_pos = component.bit_position(row, padding);
-                    bp.add_copy_constraint({zero,
-                                            var(component.W(bit_pos.second), bit_pos.first, false)});
+                    bp.add_copy_constraint({zero, var(component.W(bit_pos.second), bit_pos.first, false)});
                 }
 
                 for (std::size_t i = 0; i < component.sum_bits_amount() - 1; i += 2) {

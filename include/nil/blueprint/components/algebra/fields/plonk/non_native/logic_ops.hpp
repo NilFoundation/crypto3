@@ -96,7 +96,7 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_not(ContainerType witness) : component_type(witness, get_manifest()) {};
+                explicit logic_not(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -166,7 +166,7 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_and(ContainerType witness) : component_type(witness, get_manifest()) {};
+                explicit logic_and(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -236,7 +236,7 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_or(ContainerType witness) : component_type(witness, get_manifest()) {};
+                explicit logic_or(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -306,7 +306,7 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_xor(ContainerType witness) : component_type(witness, get_manifest()) {};
+                explicit logic_xor(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -378,7 +378,7 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_nand(ContainerType witness) : component_type(witness, get_manifest()) {};
+                explicit logic_nand(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -447,7 +447,7 @@ namespace nil {
                 }
 
                 template<typename ContainerType>
-                logic_nor(ContainerType witness) : component_type(witness, get_manifest()) {};
+                explicit logic_nor(ContainerType witness) : component_type(witness, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>

@@ -29,7 +29,6 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp>
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/bit_composition.hpp>
@@ -44,13 +43,10 @@ namespace nil {
     namespace blueprint {
         namespace components {
 
-            namespace detail {
-                    enum bit_shift_mode {
-                    LEFT,
-                    RIGHT,
-                };
-            }   // namespace detail
-            using detail::bit_shift_mode;
+            enum bit_shift_mode {
+                LEFT,
+                RIGHT,
+            };
 
             /*
                 Shits an element < 2^{bits_amount} by a constant amount of bits.
@@ -154,6 +150,10 @@ namespace nil {
 
                 struct input_type {
                     var input;
+
+                    std::vector<var> all_vars() const {
+                        return {input};
+                    }
                 };
 
                 struct result_type {
@@ -165,17 +165,15 @@ namespace nil {
                         output = typename composition_component_type::result_type(
                                     component.composition_subcomponent, row).output;
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output};
+                    }
                 };
 
-                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
-                    std::stringstream ss;
-                    ss << mode << "_" << shift;
-                    return ss.str();
-                }
-
                 template<typename ContainerType>
-                bit_shift_constant(ContainerType witness, std::uint32_t bits_amount_, std::uint32_t shift_,
-                                   bit_shift_mode mode_) :
+                explicit bit_shift_constant(ContainerType witness, std::uint32_t bits_amount_, std::uint32_t shift_,
+                                            bit_shift_mode mode_) :
                     component_type(witness, {}, {}, get_manifest()),
                     decomposition_subcomponent(witness, bits_amount_, bit_composition_mode::MSB),
                     composition_subcomponent(witness,

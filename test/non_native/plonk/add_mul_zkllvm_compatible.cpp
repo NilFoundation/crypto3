@@ -50,13 +50,12 @@
 
 using namespace nil;
 
-template <typename CurveType, typename Ed25519Type>
+template <typename CurveType, typename Ed25519Type, bool Stretched = false >
 void test_mul(typename CurveType::base_field_type::value_type b_val,
-        typename Ed25519Type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T
-    ){
+        typename Ed25519Type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T){
 
     using BlueprintFieldType = typename CurveType::base_field_type;
-    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t WitnessColumns = 9 * (Stretched ? 2 : 1);
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
@@ -65,9 +64,11 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
+    using foreign_integral_type = typename Ed25519Type::base_field_type::integral_type;
+    using value_type = typename BlueprintFieldType::value_type;
     constexpr std::size_t Lambda = 1;
 
-    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+    using var = crypto3::zk::snark::plonk_variable<value_type>;
 
     using component_type = blueprint::components::variable_base_multiplication<
         ArithmetizationType,
@@ -89,12 +90,12 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
 
     typename Ed25519Type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type P = T * b_val;
 
-    typename Ed25519Type::base_field_type::integral_type Tx = typename Ed25519Type::base_field_type::integral_type(T.X.data);
-    typename Ed25519Type::base_field_type::integral_type Ty = typename Ed25519Type::base_field_type::integral_type(T.Y.data);
-    typename Ed25519Type::base_field_type::integral_type Px = typename Ed25519Type::base_field_type::integral_type(P.X.data);
-    typename Ed25519Type::base_field_type::integral_type Py = typename Ed25519Type::base_field_type::integral_type(P.Y.data);
-    typename Ed25519Type::base_field_type::integral_type base = 1;
-    typename Ed25519Type::base_field_type::integral_type mask = (base << 66) - 1;
+    foreign_integral_type Tx = foreign_integral_type(T.X.data);
+    foreign_integral_type Ty = foreign_integral_type(T.Y.data);
+    foreign_integral_type Px = foreign_integral_type(P.X.data);
+    foreign_integral_type Py = foreign_integral_type(P.Y.data);
+    foreign_integral_type base = 1;
+    foreign_integral_type mask = (base << 66) - 1;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {
         Tx & mask, (Tx >> 66) & mask, (Tx >> 132) & mask, (Tx >> 198) & mask,
@@ -102,41 +103,46 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
         b_val};
 
     auto result_check = [Px, Py, Tx, Ty, b_val](AssignmentType &assignment, typename component_type::result_type &real_res) {
-        typename Ed25519Type::base_field_type::integral_type base = 1;
-        typename Ed25519Type::base_field_type::integral_type mask = (base << 66) - 1;
+        foreign_integral_type base = 1;
+        foreign_integral_type mask = (base << 66) - 1;
         for (std::size_t i = 0; i < 4; i++) {
-            if (
-                (typename BlueprintFieldType::value_type((Px >> 66 * i) & mask) !=
-                   var_value(assignment, real_res.output.x[i])) ||
-                (typename BlueprintFieldType::value_type((Py >> 66 * i) & mask) !=
-                   var_value(assignment, real_res.output.y[i]))
-            ) {
+            if ((value_type((Px >> 66 * i) & mask) != var_value(assignment, real_res.output.x[i])) ||
+                (value_type((Py >> 66 * i) & mask) != var_value(assignment, real_res.output.y[i]))) {
                 std::cerr << "test_mul failed! Point(hex form):\n";
                 std::cerr << std::hex << Tx << std::dec << '\n';
                 std::cerr << std::hex << Ty << std::dec << '\n';
                 std::cerr << "Scalar(hex form):\n";
-                std::cerr << std::hex << b_val.data << std::dec << '\n'<<'\n';
+                std::cerr << std::hex << b_val.data << std::dec << '\n'<< std::endl;
             }
-
-            assert(typename BlueprintFieldType::value_type((Px >> 66 * i) & mask) ==
-                   var_value(assignment, real_res.output.x[i]));
-            assert(typename BlueprintFieldType::value_type((Py >> 66 * i) & mask) ==
-                   var_value(assignment, real_res.output.y[i]));
+            assert(value_type((Px >> 66 * i) & mask) == var_value(assignment, real_res.output.x[i]));
+            assert(value_type((Py >> 66 * i) & mask) == var_value(assignment, real_res.output.y[i]));
         }
     };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {});
-    // 253 is the default bits_amount
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input, 253);
+
+    if constexpr (Stretched) {
+        using stretched_component_type = nil::blueprint::components::component_stretcher<
+            BlueprintFieldType,
+            ArithmetizationParams,
+            component_type>;
+
+        stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
+        // 253 is the default bits_amount
+        crypto3::test_component<stretched_component_type, BlueprintFieldType,
+                                ArithmetizationParams, hash_type, Lambda>(
+            stretched_instance, public_input, result_check, instance_input, 253);
+    } else {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input, 253);
+    }
 }
 
-template <typename CurveType>
+template <typename CurveType, bool Stretched = false >
 void test_mul_per_bit(){
-
     using ed25519_type = crypto3::algebra::curves::ed25519;
     using BlueprintFieldType = typename CurveType::base_field_type;
-    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t WitnessColumns = 9 * (Stretched ? 2 : 1);
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
@@ -154,7 +160,6 @@ void test_mul_per_bit(){
         CurveType,
         ed25519_type,
         nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
-
     std::array<var, 4> input_var_Xa = {
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input),
         var(0, 2, false, var::column_type::public_input), var(0, 3, false, var::column_type::public_input)};
@@ -214,16 +219,28 @@ void test_mul_per_bit(){
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {});
 
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+    if constexpr (Stretched) {
+        using stretched_component_type = nil::blueprint::components::component_stretcher<
+            BlueprintFieldType,
+            ArithmetizationParams,
+            component_type>;
+
+        stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
+
+        crypto3::test_component<stretched_component_type, BlueprintFieldType,
+                                ArithmetizationParams, hash_type, Lambda>(
+            stretched_instance, public_input, result_check, instance_input);
+    } else {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    }
 }
 
-template <typename CurveType>
-void test_doubling(){
-
+template <typename CurveType, bool Stretched = false >
+void test_doubling() {
     using ed25519_type = crypto3::algebra::curves::ed25519;
     using BlueprintFieldType = typename CurveType::base_field_type;
-    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t WitnessColumns = 9 * (Stretched ? 2 : 1);
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
@@ -276,16 +293,28 @@ void test_doubling(){
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {});
 
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+    if constexpr (Stretched) {
+        using stretched_component_type = nil::blueprint::components::component_stretcher<
+            BlueprintFieldType,
+            ArithmetizationParams,
+            component_type>;
+
+        stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
+
+        crypto3::test_component<stretched_component_type, BlueprintFieldType,
+                                ArithmetizationParams, hash_type, Lambda>(
+            stretched_instance, public_input, result_check, instance_input);
+    } else {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    }
 }
 
-template <typename CurveType>
+template <typename CurveType, bool Stretched = false >
 void test_complete_addition(){
-
     using ed25519_type = crypto3::algebra::curves::ed25519;
     using BlueprintFieldType = typename CurveType::base_field_type;
-    constexpr std::size_t WitnessColumns = 9;
+    constexpr std::size_t WitnessColumns = 9 * (Stretched ? 2 : 1);
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
@@ -352,27 +381,51 @@ void test_complete_addition(){
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {});
 
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+    if constexpr (Stretched) {
+        using stretched_component_type = nil::blueprint::components::component_stretcher<
+            BlueprintFieldType,
+            ArithmetizationParams,
+            component_type>;
+
+        stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
+
+        crypto3::test_component<stretched_component_type, BlueprintFieldType,
+                                ArithmetizationParams, hash_type, Lambda>(
+            stretched_instance, public_input, result_check, instance_input);
+    } else {
+        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+            component_instance, public_input, result_check, instance_input);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
+constexpr static const std::size_t random_tests_amount = 1;
+
 BOOST_AUTO_TEST_CASE(blueprint_non_native_complete_addition) {
-    test_complete_addition<typename crypto3::algebra::curves::pallas>();
+    for (std::size_t i = 0; i < random_tests_amount; i++) {
+        test_complete_addition<typename crypto3::algebra::curves::pallas, false>();
+        test_complete_addition<typename crypto3::algebra::curves::pallas, true>();
+    }
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_doubling) {
-    test_doubling<typename crypto3::algebra::curves::pallas>();
+    for (std::size_t i = 0; i < random_tests_amount; i++) {
+        test_doubling<typename crypto3::algebra::curves::pallas, false>();
+        test_doubling<typename crypto3::algebra::curves::pallas, true>();
+    }
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_mul_per_bit) {
-    test_mul_per_bit<typename crypto3::algebra::curves::pallas>();
+    for (std::size_t i = 0; i < random_tests_amount; i++) {
+        test_mul_per_bit<typename crypto3::algebra::curves::pallas, false>();
+        test_mul_per_bit<typename crypto3::algebra::curves::pallas, true>();
+    }
 }
 
-constexpr static const std::size_t random_tests_amount = 10;
-
 BOOST_AUTO_TEST_CASE(blueprint_non_native_mul_1) {
+    //auto start = std::chrono::high_resolution_clock::now();
+
     using CurveType = typename crypto3::algebra::curves::pallas;
     using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
@@ -399,17 +452,25 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_mul_1) {
     scal_integral = typename CurveType::base_field_type::integral_type((random_scalar_generator()).data);
     scal_rand = typename CurveType::base_field_type::value_type (scal_integral);
 
-    test_mul<CurveType, Ed25519Type>(scal_zero, point_zero);
-    test_mul<CurveType, Ed25519Type>(scal_max, point_zero);
-    test_mul<CurveType, Ed25519Type>(scal_rand, point_zero);
-    test_mul<CurveType, Ed25519Type>(scal_zero, random_point_generator());
-    test_mul<CurveType, Ed25519Type>(scal_max, random_point_generator());
+    test_mul<CurveType, Ed25519Type, false>(scal_zero, point_zero);
+    test_mul<CurveType, Ed25519Type, true>(scal_zero, point_zero);
+    test_mul<CurveType, Ed25519Type, false>(scal_max, point_zero);
+    test_mul<CurveType, Ed25519Type, true>(scal_max, point_zero);
+    test_mul<CurveType, Ed25519Type, false>(scal_rand, point_zero);
+    test_mul<CurveType, Ed25519Type, true>(scal_rand, point_zero);
+    test_mul<CurveType, Ed25519Type, false>(scal_zero, random_point_generator());
+    test_mul<CurveType, Ed25519Type, true>(scal_zero, random_point_generator());
+    test_mul<CurveType, Ed25519Type, false>(scal_max, random_point_generator());
+    test_mul<CurveType, Ed25519Type, true>(scal_max, random_point_generator());
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
         scal_integral = typename CurveType::base_field_type::integral_type((random_scalar_generator()).data);
         scal_rand = typename CurveType::base_field_type::value_type (scal_integral);
-    test_mul<CurveType, Ed25519Type>(scal_rand, random_point_generator());
+        test_mul<CurveType, Ed25519Type, false>(scal_rand, random_point_generator());
+        test_mul<CurveType, Ed25519Type, true>(scal_rand, random_point_generator());
     }
+    //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+    //std::cout << "blueprint_non_native_mul_1 test duration: " << duration.count() << " ms" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

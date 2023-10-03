@@ -95,6 +95,10 @@ namespace nil {
 
                 struct input_type {
                     var x = var(0, 0, false);
+
+                    std::vector<var> all_vars() const {
+                        return {x};
+                    }
                 };
 
                 struct result_type {
@@ -105,6 +109,10 @@ namespace nil {
 
                     result_type(const mul_by_constant &component, std::size_t start_row_index) {
                         output = var(component.W(1), start_row_index, false, var::column_type::witness);
+                    }
+
+                    std::vector<var> all_vars() const {
+                        return {output};
                     }
                 };
 
@@ -151,19 +159,18 @@ namespace nil {
 
             template<typename BlueprintFieldType,
                      typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
-                const std::size_t first_selector_index) {
+                const typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input) {
 
                 using var = typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams>::var;
 
-                auto constraint_1 = bp.add_constraint(
-                    var(component.W(0), 0) * var(0, 0, true, var::column_type::constant) - var(component.W(1), 0));
+                auto constraint_1 =
+                    var(component.W(0), 0) * var(0, 0, true, var::column_type::constant) - var(component.W(1), 0);
 
-                bp.add_gate(first_selector_index, {constraint_1});
+                return bp.add_gate(constraint_1);
             }
 
             template<typename BlueprintFieldType,
@@ -192,18 +199,9 @@ namespace nil {
                     const typename plonk_mul_by_constant<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
                     const std::size_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
 
-                if (selector_iterator == assignment.selectors_end()){
-                    first_selector_index = assignment.allocate_selector(component,
-                        component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
-
-                assignment.enable_selector(first_selector_index, start_row_index);
+                assignment.enable_selector(selector_index, start_row_index);
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
                 generate_assignments_constant(component, assignment, instance_input, start_row_index);

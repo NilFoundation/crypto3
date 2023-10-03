@@ -31,7 +31,6 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp>
 
@@ -40,7 +39,7 @@
 #include <string>
 
 using nil::blueprint::components::detail::bit_builder_component;
-using nil::blueprint::components::detail::bit_composition_mode;
+using nil::blueprint::components::bit_composition_mode;
 
 namespace nil {
     namespace blueprint {
@@ -66,6 +65,10 @@ namespace nil {
                                                                                             BlueprintFieldType,
                                                                                             ArithmetizationParams>> {
 
+                void check_params(std::size_t bits_amount, bit_composition_mode mode) const {
+                    BLUEPRINT_RELEASE_ASSERT(bits_amount > 0 && bits_amount < BlueprintFieldType::modulus_bits);
+                    BLUEPRINT_RELEASE_ASSERT(mode == bit_composition_mode::LSB || mode == bit_composition_mode::MSB);
+                }
             public:
                 using component_type =
                     bit_builder_component<
@@ -88,7 +91,7 @@ namespace nil {
                     gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
                         .merge_with(component_type::get_gate_manifest(witness_amount, lookup_column_amount,
-                                                                      bits_amount, check_input));
+                                                                             bits_amount, check_input));
                     return manifest;
                 }
 
@@ -107,6 +110,10 @@ namespace nil {
 
                 struct input_type {
                     std::vector<var> bits;
+
+                    std::vector<var> all_vars() const {
+                        return bits;
+                    }
                 };
 
                 struct result_type {
@@ -115,18 +122,19 @@ namespace nil {
                         auto pos = component.sum_bit_position(start_row_index, component.sum_bits_amount() - 1);
                         output = var(component.W(pos.second), pos.first, false);
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output};
+                    }
                 };
 
-                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
-                    std::stringstream ss;
-                    ss << "_" << mode << "_" << this->bits_amount << "_" << this->check_bits;
-                    return ss.str();
-                }
-
                 template<typename ContainerType>
-                bit_composition(ContainerType witness, std::uint32_t bits_amount, bool check_input,
-                                bit_composition_mode mode_) :
-                    component_type(witness, {}, {}, get_manifest(), bits_amount, check_input), mode(mode_) {};
+                explicit bit_composition(ContainerType witness, std::uint32_t bits_amount, bool check_input,
+                                         bit_composition_mode mode_) :
+                    component_type(witness, {}, {}, get_manifest(), bits_amount, check_input), mode(mode_) {
+
+                    check_params(bits_amount, mode);
+                };
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -134,7 +142,10 @@ namespace nil {
                                 PublicInputContainerType public_input,
                                 std::uint32_t bits_amount, bool check_input, bit_composition_mode mode_) :
                     component_type(witness, constant, public_input, get_manifest(), bits_amount, check_input),
-                    mode(mode_) {};
+                    mode(mode_) {
+
+                    check_params(bits_amount, mode);
+                };
 
                 bit_composition(
                     std::initializer_list<typename component_type::witness_container_type::value_type>
@@ -145,7 +156,10 @@ namespace nil {
                         public_inputs,
                     std::uint32_t bits_amount, bool check_input, bit_composition_mode mode_) :
                     component_type(witnesses, constants, public_inputs, get_manifest(), bits_amount, check_input),
-                    mode(mode_) {};
+                    mode(mode_) {
+
+                    check_params(bits_amount, mode);
+                };
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

@@ -51,8 +51,8 @@
 using namespace nil;
 
 template <typename BlueprintFieldType, typename NonNativeFieldType>
-void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_input,
-        std::array<typename BlueprintFieldType::value_type, 4> expected_res){
+void test_field_add(const std::vector<typename BlueprintFieldType::value_type> &public_input,
+                    const std::array<typename BlueprintFieldType::value_type, 4> &expected_res) {
 
     constexpr std::size_t WitnessColumns = 9;
     constexpr std::size_t PublicInputColumns = 1;
@@ -87,7 +87,7 @@ void test_field_add(std::vector<typename BlueprintFieldType::value_type> public_
         }
     };
 
-    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});
+    component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {}, {});
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);

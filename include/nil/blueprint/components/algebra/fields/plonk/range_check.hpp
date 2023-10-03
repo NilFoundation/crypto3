@@ -36,7 +36,6 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 
 #include <utility>
 #include <type_traits>
@@ -173,17 +172,19 @@ namespace nil {
 
                 struct input_type {
                     var x;
+
+                    std::vector<var> all_vars() const {
+                        return {x};
+                    }
                 };
 
                 struct result_type {
                     result_type(const range_check &component, std::size_t start_row_index) {}
-                };
 
-                nil::blueprint::detail::blueprint_component_id_type get_id() const override {
-                    std::stringstream ss;
-                    ss << bits_amount;
-                    return ss.str();
-                }
+                    std::vector<var> all_vars() const {
+                        return {};
+                    }
+                };
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                             typename PublicInputContainerType>
@@ -224,20 +225,16 @@ namespace nil {
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
-
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
-
-                assignment.enable_selector(first_selector_index, start_row_index + 1,
-                                            start_row_index + component.rows_amount - 1);
+                std::vector<std::size_t> selector_index = generate_gates(component, bp, assignment, instance_input);
+                assignment.enable_selector(selector_index[0], start_row_index + 1,
+                                           start_row_index + component.rows_amount - 1);
                 if ((component.bits_amount % component.chunk_size) != 0) {
-                    assignment.enable_selector(first_selector_index + 1, start_row_index + 1);
+                    if (selector_index.size() != 2) {
+                        std::cerr << "Internal error: range_check component returned the wrong selector amount."
+                                  << std::endl;
+                        std::abort();
+                    }
+                    assignment.enable_selector(selector_index[1], start_row_index + 1);
                 }
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
@@ -316,7 +313,7 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::vector<std::size_t> generate_gates(
                 const plonk_range_check<BlueprintFieldType, ArithmetizationParams>
                     &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
@@ -326,13 +323,10 @@ namespace nil {
                                                                         ArithmetizationParams>>
                     &assignment,
                 const typename plonk_range_check<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
 
                 using var = typename plonk_range_check<BlueprintFieldType, ArithmetizationParams>::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
-                using gate_type = typename crypto3::zk::snark::plonk_gate<BlueprintFieldType,
-                                                crypto3::zk::snark::plonk_constraint<BlueprintFieldType>>;
 
                 typename BlueprintFieldType::value_type base_two = 2;
 
@@ -351,7 +345,7 @@ namespace nil {
                     constraint_type chunk_range_constraint = generate_chunk_size_constraint(
                         var(component.W(0 + component.reserved_columns + i), 0, true), component.chunk_size);
 
-                    constraints.push_back(bp.add_constraint(chunk_range_constraint));
+                    constraints.push_back(chunk_range_constraint);
                 }
                 // assert sum
                 constraint_type sum_constraint = var(component.W(0 + component.reserved_columns), 0, true);
@@ -364,19 +358,18 @@ namespace nil {
                                     base_two.pow(component.chunk_size * component.chunks_per_row) *
                                                 var(component.W(0), -1, true) -
                                     var(component.W(0), 0, true);
-                constraints.push_back(bp.add_constraint(sum_constraint));
+                constraints.push_back(sum_constraint);
 
-                gate_type gate(first_selector_index, constraints);
-                bp.add_gate(gate);
-                if (component.bits_amount % component.chunk_size == 0) return;
+                std::size_t selector_index_1 = bp.add_gate(constraints);
+                if (component.bits_amount % component.chunk_size == 0) return {selector_index_1};
                 // If bits_amount is not divisible by chunk size, the first chunk should be constrained to be
                 // less than 2^{bits_amount % chunk_size}
                 constraint_type first_chunk_range_constraint = generate_chunk_size_constraint(
                     var(component.W(0 + component.reserved_columns + component.padding_size), 0, true),
                     component.bits_amount % component.chunk_size);
 
-                gate = gate_type(first_selector_index + 1, first_chunk_range_constraint);
-                bp.add_gate(gate);
+                std::size_t selector_index_2 = bp.add_gate(first_chunk_range_constraint);
+                return {selector_index_1, selector_index_2};
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

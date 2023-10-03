@@ -85,6 +85,10 @@ namespace nil {
 
                 struct input_type {
                     var k;
+
+                    std::vector<var> all_vars() const {
+                        return {k};
+                    }
                 };
 
                 struct result_type {
@@ -95,6 +99,11 @@ namespace nil {
                         var(component.W(7), start_row_index, false), var(component.W(8), start_row_index, false), var(component.W(0), start_row_index + 1, false),
                         var(component.W(1), start_row_index + 1, false), var(component.W(2), start_row_index + 1, false), var(component.W(3), start_row_index + 1, false)
                         };
+                    }
+
+                    std::vector<var> all_vars() const {
+                        return {output[0], output[1], output[2], output[3], output[4], output[5],
+                                output[6], output[7], output[8], output[9], output[10], output[11]};
                     }
                 };
 
@@ -185,14 +194,13 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::size_t generate_gates(
                 const plonk_scalar_range<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_scalar_range<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
                 using Ed25519Type = typename crypto3::algebra::curves::ed25519;
                 using var = typename plonk_scalar_range<BlueprintFieldType, ArithmetizationParams>::var;
 
@@ -200,16 +208,22 @@ namespace nil {
                 typename Ed25519Type::scalar_field_type::extended_integral_type extended_base = 1;
                 typename Ed25519Type::scalar_field_type::extended_integral_type q = Ed25519Type::scalar_field_type::modulus;
                 typename Ed25519Type::scalar_field_type::extended_integral_type d = (extended_base << 253) - q;
-                auto constraint_1 = bp.add_constraint(var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(2), -1) * (base<< 22) + var(component.W(3), -1) * (base << 44) +
-                var(component.W(4), -1)* (base << 66) + var(component.W(5), -1) * (base <<88) + var(component.W(6), -1) * (base << 110) + var(component.W(7), -1) * (base << 132) +
-                var(component.W(8), -1) * (base << 154) + var(component.W(0), 0)* (base << 176) + var(component.W(1), 0) * (base << 198) + var(component.W(2), 0) * (base << 220) +
-                var(component.W(3), 0) * (base << 242)));
-                auto constraint_2 = bp.add_constraint(var(component.W(4), 0) - var(component.W(0), -1) - d);
-                auto constraint_3 = bp.add_constraint(var(component.W(4), 0) - (var(component.W(5), 0) + var(component.W(6), 0) * (base<< 22) + var(component.W(7), 0) * (base << 44) +
-                var(component.W(8), 0)* (base << 66) + var(component.W(0), +1) * (base <<88) + var(component.W(1), +1) * (base << 110) + var(component.W(2), +1) * (base << 132) +
-                var(component.W(3), +1) * (base << 154) + var(component.W(4), +1)* (base << 176) + var(component.W(5), +1) * (base << 198) + var(component.W(6), +1) * (base << 220) +
-                var(component.W(7), +1) * (base << 242)));
-                bp.add_gate(first_selector_index, {constraint_1, constraint_2, constraint_3});
+                auto constraint_1 =
+                    var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(2), -1) * (base<< 22) +
+                    var(component.W(3), -1) * (base << 44) + var(component.W(4), -1)* (base << 66) +
+                    var(component.W(5), -1) * (base <<88) + var(component.W(6), -1) * (base << 110) +
+                    var(component.W(7), -1) * (base << 132) + var(component.W(8), -1) * (base << 154) +
+                    var(component.W(0), 0)* (base << 176) + var(component.W(1), 0) * (base << 198) +
+                    var(component.W(2), 0) * (base << 220) + var(component.W(3), 0) * (base << 242));
+                auto constraint_2 = var(component.W(4), 0) - var(component.W(0), -1) - d;
+                auto constraint_3 = var(component.W(4), 0) -
+                    (var(component.W(5), 0) + var(component.W(6), 0) * (base<< 22) +
+                     var(component.W(7), 0) * (base << 44) + var(component.W(8), 0)* (base << 66) +
+                     var(component.W(0), +1) * (base <<88) + var(component.W(1), +1) * (base << 110) +
+                     var(component.W(2), +1) * (base << 132) + var(component.W(3), +1) * (base << 154) +
+                     var(component.W(4), +1)* (base << 176) + var(component.W(5), +1) * (base << 198) +
+                      var(component.W(6), +1) * (base << 220) + var(component.W(7), +1) * (base << 242));
+                return bp.add_gate({constraint_1, constraint_2, constraint_3});
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -235,16 +249,9 @@ namespace nil {
                         &instance_input,
                     const std::size_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 std::size_t j = start_row_index;
-                assignment.enable_selector(first_selector_index, j + 1);
+                assignment.enable_selector(selector_index, j + 1);
                 generate_copy_constraints(component, bp, assignment, instance_input, j);
 
                 return typename plonk_scalar_range<BlueprintFieldType, ArithmetizationParams>::result_type(

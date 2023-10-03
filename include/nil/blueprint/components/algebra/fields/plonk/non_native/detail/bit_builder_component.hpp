@@ -37,12 +37,11 @@
 namespace nil {
     namespace blueprint {
         namespace components {
+            enum bit_composition_mode {
+                LSB,
+                MSB,
+            };
             namespace detail {
-
-                enum bit_composition_mode {
-                    LSB,
-                    MSB,
-                };
                 /*
                     This is a component base, which is used for both bit_decomposition and
                     bit_builder_component components, as they are similar.
@@ -224,8 +223,8 @@ namespace nil {
                     }
 
                     template<typename ContainerType>
-                    bit_builder_component(ContainerType witness, manifest_type manifest,
-                                          std::uint32_t bits_amount_, bool check_bits_) :
+                    explicit bit_builder_component(ContainerType witness, manifest_type manifest,
+                                                   std::uint32_t bits_amount_, bool check_bits_) :
                         component_type(witness, std::array<std::uint32_t, 0>(), std::array<std::uint32_t, 0>(),
                                        manifest),
                         bits_amount(bits_amount_),
@@ -354,18 +353,16 @@ namespace nil {
                     It is optional for bit_composition: the input might have already been checked.
                 */
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
-                void generate_gates(
+                std::size_t generate_gates(
                         const plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>
                             &component,
                         circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                             &bp,
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                            &assignment,
-                        const std::size_t first_selector_index) {
+                            &assignment) {
 
                     using var = typename plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>::var;
                     using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
-                    using gate_type = crypto3::zk::snark::plonk_gate<BlueprintFieldType, constraint_type>;
 
                     int row_idx = -1;
                     std::size_t col_idx = 1;
@@ -401,8 +398,7 @@ namespace nil {
                             }
                         }
                     }
-                    gate_type gate(first_selector_index, constraints);
-                    bp.add_gate(gate);
+                    return bp.add_gate(constraints);
                 }
 
                 template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -428,19 +424,12 @@ namespace nil {
                             &assignment,
                         const std::size_t start_row_index) {
 
-                    auto selector_iterator = assignment.find_selector(component);
-                    std::size_t first_selector_index;
-                    if (selector_iterator == assignment.selectors_end()) {
-                        first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                        generate_gates<BlueprintFieldType, ArithmetizationParams>(
-                                            component, bp, assignment, first_selector_index);
-                    } else {
-                        first_selector_index = selector_iterator->second;
-                    }
+                    std::size_t selector_index =
+                        generate_gates<BlueprintFieldType, ArithmetizationParams>(component, bp, assignment);
 
                     std::size_t end_row_index = start_row_index + component.rows_amount - 2;
 
-                    assignment.enable_selector(first_selector_index,  start_row_index + 1, end_row_index, 3);
+                    assignment.enable_selector(selector_index, start_row_index + 1, end_row_index, 3);
 
                     // copy constraints are specific to either bit_composition or bit_decomposition
                     // they are created in generate_circuit for corresponding classes

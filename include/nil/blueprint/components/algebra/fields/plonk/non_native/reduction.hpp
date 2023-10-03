@@ -92,6 +92,10 @@ namespace nil {
 
                 struct input_type {
                     std::array<var, 8> k;
+
+                    std::vector<var> all_vars() const {
+                        return {k[0], k[1], k[2], k[3], k[4], k[5], k[6], k[7]};
+                    }
                 };
 
                 struct result_type {
@@ -100,10 +104,14 @@ namespace nil {
                     result_type(const reduction &component, std::uint32_t start_row_index) {
                         output = var(component.W(4), start_row_index + component.rows_amount - 3, false);
                     }
+
+                    std::vector<var> all_vars() const {
+                        return {output};
+                    }
                 };
 
                 template<typename ContainerType>
-                reduction(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
+                explicit reduction(ContainerType witness) : component_type(witness, {}, {}, get_manifest()) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -240,21 +248,19 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
-            void generate_gates(
+            std::array<std::size_t, 2> generate_gates(
                 const plonk_reduction<BlueprintFieldType, ArithmetizationParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::size_t first_selector_index) {
+                    &instance_input) {
 
                 using var = typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::var;
 
-                std::size_t selector_index = first_selector_index;
                 auto L = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui512;
 
-                auto constraint_1 = bp.add_constraint(
+                auto constraint_1 =
                     var(component.W(0), +1) * 0x01_cppui512 + var(component.W(1), +1) * 0x10000000000000000_cppui512 +
                     var(component.W(2), +1) * 0x100000000000000000000000000000000_cppui512 +
                     var(component.W(3), +1) * 0x1000000000000000000000000000000000000000000000000_cppui512 +
@@ -269,7 +275,7 @@ namespace nil {
                     var(component.W(4), -1) -
                     (var(component.W(0), 0) * 0x800000000000_cppui512 + var(component.W(1), 0) * 0x8000000_cppui512 +
                      var(component.W(2), 0) * 0x80_cppui512 + var(component.W(3), 0)) *
-                        L);
+                        L;
 
                 auto s_r = var(component.W(0), -1) + var(component.W(1), -1) + var(component.W(2), -1) +
                            var(component.W(3), -1) + var(component.W(4), -1) + var(component.W(5), -1) +
@@ -277,7 +283,7 @@ namespace nil {
                            var(component.W(0), 0) + var(component.W(1), 0) + var(component.W(2), 0) -
                            12 * ((1 << (20)) - 1);
 
-                auto constraint_2 = bp.add_constraint(
+                auto constraint_2 =
                     var(component.W(4), 0) -
                     (var(component.W(3), 0) + var(component.W(2), 0) * 0x2000_cppui255 +
                      var(component.W(1), 0) * 0x200000000_cppui255 +
@@ -290,16 +296,17 @@ namespace nil {
                      var(component.W(3), -1) * 0x20000000000000000000000000000000000000000000_cppui255 +
                      var(component.W(2), -1) * 0x2000000000000000000000000000000000000000000000000_cppui255 +
                      var(component.W(1), -1) * 0x200000000000000000000000000000000000000000000000000000_cppui255 +
-                     var(component.W(0), -1) * 0x20000000000000000000000000000000000000000000000000000000000_cppui255));
+                     var(component.W(0), -1) * 0x20000000000000000000000000000000000000000000000000000000000_cppui255);
 
-                auto constraint_3 = bp.add_constraint((s_r) * ((s_r)*var(component.W(5), 0) - 1));
+                auto constraint_3 = (s_r) * ((s_r)*var(component.W(5), 0) - 1);
 
-                auto constraint_4 = bp.add_constraint((s_r)*var(component.W(5), 0) +
-                                                      (1 - (s_r)*var(component.W(5), 0)) * var(component.W(6), 0) - 1);
+                auto constraint_4 =
+                    (s_r) * var(component.W(5), 0) +
+                    (1 - (s_r)*var(component.W(5), 0)) * var(component.W(6), 0) - 1;
                 crypto3::algebra::curves::ed25519::scalar_field_type::extended_integral_type one = 1;
                 std::array<crypto3::algebra::curves::ed25519::scalar_field_type::extended_integral_type, 5> m = {
                     ((one << 192) % L), ((one << 256) % L), ((one << 320) % L), ((one << 384) % L), ((one << 448) % L)};
-                auto constraint_5 = bp.add_constraint(
+                auto constraint_5 =
                     var(component.W(0), +1) + var(component.W(1), +1) * (one << 64) +
                     var(component.W(3), +1) * (m[0] & ((one << 73) - 1)) +
                     var(component.W(4), +1) * (m[1] & ((one << 73) - 1)) +
@@ -311,16 +318,18 @@ namespace nil {
                         ((one << 73) - (L % (one << 73))) -
                     (var(component.W(3), -1) + var(component.W(2), -1) * (one << 13) +
                      var(component.W(1), -1) * (one << 33) + var(component.W(0), -1) * (one << 53)) -
-                    var(component.W(8), +1) * (one << 69));
+                    var(component.W(8), +1) * (one << 69);
 
                 auto constraint_6 =
-                    bp.add_constraint(var(component.W(8), +1) -
-                                      (var(component.W(4), 0) * (one << 56) + var(component.W(5), 0) * (one << 34) +
-                                       var(component.W(6), 0) * (one << 12) + var(component.W(7), 0)));
+                    var(component.W(8), +1) -
+                    (var(component.W(4), 0) * (one << 56) + var(component.W(5), 0) * (one << 34) +
+                     var(component.W(6), 0) * (one << 12) + var(component.W(7), 0));
 
-                bp.add_gate(selector_index, {constraint_2, constraint_3, constraint_4});
+                std::size_t selector_index_1 = bp.add_gate({constraint_2, constraint_3, constraint_4});
 
-                bp.add_gate(selector_index + 1, {constraint_1, constraint_5, constraint_6});
+                std::size_t selector_index_2 = bp.add_gate({constraint_1, constraint_5, constraint_6});
+
+                return {selector_index_1, selector_index_2};
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -357,18 +366,10 @@ namespace nil {
                     &instance_input,
                 const std::size_t start_row_index) {
 
-                auto selector_iterator = assignment.find_selector(component);
-                std::size_t first_selector_index;
+                std::array<std::size_t, 2> selector_indices = generate_gates(component, bp, assignment, instance_input);
 
-                if (selector_iterator == assignment.selectors_end()) {
-                    first_selector_index = assignment.allocate_selector(component, component.gates_amount);
-                    generate_gates(component, bp, assignment, instance_input, first_selector_index);
-                } else {
-                    first_selector_index = selector_iterator->second;
-                }
-
-                assignment.enable_selector(first_selector_index, start_row_index + 1);
-                assignment.enable_selector(first_selector_index + 1, start_row_index + 2);
+                assignment.enable_selector(selector_indices[0], start_row_index + 1);
+                assignment.enable_selector(selector_indices[1], start_row_index + 2);
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 

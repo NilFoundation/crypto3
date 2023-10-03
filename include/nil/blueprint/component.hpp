@@ -30,7 +30,6 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
-#include <nil/blueprint/detail/get_component_id.hpp>
 #include <nil/blueprint/manifest.hpp>
 #include <nil/blueprint/assert.hpp>
 
@@ -54,6 +53,8 @@ namespace nil {
                 using witness_container_type = std::vector<std::uint32_t>;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
             public:
+                static constexpr std::size_t constants_amount = ConstantAmount;
+                static constexpr std::size_t public_inputs_amount = PublicInputAmount;
 
                 using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
                 using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
@@ -128,11 +129,6 @@ namespace nil {
                 std::size_t public_input_amount() const {
                     return _PI.size();
                 }
-
-                virtual detail::blueprint_component_id_type get_id() const { return std::string(""); };
-
-                template <typename ComponentType>
-                friend detail::blueprint_component_id_type detail::get_component_id (ComponentType component);
             };
 
             // namespace detail {
@@ -164,8 +160,6 @@ namespace nil {
             public:
                 r1cs_component(blueprint<ArithmetizationType> &bp) : bp(bp) {
                 }
-
-                virtual detail::blueprint_component_id_type get_id() const { return std::string(""); };
             };
         }    // namespace components
     }        // namespace blueprint
