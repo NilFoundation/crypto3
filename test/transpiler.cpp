@@ -239,6 +239,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         lpc_preprocessed_public_data.common_data, 
         lpc_scheme,
         columns_with_copy_constraints.size(),"circuit1"
+        ,26 /* gates library size threshold */
     );
     printer.print();
 }
@@ -324,6 +325,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit2"
+        ,26 /* gates library size threshold */
     );
     printer.print();
 }
@@ -399,6 +401,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit3"
+        ,26 /* gates library size threshold */
     );
     printer.print();
 }
@@ -472,6 +475,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         lpc_scheme, 
         columns_with_copy_constraints.size(),
         "circuit4"
+        ,26 /* gates library size threshold */
     );
     printer.print();
 }
@@ -547,6 +551,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit6"
+        ,26 /* gates library size threshold */
     );
     printer.print();
 }
@@ -622,6 +627,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         lpc_scheme,
         columns_with_copy_constraints.size(),
         "circuit7"
+        ,26 /* gates library size threshold */
     );
     printer.print();
 }

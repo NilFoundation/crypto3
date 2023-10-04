@@ -6,7 +6,7 @@
 namespace nil {
     namespace blueprint {
         std::string gate_call_template = 
-            "\t\t(eval, theta_acc) = gate_$TEST_NAME$_$GATE_LIB_ID$.evaluate_gate_be( blob, theta, theta_acc ); F = addmod(F, eval, modulus);";
+            "\t\t(eval, theta_acc) = gate_$TEST_NAME$_$GATE_LIB_ID$.evaluate_gate_$GATE_ID$_be( blob, theta, theta_acc ); F = addmod(F, eval, modulus);";
 
         std::string modular_gate_argument_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.

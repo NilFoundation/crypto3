@@ -5,6 +5,21 @@
 
 namespace nil {
     namespace blueprint {
+        std::string gate_evaluation_template = R"(
+    function evaluate_gate_$GATE_ID$_be(
+        bytes calldata blob,
+        uint256 theta,
+        uint256 theta_acc
+    ) external pure returns (uint256 F, uint256) {
+        uint256 sum;
+        uint256 gate;
+        uint256 prod;
+
+$GATE_ASSEMBLY_CODE$
+
+        return( F, theta_acc );
+    }
+)";
         std::string modular_external_gate_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
 //---------------------------------------------------------------------------//
@@ -28,19 +43,8 @@ import "../../../contracts/basic_marshalling.sol";
 
 library gate_$TEST_NAME$_$GATE_LIB_ID${
     uint256 constant modulus = $MODULUS$;
-    
-    function evaluate_gate_be(
-        bytes calldata blob,
-        uint256 theta,
-        uint256 theta_acc
-    ) external pure returns (uint256 F, uint256) {
-        uint256 sum;
-        uint256 gate;
-        uint256 prod;
-        
-$GATES_ASSEMBLY_CODE$
-        return( F, theta_acc );
-    }
+
+    $GATES_COMPUTATION_CODE$
 }
         )";
     }

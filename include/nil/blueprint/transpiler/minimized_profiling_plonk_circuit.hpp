@@ -105,14 +105,14 @@ namespace nil {
 
                     using variable_type = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
                     std::size_t offset = 0x80;
-                    
+
                     // compute needed and rotated vars
                     for (const auto& gate: gates) {
                         // constraint
                         // gate_evaluation
                         // theta_acc
                         for (const auto& constraint: gate.constraints) {
-		                    crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
+                            crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
                                 [this](const variable_type& var){
                                     if (var.type == variable_type::witness) {
                                         this->need_witness = true;
@@ -130,7 +130,7 @@ namespace nil {
                                         if( var.rotation != 0) { this->rotated_selector = true; }
                                     }
                                 });
-			                visitor.visit(constraint);
+                            visitor.visit(constraint);
                         }
                     }
 
@@ -138,8 +138,8 @@ namespace nil {
                         std::size_t gate_lines = 2;
                         for (const auto& constraint: gate.constraints) {
                             gate_lines += 2;
-            			    // Convert constraint expression to non_linear_combination.
- 	                        crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
+                            // Convert constraint expression to non_linear_combination.
+                            crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
                             auto comb = visitor.convert(constraint);
 
                             for (std::size_t t_index = 0; t_index < comb.terms.size(); t_index++) {
@@ -274,14 +274,14 @@ namespace nil {
                 columns_rotations_type result;
                 for (const auto& gate: constraint_system.gates()) {
                     for (const auto& constraint: gate.constraints) {
-			            crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
+                        crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
                             [&table_description, &result](const variable_type& var) {
                                 if (var.relative) {
                                     std::size_t column_index = table_description.global_index(var);
                                     result[column_index].insert(var.rotation);
                                 }
                             });
-			            visitor.visit(constraint);
+                        visitor.visit(constraint);
                     }
                 }
 /*
@@ -430,8 +430,8 @@ namespace nil {
                 std::stringstream res;
                 res << "\t\t\tmstore(add(local_vars, CONSTRAINT_EVAL_OFFSET), 0)" << std::endl;
 
-		        // Convert constraint expression to non_linear_combination.
-		        crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
+                // Convert constraint expression to non_linear_combination.
+                crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
                 auto comb = visitor.convert(constraint);
                 res << generate_terms(profiling_params, comb.terms, columns_rotations);
                 return res.str();
