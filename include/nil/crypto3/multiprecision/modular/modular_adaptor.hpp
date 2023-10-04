@@ -28,6 +28,8 @@
 #include <cmath>
 #include <vector>
 
+#include </home/martun/nil/solana4/solana-consensus-proof/libs/zk/include/nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {
@@ -302,30 +304,15 @@ namespace nil {
                 constexpr void eval_subtract(
                     modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked>, StorageType> &result,
                     const modular_adaptor<cpp_int_backend<MinBits, MaxBits, SignType, Checked>, StorageType> &o) {
+
                     BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
                     using ui_type = typename std::tuple_element<
                         0, typename cpp_int_backend<MinBits, MaxBits, SignType, Checked>::unsigned_types>::type;
                     using default_ops::eval_lt;
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-#if BOOST_ARCH_X86_64
-                    auto limbs_count = result.base_data().size();
-                    if (!BOOST_MP_IS_CONST_EVALUATED(result.base_data().limbs()) &&
-                        !is_trivial_cpp_int<cpp_int_backend<MinBits, MaxBits, SignType, Checked>>::value &&
-                        result.base_data().size() == o.base_data().size() &&
-                        result.base_data().size() == result.mod_data().get_mod().backend().size()) {
 
-                        sub_mod_asm(limbs_count, result.base_data().limbs(), o.base_data().limbs(),
-                                    result.mod_data().get_mod().backend().limbs());
-                        result.base_data().resize(limbs_count, limbs_count);
-                        result.base_data().normalize();
-                    } else
-#endif
-#endif
-                    {
-                        eval_subtract(result.base_data(), o.base_data());
-                        if (eval_lt(result.base_data(), ui_type(0u))) {
-                            eval_add(result.base_data(), result.mod_data().get_mod().backend());
-                        }
+                    eval_subtract(result.base_data(), o.base_data());
+                    if (eval_lt(result.base_data(), ui_type(0u))) {
+                        eval_add(result.base_data(), result.mod_data().get_mod().backend());
                     }
                 }
 

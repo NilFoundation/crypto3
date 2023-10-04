@@ -12,8 +12,9 @@
 #define BOOST_MULTIPRECISION_MODULAR_FUNCTIONS_FIXED_PRECISION_HPP
 
 #include <nil/crypto3/multiprecision/detail/number_base.hpp>
-#include <nil/crypto3/multiprecision/modular/asm_functions.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_policy_fixed.hpp>
+
+#include </home/martun/nil/solana4/solana-consensus-proof/libs/zk/include/nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 
 #include <boost/mpl/if.hpp>
 
@@ -394,6 +395,7 @@ namespace nil {
                                  /// result should fit in the output parameter
                                  max_precision<Backend1>::value >= max_precision<Backend>::value>::type>
                     constexpr void montgomery_reduce(Backend1 &result) const {
+
                         using default_ops::eval_add;
                         using default_ops::eval_bitwise_and;
                         using default_ops::eval_left_shift;
@@ -403,48 +405,24 @@ namespace nil {
 
                         Backend_doubled_padded_limbs accum(result);
                         Backend_doubled_padded_limbs prod;
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-#if BOOST_ARCH_X86_64
-                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == m_mod.backend().size()
-                            && !is_trivial_cpp_int<Backend1>::value && result.size() > 1) {
-                            bool carry =
-                                reduce_limb_asm(m_mod.backend().size(), accum.limbs(), m_mod.backend().limbs(),
-                                                static_cast<double_limb_type>(m_montgomery_p_dash));
-                            if (carry || cmp_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
-                                                 m_mod.backend().limbs()) >= 0) {
-                                sub_asm(m_mod.backend().size(), accum.limbs() + m_mod.backend().size(),
-                                        m_mod.backend().limbs());
-                            }
-                            // Now result in first m_mod.backend().size() limbs, so we can do
-                            // eval_bitwise_and(accum, m_modulus_mask);
-                            // or just copy n limbs to result
-                            for (size_t i = 0; i < m_mod.backend().size(); ++i) {
-                                result.limbs()[i] = accum.limbs()[i + m_mod.backend().size()];
-                            }
-                            result.resize(m_mod.backend().size(), m_mod.backend().size());
-                            result.normalize();
-                        } else
-#endif
-#endif
-                        {
-                            for (auto i = 0; i < m_mod.backend().size(); ++i) {
-                                eval_multiply(prod, m_mod.backend(),
-                                              static_cast<double_limb_type>(static_cast<internal_limb_type>(
-                                                  custom_get_limb_value<internal_limb_type>(accum, i) *
-                                                  /// to prevent overflow error in constexpr
-                                                  static_cast<double_limb_type>(m_montgomery_p_dash))));
-                                eval_left_shift(prod, i * limb_bits);
-                                eval_add(accum, prod);
-                            }
-                            custom_right_shift(accum, m_mod.backend().size() * limb_bits);
-                            if (!eval_lt(accum, m_mod.backend())) {
-                                eval_subtract(accum, m_mod.backend());
-                            }
-                            if (m_mod.backend().size() < accum.size()) {
-                                accum.resize(m_mod.backend().size(), m_mod.backend().size());
-                            }
-                            result = accum;
+
+                        for (auto i = 0; i < m_mod.backend().size(); ++i) {
+                            eval_multiply(prod, m_mod.backend(),
+                                          static_cast<double_limb_type>(static_cast<internal_limb_type>(
+                                              custom_get_limb_value<internal_limb_type>(accum, i) *
+                                              /// to prevent overflow error in constexpr
+                                              static_cast<double_limb_type>(m_montgomery_p_dash))));
+                            eval_left_shift(prod, i * limb_bits);
+                            eval_add(accum, prod);
                         }
+                        custom_right_shift(accum, m_mod.backend().size() * limb_bits);
+                        if (!eval_lt(accum, m_mod.backend())) {
+                            eval_subtract(accum, m_mod.backend());
+                        }
+                        if (m_mod.backend().size() < accum.size()) {
+                            accum.resize(m_mod.backend().size(), m_mod.backend().size());
+                        }
+                        result = accum;
                     }
 
                     template<typename Backend1, typename Backend2,
@@ -452,6 +430,7 @@ namespace nil {
                              typename = typename boost::enable_if_c<max_precision<Backend1>::value >=
                                                                     max_precision<Backend>::value>::type>
                     constexpr void regular_add(Backend1 &result, const Backend2 &y) const {
+
                         using default_ops::eval_add;
                         using default_ops::eval_lt;
                         using default_ops::eval_subtract;
@@ -459,25 +438,14 @@ namespace nil {
                         // TODO: maybe reduce input parameters
                         /// input parameters should be lesser than modulus
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
-#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
-#if BOOST_ARCH_X86_64
-                        if (!BOOST_MP_IS_CONST_EVALUATED(result.limbs()) && result.size() == y.size()
-                            && result.size() == m_mod.backend().size() && !is_trivial_cpp_int<Backend1>::value) {
-                            add_mod_asm(limbs_count, result.limbs(), y.limbs(), m_mod.backend().limbs());
-                            result.resize(limbs_count, limbs_count);
-                            result.normalize();
-                        } else
-#endif
-#endif
-                        {
-                            using T = typename policy_type::Backend_padded_limbs_u;
-                            T tmp(result), modulus(m_mod.backend());
-                            eval_add(tmp, y);
-                            if (!eval_lt(tmp, modulus)) {
-                                eval_subtract(tmp, modulus);
-                            }
-                            result = tmp;
+
+                        using T = typename policy_type::Backend_padded_limbs_u;
+                        T tmp(result), modulus(m_mod.backend());
+                        eval_add(tmp, y);
+                        if (!eval_lt(tmp, modulus)) {
+                            eval_subtract(tmp, modulus);
                         }
+                        result = tmp;
                     }
 
                     template<typename Backend1, typename Backend2,
