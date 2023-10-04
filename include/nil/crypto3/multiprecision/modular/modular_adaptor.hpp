@@ -28,8 +28,6 @@
 #include <cmath>
 #include <vector>
 
-#include </home/martun/nil/solana4/solana-consensus-proof/libs/zk/include/nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace multiprecision {

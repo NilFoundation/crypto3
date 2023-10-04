@@ -14,8 +14,6 @@
 #include <nil/crypto3/multiprecision/detail/number_base.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_policy_fixed.hpp>
 
-#include </home/martun/nil/solana4/solana-consensus-proof/libs/zk/include/nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
-
 #include <boost/mpl/if.hpp>
 
 #include <type_traits>
