@@ -44,7 +44,7 @@ namespace nil {
                      *    @tparam Coordinates Representation coordinates of the group element
                      */
                     template<typename CurveParams, typename Form, typename Coordinates>
-                    struct curve_element;
+                    class curve_element;
 
                     /**
                      * @brief A struct representing an element from the group G1 of Montgomery curve of
@@ -53,7 +53,7 @@ namespace nil {
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, forms::montgomery, coordinates::affine> {
+                    class curve_element<CurveParams, forms::montgomery, coordinates::affine> {
                         using field_type = typename CurveParams::field_type;
 
                     private:

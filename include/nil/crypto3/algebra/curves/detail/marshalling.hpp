@@ -40,12 +40,12 @@ namespace nil {
         using namespace nil::crypto3;
 
         template<typename CurveType>
-        struct curve_element_serializer { };
+        class curve_element_serializer { };
 
         // ZCash serialization format for BLS12-381
         // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C
         template<>
-        struct curve_element_serializer<algebra::curves::bls12_381> {
+        class curve_element_serializer<algebra::curves::bls12_381> {
             typedef algebra::curves::bls12_381 curve_type;
 
             typedef typename curve_type::template g1_type<>::value_type g1_value_type;

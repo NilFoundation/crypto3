@@ -35,7 +35,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                struct vesta;
+                class vesta;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of vesta curve.
@@ -43,7 +43,7 @@ namespace nil {
                      *
                      */
                     template<typename Form, typename Coordinates>
-                    struct vesta_g1 {
+                    class vesta_g1 {
                         using params_type = vesta_g1_params<Form>;
 
                         using curve_type = vesta;

@@ -37,11 +37,11 @@ namespace nil {
             namespace fields {
 
                 template<typename BaseField>
-                struct fp3;
+                class fp3;
                 namespace detail {
 
                     template<typename BaseField>
-                    struct fp3_extension_params;
+                    class fp3_extension_params;
 
                     /************************* EDWARDS ***********************************/
 

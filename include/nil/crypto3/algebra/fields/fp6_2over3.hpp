@@ -47,7 +47,8 @@ namespace nil {
                  * @tparam Version
                  */
                 template<typename BaseField>
-                struct fp6_2over3 {
+                class fp6_2over3 {
+                public:
                     typedef BaseField base_field_type;
                     typedef base_field_type policy_type;
                     typedef detail::fp6_2over3_extension_params<policy_type> extension_policy;

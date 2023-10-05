@@ -39,15 +39,15 @@ namespace nil {
             namespace fields {
 
                 template<typename BaseField>
-                struct fp12_2over3over2;
+                class fp12_2over3over2;
 
                 namespace detail {
 
                     template<typename BaseField>
-                    struct fp12_2over3over2_extension_params;
+                    class fp12_2over3over2_extension_params;
 
                     template<typename BaseField>
-                    struct fp12_2over3over2;
+                    class fp12_2over3over2;
 
                     /************************* ALT_BN128 ***********************************/
 

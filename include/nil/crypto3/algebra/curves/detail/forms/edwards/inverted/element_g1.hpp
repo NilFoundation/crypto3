@@ -47,7 +47,7 @@ namespace nil {
                      *    @tparam Coordinates Representation coordinates of the group element
                      */
                     template<typename CurveParams, typename Form, typename Coordinates>
-                    struct curve_element;
+                    class curve_element;
 
                     /** @brief A struct representing an element from the group G1 of Edwards curve of
                      *  inverted coordinates representation.
@@ -55,7 +55,7 @@ namespace nil {
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, forms::edwards, coordinates::inverted> {
+                    class curve_element<CurveParams, forms::edwards, coordinates::inverted> {
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;

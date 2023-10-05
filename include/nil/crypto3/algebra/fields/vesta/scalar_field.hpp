@@ -42,7 +42,7 @@ namespace nil {
                  * @brief A struct representing a vesta curve.
                  */
 #ifdef __ZKLLVM__
-                    struct vesta_scalar_field {
+                    class vesta_scalar_field {
                         typedef __zkllvm_field_vesta_scalar value_type;
                     };
 #else

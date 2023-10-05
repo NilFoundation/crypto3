@@ -42,18 +42,18 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version, typename Form, typename Coordinates>
-                    struct edwards_g2;
+                    class edwards_g2;
                     /** @brief A struct representing an element from the group G2 of Edwards curve.
                      *    @tparam Version version of the curve
                      *
                      */
                     template<std::size_t Version>
-                    struct element_edwards_g2 { };
+                    class element_edwards_g2 { };
                     /** @brief A struct representing an elememnt from the group G2 of Edwards curve.
                      *
                      */
                     template<>
-                    struct element_edwards_g2<183> {
+                    class element_edwards_g2<183> {
 
                         using group_type = edwards_g2<183, forms::twisted_edwards, coordinates::inverted>;
 

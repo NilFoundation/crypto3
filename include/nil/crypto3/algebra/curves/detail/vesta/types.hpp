@@ -36,17 +36,17 @@ namespace nil {
                 namespace detail {
 
                     template<typename Form, typename Coordinates>
-                    struct vesta_g1;
+                    class vesta_g1;
 
                     template<typename Form>
-                    struct vesta_params;
+                    class vesta_params;
 
                     template<typename Form>
-                    struct vesta_g1_params;
+                    class vesta_g1_params;
 
                     /** @brief A struct representing details about base and scalar fields.
                      */
-                    struct vesta_types {
+                    class vesta_types {
                         using base_field_type = fields::vesta_base_field;
                         using scalar_field_type = fields::vesta_scalar_field;
 

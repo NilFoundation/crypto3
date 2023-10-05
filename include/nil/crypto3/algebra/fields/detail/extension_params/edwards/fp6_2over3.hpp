@@ -39,7 +39,7 @@ namespace nil {
                 namespace detail {
 
                     template<typename BaseField>
-                    struct fp6_2over3_extension_params;
+                    class fp6_2over3_extension_params;
 
                     /************************* EDWARDS ***********************************/
 

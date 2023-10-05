@@ -42,7 +42,7 @@ namespace nil {
                      * @brief https://zips.z.cash/protocol/protocol.pdf#pallasandvesta
                      */
                     template<>
-                    struct vesta_params<forms::short_weierstrass> {
+                    class vesta_params<forms::short_weierstrass> {
                         using base_field_type = typename vesta_types::base_field_type;
                         using scalar_field_type = typename vesta_types::scalar_field_type;
 #ifdef __ZKLLVM__
@@ -62,7 +62,7 @@ namespace nil {
                     };
 
                     template<>
-                    struct vesta_g1_params<forms::short_weierstrass>
+                    class vesta_g1_params<forms::short_weierstrass>
                         : public vesta_params<forms::short_weierstrass> {
                         using field_type = typename vesta_types::g1_field_type;
 

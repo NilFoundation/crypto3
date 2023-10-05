@@ -37,11 +37,12 @@ namespace nil {
             namespace fields {
 
                 template<typename BaseField>
-                struct fp2;
+                class fp2;
+
                 namespace detail {
 
                     template<typename BaseField>
-                    struct fp2_extension_params;
+                    class fp2_extension_params;
 
                     /************************* MNT4 ***********************************/
 

@@ -43,7 +43,7 @@ namespace nil {
                  * https://neuromancer.sk/std/other/Curve25519#
                  * https://neuromancer.sk/std/other/Ed25519#
                  */
-                struct curve25519_scalar_field : public field<253> {
+                class curve25519_scalar_field : public field<253> {
                     typedef field<253> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;

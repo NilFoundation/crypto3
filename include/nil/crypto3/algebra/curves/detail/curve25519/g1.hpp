@@ -39,7 +39,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                struct curve25519;
+                class curve25519;
                 struct ed25519;
 
                 namespace detail {
@@ -48,7 +48,7 @@ namespace nil {
                      *
                      */
                     template<typename Form, typename Coordinates>
-                    struct curve25519_g1 {
+                    class curve25519_g1 {
                         using params_type = curve25519_g1_params<Form>;
 
                         using curve_type = typename std::conditional<std::is_same<Form, forms::twisted_edwards>::value,
