@@ -47,7 +47,7 @@ namespace nil {
                      *    @tparam Coordinates Representation coordinates of the group element
                      */
                     template<typename CurveParams, typename Form, typename Coordinates>
-                    struct curve_element;
+                    class curve_element;
 
                     /** @brief A struct representing an element from the group G1 of short Weierstrass curve of
                      *  jacobian_with_a4_0 coordinates representation.
@@ -55,7 +55,8 @@ namespace nil {
                      *
                      */
                     template<typename CurveParams>
-                    struct curve_element<CurveParams, forms::short_weierstrass, coordinates::jacobian_with_a4_0> {
+                    class curve_element<CurveParams, forms::short_weierstrass, coordinates::jacobian_with_a4_0> {
+                    public:
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;

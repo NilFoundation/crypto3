@@ -40,7 +40,8 @@ namespace nil {
                 /**
                  * @brief A struct representing a vesta curve.
                  */
-                struct vesta_base_field : public field<255> {
+                class vesta_base_field : public field<255> {
+                public:
                     typedef field<255> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;

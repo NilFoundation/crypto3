@@ -40,7 +40,8 @@ namespace nil {
                      * @brief https://neuromancer.sk/std/other/Curve25519#
                      */
                     template<>
-                    struct curve25519_params<forms::montgomery> {
+                    class curve25519_params<forms::montgomery> {
+                    public:
                         using base_field_type = typename curve25519_types::base_field_type;
                         using scalar_field_type = typename curve25519_types::scalar_field_type;
 
@@ -53,7 +54,8 @@ namespace nil {
                     };
 
                     template<>
-                    struct curve25519_g1_params<forms::montgomery> : public curve25519_params<forms::montgomery> {
+                    class curve25519_g1_params<forms::montgomery> : public curve25519_params<forms::montgomery> {
+                    public:
                         using field_type = typename curve25519_types::g1_field_type;
 
                         template<typename Coordinates>
@@ -74,7 +76,8 @@ namespace nil {
                      * @brief https://neuromancer.sk/std/other/Ed25519#
                      */
                     template<>
-                    struct curve25519_params<forms::twisted_edwards> {
+                    class curve25519_params<forms::twisted_edwards> {
+                    public:
                         using base_field_type = typename curve25519_types::base_field_type;
                         using scalar_field_type = typename curve25519_types::scalar_field_type;
 #ifdef __ZKLLVM__
@@ -97,8 +100,9 @@ namespace nil {
                     };
 
                     template<>
-                    struct curve25519_g1_params<forms::twisted_edwards>
+                    class curve25519_g1_params<forms::twisted_edwards>
                         : public curve25519_params<forms::twisted_edwards> {
+                    public:
                         using field_type = typename curve25519_types::g1_field_type;
 
                         template<typename Coordinates>

@@ -36,17 +36,18 @@ namespace nil {
                 namespace detail {
 
                     template<typename Form, typename Coordinates>
-                    struct curve25519_g1;
+                    class curve25519_g1;
 
                     template<typename Form>
-                    struct curve25519_params;
+                    class curve25519_params;
 
                     template<typename Form>
-                    struct curve25519_g1_params;
+                    class curve25519_g1_params;
 
                     /** @brief A struct representing details about base and scalar fields.
                      */
-                    struct curve25519_types {
+                    class curve25519_types {
+                    public:
                         using base_field_type = fields::curve25519_base_field;
                         using scalar_field_type = fields::curve25519_scalar_field;
 

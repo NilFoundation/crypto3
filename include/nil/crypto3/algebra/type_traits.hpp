@@ -124,7 +124,7 @@ namespace nil {
             namespace curves {
                 namespace detail {
                     template<typename CurveParams, typename Form, typename Coordinates>
-                    struct curve_element;
+                    class curve_element;
                 }    // namespace detail
             }        // namespace curves
 
@@ -136,25 +136,25 @@ namespace nil {
             namespace fields {
                 namespace detail {
                     template<typename FieldParams>
-                    struct element_fp;
+                    class element_fp;
 
                     template<typename FieldParams>
-                    struct element_fp2;
+                    class element_fp2;
 
                     template<typename FieldParams>
-                    struct element_fp3;
+                    class element_fp3;
 
                     template<typename FieldParams>
-                    struct element_fp4;
+                    class element_fp4;
 
                     template<typename FieldParams>
-                    struct element_fp6_2over3;
+                    class element_fp6_2over3;
 
                     template<typename FieldParams>
-                    struct element_fp6_3over2;
+                    class element_fp6_3over2;
 
                     template<typename FieldParams>
-                    struct element_fp12_2over3over2;
+                    class element_fp12_2over3over2;
                 }    // namespace detail
             }        // namespace curves
 
