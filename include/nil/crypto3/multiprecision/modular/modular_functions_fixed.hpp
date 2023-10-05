@@ -404,7 +404,7 @@ namespace nil {
                         Backend_doubled_padded_limbs accum(result);
                         Backend_doubled_padded_limbs prod;
 
-                        for (auto i = 0; i < m_mod.backend().size(); ++i) {
+                        for (size_t i = 0; i < m_mod.backend().size(); ++i) {
                             eval_multiply(prod, m_mod.backend(),
                                           static_cast<double_limb_type>(static_cast<internal_limb_type>(
                                               custom_get_limb_value<internal_limb_type>(accum, i) *
@@ -479,11 +479,11 @@ namespace nil {
                         // BOOST_ASSERT(eval_lt(x, m_mod.backend()) && eval_lt(y, m_mod.backend()));
 
                         Backend_padded_limbs A(internal_limb_type(0u));
-                        const auto mod_size = m_mod.backend().size();
+                        const size_t mod_size = m_mod.backend().size();
                         auto mod_last_limb = static_cast<internal_double_limb_type>(get_limb_value(m_mod.backend(), 0));
                         auto y_last_limb = get_limb_value(y, 0);
 
-                        for (auto i = 0; i < mod_size; i++) {
+                        for (size_t i = 0; i < mod_size; i++) {
                             auto x_i = get_limb_value(result, i);
                             auto A_0 = A.limbs()[0];
                             internal_limb_type u_i = (A_0 + x_i * y_last_limb) * m_montgomery_p_dash;
@@ -500,7 +500,7 @@ namespace nil {
                             k = static_cast<internal_limb_type>(z >> std::numeric_limits<internal_limb_type>::digits);
                             k2 = static_cast<internal_limb_type>(z2 >> std::numeric_limits<internal_limb_type>::digits);
 
-                            for (auto j = 1; j < mod_size; ++j) {
+                            for (size_t j = 1; j < mod_size; ++j) {
                                 internal_double_limb_type t =
                                     static_cast<internal_double_limb_type>(get_limb_value(y, j)) *
                                         static_cast<internal_double_limb_type>(x_i) +

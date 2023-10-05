@@ -114,7 +114,7 @@ namespace nil {
                 constexpr Backend eval_inverse_mod_odd(const Backend& n, const Backend& mod)
                 {
                     using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
-                    Backend zero, one, two;
+                    Backend zero, one;
                     zero = ui_type(0u);
                     one = ui_type(1u);
                     // Caller should assure these preconditions:

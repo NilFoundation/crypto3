@@ -48,7 +48,7 @@ namespace nil {
                 }
 
                 template<typename Backend>
-                class modular_policy;
+                struct modular_policy;
 
                 template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
                 struct modular_policy<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>> {
