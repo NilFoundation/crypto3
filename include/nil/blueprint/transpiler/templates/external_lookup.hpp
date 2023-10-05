@@ -5,6 +5,23 @@
 
 namespace nil {
     namespace blueprint {
+        std::string lookup_evaluation_template = R"(
+    function evaluate_lookup_$LOOKUP_ID$_be(
+        bytes calldata blob,
+        uint256 theta,
+        uint256 theta_acc,
+        uint256 beta,
+        uint256 gamma
+    ) external pure returns (uint256 g, uint256) {
+        uint256 l;
+        uint256 selector_value;
+        uint256 sum;
+        uint256 prod;
+
+$LOOKUP_ASSEMBLY_CODE$
+        return( g, theta_acc );
+    }
+)";
         std::string modular_external_lookup_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
 //---------------------------------------------------------------------------//
@@ -28,22 +45,9 @@ import "../../../contracts/basic_marshalling.sol";
 
 library lookup_$TEST_NAME$_$LOOKUP_LIB_ID${
     uint256 constant modulus = $MODULUS$;
-    
-    function evaluate_gate_be(
-        bytes calldata blob,
-        uint256 theta,
-        uint256 theta_acc,
-        uint256 beta,
-        uint256 gamma
-    ) external pure returns (uint256 g, uint256) {
-        uint256 l;
-        uint256 selector_value;
-        uint256 sum;
-        uint256 prod;
 
-$LOOKUP_ASSEMBLY_CODE$
-        return( g, theta_acc );
-    }
+$LOOKUP_COMPUTATION_CODE$
+
 }
         )";
     }

@@ -33,6 +33,8 @@
 
 #include <boost/algorithm/string.hpp> 
 #include <nil/blueprint/transpiler/util.hpp>
+#include <nil/blueprint/transpiler/templates/commitment_scheme.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -177,7 +179,7 @@ namespace nil {
                 replacements["$GRINDING_CHECK$"] = modular_commitment_grinding_check_template;
             } else {
                 replacements["$GRINDING_CHECK$"] = "";
-            } 
+            }
         }
 
         template<typename PlaceholderParams>

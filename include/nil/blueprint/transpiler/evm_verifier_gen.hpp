@@ -166,15 +166,16 @@ namespace nil {
                 const typename PlaceholderParams::commitment_scheme_type &lpc_scheme,
                 std::size_t permutation_size,
                 std::string folder_name,
-                std::size_t gates_library_size_threshold = 24000
+                std::size_t gates_library_size_threshold = 1600,
+                std::size_t lookups_library_size_threshold = 1600
             ) :
             _constraint_system(constraint_system),
             _common_data(common_data),
             _lpc_scheme(lpc_scheme),
             _permutation_size(permutation_size),
             _folder_name(folder_name),
-            _gates_library_size_threshold(gates_library_size_threshold)
-
+            _gates_library_size_threshold(gates_library_size_threshold),
+            _lookups_library_size_threshold(lookups_library_size_threshold)
             {
                 std::size_t found = folder_name.rfind("/");
                 if( found == std::string::npos ){
@@ -183,7 +184,7 @@ namespace nil {
                     _test_name = folder_name.substr(found + 1);
                 }
                 _use_lookups = _constraint_system.lookup_gates().size() > 0;
-                
+
                 _z_offset = _use_lookups ? 0xc9 : 0xa1;
                 _special_selectors_offset = _z_offset + _permutation_size * 0x80;
                 _table_z_offset = _special_selectors_offset + 0xc0;
@@ -206,41 +207,53 @@ namespace nil {
                 _var_indices = get_plonk_variable_indices(_common_data.columns_rotations);
             }
 
-            void print_library_file(std::size_t library_id,
+            void print_gates_library_file(std::size_t library_id,
                     std::vector<std::size_t> const& gates_list,
-                    std::vector<std::string> const& gate_computation_codes) {
+                    std::vector<std::string> const& gate_codes) {
 
-                std::string all_gates;
+                std::string library_gates;
 
-                for(auto const& i: gates_list) {
+                for (auto i: gates_list) {
                     std::string gate_evaluation = gate_evaluation_template;
                     boost::replace_all(gate_evaluation, "$GATE_ID$" , to_string(i) );
-                    boost::replace_all(gate_evaluation, "$GATE_ASSEMBLY_CODE$", gate_computation_codes[i]);
-                    all_gates += gate_evaluation;
+                    boost::replace_all(gate_evaluation, "$GATE_ASSEMBLY_CODE$", gate_codes[i]);
+                    library_gates += gate_evaluation;
                 }
 
                 std::string result = modular_external_gate_library_template;
                 boost::replace_all(result, "$TEST_NAME$", _test_name);
                 boost::replace_all(result, "$GATE_LIB_ID$", to_string(library_id));
-                boost::replace_all(result, "$GATES_COMPUTATION_CODE$", all_gates);
+                boost::replace_all(result, "$GATES_COMPUTATION_CODE$", library_gates);
                 boost::replace_all(result, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
 
                 std::ofstream out;
                 out.open(_folder_name + "/gate_" + to_string(library_id) + ".sol");
-                out <<result;
+                out << result;
                 out.close();
             }
 
-            void print_lookup_file(std::string lookup_computation_code, std::size_t lookup_id){
+            void print_lookups_library_file(std::size_t library_id,
+                    std::vector<std::size_t> const& lookups_list,
+                    std::vector<std::string> const& lookup_codes) {
+
+                std::string library_lookups;
+
+                for(auto const& i: lookups_list) {
+                    std::string lookup_evaluation = lookup_evaluation_template;
+                    boost::replace_all(lookup_evaluation, "$LOOKUP_ID$" , to_string(i) );
+                    boost::replace_all(lookup_evaluation, "$LOOKUP_ASSEMBLY_CODE$", lookup_codes[i]);
+                    library_lookups += lookup_evaluation;
+                }
+
                 std::string result = modular_external_lookup_library_template;
                 boost::replace_all(result, "$TEST_NAME$", _test_name);
-                boost::replace_all(result, "$LOOKUP_LIB_ID$", to_string(lookup_id));
-                boost::replace_all(result, "$LOOKUP_ASSEMBLY_CODE$", lookup_computation_code);
+                boost::replace_all(result, "$LOOKUP_LIB_ID$", to_string(library_id));
+                boost::replace_all(result, "$LOOKUP_COMPUTATION_CODE$", library_lookups);
                 boost::replace_all(result, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
 
                 std::ofstream out;
-                out.open(_folder_name + "/lookup_" + to_string(lookup_id) + ".sol");
-                out <<result;
+                out.open(_folder_name + "/lookup_" + to_string(library_id) + ".sol");
+                out << result;
                 out.close();
             }
 
@@ -280,93 +293,90 @@ namespace nil {
                 return out.str();
             }
 
-            void print_gate_libs_list(std::vector<std::size_t> library_ids){
-                std::ofstream out;
-                out.open(_folder_name + "/gate_libs_list.json");
-                out << "[" << std::endl;
-                for(std::size_t i=0; i < library_ids.size(); i++){
-                    out << "\"" << "gate_" << _test_name << "_" << library_ids[i] << "\"";
-                    if(i < library_ids.size() - 1){
-                        out << ",";
-                    }
-                    out << std::endl;
-                }
-                out << "]" << std::endl;
-                out.close();
-            }
-
-            void print_lookup_libs_list(std::vector<std::size_t> gate_ids){
-                std::ofstream out;
-                out.open(_folder_name + "/lookup_libs_list.json");
-                out << "[" << std::endl;
-                for(std::size_t i=0; i < gate_ids.size(); i++){
-                    out << "\"" << "lookup_" << _test_name << "_" << gate_ids[i] << "\"";
-                    if(i < gate_ids.size() - 1){
-                        out << ",";
-                    }
-                    out << std::endl;
-                }
-                out << "]" << std::endl;
-                out.close();
-            }
-
-            std::size_t estimate_cost(std::string const& solana_code) {
+            std::size_t estimate_gate_cost(std::string const& code) {
                 /* proof-of-concept: cost = number of lines */
                 std::size_t lines = 0;
-                for(auto &ch: solana_code) {
+                for(auto &ch: code) {
                     lines += ch == '\n';
                 }
                 return lines;
             }
 
+            std::size_t estimate_lookup_cost(std::string const& code) {
+                /* proof-of-concept: cost = number of lines */
+                std::size_t lines = 0;
+                for(auto &ch: code) {
+                    lines += ch == '\n';
+                }
+                return lines;
+            }
+
+            /** @brief Split items into buckets, each bucket is limited
+             * to max_bucket_size, minimizes number of buckets
+             * @param[in] items (item_id, item_size)
+             * @param[in] max_bucket_size
+             * @returns buckets (bucket_id -> [item_id])
+             * */
+            std::unordered_map<std::size_t, std::vector<std::size_t>> split_items_into_buckets(
+                    std::vector<std::pair<std::size_t, std::size_t>> &items,
+                    std::size_t max_bucket_size) {
+
+                std::sort(items.begin(), items.end(),
+                        [](const std::pair<std::size_t, std::size_t> &a,
+                            const std::pair<std::size_t, std::size_t> &b) {
+                        return a.second > b.second;
+                        });
+
+                std::unordered_map<std::size_t, std::vector<std::size_t>> buckets;
+                std::vector<std::size_t> bucket_sizes;
+
+                for (auto const& item : items) {
+                    bool bucket_found = false;
+                    for (std::size_t i = 0; i < bucket_sizes.size(); ++i) {
+                        if (bucket_sizes[i]+item.second <= max_bucket_size) {
+                            buckets[i].push_back(item.first);
+                            bucket_sizes[i] += item.second;
+                            bucket_found = true;
+                            break;
+                        }
+                    }
+
+                    if (!bucket_found) {
+                        bucket_sizes.push_back(item.second);
+                        buckets[bucket_sizes.size()-1].push_back(item.first);
+                    }
+                }
+                return buckets;
+            }
+
             std::string print_gate_argument(){
-                std::stringstream gate_argument_str;
                 std::size_t gates_count = _constraint_system.gates().size();
-                std::vector<std::string> gates_computation_code(gates_count);
-                std::vector<std::size_t> gates_cost(gates_count);
+                if (gates_count == 0)
+                    return "";
+
+                std::stringstream gate_argument_str;
                 std::size_t i = 0;
+                std::vector<std::string> gate_codes(gates_count);
+                std::vector<std::pair<std::size_t, std::size_t>> gate_costs(gates_count);
                 std::vector<std::size_t> gate_ids(gates_count);
 
                 i = 0;
                 for(const auto &gate: _constraint_system.gates()) {
-                    std::string comp = gate_computation_code(gate);
-                    gates_cost[i] = estimate_cost(comp);
-                    gates_computation_code[i] = comp;
+                    std::string code = gate_computation_code(gate);
+                    gate_costs[i] = std::make_pair(i, estimate_gate_cost(code));
+                    gate_codes[i] = code;
                     ++i;
                 }
 
-                std::size_t library_size = 0;
-                std::size_t libraries_count = 0;
+                auto library_gates_buckets = split_items_into_buckets(gate_costs, _gates_library_size_threshold);
                 std::vector<std::size_t> gate_lib(gates_count);
-                std::map<std::size_t, std::vector<std::size_t>> library_gates;
 
-                if (gates_count > 0) {
-
-                    for (i = 0; i < gates_count; ++i) {
-                        /* start a new library if current gate won't fit */
-                        if ((library_size + gates_cost[i] > _gates_library_size_threshold) && (library_size > 0)) {
-                            library_size = 0;
-                            ++libraries_count;
-                            std::cout << "library is above threshold, starting new.." << std::endl;
-                        }
-
-                        gate_lib[i] = libraries_count;
-                        library_gates[libraries_count].push_back(i);
-                        library_size += gates_cost[i];
-                        std::cout << "library grew by " << gates_cost[i] << " clicks: " << library_size << std::endl;
-
-                        if (library_gates[libraries_count].size() == 1) {
-                            _gate_includes += "import \"./gate_"  + to_string(libraries_count) + ".sol\";\n";
-                        }
+                for(auto const& lib: library_gates_buckets) {
+                    _gate_includes += "import \"./gate_"  + to_string(lib.first) + ".sol\";\n";
+                    for(auto g: lib.second) {
+                        gate_lib[g] = lib.first;
                     }
-
-                    ++libraries_count;
-                }
-
-                std::cout << "gate inc: [" << _gate_includes << "]" << std::endl;
-
-                for(auto const& [library_id, gates_list]: library_gates) {
-                    print_library_file(library_id, gates_list, gates_computation_code);
+                    print_gates_library_file(lib.first, lib.second, gate_codes);
                 }
 
                 i = 0;
@@ -378,45 +388,76 @@ namespace nil {
                     boost::replace_all(gate_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
                     gate_argument_str << gate_eval_string << std::endl;
                     gate_ids.push_back(i);
-                    i++;
+                    ++i;
                 }
 
-                if (libraries_count > 0) {
-                    std::ofstream out;
-                    out.open(_folder_name + "/gate_libs_list.json");
-                    out << "[" << std::endl;
-                    for(i = 0; i < libraries_count-1; ++i ) {
-                        out << "\"" << "gate_" << _test_name << "_" << i << "\"," << std::endl;
-                    }
-                    out << "\"" << "gate_" << _test_name << "_" << libraries_count-1 << "\"" << std::endl;
-                    out << "]" << std::endl;
-                    out.close();
+                std::ofstream out;
+                out.open(_folder_name + "/gate_libs_list.json");
+                out << "[" << std::endl;
+                for(i = 0; i < library_gates_buckets.size()-1; ++i ) {
+                    out << "\"" << "gate_" << _test_name << "_" << i << "\"," << std::endl;
                 }
+                out << "\"" << "gate_" << _test_name << "_" << library_gates_buckets.size()-1 << "\"" << std::endl;
+                out << "]" << std::endl;
+                out.close();
 
                 return gate_argument_str.str();
             }
 
             std::string print_lookup_argument(){
+                std::size_t lookup_count = _constraint_system.lookup_gates().size();
+                if (lookup_count == 0)
+                    return "";
+
                 std::stringstream lookup_str;
                 std::size_t j = 0;
                 std::size_t i = 0;
                 std::size_t cur = 0;
-                std::vector<std::string> lookups_computation_code;
-                std::vector<std::size_t> lookup_ids;
+                std::vector<std::string> lookup_codes(lookup_count);
+                std::vector<std::size_t> lookup_ids(lookup_count);
+                std::vector<std::pair<std::size_t, std::size_t>> lookup_costs(lookup_count);
+                std::vector<std::size_t> lookup_lib(lookup_count);
 
+                i = 0;
+                for(const auto &lookup: _constraint_system.lookup_gates()) {
+                    std::string code = lookup_computation_code(lookup);
+                    lookup_costs[i] = std::make_pair(i, estimate_lookup_cost(code));
+                    lookup_codes[i] = code;
+                    ++i;
+                }
+
+                auto library_lookup_buckets = split_items_into_buckets(lookup_costs, _lookups_library_size_threshold);
+
+                _lookup_includes = "";
+                for(auto const& lib: library_lookup_buckets) {
+                    _lookup_includes += "import \"./lookup_"  + to_string(lib.first) + ".sol\";\n";
+                    for(auto l: lib.second) {
+                        lookup_lib[l] = lib.first;
+                    }
+                    print_lookups_library_file(lib.first, lib.second, lookup_codes);
+                }
+
+                i = 0;
                 for(const auto &lookup_gate: _constraint_system.lookup_gates()){
                     std::string lookup_eval_string = lookup_call_template;
                     boost::replace_all(lookup_eval_string, "$TEST_NAME$", _test_name);
-                    boost::replace_all(lookup_eval_string, "$LOOKUP_LIB_ID$", to_string(i));
+                    boost::replace_all(lookup_eval_string, "$LOOKUP_LIB_ID$", to_string(lookup_lib[i]));
+                    boost::replace_all(lookup_eval_string, "$LOOKUP_ID$", to_string(i));
                     boost::replace_all(lookup_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
                     lookup_str << lookup_eval_string;
-                    lookup_ids.push_back(i);
-                    _lookup_includes += "import \"./lookup_"  + to_string(i) + ".sol\"; \n";
-                    lookups_computation_code.push_back(lookup_computation_code(lookup_gate));
-                    print_lookup_file(lookups_computation_code[i], i);
-                    i++;
+                    ++i;
                 }
-                if(_use_lookups) print_lookup_libs_list(lookup_ids);
+
+                std::ofstream out;
+                out.open(_folder_name + "/lookup_libs_list.json");
+                out << "[" << std::endl;
+                for(i = 0; i < library_lookup_buckets.size()-1; ++i ) {
+                    out << "\"" << "lookup_" << _test_name << "_" << i << "\"," << std::endl;
+                }
+                out << "\"" << "lookup_" << _test_name << "_" << library_lookup_buckets.size()-1 << "\"" << std::endl;
+                out << "]" << std::endl;
+                out.close();
+
                 j = 0;
                 std::size_t table_index = 1;
                 for(const auto &table: _constraint_system.lookup_tables()){
@@ -450,10 +491,10 @@ namespace nil {
                     table_index++;
                 }
                 lookup_str << std::endl;
-                
+
                 return lookup_str.str();
             }
-        
+
             void print(){
                 std::filesystem::create_directory(_folder_name);
                 std::cout << "Generating verifier " << _test_name << std::endl;
@@ -523,6 +564,7 @@ namespace nil {
             std::string _gate_includes;
             std::string _lookup_includes;
             std::size_t _gates_library_size_threshold;
+            std::size_t _lookups_library_size_threshold;
         };
     }
 }
