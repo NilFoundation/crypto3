@@ -52,6 +52,7 @@ namespace nil {
                      */
                     template<typename CurveParams>
                     class curve_element<CurveParams, forms::short_weierstrass, coordinates::affine> {
+                    public:
 
                         using field_type = typename CurveParams::field_type;
 

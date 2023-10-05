@@ -49,6 +49,7 @@ namespace nil {
                      */
                     template<typename Form, typename Coordinates>
                     class curve25519_g1 {
+                    public:
                         using params_type = curve25519_g1_params<Form>;
 
                         using curve_type = typename std::conditional<std::is_same<Form, forms::twisted_edwards>::value,

@@ -137,6 +137,8 @@ namespace nil {
 
             template<>
             class curve<algebra::curves::bls12<381>> {
+            public:
+
                 typedef algebra::curves::bls12<381> curve_type;
                 typedef typename curve_type::base_field_type fp_type;
                 typedef typename curve_type::scalar_field_type fr_type;

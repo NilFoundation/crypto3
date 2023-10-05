@@ -46,6 +46,7 @@ namespace nil {
         // https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-09#appendix-C
         template<>
         class curve_element_serializer<algebra::curves::bls12_381> {
+        public:
             typedef algebra::curves::bls12_381 curve_type;
 
             typedef typename curve_type::template g1_type<>::value_type g1_value_type;

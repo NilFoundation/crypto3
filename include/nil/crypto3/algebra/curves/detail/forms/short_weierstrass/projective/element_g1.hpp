@@ -55,6 +55,7 @@ namespace nil {
                      */
                     template<typename CurveParams>
                     class curve_element<CurveParams, forms::short_weierstrass, coordinates::projective> {
+                    public:
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;

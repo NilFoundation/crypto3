@@ -54,6 +54,7 @@ namespace nil {
                      */
                     template<>
                     class element_edwards_g2<183> {
+                    public:
 
                         using group_type = edwards_g2<183, forms::twisted_edwards, coordinates::inverted>;
 

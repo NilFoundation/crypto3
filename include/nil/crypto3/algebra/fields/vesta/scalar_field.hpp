@@ -43,6 +43,7 @@ namespace nil {
                  */
 #ifdef __ZKLLVM__
                     class vesta_scalar_field {
+                    public:
                         typedef __zkllvm_field_vesta_scalar value_type;
                     };
 #else

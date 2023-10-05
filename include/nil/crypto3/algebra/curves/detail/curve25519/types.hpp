@@ -47,6 +47,7 @@ namespace nil {
                     /** @brief A struct representing details about base and scalar fields.
                      */
                     class curve25519_types {
+                    public:
                         using base_field_type = fields::curve25519_base_field;
                         using scalar_field_type = fields::curve25519_scalar_field;
 

@@ -56,6 +56,7 @@ namespace nil {
                      */
                     template<typename CurveParams>
                     class curve_element<CurveParams, forms::short_weierstrass, coordinates::jacobian_with_a4_minus_3> {
+                    public:
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;

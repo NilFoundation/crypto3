@@ -47,6 +47,7 @@ namespace nil {
                     /** @brief A struct representing details about base and scalar fields.
                      */
                     class vesta_types {
+                    public:
                         using base_field_type = fields::vesta_base_field;
                         using scalar_field_type = fields::vesta_scalar_field;
 

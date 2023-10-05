@@ -44,6 +44,8 @@ namespace nil {
                      */
                     template<typename Form, typename Coordinates>
                     class vesta_g1 {
+                    public:
+
                         using params_type = vesta_g1_params<Form>;
 
                         using curve_type = vesta;

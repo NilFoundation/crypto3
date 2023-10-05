@@ -56,6 +56,7 @@ namespace nil {
                      */
                     template<typename CurveParams>
                     class curve_element<CurveParams, forms::edwards, coordinates::inverted> {
+                    public:
 
                         using params_type = CurveParams;
                         using field_type = typename params_type::field_type;
