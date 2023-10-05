@@ -94,6 +94,7 @@ namespace nil {
 
                 template<typename Backend, typename StorageType>
                 class modular_adaptor {
+                public:
                     typedef modular_params<Backend> modular_type;
                     typedef Backend backend_type;
 
