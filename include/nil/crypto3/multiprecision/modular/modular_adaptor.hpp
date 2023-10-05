@@ -93,7 +93,8 @@ namespace nil {
                 constexpr modular_params<Backend> const modular_params_ct<Backend, Modulus>::m_mod;
 
                 template<typename Backend, typename StorageType>
-                struct modular_adaptor {
+                class modular_adaptor {
+                public:
                     typedef modular_params<Backend> modular_type;
                     typedef Backend backend_type;
 
@@ -405,7 +406,7 @@ namespace nil {
                     window_bits += wsize[j][1];
 
                     return window_bits;
-                };
+                }
 
                 template<class Backend, typename StorageType>
                 inline void find_modular_pow(modular_adaptor<Backend, StorageType> &result,
