@@ -34,8 +34,6 @@
 #include <boost/array.hpp>
 
 #include <nil/crypto3/detail/pack.hpp>
-#include <boost/stacktrace.hpp>
-
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
 namespace nil {
