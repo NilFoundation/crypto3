@@ -37,6 +37,8 @@ namespace nil {
                 private:
                     std::map<std::size_t, std::vector<std::vector<typename FieldType::value_type>>> z;
                 public:
+                    using field_type = FieldType;
+                    
                     bool operator==(const eval_storage& other) const{
                         return this->z == other.z;
                     }

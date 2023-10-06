@@ -99,6 +99,7 @@ namespace nil {
                         using precommitment_type = merkle_tree_type;
                         using commitment_type = typename precommitment_type::value_type;
                         using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
+                        using polynomial_type = math::polynomial<typename FieldType::value_type>;
 
                         struct params_type {
                             using field_type = FieldType;

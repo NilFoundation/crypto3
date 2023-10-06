@@ -60,6 +60,7 @@ namespace nil {
                     using transcript_hash_type = typename LPCScheme::transcript_hash_type;
                     using poly_type = PolynomialType;
                     using lpc = LPCScheme;
+                    using eval_storage_type = typename LPCScheme::eval_storage_type;
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
                     typename fri_type::params_type _fri_params;
@@ -347,6 +348,7 @@ namespace nil {
                     using params_type = typename basic_fri::params_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<typename LPCParams::transcript_hash_type>;
                     using transcript_hash_type = typename LPCParams::transcript_hash_type;
+                    using eval_storage_type = eval_storage<field_type>;
 
                     struct proof_type {
                         bool operator==(const proof_type &rhs) const {
@@ -359,7 +361,7 @@ namespace nil {
 
                         typedef std::vector<std::vector<typename FieldType::value_type>> z_type;
 
-                        eval_storage<field_type> z;
+                        eval_storage_type z;
                         typename basic_fri::proof_type fri_proof;
                     };
                 };
