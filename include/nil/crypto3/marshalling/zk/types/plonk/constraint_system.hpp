@@ -38,7 +38,6 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/lookup_gate.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/gate.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
@@ -53,7 +52,7 @@ namespace nil {
                 using plonk_constraint_system = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<
                         plonk_gates< TTypeBase, typename PlonkConstraintSystem::gates_container_type::value_type >, // gates
-                        plonk_copy_constraints< TTypeBase, typename PlonkConstraintSystem::field_type >,              // copy constraints
+                        plonk_copy_constraints< TTypeBase, typename PlonkConstraintSystem::variable_type >,              // copy constraints
                         plonk_lookup_gates< TTypeBase, typename PlonkConstraintSystem::lookup_gates_container_type::value_type >,  // lookup constraints
                         // If we don't have lookup gates, we don't need lookup tables
                         plonk_lookup_tables< TTypeBase, typename PlonkConstraintSystem::lookup_tables_type::value_type >  // lookup tables
@@ -68,7 +67,7 @@ namespace nil {
 
                     return result_type(std::make_tuple(
                         fill_plonk_gates<Endianness, typename PlonkConstraintSystem::gates_container_type::value_type>(system.gates()),
-                        fill_plonk_copy_constraints<Endianness, typename PlonkConstraintSystem::field_type>(system.copy_constraints()),
+                        fill_plonk_copy_constraints<Endianness, typename PlonkConstraintSystem::variable_type>(system.copy_constraints()),
                         fill_plonk_lookup_gates<Endianness, typename PlonkConstraintSystem::lookup_gates_container_type::value_type>(system.lookup_gates()),
                         fill_plonk_lookup_tables<Endianness, typename PlonkConstraintSystem::lookup_tables_type::value_type>(system.lookup_tables())
                     ));
@@ -83,7 +82,7 @@ namespace nil {
 
                     return PlonkConstraintSystem(
                         make_plonk_gates<Endianness, typename PlonkConstraintSystem::gates_container_type::value_type>(std::get<0>(filled_system.value())),
-                        make_plonk_copy_constraints<Endianness, typename PlonkConstraintSystem::field_type>(std::get<1>(filled_system.value())),
+                        make_plonk_copy_constraints<Endianness, typename PlonkConstraintSystem::variable_type>(std::get<1>(filled_system.value())),
                         make_plonk_lookup_gates<Endianness, typename PlonkConstraintSystem::lookup_gates_container_type::value_type>(std::get<2>(filled_system.value())),
                         make_plonk_lookup_tables<Endianness, typename PlonkConstraintSystem::lookup_tables_type::value_type>(std::get<3>(filled_system.value()))
                     );

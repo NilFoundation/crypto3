@@ -41,8 +41,6 @@
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
 
-#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
@@ -50,7 +48,7 @@ namespace nil {
                 // Default commitment scheme proof marshalling type in fact it'll be one of tuple's elements for LPC and KZG
                 template <typename TTypeBase, typename commitment_scheme_type> struct eval_proof;
 
-                template < typename TTypeBase, typename FieldType >
+                template < typename TTypeBase, typename EvalStorage >
                     using eval_storage = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
@@ -59,7 +57,7 @@ namespace nil {
                         // All z-s are placed into plain array
                         nil::marshalling::types::array_list<
                             TTypeBase,
-                            field_element<TTypeBase, typename FieldType::value_type>,
+                            field_element<TTypeBase, typename EvalStorage::field_type::value_type>,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >,
 
@@ -78,9 +76,9 @@ namespace nil {
                     >
                 >;
 
-                template<typename Endianness, typename FieldType>
-                eval_storage<nil::marshalling::field_type<Endianness>, FieldType> 
-                fill_eval_storage( const typename nil::crypto3::zk::commitments::eval_storage<FieldType> &z ){
+                template<typename Endianness, typename EvalStorage>
+                eval_storage<nil::marshalling::field_type<Endianness>, EvalStorage> 
+                fill_eval_storage( const EvalStorage &z ){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     nil::crypto3::marshalling::types::batch_info_type batch_info;
@@ -110,7 +108,7 @@ namespace nil {
                         }
                     }
 
-                    std::vector<typename FieldType::value_type> z_val;
+                    std::vector<typename EvalStorage::field_type::value_type> z_val;
                     for( std::size_t i = 0; i < batches.size(); i++ ){
                         for(std::size_t j = 0; j < z.get_batch_size(batches[i]); j++ ){
                             for(std::size_t k = 0; k < z.get_poly_points_number(batches[i], j); k++ ){
@@ -120,22 +118,22 @@ namespace nil {
                     }
                     nil::marshalling::types::array_list<
                         TTypeBase,
-                        field_element<TTypeBase, typename FieldType::value_type>,
+                        field_element<TTypeBase, typename EvalStorage::field_type::value_type>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
-                    > filled_z = fill_field_element_vector<typename FieldType::value_type, Endianness>(z_val);
+                    > filled_z = fill_field_element_vector<typename EvalStorage::field_type::value_type, Endianness>(z_val);
 
-                    return eval_storage<TTypeBase, FieldType>(
+                    return eval_storage<TTypeBase, EvalStorage>(
                         std::tuple( filled_z, filled_batch_info, filled_eval_points_num )
                     );
                 }
 
-                template<typename Endianness, typename FieldType>
-                typename nil::crypto3::zk::commitments::eval_storage<FieldType> make_eval_storage(
-                    const eval_storage<nil::marshalling::field_type<Endianness>, FieldType> &filled_storage
+                template<typename Endianness, typename EvalStorage>
+                EvalStorage make_eval_storage(
+                    const eval_storage<nil::marshalling::field_type<Endianness>, EvalStorage> &filled_storage
                 ){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    typename nil::crypto3::zk::commitments::eval_storage<FieldType> z;
+                    EvalStorage z;
                     typename nil::crypto3::marshalling::types::batch_info_type batch_info;
                     std::vector<std::uint8_t> eval_points_num;
 

@@ -33,8 +33,6 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_table.hpp>
-
 #include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/lookup_constraint.hpp>
 
@@ -73,7 +71,7 @@ namespace nil {
                         BOOST_ASSERT(table.lookup_options[i].size() == table.columns_number);
                         for( std::size_t j = 0; j < table.lookup_options[i].size(); j++){
                             filled_options.value().push_back(
-                                fill_variable<variable_type, Endianness>(table.lookup_options[i][j])
+                                fill_variable<Endianness, variable_type>(table.lookup_options[i][j])
                             );
                         }
                     }
@@ -102,7 +100,7 @@ namespace nil {
                         std::vector<typename LookupTable::variable_type> row;
                         for( std::size_t j = 0; j < columns_number; j++, cur++ ){
                             row.emplace_back(
-                                make_variable<typename LookupTable::variable_type, Endianness>(
+                                make_variable<Endianness, typename LookupTable::variable_type>(
                                     std::get<2>(filled_table.value()).value().at(cur)
                                 )
                             );

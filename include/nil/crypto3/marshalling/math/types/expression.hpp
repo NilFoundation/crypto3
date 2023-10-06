@@ -39,8 +39,6 @@
 #include <nil/crypto3/marshalling/math/types/term.hpp>
 #include <nil/crypto3/marshalling/math/types/flat_expression.hpp>
 
-#include <nil/crypto3/zk/math/expression.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
@@ -168,7 +166,7 @@ namespace nil {
                     term_vector_marshalling_type filled_terms;
                     for (const auto &term : flat_expr.terms) {
                         filled_terms.value().push_back(
-                            fill_term<typename Expression::term_type, Endianness>(term));
+                            fill_term<Endianness, typename Expression::term_type>(term));
                     }
 
                     // Fill the power operations. 
@@ -234,7 +232,7 @@ namespace nil {
                     const auto& terms = std::get<0>(filled_expr.value()).value();
                     for (auto i = 0; i < terms.size(); i++) {
                         flat_expr.terms.emplace_back(
-                            make_term<typename Expression::term_type, Endianness>(terms.at(i)));
+                            make_term<Endianness, typename Expression::term_type>(terms.at(i)));
                     }
 
                     // Get the power operations.

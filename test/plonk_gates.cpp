@@ -51,6 +51,10 @@
 #include <nil/crypto3/marshalling/zk/types/plonk/lookup_table.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/gate.hpp>
 
+#include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_gate.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_table.hpp>
+
 template<typename TIter>
 void print_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end) {
     os << std::hex;
@@ -186,13 +190,13 @@ template<typename Field, typename Endianness>
 void test_plonk_variable() {
     using namespace nil::crypto3::marshalling;
 
-    using value_type = nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>;
-    using value_marshalling_type = typename types::variable<nil::marshalling::field_type<Endianness>, value_type>::type;
+    using varialbe_type = nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>;
+    using value_marshalling_type = typename types::variable<nil::marshalling::field_type<Endianness>, varialbe_type>::type;
 
-    auto val = generate_random_plonk_variable<value_type>();
+    auto val = generate_random_plonk_variable<varialbe_type>();
 
-    auto filled_val = nil::crypto3::marshalling::types::fill_variable<value_type, Endianness>(val);
-    auto _val = types::make_variable<value_type, Endianness>(filled_val);
+    auto filled_val = nil::crypto3::marshalling::types::fill_variable<Endianness, varialbe_type>(val);
+    auto _val = types::make_variable<Endianness,varialbe_type>(filled_val);
     BOOST_CHECK(val == _val);
 
     std::vector<std::uint8_t> cv;
@@ -205,8 +209,7 @@ void test_plonk_variable() {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-    auto constructed_val_read = types::make_variable<value_type, Endianness>(test_val_read);
-    BOOST_CHECK(val == constructed_val_read);
+    auto constructed_val_read = types::make_variable<Endianness, varialbe_type>(test_val_read);
     BOOST_CHECK(val == constructed_val_read);
 }
 
@@ -215,16 +218,16 @@ void test_plonk_variables(std::size_t n) {
     using namespace nil::crypto3::marshalling;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    using value_type = nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>;
+    using variable_type = nil::crypto3::zk::snark::plonk_variable<typename Field::value_type>;
     using value_marshalling_type = typename types::variables<nil::marshalling::field_type<Endianness>, Field>;
 
-    std::vector<value_type> val;
+    std::vector<variable_type> val;
     for (size_t i = 0; i < n; i++) {
-        val.push_back(generate_random_plonk_variable<value_type>());
+        val.push_back(generate_random_plonk_variable<variable_type>());
     }
 
-    auto filled_val = nil::crypto3::marshalling::types::fill_variables<value_type, Endianness>(val);
-    auto _val = types::make_variables<value_type, Endianness>(filled_val);
+    auto filled_val = nil::crypto3::marshalling::types::fill_variables<Endianness, variable_type>(val);
+    auto _val = types::make_variables<Endianness, variable_type>(filled_val);
     BOOST_CHECK(val.size() == _val.size());
     for (std::size_t i = 0; i < val.size(); i++) {
         BOOST_CHECK(val[i] == _val[i]);
@@ -240,7 +243,7 @@ void test_plonk_variables(std::size_t n) {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-    auto constructed_val_read = types::make_variables<value_type, Endianness>(test_val_read);
+    auto constructed_val_read = types::make_variables<Endianness, variable_type>(test_val_read);
     BOOST_CHECK(val.size() == _val.size());
     for (std::size_t i = 0; i < val.size(); i++) {
         BOOST_CHECK(val[i] == _val[i]);
@@ -257,8 +260,8 @@ void test_plonk_term(std::size_t vars_n) {
             typename types::term<nil::marshalling::field_type<Endianness>, value_type>::type;
 
     auto val = generate_random_plonk_term<Field, variable_type>(vars_n);
-    auto filled_val = types::fill_term<value_type, Endianness>(val);
-    auto _val = types::make_term<value_type, Endianness>(filled_val);
+    auto filled_val = types::fill_term<Endianness, value_type>(val);
+    auto _val = types::make_term<Endianness, value_type>(filled_val);
     BOOST_CHECK_EQUAL(val, _val);
 
     std::vector<std::uint8_t> cv;
@@ -272,7 +275,7 @@ void test_plonk_term(std::size_t vars_n) {
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-    auto constructed_val_read = types::make_term<value_type, Endianness>(test_val_read);
+    auto constructed_val_read = types::make_term<Endianness, value_type>(test_val_read);
     BOOST_CHECK_EQUAL(val, constructed_val_read);
 }
 

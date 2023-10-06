@@ -9,10 +9,6 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
-
 #include <nil/crypto3/marshalling/math/types/expression.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 
@@ -22,74 +18,71 @@ namespace nil {
             namespace types {
 
                 // *********************** Plonk copy constraint **************************** //
-                template<typename TTypeBase, typename FieldType> 
+                template<typename TTypeBase, typename VariableType> 
                     using plonk_copy_constraint = nil::marshalling::types::bundle<TTypeBase, std::tuple<
-                        typename variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>>::type, 
-                        typename variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>>::type
+                        typename variable<TTypeBase, VariableType>::type, 
+                        typename variable<TTypeBase, VariableType>::type
                     >>;
 
-                template<typename Endianness, typename FieldType> 
-                nil::crypto3::marshalling::types::plonk_copy_constraint<typename nil::marshalling::field_type<Endianness>, FieldType>
-                fill_plonk_copy_constraint(const nil::crypto3::zk::snark::plonk_copy_constraint<FieldType> &copy_constraint){
+                template<typename Endianness, typename VariableType> 
+                plonk_copy_constraint<typename nil::marshalling::field_type<Endianness>, VariableType>
+                fill_plonk_copy_constraint(const std::pair<VariableType, VariableType> &copy_constraint){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
-                    using result_type = nil::crypto3::marshalling::types::plonk_copy_constraint<TTypeBase, FieldType>;
+                    using result_type = plonk_copy_constraint<TTypeBase, VariableType>;
 
                     return result_type(
                         std::make_tuple(
-                            fill_variable<VariableType, Endianness>(std::get<0>(copy_constraint)),
-                            fill_variable<VariableType, Endianness>(std::get<1>(copy_constraint))
+                            fill_variable<Endianness, VariableType>(std::get<0>(copy_constraint)),
+                            fill_variable<Endianness, VariableType>(std::get<1>(copy_constraint))
                         )
                     );
                 }
 
-                template<typename Endianness, typename FieldType>
-                nil::crypto3::zk::snark::plonk_copy_constraint<FieldType>
-                make_plonk_copy_constraint(const nil::crypto3::marshalling::types::plonk_copy_constraint<
-                    typename nil::marshalling::field_type<Endianness>, 
-                    FieldType> &filled_copy_constraint){
+                template<typename Endianness, typename VariableType>
+                std::pair<VariableType, VariableType>
+                make_plonk_copy_constraint(const plonk_copy_constraint<typename nil::marshalling::field_type<Endianness>, VariableType> &filled_copy_constraint
+                ){
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using VariableType = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
-                    using result_type = nil::crypto3::zk::snark::plonk_copy_constraint<FieldType>;
+
                     return std::make_pair(
-                        make_variable<VariableType, Endianness>(std::get<0>(filled_copy_constraint.value())),
-                        make_variable<VariableType, Endianness>(std::get<1>(filled_copy_constraint.value()))
+                        make_variable<Endianness, VariableType>(std::get<0>(filled_copy_constraint.value())),
+                        make_variable<Endianness, VariableType>(std::get<1>(filled_copy_constraint.value()))
                     );      
                 }
 
 
                 // *********************** Plonk copy constraints **************************** //
-                template<typename TTypeBase, typename FieldType>
+                template<typename TTypeBase, typename VariableType>
                 using plonk_copy_constraints = nil::marshalling::types::array_list<
                     TTypeBase, 
-                    plonk_copy_constraint<TTypeBase, FieldType>,
+                    plonk_copy_constraint<TTypeBase, VariableType>,
                     nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                 >;
 
-                template<typename Endianness, typename FieldType>
-                plonk_copy_constraints<nil::marshalling::field_type<Endianness>,  FieldType>
-                fill_plonk_copy_constraints(const std::vector< nil::crypto3::zk::snark::plonk_copy_constraint<FieldType>> &constraints) {
+                template<typename Endianness, typename VariableType>
+                plonk_copy_constraints<nil::marshalling::field_type<Endianness>,  VariableType>
+                fill_plonk_copy_constraints(const std::vector<std::pair<VariableType, VariableType>> &constraints) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    plonk_copy_constraints<TTypeBase, FieldType> filled_constraints;
+                    plonk_copy_constraints<TTypeBase, VariableType> filled_constraints;
                     for (const auto &constraint : constraints) {
                         filled_constraints.value().push_back(
-                            fill_plonk_copy_constraint< Endianness, FieldType>(constraint)
+                            fill_plonk_copy_constraint< Endianness, VariableType>(constraint)
                         );
                     }
 
                     return filled_constraints;
                 }
 
-                template<typename Endianness, typename FieldType>
-                std::vector< nil::crypto3::zk::snark::plonk_copy_constraint<FieldType> >
+                template<typename Endianness, typename VariableType>
+                std::vector<std::pair<VariableType, VariableType> >
                 make_plonk_copy_constraints(
-                    const plonk_copy_constraints<nil::marshalling::field_type<Endianness>, FieldType> &filled_constraints
+                    const plonk_copy_constraints<nil::marshalling::field_type<Endianness>, VariableType> &filled_constraints
                 ){
-                    std::vector< nil::crypto3::zk::snark::plonk_copy_constraint<FieldType> > constraints;
+                    std::vector< std::pair< VariableType, VariableType > > constraints;
                     for (auto i = 0; i < filled_constraints.value().size(); i++) {
-                        constraints.emplace_back(make_plonk_copy_constraint<Endianness, FieldType>(filled_constraints.value()[i]));
+                        constraints.emplace_back(make_plonk_copy_constraint<Endianness, VariableType>(filled_constraints.value()[i]));
                     }
                     return constraints;
                 }

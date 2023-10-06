@@ -45,45 +45,22 @@
 #include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/eval_storage.hpp>
 
-#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template <typename TTypeBase, typename CommitmentSchemeType, 
-                    typename std::enable_if<
-                        std::is_same<
-                            CommitmentSchemeType, 
-                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
-                        >::value, bool
-                    >::type = true
-                >
+                template <typename TTypeBase, typename CommitmentSchemeType>
                 struct commitment{
                     using type = typename merkle_node_value< TTypeBase, typename CommitmentSchemeType::commitment_type>::type;
                 };
 
-                template <typename Endianness, typename CommitmentSchemeType, 
-                    typename std::enable_if<
-                        std::is_same<
-                            CommitmentSchemeType, 
-                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
-                        >::value, bool
-                    >::type = true
-                >
+                template <typename Endianness, typename CommitmentSchemeType>
                 typename commitment<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type
                 fill_commitment(typename CommitmentSchemeType::commitment_type commitment){
                     return fill_merkle_node_value<typename CommitmentSchemeType::commitment_type, Endianness>( commitment );
                 }
                 
-                template <typename Endianness, typename CommitmentSchemeType, 
-                    typename std::enable_if<
-                        std::is_same<
-                            CommitmentSchemeType, 
-                            zk::commitments::lpc_commitment_scheme<typename CommitmentSchemeType::lpc, typename CommitmentSchemeType::poly_type>
-                        >::value, bool
-                    >::type = true
-                >
+                template <typename Endianness, typename CommitmentSchemeType >
                 typename CommitmentSchemeType::commitment_type
                 make_commitment(const typename commitment<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type &filled_commitment){
                     return make_merkle_node_value<typename CommitmentSchemeType::commitment_type, Endianness>( filled_commitment );
@@ -96,7 +73,7 @@ namespace nil {
                         TTypeBase,
                         std::tuple<
                             // Evaluation points storage z
-                            eval_storage<TTypeBase, typename LPC::field_type>,
+                            eval_storage<TTypeBase, typename LPC::eval_storage_type>,
 
                             // One fri proof
                             typename fri_proof<TTypeBase, typename LPC::basic_fri>::type
@@ -111,7 +88,7 @@ namespace nil {
 
                     nil::crypto3::marshalling::types::batch_info_type batch_info = proof.z.get_batch_info();
 
-                    auto filled_z = fill_eval_storage<Endianness, typename LPC::field_type>(proof.z);
+                    auto filled_z = fill_eval_storage<Endianness, typename LPC::eval_storage_type>(proof.z);
 
                     typename fri_proof<TTypeBase, typename LPC::basic_fri>::type filled_fri_proof = fill_fri_proof<Endianness, typename LPC::basic_fri>(
                         proof.fri_proof, batch_info
@@ -127,7 +104,7 @@ namespace nil {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     typename LPC::proof_type proof;
 
-                    proof.z = make_eval_storage<Endianness, typename LPC::field_type>(std::get<0>(filled_proof.value()));
+                    proof.z = make_eval_storage<Endianness, typename LPC::eval_storage_type>(std::get<0>(filled_proof.value()));
                     auto batch_info = proof.z.get_batch_info();
                     proof.fri_proof = make_fri_proof<Endianness, typename LPC::basic_fri>(std::get<1>(filled_proof.value()), batch_info);
 

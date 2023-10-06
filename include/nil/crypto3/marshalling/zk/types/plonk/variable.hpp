@@ -37,8 +37,6 @@
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
@@ -47,8 +45,8 @@ namespace nil {
                 struct variable;
                 
                 //********************************* plonk_variable ***************************/
-                template<typename TTypeBase, typename AssignmentType>
-                struct variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<AssignmentType>> {
+                template<typename TTypeBase, typename VariableType>
+                struct variable<TTypeBase, VariableType> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
@@ -56,18 +54,15 @@ namespace nil {
                             nil::marshalling::types::integral<TTypeBase, std::size_t>,
                             // std::int32_t rotation
                             nil::marshalling::types::integral<TTypeBase, std::int32_t>,
-                            // bool relative
+                            //bool relative
                             nil::marshalling::types::integral<TTypeBase, bool>,
                             // enum column_type : std::uint8_t { witness, public_input, constant, selector } type
                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>>
                         >;
                 };
 
-                template<typename Variable, typename Endianness>
-                typename std::enable_if<
-                    std::is_same<Variable,
-                                 nil::crypto3::zk::snark::plonk_variable<typename Variable::assignment_type>>::value,
-                    typename variable<nil::marshalling::field_type<Endianness>, Variable>::type>::type
+                template<typename Endianness, typename Variable>
+                typename variable<nil::marshalling::field_type<Endianness>, Variable>::type
                 fill_variable(const Variable &var) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using result_type = typename variable<TTypeBase, Variable>::type;
@@ -76,18 +71,18 @@ namespace nil {
                     using octet_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint8_t>;
                     using bool_marshalling_type = nil::marshalling::types::integral<TTypeBase, bool>;
 
-                    return result_type(
-                        std::make_tuple(size_t_marshalling_type(var.index), int32_marshalling_type(var.rotation),
-                                        bool_marshalling_type(var.relative), octet_marshalling_type(var.type)));
+                    return result_type(std::make_tuple(
+                        size_t_marshalling_type(var.index), 
+                        int32_marshalling_type(var.rotation),
+                        bool_marshalling_type(var.relative), 
+                        octet_marshalling_type(var.type)
+                    ));
                 }
 
-                template<typename Variable, typename Endianness>
-                typename std::enable_if<std::is_same<Variable, nil::crypto3::zk::snark::plonk_variable<
-                                                                   typename Variable::assignment_type>>::value,
-                                        Variable>::type
-                    make_variable(
-                        const typename variable<nil::marshalling::field_type<Endianness>, Variable>::type &filled_var) {
-
+                template<typename Endianness, typename Variable>
+                Variable make_variable(
+                    const typename variable<nil::marshalling::field_type<Endianness>, Variable>::type &filled_var
+                ) {
                     return Variable(std::get<0>(filled_var.value()).value(),
                                     std::get<1>(filled_var.value()).value(),
                                     std::get<2>(filled_var.value()).value(),
@@ -95,14 +90,14 @@ namespace nil {
                 }
 
                 //****************** vector of plonk_variable *************************/
-                template<typename TTypeBase, typename AssignmentType>
+                template<typename TTypeBase, typename VariableType>
                 using variables = nil::marshalling::types::array_list<
                     TTypeBase, 
-                    typename variable<TTypeBase, nil::crypto3::zk::snark::plonk_variable<AssignmentType>>::type,
+                    typename variable<TTypeBase, VariableType>::type,
                     nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                 >;
 
-                template<typename Variable, typename Endianness>
+                template<typename Endianness, typename Variable>
                 variables<nil::marshalling::field_type<Endianness>, typename Variable::assignment_type>
                 fill_variables(const std::vector<Variable> &vars) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -110,18 +105,18 @@ namespace nil {
 
                     variables<TTypeBase, AssignmentType> filled_vars;
                     for (const auto &var : vars) {
-                        filled_vars.value().push_back(fill_variable<Variable, Endianness>(var));
+                        filled_vars.value().push_back(fill_variable<Endianness, Variable>(var));
                     }
 
                     return filled_vars;
                 }
 
-                template<typename Variable, typename Endianness>
+                template<typename Endianness, typename Variable>
                 std::vector<Variable>
                 make_variables(const variables<nil::marshalling::field_type<Endianness>, typename Variable::assignment_type> &filled_vars){
                     std::vector<Variable> vars;
                     for (std::size_t i = 0; i < filled_vars.value().size(); i++) {
-                        vars.emplace_back(make_variable<Variable, Endianness>(filled_vars.value().at(i)));
+                        vars.emplace_back(make_variable<Endianness, Variable>(filled_vars.value().at(i)));
                     }
                     return vars;
                 }

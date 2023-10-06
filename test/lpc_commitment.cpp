@@ -58,6 +58,7 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
@@ -66,10 +67,14 @@
 
 #include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 
 #include <nil/crypto3/random/algebraic_engine.hpp>
 #include <nil/crypto3/random/algebraic_random_device.hpp>
+
+#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 
 using namespace nil::crypto3;
 

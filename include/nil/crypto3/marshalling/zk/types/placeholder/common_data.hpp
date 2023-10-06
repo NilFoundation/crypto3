@@ -41,7 +41,6 @@
 
 #include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 
 namespace nil {
     namespace crypto3 {

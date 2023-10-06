@@ -35,8 +35,6 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
-
 #include <nil/crypto3/marshalling/zk/types/plonk/constraint.hpp>
 
 namespace nil {
