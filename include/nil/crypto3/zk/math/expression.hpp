@@ -68,7 +68,10 @@ namespace nil {
             template<typename VariableType>
             class expression {
             public:
+                // Theese typedefs are useful for usage in marshalling, for support of actor version.
                 typedef term<VariableType> term_type;
+                typedef pow_operation<VariableType> pow_operation_type;
+                typedef binary_arithmetic_operation<VariableType> binary_arithmetic_operation_type;
                 typedef VariableType variable_type;
                 typedef typename VariableType::assignment_type assignment_type;
 
@@ -335,6 +338,8 @@ namespace nil {
             class binary_arithmetic_operation
             {
             public:
+                using ArithmeticOperatorType = ArithmeticOperator;
+
                 binary_arithmetic_operation(
                         const expression<VariableType>& expr_left,
                         const expression<VariableType>& expr_right,
