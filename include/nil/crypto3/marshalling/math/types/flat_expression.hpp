@@ -29,7 +29,6 @@
 #define CRYPTO3_MARSHALLING_ZK_MATH_FLAT_EXPRESSION_HPP
 
 #include <vector>
-#include <nil/crypto3/zk/math/expression.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,8 +50,9 @@ namespace nil {
                 std::uint32_t child_index;
             };
 
+            template<typename ArithmeticOperatorType>
             struct flat_binary_arithmetic_operation {
-                ArithmeticOperator op;
+                ArithmeticOperatorType op;
 
                 // Type of the left base expression.
                 flat_node_type left_type;
@@ -70,29 +70,33 @@ namespace nil {
             // Storing the crypto3::math::expression class in a flat way, 
             // to be able to use it in marshalling. We put different types of nodes
             // into different vectors, and use indexes instead of pointers.
-            template<typename VariableType>
+            template<typename ExpressionType>
             class flat_expression {
             public:
-                    
+                using VariableType = typename ExpressionType::variable_type;
+                using term_type = typename ExpressionType::term_type;
+                using pow_operation_type = typename ExpressionType::pow_operation_type;
+                using binary_arithmetic_operation_type = typename ExpressionType::binary_arithmetic_operation_type;
+
                 // The opposite operation of flattening, returns normal tree-structured expression.
-                math::expression<VariableType> to_expression() {
+                ExpressionType to_expression() {
                     return to_expression(root_type, root_index);
                 }
 
-                math::expression<VariableType> to_expression(
+                ExpressionType to_expression(
                         flat_node_type type, int node_index) {
                     switch (type) {
                         case flat_node_type::TERM:
                             return terms[node_index];
                         case flat_node_type::POWER: {
                             const auto& pow_op = pow_operations[node_index];
-                            return math::pow_operation<VariableType>(
+                            return pow_operation_type(
                                 to_expression(pow_op.type, pow_op.child_index),
                                 pow_op.power);
                         }
                         case flat_node_type::BINARY_ARITHMETIC: {
                             const auto& bin_op = binary_operations[node_index];
-                            return math::binary_arithmetic_operation<VariableType>(
+                            return binary_arithmetic_operation_type(
                                 to_expression(bin_op.left_type, bin_op.left_index), 
                                 to_expression(bin_op.right_type, bin_op.right_index), 
                                 bin_op.op);
@@ -100,9 +104,9 @@ namespace nil {
                     }
                 }
 
-                std::vector<math::term<VariableType>> terms;
+                std::vector<term_type> terms;
                 std::vector<flat_pow_operation> pow_operations;
-                std::vector<flat_binary_arithmetic_operation> binary_operations;
+                std::vector<flat_binary_arithmetic_operation<typename binary_arithmetic_operation_type::ArithmeticOperatorType>> binary_operations;
 
                 // Type of the base expression.
                 flat_node_type root_type;
@@ -114,26 +118,30 @@ namespace nil {
             };
     
             // Class for creating a flat_expression from expression. 
-            template<typename VariableType>
+            template<typename ExpressionType>
             class expression_flattener : public boost::static_visitor<void> {
             public:
-                expression_flattener(const math::expression<VariableType>& expr) {
+                using VariableType = typename ExpressionType::variable_type;
+                using term_type = typename ExpressionType::term_type;
+                using pow_operation_type = typename ExpressionType::pow_operation_type;
+                using binary_arithmetic_operation_type = typename ExpressionType::binary_arithmetic_operation_type;
+
+                expression_flattener(const ExpressionType& expr) {
                     boost::apply_visitor(*this, expr.get_expr());
                 }
 
-                const flat_expression<VariableType>& get_result() const {
+                const flat_expression<ExpressionType>& get_result() const {
                     return result;
                 }
     
-                void operator()(const math::term<VariableType>& term) {
+                void operator()(const term_type& term) {
                     result.terms.push_back(term);
 
                     result.root_type = flat_node_type::TERM;
                     result.root_index = result.terms.size() - 1;
                 }
 
-                void operator()(
-                        const math::pow_operation<VariableType>& pow) {
+                void operator()(const pow_operation_type& pow) {
                     boost::apply_visitor(*this, pow.get_expr().get_expr());
                     result.pow_operations.push_back({pow.get_power(), result.root_type, result.root_index});
 
@@ -141,9 +149,8 @@ namespace nil {
                     result.root_index = result.pow_operations.size() - 1;
                 }
 
-                void operator()(
-                        const math::binary_arithmetic_operation<VariableType>& op) {
-                    flat_binary_arithmetic_operation flat_op;
+                void operator()(const binary_arithmetic_operation_type& op) {
+                    flat_binary_arithmetic_operation<typename binary_arithmetic_operation_type::ArithmeticOperatorType> flat_op;
                     flat_op.op = op.get_op();
 
                     boost::apply_visitor(*this, op.get_expr_left().get_expr());
@@ -161,7 +168,7 @@ namespace nil {
                 }
 
             private:
-                flat_expression<VariableType> result;
+                flat_expression<ExpressionType> result;
             };
 
         }        // namespace math
