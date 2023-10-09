@@ -59,9 +59,6 @@ BOOST_AUTO_TEST_CASE(gate_id_sanity_tests) {
     constexpr std::size_t WitnessColumns = 11;
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
-    // We use either one or two depending on whether R divides chunk_size or not.
-    // Since we need to know SelectorColumns amount before the component is actually intialized,
-    // we use two.
     constexpr std::size_t SelectorColumns = 2;
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<
         WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
@@ -127,6 +124,72 @@ BOOST_AUTO_TEST_CASE(gate_id_sanity_tests) {
     gate_id_type id_5(constraints_5),
                  id_6(constraints_6);
     BOOST_ASSERT(id_5 == id_6);
+
+    std::vector<constraint_type> constraints_7;
+    constraints_7.emplace_back(var(0, 0, true, var::column_type::witness));
+    std::vector<constraint_type> constraints_8;
+    constraints_8.emplace_back(var(0, 0, true, var::column_type::constant));
+    gate_id_type id_7(constraints_7),
+                 id_8(constraints_8);
+    BOOST_ASSERT(id_7 != id_8);
+}
+
+BOOST_AUTO_TEST_CASE(lookup_gate_id_sanity_tests) {
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::scalar_field_type;
+    using value_type = typename field_type::value_type;
+    using var = typename nil::crypto3::zk::snark::plonk_variable<value_type>;
+    using constraint_type = nil::crypto3::zk::snark::plonk_constraint<field_type>;
+    using gate_type = nil::crypto3::zk::snark::plonk_gate<field_type, constraint_type>;
+
+    constexpr std::size_t WitnessColumns = 11;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 1;
+    constexpr std::size_t SelectorColumns = 2;
+    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+    using lookup_constraint_type = nil::crypto3::zk::snark::plonk_lookup_constraint<field_type>;
+    using lookup_gate_type = nil::crypto3::zk::snark::plonk_lookup_gate<field_type, lookup_constraint_type>;
+    using lookup_gate_id_type = nil::blueprint::lookup_gate_id<field_type, ArithmetizationParams>;
+
+    std::vector<lookup_constraint_type> constraints_1, constraints_2;
+
+    constraints_1.reserve(2);
+    lookup_constraint_type constraint_1, constraint_2;
+    constraint_1.table_id = 0;
+    constraint_1.lookup_input.emplace_back(
+        var(0, -1, true, var::column_type::witness) * var(1, 3, true, var::column_type::witness) -
+        var(2, 0, true, var::column_type::witness));
+    constraint_1.lookup_input.emplace_back(var(1, 3, true, var::column_type::witness));
+    constraints_1.push_back(constraint_1);
+    constraint_2 = constraint_1;
+    constraint_2.table_id = 1;
+    constraints_1.push_back(constraint_2);
+
+    constraints_2.resize(2);
+    std::copy(constraints_1.rbegin(), constraints_1.rend(), constraints_2.begin());
+
+    // Order of constraints should not matter
+    lookup_gate_type gate_1(0, constraints_1),
+                     gate_2(1, constraints_2);
+    lookup_gate_id_type id_1 = lookup_gate_id_type(gate_1),
+                        id_2 = lookup_gate_id_type(gate_2);
+    BOOST_ASSERT(id_1 == id_2);
+    BOOST_ASSERT(!(id_1 < id_2) && !(id_2 < id_1));
+    // Order of variables inside constraints should matter
+    auto var_1 = var(0, -1, true, var::column_type::witness),
+         var_2 = var(1, 3, true, var::column_type::witness);
+    lookup_constraint_type constraint_3({0, {var_1, var_2}}),
+                           constraint_4({0, {var_2, var_1}});
+    lookup_gate_id_type id_3(constraint_3),
+                        id_4(constraint_4);
+    BOOST_ASSERT(id_3 != id_4);
+    // Table ids should matter
+    lookup_constraint_type constraint_5({0, {var_1, var_2}}),
+                           constraint_6({1, {var_1, var_2}});
+    lookup_gate_id_type id_5(constraint_5),
+                        id_6(constraint_6);
+    BOOST_ASSERT(id_5 != id_6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

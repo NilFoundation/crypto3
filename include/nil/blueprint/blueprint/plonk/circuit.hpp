@@ -59,18 +59,18 @@ namespace nil {
 
         private:
             using gate_id_type = gate_id<BlueprintFieldType, ArithmetizationParams>;
-            using gate_selector_map = std::map<
-                gate_id_type,
-                std::size_t>;
-            using gate_type =
-                crypto3::zk::snark::plonk_gate<
-                    BlueprintFieldType,
-                    crypto3::zk::snark::plonk_constraint<BlueprintFieldType>>;
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
+            using gate_selector_map = std::map<gate_id_type, std::size_t>;
+            using gate_type = crypto3::zk::snark::plonk_gate<BlueprintFieldType, constraint_type>;
+
+            using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
+            using lookup_gate_type = crypto3::zk::snark::plonk_lookup_gate<BlueprintFieldType, lookup_constraint_type>;
+            using lookup_gate_id_type = lookup_gate_id<BlueprintFieldType, ArithmetizationParams>;
+            using lookup_gate_selector_map = std::map<lookup_gate_id_type, std::size_t>;
 
             gate_selector_map selector_map = {};
+            lookup_gate_selector_map lookup_selector_map = {};
             std::size_t next_selector_index = 0;
-
         public:
             typedef BlueprintFieldType blueprint_field_type;
 
@@ -80,32 +80,50 @@ namespace nil {
 
             circuit() : ArithmetizationType() {}
 
-            #define gate_adder_macro \
-                gate_id_type gate_id = gate_id_type(args); \
-                auto it = selector_map.find(gate_id); \
-                if (it != selector_map.end()) { \
+            #define GENERIC_GATE_ADDER_MACRO(mapping, gate_container) \
+                auto it = mapping.find(gate_id); \
+                if (it != mapping.end()) { \
                     return it->second; \
                 } else { \
                     std::size_t selector_index = next_selector_index; \
-                    selector_map[gate_id] = selector_index; \
-                    this->_gates.emplace_back(selector_index, args); \
+                    mapping[gate_id] = selector_index; \
+                    this->gate_container.emplace_back(selector_index, args); \
                     next_selector_index++; \
                     return selector_index; \
                 }
 
-            template <typename GateArguments>
+            #define GATE_ADDER_MACRO(mapping, gate_container) \
+                auto gate_id = gate_id_type(args); \
+                GENERIC_GATE_ADDER_MACRO(mapping, gate_container)
+
+            #define LOOKUP_GATE_ADDER_MACRO(mapping, gate_container) \
+                auto gate_id = lookup_gate_id_type(args); \
+                GENERIC_GATE_ADDER_MACRO(mapping, gate_container)
+
+            template<typename GateArguments>
             std::size_t add_gate(const GateArguments &args) {
-                gate_adder_macro;
+                GATE_ADDER_MACRO(selector_map, _gates);
             }
 
             std::size_t add_gate(const std::initializer_list<constraint_type> &&args) {
-                gate_adder_macro;
+                GATE_ADDER_MACRO(selector_map, _gates);
             }
 
-            #undef gate_adder_macro
+            template<typename GateArguments>
+            std::size_t add_lookup_gate(const GateArguments &args) {
+                LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_tables);
+            }
+
+            std::size_t add_lookup_gate(const std::initializer_list<constraint_type> &&args) {
+                LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_tables);
+            }
+
+            #undef GATE_ADDER_MACRO
+            #undef LOOKUP_GATE_ADDER_MACRO
+            #undef GENERIC_GATE_ADDER_MACRO
 
             void add_copy_constraint(const crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
-                static std::size_t private_storage_index =
+                static const std::size_t private_storage_index =
                     assignment<crypto3::zk::snark::plonk_constraint_system<
                         BlueprintFieldType, ArithmetizationParams>>::private_storage_index;
                 if (copy_constraint.first == copy_constraint.second) {
@@ -116,6 +134,10 @@ namespace nil {
                     return;
                 }
                 this->_copy_constraints.emplace_back(copy_constraint);
+            }
+
+            std::size_t get_next_selector_index() const {
+                return next_selector_index;
             }
 
             void export_circuit(std::ostream& os) const {
