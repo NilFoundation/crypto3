@@ -107,7 +107,7 @@ namespace nil {
             void add_copy_constraint(const crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
                 static std::size_t private_storage_index =
                     assignment<crypto3::zk::snark::plonk_constraint_system<
-                        BlueprintFieldType, ArithmetizationParams>>::PRIVATE_STORAGE_INDEX;
+                        BlueprintFieldType, ArithmetizationParams>>::private_storage_index;
                 if (copy_constraint.first == copy_constraint.second) {
                     return;
                 }

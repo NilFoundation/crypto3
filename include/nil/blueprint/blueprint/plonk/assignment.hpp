@@ -64,10 +64,10 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
 
             std::size_t next_selector_index = 0;
-            std::uint32_t _allocated_rows = 0;
-            std::vector<value_type> _private_storage;
+            std::uint32_t assignment_allocated_rows = 0;
+            std::vector<value_type> assignment_private_storage;
         public:
-            static constexpr const std::size_t PRIVATE_STORAGE_INDEX = std::numeric_limits<std::size_t>::max();
+            static constexpr const std::size_t private_storage_index = std::numeric_limits<std::size_t>::max();
 
             assignment() :
                     crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
@@ -93,7 +93,7 @@ namespace nil {
             }
 
             std::uint32_t allocated_rows() const {
-                return _allocated_rows;
+                return assignment_allocated_rows;
             }
 
             void enable_selector(const std::size_t selector_index, const std::size_t row_index) {
@@ -118,7 +118,7 @@ namespace nil {
                 if (this->_private_table._witnesses[witness_index].size() <= row_index)
                     this->_private_table._witnesses[witness_index].resize(row_index + 1);
 
-                _allocated_rows = std::max(_allocated_rows, row_index + 1);
+                assignment_allocated_rows = std::max(assignment_allocated_rows, row_index + 1);
                 return this->_private_table._witnesses[witness_index][row_index];
             }
 
@@ -157,7 +157,7 @@ namespace nil {
                 if (zk_type::constant_column_size(constant_index) <= row_index)
                     this->_public_table._constants[constant_index].resize(row_index + 1);
 
-                _allocated_rows = std::max(_allocated_rows, row_index + 1);
+                assignment_allocated_rows = std::max(assignment_allocated_rows, row_index + 1);
                 return this->_public_table._constants[constant_index][row_index];
             }
 
@@ -171,29 +171,28 @@ namespace nil {
             }
 
             value_type private_storage(std::uint32_t storage_index) const {
-                BLUEPRINT_ASSERT(storage_index < _private_storage.size());
-                return _private_storage[storage_index];
+                BLUEPRINT_ASSERT(storage_index < private_storage.size());
+                return assignment_private_storage[storage_index];
             }
 
             value_type &private_storage(std::uint32_t storage_index) {
-                if (_private_storage.size() <= storage_index) {
-                    _private_storage.resize(storage_index + 1);
+                if (assignment_private_storage.size() <= storage_index) {
+                    assignment_private_storage.resize(storage_index + 1);
                 }
-                return _private_storage[storage_index];
+                return assignment_private_storage[storage_index];
             }
 
-            // Not required to be called; get_private_storage will automatically resize
-            // But you might want to use this to clear
+            // Not required to be called; private_storage calls will automatically resize
             void resize_private_storage(std::uint32_t new_size) {
-                _private_storage.resize(new_size);
+                assignment_private_storage.resize(new_size);
             }
 
             void clear_private_storage() {
-                _private_storage.clear();
+                assignment_private_storage.clear();
             }
 
             std::size_t private_storage_size() const {
-                return _private_storage.size();
+                return assignment_private_storage.size();
             }
 
             void export_table(std::ostream& os, bool wide_export = false) const {
@@ -280,7 +279,7 @@ namespace nil {
             // This SHOULD be handled by a separate variable type
             // But adding a new variable type breaks assigner
             // So we add a type without actually adding a type
-            if (input_var.index == assignment_type::PRIVATE_STORAGE_INDEX) {
+            if (input_var.index == assignment_type::private_storage_index) {
                 return input_assignment.private_storage(input_var.rotation);
             }
             switch(input_var.type){
