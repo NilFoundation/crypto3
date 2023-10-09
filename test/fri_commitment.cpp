@@ -376,17 +376,18 @@ BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
     using FRI_gr = typename nil::crypto3::zk::commitments::detail::basic_batched_fri<field_type, hash_type, hash_type, lambda, m, true>;
 
     BOOST_AUTO_TEST_CASE(polynomial_test) {
-        math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
-        auto filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, value_type>(f);
+        using polynomial_type = math::polynomial<typename field_type::value_type>;
+        polynomial_type f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+        auto filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, polynomial_type>(f);
 
-        auto _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, value_type>(filled_polynomial);
+        auto _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, polynomial_type>(filled_polynomial);
         BOOST_CHECK(f == _f);
 
 
         f = generate_random_polynomial<field_type>(2048, test_global_alg_rnd_engine<field_type>);
-        filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, value_type>(f);
+        filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, polynomial_type>(f);
 
-        _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, value_type>(filled_polynomial);
+        _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, polynomial_type>(filled_polynomial);
         BOOST_CHECK(f == _f);
     }
 

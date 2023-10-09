@@ -42,10 +42,6 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
-#include <nil/crypto3/zk/commitments/type_traits.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
@@ -60,30 +56,30 @@ namespace nil {
                 ///////////////////////////////////////////////
                 // math::polynomial marshalling
                 ///////////////////////////////////////////////
-                template<typename TTypeBase, typename ValueType>
-                using fri_math_polynomial =  field_element_vector_type<TTypeBase, ValueType>;
+                template<typename TTypeBase, typename PolynomialType>
+                using fri_math_polynomial =  field_element_vector_type<TTypeBase, typename PolynomialType::value_type>;
 
-                template<typename Endianness, typename ValueType, typename Range>
-                fri_math_polynomial<nil::marshalling::field_type<Endianness>, ValueType>
+                template<typename Endianness, typename PolynomialType, typename Range>
+                fri_math_polynomial<nil::marshalling::field_type<Endianness>, PolynomialType>
                 fill_fri_math_polynomial(const Range &f){
-                    std::vector<ValueType> val;
+                    std::vector<typename PolynomialType::value_type> val;
                     for( auto it=f.begin(); it != f.end(); it++){ val.push_back(*it); }
 
                     return nil::crypto3::marshalling::types::fill_field_element_vector<
-                        ValueType,
+                        typename PolynomialType::value_type,
                         Endianness
                     >(val);
                 }
 
-                template<typename Endianness, typename ValueType>
-                math::polynomial<ValueType>
-                make_fri_math_polynomial( const fri_math_polynomial<nil::marshalling::field_type<Endianness>, ValueType> &filled_polynomial){
+                template<typename Endianness, typename PolynomialType>
+                PolynomialType
+                make_fri_math_polynomial( const fri_math_polynomial<nil::marshalling::field_type<Endianness>, PolynomialType> &filled_polynomial){
                     auto val = nil::crypto3::marshalling::types::make_field_element_vector<
-                        ValueType,
+                        typename PolynomialType::value_type,
                         Endianness
                     >(filled_polynomial);
 
-                    return math::polynomial<ValueType>(val);
+                    return PolynomialType(val);
                 }
 
 
@@ -186,7 +182,7 @@ namespace nil {
 
                             // std::select_container<math::polynomial> final_polynomials 
                             // May be different size, because real degree may be less than before. So put int in the end
-                            fri_math_polynomial<TTypeBase, typename FRI::field_type::value_type>,
+                            fri_math_polynomial<TTypeBase, typename FRI::polynomial_type>,
 
 
                             // proof of work. TODO: how to do it optional?
@@ -249,7 +245,7 @@ namespace nil {
 
                             // std::select_container<math::polynomial> final_polynomials 
                             // May be different size, because real degree may be less than before. So put int in the end
-                            fri_math_polynomial<TTypeBase, typename FRI::field_type::value_type>
+                            fri_math_polynomial<TTypeBase, typename FRI::polynomial_type>
                         >
                     >;
                 };
@@ -360,7 +356,7 @@ namespace nil {
                         }
                     }
 
-                    auto filled_final_polynomial = fill_fri_math_polynomial<Endianness, typename FRI::field_type::value_type>(
+                    auto filled_final_polynomial = fill_fri_math_polynomial<Endianness, typename FRI::polynomial_type>(
                         proof.final_polynomial
                     );
 
@@ -459,7 +455,7 @@ namespace nil {
                     }
 
                     // final_polynomial
-                    proof.final_polynomial = make_fri_math_polynomial<Endianness, typename FRI::field_type::value_type>(
+                    proof.final_polynomial = make_fri_math_polynomial<Endianness, typename FRI::polynomial_type>(
                         std::get<6>(filled_proof.value())
                     );
                     // proof_of_work

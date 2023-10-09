@@ -43,8 +43,6 @@
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/proof.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
@@ -102,12 +100,7 @@ namespace nil {
                     return proof;
                 }
 
-                template<typename TTypeBase, typename Proof,
-                    typename std::enable_if<
-                        std::is_same<Proof, nil::crypto3::zk::snark::placeholder_proof<typename Proof::field_type, typename Proof::params_type>>::value,
-                        bool
-                    >::type = true
-                >
+                template<typename TTypeBase, typename Proof>
                 using placeholder_proof = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
@@ -160,7 +153,7 @@ namespace nil {
 
                     std::size_t cur = 0;
                     for( const auto &it:batch_info ){
-                        if( it.first == nil::crypto3::zk::snark::FIXED_VALUES_BATCH ) continue;
+                        if( it.first == Proof::FIXED_VALUES_BATCH ) continue;
                         proof.commitments[it.first] = make_commitment<Endianness, typename Proof::commitment_scheme_type>(
                             std::get<0>(filled_proof.value()).value()[cur++]
                         );

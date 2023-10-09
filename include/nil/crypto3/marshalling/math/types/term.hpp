@@ -36,8 +36,6 @@
 #include <nil/marshalling/options.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
-
-#include <nil/crypto3/zk/math/expression.hpp>
 #include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
 
 namespace nil {
@@ -47,17 +45,16 @@ namespace nil {
                 template<typename TTypeBase, typename NonLinearTerm, typename = void>
                 struct term;
 
-                template<typename TTypeBase, typename VariableType>
-                struct term<TTypeBase, nil::crypto3::math::term<VariableType>, void> {
+                template<typename TTypeBase, typename NonLinearTerm>
+                struct term<TTypeBase, NonLinearTerm, void> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
                             // assignment_type coeff
-                            field_element<TTypeBase,
-                                          typename nil::crypto3::math::term<VariableType>::assignment_type>,
+                            field_element<TTypeBase, typename NonLinearTerm::assignment_type>,
                             // std::vector<VariableType> vars
                             nil::marshalling::types::array_list<
-                                TTypeBase, typename variable<TTypeBase, VariableType>::type,
+                                TTypeBase, typename variable<TTypeBase, typename NonLinearTerm::variable_type>::type,
                                 nil::marshalling::option::sequence_size_field_prefix<
                                     nil::marshalling::types::integral<TTypeBase, std::size_t>>
                                 >
@@ -65,11 +62,8 @@ namespace nil {
                         >;
                 };
 
-                template<typename NonLinearTerm, typename Endianness>
-                typename std::enable_if<
-                    std::is_same<nil::crypto3::math::term<typename NonLinearTerm::variable_type>,
-                                 NonLinearTerm>::value,
-                    typename term<nil::marshalling::field_type<Endianness>, NonLinearTerm>::type>::type
+                template<typename Endianness, typename NonLinearTerm>
+                    typename term<nil::marshalling::field_type<Endianness>, NonLinearTerm>::type
                     fill_term(const NonLinearTerm &t) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -86,24 +80,21 @@ namespace nil {
                     variable_vector_marshalling_type filled_vars;
                     for (const auto &var : t.get_vars()) {
                         filled_vars.value().push_back(
-                            fill_variable<typename NonLinearTerm::variable_type, Endianness>(var));
+                            fill_variable<Endianness, typename NonLinearTerm::variable_type>(var));
                     }
 
                     return result_type(std::make_tuple(field_element_marhsalling_type(t.get_coeff()), filled_vars));
                 }
 
-                template<typename NonLinearTerm, typename Endianness>
-                typename std::enable_if<
-                    std::is_same<nil::crypto3::math::term<typename NonLinearTerm::variable_type>,
-                                 NonLinearTerm>::value,
-                    NonLinearTerm>::type
+                template<typename Endianness, typename NonLinearTerm>
+                    NonLinearTerm
                     make_term(const typename term<nil::marshalling::field_type<Endianness>,
                                                                         NonLinearTerm>::type &filled_term) {
                     std::vector<typename NonLinearTerm::variable_type> vars;
                     auto coeff = std::get<0>(filled_term.value()).value();
                     vars.reserve(std::get<1>(filled_term.value()).value().size());
                     for (auto i = 0; i < std::get<1>(filled_term.value()).value().size(); i++) {
-                        vars.emplace_back(make_variable<typename NonLinearTerm::variable_type, Endianness>(
+                        vars.emplace_back(make_variable<Endianness, typename NonLinearTerm::variable_type>(
                             std::get<1>(filled_term.value()).value().at(i)));
                     }
                     return NonLinearTerm(vars, coeff);

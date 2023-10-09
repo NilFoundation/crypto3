@@ -36,9 +36,6 @@
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
-
 #include <nil/crypto3/marshalling/math/types/term.hpp>
 #include <nil/crypto3/marshalling/math/types/expression.hpp>
 
@@ -50,19 +47,13 @@ namespace nil {
                 template<typename TTypeBase, typename PlonkConstraint>
                 using plonk_constraint = typename expression<TTypeBase, typename PlonkConstraint::base_type>::type;
 
-                template<typename Endianness, typename PlonkConstraint,  typename = typename std::enable_if<
-                             std::is_same<PlonkConstraint, nil::crypto3::zk::snark::plonk_constraint<
-                                                               typename PlonkConstraint::field_type,
-                                                               typename PlonkConstraint::variable_type>>::value>::type>
+                template<typename Endianness, typename PlonkConstraint>
                 plonk_constraint<nil::marshalling::field_type<Endianness>, PlonkConstraint>
                 fill_plonk_constraint(const PlonkConstraint &constr) {
                     return fill_expression<typename PlonkConstraint::base_type, Endianness>(constr);
                 }
 
-                template<typename Endianness, typename PlonkConstraint,  typename = typename std::enable_if<
-                             std::is_same<PlonkConstraint, nil::crypto3::zk::snark::plonk_constraint<
-                                                               typename PlonkConstraint::field_type,
-                                                               typename PlonkConstraint::variable_type>>::value>::type>
+                template<typename Endianness, typename PlonkConstraint>
                 PlonkConstraint make_plonk_constraint(
                     const plonk_constraint<nil::marshalling::field_type<Endianness>, PlonkConstraint> &filled_constr
                 ) {
