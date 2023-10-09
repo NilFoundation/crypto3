@@ -30,6 +30,7 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
+#include <unordered_set>
 
 #include <boost/algorithm/string.hpp> 
 #include <nil/blueprint/transpiler/templates/modular_verifier.hpp>
@@ -167,7 +168,9 @@ namespace nil {
                 std::size_t permutation_size,
                 std::string folder_name,
                 std::size_t gates_library_size_threshold = 1600,
-                std::size_t lookups_library_size_threshold = 1600
+                std::size_t lookups_library_size_threshold = 1600,
+                std::size_t gates_contract_size_threshold = 1400,
+                std::size_t lookups_contract_size_threshold = 1400
             ) :
             _constraint_system(constraint_system),
             _common_data(common_data),
@@ -175,7 +178,9 @@ namespace nil {
             _permutation_size(permutation_size),
             _folder_name(folder_name),
             _gates_library_size_threshold(gates_library_size_threshold),
-            _lookups_library_size_threshold(lookups_library_size_threshold)
+            _lookups_library_size_threshold(lookups_library_size_threshold),
+            _gates_contract_size_threshold(gates_contract_size_threshold),
+            _lookups_contract_size_threshold(lookups_contract_size_threshold)
             {
                 std::size_t found = folder_name.rfind("/");
                 if( found == std::string::npos ){
@@ -209,14 +214,14 @@ namespace nil {
 
             void print_gates_library_file(std::size_t library_id,
                     std::vector<std::size_t> const& gates_list,
-                    std::vector<std::string> const& gate_codes) {
+                    std::unordered_map<std::size_t, std::string> const& gate_codes) {
 
                 std::string library_gates;
 
                 for (auto i: gates_list) {
                     std::string gate_evaluation = gate_evaluation_template;
                     boost::replace_all(gate_evaluation, "$GATE_ID$" , to_string(i) );
-                    boost::replace_all(gate_evaluation, "$GATE_ASSEMBLY_CODE$", gate_codes[i]);
+                    boost::replace_all(gate_evaluation, "$GATE_ASSEMBLY_CODE$", gate_codes.at(i));
                     library_gates += gate_evaluation;
                 }
 
@@ -312,7 +317,8 @@ namespace nil {
             }
 
             /** @brief Split items into buckets, each bucket is limited
-             * to max_bucket_size, minimizes number of buckets
+             * to max_bucket_size, minimizes number of buckets. 
+             * items must be sorted
              * @param[in] items (item_id, item_size)
              * @param[in] max_bucket_size
              * @returns buckets (bucket_id -> [item_id])
@@ -320,12 +326,6 @@ namespace nil {
             std::unordered_map<std::size_t, std::vector<std::size_t>> split_items_into_buckets(
                     std::vector<std::pair<std::size_t, std::size_t>> &items,
                     std::size_t max_bucket_size) {
-
-                std::sort(items.begin(), items.end(),
-                        [](const std::pair<std::size_t, std::size_t> &a,
-                            const std::pair<std::size_t, std::size_t> &b) {
-                        return a.second > b.second;
-                        });
 
                 std::unordered_map<std::size_t, std::vector<std::size_t>> buckets;
                 std::vector<std::size_t> bucket_sizes;
@@ -356,7 +356,7 @@ namespace nil {
 
                 std::stringstream gate_argument_str;
                 std::size_t i = 0;
-                std::vector<std::string> gate_codes(gates_count);
+                std::unordered_map<std::size_t, std::string> gate_codes;
                 std::vector<std::pair<std::size_t, std::size_t>> gate_costs(gates_count);
                 std::vector<std::size_t> gate_ids(gates_count);
 
@@ -367,6 +367,28 @@ namespace nil {
                     gate_codes[i] = code;
                     ++i;
                 }
+
+                std::sort(gate_costs.begin(), gate_costs.end(),
+                        [](const std::pair<std::size_t, std::size_t> &a,
+                            const std::pair<std::size_t, std::size_t> &b) {
+                        return a.second > b.second;
+                        });
+
+                /* Fill contract inline gate computation, inline small gates first */
+                std::unordered_set<std::size_t> inlined_gate_codes;
+                std::size_t inlined_gate_codes_size = 0;
+                for (auto gate=gate_costs.rbegin(); gate != gate_costs.rend(); ++gate) {
+                    if (gate->second + inlined_gate_codes_size < _gates_contract_size_threshold) {
+                        inlined_gate_codes.insert(gate->first);
+                        inlined_gate_codes_size += gate->second;
+                    }
+                }
+
+                auto inlined_gates_end = std::remove_if(gate_costs.begin(), gate_costs.end(),
+                    [&inlined_gate_codes](const std::pair<std::size_t, std::size_t>& cost) {
+                        return inlined_gate_codes.count(cost.first) == 1 ;
+                    });
+                gate_costs.erase(inlined_gates_end, gate_costs.end());
 
                 auto library_gates_buckets = split_items_into_buckets(gate_costs, _gates_library_size_threshold);
                 std::vector<std::size_t> gate_lib(gates_count);
@@ -379,27 +401,40 @@ namespace nil {
                     print_gates_library_file(lib.first, lib.second, gate_codes);
                 }
 
+
+                if (inlined_gate_codes.size() > 0) {
+                    gate_argument_str << "\t\tuint256 sum;" << std::endl;
+                    gate_argument_str << "\t\tuint256 prod;" << std::endl;
+                    gate_argument_str << "\t\tuint256 gate;" << std::endl;
+                }
+
                 i = 0;
                 for(const auto &gate: _constraint_system.gates()){
-                    std::string gate_eval_string = gate_call_template;
-                    boost::replace_all(gate_eval_string, "$TEST_NAME$", _test_name);
-                    boost::replace_all(gate_eval_string, "$GATE_LIB_ID$", to_string(gate_lib[i]));
-                    boost::replace_all(gate_eval_string, "$GATE_ID$", to_string(i));
-                    boost::replace_all(gate_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
-                    gate_argument_str << gate_eval_string << std::endl;
-                    gate_ids.push_back(i);
+                    if (inlined_gate_codes.count(i) == 1) {
+                        gate_argument_str << "/* -- gate " << i << " is inlined -- */" << std::endl;
+                        gate_argument_str << gate_codes[i] << std::endl;
+                    } else {
+                        std::string gate_eval_string = gate_call_template;
+                        boost::replace_all(gate_eval_string, "$TEST_NAME$", _test_name);
+                        boost::replace_all(gate_eval_string, "$GATE_LIB_ID$", to_string(gate_lib[i]));
+                        boost::replace_all(gate_eval_string, "$GATE_ID$", to_string(i));
+                        boost::replace_all(gate_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                        gate_argument_str << gate_eval_string << std::endl;
+                    }
                     ++i;
                 }
 
-                std::ofstream out;
-                out.open(_folder_name + "/gate_libs_list.json");
-                out << "[" << std::endl;
-                for(i = 0; i < library_gates_buckets.size()-1; ++i ) {
-                    out << "\"" << "gate_" << _test_name << "_" << i << "\"," << std::endl;
+                if (library_gates_buckets.size() > 0) {
+                    std::ofstream out;
+                    out.open(_folder_name + "/gate_libs_list.json");
+                    out << "[" << std::endl;
+                    for(i = 0; i < library_gates_buckets.size()-1; ++i ) {
+                        out << "\"" << "gate_" << _test_name << "_" << i << "\"," << std::endl;
+                    }
+                    out << "\"" << "gate_" << _test_name << "_" << library_gates_buckets.size()-1 << "\"" << std::endl;
+                    out << "]" << std::endl;
+                    out.close();
                 }
-                out << "\"" << "gate_" << _test_name << "_" << library_gates_buckets.size()-1 << "\"" << std::endl;
-                out << "]" << std::endl;
-                out.close();
 
                 return gate_argument_str.str();
             }
@@ -563,6 +598,8 @@ namespace nil {
 
             std::string _gate_includes;
             std::string _lookup_includes;
+            std::size_t _gates_contract_size_threshold;
+            std::size_t _lookups_contract_size_threshold;
             std::size_t _gates_library_size_threshold;
             std::size_t _lookups_library_size_threshold;
         };
