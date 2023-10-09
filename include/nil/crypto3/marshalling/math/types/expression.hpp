@@ -210,7 +210,7 @@ namespace nil {
                 math::flat_binary_arithmetic_operation<ArithmeticOperatorType>
                     make_binary_operation(const typename flat_binary_arithmetic_operation<nil::marshalling::field_type<Endianness>>::type& filled_power_op) {
                     math::flat_binary_arithmetic_operation<ArithmeticOperatorType> bin_op;
-                    bin_op.op = static_cast<math::ArithmeticOperator>(std::get<0>(filled_power_op.value()).value());
+                    bin_op.op = static_cast<ArithmeticOperatorType>(std::get<0>(filled_power_op.value()).value());
                     bin_op.left_type = static_cast<math::flat_node_type>(std::get<1>(filled_power_op.value()).value());
                     bin_op.left_index = std::get<2>(filled_power_op.value()).value();
                     bin_op.right_type = static_cast<math::flat_node_type>(std::get<3>(filled_power_op.value()).value());
@@ -222,7 +222,9 @@ namespace nil {
                 ExpressionType make_expression(
                     const typename expression<nil::marshalling::field_type<Endianness>,
                                                           ExpressionType>::type &filled_expr) {
-                    math::flat_expression<typename ExpressionType::variable_type> flat_expr;
+
+                    using ArithmeticOperatorType = typename ExpressionType::binary_arithmetic_operation_type::ArithmeticOperatorType;
+                    math::flat_expression<ExpressionType> flat_expr;
 
                     // Get the terms.
                     const auto& terms = std::get<0>(filled_expr.value()).value();
@@ -242,7 +244,7 @@ namespace nil {
                     const auto& bin_ops = std::get<2>(filled_expr.value()).value();
                     for (auto i = 0; i < bin_ops.size(); i++) {
                         flat_expr.binary_operations.emplace_back(
-                            make_binary_operation<Endianness>(bin_ops.at(i)));
+                            make_binary_operation<Endianness, ArithmeticOperatorType>(bin_ops.at(i)));
                     }
 
                     flat_expr.root_type = static_cast<math::flat_node_type>(std::get<3>(filled_expr.value()).value());

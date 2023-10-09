@@ -29,6 +29,8 @@
 #define CRYPTO3_MARSHALLING_ZK_MATH_FLAT_EXPRESSION_HPP
 
 #include <vector>
+#include <boost/variant/static_visitor.hpp>
+#include <boost/variant/apply_visitor.hpp>
 
 namespace nil {
     namespace crypto3 {
