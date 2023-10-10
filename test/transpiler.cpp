@@ -241,7 +241,9 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         columns_with_copy_constraints.size(),
         "circuit1",
         26, /* gates library size threshold */
-        60 /* lookups library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -328,7 +330,9 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         columns_with_copy_constraints.size(),
         "circuit2",
         26, /* gates library size threshold */
-        60 /* lookups library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -405,7 +409,9 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         columns_with_copy_constraints.size(),
         "circuit3",
         26, /* gates library size threshold */
-        60 /* lookups library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -480,7 +486,9 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         columns_with_copy_constraints.size(),
         "circuit4",
         26, /* gates library size threshold */
-        60 /* lookups library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -557,7 +565,9 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         columns_with_copy_constraints.size(),
         "circuit6",
         26, /* gates library size threshold */
-        60 /* lookups library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -634,7 +644,9 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         columns_with_copy_constraints.size(),
         "circuit7",
         26, /* gates library size threshold */
-        60 /* lookups library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }

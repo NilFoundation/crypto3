@@ -239,14 +239,14 @@ namespace nil {
 
             void print_lookups_library_file(std::size_t library_id,
                     std::vector<std::size_t> const& lookups_list,
-                    std::vector<std::string> const& lookup_codes) {
+                    std::unordered_map<std::size_t, std::string> const& lookup_codes) {
 
                 std::string library_lookups;
 
                 for(auto const& i: lookups_list) {
                     std::string lookup_evaluation = lookup_evaluation_template;
                     boost::replace_all(lookup_evaluation, "$LOOKUP_ID$" , to_string(i) );
-                    boost::replace_all(lookup_evaluation, "$LOOKUP_ASSEMBLY_CODE$", lookup_codes[i]);
+                    boost::replace_all(lookup_evaluation, "$LOOKUP_ASSEMBLY_CODE$", lookup_codes.at(i));
                     library_lookups += lookup_evaluation;
                 }
 
@@ -255,6 +255,7 @@ namespace nil {
                 boost::replace_all(result, "$LOOKUP_LIB_ID$", to_string(library_id));
                 boost::replace_all(result, "$LOOKUP_COMPUTATION_CODE$", library_lookups);
                 boost::replace_all(result, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                boost::replace_all(result, "$STATE$", "");
 
                 std::ofstream out;
                 out.open(_folder_name + "/lookup_" + to_string(library_id) + ".sol");
@@ -281,18 +282,17 @@ namespace nil {
                 std::stringstream out;
 
                 variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
-                out << "\t\tselector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
-                out << "\t\tg = 1;" << std::endl;
+                out << "\t\t$STATE$selector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
                 for( const auto &constraint: gate.constraints ){
                     variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
-                    out << "\t\tl = mulmod( " << constraint.table_id << ",selector_value, modulus);" << std::endl;
-                    out << "\t\ttheta_acc=theta;" << std::endl;
+                    out << "\t\tl = mulmod( " << constraint.table_id << ",$STATE$selector_value, modulus);" << std::endl;
+                    out << "\t\t$STATE$theta_acc=$STATE$theta;" << std::endl;
                     for( const auto &expression:constraint.lookup_input ){
                         out << constraint_computation_code(_var_indices, expression) << std::endl  << std::endl;
-                        out << "\t\tl = addmod( l, mulmod( mulmod(theta_acc, selector_value, modulus), sum, modulus), modulus);" << std::endl;
-                        out << "\t\ttheta_acc = mulmod(theta_acc, theta, modulus);" << std::endl;
+                        out << "\t\tl = addmod( l, mulmod( mulmod($STATE$theta_acc, $STATE$selector_value, modulus), sum, modulus), modulus);" << std::endl;
+                        out << "\t\t$STATE$theta_acc = mulmod($STATE$theta_acc, $STATE$theta, modulus);" << std::endl;
                     }
-                    out << "\t\tg = mulmod(g, mulmod(addmod(1, beta, modulus), addmod(l,gamma, modulus), modulus), modulus);" << std::endl;
+                    out << "\t\t$STATE$g = mulmod($STATE$g, mulmod(addmod(1, $STATE$beta, modulus), addmod(l, $STATE$gamma, modulus), modulus), modulus);" << std::endl;
                 }
 
                 return out.str();
@@ -381,6 +381,7 @@ namespace nil {
                     if (gate->second + inlined_gate_codes_size < _gates_contract_size_threshold) {
                         inlined_gate_codes.insert(gate->first);
                         inlined_gate_codes_size += gate->second;
+                        std::cout << "gate " << gate->first << " is inlined, cost: " << gate->second << std::endl;
                     }
                 }
 
@@ -400,7 +401,6 @@ namespace nil {
                     }
                     print_gates_library_file(lib.first, lib.second, gate_codes);
                 }
-
 
                 if (inlined_gate_codes.size() > 0) {
                     gate_argument_str << "\t\tuint256 sum;" << std::endl;
@@ -448,7 +448,7 @@ namespace nil {
                 std::size_t j = 0;
                 std::size_t i = 0;
                 std::size_t cur = 0;
-                std::vector<std::string> lookup_codes(lookup_count);
+                std::unordered_map<std::size_t, std::string> lookup_codes;
                 std::vector<std::size_t> lookup_ids(lookup_count);
                 std::vector<std::pair<std::size_t, std::size_t>> lookup_costs(lookup_count);
                 std::vector<std::size_t> lookup_lib(lookup_count);
@@ -461,6 +461,29 @@ namespace nil {
                     ++i;
                 }
 
+                std::sort(lookup_costs.begin(), lookup_costs.end(),
+                        [](const std::pair<std::size_t, std::size_t> &a,
+                            const std::pair<std::size_t, std::size_t> &b) {
+                        return a.second > b.second;
+                        });
+
+                /* Fill contract inline lookup computation, inline small first */
+                std::unordered_set<std::size_t> inlined_lookup_codes;
+                std::size_t inlined_lookup_codes_size = 0;
+                for (auto lookup = lookup_costs.rbegin(); lookup != lookup_costs.rend(); ++lookup) {
+                    if (lookup->second + inlined_lookup_codes_size < _lookups_contract_size_threshold) {
+                        inlined_lookup_codes.insert(lookup->first);
+                        inlined_lookup_codes_size += lookup->second;
+                        std::cout << "lookup " << lookup->first << " is inlined, cost: " << lookup->second << std::endl;
+                    }
+                }
+
+                auto inlined_lookups_end = std::remove_if(lookup_costs.begin(), lookup_costs.end(),
+                    [&inlined_lookup_codes](const std::pair<std::size_t, std::size_t>& cost) {
+                        return inlined_lookup_codes.count(cost.first) == 1 ;
+                    });
+                lookup_costs.erase(inlined_lookups_end, lookup_costs.end());
+
                 auto library_lookup_buckets = split_items_into_buckets(lookup_costs, _lookups_library_size_threshold);
 
                 _lookup_includes = "";
@@ -472,44 +495,56 @@ namespace nil {
                     print_lookups_library_file(lib.first, lib.second, lookup_codes);
                 }
 
-                i = 0;
-                for(const auto &lookup_gate: _constraint_system.lookup_gates()){
-                    std::string lookup_eval_string = lookup_call_template;
-                    boost::replace_all(lookup_eval_string, "$TEST_NAME$", _test_name);
-                    boost::replace_all(lookup_eval_string, "$LOOKUP_LIB_ID$", to_string(lookup_lib[i]));
-                    boost::replace_all(lookup_eval_string, "$LOOKUP_ID$", to_string(i));
-                    boost::replace_all(lookup_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
-                    lookup_str << lookup_eval_string;
-                    ++i;
+                if (inlined_lookup_codes.size() > 0) {
+                    lookup_str << "\t\t\tuint256 sum;" << std::endl;
+                    lookup_str << "\t\t\tuint256 prod;" << std::endl;
                 }
 
-                std::ofstream out;
-                out.open(_folder_name + "/lookup_libs_list.json");
-                out << "[" << std::endl;
-                for(i = 0; i < library_lookup_buckets.size()-1; ++i ) {
-                    out << "\"" << "lookup_" << _test_name << "_" << i << "\"," << std::endl;
+                for (i = 0; i < _constraint_system.lookup_gates().size(); ++i) {
+                    if (inlined_lookup_codes.count(i) == 1) {
+                        boost::replace_all(lookup_codes[i], "$STATE$", "state.");
+                        lookup_str << "/* -- lookup " << i << " is inlined -- */" << std::endl;
+                        lookup_str << lookup_codes[i] << std::endl;
+                        lookup_str << "/* -- /lookup " << i << " is inlined -- */" << std::endl;
+                    } else {
+                        std::string lookup_eval_string = lookup_call_template;
+                        boost::replace_all(lookup_eval_string, "$TEST_NAME$", _test_name);
+                        boost::replace_all(lookup_eval_string, "$LOOKUP_LIB_ID$", to_string(lookup_lib[i]));
+                        boost::replace_all(lookup_eval_string, "$LOOKUP_ID$", to_string(i));
+                        boost::replace_all(lookup_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                        lookup_str << lookup_eval_string;
+                    }
                 }
-                out << "\"" << "lookup_" << _test_name << "_" << library_lookup_buckets.size()-1 << "\"" << std::endl;
-                out << "]" << std::endl;
-                out.close();
+
+                if (library_lookup_buckets.size() > 0) {
+                    std::ofstream out;
+                    out.open(_folder_name + "/lookup_libs_list.json");
+                    out << "[" << std::endl;
+                    for(i = 0; i < library_lookup_buckets.size()-1; ++i ) {
+                        out << "\"" << "lookup_" << _test_name << "_" << i << "\"," << std::endl;
+                    }
+                    out << "\"" << "lookup_" << _test_name << "_" << library_lookup_buckets.size()-1 << "\"" << std::endl;
+                    out << "]" << std::endl;
+                    out.close();
+                }
 
                 j = 0;
                 std::size_t table_index = 1;
                 for(const auto &table: _constraint_system.lookup_tables()){
                     variable_type sel_var(table.tag_index, 0, true, variable_type::column_type::selector);
                     variable_type shifted_sel_var(table.tag_index, 1, true, variable_type::column_type::selector);
-                    lookup_str << "\t\tstate.selector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
-                    lookup_str << "\t\tstate.shifted_selector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(shifted_sel_var) * 0x20 << ");" << std::endl;
+                    lookup_str << "\t\t\tstate.selector_value = basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
+                    lookup_str << "\t\t\tstate.shifted_selector_value = basic_marshalling.get_uint256_be(blob, " << _var_indices.at(shifted_sel_var) * 0x20 << ");" << std::endl;
 
                     for( const auto &option: table.lookup_options ){
                         lookup_str << 
-                            "\t\t\tl= mulmod( " << table_index << ", state.selector_value, modulus);" << std::endl;
+                            "\t\t\tl = mulmod( " << table_index << ", state.selector_value, modulus);" << std::endl;
                         lookup_str << 
                             "\t\t\tstate.l_shifted = mulmod( " << table_index << ", state.shifted_selector_value, modulus);" << std::endl;
                         lookup_str << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
                         for( const auto &var: option ){
                             lookup_str << 
-                                "\t\t\tl= addmod( l, mulmod(state.selector_value,  mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
+                                "\t\t\tl = addmod( l, mulmod(state.selector_value,  mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
                             variable_type shifted_var = var;
                             shifted_var.rotation = 1;
                             lookup_str << 
@@ -517,10 +552,10 @@ namespace nil {
                             lookup_str << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
                         }
                         lookup_str << 
-                            "\t\t\tl= mulmod( l, state.mask, modulus);" << std::endl;
+                            "\t\t\tl = mulmod( l, state.mask, modulus);" << std::endl;
                         lookup_str << 
                             "\t\t\tstate.l_shifted = mulmod( state.l_shifted, state.shifted_mask, modulus);" << std::endl;
-                        lookup_str << "\t\t\t state.g = mulmod(state.g, addmod( state.factor, addmod(l, mulmod(state.beta, state.l_shifted, modulus), modulus), modulus), modulus);" << std::endl;
+                        lookup_str << "\t\t\tstate.g = mulmod(state.g, addmod( state.factor, addmod(l, mulmod(state.beta, state.l_shifted, modulus), modulus), modulus), modulus);" << std::endl;
                         j++;
                     }
                     table_index++;

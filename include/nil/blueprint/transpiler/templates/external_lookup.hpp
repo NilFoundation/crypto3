@@ -18,7 +18,10 @@ namespace nil {
         uint256 sum;
         uint256 prod;
 
+        g = 1;
+
 $LOOKUP_ASSEMBLY_CODE$
+
         return( g, theta_acc );
     }
 )";
