@@ -381,7 +381,6 @@ namespace nil {
                     if (gate->second + inlined_gate_codes_size < _gates_contract_size_threshold) {
                         inlined_gate_codes.insert(gate->first);
                         inlined_gate_codes_size += gate->second;
-                        std::cout << "gate " << gate->first << " is inlined, cost: " << gate->second << std::endl;
                     }
                 }
 
@@ -474,7 +473,6 @@ namespace nil {
                     if (lookup->second + inlined_lookup_codes_size < _lookups_contract_size_threshold) {
                         inlined_lookup_codes.insert(lookup->first);
                         inlined_lookup_codes_size += lookup->second;
-                        std::cout << "lookup " << lookup->first << " is inlined, cost: " << lookup->second << std::endl;
                     }
                 }
 
