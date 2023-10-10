@@ -159,6 +159,33 @@ namespace nil {
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
+            void mark_set(
+                const nil::blueprint::assignment<
+                    nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                boost::disjoint_sets_with_storage<> &zones,
+                const std::set<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                    &variable_set,
+                const std::function<std::size_t(std::size_t, std::size_t,
+                    nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>)>
+                    &gate_var_address,
+                std::size_t selector_index,
+                std::size_t start_row_index,
+                std::size_t end_row_index) {
+
+                std::size_t last_row =
+                    std::min<std::size_t>(end_row_index, assignment.selector_column_size(selector_index));
+                for (std::size_t row = start_row_index; row < last_row; row++) {
+                    if (assignment.selector(selector_index, row) != 0) {
+                        for (const auto &variable : variable_set) {
+                            zones.union_set(gate_var_address(start_row_index, row, variable),
+                                        gate_var_address(start_row_index, row, *variable_set.begin()));
+                        }
+                    }
+                }
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
             boost::disjoint_sets_with_storage<> generate_connectedness_zones(
                 const nil::blueprint::assignment<
                     nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
@@ -189,23 +216,29 @@ namespace nil {
                 const std::size_t end_row_index = start_row_index + rows_amount;
                 for (const auto &gate : bp.gates()) {
                     std::set<var> variable_set;
+                    std::function<void(var)> variable_extractor = [&variable_set](var variable) {
+                        variable_set.insert(variable);
+                    };
+                    nil::crypto3::math::expression_for_each_variable_visitor<var> visitor(variable_extractor);
                     for (const auto &constraint : gate.constraints) {
-                        std::function<void(var)> variable_extractor = [&variable_set](var variable) {
-                            variable_set.insert(variable);
-                        };
-                        nil::crypto3::math::expression_for_each_variable_visitor<var> visitor(variable_extractor);
                         visitor.visit(constraint);
                     }
-                    std::size_t last_row =
-                        std::min<std::size_t>(end_row_index, assignment.selector_column_size(gate.selector_index));
-                    for (std::size_t row = start_row_index; row < last_row; row++) {
-                        if (assignment.selector(gate.selector_index, row) != 0) {
-                            for (const auto &variable : variable_set) {
-                                zones.union_set(gate_var_address(start_row_index, row, variable),
-                                            gate_var_address(start_row_index, row, *variable_set.begin()));
-                            }
+                    mark_set(assignment, zones, variable_set, gate_var_address, gate.selector_index,
+                             start_row_index, end_row_index);
+                }
+                for (auto &lookup_gate : bp.lookup_gates()) {
+                    std::set<var> variable_set;
+                    std::function<void(var)> variable_extractor = [&variable_set](var variable) {
+                        variable_set.insert(variable);
+                    };
+                    nil::crypto3::math::expression_for_each_variable_visitor<var> visitor(variable_extractor);
+                    for (const auto &lookup_constraint : lookup_gate.constraints) {
+                        for (const auto &lookup_input : lookup_constraint.lookup_input) {
+                            visitor.visit(lookup_input);
                         }
                     }
+                    mark_set(assignment, zones, variable_set, gate_var_address, lookup_gate.tag_index,
+                             start_row_index, end_row_index);
                 }
                 for (auto &constraint : bp.copy_constraints()) {
                     zones.union_set(
@@ -220,8 +253,9 @@ namespace nil {
 
         // Ensure that output and input variables are connected via constraints.
         // This failing basically guarantees that the circuit is broken (or the check is).
-        // There might exists rare components for which a lower level of connectedness is sufficient.
-        // Haven't seen one yet.
+        // There might exists rare components for which a lower level of connectedness is sufficient:
+        // technically this checks that all inputs can affect all outputs.
+        // Haven't seen a use case for a weaker check yet.
         template<typename BlueprintFieldType, typename ArithmetizationParams>
         bool check_connectedness(
             const nil::blueprint::assignment<
@@ -239,9 +273,6 @@ namespace nil {
             using detail::copy_var_address;
             auto zones = detail::generate_connectedness_zones(assignment, bp, input_variables,
                                                               start_row_index, rows_amount);
-
-            // The check actually needs to be slightly cleverer:
-            // All outputs should depend on at least some of the inputs
             std::size_t expected_zone = zones.find_set(
                 copy_var_address<BlueprintFieldType, ArithmetizationParams>(
                     start_row_index, rows_amount, input_variables[0]));

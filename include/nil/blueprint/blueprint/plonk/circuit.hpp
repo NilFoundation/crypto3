@@ -111,11 +111,11 @@ namespace nil {
 
             template<typename GateArguments>
             std::size_t add_lookup_gate(const GateArguments &args) {
-                LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_tables);
+                LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_gates);
             }
 
-            std::size_t add_lookup_gate(const std::initializer_list<constraint_type> &&args) {
-                LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_tables);
+            std::size_t add_lookup_gate(const std::initializer_list<lookup_constraint_type> &&args) {
+                LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_gates);
             }
 
             #undef GATE_ADDER_MACRO
