@@ -30,6 +30,7 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
+#include <unordered_set>
 
 #include <boost/algorithm/string.hpp> 
 #include <nil/blueprint/transpiler/templates/modular_verifier.hpp>
@@ -160,18 +161,26 @@ namespace nil {
                 return result.str();
             }
         public:
-            evm_verifier_printer(                
+            evm_verifier_printer(
                 const typename PlaceholderParams::constraint_system_type &constraint_system,
                 const common_data_type &common_data,
                 const typename PlaceholderParams::commitment_scheme_type &lpc_scheme,
                 std::size_t permutation_size,
-                std::string folder_name
-            ): 
+                std::string folder_name,
+                std::size_t gates_library_size_threshold = 1600,
+                std::size_t lookups_library_size_threshold = 1600,
+                std::size_t gates_contract_size_threshold = 1400,
+                std::size_t lookups_contract_size_threshold = 1400
+            ) :
             _constraint_system(constraint_system),
             _common_data(common_data),
             _lpc_scheme(lpc_scheme),
             _permutation_size(permutation_size),
-            _folder_name(folder_name)    
+            _folder_name(folder_name),
+            _gates_library_size_threshold(gates_library_size_threshold),
+            _lookups_library_size_threshold(lookups_library_size_threshold),
+            _gates_contract_size_threshold(gates_contract_size_threshold),
+            _lookups_contract_size_threshold(lookups_contract_size_threshold)
             {
                 std::size_t found = folder_name.rfind("/");
                 if( found == std::string::npos ){
@@ -180,7 +189,7 @@ namespace nil {
                     _test_name = folder_name.substr(found + 1);
                 }
                 _use_lookups = _constraint_system.lookup_gates().size() > 0;
-                
+
                 _z_offset = _use_lookups ? 0xc9 : 0xa1;
                 _special_selectors_offset = _z_offset + _permutation_size * 0x80;
                 _table_z_offset = _special_selectors_offset + 0xc0;
@@ -203,29 +212,54 @@ namespace nil {
                 _var_indices = get_plonk_variable_indices(_common_data.columns_rotations);
             }
 
-            void print_gate_file(std::string gate_computation_code, std::size_t gate_id){
+            void print_gates_library_file(std::size_t library_id,
+                    std::vector<std::size_t> const& gates_list,
+                    std::unordered_map<std::size_t, std::string> const& gate_codes) {
+
+                std::string library_gates;
+
+                for (auto i: gates_list) {
+                    std::string gate_evaluation = gate_evaluation_template;
+                    boost::replace_all(gate_evaluation, "$GATE_ID$" , to_string(i) );
+                    boost::replace_all(gate_evaluation, "$GATE_ASSEMBLY_CODE$", gate_codes.at(i));
+                    library_gates += gate_evaluation;
+                }
+
                 std::string result = modular_external_gate_library_template;
                 boost::replace_all(result, "$TEST_NAME$", _test_name);
-                boost::replace_all(result, "$GATE_LIB_ID$", to_string(gate_id));
-                boost::replace_all(result, "$GATES_ASSEMBLY_CODE$", gate_computation_code);
+                boost::replace_all(result, "$GATE_LIB_ID$", to_string(library_id));
+                boost::replace_all(result, "$GATES_COMPUTATION_CODE$", library_gates);
                 boost::replace_all(result, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
 
                 std::ofstream out;
-                out.open(_folder_name + "/gate_" + to_string(gate_id) + ".sol");
-                out <<result;
+                out.open(_folder_name + "/gate_" + to_string(library_id) + ".sol");
+                out << result;
                 out.close();
             }
 
-            void print_lookup_file(std::string lookup_computation_code, std::size_t lookup_id){
+            void print_lookups_library_file(std::size_t library_id,
+                    std::vector<std::size_t> const& lookups_list,
+                    std::unordered_map<std::size_t, std::string> const& lookup_codes) {
+
+                std::string library_lookups;
+
+                for(auto const& i: lookups_list) {
+                    std::string lookup_evaluation = lookup_evaluation_template;
+                    boost::replace_all(lookup_evaluation, "$LOOKUP_ID$" , to_string(i) );
+                    boost::replace_all(lookup_evaluation, "$LOOKUP_ASSEMBLY_CODE$", lookup_codes.at(i));
+                    library_lookups += lookup_evaluation;
+                }
+
                 std::string result = modular_external_lookup_library_template;
                 boost::replace_all(result, "$TEST_NAME$", _test_name);
-                boost::replace_all(result, "$LOOKUP_LIB_ID$", to_string(lookup_id));
-                boost::replace_all(result, "$LOOKUP_ASSEMBLY_CODE$", lookup_computation_code);
+                boost::replace_all(result, "$LOOKUP_LIB_ID$", to_string(library_id));
+                boost::replace_all(result, "$LOOKUP_COMPUTATION_CODE$", library_lookups);
                 boost::replace_all(result, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                boost::replace_all(result, "$STATE$", "");
 
                 std::ofstream out;
-                out.open(_folder_name + "/lookup_" + to_string(lookup_id) + ".sol");
-                out <<result;
+                out.open(_folder_name + "/lookup_" + to_string(library_id) + ".sol");
+                out << result;
                 out.close();
             }
 
@@ -248,114 +282,267 @@ namespace nil {
                 std::stringstream out;
 
                 variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
-                out << "\t\tselector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
-                out << "\t\tg = 1;" << std::endl;
+                out << "\t\t$STATE$selector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
                 for( const auto &constraint: gate.constraints ){
                     variable_type sel_var(gate.tag_index, 0, true, variable_type::column_type::selector);
-                    out << "\t\tl = mulmod( " << constraint.table_id << ",selector_value, modulus);" << std::endl;
-                    out << "\t\ttheta_acc=theta;" << std::endl;
+                    out << "\t\tl = mulmod( " << constraint.table_id << ",$STATE$selector_value, modulus);" << std::endl;
+                    out << "\t\t$STATE$theta_acc=$STATE$theta;" << std::endl;
                     for( const auto &expression:constraint.lookup_input ){
                         out << constraint_computation_code(_var_indices, expression) << std::endl  << std::endl;
-                        out << "\t\tl = addmod( l, mulmod( mulmod(theta_acc, selector_value, modulus), sum, modulus), modulus);" << std::endl;
-                        out << "\t\ttheta_acc = mulmod(theta_acc, theta, modulus);" << std::endl;
+                        out << "\t\tl = addmod( l, mulmod( mulmod($STATE$theta_acc, $STATE$selector_value, modulus), sum, modulus), modulus);" << std::endl;
+                        out << "\t\t$STATE$theta_acc = mulmod($STATE$theta_acc, $STATE$theta, modulus);" << std::endl;
                     }
-                    out << "\t\tg = mulmod(g, mulmod(addmod(1, beta, modulus), addmod(l,gamma, modulus), modulus), modulus);" << std::endl;
+                    out << "\t\t$STATE$g = mulmod($STATE$g, mulmod(addmod(1, $STATE$beta, modulus), addmod(l, $STATE$gamma, modulus), modulus), modulus);" << std::endl;
                 }
 
                 return out.str();
             }
 
-            void print_gate_libs_list(std::vector<std::size_t> gate_ids){
-                std::ofstream out;
-                out.open(_folder_name + "/gate_libs_list.json");
-                out << "[" << std::endl;
-                for(std::size_t i=0; i < gate_ids.size(); i++){
-                    out << "\"" << "gate_" << _test_name << "_" << gate_ids[i] << "\"";
-                    if(i < gate_ids.size() - 1){
-                        out << ",";
-                    }
-                    out << std::endl;
+            std::size_t estimate_gate_cost(std::string const& code) {
+                /* proof-of-concept: cost = number of lines */
+                std::size_t lines = 0;
+                for(auto &ch: code) {
+                    lines += ch == '\n';
                 }
-                out << "]" << std::endl;
-                out.close();
+                return lines;
             }
 
-            void print_lookup_libs_list(std::vector<std::size_t> gate_ids){
-                std::ofstream out;
-                out.open(_folder_name + "/lookup_libs_list.json");
-                out << "[" << std::endl;
-                for(std::size_t i=0; i < gate_ids.size(); i++){
-                    out << "\"" << "lookup_" << _test_name << "_" << gate_ids[i] << "\"";
-                    if(i < gate_ids.size() - 1){
-                        out << ",";
-                    }
-                    out << std::endl;
+            std::size_t estimate_lookup_cost(std::string const& code) {
+                /* proof-of-concept: cost = number of lines */
+                std::size_t lines = 0;
+                for(auto &ch: code) {
+                    lines += ch == '\n';
                 }
-                out << "]" << std::endl;
-                out.close();
+                return lines;
+            }
+
+            /** @brief Split items into buckets, each bucket is limited
+             * to max_bucket_size, minimizes number of buckets. 
+             * items must be sorted
+             * @param[in] items (item_id, item_size)
+             * @param[in] max_bucket_size
+             * @returns buckets (bucket_id -> [item_id])
+             * */
+            std::unordered_map<std::size_t, std::vector<std::size_t>> split_items_into_buckets(
+                    std::vector<std::pair<std::size_t, std::size_t>> &items,
+                    std::size_t max_bucket_size) {
+
+                std::unordered_map<std::size_t, std::vector<std::size_t>> buckets;
+                std::vector<std::size_t> bucket_sizes;
+
+                for (auto const& item : items) {
+                    bool bucket_found = false;
+                    for (std::size_t i = 0; i < bucket_sizes.size(); ++i) {
+                        if (bucket_sizes[i]+item.second <= max_bucket_size) {
+                            buckets[i].push_back(item.first);
+                            bucket_sizes[i] += item.second;
+                            bucket_found = true;
+                            break;
+                        }
+                    }
+
+                    if (!bucket_found) {
+                        bucket_sizes.push_back(item.second);
+                        buckets[bucket_sizes.size()-1].push_back(item.first);
+                    }
+                }
+                return buckets;
             }
 
             std::string print_gate_argument(){
-                std::stringstream gate_argument_str;
-                std::vector<std::string> gates_computation_code;
-                std::size_t i = 0;
-                std::vector<std::size_t> gate_ids;
+                std::size_t gates_count = _constraint_system.gates().size();
+                if (gates_count == 0)
+                    return "";
 
-                for(const auto &gate: _constraint_system.gates()){
-                    std::string gate_eval_string = gate_call_template;
-                    boost::replace_all(gate_eval_string, "$TEST_NAME$", _test_name);
-                    boost::replace_all(gate_eval_string, "$GATE_LIB_ID$", to_string(i));
-                    boost::replace_all(gate_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
-                    gate_argument_str << gate_eval_string << std::endl;
-                    _gate_includes += "import \"./gate_"  + to_string(i) + ".sol\"; \n";
-                    gates_computation_code.push_back(gate_computation_code(gate));
-                    print_gate_file(gates_computation_code[i], i);
-                    gate_ids.push_back(i);
-                    i++;
+                std::stringstream gate_argument_str;
+                std::size_t i = 0;
+                std::unordered_map<std::size_t, std::string> gate_codes;
+                std::vector<std::pair<std::size_t, std::size_t>> gate_costs(gates_count);
+                std::vector<std::size_t> gate_ids(gates_count);
+
+                i = 0;
+                for(const auto &gate: _constraint_system.gates()) {
+                    std::string code = gate_computation_code(gate);
+                    gate_costs[i] = std::make_pair(i, estimate_gate_cost(code));
+                    gate_codes[i] = code;
+                    ++i;
                 }
-                print_gate_libs_list(gate_ids);
+
+                std::sort(gate_costs.begin(), gate_costs.end(),
+                        [](const std::pair<std::size_t, std::size_t> &a,
+                            const std::pair<std::size_t, std::size_t> &b) {
+                        return a.second > b.second;
+                        });
+
+                /* Fill contract inline gate computation, inline small gates first */
+                std::unordered_set<std::size_t> inlined_gate_codes;
+                std::size_t inlined_gate_codes_size = 0;
+                for (auto gate=gate_costs.rbegin(); gate != gate_costs.rend(); ++gate) {
+                    if (gate->second + inlined_gate_codes_size < _gates_contract_size_threshold) {
+                        inlined_gate_codes.insert(gate->first);
+                        inlined_gate_codes_size += gate->second;
+                    }
+                }
+
+                auto inlined_gates_end = std::remove_if(gate_costs.begin(), gate_costs.end(),
+                    [&inlined_gate_codes](const std::pair<std::size_t, std::size_t>& cost) {
+                        return inlined_gate_codes.count(cost.first) == 1 ;
+                    });
+                gate_costs.erase(inlined_gates_end, gate_costs.end());
+
+                auto library_gates_buckets = split_items_into_buckets(gate_costs, _gates_library_size_threshold);
+                std::vector<std::size_t> gate_lib(gates_count);
+
+                for(auto const& lib: library_gates_buckets) {
+                    _gate_includes += "import \"./gate_"  + to_string(lib.first) + ".sol\";\n";
+                    for(auto g: lib.second) {
+                        gate_lib[g] = lib.first;
+                    }
+                    print_gates_library_file(lib.first, lib.second, gate_codes);
+                }
+
+                if (inlined_gate_codes.size() > 0) {
+                    gate_argument_str << "\t\tuint256 sum;" << std::endl;
+                    gate_argument_str << "\t\tuint256 prod;" << std::endl;
+                    gate_argument_str << "\t\tuint256 gate;" << std::endl;
+                }
+
+                i = 0;
+                for(const auto &gate: _constraint_system.gates()){
+                    if (inlined_gate_codes.count(i) == 1) {
+                        gate_argument_str << "/* -- gate " << i << " is inlined -- */" << std::endl;
+                        gate_argument_str << gate_codes[i] << std::endl;
+                    } else {
+                        std::string gate_eval_string = gate_call_template;
+                        boost::replace_all(gate_eval_string, "$TEST_NAME$", _test_name);
+                        boost::replace_all(gate_eval_string, "$GATE_LIB_ID$", to_string(gate_lib[i]));
+                        boost::replace_all(gate_eval_string, "$GATE_ID$", to_string(i));
+                        boost::replace_all(gate_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                        gate_argument_str << gate_eval_string << std::endl;
+                    }
+                    ++i;
+                }
+
+                if (library_gates_buckets.size() > 0) {
+                    std::ofstream out;
+                    out.open(_folder_name + "/gate_libs_list.json");
+                    out << "[" << std::endl;
+                    for(i = 0; i < library_gates_buckets.size()-1; ++i ) {
+                        out << "\"" << "gate_" << _test_name << "_" << i << "\"," << std::endl;
+                    }
+                    out << "\"" << "gate_" << _test_name << "_" << library_gates_buckets.size()-1 << "\"" << std::endl;
+                    out << "]" << std::endl;
+                    out.close();
+                }
 
                 return gate_argument_str.str();
             }
 
             std::string print_lookup_argument(){
+                std::size_t lookup_count = _constraint_system.lookup_gates().size();
+                if (lookup_count == 0)
+                    return "";
+
                 std::stringstream lookup_str;
                 std::size_t j = 0;
                 std::size_t i = 0;
                 std::size_t cur = 0;
-                std::vector<std::string> lookups_computation_code;
-                std::vector<std::size_t> lookup_ids;
+                std::unordered_map<std::size_t, std::string> lookup_codes;
+                std::vector<std::size_t> lookup_ids(lookup_count);
+                std::vector<std::pair<std::size_t, std::size_t>> lookup_costs(lookup_count);
+                std::vector<std::size_t> lookup_lib(lookup_count);
 
-                for(const auto &lookup_gate: _constraint_system.lookup_gates()){
-                    std::string lookup_eval_string = lookup_call_template;
-                    boost::replace_all(lookup_eval_string, "$TEST_NAME$", _test_name);
-                    boost::replace_all(lookup_eval_string, "$LOOKUP_LIB_ID$", to_string(i));
-                    boost::replace_all(lookup_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
-                    lookup_str << lookup_eval_string;
-                    lookup_ids.push_back(i);
-                    _lookup_includes += "import \"./lookup_"  + to_string(i) + ".sol\"; \n";
-                    lookups_computation_code.push_back(lookup_computation_code(lookup_gate));
-                    print_lookup_file(lookups_computation_code[i], i);
-                    i++;
+                i = 0;
+                for(const auto &lookup: _constraint_system.lookup_gates()) {
+                    std::string code = lookup_computation_code(lookup);
+                    lookup_costs[i] = std::make_pair(i, estimate_lookup_cost(code));
+                    lookup_codes[i] = code;
+                    ++i;
                 }
-                if(_use_lookups) print_lookup_libs_list(lookup_ids);
+
+                std::sort(lookup_costs.begin(), lookup_costs.end(),
+                        [](const std::pair<std::size_t, std::size_t> &a,
+                            const std::pair<std::size_t, std::size_t> &b) {
+                        return a.second > b.second;
+                        });
+
+                /* Fill contract inline lookup computation, inline small first */
+                std::unordered_set<std::size_t> inlined_lookup_codes;
+                std::size_t inlined_lookup_codes_size = 0;
+                for (auto lookup = lookup_costs.rbegin(); lookup != lookup_costs.rend(); ++lookup) {
+                    if (lookup->second + inlined_lookup_codes_size < _lookups_contract_size_threshold) {
+                        inlined_lookup_codes.insert(lookup->first);
+                        inlined_lookup_codes_size += lookup->second;
+                    }
+                }
+
+                auto inlined_lookups_end = std::remove_if(lookup_costs.begin(), lookup_costs.end(),
+                    [&inlined_lookup_codes](const std::pair<std::size_t, std::size_t>& cost) {
+                        return inlined_lookup_codes.count(cost.first) == 1 ;
+                    });
+                lookup_costs.erase(inlined_lookups_end, lookup_costs.end());
+
+                auto library_lookup_buckets = split_items_into_buckets(lookup_costs, _lookups_library_size_threshold);
+
+                _lookup_includes = "";
+                for(auto const& lib: library_lookup_buckets) {
+                    _lookup_includes += "import \"./lookup_"  + to_string(lib.first) + ".sol\";\n";
+                    for(auto l: lib.second) {
+                        lookup_lib[l] = lib.first;
+                    }
+                    print_lookups_library_file(lib.first, lib.second, lookup_codes);
+                }
+
+                if (inlined_lookup_codes.size() > 0) {
+                    lookup_str << "\t\t\tuint256 sum;" << std::endl;
+                    lookup_str << "\t\t\tuint256 prod;" << std::endl;
+                }
+
+                for (i = 0; i < _constraint_system.lookup_gates().size(); ++i) {
+                    if (inlined_lookup_codes.count(i) == 1) {
+                        boost::replace_all(lookup_codes[i], "$STATE$", "state.");
+                        lookup_str << "/* -- lookup " << i << " is inlined -- */" << std::endl;
+                        lookup_str << lookup_codes[i] << std::endl;
+                        lookup_str << "/* -- /lookup " << i << " is inlined -- */" << std::endl;
+                    } else {
+                        std::string lookup_eval_string = lookup_call_template;
+                        boost::replace_all(lookup_eval_string, "$TEST_NAME$", _test_name);
+                        boost::replace_all(lookup_eval_string, "$LOOKUP_LIB_ID$", to_string(lookup_lib[i]));
+                        boost::replace_all(lookup_eval_string, "$LOOKUP_ID$", to_string(i));
+                        boost::replace_all(lookup_eval_string, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                        lookup_str << lookup_eval_string;
+                    }
+                }
+
+                if (library_lookup_buckets.size() > 0) {
+                    std::ofstream out;
+                    out.open(_folder_name + "/lookup_libs_list.json");
+                    out << "[" << std::endl;
+                    for(i = 0; i < library_lookup_buckets.size()-1; ++i ) {
+                        out << "\"" << "lookup_" << _test_name << "_" << i << "\"," << std::endl;
+                    }
+                    out << "\"" << "lookup_" << _test_name << "_" << library_lookup_buckets.size()-1 << "\"" << std::endl;
+                    out << "]" << std::endl;
+                    out.close();
+                }
+
                 j = 0;
                 std::size_t table_index = 1;
                 for(const auto &table: _constraint_system.lookup_tables()){
                     variable_type sel_var(table.tag_index, 0, true, variable_type::column_type::selector);
                     variable_type shifted_sel_var(table.tag_index, 1, true, variable_type::column_type::selector);
-                    lookup_str << "\t\tstate.selector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;                    
-                    lookup_str << "\t\tstate.shifted_selector_value=basic_marshalling.get_uint256_be(blob, " << _var_indices.at(shifted_sel_var) * 0x20 << ");" << std::endl;                    
+                    lookup_str << "\t\t\tstate.selector_value = basic_marshalling.get_uint256_be(blob, " << _var_indices.at(sel_var) * 0x20 << ");" << std::endl;
+                    lookup_str << "\t\t\tstate.shifted_selector_value = basic_marshalling.get_uint256_be(blob, " << _var_indices.at(shifted_sel_var) * 0x20 << ");" << std::endl;
 
                     for( const auto &option: table.lookup_options ){
                         lookup_str << 
-                            "\t\t\tl= mulmod( " << table_index << ", state.selector_value, modulus);" << std::endl;
+                            "\t\t\tl = mulmod( " << table_index << ", state.selector_value, modulus);" << std::endl;
                         lookup_str << 
                             "\t\t\tstate.l_shifted = mulmod( " << table_index << ", state.shifted_selector_value, modulus);" << std::endl;
                         lookup_str << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
                         for( const auto &var: option ){
                             lookup_str << 
-                                "\t\t\tl= addmod( l, mulmod(state.selector_value,  mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
+                                "\t\t\tl = addmod( l, mulmod(state.selector_value,  mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
                             variable_type shifted_var = var;
                             shifted_var.rotation = 1;
                             lookup_str << 
@@ -363,19 +550,19 @@ namespace nil {
                             lookup_str << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
                         }
                         lookup_str << 
-                            "\t\t\tl= mulmod( l, state.mask, modulus);" << std::endl;
+                            "\t\t\tl = mulmod( l, state.mask, modulus);" << std::endl;
                         lookup_str << 
                             "\t\t\tstate.l_shifted = mulmod( state.l_shifted, state.shifted_mask, modulus);" << std::endl;
-                        lookup_str << "\t\t\t state.g = mulmod(state.g, addmod( state.factor, addmod(l, mulmod(state.beta, state.l_shifted, modulus), modulus), modulus), modulus);" << std::endl;
+                        lookup_str << "\t\t\tstate.g = mulmod(state.g, addmod( state.factor, addmod(l, mulmod(state.beta, state.l_shifted, modulus), modulus), modulus), modulus);" << std::endl;
                         j++;
                     }
                     table_index++;
                 }
                 lookup_str << std::endl;
-                
+
                 return lookup_str.str();
             }
-        
+
             void print(){
                 std::filesystem::create_directory(_folder_name);
                 std::cout << "Generating verifier " << _test_name << std::endl;
@@ -444,6 +631,10 @@ namespace nil {
 
             std::string _gate_includes;
             std::string _lookup_includes;
+            std::size_t _gates_contract_size_threshold;
+            std::size_t _lookups_contract_size_threshold;
+            std::size_t _gates_library_size_threshold;
+            std::size_t _lookups_library_size_threshold;
         };
     }
 }

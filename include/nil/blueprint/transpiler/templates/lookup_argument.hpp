@@ -6,7 +6,7 @@
 namespace nil {
     namespace blueprint {
         std::string lookup_call_template = 
-            "\t\t\t(l, state.theta_acc) = lookup_$TEST_NAME$_$LOOKUP_LIB_ID$.evaluate_gate_be( blob, state.theta, state.theta_acc, state.beta, state.gamma );\n\t\t\tstate.g = mulmod(state.g, l, modulus);\n" ;
+            "\t\t\t(l, state.theta_acc) = lookup_$TEST_NAME$_$LOOKUP_LIB_ID$.evaluate_lookup_$LOOKUP_ID$_be( blob, state.theta, state.theta_acc, state.beta, state.gamma );\n\t\t\tstate.g = mulmod(state.g, l, modulus);\n" ;
 
         std::string modular_dummy_lookup_argument_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
@@ -29,8 +29,8 @@ namespace nil {
 pragma solidity >=0.8.4;
 
 library modular_lookup_argument_$TEST_NAME${
-}            
-        )";
+}
+)";
 
         std::string modular_lookup_argument_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
@@ -192,8 +192,8 @@ $LOOKUP_ARGUMENT_COMPUTATION$
         }
         tr_state_after = tr_state.current_challenge;
     }
-}            
-        )";
+}
+)";
     }
 }
 

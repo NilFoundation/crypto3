@@ -195,10 +195,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     typedef placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params> circuit_params;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         merkle_hash_type,
-        transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -215,8 +215,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     desc.usable_rows_amount = placeholder_test_params::usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -235,10 +235,15 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         );
 
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
-        constraint_system, 
-        lpc_preprocessed_public_data.common_data, 
+        constraint_system,
+        lpc_preprocessed_public_data.common_data,
         lpc_scheme,
-        columns_with_copy_constraints.size(),"circuit1"
+        columns_with_copy_constraints.size(),
+        "circuit1",
+        26, /* gates library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -272,16 +277,16 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
         constexpr static const std::size_t m = 2;
     };
     using circuit_t_params = placeholder_circuit_params<
-        field_type, 
+        field_type,
         typename placeholder_test_params::arithmetization_params
     >;
 
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
 
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<       
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m
     >;
 
@@ -299,8 +304,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -319,11 +324,15 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
         );
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
-        constraint_system, 
-        lpc_preprocessed_public_data.common_data, 
+        constraint_system,
+        lpc_preprocessed_public_data.common_data,
         lpc_scheme,
         columns_with_copy_constraints.size(),
-        "circuit2"
+        "circuit2",
+        26, /* gates library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -358,10 +367,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<       
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -378,8 +387,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -394,11 +403,15 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
-        constraint_system, 
-        preprocessed_public_data.common_data, 
+        constraint_system,
+        preprocessed_public_data.common_data,
         lpc_scheme,
         columns_with_copy_constraints.size(),
-        "circuit3"
+        "circuit3",
+        26, /* gates library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -431,10 +444,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<       
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -451,8 +464,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -467,11 +480,15 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
-        constraint_system, 
+        constraint_system,
         preprocessed_public_data.common_data,
-        lpc_scheme, 
+        lpc_scheme,
         columns_with_copy_constraints.size(),
-        "circuit4"
+        "circuit4",
+        26, /* gates library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -506,10 +523,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<       
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -526,8 +543,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -542,11 +559,15 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
-        constraint_system, 
-        preprocessed_public_data.common_data, 
+        constraint_system,
+        preprocessed_public_data.common_data,
         lpc_scheme,
         columns_with_copy_constraints.size(),
-        "circuit6"
+        "circuit6",
+        26, /* gates library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
@@ -581,10 +602,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<       
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -601,8 +622,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -617,11 +638,15 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
-        constraint_system, 
-        preprocessed_public_data.common_data, 
+        constraint_system,
+        preprocessed_public_data.common_data,
         lpc_scheme,
         columns_with_copy_constraints.size(),
-        "circuit7"
+        "circuit7",
+        26, /* gates library size threshold */
+        60, /* lookups library size threshold */
+        13, /* gates inline size threshold */
+        15 /* lookups inline size threshold */
     );
     printer.print();
 }
