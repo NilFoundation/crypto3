@@ -119,7 +119,7 @@ namespace nil {
                     std::map<std::size_t, std::vector<PolynomialType>> gs;
                     gs[0]={g};
                     std::map<std::size_t, typename FRI::basic_fri::merkle_tree_type> trees;
-                    trees[0] = typename FRI::basic_fri::merkle_tree_type(tree);;
+                    trees[0] = typename FRI::basic_fri::merkle_tree_type(tree);
                     return proof_eval<FRI, PolynomialType>(gs, g, trees, tree, fri_params, transcript);
                 }
 

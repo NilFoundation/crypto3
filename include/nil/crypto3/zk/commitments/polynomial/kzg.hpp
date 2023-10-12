@@ -116,15 +116,12 @@ namespace nil {
                         commitment_type commit;
                         scalar_value_type z;
                         scalar_value_type eval;
-                        public_key_type() {}
+
+                        public_key_type() = default;
                         public_key_type(commitment_type c, scalar_value_type z, scalar_value_type e)
                                     : commit(c), z(z), eval(e) {}
-                        public_key_type operator=(const public_key_type &other) {
-                            eval = other.eval;
-                            commit = other.commit;
-                            z = other.z;
-                            return *this;
-                        }
+
+                        public_key_type& operator=(const public_key_type &other) = default;
                     };
                 };
             } // namespace commitments

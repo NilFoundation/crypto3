@@ -1,0 +1,9 @@
+[
+    {"field": 0}, 
+    {"field": 1},
+    {"vector": [{"field": "85070591730234615865843651857942052864"}, {"field": "85070591730234615865843651857942052865"}]},
+    {"vector": [{"field": "85070591730234615865843651857942052866"}, {"field": "85070591730234615865843651857942052867"}]},
+    {"field": "999"},
+    {"field": "0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec"}
+]
+
