@@ -255,9 +255,9 @@ namespace nil {
         // This failing basically guarantees that the circuit is broken (or the check is).
         // There might exists rare components for which a lower level of connectedness is sufficient:
         // technically this checks that all inputs can affect all outputs.
-        // Haven't seen a use case for a weaker check yet.
+        // For a weaker version, see check_weak_connectedness
         template<typename BlueprintFieldType, typename ArithmetizationParams>
-        bool check_connectedness(
+        bool check_strong_connectedness(
             const nil::blueprint::assignment<
                 nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                 &assignment,
@@ -288,6 +288,62 @@ namespace nil {
                     return false;
                 }
             }
+
+            return true;
+        }
+
+        // Ensure that output and input variables are connected via constraints.
+        // This failing basically guarantees that the circuit is broken (or the check is).
+        // This version does not require that all inputs are connected to all outputs.
+        // For a stronger version, see check_strong_connectedness
+        template<typename BlueprintFieldType, typename ArithmetizationParams>
+        bool check_weak_connectedness(
+            const nil::blueprint::assignment<
+                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                &assignment,
+            const nil::blueprint::circuit<
+                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                &bp,
+            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                &input_variables,
+            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                &output_variables,
+            std::size_t start_row_index, std::size_t rows_amount) {
+
+            using detail::copy_var_address;
+            auto zones = detail::generate_connectedness_zones(assignment, bp, input_variables,
+                                                              start_row_index, rows_amount);
+            std::set<std::size_t> expected_input_zones,
+                                  expected_output_zones;
+            // check that all outputs are connected to at least some input
+            for (auto input_var : input_variables) {
+                expected_input_zones.insert(
+                    zones.find_set(
+                        copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                            start_row_index, rows_amount, input_var)));
+            }
+            for (auto &variable : output_variables) {
+                if (expected_input_zones.count(
+                        zones.find_set(copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                                       start_row_index, rows_amount, variable))) == 0) {
+                    return false;
+                }
+            }
+            // check that all inputs are connected to at least some output
+            for (auto output_var : output_variables) {
+                expected_output_zones.insert(
+                    zones.find_set(
+                        copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                            start_row_index, rows_amount, output_var)));
+            }
+            for (auto &variable : input_variables) {
+                if (expected_output_zones.count(
+                        zones.find_set(copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                                       start_row_index, rows_amount, variable))) == 0) {
+                    return false;
+                }
+            }
+
             return true;
         }
     }   // namespace blueprint

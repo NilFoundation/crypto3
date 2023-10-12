@@ -83,7 +83,8 @@ void test_equality_flag(const std::vector<typename BlueprintFieldType::value_typ
     component_type component_instance({0, 1, 2, 3, 4}, {}, {}, inequality);
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-        (component_instance, public_input, result_check, instance_input, inequality);
+        (component_instance, public_input, result_check, instance_input,
+         nil::crypto3::detail::connectedness_check_type::STRONG, inequality);
 }
 
 template <typename BlueprintFieldType, std::size_t RandomTestsAmount>

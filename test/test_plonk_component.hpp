@@ -67,6 +67,14 @@
 
 namespace nil {
     namespace crypto3 {
+        namespace detail {
+            enum class connectedness_check_type {
+                NONE,
+                WEAK,
+                STRONG
+            };
+        }   // namespace detail
+
         inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
             using dist_type = std::uniform_int_distribution<int>;
             static std::random_device random_engine;
@@ -174,6 +182,7 @@ namespace nil {
                                                          ArithmetizationParams> &assigner,
                                typename ComponentType::input_type instance_input,
                                bool expected_to_pass,
+                               detail::connectedness_check_type connectedness_check,
                                ComponentStaticInfoArgs... component_static_info_args) {
 
             using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -204,24 +213,32 @@ namespace nil {
             result_check(assignment, component_result);
 
             if constexpr (!PrivateInput) {
-                bool is_connected = check_connectedness(
-                    assignment,
-                    bp,
-                    instance_input.all_vars(),
-                    component_result.all_vars(), start_row, component_instance.rows_amount);
+                bool is_connected;
+                if (connectedness_check == detail::connectedness_check_type::STRONG) {
+                    is_connected = check_strong_connectedness(
+                        assignment,
+                        bp,
+                        instance_input.all_vars(),
+                        component_result.all_vars(), start_row, component_instance.rows_amount);
+                } else if (connectedness_check == detail::connectedness_check_type::WEAK) {
+                    is_connected = check_weak_connectedness(
+                        assignment,
+                        bp,
+                        instance_input.all_vars(),
+                        component_result.all_vars(), start_row, component_instance.rows_amount);
+                } else if (connectedness_check == detail::connectedness_check_type::NONE) {
+                    is_connected = true;
+                    std::cout << "WARNING: connectedness check disabled" << std::endl;
+                }
 
                 // Uncomment the following if you want to output a visual representation of the connectedness graph.
                 // I recommend turning off the starting row randomization
 
                 // auto zones = blueprint::detail::generate_connectedness_zones(
-                //     assignment, bp, instance_input.all_vars(), start_row, component_instance.rows_amount);
+                //      assignment, bp, instance_input.all_vars(), start_row, component_instance.rows_amount);
                 // blueprint::detail::export_connectedness_zones(
-                //     zones, assignment, instance_input.all_vars(), start_row, component_instance.rows_amount, std::cout);
+                //      zones, assignment, instance_input.all_vars(), start_row, component_instance.rows_amount, std::cout);
 
-                // It might also happen that your component doesn't actually need to be fully connected.
-                // I anticipate this to happen rarely -- didn't come up for any components yet.
-                // In case it actually does you should write an alternative check for partial connectedness,
-                // and enable in for your component only.
                 BOOST_ASSERT_MSG(is_connected,
                     "Component disconnected! See comment above this assert for a way to output a visual representation of the connectedness graph.");
             }
@@ -276,13 +293,14 @@ namespace nil {
                                 &assigner,
                             const typename ComponentType::input_type &instance_input,
                             bool expected_to_pass,
+                            detail::connectedness_check_type connectedness_check,
                             ComponentStaticInfoArgs... component_static_info_args) {
             auto [desc, bp, assignments] =
                 prepare_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
                                   PublicInputContainerType, FunctorResultCheck, PrivateInput,
                                   ComponentStaticInfoArgs...>
                                   (component_instance, public_input, result_check, assigner, instance_input,
-                                   expected_to_pass, component_static_info_args...);
+                                   expected_to_pass, connectedness_check, component_static_info_args...);
 
 #ifdef BLUEPRINT_PLACEHOLDER_PROOF_GEN_ENABLED
             using placeholder_params =
@@ -330,6 +348,8 @@ namespace nil {
             test_component(ComponentType component_instance, const PublicInputContainerType &public_input,
                            FunctorResultCheck result_check,
                            typename ComponentType::input_type instance_input,
+                           detail::connectedness_check_type connectedness_check =
+                            detail::connectedness_check_type::STRONG,
                            ComponentStaticInfoArgs... component_static_info_args) {
             return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
                                  PublicInputContainerType, FunctorResultCheck, false,
@@ -337,7 +357,7 @@ namespace nil {
                                     component_instance, public_input, result_check,
                                     plonk_test_default_assigner<ComponentType, BlueprintFieldType,
                                                                 ArithmetizationParams>(),
-                                    instance_input, true, component_static_info_args...);
+                                    instance_input, true, connectedness_check, component_static_info_args...);
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
@@ -348,13 +368,15 @@ namespace nil {
             test_component_to_fail(ComponentType component_instance, const PublicInputContainerType &public_input,
                            FunctorResultCheck result_check,
                            typename ComponentType::input_type instance_input,
+                           detail::connectedness_check_type connectedness_check =
+                            detail::connectedness_check_type::STRONG,
                            ComponentStaticInfoArgs... component_static_info_args) {
             return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
                                  PublicInputContainerType, FunctorResultCheck, false, ComponentStaticInfoArgs...>(
                                     component_instance, public_input, result_check,
                                     plonk_test_default_assigner<ComponentType, BlueprintFieldType,
                                                                 ArithmetizationParams>(),
-                                    instance_input, false, component_static_info_args...);
+                                    instance_input, false, connectedness_check, component_static_info_args...);
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
@@ -368,12 +390,14 @@ namespace nil {
                             const plonk_test_custom_assigner<ComponentType, BlueprintFieldType,
                                                              ArithmetizationParams> &custom_assigner,
                             typename ComponentType::input_type instance_input,
+                            detail::connectedness_check_type connectedness_check =
+                                detail::connectedness_check_type::STRONG,
                             ComponentStaticInfoArgs... component_static_info_args) {
 
                 return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
                                  PublicInputContainerType, FunctorResultCheck, false, ComponentStaticInfoArgs...>
                                     (component_instance, public_input, result_check, custom_assigner,
-                                     instance_input, true, component_static_info_args...);
+                                     instance_input, true, connectedness_check, component_static_info_args...);
             }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
@@ -387,12 +411,14 @@ namespace nil {
                             const plonk_test_custom_assigner<ComponentType, BlueprintFieldType,
                                                              ArithmetizationParams> &custom_assigner,
                             typename ComponentType::input_type instance_input,
+                            detail::connectedness_check_type connectedness_check =
+                                detail::connectedness_check_type::STRONG,
                             ComponentStaticInfoArgs... component_static_info_args) {
 
                 return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
                                  PublicInputContainerType, FunctorResultCheck, false, ComponentStaticInfoArgs...>
                                     (component_instance, public_input, result_check, custom_assigner,
-                                     instance_input, false, component_static_info_args...);
+                                     instance_input, false,  connectedness_check,component_static_info_args...);
             }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
@@ -404,6 +430,8 @@ namespace nil {
             test_component_private_input(ComponentType component_instance,
                             const PublicInputContainerType &public_input, FunctorResultCheck result_check,
                             typename ComponentType::input_type instance_input,
+                            detail::connectedness_check_type connectedness_check =
+                                detail::connectedness_check_type::STRONG,
                             ComponentStaticInfoArgs... component_static_info_args) {
 
                 return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
@@ -411,7 +439,7 @@ namespace nil {
                                     (component_instance, public_input, result_check,
                                     plonk_test_default_assigner<ComponentType, BlueprintFieldType,
                                                                 ArithmetizationParams>(),
-                                    instance_input, true, component_static_info_args...);
+                                    instance_input, true, connectedness_check, component_static_info_args...);
             }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
@@ -423,6 +451,8 @@ namespace nil {
             test_component_to_fail_private_input(ComponentType component_instance,
                             const PublicInputContainerType &public_input, FunctorResultCheck result_check,
                             typename ComponentType::input_type instance_input,
+                            detail::connectedness_check_type connectedness_check =
+                                detail::connectedness_check_type::STRONG,
                             ComponentStaticInfoArgs... component_static_info_args) {
 
                 return test_component_inner<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
@@ -430,7 +460,7 @@ namespace nil {
                                     (component_instance, public_input, result_check,
                                     plonk_test_default_assigner<ComponentType, BlueprintFieldType,
                                                                 ArithmetizationParams>(),
-                                    instance_input, false, component_static_info_args...);
+                                    instance_input, false, connectedness_check, component_static_info_args...);
             }
 
         /*

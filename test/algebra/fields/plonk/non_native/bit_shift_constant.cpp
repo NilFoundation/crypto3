@@ -90,10 +90,12 @@ void test_bit_shift(typename BlueprintFieldType::value_type input,
 
     if (expected_to_pass) {
         crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input, BitsAmount, Shift, Mode);
+            component_instance, public_input, result_check, instance_input,
+            nil::crypto3::detail::connectedness_check_type::STRONG, BitsAmount, Shift, Mode);
     } else {
         crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input, BitsAmount, Shift, Mode);
+            component_instance, public_input, result_check, instance_input,
+            nil::crypto3::detail::connectedness_check_type::STRONG, BitsAmount, Shift, Mode);
     }
 }
 

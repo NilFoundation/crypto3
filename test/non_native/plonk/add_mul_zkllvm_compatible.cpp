@@ -131,10 +131,12 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
         // 253 is the default bits_amount
         crypto3::test_component<stretched_component_type, BlueprintFieldType,
                                 ArithmetizationParams, hash_type, Lambda>(
-            stretched_instance, public_input, result_check, instance_input, 253);
+            stretched_instance, public_input, result_check, instance_input,
+            nil::crypto3::detail::connectedness_check_type::STRONG, 253);
     } else {
         crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input, 253);
+            component_instance, public_input, result_check, instance_input,
+            nil::crypto3::detail::connectedness_check_type::STRONG, 253);
     }
 }
 

@@ -50,9 +50,8 @@
 
 using namespace nil::blueprint;
 using namespace nil::crypto3;
-using nil::blueprint::detail::generate_connectedness_zones;
-using nil::blueprint::detail::export_connectedness_zones;
-using nil::blueprint::check_connectedness;
+using nil::blueprint::check_strong_connectedness;
+using nil::blueprint::check_weak_connectedness;
 
 //constexpr static const std::size_t random_tests_amount = 10;
 
@@ -78,25 +77,30 @@ BOOST_AUTO_TEST_CASE(connectedness_check_sanity_tests) {
 
     std::vector<var> public_input = {var(0, 0, false, var::column_type::public_input)};
     std::vector<var> output_variables = {var(4, start_row_index, false, var::column_type::witness)};
-    BOOST_ASSERT(!check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(!check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
 
     bp.add_copy_constraint({public_input[0], output_variables[0]});
-    BOOST_ASSERT(check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
 
     public_input.push_back(var(0, 1, false, var::column_type::public_input));
-    BOOST_ASSERT(!check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(!check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
 
     const std::size_t intermediate_var_index = 5;
     var intermediate_var = var(intermediate_var_index, start_row_index, false, var::column_type::witness);
     bp.add_copy_constraint({public_input[1], intermediate_var});
-    BOOST_ASSERT(!check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(!check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
 
     bp.add_copy_constraint({intermediate_var, output_variables[0]});
-    BOOST_ASSERT(check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
+    BOOST_ASSERT(check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 1));
 
     var another_intermediate_var = var(0, start_row_index + 2, false, var::column_type::constant);
     output_variables.push_back(another_intermediate_var);
-    BOOST_ASSERT(!check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
 
     std::size_t selector_idx = bp.add_gate({
         var(intermediate_var_index, -1, true, var::column_type::witness),
@@ -104,11 +108,32 @@ BOOST_AUTO_TEST_CASE(connectedness_check_sanity_tests) {
         var(0, -1, true, var::column_type::witness),
         var(1, -1, true, var::column_type::witness),
         var(2, -1, true, var::column_type::witness)});
-    BOOST_ASSERT(!check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
+    BOOST_ASSERT(!check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
 
     assignment.enable_selector(selector_idx, start_row_index + 1);
-    auto zones = generate_connectedness_zones(assignment, bp, public_input, start_row_index, 3);
-    BOOST_ASSERT(check_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
+    BOOST_ASSERT(check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
+    BOOST_ASSERT(check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 3));
+
+    var lookup_test_var = var(0, start_row_index + 3, false, var::column_type::constant);
+    output_variables.push_back(lookup_test_var);
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
+    BOOST_ASSERT(!check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
+
+    std::size_t lookup_selector_idx = bp.add_lookup_gate(
+        {{0, {var(0, -1, true, var::column_type::constant)}},
+         {1, {var(0, 0, true, var::column_type::constant)}}});
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
+    BOOST_ASSERT(!check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
+
+    assignment.enable_selector(lookup_selector_idx, start_row_index + 3);
+    BOOST_ASSERT(check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
+    BOOST_ASSERT(check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
+
+    public_input.push_back(var(0, 2, false, var::column_type::public_input));
+    output_variables.push_back(var(0, 2, false, var::column_type::public_input));
+    BOOST_ASSERT(!check_strong_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
+    BOOST_ASSERT(check_weak_connectedness(assignment, bp, public_input, output_variables, start_row_index, 4));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

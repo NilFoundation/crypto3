@@ -114,12 +114,13 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
     if (!CustomAssignments) {
         if (expected_to_pass) {
             nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, public_input, result_check, instance_input, R, Mode);
+                component_instance, public_input, result_check, instance_input,
+                nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
         } else {
             nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
                                                  hash_type, Lambda>(
                                                     component_instance, public_input, result_check, instance_input,
-                                                    R, Mode);
+                                                    nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
         }
     } else {
         // Currently, the only custom assignment test here is for failure
@@ -129,7 +130,8 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
         nil::crypto3::test_component_to_fail_custom_assignments<component_type, BlueprintFieldType,
                 ArithmetizationParams, hash_type, Lambda>(
                         component_instance, public_input, result_check,
-                        custom_assignment, instance_input, R, Mode);
+                        custom_assignment, instance_input,
+                        nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
     }
 }
 

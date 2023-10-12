@@ -110,17 +110,20 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
     if (!CustomAssignments) {
         if (expected_to_pass) {
             crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, public_input, result_check, instance_input, BitsAmount);
+                component_instance, public_input, result_check, instance_input,
+                crypto3::detail::connectedness_check_type::STRONG, BitsAmount);
         } else {
             crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, public_input, result_check, instance_input, BitsAmount);
+                component_instance, public_input, result_check, instance_input,
+                crypto3::detail::connectedness_check_type::STRONG, BitsAmount);
         }
     } else {
         auto custom_assignments = crypto3::generate_patched_assignments<BlueprintFieldType,
             ArithmetizationParams, component_type>(patches);
         crypto3::test_component_to_fail_custom_assignments<
             component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-                (component_instance, public_input, result_check, custom_assignments, instance_input, BitsAmount);
+                (component_instance, public_input, result_check, custom_assignments, instance_input,
+                 crypto3::detail::connectedness_check_type::STRONG, BitsAmount);
     }
 }
 

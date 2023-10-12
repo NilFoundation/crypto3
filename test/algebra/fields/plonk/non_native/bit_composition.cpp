@@ -106,10 +106,12 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
     if (!CustomAssignments) {
         if (expected_to_pass) {
             crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, bits, result_check, instance_input, BitsAmount, CheckInput);
+                component_instance, bits, result_check, instance_input,
+                crypto3::detail::connectedness_check_type::STRONG, BitsAmount, CheckInput);
         } else {
             crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, bits, result_check, instance_input, BitsAmount, CheckInput);
+                component_instance, bits, result_check, instance_input,
+                crypto3::detail::connectedness_check_type::STRONG, BitsAmount, CheckInput);
         }
     } else {
         auto custom_assignments = crypto3::generate_patched_assignments<BlueprintFieldType,
@@ -117,7 +119,8 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
         crypto3::test_component_to_fail_custom_assignments<
             component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
                 (component_instance, bits, result_check,
-                 custom_assignments, instance_input, BitsAmount, CheckInput);
+                 custom_assignments, instance_input,
+                 crypto3::detail::connectedness_check_type::STRONG, BitsAmount, CheckInput);
     }
 }
 
