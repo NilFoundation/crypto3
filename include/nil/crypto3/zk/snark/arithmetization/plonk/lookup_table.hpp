@@ -52,6 +52,9 @@ namespace nil {
                                (lookup_options == other.lookup_options);
                     }
 
+                    plonk_lookup_table() : columns_number(0), tag_index(0) {
+                    }
+
                     plonk_lookup_table(std::size_t _columns_number, std::size_t _tag_index) :
                         columns_number(_columns_number), tag_index(_tag_index) {
                     }

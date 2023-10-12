@@ -176,6 +176,20 @@ namespace nil {
                         return _selectors;
                     }
 
+                    void fill_constant(std::uint32_t index, const ColumnType& column) {
+                        BOOST_ASSERT(index < constants_amount());
+                        BOOST_ASSERT(_constants[index].size() == 0);
+
+                        _constants[index] = column;
+                    }
+
+                    void fill_selector(std::uint32_t index, const ColumnType& column) {
+                        BOOST_ASSERT(index < selectors_amount());
+                        BOOST_ASSERT(_selectors[index].size() == 0);
+
+                        _selectors[index] = column;
+                    }
+
                     const ColumnType& operator[](std::uint32_t index) const {
                         if (index < public_inputs_amount())
                             return public_input(index);
@@ -246,6 +260,14 @@ namespace nil {
 
                     const ColumnType& selector(std::uint32_t index) const {
                         return _public_table.selector(index);
+                    }
+
+                    void fill_constant(std::uint32_t index, const ColumnType& column) {
+                        _public_table.fill_constant(index, column);
+                    }
+
+                    void fill_selector(std::uint32_t index, const ColumnType& column) {
+                        _public_table.fill_selector(index, column);
                     }
 
                     const witnesses_container_type& witnesses() const {

@@ -89,6 +89,10 @@ namespace nil {
                         return _gates.size();
                     }
 
+                    std::size_t num_lookup_gates() const {
+                        return _lookup_gates.size();
+                    }
+
                     // bool
                     //     is_satisfied(plonk_variable_assignment<FieldType, witness_columns> full_variable_assignment)
                     //     const {
@@ -120,6 +124,10 @@ namespace nil {
 
                     const lookup_table_type &lookup_table(std::size_t table_id) const {
                         return _lookup_tables[table_id];
+                    }
+
+                    void add_lookup_table(const lookup_table_type &table) {
+                        _lookup_tables.push_back(table);
                     }
 
                     std::size_t sorted_lookup_columns_number() const {
