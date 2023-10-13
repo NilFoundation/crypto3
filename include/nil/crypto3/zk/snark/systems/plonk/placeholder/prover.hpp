@@ -142,7 +142,7 @@ namespace nil {
                     }
 
                     placeholder_proof<FieldType, ParamsType> process() {
-                        PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time:");
+                        PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time");
 
                         // 2. Commit witness columns and public_input columns
                         _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table.witnesses());
@@ -200,11 +200,11 @@ namespace nil {
                         _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
 
                         generate_evaluation_points();
-
-                        _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
-
-                        std::size_t permutation_size = preprocessed_public_data.permutation_polynomials.size();
-
+                        
+                        {
+                            PROFILE_PLACEHOLDER_SCOPE("commitment scheme proof eval time");
+                            _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
+                        }
                         return _proof;
                     }
 

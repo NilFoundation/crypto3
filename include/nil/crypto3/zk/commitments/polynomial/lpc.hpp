@@ -46,10 +46,14 @@ namespace nil {
             namespace commitments { 
 
                 // Placeholder-friendly class.
-                template<typename LPCScheme, typename PolynomialType = typename math::polynomial_dfs<typename LPCScheme::params_type::field_type::value_type>>
-                class lpc_commitment_scheme:public polys_evaluator<typename LPCScheme::params_type, typename LPCScheme::commitment_type, PolynomialType>{
+                template<typename LPCScheme, typename PolynomialType = typename math::polynomial_dfs<
+                    typename LPCScheme::params_type::field_type::value_type>>
+                class lpc_commitment_scheme : public polys_evaluator<typename LPCScheme::params_type,
+                    typename LPCScheme::commitment_type, PolynomialType>{
+
                 public:
                     using field_type = typename LPCScheme::field_type;
+                    using value_type = typename field_type::value_type;
                     using params_type = typename LPCScheme::params_type;
                     using precommitment_type = typename LPCScheme::precommitment_type;
                     using commitment_type = typename LPCScheme::commitment_type;
@@ -61,32 +65,36 @@ namespace nil {
                     using poly_type = PolynomialType;
                     using lpc = LPCScheme;
                     using eval_storage_type = typename LPCScheme::eval_storage_type;
+
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
                     typename fri_type::params_type _fri_params;
-                    typename field_type::value_type _etha;
+                    value_type _etha;
                     std::map<std::size_t, bool> _batch_fixed;
+
                 public:
-                    lpc_commitment_scheme(const typename fri_type::params_type &fri_params){
-                        _fri_params = fri_params;
+
+                    lpc_commitment_scheme(const typename fri_type::params_type &fri_params) 
+                        : _fri_params(fri_params) {
                     }
 
-                    void setup(transcript_type& transcript){
+                    void setup(transcript_type& transcript) {
                         _etha = transcript.template challenge<field_type>();
                     }
 
-                    commitment_type commit(std::size_t index){
+                    commitment_type commit(std::size_t index) {
                         this->state_commited(index);
-                        _trees[index] = nil::crypto3::zk::algorithms::precommit<fri_type>(this->_polys[index], _fri_params.D[0], _fri_params.step_list.front());
+                        _trees[index] = nil::crypto3::zk::algorithms::precommit<fri_type>(
+                            this->_polys[index], _fri_params.D[0], _fri_params.step_list.front());
                         return _trees[index].root();
                     }
 
                     // Should be done after commitment.
-                    void mark_batch_as_fixed(std::size_t index){
+                    void mark_batch_as_fixed(std::size_t index) {
                         _batch_fixed[index] = true;
                     }
 
-                    proof_type proof_eval(transcript_type &transcript){
+                    proof_type proof_eval(transcript_type &transcript) {
                         for( auto const&it: _batch_fixed){
                             if(it.second){
                                 this->append_eval_point(it.first, _etha);
@@ -103,7 +111,7 @@ namespace nil {
                         // Prepare z-s and combined_Q;
                         auto theta = transcript.template challenge<field_type>();
                         poly_type combined_Q;
-                        if constexpr (std::is_same<math::polynomial_dfs<typename field_type::value_type>, PolynomialType>::value
+                        if constexpr (std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value
                         ) {
                             bool first = true;
                             // prepare U and V
@@ -111,21 +119,21 @@ namespace nil {
                                 auto b_ind = it.first;
                                 BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
                                 BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
-                                for( std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++){
+
+                                for( std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++) {
                                     // All evaluation points are filled successfully.
-                                    auto points = this->_points[b_ind][poly_ind];
+                                    auto& points = this->_points[b_ind][poly_ind];
                                     BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
 
-                                    math::polynomial<typename field_type::value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
-                                    math::polynomial<typename field_type::value_type> U =  this->get_U(b_ind, poly_ind);
+                                    math::polynomial<value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
+                                    math::polynomial<value_type> U =  this->get_U(b_ind, poly_ind);
 
-                                    math::polynomial_dfs<typename field_type::value_type> U_dfs(0, _fri_params.D[0]->size());
-                                    U_dfs.from_coefficients(U);
+                                    math::polynomial<value_type> g_normal(this->_polys[b_ind][poly_ind].coefficients());
+                                    math::polynomial<value_type> Q = g_normal - this->get_U(b_ind, poly_ind);
 
-                                    math::polynomial<typename field_type::value_type> g_normal(this->_polys[b_ind][poly_ind].coefficients());
-                                    math::polynomial<typename field_type::value_type> Q = g_normal - this->get_U(b_ind, poly_ind);
                                     Q = Q / this->get_V(this->_points[b_ind][poly_ind]);
-                                    math::polynomial_dfs<typename field_type::value_type> Q_dfs(0, _fri_params.D[0]->size());
+
+                                    math::polynomial_dfs<value_type> Q_dfs(0, _fri_params.D[0]->size());
                                     Q_dfs.from_coefficients(Q);
 
                                     if (first) {
@@ -149,11 +157,11 @@ namespace nil {
                                     auto points = this->_points[b_ind][poly_ind];
                                     BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
 
-                                    math::polynomial<typename field_type::value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
-                                    math::polynomial<typename field_type::value_type> U =  this->get_U(b_ind, poly_ind);
+                                    math::polynomial<value_type> V = this->get_V(this->_points[b_ind][poly_ind]);
+                                    math::polynomial<value_type> U =  this->get_U(b_ind, poly_ind);
 
-                                    math::polynomial<typename field_type::value_type> g_normal = this->_polys[b_ind][poly_ind];
-                                    math::polynomial<typename field_type::value_type> Q = g_normal - U;
+                                    math::polynomial<value_type> g_normal = this->_polys[b_ind][poly_ind];
+                                    math::polynomial<value_type> Q = g_normal - U;
                                     Q = Q / V;
                                     if (first) {
                                         first = false;
@@ -205,11 +213,11 @@ namespace nil {
                         // Point identifier for each polynomial. poly=>id
                         typename std::map<std::size_t, std::vector<std::size_t>> eval_map = this->get_eval_map(unique_points);
                         // combined U for each polynomials with id eval points. id=>eval_points.
-                        typename std::vector<math::polynomial<typename field_type::value_type>> combined_U;
+                        typename std::vector<math::polynomial<value_type>> combined_U;
                         // V for each polynoial
-                        typename std::vector<math::polynomial<typename field_type::value_type>> denominators;
+                        typename std::vector<math::polynomial<value_type>> denominators;
 
-                        typename field_type::value_type theta = transcript.template challenge<field_type>();
+                        value_type theta = transcript.template challenge<field_type>();
 
                         combined_U.resize(unique_points.size());
                         denominators.resize(unique_points.size());

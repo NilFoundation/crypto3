@@ -48,7 +48,7 @@ namespace nil {
                                 auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                                                 std::chrono::high_resolution_clock::now() - start);
                                 std::cout << name << ": " << std::fixed << std::setprecision(3)
-                                    << elapsed.count() << "ms" << std::endl;
+                                    << elapsed.count() << " ms" << std::endl;
                             }
                     
                         private:
@@ -73,9 +73,13 @@ namespace nil {
                             call_stats() {}
                             ~call_stats() {
                                 for (const auto& [name, count]: call_counts) {
-                                    std::cout << name << ": " << count << " calls " << call_miliseconds[name] << "miliseconds" << std::endl;
+                                    uint64_t miliseconds = call_miliseconds[name] / 1000000;
+                                    std::cout << name << ": " << count << " calls "
+                                        << miliseconds / 1000 << " sec " 
+                                        << miliseconds % 1000 << " ms" << std::endl;
                                 }
                             }
+
                             std::unordered_map<std::string, uint64_t> call_counts;
                             std::unordered_map<std::string, uint64_t> call_miliseconds;
                     };
@@ -91,7 +95,7 @@ namespace nil {
                             }
                     
                             inline ~placeholder_scoped_aggregate_profiler() {
-                                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
                                                 std::chrono::high_resolution_clock::now() - start);
                                 call_stats::get_stats().add_stat(name, elapsed.count());
                             }

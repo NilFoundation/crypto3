@@ -46,6 +46,7 @@
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/fold_polynomial.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/proof_of_work.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -345,12 +346,8 @@ namespace nil {
                           D,
                           const std::size_t fri_step
                 ) {
+                    PROFILE_PLACEHOLDER_SCOPE("Basic FRI Precommit time");
 
-#ifdef ZK_PLACEHOLDER_PROFILING_ENABLED
-                    auto begin = std::chrono::high_resolution_clock::now();
-                    auto last = begin;
-                    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::high_resolution_clock::now() - last);
-#endif
                     for (int i = 0; i < poly.size(); ++i) {
                         if (poly[i].size() != D->size()) {
                             poly[i].resize(D->size());
