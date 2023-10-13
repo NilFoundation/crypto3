@@ -38,6 +38,8 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
+#include <nil/blueprint/lookup_library.hpp>
+
 namespace nil {
     namespace blueprint {
 
@@ -68,9 +70,13 @@ namespace nil {
             using lookup_gate_id_type = lookup_gate_id<BlueprintFieldType, ArithmetizationParams>;
             using lookup_gate_selector_map = std::map<lookup_gate_id_type, std::size_t>;
 
+            using lookup_table_definition = typename nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
+
             gate_selector_map selector_map = {};
             lookup_gate_selector_map lookup_selector_map = {};
             std::size_t next_selector_index = 0;
+        protected:
+            lookup_library<BlueprintFieldType> _lookup_library;
         public:
             typedef BlueprintFieldType blueprint_field_type;
 
@@ -116,6 +122,22 @@ namespace nil {
 
             std::size_t add_lookup_gate(const std::initializer_list<lookup_constraint_type> &&args) {
                 LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_gates);
+            }
+
+            void register_lookup_table(std::shared_ptr<lookup_table_definition> table) {
+                _lookup_library.register_lookup_table(table);
+            }
+
+            void reserve_table(std::string name){
+                _lookup_library.reserve_table(name);
+            }
+
+            const std::map<std::string, std::size_t> &get_reserved_indices(){
+                return _lookup_library.get_reserved_indices();
+            }
+
+            const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables(){
+                return _lookup_library.get_reserved_tables();
             }
 
             #undef GATE_ADDER_MACRO

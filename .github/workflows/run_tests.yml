@@ -41,6 +41,7 @@ jobs:
             blueprint_algebra_fields_plonk_non_native_bit_composition_test,
             blueprint_algebra_fields_plonk_non_native_bit_shift_constant_test,
             blueprint_algebra_fields_plonk_non_native_logic_ops_test,
+            blueprint_algebra_fields_plonk_non_native_lookup_logic_ops_test,
             blueprint_algebra_fields_plonk_non_native_comparison_checked_test,
             blueprint_algebra_fields_plonk_non_native_comparison_unchecked_test,
             blueprint_algebra_fields_plonk_non_native_comparison_flag_test,
