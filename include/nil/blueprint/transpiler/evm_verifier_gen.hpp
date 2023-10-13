@@ -99,7 +99,7 @@ namespace nil {
 
             std::string zero_indices(columns_rotations_type col_rotations){
                 std::vector<std::size_t> zero_indices;
-                std::uint16_t fixed_values_points;
+                std::uint16_t fixed_values_points = 0;
                 std::stringstream result;
 
                 for(std::size_t i= 0; i < PlaceholderParams::constant_columns + PlaceholderParams::selector_columns; i++){
@@ -116,6 +116,7 @@ namespace nil {
                         j++;
                     }
                 }
+
                 std::uint16_t sum = fixed_values_points;
                 std::size_t i = 0;
                 for(; i < PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns; i++){
