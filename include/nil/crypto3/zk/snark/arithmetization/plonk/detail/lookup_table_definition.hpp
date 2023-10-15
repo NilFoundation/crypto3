@@ -280,26 +280,28 @@ namespace nil {
                             } else  if( start_row + table->get_rows_number() < max_usable_rows ){
                                 if(prev_columns_number < table->get_columns_number()) prev_columns_number = table->get_columns_number();
                             } else if(table->get_rows_number() < max_usable_rows){
+                                start_row = 1;
                                 start_constant_column += prev_columns_number;
                                 prev_columns_number = table->get_columns_number();
                             } 
 
                             // Place table into constant_columns.
                             for( std::size_t i = 0; i < table->get_table().size(); i++ ){
-                                if(constant_columns[i].size() < start_row + table->get_table()[i].size()){
-                                    constant_columns[i].resize(start_row + table->get_table()[i].size());
+                                if(constant_columns[start_constant_column + i].size() < start_row + table->get_table()[i].size()){
+                                    constant_columns[start_constant_column + i].resize(start_row + table->get_table()[i].size());
                                     if( usable_rows_after < start_row + table->get_table()[i].size() ){
                                         usable_rows_after = start_row + table->get_table()[i].size();
                                     }
                                 }
                                 for( std::size_t j = 0; j < table->get_table()[i].size(); j++ ){
-                                    constant_columns[i][start_row + j] = table->get_table()[i][j];
+                                    constant_columns[start_constant_column + i][start_row + j] = table->get_table()[i][j];
                                 }
                             }
 
                             std::map<std::pair<std::size_t, std::size_t>, std::size_t> selector_ids;
                             for( const auto &[subtable_name, subtable]:table->subtables ){
                                 if( selector_ids.find(std::make_pair(subtable.begin, subtable.end)) != selector_ids.end() ){
+                                    std::cout  << "selector for " << subtable_name << " from " << start_row + subtable.begin << " to " << start_row + subtable.end << std::endl;
                                     auto selector_id = selector_ids[std::make_pair(subtable.begin, subtable.end)];
                                     std::string full_table_name = table->table_name + "/" + subtable_name;
                                     bp_lookup_tables[lookup_table_ids.at(full_table_name) - 1] = plonk_lookup_table<FieldType>(subtable.column_indices.size(), selector_id);
@@ -315,6 +317,7 @@ namespace nil {
                                 } 
                                 // Create selector
                                 plonk_column<FieldType> selector_column(usable_rows_after, FieldType::value_type::zero());
+                                std::cout  << "selector for " << subtable_name << " from " << start_row + subtable.begin << " to " << start_row + subtable.end << std::endl;
                                 for(std::size_t k = subtable.begin; k <= subtable.end; k++){
                                     selector_column[start_row + k] = FieldType::value_type::one();
                                 }
@@ -342,6 +345,10 @@ namespace nil {
                             bp.add_lookup_table(std::move(bp_lookup_tables[i]));
                         }
                         for( std::size_t i = 0; i < constant_columns.size(); i++ ){
+                            for(std::size_t j = 0; j < 100; j++){
+                                std::cout << constant_columns[i][j] << " ";
+                            }
+                            std::cout << std::endl;
                             assignment.fill_constant(constant_columns_ids[i], constant_columns[i]);
                         }
                         return usable_rows_after;
