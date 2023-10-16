@@ -26,6 +26,7 @@
 #define CRYPTO3_ZK_PLONK_DETAIL_LOOKUP_TABLE_DEFINITION_HPP
 
 #include <string>
+#include <map>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
@@ -103,9 +104,9 @@ namespace nil {
 
                     // Returned value -- new usable_rows.
                     // All tables are necessary for circuit generation.
-                    template<typename FieldType, typename ArithmetizationParams>
-                    std::size_t pack_lookup_tables_vertical(
-                        const std::map<std::string, std::size_t> &lookup_table_ids,
+                    template<typename FieldType, typename ArithmetizationParams, typename TableIdsMapType>
+                    std::size_t pack_lookup_tables(
+                        const TableIdsMapType &lookup_table_ids,
                         const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &lookup_tables,
                         plonk_constraint_system<FieldType, ArithmetizationParams> &bp,
                         plonk_assignment_table<FieldType, ArithmetizationParams> &assignment,
@@ -191,7 +192,7 @@ namespace nil {
                     template<typename FieldType, typename ArithmetizationParams>
                     std::size_t pack_lookup_tables_horizontal(
                         const std::map<std::string, std::size_t> &lookup_table_ids,
-                        const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &lookup_tables, 
+                        const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &lookup_tables,
                         plonk_constraint_system<FieldType, ArithmetizationParams> &bp,
                         plonk_assignment_table<FieldType, ArithmetizationParams> &assignment,
                         const std::vector<std::size_t> &constant_columns_ids,
@@ -260,7 +261,7 @@ namespace nil {
                                     cur_constant_column += table->get_columns_number();
                                 }
                                 for( const auto &[subtable_name, subtable]:table->subtables ){
-                                    if(subtable.begin != 0 || subtable.end != table->get_rows_number() -1) 
+                                    if(subtable.begin != 0 || subtable.end != table->get_rows_number() -1)
                                         BOOST_ASSERT_MSG(false, "Only full big tables are supported now");
                                     std::string full_table_name = table->table_name + "/" + subtable_name;
                                     bp_lookup_tables[lookup_table_ids.at(full_table_name) - 1] = plonk_lookup_table<FieldType>(subtable.column_indices.size(), full_selector_id);
@@ -268,7 +269,7 @@ namespace nil {
                                         std::vector<plonk_variable<typename FieldType::value_type>> option;
                                         for( const auto &column_index:subtable.column_indices ){
                                             option.emplace_back( plonk_variable<typename FieldType::value_type>(
-                                                constant_columns_ids[start_constant_column + i * table->get_columns_number() + column_index], 0, 
+                                                constant_columns_ids[start_constant_column + i * table->get_columns_number() + column_index], 0,
                                                 false, plonk_variable<typename FieldType::value_type>::column_type::constant
                                             ) );
                                         }
@@ -283,7 +284,7 @@ namespace nil {
                                 start_row = 1;
                                 start_constant_column += prev_columns_number;
                                 prev_columns_number = table->get_columns_number();
-                            } 
+                            }
 
                             // Place table into constant_columns.
                             for( std::size_t i = 0; i < table->get_table().size(); i++ ){
@@ -308,26 +309,26 @@ namespace nil {
                                     std::vector<plonk_variable<typename FieldType::value_type>> option;
                                     for( const auto &column_index:subtable.column_indices ){
                                         option.emplace_back( plonk_variable<typename FieldType::value_type>(
-                                            constant_columns_ids[column_index], 0, 
+                                            constant_columns_ids[column_index], 0,
                                             false, plonk_variable<typename FieldType::value_type>::column_type::constant
                                         ) );
                                     }
                                     bp_lookup_tables[lookup_table_ids.at(full_table_name) - 1].append_option(option);
                                     continue;
-                                } 
+                                }
                                 // Create selector
                                 plonk_column<FieldType> selector_column(usable_rows_after, FieldType::value_type::zero());
                                 std::cout  << "selector for " << subtable_name << " from " << start_row + subtable.begin << " to " << start_row + subtable.end << std::endl;
                                 for(std::size_t k = subtable.begin; k <= subtable.end; k++){
                                     selector_column[start_row + k] = FieldType::value_type::one();
                                 }
-                                
+
                                 std::string full_table_name = table->table_name + "/" + subtable_name;
                                 bp_lookup_tables[lookup_table_ids.at(full_table_name) - 1] = plonk_lookup_table<FieldType>(subtable.column_indices.size(), cur_selector_id);
                                 std::vector<plonk_variable<typename FieldType::value_type>> option;
                                 for( const auto &column_index:subtable.column_indices ){
                                     option.emplace_back( plonk_variable<typename FieldType::value_type>(
-                                        constant_columns_ids[start_constant_column + column_index], 0, 
+                                        constant_columns_ids[start_constant_column + column_index], 0,
                                         false, plonk_variable<typename FieldType::value_type>::column_type::constant
                                     ) );
                                 }
