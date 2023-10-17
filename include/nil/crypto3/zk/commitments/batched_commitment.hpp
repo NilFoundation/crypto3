@@ -59,19 +59,35 @@ namespace nil {
                     using poly_type = PolynomialType;
 
                     eval_storage<field_type> _z;
-                    polys_evaluator(){}
+
+                    polys_evaluator() = default;
+
                 protected:
                     std::map<std::size_t, std::vector<poly_type>> _polys;
                     std::map<std::size_t, bool> _locked; // _locked[batch] is true after it is commited
                     std::map<std::size_t, std::vector<std::vector<typename field_type::value_type>>> _points;
+
                 protected:
                     math::polynomial<typename field_type::value_type> get_V(const std::vector<typename field_type::value_type> &points) const{
                         math::polynomial<typename field_type::value_type> V = {1};
                         for( std::size_t xi_index = 0; xi_index < points.size(); xi_index++ ){
-                            V = V * math::polynomial<typename field_type::value_type>({-points[xi_index], 1});
+                            V *= math::polynomial<typename field_type::value_type>({-points[xi_index], 1});
                         }
                         return V;
                     }
+
+                    std::vector<math::polynomial<typename field_type::value_type>> get_V_multipliers(
+                        const std::vector<typename field_type::value_type> &points) const {
+
+                        std::vector<math::polynomial<typename field_type::value_type>> V_multipliers;
+                        for( std::size_t xi_index = 0; xi_index < points.size(); xi_index++ ){
+                            V_multipliers.push_back(math::polynomial<typename field_type::value_type>(
+                                {-points[xi_index], 1}));
+                        }
+                        return V_multipliers;
+                    }
+
+
                     math::polynomial<typename field_type::value_type> get_U(std::size_t b_ind, std::size_t poly_ind) const{
                         const auto &points = _points.at(b_ind)[poly_ind];
                         BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
