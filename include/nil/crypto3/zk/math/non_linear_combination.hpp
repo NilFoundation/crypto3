@@ -115,6 +115,12 @@ namespace nil {
                     return max_degree;
                 }
 
+                void sort_terms_by_degree() {
+                    std::sort(this->terms.begin(), this->terms.end(),[](term_type const& left, term_type const& right) {
+                            return left.get_vars().size() > right.get_vars().size();
+                        });
+                }
+
                 void merge_equal_terms() {
                     std::unordered_map<term_type, assignment_type> unique_terms;
                     for (const auto& term: this->terms) {
