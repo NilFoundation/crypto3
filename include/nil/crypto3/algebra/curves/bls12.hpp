@@ -61,6 +61,7 @@ namespace nil {
                     template<typename Coordinates = coordinates::jacobian_with_a4_0,
                              typename Form = forms::short_weierstrass>
                     using g2_type = typename detail::bls12_g2<Version, Form, Coordinates>;
+#ifndef __ZKLLVM__
 
                     constexpr static const bool has_affine_pairing = false;
 
@@ -69,6 +70,7 @@ namespace nil {
                     //     pairing;
 
                     typedef typename policy_type::gt_field_type gt_type;
+#endif
                 };
 
                 typedef bls12<381> bls12_381;

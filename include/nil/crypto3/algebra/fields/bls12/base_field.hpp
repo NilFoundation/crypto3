@@ -87,7 +87,7 @@ namespace nil {
                     typedef typename policy_type::integral_type integral_type;
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 #ifdef __ZKLLVM__
-                    typedef __zkllvm_field_bls12377_base value_type;
+                    // typedef __zkllvm_field_bls12377_base value_type;
 #else
 
                     constexpr static const integral_type modulus =

@@ -29,8 +29,10 @@
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
 
+#ifndef __ZKLLVM__
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 #include <nil/crypto3/algebra/fields/fp12_2over3over2.hpp>
+#endif
 
 namespace nil {
     namespace crypto3 {
@@ -63,10 +65,13 @@ namespace nil {
                         using scalar_field_type = fields::bls12_scalar_field<Version>;
 
                         using g1_field_type = base_field_type;
+
+#ifndef __ZKLLVM__
                         using g2_field_type = typename fields::fp2<base_field_type>;
                         using gt_field_type = typename fields::fp12_2over3over2<base_field_type>;
 
                         using integral_type = typename base_field_type::integral_type;
+#endif
 
                         template<typename Form, typename Coordinates>
                         using g1_type = bls12_g1<Version, Form, Coordinates>;
