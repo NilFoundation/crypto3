@@ -134,6 +134,80 @@ namespace nil {
                 return result.str();
             }
 
+            bool detect_polynomial(crypto3::math::non_linear_combination<variable_type> const& comb) {
+                std::unordered_set<variable_type> comb_vars;
+
+                for (auto it = std::begin(comb); it != std::cend(comb); ++it ) {
+                    const auto &vars = it->get_vars();
+                    for (auto v = std::cbegin(vars); v != std::cend(vars); ++v) {
+                        comb_vars.insert(*v);
+                    }
+                }
+
+                return comb_vars.size() == 1;
+            }
+
+            std::string constraint_computation_code_optimize_polynomial(
+                variable_indices_type &_var_indices,
+                const constraint_type &constraint
+            ){
+                std::stringstream result;
+
+                crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
+                auto comb = visitor.convert(constraint);
+
+                if (_deduce_horner && detect_polynomial(comb)) {
+                    comb.sort_terms_by_degree();
+                    /* First term always exists, as polynomial contains at least one term */
+                    std::size_t degree = comb.terms[0].get_vars().size();
+                    result << "\t\t/* Constraint is a polynomial over one variable. Using Horner's formula */" << std::endl;
+                    auto it = std::cbegin(comb);
+                    /* Load temporary variable */
+                    result << "\t\tx = basic_marshalling.get_uint256_be(blob, " << _var_indices.at(comb.terms[0].get_vars()[0]) * 0x20 << ");" << std::endl;
+                    if (it->get_coeff() == PlaceholderParams::field_type::value_type::one()) {
+                        result << "\t\tsum = x;" << std::endl;
+                    } else {
+                        result << "\t\tsum = " << it->get_coeff() <<";" << std::endl;
+                        result << "\t\tsum = mulmod(sum, x, modulus);" << std::endl;
+                    }
+                    ++it;
+                    --degree;
+                    while (degree != 0) {
+                        if (degree == it->get_vars().size()) {
+                            result << "\t\tsum = addmod(sum, " << it->get_coeff() << ", modulus);" << std::endl;
+                            ++it;
+                        } else {
+                            result << "/* term with zero coeficient is skipped */" << std::endl;
+                        }
+                        result << "\t\tsum = mulmod(sum, x, modulus);" << std::endl;
+                        --degree;
+                    }
+                    if (it != std::cend(comb)) {
+                        result << "/* last term */" << std::endl;
+                        result << "\t\tsum = addmod(sum, " << it->get_coeff() << ", modulus);" << std::endl;
+                    }
+                    result << "\t\t/* End using Horner's formula */" << std::endl;
+                } else {
+                    result << "\t\tsum = 0;" << std::endl;
+                    for( auto it = std::cbegin(comb); it != std::cend(comb); ++it ){
+                        bool coeff_one = (it->get_coeff() == PlaceholderParams::field_type::value_type::one());
+                        if(!coeff_one) result << "\t\tprod = " << it->get_coeff() << ";" << std::endl;
+                        const auto &vars = it->get_vars();
+                        for( auto it2 = std::cbegin(vars); it2 != std::cend(vars); it2++ ){
+                            const variable_type &v = *it2;
+                            if(coeff_one){
+                                coeff_one = false;
+                                result << "\t\tprod = basic_marshalling.get_uint256_be(blob, " << _var_indices.at(v) * 0x20 << ");" << std::endl;
+                            } else{
+                                result << "\t\tprod = mulmod(prod, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(v) * 0x20 << "), modulus);" << std::endl;
+                            }
+                        }
+                        result << "\t\tsum = addmod(sum, prod, modulus);" << std::endl;
+                    }
+                }
+                return result.str();
+            }
+
             std::string constraint_computation_code(
                 variable_indices_type &_var_indices,
                 const constraint_type &constraint
@@ -144,7 +218,7 @@ namespace nil {
                 crypto3::math::expression_to_non_linear_combination_visitor<variable_type> visitor;
                 auto comb = visitor.convert(constraint);
                 result << "\t\tsum = 0;" << std::endl;
-                for( auto it = std::cbegin(comb); it != std::cend(comb); it++ ){
+                for( auto it = std::cbegin(comb); it != std::cend(comb); ++it ){
                     bool coeff_one = (it->get_coeff() == PlaceholderParams::field_type::value_type::one());
                     if(!coeff_one) result << "\t\tprod = " << it->get_coeff() << ";" << std::endl;
                     const auto &vars = it->get_vars();
@@ -171,7 +245,8 @@ namespace nil {
                 std::size_t gates_library_size_threshold = 1600,
                 std::size_t lookups_library_size_threshold = 1600,
                 std::size_t gates_contract_size_threshold = 1400,
-                std::size_t lookups_contract_size_threshold = 1400
+                std::size_t lookups_contract_size_threshold = 1400,
+                bool deduce_horner = true
             ) :
             _constraint_system(constraint_system),
             _common_data(common_data),
@@ -181,7 +256,8 @@ namespace nil {
             _gates_library_size_threshold(gates_library_size_threshold),
             _lookups_library_size_threshold(lookups_library_size_threshold),
             _gates_contract_size_threshold(gates_contract_size_threshold),
-            _lookups_contract_size_threshold(lookups_contract_size_threshold)
+            _lookups_contract_size_threshold(lookups_contract_size_threshold),
+            _deduce_horner(deduce_horner)
             {
                 std::size_t found = folder_name.rfind("/");
                 if( found == std::string::npos ){
@@ -264,12 +340,13 @@ namespace nil {
                 out.close();
             }
 
-            std::string gate_computation_code(const gate_type& gate){
+            std::string gate_computation_code(const gate_type& gate) {
                 std::stringstream out;
 
                 out << "\t\tgate = 0;" << std::endl;
+                int c = 0;
                 for(const auto &constraint: gate.constraints){
-                    out << constraint_computation_code(_var_indices, constraint);
+                    out << constraint_computation_code_optimize_polynomial(_var_indices, constraint);
                     out << "\t\tgate = addmod(gate, mulmod(theta_acc, sum, modulus), modulus);" << std::endl;
                     out << "\t\ttheta_acc = mulmod(theta_acc, theta, modulus);" << std::endl;
                 }
@@ -630,6 +707,7 @@ namespace nil {
             std::size_t _public_input_offset;
             variable_indices_type _var_indices;
 
+            bool _deduce_horner;
             std::string _gate_includes;
             std::string _lookup_includes;
             std::size_t _gates_contract_size_threshold;

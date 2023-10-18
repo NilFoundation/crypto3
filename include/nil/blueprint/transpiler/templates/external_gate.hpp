@@ -14,6 +14,7 @@ namespace nil {
         uint256 sum;
         uint256 gate;
         uint256 prod;
+        uint256 x;
 
 $GATE_ASSEMBLY_CODE$
 
