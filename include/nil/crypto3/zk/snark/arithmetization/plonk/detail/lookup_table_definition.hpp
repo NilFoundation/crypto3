@@ -113,8 +113,8 @@ namespace nil {
                         const std::vector<std::size_t> &constant_columns_ids,
                         std::size_t usable_rows
                     ){
-                        std::cout << "Packing lookup tables" << std::endl;
-                        std::cout << "Usable rows before: " << usable_rows << std::endl;
+//                        std::cout << "Packing lookup tables" << std::endl;
+//                        std::cout << "Usable rows before: " << usable_rows << std::endl;
                         std::size_t usable_rows_after = usable_rows;
 
                         // Compute first selector index.
@@ -137,7 +137,7 @@ namespace nil {
                         std::size_t table_index = 0;
                         std::vector<plonk_lookup_table<FieldType>> bp_lookup_tables(lookup_table_ids.size());
                         for( const auto&[k, table]:lookup_tables ){
-                            std::cout << "Packing table " << table->table_name << std::endl;
+//                            std::cout << "Packing table " << table->table_name << std::endl;
                             // Place table into constant_columns.
                             for( std::size_t i = 0; i < table->get_table().size(); i++ ){
                                 auto end = start_row + table->get_table()[i].size();
@@ -153,7 +153,7 @@ namespace nil {
                             }
 
                             for( const auto &[subtable_name, subtable]:table->subtables ){
-                                std::cout << "Packing subtable " << subtable_name << std::endl;
+//                                std::cout << "Packing subtable " << subtable_name << std::endl;
                                 // Create selector
                                 plonk_column<FieldType> selector_column(usable_rows_after, FieldType::value_type::zero());
                                 for(std::size_t k = subtable.begin; k <= subtable.end; k++){
@@ -185,7 +185,7 @@ namespace nil {
                         for( std::size_t i = 0; i < constant_columns.size(); i++ ){
                             assignment.fill_constant(constant_columns_ids[i], constant_columns[i]);
                         }
-                        std::cout << "Usable rows after: " << usable_rows_after << std::endl;
+//                        std::cout << "Usable rows after: " << usable_rows_after << std::endl;
                         return usable_rows_after;
                     }
 
@@ -200,6 +200,7 @@ namespace nil {
                         std::size_t max_usable_rows = 524288
                     ){
                         std::size_t usable_rows_after = usable_rows;
+//                        std::cout << "Packing lookup tables" << std::endl;
 
                         // Compute first selector index.
                         std::size_t cur_selector_id = 0;
@@ -210,6 +211,7 @@ namespace nil {
                             cur_selector_id = std::max(cur_selector_id, lookup_gate.tag_index);
                         }
                         cur_selector_id++;
+//                        std::cout << "pack_lookup_tables_horizontal " << std::endl;
 
                         // Allocate constant columns
                         std::vector<plonk_column<FieldType>> constant_columns(
@@ -218,6 +220,7 @@ namespace nil {
                         std::vector<plonk_column<FieldType>> selector_columns;
 
                         std::vector<std::string> ordered_table_names = get_tables_ordered_by_rows_number<FieldType>(lookup_tables);
+//                        std::cout << "allocated " << std::endl;
 
                         std::size_t start_row = 1;
                         std::vector<plonk_lookup_table<FieldType>> bp_lookup_tables(lookup_table_ids.size());
@@ -226,6 +229,7 @@ namespace nil {
                         std::size_t full_selector_id = 0;
 
                         for( const auto&table_name:ordered_table_names ){
+//                            std::cout << "Pack table " << std::endl;
                             const auto &table = lookup_tables.at(table_name);
 
                             if( table->get_rows_number() > max_usable_rows ){
@@ -302,7 +306,7 @@ namespace nil {
                             std::map<std::pair<std::size_t, std::size_t>, std::size_t> selector_ids;
                             for( const auto &[subtable_name, subtable]:table->subtables ){
                                 if( selector_ids.find(std::make_pair(subtable.begin, subtable.end)) != selector_ids.end() ){
-                                    std::cout  << "selector for " << subtable_name << " from " << start_row + subtable.begin << " to " << start_row + subtable.end << std::endl;
+//                                    std::cout  << "selector for " << subtable_name << " from " << start_row + subtable.begin << " to " << start_row + subtable.end << std::endl;
                                     auto selector_id = selector_ids[std::make_pair(subtable.begin, subtable.end)];
                                     std::string full_table_name = table->table_name + "/" + subtable_name;
                                     bp_lookup_tables[lookup_table_ids.at(full_table_name) - 1] = plonk_lookup_table<FieldType>(subtable.column_indices.size(), selector_id);
@@ -318,7 +322,7 @@ namespace nil {
                                 }
                                 // Create selector
                                 plonk_column<FieldType> selector_column(usable_rows_after, FieldType::value_type::zero());
-                                std::cout  << "selector for " << subtable_name << " from " << start_row + subtable.begin << " to " << start_row + subtable.end << std::endl;
+//                                std::cout  << "selector for " << subtable_name << " from " << start_row + subtable.begin << " to " << start_row + subtable.end << std::endl;
                                 for(std::size_t k = subtable.begin; k <= subtable.end; k++){
                                     selector_column[start_row + k] = FieldType::value_type::one();
                                 }
@@ -346,10 +350,11 @@ namespace nil {
                             bp.add_lookup_table(std::move(bp_lookup_tables[i]));
                         }
                         for( std::size_t i = 0; i < constant_columns.size(); i++ ){
-                            for(std::size_t j = 0; j < 100; j++){
+/*                          for(std::size_t j = 0; j < 100; j++){
+                                if( j == constant_columns[i].size() ) break;
                                 std::cout << constant_columns[i][j] << " ";
                             }
-                            std::cout << std::endl;
+                            std::cout << std::endl;*/
                             assignment.fill_constant(constant_columns_ids[i], constant_columns[i]);
                         }
                         return usable_rows_after;
