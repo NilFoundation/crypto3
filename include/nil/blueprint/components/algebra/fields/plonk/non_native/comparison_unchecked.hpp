@@ -100,9 +100,9 @@ namespace nil {
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
+                    static const constexpr std::size_t clamp = 4;
                     std::size_t witness_amount;
                     comparison_mode mode;
-                    static const std::size_t clamp = 4;
 
                     gate_manifest_type(std::size_t witness_amount_, comparison_mode mode_)
                         : witness_amount(std::min(witness_amount_, clamp)), mode(mode_) {}
@@ -155,7 +155,7 @@ namespace nil {
                 const comparison_mode mode;
                 /* Do NOT move the above variables! */
 
-                range_check_component_type range_check;
+                range_check_component_type range_check_subcomponent;
 
                 const bool needs_bonus_row = needs_bonus_row_internal(this->witness_amount(), mode);
 
@@ -186,7 +186,7 @@ namespace nil {
                         component_type(witness, constant, public_input, get_manifest()),
                         bits_amount(bits_amount_),
                         mode(mode_),
-                        range_check(witness, constant, public_input, bits_amount_) {
+                        range_check_subcomponent(witness, constant, public_input, bits_amount_) {
 
                     check_params(bits_amount, mode);
                  };
@@ -200,7 +200,7 @@ namespace nil {
                             component_type(witnesses, constants, public_inputs, get_manifest()),
                             bits_amount(bits_amount_),
                             mode(mode_),
-                            range_check(witnesses, constants, public_inputs, bits_amount_) {
+                            range_check_subcomponent(witnesses, constants, public_inputs, bits_amount_) {
 
                         check_params(bits_amount, mode);
                     };
@@ -304,8 +304,8 @@ namespace nil {
                 const std::uint32_t start_row_index) {
 
                 using var = typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::var;
-                generate_circuit(component.range_check, bp, assignment,
-                                 {var(component.W(2), start_row_index + component.range_check.rows_amount)},
+                generate_circuit(component.range_check_subcomponent, bp, assignment,
+                                 {var(component.W(2), start_row_index + component.range_check_subcomponent.rows_amount)},
                                  start_row_index);
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
@@ -354,13 +354,13 @@ namespace nil {
                 }
                 value_type diff = y - x;
 
-                row += component.range_check.rows_amount;
+                row += component.range_check_subcomponent.rows_amount;
 
                 assignment.witness(component.W(0), row) = x;
                 assignment.witness(component.W(1), row) = y;
                 assignment.witness(component.W(2), row) = diff;
                 // Note that we fill rows below the current value of row!
-                generate_assignments(component.range_check, assignment,
+                generate_assignments(component.range_check_subcomponent, assignment,
                                      {var(component.W(2), row)},
                                      start_row_index);
 

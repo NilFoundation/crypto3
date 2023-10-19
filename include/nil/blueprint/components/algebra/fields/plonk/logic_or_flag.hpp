@@ -77,8 +77,8 @@ namespace nil {
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
+                    static const constexpr std::size_t clamp_val = 6;
                     std::size_t witness_amount;
-                    static const std::size_t clamp_val = 6;
 
                     gate_manifest_type(std::size_t witness_amount_)
                         : witness_amount(std::min(witness_amount_, clamp_val)) {}
