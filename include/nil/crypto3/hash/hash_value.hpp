@@ -150,7 +150,7 @@ namespace nil {
                         result_type result =
                             boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                         std::array<T, Size> out;
-                        std::copy(result.begin(), result.end(), out.end());
+                        std::copy(result.begin(), result.end(), out.begin());
                         return out;
                     }
 
@@ -159,7 +159,7 @@ namespace nil {
                         result_type result =
                             boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                         boost::array<T, Size> out;
-                        std::copy(result.begin(), result.end(), out.end());
+                        std::copy(result.begin(), result.end(), out.begin());
                         return out;
                     }
 
