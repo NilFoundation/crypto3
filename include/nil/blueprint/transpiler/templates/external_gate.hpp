@@ -41,11 +41,26 @@ $GATE_ASSEMBLY_CODE$
 pragma solidity >=0.8.4;
 
 import "../../../contracts/basic_marshalling.sol";
+import "./utils.sol";
 
 library gate_$TEST_NAME$_$GATE_LIB_ID${
     uint256 constant modulus = $MODULUS$;
 
-    $GATES_COMPUTATION_CODE$
+    function evaluate_constraint_series_be(
+        bytes calldata blob,
+        uint256 theta,
+        uint256 theta_acc
+    ) external pure returns (uint256 F, uint256) {
+        uint256 sum;
+        uint256 gate;
+        uint256 prod;
+        uint256 x;
+
+$CONSTRAINT_SERIES_CODE$
+
+        return( F, theta_acc );
+    }
+
 }
         )";
     }
