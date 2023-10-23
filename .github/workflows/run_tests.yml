@@ -51,6 +51,7 @@ jobs:
             blueprint_non_native_plonk_bool_scalar_multiplication_test,
             blueprint_non_native_plonk_add_mul_zkllvm_compatible_test,
             blueprint_hashes_plonk_decomposition_test,
+            blueprint_verifiers_placeholder_fri_cosets_test,
             blueprint_hashes_plonk_sha256_process_test,
             blueprint_hashes_plonk_sha512_process_test,
             blueprint_hashes_plonk_sha256_test,

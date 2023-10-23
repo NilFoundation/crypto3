@@ -133,6 +133,7 @@ set(PLONK_TESTS_FILES
     "verifiers/pickles/verify_heterogenous_scalar"
     "verifiers/pickles/verify_heterogenous_base"
     "verifiers/pickles/scalar_details/evals_of_split_evals"
+    "verifiers/placeholder/fri_cosets"
     )
 
 set(FIELDS_TESTS_FILES
