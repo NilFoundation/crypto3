@@ -58,11 +58,11 @@ BOOST_AUTO_TEST_CASE(expression_to_non_linear_combination_test) {
     variable_type w2(4, 1, variable_type::column_type::public_input);
     variable_type w3(6, 2, variable_type::column_type::constant);
 
-    expression<variable_type> expr = (w0 + w1) * (w2 + w3);
+    expression<variable_type> expr = (w0 + w1) * (w2 + w3) - w1 * (w2 + w0);
    
     expression_to_non_linear_combination_visitor<variable_type> visitor;
     non_linear_combination<variable_type> result = visitor.convert(expr);
-    non_linear_combination<variable_type> expected({w0 * w2, w0 * w3, w1 * w2, w1 * w3});
+    non_linear_combination<variable_type> expected({w0 * w2, w0 * w3, w1 * w3, -w1 * w0});
  
     // We may get the terms in a different order due to changes in the code, and that's fine.
     BOOST_CHECK_EQUAL(result, expected);

@@ -121,6 +121,7 @@ namespace nil {
                         });
                 }
 
+                // Merges equal terms, and if some term has coefficient of 0, removes it.
                 void merge_equal_terms() {
                     std::unordered_map<term_type, assignment_type> unique_terms;
                     for (const auto& term: this->terms) {
@@ -135,7 +136,10 @@ namespace nil {
                     }
                     this->terms.clear();
                     for (const auto& it: unique_terms) {
-                        this->terms.emplace_back(it.first.get_vars(), it.second);
+                        if (it.second != assignment_type::zero())
+                        {
+                            this->terms.emplace_back(it.first.get_vars(), it.second);
+                        }
                     }
                 }
                 
