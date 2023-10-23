@@ -79,18 +79,16 @@ set(TESTS_NAMES
     "sha2"
     "sha3"
     "static_digest"
-    "tiger")
+    "tiger"
+    "poseidon"
+    )
     # "reinforced_concrete")  # fails
 
-if(CRYPTO3_HASH_PEDERSEN OR CRYPTO3_HASH_POSEIDON)
+if(CRYPTO3_HASH_PEDERSEN)
     list(APPEND TESTS_NAMES
          find_group_hash
          h2c
          h2f)
-
-    if(CRYPTO3_HASH_POSEIDON)
-        list(APPEND TESTS_NAMES poseidon)
-    endif()
 
     if(CRYPTO3_HASH_PEDERSEN)
         list(APPEND TESTS_NAMES pedersen)

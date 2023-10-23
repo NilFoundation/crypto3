@@ -48,7 +48,7 @@ namespace nil {
                     // Choose which constants we want, original or kimchi. We may later add
                     // other sets of constants here.
                     typedef typename std::conditional<poseidon_policy_type::mina_version, poseidon_kimchi_constants_data<policy_type>, poseidon_original_constants_data<policy_type>>::type constants_data_type;
-    
+ 
                     poseidon_constants() {
                         // Transpose the matrix.
                         for (std::size_t i = 0; i < state_words; i++) {

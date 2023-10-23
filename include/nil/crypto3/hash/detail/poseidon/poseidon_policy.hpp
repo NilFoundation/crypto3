@@ -13,6 +13,8 @@
 #include <array>
 #include <type_traits>
 
+#include <nil/crypto3/detail/stream_endian.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hashes {
@@ -35,11 +37,18 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = field_type::modulus_bits;
                     typedef element_type digest_type;
 
+                    // TODO: Not sure what is best to use here.
+                    typedef typename stream_endian::big_octet_big_bit digest_endian;
+
                     constexpr static const std::size_t state_bits = (Rate + Capacity) * field_type::modulus_bits;
                     constexpr static const std::size_t state_words = (Rate + Capacity);
                     typedef std::array<element_type, Rate + Capacity> state_type;
 
                     constexpr static const std::size_t block_bits = Rate * field_type::modulus_bits;
+
+                    // TODO: Check if this value is correct.
+                    constexpr static const std::size_t length_bits = word_bits;
+
                     constexpr static const std::size_t block_words = Rate;
                     typedef std::array<element_type, Rate> block_type;
 

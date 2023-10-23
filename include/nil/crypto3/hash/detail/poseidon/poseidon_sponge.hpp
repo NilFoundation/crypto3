@@ -16,77 +16,64 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename poseidon_policy>
+                template<typename policy_type>
                 struct poseidon_sponge_construction {
-                    private:
-                        typedef poseidon_permutation<poseidon_policy> permutation_type;
-                        std::size_t state_count = 0;
-                        bool state_absorbed = true;
+                private:
+                    typedef poseidon_permutation<policy_type> permutation_type;
+                    std::size_t state_count = 0;
 
-                    public:
+                public:
 
-                    std::array<typename poseidon_policy::element_type, poseidon_policy::state_words> state;
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    constexpr static const std::size_t block_words = policy_type::block_words;
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+
+                    typedef typename policy_type::word_type word_type;
+                    typedef typename policy_type::digest_endian endian_type;
+                    typedef typename policy_type::block_type block_type;
+
+                    std::array<typename policy_type::element_type, policy_type::state_words> state;
 
                     poseidon_sponge_construction() {
-                        for (std::size_t i = 0; i < poseidon_policy::state_words; i++) {
+                        for (std::size_t i = 0; i < policy_type::state_words; i++) {
                             this->state[i] = 0;
                         }
-
-                        this->state_absorbed = true;
                         this->state_count = 0;
                     }
 
-                    void absorb(std::vector<typename poseidon_policy::element_type>& inputs) {
+                    void absorb(const std::vector<typename policy_type::element_type>& inputs) {
                         for (auto &input : inputs) {
                             absorb(input);
                         }
                     }
 
-                    void absorb(typename poseidon_policy::element_type &input){
-                        if (this->state_absorbed) {
-                            if (this->state_count == poseidon_policy::rate) {
-                                permutation_type::permute(this->state);
+                    void permute() {
+                        permutation_type::permute(this->state);
 
-                                this->state[0] += input;
-
-                                this->state_count = 1;
-                            } else {
-                                this->state[this->state_count] += input;
-
-                                this->state_count++;
-                            }
-                        } else {
-                            this->state[0] += input;
-
-                            this->state_absorbed = true;
-                            this->state_count = 1;
+                        // When you permute, the last element becomes first, the others zero out.
+                        this->state[0] = this->state[policy_type::state_words - 1];
+                        for (size_t i = 1; i < policy_type::state_words; ++i) {
+                            this->state[i] = 0;
                         }
+                        this->state_count = 1;
                     }
 
-                    typename poseidon_policy::element_type squeeze() {
-                        if (!this->state_absorbed) { // state = squeezed
-                            if (this->state_count == poseidon_policy::rate) {
-                                permutation_type::permute(this->state);
-                                this->state_count = 1;
-
-                                return this->state[0];
-                            } else {
-                                return this->state[this->state_count++];
-                            }
-                        } else {
-                            permutation_type::permute(this->state);
-
-                            this->state_absorbed = false;
-                            this->state_count = 1;
-
-                            return this->state[0];
+                    void absorb(const typename policy_type::element_type &input) {
+                        if (this->state_count == policy_type::state_words) {
+                            permute();
                         }
+
+                        this->state[this->state_count] = input;
+                        this->state_count++;
+                    }
+
+                    const typename policy_type::element_type& squeeze() {
+                        permute();
+                        return this->state[0];
                     }
 
                     void reset() {
                         state.clear();
-
-                        this->state_absorbed = true;
                         this->state_count = 0;
                     }
                 };

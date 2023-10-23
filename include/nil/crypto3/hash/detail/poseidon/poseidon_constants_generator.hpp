@@ -63,9 +63,8 @@ namespace nil {
 #ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
                     constexpr
 #endif
-                    static const poseidon_constants_type generate_constants() {
-                        return {generate_mds_matrix(),
-                                generate_round_constants()};
+                    static std::pair<mds_matrix_type, round_constants_type> generate_constants() {
+                        return {generate_mds_matrix(), generate_round_constants()};
                     }
                     
                 private:
@@ -82,8 +81,8 @@ namespace nil {
                         while (!secure_MDS_found) {
                             secure_MDS_found = true;
                             for (std::size_t i = 0; i < state_words; i++) {
-                                x[i] = random_element<field_type>(); 
-                                y[i] = random_element<field_type>(); 
+                                x[i] = algebra::random_element<field_type>(); 
+                                y[i] = algebra::random_element<field_type>(); 
                             }
 
                             for (std::size_t i = 0; i < state_words; i++) {
@@ -103,7 +102,7 @@ namespace nil {
                                     break;
                             }
                             // Determinant of the matrix must not be 0.
-                            if (mds.det() == 0)
+                            if (new_mds_matrix.det() == 0)
                                 secure_MDS_found = false;
 
                             // TODO(martun): check that mds has NO eignevalues. 

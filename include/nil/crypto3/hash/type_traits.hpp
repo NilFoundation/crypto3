@@ -101,6 +101,10 @@
 namespace nil {
     namespace crypto3 {
         namespace hashes {
+
+            template<typename PolicyType>
+            struct poseidon;
+
             template<typename Params, typename Hash, typename Group>
             struct find_group_hash;
 
@@ -144,6 +148,20 @@ namespace nil {
 
             template<typename Group, typename Hash, typename Params>
             struct is_h2c<h2c<Group, Hash, Params>> : std::integral_constant<bool, true> { };
+
+            // TODO: change this to more generic type trait to check for all sponge based hashes.
+            template<typename HashType, typename Enable = void>
+            struct is_poseidon {
+            public:
+                static const bool value = false;
+            };
+
+            template<typename HashType>
+            struct is_poseidon<HashType, typename std::enable_if_t<std::is_same<nil::crypto3::hashes::poseidon<typename HashType::policy_type>, HashType>::value>> {
+            public:
+                static const bool value = true;
+                typedef HashType type;
+            };
 
         }    // namespace hashes
     }        // namespace crypto3

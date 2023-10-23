@@ -9,8 +9,6 @@
 
 #define BOOST_TEST_MODULE poseidon_test
 
-#include<boost/predef/architecture/x86/64.h>
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -27,6 +25,7 @@
 #include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_constants_generator.hpp>
 
 #include <nil/crypto3/algebra/fields/alt_bn128/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
@@ -256,5 +255,14 @@ BOOST_AUTO_TEST_CASE(poseidon_original_test_255_4) {
         }
     );
 }
+
+// This test can be useful for constants generation in the future.
+//BOOST_AUTO_TEST_CASE(poseidon_generate_pallas_constants) {
+//    
+//    typedef poseidon_policy<nil::crypto3::algebra::fields::pallas_base_field, 128, 2> poseidon_policy_type;
+//    typedef poseidon_constants_generator<poseidon_policy_type> generator_type;
+//    generator_type generator;
+//    auto constants = generator.generate_constants();
+//}
 
 BOOST_AUTO_TEST_SUITE_END()

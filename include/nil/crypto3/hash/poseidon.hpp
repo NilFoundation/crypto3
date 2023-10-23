@@ -14,7 +14,7 @@
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #else
 #include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
-#include <nil/crypto3/hash/detail/sponge_construction.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #endif
 
@@ -40,16 +40,16 @@ namespace nil {
                 typedef detail::poseidon_permutation<policy_type> poseidon_permutation;
 
             public:
-                constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
-
-                constexpr static const std::size_t state_bits = policy_type::state_bits;
-                constexpr static const std::size_t state_words = policy_type::state_words;
+                typedef typename policy_type::block_type block_type;
                 typedef typename policy_type::state_type state_type;
 
+                constexpr static const std::size_t word_bits = policy_type::word_bits;
+                constexpr static const std::size_t state_bits = policy_type::state_bits;
+                constexpr static const std::size_t state_words = policy_type::state_words;
                 constexpr static const std::size_t block_bits = policy_type::block_bits;
                 constexpr static const std::size_t block_words = policy_type::block_words;
-                typedef typename policy_type::block_type block_type;
+                constexpr static const std::size_t length_bits = policy_type::length_bits;
 
                 static void process_block(state_type &state, const block_type &block) {
 
@@ -66,12 +66,10 @@ namespace nil {
                 }
             };
 
-            template<typename policy_type>
+            template<typename PolicyType>
             struct poseidon {
-            protected:
-                // typedef policy_type policy_type;
-
             public:
+                typedef PolicyType policy_type;
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -81,21 +79,18 @@ namespace nil {
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
+                typedef digest_type value_type;
 
+                // This is required by 'is_hash' concept.
                 struct construction {
                     struct params_type {
                         typedef typename policy_type::digest_endian digest_endian;
 
-                        // constexpr static const std::size_t length_bits = policy_type::length_bits;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                        constexpr static const std::size_t length_bits = policy_type::length_bits;
                     };
 
-                    // typedef sponge_construction<params_type, typename policy_type::iv_generator,
-                    //                             poseidon_compressor<FieldType, Rate, Capacity, strength>,
-                    //                             // TODO: padding and finalizer
-                    //                             detail::poseidon_padding<policy_type>,
-                    //                             detail::poseidon_finalizer<policy_type>>
-                    //     type;
+                    typedef detail::poseidon_sponge_construction<policy_type> type;
                 };
 
                 template<typename StateAccumulator, std::size_t ValueBits>

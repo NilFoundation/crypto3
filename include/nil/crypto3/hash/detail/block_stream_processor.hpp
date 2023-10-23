@@ -76,10 +76,9 @@ namespace nil {
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 inline void process_block(std::size_t block_seen = block_bits) {
-                    using namespace nil::crypto3::detail;
                     // Convert the input into words
                     block_type block;
-                    pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
+                    nil::crypto3::detail::pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
                     // Process the block
                     acc(block, ::nil::crypto3::accumulators::bits = block_seen);
                 }

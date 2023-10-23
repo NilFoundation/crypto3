@@ -30,6 +30,11 @@
 #include <nil/crypto3/hash/hash_value.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
 
+#include <nil/crypto3/hash/type_traits.hpp>
+#include <nil/crypto3/hash/poseidon.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
+
 #include <nil/crypto3/detail/type_traits.hpp>
 #endif
 
@@ -82,7 +87,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename InputIterator, typename OutputIterator>
+        template<typename Hash, typename InputIterator, typename OutputIterator,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                 OutputIterator>::type
             hash(InputIterator first, InputIterator last, OutputIterator out) {
@@ -93,6 +99,20 @@ namespace nil {
             typedef hashes::detail::itr_hash_impl<StreamHashImpl, OutputIterator> HashImpl;
 
             return HashImpl(first, last, std::move(out), HashAccumulator());
+        }
+
+        // For Posseidon. Refactor this later.
+        template<typename Hash, typename InputIterator, typename OutputIterator,
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
+        OutputIterator hash(InputIterator first, InputIterator last, OutputIterator out) {
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+
+            while (first != last) {
+                sponge.absorb(*first++);
+            }
+            *out = sponge.squeeze();
+            ++out;
+            return out;
         }
 
         /*!
@@ -110,7 +130,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename InputIterator, typename HashAccumulator = accumulator_set<Hash>>
+        template<typename Hash, typename InputIterator, typename HashAccumulator = accumulator_set<Hash>,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
                                 HashAccumulator>::type
             hash(InputIterator first, InputIterator last, HashAccumulator &sh) {
@@ -135,7 +156,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename InputIterator, typename HashAccumulator = accumulator_set<Hash>>
+        template<typename Hash, typename InputIterator, typename HashAccumulator = accumulator_set<Hash>,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         hashes::detail::range_hash_impl<hashes::detail::value_hash_impl<typename std::enable_if<
             boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value, HashAccumulator>::type>>
             hash(InputIterator first, InputIterator last) {
@@ -145,6 +167,21 @@ namespace nil {
             typedef hashes::detail::range_hash_impl<StreamHashImpl> HashImpl;
 
             return HashImpl(first, last, HashAccumulator());
+        }
+        
+        // For posseidon.
+        template<typename Hash, typename InputIterator,
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value &&
+                             nil::crypto3::detail::is_iterator<InputIterator>::value, bool> = true>
+        typename Hash::digest_type hash(InputIterator first, InputIterator last) {
+
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+
+            while (first != last) {
+                sponge.absorb(*first++);
+            }
+            return sponge.squeeze();
+ 
         }
 
         /*!
@@ -161,7 +198,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename SinglePassRange, typename OutputIterator>
+        template<typename Hash, typename SinglePassRange, typename OutputIterator,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         typename std::enable_if<::nil::crypto3::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             hash(const SinglePassRange &rng, OutputIterator out) {
 
@@ -187,7 +225,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename SinglePassRange, typename HashAccumulator = accumulator_set<Hash>>
+        template<typename Hash, typename SinglePassRange, typename HashAccumulator = accumulator_set<Hash>,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
                                 HashAccumulator>::type
             hash(const SinglePassRange &rng, HashAccumulator &sh) {
@@ -211,7 +250,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename SinglePassRange, typename HashAccumulator = accumulator_set<Hash>>
+        template<typename Hash, typename SinglePassRange, typename HashAccumulator = accumulator_set<Hash>, 
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         hashes::detail::range_hash_impl<hashes::detail::value_hash_impl<HashAccumulator>>
             hash(const SinglePassRange &r) {
 
@@ -219,6 +259,118 @@ namespace nil {
             typedef hashes::detail::range_hash_impl<StreamHashImpl> HashImpl;
 
             return HashImpl(r, HashAccumulator());
+        }
+
+        // TODO: Use packing in the block_stream_processor in the future, now it will work well with 256 bit 
+        // field elements which are used in posseidon. Also try to use concepts, not fix the posseidon class type.
+
+        // This function is used for merkle tree, where multiple group elements are hashed together to create the parent element.
+        template<typename Hash, typename GroupElementsContainer,
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value &&
+                             std::is_same<typename Hash::digest_type, typename GroupElementsContainer::value_type>::value, bool> = true>
+        typename Hash::digest_type hash(const GroupElementsContainer &r, const typename Hash::digest_type& initial_element) {
+
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+
+            sponge.absorb(initial_element);
+
+            for (const auto& element: r) {
+                sponge.absorb(element);
+            }
+            return sponge.squeeze();
+        }
+
+        // This function is used for merkle tree, where multiple group elements are hashed together to create the parent element.
+        template<typename Hash, typename GroupElementsContainer,
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value &&
+                             std::is_same<typename Hash::digest_type, typename GroupElementsContainer::value_type>::value, bool> = true>
+        typename Hash::digest_type hash(const GroupElementsContainer &r) {
+
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+
+            for (const auto& element: r) {
+                sponge.absorb(element);
+            }
+            return sponge.squeeze();
+        }
+
+        // This function is used for merkle tree to initially hash the original elements in the tree leaves.
+        template<typename Hash, typename GroupElement, 
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value && 
+                             std::is_same<typename Hash::digest_type, GroupElement>::value, bool> = true>
+        typename Hash::digest_type hash(const GroupElement &element, const typename Hash::digest_type& initial_element) {
+
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+
+            sponge.absorb(initial_element);
+            sponge.absorb(element);
+
+            return sponge.squeeze();
+        }
+
+        template<typename Hash, typename GroupElement, 
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value && 
+                             std::is_same<typename Hash::digest_type, GroupElement>::value, bool> = true>
+        typename Hash::digest_type hash(const GroupElement &element) {
+
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+
+            sponge.absorb(element);
+
+            return sponge.squeeze();
+        }
+
+        // This function is used for hashing containers of integral values using Posseidon hash. 
+        // Usually this will pack a vector of 8-bit integers into a 255 bit group element, which means the last 
+        // 7 bits will not be used in the current implementation. Also group element multiplications are pretty slow. 
+        template<typename Hash, typename IntegralContainer,
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value &&
+                             std::is_integral<typename IntegralContainer::value_type>::value, bool> = true>
+        typename Hash::digest_type absorb(hashes::detail::poseidon_sponge_construction<typename Hash::policy_type>& sponge, 
+                                          const IntegralContainer &r) {
+            typename Hash::digest_type next_element = Hash::digest_type::zero();
+            std::size_t bits_left = Hash::word_bits;
+            
+            std::size_t input_word_size = CHAR_BIT * sizeof(typename IntegralContainer::value_type);
+
+            // At least 1 input word must fit in a single group element.
+            // Normally group element is 255 or 256 bits, while input word size is 8 or 32 or 64 bits.
+            assert(input_word_size <= Hash::word_bits); 
+
+            for (const auto& word: r) {
+                if (bits_left < input_word_size) {
+                    sponge.absorb(next_element);
+                    next_element = Hash::digest_type::zero();
+                    bits_left = Hash::word_bits;
+                }
+                next_element *= 1 << input_word_size; 
+                next_element += word;
+                bits_left -= input_word_size;
+            }
+
+            if (bits_left != Hash::word_bits) {
+                sponge.absorb(next_element);
+            }
+
+            return sponge.squeeze();
+        }
+
+        template<typename Hash, typename IntegralContainer, 
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value && 
+                             std::is_integral<typename IntegralContainer::value_type>::value, bool> = true>
+        typename Hash::digest_type hash(const IntegralContainer &r, const typename Hash::digest_type& initial_element) {
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+
+            sponge.absorb(initial_element);
+            return absorb<Hash>(sponge, r);
+        }
+
+        template<typename Hash, typename IntegralContainer, 
+            std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value && 
+                             std::is_integral<typename IntegralContainer::value_type>::value, bool> = true>
+        typename Hash::digest_type hash(const IntegralContainer &r) {
+            hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+            return absorb<Hash>(sponge, r);
         }
 
         /*!
@@ -235,7 +387,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename T, typename OutputIterator>
+        template<typename Hash, typename T, typename OutputIterator,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         typename std::enable_if<::nil::crypto3::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             hash(std::initializer_list<T> list, OutputIterator out) {
 
@@ -261,7 +414,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>>
+        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
                                 HashAccumulator>::type
             hash(std::initializer_list<T> rng, HashAccumulator &sh) {
@@ -285,7 +439,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>>
+        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>,
+            std::enable_if_t<!crypto3::hashes::is_poseidon<Hash>::value, bool> = true>
         hashes::detail::range_hash_impl<hashes::detail::value_hash_impl<HashAccumulator>>
             hash(std::initializer_list<T> r) {
 
