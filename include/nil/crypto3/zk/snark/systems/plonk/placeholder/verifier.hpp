@@ -74,7 +74,7 @@ namespace nil {
                         auto _omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
                         // variable_values' rotations
-                        for (std::size_t variable_values_index = 0; 
+                        for (std::size_t variable_values_index = 0;
                              variable_values_index < witness_columns + public_input_columns;
                              variable_values_index++
                         ) {
@@ -83,8 +83,8 @@ namespace nil {
 
                             for (int rotation: variable_values_rotation) {
                                 _commitment_scheme.append_eval_point(
-                                    VARIABLE_VALUES_BATCH, 
-                                    variable_values_index, 
+                                    VARIABLE_VALUES_BATCH,
+                                    variable_values_index,
                                     challenge * _omega.pow(rotation)
                                 );
                             }
@@ -104,7 +104,7 @@ namespace nil {
 
                         // fixed values' rotations (table columns)
                         std::size_t i = 0;
-                        std::size_t start_index = preprocessed_public_data.identity_polynomials.size() + 
+                        std::size_t start_index = preprocessed_public_data.identity_polynomials.size() +
                             preprocessed_public_data.permutation_polynomials.size() + 2;
 
                         for( i = 0; i < start_index; i++){
@@ -114,7 +114,7 @@ namespace nil {
                         _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 2, challenge * _omega);
                         _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 1, challenge * _omega);
 
-                        for (std::size_t ind = 0; 
+                        for (std::size_t ind = 0;
                             ind < constant_columns + preprocessed_public_data.public_polynomial_table.selectors().size();
                             ind++, i++
                         ) {
@@ -123,14 +123,14 @@ namespace nil {
 
                             for (int rotation: fixed_values_rotation) {
                                 _commitment_scheme.append_eval_point(
-                                    FIXED_VALUES_BATCH, 
-                                    start_index + ind, 
+                                    FIXED_VALUES_BATCH,
+                                    start_index + ind,
                                     challenge * _omega.pow(rotation)
                                 );
                             }
                         }
                     }
-                    
+
                     static inline bool process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         const placeholder_proof<FieldType, ParamsType> &proof,
@@ -152,20 +152,20 @@ namespace nil {
                                 omega_pow = omega_pow * omega;
                             }
                             value *= numerator;
-                            if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, ParamsType::arithmetization_params::witness_columns + i, 0) ) 
+                            if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, ParamsType::arithmetization_params::witness_columns + i, 0) )
                                 return false;
                         }
                         return process(preprocessed_public_data, proof, constraint_system, commitment_scheme);
                     }
-                    
+
                     static inline bool process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         const placeholder_proof<FieldType, ParamsType> &proof,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         commitment_scheme_type commitment_scheme
-                    ) {                        
+                    ) {
                         // 1. Add circuit definition to transcript
-                        // transcript(short_description); 
+                        // transcript(short_description);
                         std::vector<std::uint8_t> init_blob = {};
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
@@ -200,7 +200,7 @@ namespace nil {
                         std::array<typename FieldType::value_type, permutation_parts> permutation_argument =
                             placeholder_permutation_argument<FieldType, ParamsType>::verify_eval(
                                 preprocessed_public_data, proof.eval_proof.challenge, f,
-                                proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 0, 0), 
+                                proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 0, 0),
                                 proof.eval_proof.eval_proof.z.get(PERMUTATION_BATCH, 0, 1),
                                 transcript
                             );
@@ -218,7 +218,7 @@ namespace nil {
                                 ++j;
                             }
                         }
-                        
+
                         for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
                             std::size_t i_global_index = witness_columns + i;
 
@@ -267,7 +267,7 @@ namespace nil {
                                 FieldType, commitment_scheme_type,
                                 ParamsType
                             >::verify_eval(
-                                preprocessed_public_data, 
+                                preprocessed_public_data,
                                 constraint_system.lookup_gates(),
                                 constraint_system.lookup_tables(),
                                 proof.eval_proof.challenge, columns_at_y,
@@ -281,8 +281,13 @@ namespace nil {
                         // 7. gate argument
                         std::array<typename FieldType::value_type, 1> gate_argument =
                             placeholder_gates_argument<FieldType, ParamsType>::verify_eval(
-                                constraint_system.gates(), columns_at_y, proof.eval_proof.challenge, transcript);
-                        
+                                constraint_system.gates(), columns_at_y, proof.eval_proof.challenge,
+                                FieldType::value_type::one() -
+                                    preprocessed_public_data.q_last.evaluate(proof.eval_proof.challenge) -
+                                    preprocessed_public_data.q_blind.evaluate(proof.eval_proof.challenge),
+                                transcript
+                        );
+
                         std::array<typename FieldType::value_type, f_parts> alphas =
                             transcript.template challenges<FieldType, f_parts>();
 
@@ -292,17 +297,17 @@ namespace nil {
                         auto challenge = transcript.template challenge<FieldType>();
                         BOOST_ASSERT(challenge == proof.eval_proof.challenge);
 
-                        commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));                        
-                        commitment_scheme.set_batch_size(PERMUTATION_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));                        
-                        commitment_scheme.set_batch_size(QUOTIENT_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));                        
+                        commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));
+                        commitment_scheme.set_batch_size(PERMUTATION_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));
+                        commitment_scheme.set_batch_size(QUOTIENT_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));
                         if(is_lookup_enabled)
-                            commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));                        
+                            commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));
                         generate_evaluation_points(commitment_scheme, preprocessed_public_data, constraint_system, challenge, is_lookup_enabled);
 
                         typename FieldType::value_type omega =
                             preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
-                        std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments = proof.commitments;                        
+                        std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments = proof.commitments;
                         commitments[FIXED_VALUES_BATCH] = preprocessed_public_data.common_data.commitments.fixed_values;
                         if (!commitment_scheme.verify_eval( proof.eval_proof.eval_proof, commitments, transcript )) {
                             return false;
@@ -324,15 +329,14 @@ namespace nil {
                             F_consolidated = F_consolidated + alphas[i] * F[i];
                         }
 
-                        // TODO: correct work with max_degree!
                         typename FieldType::value_type T_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH); i++) {
                             T_consolidated = T_consolidated + proof.eval_proof.eval_proof.z.get(QUOTIENT_BATCH, i, 0) *
                                                                   challenge.pow((preprocessed_public_data.common_data.rows_amount) * i);
                         }
-//
+
                         // Z is polynomial -1, 0 ...., 0, 1
-                        typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);                     
+                        typename FieldType::value_type Z_at_challenge = preprocessed_public_data.common_data.Z.evaluate(challenge);
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
                             return false;
                         }

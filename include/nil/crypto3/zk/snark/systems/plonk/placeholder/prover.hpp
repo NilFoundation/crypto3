@@ -105,7 +105,7 @@ namespace nil {
                             &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
                         commitment_scheme_type commitment_scheme
-                    ) { 
+                    ) {
 
                         auto prover = placeholder_prover<FieldType, ParamsType>(
                             preprocessed_public_data, preprocessed_private_data, table_description,
@@ -120,7 +120,7 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         const typename policy_type::variable_assignment_type &assignments,
                         const commitment_scheme_type &commitment_scheme
-                    ) 
+                    )
                             : preprocessed_public_data(preprocessed_public_data)
                             , preprocessed_private_data(preprocessed_private_data)
                             , table_description(table_description)
@@ -128,12 +128,12 @@ namespace nil {
                             , assignments(assignments)
                             , _commitment_scheme(commitment_scheme)
                             , _polynomial_table(preprocessed_private_data.private_polynomial_table,
-                                                preprocessed_public_data.public_polynomial_table) 
+                                                preprocessed_public_data.public_polynomial_table)
                             , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
                             , transcript(std::vector<std::uint8_t>())
                     {
                         // 1. Add circuit definition to transcript
-                        // transcript(short_description); 
+                        // transcript(short_description);
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
                         transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
 
@@ -177,10 +177,18 @@ namespace nil {
                         transcript(_proof.commitments[PERMUTATION_BATCH]);
 
                         // 6. circuit-satisfability
+
+                        polynomial_dfs_type mask_polynomial(
+                            0, preprocessed_public_data.common_data.basic_domain->m,
+                            typename FieldType::value_type(1)
+                        );
+                        mask_polynomial -= preprocessed_public_data.q_last;
+                        mask_polynomial -= preprocessed_public_data.q_blind;
                         _F_dfs[7] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
                             constraint_system, _polynomial_table,
                             preprocessed_public_data.common_data.basic_domain,
                             preprocessed_public_data.common_data.max_gates_degree,
+                            mask_polynomial,
                             transcript
                         )[0];
 
@@ -190,7 +198,7 @@ namespace nil {
 #endif
 
                         // 7. Aggregate quotient polynomial
-                        std::vector<polynomial_dfs_type> T_splitted_dfs = 
+                        std::vector<polynomial_dfs_type> T_splitted_dfs =
                             quotient_polynomial_split_dfs();
 
                         _proof.commitments[QUOTIENT_BATCH] = T_commit(T_splitted_dfs);
@@ -200,10 +208,10 @@ namespace nil {
                         _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
 
                         generate_evaluation_points();
-                        
+
                         {
                             PROFILE_PLACEHOLDER_SCOPE("commitment scheme proof eval time");
-                            _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);                        
+                            _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
                         }
                         return _proof;
                     }
@@ -211,7 +219,7 @@ namespace nil {
                 private:
                     std::vector<polynomial_dfs_type> quotient_polynomial_split_dfs() {
                         // TODO: pass max_degree parameter placeholder
-                        std::vector<polynomial_type> T_splitted = detail::split_polynomial<FieldType>( 
+                        std::vector<polynomial_type> T_splitted = detail::split_polynomial<FieldType>(
                             quotient_polynomial(), table_description.rows_amount - 1
                         );
 
@@ -221,7 +229,8 @@ namespace nil {
                         for (std::size_t k = 0; k < T_splitted.size(); k++) {
                             T_splitted_dfs[k].from_coefficients(T_splitted[k]);
                         }
-                        return T_splitted_dfs;                    
+
+                        return T_splitted_dfs;
                     }
 
                     polynomial_type quotient_polynomial() {
@@ -242,13 +251,14 @@ namespace nil {
                         }
 
                         polynomial_type F_consolidated_normal(F_consolidated_dfs.coefficients());
+
                         polynomial_type T_consolidated =
                             F_consolidated_normal / preprocessed_public_data.common_data.Z;
 
                         return T_consolidated;
                     }
-                    
-                    typename placeholder_lookup_argument<FieldType, commitment_scheme_type, ParamsType>::prover_lookup_result 
+
+                    typename placeholder_lookup_argument<FieldType, commitment_scheme_type, ParamsType>::prover_lookup_result
                     lookup_argument() {
                       PROFILE_PLACEHOLDER_SCOPE("lookup_argument_time");
 
@@ -283,6 +293,7 @@ namespace nil {
                         for (std::size_t i = 0; i < f_parts; i++) {
                             for (std::size_t j = 0; j < table_description.rows_amount; j++) {
                                 if (_F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != FieldType::value_type::zero()) {
+                                    std::cout << "_F_dfs[" << i << "] on row " << j << " = " << _F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) << std::endl;
                                 }
                             }
                         }
@@ -318,8 +329,8 @@ namespace nil {
 
                             for (int rotation: variable_values_rotation) {
                                 _commitment_scheme.append_eval_point(
-                                    VARIABLE_VALUES_BATCH, 
-                                    variable_values_index, 
+                                    VARIABLE_VALUES_BATCH,
+                                    variable_values_index,
                                     _proof.eval_proof.challenge * _omega.pow(rotation)
                                 );
                             }
@@ -336,10 +347,10 @@ namespace nil {
 
                         _commitment_scheme.append_eval_point(QUOTIENT_BATCH, _proof.eval_proof.challenge);
 
-                        
+
                         // fixed values' rotations (table columns)
                         std::size_t i = 0;
-                        std::size_t start_index = preprocessed_public_data.identity_polynomials.size() + 
+                        std::size_t start_index = preprocessed_public_data.identity_polynomials.size() +
                             preprocessed_public_data.permutation_polynomials.size() + 2;
 
                         for( i = 0; i < start_index; i++){
@@ -349,8 +360,8 @@ namespace nil {
                         // For special selectors
                         _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 2, _proof.eval_proof.challenge * _omega);
                         _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, start_index - 1, _proof.eval_proof.challenge * _omega);
-                        
-                        for (std::size_t ind = 0; 
+
+                        for (std::size_t ind = 0;
                             ind < constant_columns + preprocessed_public_data.public_polynomial_table.selectors().size();
                             ind++, i++
                         ) {
@@ -359,8 +370,8 @@ namespace nil {
 
                             for (int rotation: fixed_values_rotation) {
                                 _commitment_scheme.append_eval_point(
-                                    FIXED_VALUES_BATCH, 
-                                    start_index + ind, 
+                                    FIXED_VALUES_BATCH,
+                                    start_index + ind,
                                     _proof.eval_proof.challenge * _omega.pow(rotation)
                                 );
                             }
@@ -369,7 +380,7 @@ namespace nil {
 
                     std::vector<std::vector<typename FieldType::value_type>> compute_evaluation_points_public() {
                         std::vector<std::vector<typename FieldType::value_type>> evaluation_points_public(
-                            preprocessed_public_data.identity_polynomials.size() + 
+                            preprocessed_public_data.identity_polynomials.size() +
                             preprocessed_public_data.permutation_polynomials.size(),
                             _challenge_point);
 
@@ -386,7 +397,7 @@ namespace nil {
                             }
                             evaluation_points_public.push_back(std::move(point));
                         }
-                        
+
                         for (std::size_t k = 0, rotation_index = witness_columns + public_input_columns + constant_columns; k < preprocessed_public_data.public_polynomial_table.selectors().size(); k++, rotation_index++) {
                             const std::set<int>& rotations =
                                 preprocessed_public_data.common_data.columns_rotations[rotation_index];
@@ -411,7 +422,7 @@ namespace nil {
                     const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description;
                     const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system;
                     const typename policy_type::variable_assignment_type &assignments;
-                    
+
                     // Members created during proof generation.
                     plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> _polynomial_table;
                     placeholder_proof<FieldType, ParamsType> _proof;

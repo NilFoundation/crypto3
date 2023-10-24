@@ -123,6 +123,7 @@ namespace nil {
                                 &column_polynomials,
                             std::shared_ptr<math::evaluation_domain<FieldType>> original_domain,
                             std::uint32_t max_gates_degree,
+                            const polynomial_dfs_type &mask_polynomial,
                             transcript_type& transcript) {
                         PROFILE_PLACEHOLDER_SCOPE("gate_argument_time");
 
@@ -146,7 +147,7 @@ namespace nil {
                         degree_limits.push_back(max_degree / 2);
                         extended_domain_sizes.push_back(max_domain_size / 2);
 
-                        std::vector<math::expression<polynomial_dfs_variable_type>> expressions(extended_domain_sizes.size()); 
+                        std::vector<math::expression<polynomial_dfs_variable_type>> expressions(extended_domain_sizes.size());
 
                         auto theta_acc = FieldType::value_type::one();
 
@@ -161,7 +162,7 @@ namespace nil {
                         const auto& gates = constraint_system.gates();
 
                         for (const auto& gate: gates) {
-                            std::vector<math::expression<polynomial_dfs_variable_type>> gate_results(extended_domain_sizes.size()); 
+                            std::vector<math::expression<polynomial_dfs_variable_type>> gate_results(extended_domain_sizes.size());
 
                             for (const auto& constraint : gate.constraints) {
                                 auto next_term = converter.convert(constraint) * value_type_to_polynomial_dfs(theta_acc);
@@ -201,10 +202,11 @@ namespace nil {
                                 expressions[i], [&assignments=variable_values, domain_size=extended_domain_sizes[i]](const polynomial_dfs_variable_type &var) {
                                 return assignments[var];
                             });
-                            
+
                             F[0] += evaluator.evaluate();
                         }
 
+                        F[0] *= mask_polynomial;
                         return F;
                     }
 
@@ -212,6 +214,7 @@ namespace nil {
                         verify_eval(const std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> &gates,
                                     typename policy_type::evaluation_map &evaluations,
                                     const typename FieldType::value_type &challenge,
+                                    typename FieldType::value_type mask_value,
                                     transcript_type &transcript) {
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
 
@@ -236,6 +239,7 @@ namespace nil {
                             F[0] += gate_result;
                         }
 
+                        F[0] *= mask_value;
                         return F;
                     }
                 };
