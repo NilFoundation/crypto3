@@ -12,9 +12,9 @@ namespace nil {
             ILookupArgument lookup_contract = ILookupArgument(_lookup_argument_address);
             (lookup_argument, tr_state.current_challenge) = lookup_contract.verify(
 //            (lookup_argument, tr_state.current_challenge) = modular_lookup_argument_$TEST_NAME$.verify(
-                blob[special_selectors_offset: table_offset + quotient_offset], 
-                blob[lookup_offset:lookup_offset + sorted_columns * 0x60], 
-                basic_marshalling.get_uint256_be(blob, 0x81), 
+                blob[special_selectors_offset: table_offset + quotient_offset],
+                blob[lookup_offset:lookup_offset + sorted_columns * 0x60],
+                basic_marshalling.get_uint256_be(blob, 0x81),
                 state.l0,
                 tr_state.current_challenge
             );
@@ -78,7 +78,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
 
     function initialize(
 //        address permutation_argument_address,
-        address lookup_argument_address, 
+        address lookup_argument_address,
         address gate_argument_address,
         address commitment_contract_address
     ) public{
@@ -108,7 +108,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
     }
 
     // Public input columns
-    function public_input_direct(bytes calldata blob, uint256[] calldata public_input, verifier_state memory state) internal view 
+    function public_input_direct(bytes calldata blob, uint256[] calldata public_input, verifier_state memory state) internal view
     returns (bool check){
         check = true;
 
@@ -125,12 +125,12 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
                     ),
                     modulus
                 );
-                    
+
                 result = addmod(
-                    result, 
+                    result,
                     mulmod(
                         public_input[i], L, modulus
-                    ), 
+                    ),
                     modulus
                 );
             }
@@ -158,8 +158,8 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         state.xi = basic_marshalling.get_uint256_be(blob, $EVAL_PROOF_OFFSET$);
         state.Z_at_xi = addmod(field.pow_small(state.xi, rows_amount, modulus), modulus-1, modulus);
         state.l0 = mulmod(
-            state.Z_at_xi, 
-            field.inverse_static(mulmod(addmod(state.xi, modulus - 1, modulus), rows_amount, modulus), modulus), 
+            state.Z_at_xi,
+            field.inverse_static(mulmod(addmod(state.xi, modulus - 1, modulus), rows_amount, modulus), modulus),
             modulus
         );
 
@@ -171,7 +171,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             }
         }
 
-        //1. Init transcript        
+        //1. Init transcript
         types.transcript_data memory tr_state;
         tr_state.current_challenge = transcript_state;
 
@@ -181,8 +181,8 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
 
             //3. Permutation argument
             uint256[3] memory permutation_argument = modular_permutation_argument_$TEST_NAME$.verify(
-                blob[$Z_OFFSET$:$TABLE_Z_OFFSET$+$QUOTIENT_OFFSET$], 
-                transcript.get_field_challenge(tr_state, modulus), 
+                blob[$Z_OFFSET$:$TABLE_Z_OFFSET$+$QUOTIENT_OFFSET$],
+                transcript.get_field_challenge(tr_state, modulus),
                 transcript.get_field_challenge(tr_state, modulus),
                 state.l0
             );
@@ -200,6 +200,19 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             //6. Gate argument
             IGateArgument modular_gate_argument = IGateArgument(_gate_argument_address);
             state.F[7] = modular_gate_argument.verify(blob[table_offset:table_end_offset], transcript.get_field_challenge(tr_state, modulus));
+            state.F[7] = mulmod(
+                state.F[7],
+                addmod(
+                    1,
+                    modulus - addmod(
+                        basic_marshalling.get_uint256_be(blob, special_selectors_offset),
+                        basic_marshalling.get_uint256_be(blob, special_selectors_offset + 0x60),
+                        modulus
+                    ),
+                    modulus
+                ),
+                modulus
+            );
         }
 
         // No public input gate
@@ -238,8 +251,8 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             uint256 factor = 1;
             for(uint64 i = 0; i < uint64(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf]));){
                 T_consolidated = addmod(
-                    T_consolidated, 
-                    mulmod(basic_marshalling.get_uint256_be(blob, table_offset + quotient_offset + i *0x20), factor, modulus), 
+                    T_consolidated,
+                    mulmod(basic_marshalling.get_uint256_be(blob, table_offset + quotient_offset + i *0x20), factor, modulus),
                     modulus
                 );
                 factor = mulmod(factor, state.Z_at_xi + 1, modulus);
@@ -254,7 +267,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
 
         console.log("Gas for verification:", state.gas-gasleft());
     }
-}            
+}
         )";
     }
 }
