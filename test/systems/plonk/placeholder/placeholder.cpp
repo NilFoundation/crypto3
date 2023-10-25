@@ -88,12 +88,17 @@ public:
     using field_type = typename params_type::field_type;
     using transcript_hash_type = TranscriptHashType;
     using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
+    using preprocessed_data_type = bool;
 
     struct proof_type{
         nil::crypto3::zk::commitments::eval_storage<field_type> z;
     };
 
-    void setup(transcript_type &preprocessed_transript){
+    preprocessed_data_type preprocess(transcript_type &preprocessed_transript) const{
+        return true;
+    }
+
+    void setup(transcript_type &preprocessed_transript, preprocessed_data_type prep = true){
     }
 
     void mark_batch_as_fixed(std::size_t batch_id){
@@ -228,13 +233,9 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using field_type = typename curve_type::base_field_type;
     using merkle_hash_type = hashes::keccak_1600<512>;
     using transcript_hash_type = hashes::keccak_1600<512>;
-    constexpr static const std::size_t table_rows_log = 4;
 
     struct placeholder_test_params {
-        constexpr static const std::size_t table_rows = 1 << table_rows_log;
-        constexpr static const std::size_t permutation_size = 4;
-        constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
-
+        constexpr static const std::size_t usable_rows = 13;
 
         constexpr static const std::size_t witness_columns = witness_columns_1;
         constexpr static const std::size_t public_input_columns = public_columns_1;
@@ -250,10 +251,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     typedef placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params> circuit_params;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         merkle_hash_type,
-        transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m
     >;
 
@@ -267,8 +268,9 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer) {
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
-    desc.rows_amount = placeholder_test_params::table_rows;
-    desc.usable_rows_amount = placeholder_test_params::usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
@@ -303,11 +305,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using curve_type = algebra::curves::bls12<381>;
     using field_type = typename curve_type::scalar_field_type;
 
-    constexpr static const std::size_t table_rows_log = 4;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
-    constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
-
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
         using transcript_hash_type = hashes::keccak_1600<512>;
@@ -324,7 +321,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
         constexpr static const std::size_t m = 2;
     };
     using circuit_t_params = placeholder_circuit_params<
-        field_type, 
+        field_type,
         typename placeholder_test_params::arithmetization_params
     >;
 
@@ -335,10 +332,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, commitment_scheme_dummy_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, placeholder_params_type>;
 
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m
     >;
 
@@ -355,8 +352,9 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer){
     auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
@@ -406,7 +404,7 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer){
     public_input =  {{{pi0, 1}}};
     verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
         preprocessed_public_data, proof, constraint_system, commitment_scheme, public_input
-    );    
+    );
     BOOST_CHECK(!verifier_res);
 
     // LPC commitment scheme
@@ -457,16 +455,16 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer){
     BOOST_CHECK(verifier_res);
 }
 
-
 BOOST_AUTO_TEST_CASE(permutation_polynomials_test) {
-    constexpr std::size_t argument_size = 3;
+    constexpr std::size_t argument_size = 4;
 
-    auto circuit = circuit_test_t<field_type>();
+    typename field_type::value_type pi0 = test_global_alg_rnd_engine<field_type>();
+    auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
-
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
                                                                    circuit.lookup_gates);
@@ -495,7 +493,7 @@ BOOST_AUTO_TEST_CASE(permutation_polynomials_test) {
     std::shared_ptr<math::evaluation_domain<field_type>> domain = lpc_preprocessed_public_data.common_data.basic_domain;
     typename field_type::value_type id_res = field_type::value_type::one();
     typename field_type::value_type sigma_res = field_type::value_type::one();
-    for (std::size_t i = 0; i < table_rows; i++) {
+    for (std::size_t i = 0; i < desc.rows_amount; i++) {
         for (auto &identity_polynomial : lpc_preprocessed_public_data.identity_polynomials) {
             id_res = id_res * identity_polynomial.evaluate(domain->get_domain_element(i));
         }
@@ -512,7 +510,7 @@ BOOST_AUTO_TEST_CASE(permutation_polynomials_test) {
     id_res = field_type::value_type::one();
     sigma_res = field_type::value_type::one();
 
-    for (std::size_t i = 0; i < table_rows; i++) {
+    for (std::size_t i = 0; i < desc.rows_amount; i++) {
         for (std::size_t j = 0; j < lpc_preprocessed_public_data.identity_polynomials.size(); j++) {
             id_res = id_res *
                      (polynomial_table[j].evaluate(domain->get_domain_element(i)) +
@@ -555,15 +553,16 @@ BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
 BOOST_AUTO_TEST_CASE(permutation_argument_test) {
     auto circuit = circuit_test_t<field_type>();
 
-    constexpr std::size_t argument_size = 3;
+    plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
+
+    const std::size_t argument_size = 3;
+    const std::size_t permutation_size = 4;
 
     auto fri_params = create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
     lpc_scheme_type lpc_scheme(fri_params);
-
-    plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
-
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints,
                                                                    circuit.lookup_gates);
@@ -575,7 +574,7 @@ BOOST_AUTO_TEST_CASE(permutation_argument_test) {
 
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
-            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+            constraint_system, assignments.public_table(), desc, lpc_scheme, permutation_size
         );
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
@@ -602,11 +601,13 @@ BOOST_AUTO_TEST_CASE(permutation_argument_test) {
         f_at_y[i] = polynomial_table[i].evaluate(y);
     }
 
+    auto omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
+
     typename field_type::value_type v_p_at_y = prover_res.permutation_polynomial_dfs.evaluate(y);
-    typename field_type::value_type v_p_at_y_shifted = prover_res.permutation_polynomial_dfs.evaluate(circuit.omega * y);
+    typename field_type::value_type v_p_at_y_shifted = prover_res.permutation_polynomial_dfs.evaluate(omega * y);
 
     auto permutation_commitment = lpc_scheme.commit(PERMUTATION_BATCH);
-    std::array<typename field_type::value_type, 3> verifier_res =
+    std::array<typename field_type::value_type, argument_size> verifier_res =
         placeholder_permutation_argument<field_type, lpc_placeholder_params_type>::verify_eval(
             preprocessed_public_data, y, f_at_y, v_p_at_y, v_p_at_y_shifted, verifier_transcript
         );
@@ -618,8 +619,11 @@ BOOST_AUTO_TEST_CASE(permutation_argument_test) {
     for (int i = 0; i < argument_size; i++) {
         BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);
         for (std::size_t j = 0; j < desc.rows_amount; j++) {
-            BOOST_CHECK(
-                prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) == field_type::value_type::zero());
+            if(prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != 0){
+                BOOST_CHECK(
+                    prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) == field_type::value_type::zero()
+                );
+            }
         }
     }
 }
@@ -652,10 +656,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -666,7 +670,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer) {
-    auto circuit = circuit_test_3<field_type>();
+    auto circuit = circuit_test_3<field_type>(test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
@@ -674,8 +678,8 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -685,7 +689,7 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer) {
     lpc_scheme_type lpc_scheme(fri_params);
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-   
+
     typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
@@ -712,8 +716,8 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -745,6 +749,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
         placeholder_lookup_argument<field_type, lpc_scheme_type, lpc_placeholder_params_type>::prove_eval(
             constraint_system, preprocessed_public_data, polynomial_table, lpc_scheme, prover_transcript
     );
+    auto omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
     // Challenge phase
     typename field_type::value_type y = algebra::random_element<field_type>();
@@ -755,7 +760,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
             auto key = std::make_tuple(i, rotation, plonk_variable<typename field_type::value_type>::column_type::witness);
-            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * circuit.omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
         }
     }
 
@@ -767,7 +772,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
             auto key = std::make_tuple(i, rotation, plonk_variable<typename field_type::value_type>::column_type::constant);
 
-            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * circuit.omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
         }
     }
 
@@ -780,34 +785,34 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
             auto key = std::make_tuple(i, rotation, plonk_variable<typename field_type::value_type>::column_type::selector);
 
-            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * circuit.omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
         }
     }
 
     lpc_scheme.append_eval_point(LOOKUP_BATCH, y);
-    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * circuit.omega);
-    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * circuit.omega.pow(usable_rows));
+    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * omega);
+    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * omega.pow(usable_rows));
 
     lpc_scheme.commit(PERMUTATION_BATCH);
     lpc_scheme.append_eval_point(PERMUTATION_BATCH, y);
-    lpc_scheme.append_eval_point(PERMUTATION_BATCH, y * circuit.omega);
+    lpc_scheme.append_eval_point(PERMUTATION_BATCH, y * omega);
 
     transcript_type transcript;
     auto lpc_proof = lpc_scheme.proof_eval(transcript);
     // Prepare sorted and V_L values
-    
+
     auto special_selectors = (field_type::value_type::one() - (preprocessed_public_data.q_last.evaluate(y) +
             preprocessed_public_data.q_blind.evaluate(y)));
     auto half = prover_res.F_dfs[2].evaluate(y) * special_selectors.inversed();
 
-    std::array<typename field_type::value_type, argument_size> verifier_res = 
+    std::array<typename field_type::value_type, argument_size> verifier_res =
     placeholder_lookup_argument<field_type, lpc_type, lpc_placeholder_params_type>::verify_eval(
-        preprocessed_public_data, 
-        constraint_system.lookup_gates(), 
-        constraint_system.lookup_tables(), 
+        preprocessed_public_data,
+        constraint_system.lookup_gates(),
+        constraint_system.lookup_tables(),
         y, columns_at_y, lpc_proof.z.get(LOOKUP_BATCH),
         lpc_proof.z.get(PERMUTATION_BATCH, 0),
-        prover_res.lookup_commitment, 
+        prover_res.lookup_commitment,
         verifier_transcript
     );
 
@@ -816,7 +821,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
     for (int i = 0; i < argument_size; i++) {
-        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);        
+        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);
         for (std::size_t j = 0; j < desc.rows_amount; j++) {
             if(prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != field_type::value_type::zero()){
                 std::cout << "!["<< i << "][" << j << "]" << std::endl;
@@ -827,7 +832,6 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
     }
 }
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using curve_type = algebra::curves::pallas;
@@ -856,10 +860,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -878,8 +882,8 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -916,8 +920,8 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
     desc.usable_rows_amount = usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -951,6 +955,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
     );
 
     // Challenge phase
+    auto omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
     typename field_type::value_type y = algebra::random_element<field_type>();
     typename policy_type::evaluation_map columns_at_y;
     for (std::size_t i = 0; i < placeholder_test_params::witness_columns; i++) {
@@ -959,7 +964,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
 
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
             auto key = std::make_tuple(i, rotation, plonk_variable<typename field_type::value_type>::column_type::witness);
-            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * circuit.omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.witness(i).evaluate(y * omega.pow(rotation));
         }
     }
 
@@ -971,9 +976,10 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
             auto key = std::make_tuple(i, rotation, plonk_variable<typename field_type::value_type>::column_type::constant);
 
-            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * circuit.omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.constant(i).evaluate(y * omega.pow(rotation));
         }
     }
+
 
     for (std::size_t i = 0; i < placeholder_test_params::selector_columns; i++) {
 
@@ -984,33 +990,33 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
         for (int rotation : preprocessed_public_data.common_data.columns_rotations[i_global_index]) {
             auto key = std::make_tuple(i, rotation, plonk_variable<typename field_type::value_type>::column_type::selector);
 
-            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * circuit.omega.pow(rotation));
+            columns_at_y[key] = polynomial_table.selector(i).evaluate(y * omega.pow(rotation));
         }
     }
 
     lpc_scheme.append_eval_point(LOOKUP_BATCH, y);
-    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * circuit.omega);
-    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * circuit.omega.pow(usable_rows));
+    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * omega);
+    lpc_scheme.append_eval_point(LOOKUP_BATCH, y * omega.pow(usable_rows));
 
     lpc_scheme.commit(PERMUTATION_BATCH);
     lpc_scheme.append_eval_point(PERMUTATION_BATCH, y);
-    lpc_scheme.append_eval_point(PERMUTATION_BATCH, y * circuit.omega);
+    lpc_scheme.append_eval_point(PERMUTATION_BATCH, y * omega);
 
     auto lpc_proof = lpc_scheme.proof_eval(transcript);
     // Prepare sorted, V_L and V_S values.
-    
+
     auto special_selectors = (field_type::value_type::one() - (preprocessed_public_data.q_last.evaluate(y) +
             preprocessed_public_data.q_blind.evaluate(y)));
     auto half = prover_res.F_dfs[2].evaluate(y) * special_selectors.inversed();
 
-    std::array<typename field_type::value_type, argument_size> verifier_res = 
+    std::array<typename field_type::value_type, argument_size> verifier_res =
     placeholder_lookup_argument<field_type, lpc_type, lpc_placeholder_params_type>::verify_eval(
-        preprocessed_public_data, 
-        constraint_system.lookup_gates(), 
-        constraint_system.lookup_tables(), 
+        preprocessed_public_data,
+        constraint_system.lookup_gates(),
+        constraint_system.lookup_tables(),
         y, columns_at_y, lpc_proof.z.get(LOOKUP_BATCH),
         lpc_proof.z.get(PERMUTATION_BATCH, 0),
-        prover_res.lookup_commitment, 
+        prover_res.lookup_commitment,
         verifier_transcript
     );
 
@@ -1019,7 +1025,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
 
     for (int i = 0; i < argument_size; i++) {
-        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);        
+        BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);
         for (std::size_t j = 0; j < desc.rows_amount; j++) {
             if(prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != field_type::value_type::zero()){
                 std::cout << "!["<< i << "][" << j << "]" << std::endl;
@@ -1034,11 +1040,6 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
-
-    constexpr static const std::size_t table_rows_log = 3;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 3;
-    constexpr static const std::size_t usable_rows = 6;
 
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
@@ -1058,10 +1059,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -1072,16 +1073,17 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
 BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer) {
-    auto circuit = circuit_test_6<field_type>();
+    auto circuit = circuit_test_6<field_type>(test_global_alg_rnd_engine<field_type>);
 
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(circuit.table_rows);
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );
@@ -1114,10 +1116,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
 
-    constexpr static const std::size_t table_rows_log = 4;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
     constexpr static const std::size_t permutation_size = 3;
-    constexpr static const std::size_t usable_rows = 14;
 
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
@@ -1137,10 +1136,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
 
     using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
-        typename placeholder_test_params::transcript_hash_type, 
-        placeholder_test_params::lambda, 
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::lambda,
         placeholder_test_params::m,
         true
     >;
@@ -1154,12 +1153,13 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer) {
     auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
     plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
 
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(circuit.table_rows);
 
     typename policy_type::constraint_system_type constraint_system(
-        circuit.gates, 
-        circuit.copy_constraints, 
+        circuit.gates,
+        circuit.copy_constraints,
         circuit.lookup_gates,
         circuit.lookup_tables
     );

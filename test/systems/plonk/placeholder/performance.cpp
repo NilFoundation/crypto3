@@ -116,19 +116,19 @@ class placeholder_performance_test_base {
     static typename fri_type::params_type create_fri_params(std::size_t degree_log, const int max_step = 1) {
         typename fri_type::params_type params;
         math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
-    
+
         constexpr std::size_t expand_factor = 7;
-    
+
         std::size_t r = degree_log - 1;
-    
+
         std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
             math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
-    
+
         params.r = r;
         params.D = domain_set;
         params.max_degree = (1 << degree_log) - 1;
         params.step_list = generate_random_step_list(r, max_step);
-    
+
         return params;
     }
 };
@@ -139,7 +139,7 @@ public:
     // using curve_type = algebra::curves::bls12<381>;
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
- 
+
     using hash_type = hashes::keccak_1600<256>;
 
     static constexpr std::size_t m = 2;
@@ -150,12 +150,12 @@ public:
     static constexpr std::size_t ConstantColumns = 5;
     static constexpr std::size_t SelectorColumns = 35;
 
-    using lpc_params_type = commitments::list_polynomial_commitment_params<        
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
         hash_type, hash_type, lambda, m, true /* use grinding */>;
 
      using arithmetization_params_type = zk::snark::plonk_arithmetization_params<
         WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-  
+
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
     using circuit_params_type = placeholder_circuit_params<field_type, arithmetization_params_type>;
@@ -178,41 +178,41 @@ public:
 
     void run_placeholder_perf_test(std::string test_name, std::string circuit_file_path,
             std::string assignment_table_file_path) {
-    
+
         std::cout << std::endl << "Running '" << test_name << "' performance test" <<  std::endl;
-    
+
         load_circuit(circuit_file_path);
         load_assignment_table(assignment_table_file_path);
 
         compute_columns_rotations();
-    
+
         std::size_t table_rows_log = std::ceil(std::log2(table_description.rows_amount));
-        typename lpc_type::fri_type::params_type fri_params = 
+        typename lpc_type::fri_type::params_type fri_params =
             create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
 
-        std::size_t permutation_size = table_description.witness_columns + 
+        std::size_t permutation_size = table_description.witness_columns +
             table_description.public_input_columns + table_description.constant_columns;
 
         std::cout << "table_rows_log = " << table_rows_log << std::endl;
-    
+
         lpc_scheme_type lpc_scheme(fri_params);
         transcript_type lpc_transcript;
-    
+
         auto lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
                 constraint_system, assignments.public_table(), table_description, lpc_scheme,
                 permutation_size
             );
         std::cout << "max_gates_degree = " << lpc_preprocessed_public_data.common_data.max_gates_degree << std::endl;
-    
+
         auto lpc_preprocessed_private_data = placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::process(
                 constraint_system, assignments.private_table(), table_description
             );
-    
+
         auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
             lpc_preprocessed_public_data, lpc_preprocessed_private_data, table_description,
             constraint_system, assignments, lpc_scheme
         );
-    
+
         bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
             lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme
         );
@@ -227,7 +227,7 @@ private:
         char c;
         char c1;
         uint8_t b;
-    
+
         ifile >> c;
         if (c != '0')
             return false;
@@ -248,16 +248,16 @@ private:
         }
         return true;
     }
-    
+
     void load_assignment_table(std::string assignment_file_path) {
 
         std::ifstream iassignment;
         iassignment.open(assignment_file_path);
-        BOOST_CHECK(iassignment);    
+        BOOST_CHECK(iassignment);
 
         std::vector<std::uint8_t> v;
-        BOOST_CHECK(read_buffer_from_file(iassignment, v));    
-    
+        BOOST_CHECK(read_buffer_from_file(iassignment, v));
+
         iassignment.close();
 
         assignment_table_marshalling_type marshalled_data;
@@ -265,19 +265,19 @@ private:
         auto status = marshalled_data.read(read_iter, v.size());
         std::tie(table_description.usable_rows_amount, assignments) =
             marshalling::types::make_assignment_table<Endianness, assignment_table_type>(marshalled_data);
-    
+
         table_description.rows_amount = assignments.rows_amount();
     }
-    
+
     void load_circuit(std::string circuit_file_path) {
         std::ifstream ifile;
         ifile.open(circuit_file_path);
-        BOOST_CHECK(ifile.is_open());    
+        BOOST_CHECK(ifile.is_open());
 
         std::vector<std::uint8_t> v;
-        BOOST_CHECK(read_buffer_from_file(ifile, v));    
+        BOOST_CHECK(read_buffer_from_file(ifile, v));
         ifile.close();
-    
+
         circuit_marshalling_type marshalled_data;
         auto read_iter = v.begin();
         auto status = marshalled_data.read(read_iter, v.size());
@@ -287,7 +287,7 @@ private:
 
     void compute_columns_rotations() {
         using variable_type = typename zk::snark::plonk_variable<typename constraint_system_type::field_type::value_type>;
-    
+
         for (const auto& gate: constraint_system.gates()) {
             for (const auto& constraint: gate.constraints) {
                 math::expression_for_each_variable_visitor<variable_type> visitor(
@@ -300,7 +300,7 @@ private:
                 visitor.visit(constraint);
             }
         }
-    
+
         // TODO update for lookups
         //for (const auto& gate: constraint_system.lookup_gates()) {
         //    for (const auto& constraint: gate.constraints) {
@@ -372,7 +372,7 @@ struct placeholder_fibonacci_params {
 };
 
 using circuit_fib_params = placeholder_circuit_params<
-    field_type, 
+    field_type,
     typename placeholder_fibonacci_params::arithmetization_params
 >;
 
@@ -381,10 +381,10 @@ constexpr static const std::size_t table_columns =
 
 using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_fibonacci_params::transcript_hash_type>;
 
-using lpc_params_type = commitments::list_polynomial_commitment_params<        
+using lpc_params_type = commitments::list_polynomial_commitment_params<
     typename placeholder_fibonacci_params::merkle_hash_type,
-    typename placeholder_fibonacci_params::transcript_hash_type, 
-    placeholder_fibonacci_params::lambda, 
+    typename placeholder_fibonacci_params::transcript_hash_type,
+    placeholder_fibonacci_params::lambda,
     placeholder_fibonacci_params::m
 >;
 
@@ -393,18 +393,19 @@ using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
 using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_fib_params, lpc_scheme_type>;
 using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
 
-BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performance_test_base) {
-    constexpr std::size_t rows_log = 10;
-    std::cout << std::endl << "Fibonacci test rows_log = "<< rows_log << std::endl;
+const std::size_t rows_amount = 987;
 
-    auto circuit = circuit_test_fib<field_type, rows_log>();
-    typename lpc_type::fri_type::params_type fri_params = 
-        create_fri_params<typename lpc_type::fri_type, field_type>(rows_log);
+BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performance_test_base) {
+    auto circuit = circuit_test_fib<field_type, rows_amount>();
 
     plonk_table_description<field_type, typename circuit_fib_params::arithmetization_params> desc;
 
-    desc.rows_amount = 1 << rows_log;
-    desc.usable_rows_amount = desc.rows_amount - 3;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
+
+    typename lpc_type::fri_type::params_type fri_params =
+        create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
@@ -425,7 +426,7 @@ BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performanc
         );
 
     auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, 
+        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc,
         constraint_system, assignments, lpc_scheme
     );
 

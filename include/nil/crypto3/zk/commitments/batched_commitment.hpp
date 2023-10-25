@@ -42,14 +42,14 @@ namespace nil {
         namespace zk {
             namespace commitments {
 
-                template<typename FieldType, typename CommitmentType> 
+                template<typename FieldType, typename CommitmentType>
                 struct commitment_scheme_params_type{
                     using commitment_type = CommitmentType;
                     using field_type = FieldType;
                 };
 
                 // Placeholder commitment scheme works with polynomial_dfs
-                template<typename ParamsType, typename TranscriptType, typename PolynomialType = typename math::polynomial_dfs<typename ParamsType::field_type::value_type>> 
+                template<typename ParamsType, typename TranscriptType, typename PolynomialType = typename math::polynomial_dfs<typename ParamsType::field_type::value_type>>
                 class polys_evaluator{
                 public:
                     using params_type = ParamsType;
@@ -156,7 +156,7 @@ namespace nil {
                                     _z.set(k, i, j, poly[i].evaluate(point[i][j]));
                                 }
                             }
-                        } 
+                        }
                     }
                 public:
                     boost::property_tree::ptree get_params() const{
@@ -214,15 +214,28 @@ namespace nil {
 
                 namespace algorithms{
                     // TODO check, that SchemeType has commitment_type and commit functions
+                    // Is called from preprocessor
                     template<typename FieldType, typename SchemeType>
-                    static void setup(SchemeType &scheme, typename SchemeType::transcript_type &transcript ){
-                        return scheme.setup(transcript);
+                    static typename SchemeType::preprocessed_data_type preprocess(
+                        SchemeType &scheme, typename SchemeType::transcript_type &transcript
+                    ){
+                        return scheme.preprocess(transcript);
+                    }
+
+                    // Is called from prover and verifier. Checks, that transcript is well-initialized
+                    template<typename FieldType, typename SchemeType>
+                    static void setup(
+                        SchemeType &scheme,
+                        typename SchemeType::transcript_type &transcript,
+                        const typename SchemeType::preprocessed_data_type preprocessed_data
+                    ){
+                        return scheme.setup(transcript, preprocessed_data);
                     }
 
                     // TODO check, that SchemeType has commitment_type and commit functions
                     template<typename FieldType, typename SchemeType>
                     static typename SchemeType::commitment_type commit(
-                        SchemeType &scheme, 
+                        SchemeType &scheme,
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> &polynomials,
                         std::size_t index
                     ){
@@ -232,7 +245,7 @@ namespace nil {
                     // TODO check, that SchemeType has proof_type and proof_eval functions
                     template<typename FieldType, typename SchemeType>
                     static typename SchemeType::proof_type proof_eval(
-                        SchemeType &scheme, 
+                        SchemeType &scheme,
                         const std::vector<std::vector<std::vector<FieldType>>> &evaluation_points,
                         typename SchemeType::transcript_type &transcript
                     ){
@@ -242,7 +255,7 @@ namespace nil {
                     // TODO check, that SchemeType has proof_type and verify_eval functions
                     template<typename FieldType, typename SchemeType>
                     static bool verify_eval(
-                        SchemeType &scheme, 
+                        SchemeType &scheme,
                         const typename SchemeType::proof_type &proof,
                         const std::map<std::size_t, std::vector<std::vector<FieldType>>> &evaluation_points,
                         const std::map<std::size_t, typename SchemeType::commitment_type> &commitments,

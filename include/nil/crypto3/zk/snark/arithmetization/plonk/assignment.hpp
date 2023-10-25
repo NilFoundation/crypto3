@@ -84,7 +84,7 @@ namespace nil {
                     const ColumnType& operator[](std::uint32_t index) const {
                         if (index < ArithmetizationParams::witness_columns)
                             return _witnesses[index];
-                        throw std::out_of_range("Public table index out of range."); 
+                        throw std::out_of_range("Public table index out of range.");
                     }
 
                     constexpr std::uint32_t size() const {
@@ -97,6 +97,11 @@ namespace nil {
 
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
+
+                    friend std::uint32_t zk_padding<FieldType, ArithmetizationParams, ColumnType>(
+                        plonk_table<FieldType, ArithmetizationParams, ColumnType> &table,
+                        typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd
+                    );
 
                     friend struct nil::blueprint::assignment<plonk_constraint_system<FieldType,
                         ArithmetizationParams>>;
@@ -200,7 +205,7 @@ namespace nil {
                         if (index < selectors_amount()) {
                             return selector(index);
                         }
-                        throw std::out_of_range("Public table index out of range."); 
+                        throw std::out_of_range("Public table index out of range.");
                     }
 
                     constexpr std::uint32_t size() const {
@@ -217,6 +222,11 @@ namespace nil {
 
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table<FieldType, ArithmetizationParams, ColumnType> &table);
+
+                    friend std::uint32_t zk_padding<FieldType, ArithmetizationParams, ColumnType>(
+                        plonk_table<FieldType, ArithmetizationParams, ColumnType> &table,
+                        typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd
+                    );
 
                     friend struct nil::blueprint::assignment<plonk_constraint_system<FieldType,
                         ArithmetizationParams>>;
@@ -292,7 +302,7 @@ namespace nil {
                         index -= _private_table.size();
                         if (index < _public_table.size())
                             return _public_table[index];
-                        throw std::out_of_range("Private table index out of range."); 
+                        throw std::out_of_range("Private table index out of range.");
                     }
 
                     const private_table_type& private_table() const {
@@ -371,6 +381,11 @@ namespace nil {
 
                     friend std::uint32_t basic_padding<FieldType, ArithmetizationParams, ColumnType>(
                         plonk_table &table);
+
+                    friend std::uint32_t zk_padding<FieldType, ArithmetizationParams, ColumnType>(
+                        plonk_table &table,
+                        typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd
+                    );
                 };
 
                 template<typename FieldType, typename ArithmetizationParams>

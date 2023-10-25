@@ -170,7 +170,7 @@ namespace nil {
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
                         transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
-                        commitment_scheme.setup(transcript);
+                        commitment_scheme.setup(transcript, preprocessed_public_data.common_data.commitment_scheme_data);
 
 
                         // 3. append witness commitments to transcript

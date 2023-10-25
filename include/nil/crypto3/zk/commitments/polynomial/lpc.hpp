@@ -43,7 +43,7 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-            namespace commitments { 
+            namespace commitments {
 
                 // Placeholder-friendly class.
                 template<typename LPCScheme, typename PolynomialType = typename math::polynomial_dfs<
@@ -65,21 +65,37 @@ namespace nil {
                     using poly_type = PolynomialType;
                     using lpc = LPCScheme;
                     using eval_storage_type = typename LPCScheme::eval_storage_type;
+                    using preprocessed_data_type = std::map<std::size_t, std::vector<typename field_type::value_type>>;
 
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
                     typename fri_type::params_type _fri_params;
                     value_type _etha;
                     std::map<std::size_t, bool> _batch_fixed;
+                    preprocessed_data_type _fixed_polys_values;
 
                 public:
-
-                    lpc_commitment_scheme(const typename fri_type::params_type &fri_params) 
-                        : _fri_params(fri_params) {
+                    lpc_commitment_scheme(const typename fri_type::params_type &fri_params)
+                        : _fri_params(fri_params), _etha(0) {
                     }
 
-                    void setup(transcript_type& transcript) {
+                    preprocessed_data_type preprocess(transcript_type& transcript) const{
+                        auto etha = transcript.template challenge<field_type>();
+
+                        preprocessed_data_type result;
+                        for(auto const&[index, fixed]: _batch_fixed) {
+                            if(!fixed) continue;
+                            result[index] = {};
+                            for (const auto& poly: this->_polys.at(index)){
+                                result[index].push_back(poly.evaluate(etha));
+                            }
+                        }
+                        return result;
+                    }
+
+                    void setup(transcript_type& transcript, const preprocessed_data_type &preprocessed_data) {
                         _etha = transcript.template challenge<field_type>();
+                        _fixed_polys_values = preprocessed_data;
                     }
 
                     commitment_type commit(std::size_t index) {
@@ -189,7 +205,7 @@ namespace nil {
 
                         precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
                             combined_Q,
-                            _fri_params.D[0], 
+                            _fri_params.D[0],
                             _fri_params.step_list.front()
                         );
 
@@ -197,10 +213,10 @@ namespace nil {
                             fri_type, poly_type
                         >(
                             this->_polys,
-                            combined_Q, 
+                            combined_Q,
                             this->_trees,
-                            combined_Q_precommitment, 
-                            this->_fri_params, 
+                            combined_Q_precommitment,
+                            this->_fri_params,
                             transcript
                         );
                         return proof_type({this->_z, fri_proof});
@@ -211,9 +227,13 @@ namespace nil {
                         const std::map<std::size_t, commitment_type> &commitments,
                         transcript_type &transcript
                     ) {
-                        for (auto const&it: _batch_fixed) {
-                            if(it.second) {
-                                this->append_eval_point(it.first, _etha);
+                        for (auto const&[b_ind, fixed]: _batch_fixed) {
+                            if(!fixed) continue;
+                            this->append_eval_point(b_ind, _etha);
+                            for( std::size_t i = 0; i < proof.z.get_batch_size(b_ind); i++) {
+                                if(this->_fixed_polys_values[b_ind][i] != proof.z.get(b_ind, i, proof.z.get_poly_points_number(b_ind, i) - 1)) {
+                                    return false;
+                                }
                             }
                         }
 
@@ -255,7 +275,7 @@ namespace nil {
 
                         if (!nil::crypto3::zk::algorithms::verify_eval<fri_type>(
                             proof.fri_proof,
-                            _fri_params, 
+                            _fri_params,
                             commitments,
                             theta,
                             eval_map,
@@ -265,6 +285,7 @@ namespace nil {
                         )) {
                             return false;
                         }
+
                         return true;
                     }
 
@@ -279,7 +300,7 @@ namespace nil {
                         params.put("m", fri_type::m);
                         params.put("lambda", fri_type::lambda);
                         params.put("max_degree", _fri_params.max_degree);
-                        
+
                         boost::property_tree::ptree step_list_node;
                         for( std::size_t j = 0; j < _fri_params.step_list.size(); j++){
                             boost::property_tree::ptree step_node;
@@ -341,10 +362,10 @@ namespace nil {
                     typename LPCParams::grinding_type
                 > {
                     using fri_type = typename detail::basic_batched_fri<
-                        FieldType, 
+                        FieldType,
                         typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda, 
+                        LPCParams::lambda,
                         LPCParams::m,
                         LPCParams::use_grinding,
                         typename LPCParams::grinding_type

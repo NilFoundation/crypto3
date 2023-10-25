@@ -138,7 +138,7 @@ namespace nil {
                         transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
 
                         // setup commitment scheme
-                        _commitment_scheme.setup(transcript);
+                        _commitment_scheme.setup(transcript, preprocessed_public_data.common_data.commitment_scheme_data);
                     }
 
                     placeholder_proof<FieldType, ParamsType> process() {

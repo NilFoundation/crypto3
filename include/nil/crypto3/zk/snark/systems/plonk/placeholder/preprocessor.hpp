@@ -70,7 +70,7 @@ namespace nil {
 
                 public:
                     struct preprocessed_data_type {
-                        struct public_commitments_type { 
+                        struct public_commitments_type {
                             commitment_type fixed_values;
 
                             bool operator==(const public_commitments_type &rhs) const {
@@ -124,6 +124,7 @@ namespace nil {
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
                             std::uint32_t max_gates_degree;
                             verification_key vk;
+                            typename commitment_scheme_type::preprocessed_data_type commitment_scheme_data;
 
                             // Constructor with pregenerated domain
                             common_data_type(
@@ -131,7 +132,7 @@ namespace nil {
                                 public_commitments_type commts,
                                 std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
-                                std::size_t usable_rows, 
+                                std::size_t usable_rows,
                                 std::uint32_t max_gates_degree,
                                 verification_key vk
                             ):  basic_domain(D),
@@ -154,11 +155,11 @@ namespace nil {
                                 public_commitments_type commts,
                                 std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
                                 std::size_t rows,
-                                std::size_t usable_rows, 
+                                std::size_t usable_rows,
                                 std::uint32_t max_gates_degree,
                                 verification_key vk
-                            ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()), 
-                                commitments(commts), 
+                            ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()),
+                                commitments(commts),
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
                                 max_gates_degree(max_gates_degree), vk(vk)
@@ -183,7 +184,7 @@ namespace nil {
                                 basic_domain->size() == rhs.basic_domain->size() &&
                                 lagrange_0 == rhs.lagrange_0 &&
                                 Z == rhs.Z &&
-                                max_gates_degree == rhs.max_gates_degree && 
+                                max_gates_degree == rhs.max_gates_degree &&
                                 vk == rhs.vk;
                             }
                             bool operator!=(const common_data_type &rhs) const {
@@ -198,7 +199,7 @@ namespace nil {
                         // S_id
                         std::vector<polynomial_dfs_type>  identity_polynomials;
 
-                        polynomial_dfs_type               q_last;    
+                        polynomial_dfs_type               q_last;
                         polynomial_dfs_type               q_blind;
 
                         common_data_type                  common_data;
@@ -327,22 +328,22 @@ namespace nil {
                                 for (const auto& constraint: gate.constraints) {
                                     for (const auto& expr: constraint.lookup_input) {
                                         visitor.visit(expr);
-                                    } 
+                                    }
                                 }
                             }
 
                             for ( const auto &table : constraint_system.lookup_tables() ) {
                                 result[
-                                    table_description.witness_columns + 
-                                    table_description.public_input_columns + 
-                                    table_description.constant_columns + 
+                                    table_description.witness_columns +
+                                    table_description.public_input_columns +
+                                    table_description.constant_columns +
                                     table.tag_index
                                 ].insert(1);
                                 for( const auto &option:table.lookup_options){
                                     for( const auto &column:option){
                                         result[
-                                            table_description.witness_columns + 
-                                            table_description.public_input_columns + 
+                                            table_description.witness_columns +
+                                            table_description.public_input_columns +
                                             column.index
                                         ].insert(1);
                                     }
@@ -519,6 +520,11 @@ namespace nil {
                             public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree, vk
                         );
 
+                        transcript_type transcript(std::vector<std::uint8_t>({}));
+                        transcript(vk.constraint_system_hash);
+                        transcript(vk.fixed_values_commitment);
+                        common_data.commitment_scheme_data = commitment_scheme.preprocess(transcript);
+
                         // Push circuit description to transcript
                         preprocessed_data_type preprocessed_data({
                             std::move(public_polynomial_table),
@@ -528,6 +534,7 @@ namespace nil {
                             std::move(q_last_q_blind[1]),
                             std::move(common_data)
                         });
+
                         return preprocessed_data;
                     }
                 };
