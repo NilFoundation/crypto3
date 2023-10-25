@@ -86,6 +86,30 @@ namespace nil {
 
             circuit() : ArithmetizationType() {}
 
+            virtual const typename ArithmetizationType::gates_container_type& gates() const {
+                return ArithmetizationType::gates();
+            }
+
+            virtual const typename ArithmetizationType::copy_constraints_container_type& copy_constraints() const {
+                return ArithmetizationType::copy_constraints();
+            }
+
+            virtual const typename ArithmetizationType::lookup_gates_container_type& lookup_gates() const {
+                return ArithmetizationType::lookup_gates();
+            }
+
+            virtual const typename ArithmetizationType::lookup_tables_type& lookup_tables() const {
+                return ArithmetizationType::lookup_tables();
+            }
+
+            virtual std::size_t num_gates() const {
+                return ArithmetizationType::num_gates();
+            }
+
+            virtual std::size_t num_lookup_gates() const {
+                return ArithmetizationType::num_lookup_gates();
+            }
+
             #define GENERIC_GATE_ADDER_MACRO(mapping, gate_container) \
                 auto it = mapping.find(gate_id); \
                 if (it != mapping.end()) { \
@@ -106,37 +130,43 @@ namespace nil {
                 auto gate_id = lookup_gate_id_type(args); \
                 GENERIC_GATE_ADDER_MACRO(mapping, gate_container)
 
-            template<typename GateArguments>
-            std::size_t add_gate(const GateArguments &args) {
+            virtual std::size_t add_gate(const std::vector<constraint_type> &args) {
                 GATE_ADDER_MACRO(selector_map, _gates);
             }
 
-            std::size_t add_gate(const std::initializer_list<constraint_type> &&args) {
+            virtual std::size_t add_gate(const constraint_type &args) {
                 GATE_ADDER_MACRO(selector_map, _gates);
             }
 
-            template<typename GateArguments>
-            std::size_t add_lookup_gate(const GateArguments &args) {
+            virtual std::size_t add_gate(const std::initializer_list<constraint_type> &&args) {
+                GATE_ADDER_MACRO(selector_map, _gates);
+            }
+
+            virtual std::size_t add_lookup_gate(const std::vector<lookup_constraint_type> &args) {
                 LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_gates);
             }
 
-            std::size_t add_lookup_gate(const std::initializer_list<lookup_constraint_type> &&args) {
+            virtual std::size_t add_lookup_gate(const lookup_constraint_type &args) {
                 LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_gates);
             }
 
-            void register_lookup_table(std::shared_ptr<lookup_table_definition> table) {
+            virtual std::size_t add_lookup_gate(const std::initializer_list<lookup_constraint_type> &&args) {
+                LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_gates);
+            }
+
+            virtual void register_lookup_table(std::shared_ptr<lookup_table_definition> table) {
                 _lookup_library.register_lookup_table(table);
             }
 
-            void reserve_table(std::string name){
+            virtual void reserve_table(std::string name){
                 _lookup_library.reserve_table(name);
             }
 
-            const std::map<std::string, std::size_t> &get_reserved_indices(){
+            virtual const std::map<std::string, std::size_t> &get_reserved_indices(){
                 return _lookup_library.get_reserved_indices();
             }
 
-            const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables(){
+            virtual const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables(){
                 return _lookup_library.get_reserved_tables();
             }
 
@@ -144,7 +174,7 @@ namespace nil {
             #undef LOOKUP_GATE_ADDER_MACRO
             #undef GENERIC_GATE_ADDER_MACRO
 
-            void add_copy_constraint(const crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
+            virtual void add_copy_constraint(const crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
                 static const std::size_t private_storage_index =
                     assignment<crypto3::zk::snark::plonk_constraint_system<
                         BlueprintFieldType, ArithmetizationParams>>::private_storage_index;
@@ -158,11 +188,11 @@ namespace nil {
                 this->_copy_constraints.emplace_back(copy_constraint);
             }
 
-            std::size_t get_next_selector_index() const {
+            virtual std::size_t get_next_selector_index() const {
                 return next_selector_index;
             }
 
-            void export_circuit(std::ostream& os) const {
+            virtual void export_circuit(std::ostream& os) const {
                 std::ios_base::fmtflags os_flags(os.flags());
                 std::size_t gates_size = this->_gates.size(),
                             copy_constraints_size = this->_copy_constraints.size(),

@@ -62,6 +62,7 @@ namespace nil {
 
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
             using value_type = typename BlueprintFieldType::value_type;
+            using column_type = typename crypto3::zk::snark::plonk_column<BlueprintFieldType>;
 
             std::size_t next_selector_index = 0;
             std::uint32_t assignment_allocated_rows = 0;
@@ -74,7 +75,7 @@ namespace nil {
                             ArithmetizationParams>() {
             }
 
-            value_type &selector(std::size_t selector_index, std::uint32_t row_index) {
+            virtual value_type &selector(std::size_t selector_index, std::uint32_t row_index) {
 
                 assert(selector_index < this->_public_table._selectors.size());
 
@@ -84,7 +85,7 @@ namespace nil {
                 return this->_public_table._selectors[selector_index][row_index];
             }
 
-            value_type selector(std::size_t selector_index, std::uint32_t row_index) const {
+            virtual value_type selector(std::size_t selector_index, std::uint32_t row_index) const {
 
                 assert(selector_index < this->_public_table._selectors.size());
                 assert(row_index < this->_public_table._selectors[selector_index].size());
@@ -92,16 +93,32 @@ namespace nil {
                 return this->_public_table._selectors[selector_index][row_index];
             }
 
-            std::uint32_t allocated_rows() const {
+            virtual const column_type& selector(std::uint32_t index) const {
+                return zk_type::selector(index);
+            }
+
+            virtual std::uint32_t selector_column_size(std::uint32_t col_idx) const {
+                return zk_type::selector_column_size(col_idx);
+            }
+
+            virtual std::uint32_t selectors_amount() const {
+                return zk_type::selectors_amount();
+            }
+
+            virtual std::uint32_t allocated_rows() const {
                 return assignment_allocated_rows;
             }
 
-            void enable_selector(const std::size_t selector_index, const std::size_t row_index) {
+            virtual std::uint32_t rows_amount() const {
+                return zk_type::rows_amount();
+            }
+
+            virtual void enable_selector(const std::size_t selector_index, const std::size_t row_index) {
 
                 selector(selector_index, row_index) = BlueprintFieldType::value_type::one();
             }
 
-            void enable_selector(const std::size_t selector_index,
+            virtual void enable_selector(const std::size_t selector_index,
                                  const std::size_t begin_row_index,
                                  const std::size_t end_row_index,
                                  const std::size_t index_step = 1) {
@@ -112,7 +129,7 @@ namespace nil {
                 }
             }
 
-            value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
+            virtual value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
                 BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
 
                 if (this->_private_table._witnesses[witness_index].size() <= row_index)
@@ -122,14 +139,22 @@ namespace nil {
                 return this->_private_table._witnesses[witness_index][row_index];
             }
 
-            value_type witness(std::uint32_t witness_index, std::uint32_t row_index) const {
+            virtual value_type witness(std::uint32_t witness_index, std::uint32_t row_index) const {
                 BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
                 BLUEPRINT_ASSERT(row_index < this->_private_table._witnesses[witness_index].size());
 
                 return this->_private_table._witnesses[witness_index][row_index];
             }
 
-            value_type &public_input(
+            virtual std::uint32_t witness_column_size(std::uint32_t col_idx) const {
+                return this->_private_table.witness_column_size(col_idx);
+            }
+
+            virtual std::uint32_t witnesses_amount() const {
+                return zk_type::witnesses_amount();
+            }
+
+            virtual value_type &public_input(
                 std::uint32_t public_input_index, std::uint32_t row_index) {
 
                 BLUEPRINT_ASSERT(public_input_index < zk_type::public_inputs_amount());
@@ -140,7 +165,7 @@ namespace nil {
                 return this->_public_table._public_inputs[public_input_index][row_index];
             }
 
-            value_type public_input(
+            virtual value_type public_input(
                 std::uint32_t public_input_index, std::uint32_t row_index) const {
 
                 BLUEPRINT_ASSERT(public_input_index < zk_type::public_inputs_amount());
@@ -149,7 +174,15 @@ namespace nil {
                 return zk_type::public_input(public_input_index)[row_index];
             }
 
-            value_type &constant(
+            virtual std::uint32_t public_input_column_size(std::uint32_t col_idx) const {
+                return this->_public_table.public_input_column_size(col_idx);
+            }
+
+            virtual std::uint32_t public_inputs_amount() const {
+                return zk_type::public_inputs_amount();
+            }
+
+            virtual value_type &constant(
                 std::uint32_t constant_index, std::uint32_t row_index) {
 
                 assert(constant_index < zk_type::constants_amount());
@@ -161,7 +194,7 @@ namespace nil {
                 return this->_public_table._constants[constant_index][row_index];
             }
 
-            value_type constant(
+            virtual value_type constant(
                 std::uint32_t constant_index, std::uint32_t row_index) const {
 
                 BLUEPRINT_ASSERT(constant_index < zk_type::constants_amount());
@@ -170,12 +203,20 @@ namespace nil {
                 return zk_type::constant(constant_index)[row_index];
             }
 
-            value_type private_storage(std::uint32_t storage_index) const {
+            virtual std::uint32_t constant_column_size(std::uint32_t col_idx) const {
+                return this->_public_table.constant_column_size(col_idx);
+            }
+
+            virtual std::uint32_t constants_amount() const {
+                return zk_type::constants_amount();
+            }
+
+            virtual value_type private_storage(std::uint32_t storage_index) const {
                 BLUEPRINT_ASSERT(storage_index < private_storage.size());
                 return assignment_private_storage[storage_index];
             }
 
-            value_type &private_storage(std::uint32_t storage_index) {
+            virtual value_type &private_storage(std::uint32_t storage_index) {
                 if (assignment_private_storage.size() <= storage_index) {
                     assignment_private_storage.resize(storage_index + 1);
                 }
@@ -183,19 +224,19 @@ namespace nil {
             }
 
             // Not required to be called; private_storage calls will automatically resize
-            void resize_private_storage(std::uint32_t new_size) {
+            virtual void resize_private_storage(std::uint32_t new_size) {
                 assignment_private_storage.resize(new_size);
             }
 
-            void clear_private_storage() {
+            virtual void clear_private_storage() {
                 assignment_private_storage.clear();
             }
 
-            std::size_t private_storage_size() const {
+            virtual std::size_t private_storage_size() const {
                 return assignment_private_storage.size();
             }
 
-            void export_table(std::ostream& os, bool wide_export = false) const {
+            virtual void export_table(std::ostream& os, bool wide_export = false) const {
                 // wide_export is for e.g. potentiall fuzzer: does fixed width elements
                 std::ios_base::fmtflags os_flags(os.flags());
                 std::size_t witnesses_size = this->_private_table.witnesses_amount(),
