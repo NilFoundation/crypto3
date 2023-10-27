@@ -108,12 +108,11 @@ namespace nil {
                     std::cout << id << ": Not found selector " << selector_index << " on row " << row_index << std::endl;
                     BLUEPRINT_ASSERT(false);
                 }
-                return assignment_ptr->selector(selector_index, row_index);
+                return std::const_pointer_cast<const assignment<ArithmetizationType>>(assignment_ptr)->selector(selector_index, row_index);
             }
 
             const column_type& selector(std::uint32_t index) const override {
-                return assignment_ptr->crypto3::zk::snark::template plonk_assignment_table<
-                        BlueprintFieldType, ArithmetizationParams>::selector(index);
+                return assignment_ptr->selector(index);
             }
 
             std::uint32_t selector_column_size(std::uint32_t col_idx) const override {
@@ -133,10 +132,9 @@ namespace nil {
                                  const std::size_t begin_row_index,
                                  const std::size_t end_row_index,
                                  const std::size_t index_step = 1) override {
-                for (auto i = begin_row_index; i < end_row_index; i = i + index_step) {
-                    used_rows.insert(i);
+                for (auto i = begin_row_index; i <= end_row_index; i = i + index_step) {
+                    enable_selector(selector_index, i);
                 }
-                assignment_ptr->enable_selector(selector_index, begin_row_index, end_row_index, index_step);
             }
 
             value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) override {
@@ -149,7 +147,7 @@ namespace nil {
                     std::cout << id << ": Not found witness " << witness_index << " on row " << row_index << std::endl;
                     BLUEPRINT_ASSERT(false);
                 }
-                return assignment_ptr->witness(witness_index, row_index);
+                return std::const_pointer_cast<const assignment<ArithmetizationType>>(assignment_ptr)->witness(witness_index, row_index);
             }
 
             std::uint32_t witnesses_amount() const override {
@@ -172,7 +170,7 @@ namespace nil {
                     std::cout << id << ": Not found public_input " << public_input_index << " on row " << row_index << std::endl;
                     BLUEPRINT_ASSERT(false);
                 }
-                return assignment_ptr->public_input(public_input_index, row_index);
+                return std::const_pointer_cast<const assignment<ArithmetizationType>>(assignment_ptr)->public_input(public_input_index, row_index);
             }
 
             std::uint32_t public_inputs_amount() const override {
@@ -194,7 +192,7 @@ namespace nil {
                     std::cout << id << ": Not found constant " << constant_index << " on row " << row_index << std::endl;
                     BLUEPRINT_ASSERT(false);
                 }
-                return assignment_ptr->constant(constant_index, row_index);
+                return std::const_pointer_cast<const assignment<ArithmetizationType>>(assignment_ptr)->constant(constant_index, row_index);
             }
 
             std::uint32_t constants_amount() const override {
@@ -286,8 +284,6 @@ namespace nil {
                         os << (it < assignment_ptr->selector_column_size(j) ?
                                assignment_ptr->selector(j, it) : 0).data << " ";
                     }
-                    //os << (i < this->_public_table.selector_column_size(selectors_size - 1) ?
-                    //            this->_public_table.selector(selectors_size - 1)[i] : 0).data;
                     os << "\n";
                 }
                 os.flush();
@@ -332,7 +328,7 @@ namespace nil {
 
         template<typename BlueprintFieldType,
                 typename ArithmetizationParams>
-        bool is_satisfied(const circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+        bool is_accessible(const circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                 ArithmetizationParams>> &bp,
                           const assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                   ArithmetizationParams>> &assignments){
@@ -358,16 +354,37 @@ namespace nil {
                     return false;
                 }
 
+                std::uint32_t row_index = 0;
                 crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(
-                        [&assignments](const variable_type& var) {
-                            if (var.rotation >= 0) {
-                                var_value(assignments, var);
+                        [&assignments, &row_index](const variable_type& var) {
+                            BLUEPRINT_ASSERT((row_index + var.rotation) >= 0);
+                            switch (var.type) {
+                                case variable_type::column_type::witness:
+                                    assignments.witness(var.index, row_index + var.rotation);
+                                    return;
+                                case variable_type::column_type::public_input:
+                                    assignments.public_input(var.index, row_index + var.rotation);
+                                    return;
+                                case variable_type::column_type::constant:
+                                    assignments.constant(var.index, row_index + var.rotation);
+                                    return;
+                                default:
+                                    BLUEPRINT_ASSERT(false);
+                                    return;
                             }
                         }
                 );
 
-                for (const auto& constraint : gates[i].constraints) {
-                    visitor.visit(constraint);
+                crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
+                        assignments.selector(gates[i].selector_index);
+
+                for (std::size_t selector_row = 0; selector_row < selector.size(); selector_row++) {
+                    if (!selector[selector_row].is_zero() && rows.find(selector_row) != rows.end()) {
+                        row_index = selector_row;
+                        for (const auto& constraint : gates[i].constraints) {
+                            visitor.visit(constraint);
+                        }
+                    }
                 }
             }
 
