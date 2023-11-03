@@ -619,11 +619,9 @@ BOOST_AUTO_TEST_CASE(permutation_argument_test) {
     for (int i = 0; i < argument_size; i++) {
         BOOST_CHECK(prover_res.F_dfs[i].evaluate(y) == verifier_res[i]);
         for (std::size_t j = 0; j < desc.rows_amount; j++) {
-            if(prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) != 0){
-                BOOST_CHECK(
-                    prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) == field_type::value_type::zero()
-                );
-            }
+            BOOST_CHECK(
+                prover_res.F_dfs[i].evaluate(preprocessed_public_data.common_data.basic_domain->get_domain_element(j)) == field_type::value_type::zero()
+            );
         }
     }
 }

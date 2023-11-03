@@ -136,8 +136,7 @@ namespace nil {
                     }
                     this->terms.clear();
                     for (const auto& it: unique_terms) {
-                        if (it.second != assignment_type::zero())
-                        {
+                        if (it.second != assignment_type::zero()) {
                             this->terms.emplace_back(it.first.get_vars(), it.second);
                         }
                     }

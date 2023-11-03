@@ -48,7 +48,6 @@
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
-#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 #include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 
@@ -603,7 +602,6 @@ namespace nil {
                     auto right_side_pairing = algebra::pair_reduced<typename KZG::curve_type>(proof, right);
 
                     return left_side_pairing == right_side_pairing;
-                    // return true;
                 }
             } // namespace algorithms
 

@@ -68,7 +68,9 @@ namespace nil {
                     std::map<std::size_t, std::vector<std::vector<typename field_type::value_type>>> _points;
 
                 protected:
-                    math::polynomial<typename field_type::value_type> get_V(const std::vector<typename field_type::value_type> &points) const{
+                    math::polynomial<typename field_type::value_type> get_V(
+                        const std::vector<typename field_type::value_type> &points) const {
+
                         math::polynomial<typename field_type::value_type> V = {1};
                         for( std::size_t xi_index = 0; xi_index < points.size(); xi_index++ ){
                             V *= math::polynomial<typename field_type::value_type>({-points[xi_index], 1});
@@ -87,8 +89,8 @@ namespace nil {
                         return V_multipliers;
                     }
 
+                    math::polynomial<typename field_type::value_type> get_U(std::size_t b_ind, std::size_t poly_ind) const {
 
-                    math::polynomial<typename field_type::value_type> get_U(std::size_t b_ind, std::size_t poly_ind) const{
                         const auto &points = _points.at(b_ind)[poly_ind];
                         BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
                         std::vector<std::pair<typename field_type::value_type,typename field_type::value_type>> U_interpolation_points;
@@ -145,19 +147,24 @@ namespace nil {
                         _locked[index] = true;
                         _points[index].resize(_polys[index].size());
                     }
-                    void eval_polys(){
-                        for(auto const &[k, poly] : _polys){
+
+                    void eval_polys() {
+                        for(auto const &[k, poly] : _polys) {
                             _z.set_batch_size(k, poly.size());
                             auto const &point = _points.at(k);
+
                             BOOST_ASSERT(poly.size() == point.size() || point.size() == 1);
-                            for( std::size_t i = 0; i < poly.size(); i++ ){
+
+                            for (std::size_t i = 0; i < poly.size(); i++) {
                                 _z.set_poly_points_number(k, i, point[i].size());
-                                for(std::size_t j = 0; j < point[i].size(); j++){
+
+                                for (std::size_t j = 0; j < point[i].size(); j++) {
                                     _z.set(k, i, j, poly[i].evaluate(point[i][j]));
                                 }
                             }
                         }
                     }
+
                 public:
                     boost::property_tree::ptree get_params() const{
                         boost::property_tree::ptree root;
@@ -228,7 +235,7 @@ namespace nil {
                         SchemeType &scheme,
                         typename SchemeType::transcript_type &transcript,
                         const typename SchemeType::preprocessed_data_type preprocessed_data
-                    ){
+                        ) {
                         return scheme.setup(transcript, preprocessed_data);
                     }
 

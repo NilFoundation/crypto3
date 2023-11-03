@@ -65,7 +65,7 @@ namespace nil {
                     using poly_type = PolynomialType;
                     using lpc = LPCScheme;
                     using eval_storage_type = typename LPCScheme::eval_storage_type;
-                    using preprocessed_data_type = std::map<std::size_t, std::vector<typename field_type::value_type>>;
+                    using preprocessed_data_type = std::map<std::size_t, std::vector<value_type>>;
 
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
@@ -149,7 +149,7 @@ namespace nil {
                                     math::polynomial<value_type> U = this->get_U(b_ind, poly_ind);
 
                                     math::polynomial<value_type> g_normal(this->_polys[b_ind][poly_ind].coefficients());
-                                    math::polynomial<value_type> Q = g_normal - this->get_U(b_ind, poly_ind);
+                                    math::polynomial<value_type> Q = g_normal - U;
 
                                     for (const auto& V_mult: V_multipliers) {
                                         Q /= V_mult;
@@ -264,10 +264,10 @@ namespace nil {
 
                             for( auto const &it: this->_points){
                                 auto k = it.first;
-                                for(std::size_t i = 0; i < proof.z.get_batch_size(k); i++) {
+                                for (std::size_t i = 0; i < proof.z.get_batch_size(k); i++) {
                                     combined_U[point_index] *= theta;
                                     if (eval_map[k][i] == point_index) {
-                                        combined_U[point_index] += this->get_U(k,i);
+                                        combined_U[point_index] += this->get_U(k, i);
                                     }
                                 }
                             }

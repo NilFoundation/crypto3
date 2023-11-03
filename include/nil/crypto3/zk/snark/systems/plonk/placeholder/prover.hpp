@@ -142,7 +142,7 @@ namespace nil {
                     }
 
                     placeholder_proof<FieldType, ParamsType> process() {
-                        PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time");
+                        PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time:");
 
                         // 2. Commit witness columns and public_input columns
                         _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table.witnesses());
