@@ -63,10 +63,12 @@ namespace nil {
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
             using value_type = typename BlueprintFieldType::value_type;
             using column_type = typename crypto3::zk::snark::plonk_column<BlueprintFieldType>;
+            using shared_container_type = typename std::array<column_type, 1>;
 
             std::size_t next_selector_index = 0;
             std::uint32_t assignment_allocated_rows = 0;
             std::vector<value_type> assignment_private_storage;
+            shared_container_type shared_storage; // results of the previously prover
         public:
             static constexpr const std::size_t private_storage_index = std::numeric_limits<std::size_t>::max();
 
@@ -127,6 +129,26 @@ namespace nil {
 
                     enable_selector(selector_index, row_index);
                 }
+            }
+
+            virtual value_type &shared(std::uint32_t shared_index, std::uint32_t row_index) {
+                if (shared_storage[shared_index].size() <= row_index) {
+                    shared_storage[shared_index].resize(row_index + 1);
+                }
+                return shared_storage[shared_index][row_index];
+            }
+
+            virtual value_type shared(std::uint32_t shared_index, std::uint32_t row_index) const {
+                BLUEPRINT_ASSERT(row_index < shared_storage[shared_index].size());
+                return shared_storage[shared_index][row_index];
+            }
+
+            virtual std::uint32_t shared_column_size(std::uint32_t index) const {
+                return shared_storage[index].size();
+            }
+
+            virtual std::uint32_t shareds_amount() const {
+                return shared_storage.size();
             }
 
             virtual value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
@@ -322,6 +344,9 @@ namespace nil {
             // So we add a type without actually adding a type
             if (input_var.index == assignment_type::private_storage_index) {
                 return input_assignment.private_storage(input_var.rotation);
+            }
+            if (input_var.type == var_column_type::public_input && input_var.index > 0) {
+                return input_assignment.shared(input_var.index - 1, input_var.rotation);
             }
             switch(input_var.type){
                 case var_column_type::witness:
