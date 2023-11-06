@@ -19,7 +19,7 @@ if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"
 endif()
 
 option(ZK_PLACEHOLDER_PROFILING "Build with placeholder profiling" FALSE)
-option(ZK_PLACEHOLDER_DEBUG "Build with placeholder debug ouput" FALSE)
+option(ZK_PLACEHOLDER_DEBUG "Build with placeholder debug output" FALSE)
 
 if(ZK_PLACEHOLDER_PROFILING)
     add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)

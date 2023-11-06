@@ -26,7 +26,7 @@ Note that ```generate_circuit``` can modify of the ```Blueprint public assignmen
 
 The process of adding a component is following:
 
-1. (Optional) Get ```component``` start row by calling ```allocate_rows```. If the ```component``` is used as part of other ```component``` logic, it's not neccessary to call the function, because needed rows are allocated by the master ```component```.
+1. (Optional) Get ```component``` start row by calling ```allocate_rows```. If the ```component``` is used as part of other ```component``` logic, it's not necessary to call the function, because needed rows are allocated by the master ```component```.
 2. (Optional) Allocate public input on the ```Blueprint assignment table``` via ```Blueprint assignment table::allocate_public_input```.
-3. Set all the gates and constraints on the ```Blueprint``` by calling ```generate_circuit```. ```Allocated data``` is being modified in proccess of the funciton working.
+3. Set all the gates and constraints on the ```Blueprint``` by calling ```generate_circuit```. ```Allocated data``` is being modified in process of the function working.
 4. Set all the assignments on the ```Blueprint assignment table``` table by calling ```generate_assignments```.

@@ -270,7 +270,7 @@ namespace nil {
 
         // In order to correctly handle intersection, we need to know the type of the manifest parameter,
         // and to use a specific implementation of intersect for each type.
-        // This funciton returns the type of the manifest parameter.
+        // This function returns the type of the manifest parameter.
         manifest_param::type get_manifest_param_type(std::shared_ptr<manifest_param> a);
 
         class manifest_unsat_param : public manifest_param {
