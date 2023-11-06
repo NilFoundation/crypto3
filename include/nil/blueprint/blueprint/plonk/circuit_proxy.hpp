@@ -150,6 +150,15 @@ namespace nil {
                 return selector_index;
             }
 
+            const typename ArithmetizationType::lookup_table_type &lookup_table(std::size_t table_id) const override {
+                return circuit_ptr->lookup_table(table_id);
+            }
+
+            void add_lookup_table(const typename ArithmetizationType::lookup_table_type &table) override {
+                used_lookup_tables.insert(circuit_ptr->lookup_tables().size());
+                circuit_ptr->add_lookup_table(table);
+            }
+
             void register_lookup_table(std::shared_ptr<lookup_table_definition> table) override {
                 circuit_ptr->register_lookup_table(table);
             }

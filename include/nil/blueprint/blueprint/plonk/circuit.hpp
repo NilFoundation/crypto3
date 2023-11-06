@@ -154,6 +154,14 @@ namespace nil {
                 LOOKUP_GATE_ADDER_MACRO(lookup_selector_map, _lookup_gates);
             }
 
+            virtual const typename ArithmetizationType::lookup_table_type &lookup_table(std::size_t table_id) const {
+                return ArithmetizationType::lookup_table(table_id);
+            }
+
+            virtual void add_lookup_table(const typename ArithmetizationType::lookup_table_type &table) {
+                ArithmetizationType::add_lookup_table(table);
+            }
+
             virtual void register_lookup_table(std::shared_ptr<lookup_table_definition> table) {
                 _lookup_library.register_lookup_table(table);
             }

@@ -326,10 +326,9 @@ namespace nil {
         crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> save_shared_var(
                 assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                         ArithmetizationParams>> &input_assignment,
-                const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &input_var,
-                std::uint32_t _row_index = 0) {
+                const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &input_var) {
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-            std::uint32_t row_index = _row_index > 0 ? input_assignment.shared_column_size(0) : _row_index;
+            std::uint32_t row_index = input_assignment.shared_column_size(0);
             auto res = var(1, row_index, false, var::column_type::public_input);
             input_assignment.shared(0, row_index) = var_value(input_assignment, input_var);
             return res;
@@ -342,9 +341,8 @@ namespace nil {
                         ArithmetizationParams>> &input_assignment,
                 const std::vector<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>> &input_vars) {
             std::vector<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>> res;
-            std::uint32_t row_index = input_assignment.shared_column_size(0);
             for (const auto &it : input_vars) {
-                res.push_back(save_shared_var(input_assignment, it, row_index++));
+                res.push_back(save_shared_var(input_assignment, it));
             }
             return res;
         }
