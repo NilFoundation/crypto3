@@ -584,7 +584,7 @@ namespace nil {
                                 assignment.enable_selector(selectors[pos], row + r);
                             }
                         }
-                        r == component.rows_amount - 1;
+                        r = component.rows_amount - 1;
                         start_j = r % 3 + 3 * ((r % 3) == 0);
                         std::size_t offset = 0;
                         if (r % 3 == 0) {
