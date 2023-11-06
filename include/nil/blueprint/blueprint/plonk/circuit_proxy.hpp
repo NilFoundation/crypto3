@@ -158,8 +158,14 @@ namespace nil {
                 circuit_ptr->reserve_table(name);
             }
 
-            const std::map<std::string, std::size_t> &get_reserved_indices() override {
+            const typename lookup_library<BlueprintFieldType>::left_reserved_type
+                    &get_reserved_indices() const override {
                 return circuit_ptr->get_reserved_indices();
+            }
+
+            const typename lookup_library<BlueprintFieldType>::right_reserved_type &
+                    get_reserved_indices_right() const override {
+                return circuit_ptr->get_reserved_indices_right();
             }
 
             const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables() override {

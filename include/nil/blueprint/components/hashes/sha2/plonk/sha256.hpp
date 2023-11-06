@@ -135,6 +135,47 @@ namespace nil {
                        std::initializer_list<typename component_type::public_input_container_type::value_type>
                            public_inputs) :
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
+
+                using lookup_table_definition = typename
+                    nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
+
+                std::vector<std::shared_ptr<lookup_table_definition>> component_custom_lookup_tables(){
+                    std::vector<std::shared_ptr<lookup_table_definition>> result = {};
+
+                    auto sparse_values_base4 = std::shared_ptr<lookup_table_definition>(new typename sha256_process_type::sparse_values_base4_table());
+                    result.push_back(sparse_values_base4);
+
+                    auto sparse_values_base7 = std::shared_ptr<lookup_table_definition>(new typename sha256_process_type::sparse_values_base7_table());
+                    result.push_back(sparse_values_base7);
+
+                    auto maj = std::shared_ptr<lookup_table_definition>(new typename sha256_process_type::maj_function_table());
+                    result.push_back(maj);
+
+                    auto reverse_sparse_sigmas_base4 = std::shared_ptr<lookup_table_definition>(new typename sha256_process_type::reverse_sparse_sigmas_base4_table());
+                    result.push_back(reverse_sparse_sigmas_base4);
+
+                    auto reverse_sparse_sigmas_base7 = std::shared_ptr<lookup_table_definition>(new typename sha256_process_type::reverse_sparse_sigmas_base7_table());
+                    result.push_back(reverse_sparse_sigmas_base7);
+
+                    auto ch = std::shared_ptr<lookup_table_definition>(new typename sha256_process_type::ch_function_table());
+                    result.push_back(ch);
+
+                    return result;
+                }
+
+                std::map<std::string, std::size_t> component_lookup_tables(){
+                    std::map<std::string, std::size_t> lookup_tables;
+                    lookup_tables["sha256_sparse_base4/full"] = 0; // REQUIRED_TABLE
+                    lookup_tables["sha256_sparse_base4/first_column"] = 0; // REQUIRED_TABLE
+                    lookup_tables["sha256_reverse_sparse_base4/full"] = 0; // REQUIRED_TABLE
+                    lookup_tables["sha256_sparse_base7/full"] = 0; // REQUIRED_TABLE
+                    lookup_tables["sha256_sparse_base7/first_column"] = 0; // REQUIRED_TABLE
+                    lookup_tables["sha256_reverse_sparse_base7/full"] = 0; // REQUIRED_TABLE
+                    lookup_tables["sha256_maj/full"] = 0; // REQUIRED_TABLE
+                    lookup_tables["sha256_ch/full"] = 0; // REQUIRED_TABLE
+
+                    return lookup_tables;
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

@@ -29,6 +29,8 @@
 #include <string>
 #include <map>
 
+#include <boost/bimap.hpp>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/detail/lookup_table_definition.hpp>
 #include <nil/blueprint/manifest.hpp>
 #include <nil/blueprint/assert.hpp>
@@ -39,7 +41,7 @@ namespace nil {
         struct component_use_lookup : std::false_type{ };
 
         template <typename Type>
-        struct component_use_lookup<Type, 
+        struct component_use_lookup<Type,
             typename std::enable_if<std::is_member_function_pointer<decltype(&Type::component_lookup_tables)>::value>::type> : std::true_type
         { };
 
@@ -55,7 +57,7 @@ namespace nil {
         struct component_use_custom_lookup_tables : std::false_type{ };
 
         template <typename Type>
-        struct component_use_custom_lookup_tables<Type, 
+        struct component_use_custom_lookup_tables<Type,
             typename std::enable_if<std::is_member_function_pointer<decltype(&Type::component_custom_lookup_tables)>::value>::type> : std::true_type
         { };
 
@@ -68,7 +70,7 @@ namespace nil {
         }
 
         template <typename BlueprintFieldType>
-        class lookup_library{
+        class lookup_library {
             using lookup_table_definition = typename nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
             using filled_lookup_table_definition = typename nil::crypto3::zk::snark::detail::filled_lookup_table_definition<BlueprintFieldType>;
 
@@ -87,21 +89,32 @@ namespace nil {
                 virtual std::size_t get_columns_number(){ return 3; }
                 virtual std::size_t get_rows_number(){ return 4; }
             };
-        protected:
-            std::shared_ptr<lookup_table_definition> binary_xor_table;
-            bool reserved_all;
 
-            std::map<std::string, std::shared_ptr<lookup_table_definition>> tables;
-            std::set<std::string> reserved_tables;
-            std::map<std::string, std::size_t> reserved_tables_indices;
-            std::map<std::string, std::shared_ptr<lookup_table_definition>> reserved_tables_map;
-            // Last index
+            class binary_and_table_type : public lookup_table_definition{
+            public:
+                binary_and_table_type(): lookup_table_definition("binary_and_table"){
+                    this->subtables["full"] = {{0,1,2}, 0, 3};
+                }
+                virtual void generate(){
+                    this->_table = {
+                        {0, 0, 1, 1},
+                        {0, 1, 0, 1},
+                        {0, 0, 0, 1}
+                    };
+                }
+                virtual std::size_t get_columns_number(){ return 3; }
+                virtual std::size_t get_rows_number(){ return 4; }
+            };
         public:
+            using bimap_type = boost::bimap<boost::bimaps::set_of<std::string>, boost::bimaps::set_of<std::size_t>>;
+            using left_reserved_type = typename bimap_type::left_map;
+            using right_reserved_type = typename bimap_type::right_map;
+
             lookup_library(){
                 tables = {};
                 reserved_all = false;
-                binary_xor_table = std::shared_ptr<lookup_table_definition>(new binary_xor_table_type());
-                tables["binary_xor_table"] = binary_xor_table;
+                tables["binary_xor_table"] = std::shared_ptr<lookup_table_definition>(new binary_xor_table_type());
+                tables["binary_and_table"] = std::shared_ptr<lookup_table_definition>(new binary_and_table_type());
             }
 
             void register_lookup_table(std::shared_ptr<lookup_table_definition> table){
@@ -115,35 +128,46 @@ namespace nil {
                 std::string subtable_name = name.substr(name.find("/")+1, name.size());
                 BOOST_ASSERT(tables[table_name]->subtables.find(subtable_name) != tables[table_name]->subtables.end());
                 reserved_tables.insert(name);
-                reserved_tables_indices[name] = reserved_tables.size();
+                reserved_tables_indices.left.insert(std::make_pair(name, reserved_tables.size()));
             }
 
             void reservation_done(){
                 if(reserved_all) return;
-                
+
                 reserved_all = true;
                 for (auto &name : reserved_tables){
-                    std::string table_name = name.substr(0, name.find("/"));
+                    auto slash_pos = name.find("/");
+                    std::string table_name = name.substr(0, slash_pos);
                     BOOST_ASSERT(tables.find(table_name) != tables.end());
-                    std::string subtable_name = name.substr(name.find("/")+1, name.size());
-                    BOOST_ASSERT(tables[table_name]->subtables.find(subtable_name) != tables[table_name]->subtables.end());
+                    std::string subtable_name = name.substr(slash_pos + 1, name.size());
+                    BOOST_ASSERT(tables[table_name]->subtables.find(subtable_name) !=
+                                 tables[table_name]->subtables.end());
 
                     if( reserved_tables_map.find(table_name) == reserved_tables_map.end() ){
-                        filled_lookup_table_definition *filled_definition = new filled_lookup_table_definition(*(tables[table_name]));
+                        filled_lookup_table_definition *filled_definition =
+                            new filled_lookup_table_definition(*(tables[table_name]));
                         reserved_tables_map[table_name] = std::shared_ptr<lookup_table_definition>(filled_definition);
                     }
-                    reserved_tables_map[table_name]->subtables[subtable_name] = tables[table_name]->subtables[subtable_name];
+                    reserved_tables_map[table_name]->subtables[subtable_name] =
+                        tables[table_name]->subtables[subtable_name];
                 }
             }
 
-            const std::map<std::string, std::size_t> &get_reserved_indices(){
+            const bimap_type &get_reserved_indices() const {
                 return reserved_tables_indices;
             }
 
-            const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables(){
+            const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables() {
                 reservation_done();
                 return reserved_tables_map;
             }
+        protected:
+            bool reserved_all;
+
+            std::map<std::string, std::shared_ptr<lookup_table_definition>> tables;
+            std::set<std::string> reserved_tables;
+            bimap_type reserved_tables_indices;
+            std::map<std::string, std::shared_ptr<lookup_table_definition>> reserved_tables_map;
         };
     }        // namespace blueprint
 }    // namespace nil

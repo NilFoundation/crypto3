@@ -78,8 +78,9 @@ namespace nil {
                     constexpr static const std::size_t gates_amount = 1;
 
                     virtual crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType> op_lookup_constraint(
-                        const std::array<var, 2 + 1> &witnesses, 
-                        const std::map<std::string, std::size_t> lookup_tables_indices
+                        const std::array<var, 2 + 1> &witnesses,
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                            &bp
                     ) const = 0;
 
                     virtual value_type result_assignment(const std::array<value_type, 2> &input_values) const = 0;
@@ -175,8 +176,7 @@ namespace nil {
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
                 const typename plonk_boolean_lookup_op_component<BlueprintFieldType, ArithmetizationParams>::input_type
-                    &instance_input,
-                const std::map<std::string, std::size_t> lookup_tables_indices
+                    &instance_input
             ) {
 
                 using var = typename plonk_boolean_lookup_op_component<BlueprintFieldType, ArithmetizationParams>::var;
@@ -185,8 +185,8 @@ namespace nil {
                 for (std::size_t col_idx = 0; col_idx < witnesses.size(); col_idx++) {
                     witnesses[col_idx] = var(component.W(col_idx), 0);
                 }
-                auto constraint = component.op_lookup_constraint(witnesses, lookup_tables_indices);
-                auto selector_id =  bp.add_lookup_gate({constraint});
+                auto constraint = component.op_lookup_constraint(witnesses, bp);
+                auto selector_id = bp.add_lookup_gate({constraint});
                 return selector_id;
             }
 
@@ -223,10 +223,9 @@ namespace nil {
                         &instance_input,
                     const std::size_t start_row_index
             ) {
-                const std::map<std::string, std::size_t> &lookup_tables_indices = bp.get_reserved_indices();
                 using component_type = plonk_boolean_lookup_op_component<BlueprintFieldType, ArithmetizationParams>;
 
-                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input, lookup_tables_indices);
+                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
 
                 assignment.enable_selector(selector_index, start_row_index);
 
