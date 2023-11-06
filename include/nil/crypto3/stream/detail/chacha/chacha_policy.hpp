@@ -38,11 +38,11 @@ namespace nil {
         namespace stream {
             namespace detail {
                 template<std::size_t Rounds, std::size_t IVBits, std::size_t KeyBits>
-                struct chacha_policy : public basic_functions<32> {
-                    typedef typename basic_functions<32>::byte_type byte_type;
+                struct chacha_policy : public detail::basic_functions<32> {
+                    typedef typename detail::basic_functions<32>::byte_type byte_type;
 
-                    constexpr static const std::size_t word_bits = basic_functions<32>::word_bits;
-                    typedef typename basic_functions<32>::word_type word_type;
+                    constexpr static const std::size_t word_bits = detail::basic_functions<32>::word_bits;
+                    typedef typename detail::basic_functions<32>::word_type word_type;
 
                     constexpr static const std::size_t rounds = Rounds;
                     BOOST_STATIC_ASSERT(Rounds % 2 == 0);
