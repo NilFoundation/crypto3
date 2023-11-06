@@ -27,6 +27,7 @@
 #define CRYPTO3_BLUEPRINT_BASIC_NON_NATIVE_POLICY_HPP
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
@@ -165,6 +166,93 @@ namespace nil {
             };
 
             /*
+             * Specialization for non-native bls12381 scalar field element on pallas base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::curves::pallas::base_field_type,
+                                                      typename crypto3::algebra::fields::bls12_scalar_field<381>> {
+
+                constexpr static const std::uint32_t ratio = 1;
+
+                typedef crypto3::zk::snark::plonk_variable<typename crypto3::algebra::fields::bls12_base_field<381>::value_type>
+                non_native_var_type;
+            };
+
+
+            /*
+             * Specialization for non-native bls12381 scalar field element on bls12381 base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::fields::bls12_base_field<381>,
+                                                      typename crypto3::algebra::fields::bls12_scalar_field<381>> {
+
+                constexpr static const std::uint32_t ratio = 1;
+
+                typedef crypto3::zk::snark::plonk_variable<typename crypto3::algebra::fields::bls12_base_field<381>::value_type>
+                non_native_var_type;
+            };
+
+
+            /*
+             * Specialization for non-native bls12-381 base field element on Pallas base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::curves::pallas::base_field_type,
+                                                      typename crypto3::algebra::fields::bls12_base_field<381>> {
+                constexpr static const std::uint32_t ratio = 0; // not implemented yet
+                using var = crypto3::zk::snark::plonk_variable<typename crypto3::algebra::curves::pallas::base_field_type>;
+                typedef std::array<var, ratio> non_native_var_type;
+            };
+
+            /*
+             * Specialization for non-native Pallas base field element on bls12-381 base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::fields::bls12_base_field<381>,
+                                                      typename crypto3::algebra::curves::pallas::base_field_type> {
+
+                constexpr static const std::uint32_t ratio = 0; // not implemented yet
+                using var = crypto3::zk::snark::plonk_variable<typename crypto3::algebra::fields::bls12_base_field<381>>;
+                typedef std::array<var, ratio> non_native_var_type;
+            };
+
+            /*
+             * Specialization for non-native Pallas scalar field element on bls12-381 base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::fields::bls12_base_field<381>,
+                                                      typename crypto3::algebra::curves::pallas::scalar_field_type> {
+
+                constexpr static const std::uint32_t ratio = 0; // not implemented yet
+                using var = crypto3::zk::snark::plonk_variable<typename crypto3::algebra::fields::bls12_base_field<381>>;
+                typedef std::array<var, ratio> non_native_var_type;
+            };
+
+            /*
+             * Specialization for non-native Ed25519 base field element on bls12-381 base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::fields::bls12_base_field<381>,
+                                                      typename crypto3::algebra::curves::ed25519::base_field_type> {
+                constexpr static const std::uint32_t ratio = 0; // not implemented yet
+                using var = crypto3::zk::snark::plonk_variable<typename crypto3::algebra::fields::bls12_base_field<381>>;
+                typedef std::array<var, ratio> non_native_var_type;
+            };
+
+            /*
+             * Specialization for non-native Ed25519 scalar field element on bls12-381 base field
+             */
+            template<>
+            struct basic_non_native_policy_field_type<typename crypto3::algebra::fields::bls12_base_field<381>,
+                                                      typename crypto3::algebra::curves::ed25519::scalar_field_type> {
+                constexpr static const std::uint32_t ratio = 0; // not implemented yet
+                using var = crypto3::zk::snark::plonk_variable<typename crypto3::algebra::fields::bls12_base_field<381>>;
+                typedef std::array<var, ratio> non_native_var_type;
+            };
+
+
+
+            /*
              * Native element type.
              */
             template<typename BlueprintFieldType>
@@ -188,6 +276,17 @@ namespace nil {
             template<typename OperatingFieldType>
             using field = typename detail::basic_non_native_policy_field_type<BlueprintFieldType, OperatingFieldType>;
         };
+
+        template<>
+        class basic_non_native_policy<typename crypto3::algebra::fields::bls12_base_field<381>> {
+
+            using BlueprintFieldType = typename crypto3::algebra::fields::bls12_base_field<381>;
+
+        public:
+            template<typename OperatingFieldType>
+            using field = typename detail::basic_non_native_policy_field_type<BlueprintFieldType, OperatingFieldType>;
+        };
+
 
 
 
