@@ -31,7 +31,7 @@
 
 #include <nil/crypto3/detail/inline_variable.hpp>
 
-#include <nil/crypto3/stream/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
