@@ -135,6 +135,12 @@ set(PLONK_TESTS_FILES
     "verifiers/pickles/verify_heterogenous_scalar"
     "verifiers/pickles/verify_heterogenous_base"
     "verifiers/pickles/scalar_details/evals_of_split_evals"
+    "verifiers/placeholder/permutation_argument_verifier"
+    "verifiers/placeholder/gate_argument_verifier"
+    "verifiers/placeholder/lookup_argument_verifier"
+    "verifiers/placeholder/gate_component"
+    "verifiers/placeholder/f1_loop"
+    "verifiers/placeholder/f3_loop"
     "verifiers/placeholder/fri_cosets"
     )
 
