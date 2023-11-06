@@ -143,6 +143,8 @@ set(PLONK_TESTS_FILES
     "verifiers/placeholder/f1_loop"
     "verifiers/placeholder/f3_loop"
     "verifiers/placeholder/fri_cosets"
+    "verifiers/placeholder/fri_lin_inter"
+    "verifiers/placeholder/fri_array_swap"
     )
 
 set(FIELDS_TESTS_FILES

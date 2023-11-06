@@ -57,6 +57,8 @@ jobs:
             blueprint_hashes_plonk_sha256_test,
             blueprint_hashes_plonk_sha512_test,
             blueprint_algebra_fields_plonk_sqrt_test,
+            blueprint_verifiers_placeholder_fri_lin_inter_test,
+            blueprint_verifiers_placeholder_fri_array_swap_test,
             blueprint_manifest_test,
             blueprint_detail_huang_lu_test,
             blueprint_private_input_test,

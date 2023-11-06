@@ -248,6 +248,7 @@ namespace nil {
 
                 // Uncomment the following if you want to output a visual representation of the connectedness graph.
                 // I recommend turning off the starting row randomization
+                // If the whole of public_input isn't shown, increase the end row
 
                 // auto zones = blueprint::detail::generate_connectedness_zones(
                 //      assignment, bp, instance_input.all_vars(), start_row, component_instance.rows_amount);
