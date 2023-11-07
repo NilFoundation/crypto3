@@ -48,7 +48,6 @@ using namespace nil;
 template <typename FieldType, std::size_t WitnessColumns>
 void test_fri_cosets(std::vector<typename FieldType::value_type> public_input,
     std::size_t n,
-    std::size_t total_bits,
     typename FieldType::value_type omega){
     using BlueprintFieldType = FieldType;
     constexpr std::size_t PublicInputColumns = 1;
@@ -119,22 +118,22 @@ void test_fri_cosets(std::vector<typename FieldType::value_type> public_input,
     component_type component_instance(witnesses, // witnesses
                                       std::array<std::uint32_t, 1>{0}, // constants
                                       std::array<std::uint32_t, 0>{},  // public inputs
-                                      n, total_bits, omega);
+                                      n, omega);
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input, nil::crypto3::detail::connectedness_check_type::STRONG, n, total_bits);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input, nil::crypto3::detail::connectedness_check_type::STRONG, n);
 }
 
 template <typename FieldType>
 void field_operations_test() {
-//  Format: test_fri_cosets<FieldType,WitnessColumns>(public_input, n, total_bits, omega)
+//  Format: test_fri_cosets<FieldType,WitnessColumns>(public_input, n, omega)
     for (int i = 14; i < 25; i++){
-         test_fri_cosets<FieldType,6>({i}, 3, 64, 2);
+         test_fri_cosets<FieldType,9>({i}, 3, 2);
     }
-    test_fri_cosets<FieldType,12>({46744073709551615}, 4, 64, 2);
-    test_fri_cosets<FieldType,12>({46744073709551615}, 3, 64, 2);
-    test_fri_cosets<FieldType,12>({46744073709551615}, 5, 64, 2);
+    test_fri_cosets<FieldType,18>({46744073709551615}, 4, 2);
+    test_fri_cosets<FieldType,18>({46744073709551615}, 3, 2);
+    test_fri_cosets<FieldType,18>({46744073709551615}, 5, 2);
 // more realistic data
-    test_fri_cosets<FieldType,6>({0xa53a16c34fb833b5_cppui255}, 4, 64,
+    test_fri_cosets<FieldType,9>({0xa53a16c34fb833b5_cppui255}, 4,
         0x1ff2863fd35bfc59e51f3693bf37e2d841d1b5fbed4138f755a638bec8750abd_cppui255
     );
 }

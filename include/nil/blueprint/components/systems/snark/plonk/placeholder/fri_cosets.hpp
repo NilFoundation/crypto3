@@ -47,11 +47,11 @@ namespace nil {
                 }
             } // namespace detail
 
-            // Uses parameters  n, total_bits, omega
-            // Input: x (challenge, originally uint64_t, takes total_bits bits)
-            // Output: vector of triplets < (s,-s,b) >, where s_0 = omega^{x % 2^n}, s_{i+1} = s_i^2,
+            // Uses parameters n, omega
+            // Input: x (challenge)
+            // Output: vector of length n with triplets < (s,-s,b) >, where s_0 = omega^{x % 2^n}, s_{i+1} = s_i^2,
             // b = 0 or 1, showing whether the pair (s,-s) needs reordering
-            // For details see https://www.notion.so/nilfoundation/FRI-cosets-generator-910475aa46e54bdc986407d178428a8a?pvs=4
+            // For details see https://www.notion.so/nilfoundation/FRI-cosets-generator-910475aa46e54bdc986407d178428a8a
             //
 
             using detail::lfit;
@@ -66,13 +66,13 @@ namespace nil {
                 public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
 
                 static std::size_t gates_amount_internal(std::size_t witness_amount, std::size_t n, std::size_t total_bits) {
-                    const std::size_t l = witness_amount / 6; // number of 6-blocks per row
-                    const std::size_t last_l = n % l; // 6-blocks in transition row. If 0, no transition row exists
-                    const std::size_t sixb_rows = lfit(n,l); // number of rows with 6-blocks
-                    const std::size_t octs = lfit(total_bits-n,3);
-                    const std::size_t remaining_octs = octs - ((last_l > 0)? 6*(l - last_l)-1 : 0);
+                    const std::size_t l = witness_amount / 9; // number of 9-blocks per row
+                    const std::size_t last_l = n % l; // 9-blocks in transition row. If 0, no transition row exists
+                    const std::size_t nineb_rows = lfit(n,l); // number of rows with 9-blocks
+                    const std::size_t bits = total_bits-n;
+                    const std::size_t remaining_bits = bits - ((last_l > 0)? 3*(l - last_l)-1 : 0);
 
-                    return (sixb_rows > 1) + (sixb_rows > 2) + 1 + (remaining_octs > 0);
+                    return (nineb_rows > 1) + (nineb_rows > 2) + 1 + (remaining_bits > 0);
                 }
 
 
@@ -80,12 +80,12 @@ namespace nil {
                                                         std::size_t n,
                                                         std::size_t total_bits) {
 
-                    std::size_t trans_6_bl_space = 6*n % witness_amount; // space occupied by 6-blocks in transition line
-                    // space for octs in transition line
-                    std::size_t trans_line_octs = (trans_6_bl_space > 0) ? witness_amount-1 - trans_6_bl_space : 0;
+                    std::size_t trans_9_bl_space = 9*n % witness_amount; // space occupied by 9-blocks in transition line
+                    // space for 3-bit_blocks in transition line
+                    std::size_t trans_line_bits = (trans_9_bl_space > 0) ? (witness_amount - trans_9_bl_space)/3 - 1 : 0;
 
-                    return lfit(6*n, witness_amount)
-                           + lfit(lfit(total_bits-n,3) - trans_line_octs, witness_amount-1 ) // bits in chunks of 3 in all cols but the 1st
+                    return lfit(9*n, witness_amount)
+                           + lfit(total_bits-n - trans_line_bits, witness_amount/3 - 1 ) // 3-bit_blocks in all cols but the 1st three
                            + 1; // the row for storing 0
                 }
 
@@ -95,23 +95,23 @@ namespace nil {
                 class gate_manifest_type : public component_gate_manifest {
 
                     std::array<std::size_t,5> gates_footprint(std::size_t WA, std::size_t N, std::size_t TB) const {
-                        std::size_t l = WA / 6;
+                        std::size_t l = WA / 9;
                         std::size_t last_l = N % l;
-                        std::size_t sixb_rows = lfit(N,l);
-                        std::size_t octs = lfit(TB-N,3);
+                        std::size_t nineb_rows = lfit(N,l);
+                        std::size_t bits = TB-N;
 
-                        std::size_t remaining_octs = octs - ((last_l > 0)? 6*(l - last_l)-1 : 0);
+                        std::size_t remaining_bits = bits - ((last_l > 0)? 3*(l - last_l)-1 : 0);
 
-                        return { WA, last_l, (sixb_rows > 1), (sixb_rows > 2), (remaining_octs > 0) };
+                        return { WA, last_l, (nineb_rows > 1), (nineb_rows > 2), (remaining_bits > 0) };
                     }
 
                 public:
                     std::size_t witness_amount;
                     std::size_t n;
-                    std::size_t total_bits;
+                    const std::size_t total_bits = BlueprintFieldType::modulus_bits;
 
-                    gate_manifest_type(std::size_t witness_amount_, std::size_t n_, std::size_t total_bits_)
-                        : witness_amount(witness_amount_), n(n_), total_bits(total_bits_) {}
+                    gate_manifest_type(std::size_t witness_amount_, std::size_t n_)
+                        : witness_amount(witness_amount_), n(n_) {}
 
                     std::uint32_t gates_amount() const override {
                         return fri_cosets::gates_amount_internal(witness_amount,n,total_bits);
@@ -120,19 +120,17 @@ namespace nil {
                     bool operator<(const component_gate_manifest *other) const override {
                         std::size_t o_witness_amount = dynamic_cast<const gate_manifest_type*>(other)->witness_amount;
                         std::size_t o_n = dynamic_cast<const gate_manifest_type*>(other)->n;
-                        std::size_t o_total_bits = dynamic_cast<const gate_manifest_type*>(other)->total_bits;
 
                         std::array<std::size_t,5> gates = gates_footprint(witness_amount,n,total_bits);
-                        std::array<std::size_t,5> o_gates = gates_footprint(o_witness_amount,o_n,o_total_bits);
+                        std::array<std::size_t,5> o_gates = gates_footprint(o_witness_amount,o_n,total_bits);
                         return (gates < o_gates);
                     }
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
                                                        std::size_t lookup_column_amount,
-                                                       std::size_t n,
-                                                       std::size_t total_bits) {
-                    gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount,n,total_bits));
+                                                       std::size_t n) {
+                    gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount,n));
                     return manifest;
                 }
 
@@ -144,7 +142,7 @@ namespace nil {
                 static manifest_type get_manifest() {
                     static manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(
-                            new manifest_range_param(6,384,6) // 384 = 6*64, because we plan n <= 64
+                            new manifest_range_param(9,2295,9) // 2295 = 9*255, because we expect n <= 255
                         ),
                         true // constant column required
                     );
@@ -153,18 +151,18 @@ namespace nil {
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
                                                              std::size_t lookup_column_amount,
-                                                             std::size_t n,
-                                                             std::size_t total_bits) {
-                    return rows_amount_internal(witness_amount,n,total_bits);
+                                                             std::size_t n) {
+                    return rows_amount_internal(witness_amount,n,BlueprintFieldType::modulus_bits);
                 }
                 // Initialized by constructor
                 std::size_t n;
-                std::size_t total_bits;
                 value_type omega;
                 // aliases and derivatives
+                const std::size_t total_bits = BlueprintFieldType::modulus_bits; // the total amount of bits for storing a field element
+
                 const std::size_t WA = this->witness_amount();
-                const std::size_t six_bl_per_line = WA / 6; // 6-blocks per line
-                const std::size_t octs_blocks_count = lfit(total_bits-n,3); // number of 2-blocks
+                const std::size_t nine_bl_per_line = WA / 9; // 9-blocks per line
+                const std::size_t bits_blocks_count = total_bits-n; // number of bit blocks
 
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), n, total_bits);
 
@@ -181,15 +179,15 @@ namespace nil {
 
                     result_type(const fri_cosets &component, std::size_t start_row_index) {
                         const std::size_t n = component.n;
-                        const std::size_t l = component.six_bl_per_line;
+                        const std::size_t l = component.nine_bl_per_line;
 
                         output.clear();
                         for(std::size_t b = n; b > 0; b--) {
                             std::size_t i = (b-1) / l; // blocks are numbered 0..(n-1). i = row of block b
                             std::size_t j = (b-1) % l; // j = number of block b in i-th row
-                            output.push_back({ var(component.W(6*j + 3), start_row_index + i, false, var::column_type::witness),
-                                   var(component.W(6*j + 4), start_row_index + i, false, var::column_type::witness),
-                                   var(component.W(6*j + 5), start_row_index + i, false, var::column_type::witness) });
+                            output.push_back({ var(component.W(9*j + 5), start_row_index + i, false, var::column_type::witness),
+                                               var(component.W(9*j + 6), start_row_index + i, false, var::column_type::witness),
+                                               var(component.W(9*j + 7), start_row_index + i, false, var::column_type::witness) });
                         }
                     }
 
@@ -209,11 +207,9 @@ namespace nil {
                            ConstantContainerType constant,
                            PublicInputContainerType public_input,
                            std::size_t n_,
-                           std::size_t total_bits_,
                            value_type omega_):
                     component_type(witness, constant, public_input, get_manifest()),
                     n(n_),
-                    total_bits(total_bits_),
                     omega(omega_) {
                 };
 
@@ -224,11 +220,9 @@ namespace nil {
                                std::initializer_list<
                         typename component_type::public_input_container_type::value_type> public_inputs,
                         std::size_t n_,
-                        std::size_t total_bits_,
                         value_type omega_):
                     component_type(witnesses, constants, public_inputs, get_manifest()),
                     n(n_),
-                    total_bits(total_bits_),
                     omega(omega_) {
                 };
             };
@@ -251,48 +245,67 @@ namespace nil {
 
                 const std::size_t WA = component.WA;
                 const std::size_t n = component.n;
-                const std::size_t l = component.six_bl_per_line;
+                const std::size_t l = component.nine_bl_per_line;
 
-                typename BlueprintFieldType::integral_type x_decomp =
-                               typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.x).data);
+                typename BlueprintFieldType::integral_type
+                    x_decomp = typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.x).data),
+                    pm1_decomp = typename BlueprintFieldType::integral_type(BlueprintFieldType::value_type::modulus - 1);
 
                 value_type w_power = component.omega;
                 value_type coset_element = 1;
 
-                // fill the 6-blocks
+                // fill the 9-blocks
                 // top-down part
                 for(std::size_t b = 0; b < n; b++) {
                     std::size_t i = start_row_index + b / l;
                     std::size_t j = b % l;
-                    assignment.witness(component.W(6*j),i) = value_type(x_decomp);
-                    assignment.witness(component.W(6*j+1),i) = w_power;
+                    assignment.witness(component.W(9*j),i) = value_type(x_decomp);
+                    assignment.witness(component.W(9*j+1),i) = value_type(pm1_decomp);
+                    // W(9j + 2) = sgn(pm1_decomp - x_decomp)
+                    assignment.witness(component.W(9*j+2),i) = value_type((x_decomp < pm1_decomp) - (pm1_decomp < x_decomp));
+                    assignment.witness(component.W(9*j+3),i) = w_power;
                     coset_element *= (x_decomp % 2 == 1 ? w_power : 1);
-                    assignment.witness(component.W(6*j+2),i) = coset_element;
-                    assignment.witness(component.W(6*j+5),i) = value_type(x_decomp % 2);
+                    assignment.witness(component.W(9*j+4),i) = coset_element;
+                    assignment.witness(component.W(9*j+7),i) = value_type(x_decomp % 2);
+                    assignment.witness(component.W(9*j+8),i) = value_type(pm1_decomp % 2);
                     x_decomp /= 2;
+                    pm1_decomp /= 2;
                     w_power *= w_power;
                 }
                 // down-top part
                 for(std::size_t b = n; b > 0; b--) {
                     std::size_t i = start_row_index + (b-1) / l;
                     std::size_t j = (b-1) % l;
-                    assignment.witness(component.W(6*j+3),i) = coset_element;
-                    assignment.witness(component.W(6*j+4),i) = (-1)*coset_element;
+                    assignment.witness(component.W(9*j+5),i) = coset_element;
+                    assignment.witness(component.W(9*j+6),i) = (-1)*coset_element;
                     coset_element = coset_element * coset_element;
                 }
 
-                std::size_t i = (6*n) / WA;
-                std::size_t j = (6*n) % WA;
+                std::size_t i = (9*n) / WA;
+                std::size_t j = (9*n) % WA;
                 assignment.witness(component.W(j),start_row_index + i) = value_type(x_decomp);
-                j++;
+                assignment.witness(component.W(j+1),start_row_index + i) = value_type(pm1_decomp);
+                // W(j + 2) = sgn(pm1_decomp - x_decomp)
+                assignment.witness(component.W(j+2),start_row_index + i) =
+                                   value_type((x_decomp < pm1_decomp) - (pm1_decomp < x_decomp));
+                j += 3;
                 while(i < component.rows_amount-1) {
-                    assignment.witness(component.W(j),start_row_index + i) = value_type(x_decomp % 8);
-                    x_decomp = x_decomp / 8;
-                    j++;
+                    assignment.witness(component.W(j),start_row_index + i) = value_type(x_decomp % 2);
+                    assignment.witness(component.W(j+1),start_row_index + i) = value_type(pm1_decomp % 2);
+                    assignment.witness(component.W(j+2),start_row_index + i) =
+                                       value_type((x_decomp < pm1_decomp) - (pm1_decomp < x_decomp));
+                    x_decomp = x_decomp / 2;
+                    pm1_decomp = pm1_decomp / 2;
+                    // W(j + 2) = sgn(pm1_decomp - x_decomp)
+                    j += 3;
                     if (j == WA) {
                         i++;
                         assignment.witness(component.W(0),start_row_index + i) = value_type(x_decomp);
-                        j = 1;
+                        assignment.witness(component.W(1),start_row_index + i) = value_type(pm1_decomp);
+                        // W(2) = sgn(pm1_decomp - x_decomp)
+                        assignment.witness(component.W(j+2),start_row_index + i) =
+                                           value_type((x_decomp < pm1_decomp) - (pm1_decomp < x_decomp));
+                        j = 3;
                     }
                 }
 
@@ -310,11 +323,33 @@ namespace nil {
 
                 using var = typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::var;
 
+                // input
                 bp.add_copy_constraint({instance_input.x, var(component.W(0), start_row_index, false)});
+
+                // omega
                 bp.add_copy_constraint({var(0, start_row_index, false, var::column_type::constant),
-                                        var(component.W(1), start_row_index, false)});
+                                        var(component.W(3), start_row_index, false)});
+
+                // everything that's over total_bits should be zero
+                std::size_t WA = component.WA; // witness_amount
+                std::size_t l = component.nine_bl_per_line; // number of 9-blocks per row
+                std::size_t last_l = component.n % l; // 9-blocks in transition row. If 0, no transition row exists
+                std::size_t remaining_bits = component.bits_blocks_count - ((last_l > 0)? 3*(l - last_l)-1 : 0);
+
+                if (remaining_bits % (WA/3 - 1) > 0) { // Are there extra bits in the last row?
+                    for(std::size_t j = 3*(remaining_bits % (WA/3 - 1) + 1); j < WA; j++) {
+                        bp.add_copy_constraint({var(0, start_row_index + 1, false, var::column_type::constant),
+                                                var(component.W(j), start_row_index + component.rows_amount - 2, false)});
+                    }
+                }
+
+                // final row first 3-block is all zeros
                 bp.add_copy_constraint({var(0, start_row_index + 1, false, var::column_type::constant),
                                         var(component.W(0), start_row_index + component.rows_amount - 1, false)});
+                bp.add_copy_constraint({var(0, start_row_index + 1, false, var::column_type::constant),
+                                        var(component.W(1), start_row_index + component.rows_amount - 1, false)});
+                bp.add_copy_constraint({var(0, start_row_index + 1, false, var::column_type::constant),
+                                        var(component.W(2), start_row_index + component.rows_amount - 1, false)});
             }
 
             template<typename BlueprintFieldType,
@@ -332,107 +367,142 @@ namespace nil {
 
                 const std::size_t WA = component.WA;
 
-                const std::size_t l = component.six_bl_per_line;
-                const std::size_t sixb_rows = lfit(component.n,l); // number of rows with 6-blocks
-                const std::size_t last_l = component.n % l; // 6-blocks in transition row. If 0, no transition row exists
-                const std::size_t octs = component.octs_blocks_count;
+                const std::size_t l = component.nine_bl_per_line;
+                const std::size_t nineb_rows = lfit(component.n,l); // number of rows with 9-blocks
+                const std::size_t last_l = component.n % l; // 9-blocks in transition row. If 0, no transition row exists
+                const std::size_t bits = component.bits_blocks_count;
 
                 std::size_t selector_index;
 
-                std::vector<constraint_type> six_block;
-                std::vector<constraint_type> oct_line;
-                constraint_type first_W2 = var(component.W(1),0)*var(component.W(5),0) + 1-var(component.W(5),0) - var(component.W(2),0);
+                std::vector<constraint_type> nine_block;
+                std::vector<constraint_type> bit_line;
+                constraint_type first_add_W1 = var(component.W(1),0) + 1;
+                constraint_type first_add_W2 = var(component.W(2),0) * (1-var(component.W(2),0));
+                constraint_type first_W4 = var(component.W(3),0)*var(component.W(7),0) + 1-var(component.W(7),0) - var(component.W(4),0);
 
                 // Store typical constraints for every column
-                six_block.resize(WA);
+                nine_block.resize(WA);
                 for(std::size_t j = 0; j < l; j++) {
-                    var W0 = var(component.W(6*j),0),
-                        W1 = var(component.W(6*j + 1),0),
-                        W2 = var(component.W(6*j + 2),0),
-                        W3 = var(component.W(6*j + 3),0),
-                        W4 = var(component.W(6*j + 4),0),
-                        W5 = var(component.W(6*j + 5),0),
-                        W0next = var(component.W(6*((j+1) % l)),(j+1)/l),
-                        W1prev = var(component.W(6*((l+j-1) % l) + 1), -(j == 0)),
-                        W2prev = var(component.W(6*((l+j-1) % l) + 2), -(j == 0)),
-                        W3next = var(component.W(6*((j+1) % l) + 3),(j+1)/l);
+                    var W0 = var(component.W(9*j),0),     // x/2^j
+                        W1 = var(component.W(9*j + 1),0), // (p-1)/2^j
+                        W2 = var(component.W(9*j + 2),0), // sgn( (p-1-x)/2^j )
+                        W3 = var(component.W(9*j + 3),0), // omega^{2^j}
+                        W4 = var(component.W(9*j + 4),0), // omega^{b_j...b_0}
+                        W5 = var(component.W(9*j + 5),0), // (omega^{2^{n-1-j}})^x
+                        W6 = var(component.W(9*j + 6),0), // -(omega^{2^{n-1-j}})^x
+                        W7 = var(component.W(9*j + 7),0), // b_j = the j-th bit of x binary decomposition
+                        W8 = var(component.W(9*j + 8),0), // c_j = the j-th bit of (p-1) binary decomposition
+                        W0next = var(component.W(9*((j+1) % l)),(j+1)/l),
+                        W1next = var(component.W(9*((j+1) % l) + 1),(j+1)/l),
+                        W2next = var(component.W(9*((j+1) % l) + 2),(j+1)/l),
+                        W3prev = var(component.W(9*((l+j-1) % l) + 3), -(j == 0)),
+                        W4prev = var(component.W(9*((l+j-1) % l) + 4), -(j == 0)),
+                        W5next = var(component.W(9*((j+1) % l) + 5),(j+1)/l);
 
-                    six_block[6*j]   = W0 - 2*W0next - W5;
-                    six_block[6*j+1] = W1 - W1prev * W1prev;
-                    six_block[6*j+2] = W2 - W2prev * (W1*W5 + 1-W5);
-                    six_block[6*j+3] = W3 - W3next * W3next;
-                    six_block[6*j+4] = W3 + W4;
-                    six_block[6*j+5] = (1 - W5) * W5;
+                    nine_block[9*j]   = W0 - 2*W0next - W7;
+                    nine_block[9*j+1] = W1 - 2*W1next - W8;
+                    nine_block[9*j+2] = (W8 - W7)*(1 - W2next)*(1 + W2next) + W2next - W2;
+                    nine_block[9*j+3] = W3 - W3prev * W3prev;
+                    nine_block[9*j+4] = W4 - W4prev * (W3*W7 + 1-W7);
+                    nine_block[9*j+5] = W5 - W5next * W5next;
+                    nine_block[9*j+6] = W5 + W6;
+                    nine_block[9*j+7] = (1 - W7) * W7;
+                    nine_block[9*j+8] = (1 - W8) * W8;
                 }
 
-                oct_line.resize(WA);
-                oct_line[0] = var(component.W(0),1);
-                for(std::size_t j = WA-1; j > 0; j--) {
-                    var Wj = var(component.W(j),0);
-                    oct_line[0] *= 8;
-                    oct_line[0] += Wj;
-                    oct_line[j] = Wj * (Wj - 1) * (Wj - 2) * (Wj - 3) * (Wj - 4) * (Wj - 5) * (Wj - 6) * (Wj - 7);
+                bit_line.resize(WA);
+                bit_line[0] = var(component.W(0),1);
+                bit_line[1] = var(component.W(1),1);
+                bit_line[2] = var(component.W(2),0) - var(component.W(5),0); // the first sign in the bit_line is just a copy of the 2nd
+                for(std::size_t j = WA-3; j > 0; j -= 3) {
+                    var Wj  = var(component.W(j),0),
+                        Wj1 = var(component.W(j+1),0),
+                        Wj2 = var(component.W(j+2),0),
+                        Wj2next = var(component.W((j+5) % WA), (j+3 == WA)); // the sign in the next 3-block may be in the next line
+                    bit_line[0] *= 2;
+                    bit_line[0] += Wj;
+                    bit_line[1] *= 2;
+                    bit_line[1] += Wj1;
+                    bit_line[j] = Wj * (Wj - 1);
+                    bit_line[j+1] = Wj1 * (Wj1 - 1);
+                    bit_line[j+2] = (Wj1 - Wj)*(1 - Wj2next)*(1 + Wj2next) + Wj2next - Wj2;
                 }
-                oct_line[0] -= var(component.W(0),0);
+                bit_line[0] -= var(component.W(0),0);
+                bit_line[1] -= var(component.W(1),0);
 
                 std::vector<constraint_type> cs1;
-                if (sixb_rows > 1) { // there is a starting row which is not final (gate type 1)
-                    cs1 = {six_block[0]};
-                    cs1.push_back(first_W2);
-                    cs1.insert(cs1.end(),std::next(six_block.begin(),3),six_block.end());
+                if (nineb_rows > 1) { // there is a starting row which is not final (gate type 1)
+                    cs1 = {nine_block[0],nine_block[1],nine_block[2]};
+                    cs1.push_back(first_add_W1);
+                    cs1.push_back(first_add_W2);
+                    cs1.push_back(first_W4);
+                    cs1.insert(cs1.end(),std::next(nine_block.begin(),5),nine_block.end());
                     selector_index = bp.add_gate(cs1); // type 1 gate
                     // Applying gate type 1 to line 0
                     assignment.enable_selector(selector_index, start_row_index);
                 }
 
-                if (sixb_rows > 2) { // there is a middle row (gate type 2)
-                    selector_index = bp.add_gate(six_block); // type 2 gate
-                    // Applying gate type 2 to lines 1--(sixb_rows - 2)
-                    for(std::size_t i = 1; i < sixb_rows - 1; i++) {
+                if (nineb_rows > 2) { // there is a middle row (gate type 2)
+                    selector_index = bp.add_gate(nine_block); // type 2 gate
+                    // Applying gate type 2 to lines 1--(nineb_rows - 2)
+                    for(std::size_t i = 1; i < nineb_rows - 1; i++) {
                         assignment.enable_selector(selector_index, start_row_index + i);
                     }
                 }
 
-                // The gate for the line where the 6-blocks end
+                // The gate for the line where the 9-blocks end
                 std::vector<constraint_type> cs3;
-                std::size_t last = (last_l > 0)? last_l : l; // The number of the last 6-block in the row
-                cs3 = {six_block[0]};
-                if (sixb_rows > 1) { // if the first 6-block is a regular middle 6-block, otherwise there's no "previous"
-                    cs3.push_back(six_block[1]);
-                    cs3.push_back(six_block[2]);
+                std::size_t last = (last_l > 0)? last_l : l; // The number of the last 9-block in the row
+                cs3 = {nine_block[0],nine_block[1],nine_block[2]};
+                if (nineb_rows > 1) { // if the first 9-block is a regular middle 9-block, otherwise there's no "previous"
+                    cs3.push_back(nine_block[3]);
+                    cs3.push_back(nine_block[4]);
                 } else {
-                    cs3.push_back(first_W2);
+                    cs3.push_back(first_add_W1);
+                    cs3.push_back(first_add_W2);
+                    cs3.push_back(first_W4);
                 }
-                cs3.insert(cs3.end(),std::next(six_block.begin(),3),std::next(six_block.begin(),6*(last-1)+3));
-                cs3.push_back(var(component.W(6*(last - 1) + 3),0) - var(component.W(6*(last - 1) + 2),0));
-                cs3.push_back(six_block[6*(last-1)+4]);
-                cs3.push_back(six_block[6*(last-1)+5]);
+                cs3.insert(cs3.end(),std::next(nine_block.begin(),5),std::next(nine_block.begin(),9*(last-1)+5));
+                cs3.push_back(var(component.W(9*(last - 1) + 5),0) - var(component.W(9*(last - 1) + 4),0));
+                cs3.push_back(nine_block[9*(last-1)+6]);
+                cs3.push_back(nine_block[9*(last-1)+7]);
+                cs3.push_back(nine_block[9*(last-1)+8]);
 
-                if (last_l > 0) { // there are octets on the transition line
-                    constraint_type mid = var(component.W(0),1);
+                if (last_l > 0) { // there are bits on the transition line
+                    constraint_type mid  = var(component.W(0),1),
+                                    mid1 = var(component.W(1),1);
 
-                    for(std::size_t j = WA-1; j > 6*last_l; j--) {
-                        mid *= 8;
+                    for(std::size_t j = WA-3; j > 9*last_l; j -= 3) {
+                        mid *= 2;
                         mid += var(component.W(j),0);
+                        mid1 *= 2;
+                        mid1 += var(component.W(j+1),0);
                     }
-                    mid -= var(component.W(6*last_l),0);
+                    mid  -= var(component.W(9*last_l),0);
+                    mid1 -= var(component.W(9*last_l + 1),0);
                     cs3.push_back(mid);
+                    cs3.push_back(mid1);
+
+                    // the sign bit should be just a copy from the next block
+                    var Wl2     = var(component.W(9*last_l + 2),0),
+                        Wl2next = var(component.W(9*last_l + 5),0);
+                    cs3.push_back( Wl2 - Wl2next );
 
                     cs3.insert(cs3.end(),
-                              std::next(oct_line.begin(),6*last_l + 1),
-                              oct_line.end());
+                              std::next(bit_line.begin(),9*last_l + 3),
+                              bit_line.end());
                 }
                 selector_index = bp.add_gate(cs3); // type 3 gate
-                // Applying gate type 3 to line (sixb_rows - 1)
-                assignment.enable_selector(selector_index, start_row_index + sixb_rows - 1);
+                // Applying gate type 3 to line (nineb_rows - 1)
+                assignment.enable_selector(selector_index, start_row_index + nineb_rows - 1);
 
-                // the number of 2-blocks not fitting on the "transition" line
-                std::size_t remaining_octs = octs - (last_l > 0 ? 6*(l - last_l)-1 : 0);
-                if (remaining_octs > 0) {
-                    selector_index = bp.add_gate(oct_line); // type 4 gate
-                    // Applying gate type 4 to lines sixb_rows -- (sixb_rows + lfit(remaining_octs,WA-1) - 2)
-                    for(std::size_t i = 0; i < lfit(remaining_octs, WA - 1); i++) {
-                        assignment.enable_selector(selector_index, start_row_index + sixb_rows + i);
+                // the number of bits not fitting on the "transition" line
+                std::size_t remaining_bits = bits - (last_l > 0 ? 3*(l - last_l)-1 : 0);
+                if (remaining_bits > 0) {
+                    selector_index = bp.add_gate(bit_line); // type 4 gate
+                    // Applying gate type 4 to lines nineb_rows -- (nineb_rows + lfit(remaining_bits,WA/3-1) - 2)
+                    for(std::size_t i = 0; i < lfit(remaining_bits, WA/3 - 1); i++) {
+                        assignment.enable_selector(selector_index, start_row_index + nineb_rows + i);
                     }
                 }
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
