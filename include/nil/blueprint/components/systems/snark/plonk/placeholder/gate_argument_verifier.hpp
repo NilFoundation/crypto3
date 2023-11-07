@@ -69,9 +69,9 @@ namespace nil {
                     return r;
                 }
 
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, ConstantsAmount, 1>;
 
             public:
+                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, ConstantsAmount, 1>;
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
 
@@ -389,7 +389,7 @@ namespace nil {
                 }
 
                 if (n_sl > 1) {
-                    
+
                     generate_assignments_constant(component, bp, assignment, instance_input, start_row_index);
 
                     std::size_t total_deg =
