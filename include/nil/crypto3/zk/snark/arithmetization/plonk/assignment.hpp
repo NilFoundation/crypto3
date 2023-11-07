@@ -272,11 +272,11 @@ namespace nil {
                         return _public_table.selector(index);
                     }
 
-                    void fill_constant(std::uint32_t index, const ColumnType& column) {
+                    virtual void fill_constant(std::uint32_t index, const ColumnType& column) {
                         _public_table.fill_constant(index, column);
                     }
 
-                    void fill_selector(std::uint32_t index, const ColumnType& column) {
+                    virtual void fill_selector(std::uint32_t index, const ColumnType& column) {
                         _public_table.fill_selector(index, column);
                     }
 
