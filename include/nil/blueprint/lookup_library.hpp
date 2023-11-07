@@ -32,6 +32,8 @@
 #include <boost/bimap.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/detail/lookup_table_definition.hpp>
+#include <nil/blueprint/components/hashes/sha2/plonk/detail/split_functions.hpp>
+#include <nil/blueprint/components/hashes/sha2/plonk/detail/sha_table_generators.hpp>
 #include <nil/blueprint/manifest.hpp>
 #include <nil/blueprint/assert.hpp>
 
@@ -60,14 +62,6 @@ namespace nil {
         struct component_use_custom_lookup_tables<Type,
             typename std::enable_if<std::is_member_function_pointer<decltype(&Type::component_custom_lookup_tables)>::value>::type> : std::true_type
         { };
-
-        template <typename Type>
-        constexpr bool use_custom_lookup_tables(){
-            if(component_use_custom_lookup_tables<Type>::value){
-                return true;
-            }
-            return false;
-        }
 
         template <typename BlueprintFieldType>
         class lookup_library {
@@ -105,6 +99,159 @@ namespace nil {
                 virtual std::size_t get_columns_number(){ return 3; }
                 virtual std::size_t get_rows_number(){ return 4; }
             };
+
+            class sparse_values_base4_table: public lookup_table_definition {
+            public:
+                sparse_values_base4_table(): lookup_table_definition("sha256_sparse_base4"){
+                    this->subtables["full"] = {{0,1}, 0, 16383};
+                    this->subtables["first_column"] = {{0}, 0, 16383};
+                };
+                virtual void generate(){
+                    this->_table.resize(2);
+                    std::vector<std::size_t> value_sizes = {14};
+
+                    // lookup table for sparse values with base = 4
+                    for (typename BlueprintFieldType::integral_type i = 0;
+                        i < typename BlueprintFieldType::integral_type(16384);
+                        i++
+                    ) {
+                        std::vector<bool> value(14);
+                        for (std::size_t j = 0; j < 14; j++) {
+                            value[14 - j - 1] = crypto3::multiprecision::bit_test(i, j);
+                        }
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> value_chunks =
+                            components::detail::split_and_sparse<BlueprintFieldType>(value, value_sizes, 4);
+                        this->_table[0].push_back(value_chunks[0][0]);
+                        this->_table[1].push_back(value_chunks[1][0]);
+                    }
+                }
+
+                virtual std::size_t get_columns_number(){return 2;}
+                virtual std::size_t get_rows_number(){return 16384;}
+            };
+
+            class reverse_sparse_sigmas_base4_table : public lookup_table_definition {
+            public:
+                reverse_sparse_sigmas_base4_table(): lookup_table_definition("sha256_reverse_sparse_base4"){
+                    this->subtables["full"] = {{0,1}, 0, 65535};
+                };
+
+                virtual void generate() {
+                    this->_table = components::detail::load_sha_table<BlueprintFieldType>(
+                        {"8_split_4.txt",
+                        "./../libs/crypto3/libs/blueprint/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_4.txt",
+                        "./../libs/blueprint/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_4.txt",
+                        "./../../../../libs/blueprint/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_4.txt"});
+                    if (this->_table.size() == 0 || this->_table[0].size() == 0) {
+                        std::cerr << "Failed to load table 8_split_4.txt!"
+                                        " Please check the paths and generate the table."
+                                    << std::endl;
+                        BLUEPRINT_RELEASE_ASSERT(0);
+                    }
+                }
+
+                virtual std::size_t get_columns_number(){return 2;}
+                virtual std::size_t get_rows_number(){return 65536;}
+            };
+
+            class sparse_values_base7_table: public lookup_table_definition{
+            public:
+                sparse_values_base7_table(): lookup_table_definition("sha256_sparse_base7"){
+                    this->subtables["full"] = {{0,1}, 0, 16383};
+                    this->subtables["first_column"] = {{0}, 0, 16383};
+                    this->subtables["second_column"] = {{1}, 0, 16383};
+                };
+                virtual void generate(){
+                    this->_table.resize(2);
+                    std::vector<std::size_t> value_sizes = {14};
+                    for (typename BlueprintFieldType::integral_type i = 0;
+                        i < typename BlueprintFieldType::integral_type(16384);
+                        i++) {
+                        std::vector<bool> value(14);
+                        for (std::size_t j = 0; j < 14; j++) {
+                            value[14 - j - 1] = crypto3::multiprecision::bit_test(i, j);
+                        }
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> value_chunks =
+                            components::detail::split_and_sparse<BlueprintFieldType>(value, value_sizes, 7);
+                        this->_table[0].push_back(value_chunks[0][0]);
+                        this->_table[1].push_back(value_chunks[1][0]);
+                    }
+                }
+
+                virtual std::size_t get_columns_number(){return 2;}
+                virtual std::size_t get_rows_number(){return 16384;}
+            };
+
+            class reverse_sparse_sigmas_base7_table: public lookup_table_definition{
+            public:
+                reverse_sparse_sigmas_base7_table(): lookup_table_definition("sha256_reverse_sparse_base7"){
+                    this->subtables["full"] = {{0,1}, 0, 43903};
+                };
+                virtual void generate() {
+                    this->_table = components::detail::load_sha_table<BlueprintFieldType>(
+                        {"8_split_7.txt",
+                        "./../libs/crypto3/libs/blueprint/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_7.txt",
+                        "./../libs/blueprint/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_7.txt",
+                        "./../../../../libs/blueprint/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_7.txt"});
+                    if (this->_table.size() == 0 || this->_table[0].size() == 0) {
+                        std::cerr << "Failed to load table 8_split_7.txt!"
+                                     " Please check the paths and generate the table."
+                                  << std::endl;
+                        BLUEPRINT_RELEASE_ASSERT(0);
+                    }
+                }
+
+                virtual std::size_t get_columns_number(){return 2;}
+                virtual std::size_t get_rows_number(){return 43904;}
+            };
+
+            class maj_function_table: public lookup_table_definition{
+            public:
+                maj_function_table(): lookup_table_definition("sha256_maj"){
+                    this->subtables["full"] = {{0,1}, 0, 65534};
+                    this->subtables["first_column"] = {{0}, 0, 65534};
+                };
+                virtual void generate(){
+                    this->_table.resize(2);
+                    std::vector<std::size_t> value_sizes = {8};
+                    for (typename BlueprintFieldType::integral_type i = 0;
+                        i < typename BlueprintFieldType::integral_type(65535);
+                        i++
+                    ) {
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
+                            value = components::detail::reversed_sparse_and_split_maj<BlueprintFieldType>(i, value_sizes, 4);
+                        this->_table[0].push_back(value[0][0]);
+                        this->_table[1].push_back(value[1][0]);
+                    }
+                }
+
+                virtual std::size_t get_columns_number(){return 2;}
+                virtual std::size_t get_rows_number(){return 65535;}
+            };
+
+            class ch_function_table: public lookup_table_definition{
+            public:
+                ch_function_table(): lookup_table_definition("sha256_ch"){
+                    this->subtables["full"] = {{0,1}, 0, 5765040};
+                    this->subtables["first_column"] = {{0}, 0, 5765040};
+                };
+                virtual void generate(){
+                    this->_table.resize(2);
+                    std::vector<std::size_t> value_sizes = {8};
+                    for (typename BlueprintFieldType::integral_type i = 0;
+                        i < typename BlueprintFieldType::integral_type(5765041);
+                        i++
+                    ) {
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
+                            value = components::detail::reversed_sparse_and_split_ch<BlueprintFieldType>(i, value_sizes, 7);
+                        this->_table[0].push_back(value[0][0]);
+                        this->_table[1].push_back(value[1][0]);
+                    }
+                }
+
+                virtual std::size_t get_columns_number(){return 2;}
+                virtual std::size_t get_rows_number(){return 5765041;}
+            };
         public:
             using bimap_type = boost::bimap<boost::bimaps::set_of<std::string>, boost::bimaps::set_of<std::size_t>>;
             using left_reserved_type = typename bimap_type::left_map;
@@ -115,6 +262,12 @@ namespace nil {
                 reserved_all = false;
                 tables["binary_xor_table"] = std::shared_ptr<lookup_table_definition>(new binary_xor_table_type());
                 tables["binary_and_table"] = std::shared_ptr<lookup_table_definition>(new binary_and_table_type());
+                tables["sha256_sparse_base4"] = std::shared_ptr<lookup_table_definition>(new sparse_values_base4_table());
+                tables["sha256_reverse_sparse_base4"] = std::shared_ptr<lookup_table_definition>(new reverse_sparse_sigmas_base4_table());
+                tables["sha256_sparse_base7"] = std::shared_ptr<lookup_table_definition>(new sparse_values_base7_table());
+                tables["sha256_reverse_sparse_base7"] = std::shared_ptr<lookup_table_definition>(new reverse_sparse_sigmas_base7_table());
+                tables["sha256_maj"] = std::shared_ptr<lookup_table_definition>(new maj_function_table());
+                tables["sha256_ch"] = std::shared_ptr<lookup_table_definition>(new ch_function_table());
             }
 
             void register_lookup_table(std::shared_ptr<lookup_table_definition> table){
