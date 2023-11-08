@@ -176,7 +176,12 @@ namespace nil {
             replacements["$POINTS_INITIALIZATION$"] = points_initializer.str();
             replacements["$ETHA$"] = to_string(etha);
             if( PlaceholderParams::commitment_scheme_type::fri_type::use_grinding){
+                auto params = PlaceholderParams::commitment_scheme_type::fri_type::grinding_type::get_params();
+                uint32_t mask_value = params.template get<uint32_t>("mask", 0);
+                std::stringstream mask_value_hex;
+                mask_value_hex << std::hex << std::showbase << std::setw(8) << std::setfill('0') << mask_value;
                 replacements["$GRINDING_CHECK$"] = modular_commitment_grinding_check_template;
+                replacements["$GRINDING_MASK$"] = mask_value_hex.str();
             } else {
                 replacements["$GRINDING_CHECK$"] = "";
             }

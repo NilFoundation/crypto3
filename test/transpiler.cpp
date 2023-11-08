@@ -63,6 +63,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
+#include <nil/crypto3/zk/commitments/detail/polynomial/proof_of_work.hpp>
 #include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
@@ -200,8 +201,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
         transcript_hash_type,
         placeholder_test_params::lambda,
         placeholder_test_params::m,
-        true
+        true,
+        crypto3::zk::commitments::proof_of_work<transcript_hash_type, std::uint32_t, 0xFFFF8000 >
     >;
+
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;

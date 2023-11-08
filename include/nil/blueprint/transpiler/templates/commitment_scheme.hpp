@@ -8,8 +8,9 @@ namespace nil {
         std::string modular_commitment_grinding_check_template = R"(
         bytes calldata proof_of_work = blob[blob.length - 4:];
         transcript.update_transcript(tr_state, proof_of_work);
-        transcript.get_integral_challenge_be(tr_state, 4);
-            )";
+        uint256 p_o_w = transcript.get_integral_challenge_be(tr_state, 4);
+        if (p_o_w & $GRINDING_MASK$ != 0) return false;
+)";
 
         std::string modular_commitment_library_template = R"(
 // SPDX-License-Identifier: Apache-2.0.
