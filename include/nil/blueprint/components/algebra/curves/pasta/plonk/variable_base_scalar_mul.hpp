@@ -348,9 +348,9 @@ namespace nil {
                 // assign additional bits of aux for the range check (integral_b < q) or (b_high * 2^254 + integral_b < q)
                 typename BlueprintFieldType::value_type u_next = 0;
                 typename BlueprintFieldType::value_type u0, u1;
-                for (std::size_t i = component.aux_bits_start_row; i <= component.aux_bits_start_row + component.aux_bits_rows_amount - 3; i = i + 2) {
+                for (std::size_t i = start_row_index + component.aux_bits_start_row; i <= start_row_index + component.aux_bits_start_row + component.aux_bits_rows_amount - 3; i = i + 2) {
                     assignment.witness(component.W(6), i) = u_next;
-                    const std::size_t ind = 125 + ((i - component.aux_bits_start_row) / 2) * 6;
+                    const std::size_t ind = 125 + ((i - component.aux_bits_start_row - start_row_index) / 2) * 6;
                     u0 = 4 * aux_bits[ind] + 2 * aux_bits[ind+1] + aux_bits[ind+2];
                     u1 = 4 * aux_bits[ind+3] + 2 * aux_bits[ind+4] + aux_bits[ind+5];
                     u_next = 64 * u_next + 8 * u0 + u1;
@@ -358,25 +358,25 @@ namespace nil {
                     assignment.witness(component.W(13), i+1) = u1;
                     assignment.witness(component.W(14), i+1) = u_next;
                 }
-                assignment.witness(component.W(6), component.aux_bits_start_row + component.aux_bits_rows_amount - 2) = u_next;
+                assignment.witness(component.W(6), start_row_index + component.aux_bits_start_row + component.aux_bits_rows_amount - 2) = u_next;
                 const std::size_t ind = 125 + (component.aux_bits_rows_amount / 2 - 1) * 6;
                 u0 = 4 * aux_bits[ind] + 2 * aux_bits[ind+1] + aux_bits[ind+2];
                 u1 = aux_bits[ind+3];
                 u_next = 16 * u_next + 2 * u0 + u1;
-                assignment.witness(component.W(12), component.aux_bits_start_row + component.aux_bits_rows_amount - 1) = u0;
-                assignment.witness(component.W(13), component.aux_bits_start_row + component.aux_bits_rows_amount - 1) = u1;
-                assignment.witness(component.W(14), component.aux_bits_start_row + component.aux_bits_rows_amount - 1) = u_next;
+                assignment.witness(component.W(12), start_row_index + component.aux_bits_start_row + component.aux_bits_rows_amount - 1) = u0;
+                assignment.witness(component.W(13), start_row_index + component.aux_bits_start_row + component.aux_bits_rows_amount - 1) = u1;
+                assignment.witness(component.W(14), start_row_index + component.aux_bits_start_row + component.aux_bits_rows_amount - 1) = u_next;
 
-                assignment.witness(component.W(9), component.rows_amount - 1) = bits[0];
+                assignment.witness(component.W(9), start_row_index + component.rows_amount - 1) = bits[0];
                 typename BlueprintFieldType::value_type e2 = 0;
                 typename BlueprintFieldType::value_type cur_pow = 1;
                 for (std::size_t l = 130; l <= 254; l = l + 1) {
                     e2 += + bits[254-l] * cur_pow;
                     cur_pow = cur_pow * 2;
                 }
-                assignment.witness(component.W(10), component.rows_amount - 1) = e2;
-                assignment.witness(component.W(11), component.rows_amount - 1) = integral_b;
-                assignment.witness(component.W(12), component.rows_amount - 1) = aux;
+                assignment.witness(component.W(10), start_row_index + component.rows_amount - 1) = e2;
+                assignment.witness(component.W(11), start_row_index + component.rows_amount - 1) = integral_b;
+                assignment.witness(component.W(12), start_row_index + component.rows_amount - 1) = aux;
 
                 // assign last 3 rows
                 typename BlueprintFieldType::value_type m = ((n_next - component.shifted_minus_one)*
