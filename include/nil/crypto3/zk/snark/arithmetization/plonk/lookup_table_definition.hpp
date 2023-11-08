@@ -35,6 +35,17 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                namespace detail {
+                    std::size_t next_power_of_two_minus_3(std::size_t x) {
+                        BOOST_ASSERT_MSG(x > 2, "x must be greater than 2");
+                        std::size_t result = (1 << __builtin_clz((x | 1) << 1)) - 2;
+                        if (result <= x) {
+                            result =  (1 << __builtin_clz(result << 1)) - 2;
+                        }
+                        return result - 2;
+                    }
+                };
+
                 // Interface for lookup table definitions.
                 template<typename FieldType>
                 class lookup_subtable_definition{
@@ -235,6 +246,13 @@ namespace nil {
                             : 1;
                         const std::size_t column_count = table->get_columns_number() * fold_count;
                         const std::size_t rows_amount = (table->get_rows_number() + fold_count - 1) / fold_count;
+                        if (rows_amount > max_usable_rows) {
+                            // We need to increase the max_usable_rows to make it fit
+                            // A proper optimizer would calculate a reasonable bound
+                            return pack_lookup_tables_horizontal<FieldType, ArithmetizationParams, TableIdsMapType>(
+                                lookup_table_ids, lookup_tables, bp, assignment, constant_columns_ids, usable_rows,
+                                detail::next_power_of_two_minus_3(max_usable_rows));
+                        }
                         table_sizes.emplace_back(table_name, column_count, rows_amount, fold_count);
                     }
                     // Now we can fold the smaller tables "below" the larger ones in some cases
@@ -278,7 +296,7 @@ namespace nil {
                         // A proper optimizer would calculate a reasonable bound
                         return pack_lookup_tables_horizontal<FieldType, ArithmetizationParams, TableIdsMapType>(
                             lookup_table_ids, lookup_tables, bp, assignment, constant_columns_ids, usable_rows,
-                            max_usable_rows * 2);
+                            detail::next_power_of_two_minus_3(max_usable_rows));
                     }
                     // std::cout << "Showing the layout:" << std::endl;
                     // for (const auto &[table_name, column_count, rows_amount, fold_count, layout_coords] : layout) {
