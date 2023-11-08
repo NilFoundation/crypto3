@@ -9,12 +9,12 @@ namespace nil {
         {
             uint256 lookup_offset = table_offset + quotient_offset + uint256(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf])) * 0x20;
             uint256[4] memory lookup_argument;
+            uint256 lookup_commitment = basic_marshalling.get_uint256_be(blob, 0x81);
             ILookupArgument lookup_contract = ILookupArgument(_lookup_argument_address);
             (lookup_argument, tr_state.current_challenge) = lookup_contract.verify(
-//            (lookup_argument, tr_state.current_challenge) = modular_lookup_argument_$TEST_NAME$.verify(
                 blob[special_selectors_offset: table_offset + quotient_offset],
                 blob[lookup_offset:lookup_offset + sorted_columns * 0x60],
-                basic_marshalling.get_uint256_be(blob, 0x81),
+                lookup_commitment,
                 state.l0,
                 tr_state.current_challenge
             );
@@ -151,7 +151,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
     function verify(
         bytes calldata blob,
         uint256[] calldata public_input
-    ) public view{
+    ) public view returns (bool result) {
         verifier_state memory state;
         state.b = true;
         state.gas = gasleft();
@@ -191,6 +191,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             state.F[2] = permutation_argument[2];
         }
 
+        //4. Lookup library call
         $LOOKUP_LIBRARY_CALL$
 
         //5. Push permutation batch to transcript
@@ -266,6 +267,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         }
 
         console.log("Gas for verification:", state.gas-gasleft());
+        result = state.b;
     }
 }
         )";

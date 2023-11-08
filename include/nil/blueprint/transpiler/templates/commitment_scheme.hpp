@@ -422,6 +422,9 @@ $POINTS_INITIALIZATION$
         types.transcript_data memory tr_state;
         tr_state.current_challenge = transcript_state;
         commitment_state memory state;
+
+        $ETA_VALUES_VERIFICATION$
+
         {
             uint256 offset;
 

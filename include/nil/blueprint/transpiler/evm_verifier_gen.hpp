@@ -318,6 +318,7 @@ namespace nil {
                 }
 
                 _permutation_offset = _variable_values_offset;
+                _public_input_offset = _variable_values_offset;
                 for( std::size_t i = 0; i < PlaceholderParams::arithmetization_params::witness_columns + PlaceholderParams::arithmetization_params::public_input_columns; i++){
                     if(i == PlaceholderParams::arithmetization_params::witness_columns){
                         _public_input_offset = _permutation_offset;
@@ -602,6 +603,8 @@ namespace nil {
                         boost::replace_all(result, "$GATE_LIB_ID$", to_string(gate_modules_count));
                         boost::replace_all(result, "$CONSTRAINT_SERIES_CODE$", code);
                         boost::replace_all(result, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                        boost::replace_all(result, "$UTILS_LIBRARY_IMPORT$", _term_powers.size() >0? "import \"./utils.sol\";" : "");
+
 
                         std::ofstream out;
                         out.open(_folder_name + "/gate_" + to_string(gate_modules_count) + ".sol");
@@ -613,19 +616,21 @@ namespace nil {
                     }
                 }
 
-                std::stringstream power_functions;
-                for(std::size_t power: _term_powers) {
-                    power_functions << generate_power_function(power);
-                }
+                if (_term_powers.size() > 0) {
+                    std::stringstream power_functions;
+                    for(std::size_t power: _term_powers) {
+                        power_functions << generate_power_function(power);
+                    }
 
-                std::string utils_library(utils_library_template);
-                boost::replace_all(utils_library, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
-                boost::replace_all(utils_library, "$POWER_FUNCTIONS$", power_functions.str());
-                boost::replace_all(utils_library, "$TEST_NAME$", _test_name);
-                std::ofstream utils;
-                utils.open(_folder_name + "/utils.sol");
-                utils << utils_library;
-                utils.close();
+                    std::string utils_library(utils_library_template);
+                    boost::replace_all(utils_library, "$MODULUS$", to_string(PlaceholderParams::field_type::modulus));
+                    boost::replace_all(utils_library, "$POWER_FUNCTIONS$", power_functions.str());
+                    boost::replace_all(utils_library, "$TEST_NAME$", _test_name);
+                    std::ofstream utils;
+                    utils.open(_folder_name + "/utils.sol");
+                    utils << utils_library;
+                    utils.close();
+                }
 
                 for ( i = 0; i < gate_modules_count; ++i ) {
                     std::string gate_eval_string = gate_call_template;
@@ -775,6 +780,69 @@ namespace nil {
                 return lookup_str.str();
             }
 
+            std::string eta_point_verification_code() {
+                std::stringstream result;
+                auto fixed_poly_values = _common_data.commitment_scheme_data;
+                
+                std::size_t poly_points = 2;
+                
+                if (fixed_poly_values.size() == 0)
+                    return "";
+                
+                result << "\t\t{" << std::endl;
+                result << "\t\t\tuint256 poly_at_eta;" << std::endl;
+
+                result << "\t\t\t/* 1 - 2*permutation_size */" << std::endl;
+                std::size_t i = 0, j = 0;
+                std::size_t point_offset = 8;
+
+                while (j < 2*_permutation_size) {
+                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
+                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    point_offset += 32*poly_points;
+                    ++i;
+                    ++j;
+                }
+
+                result << "\t\t\t/* 2 - special selectors */" << std::endl;
+                poly_points = 3;
+                j = 0;
+                while (j < 2) {
+                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
+                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    point_offset += 32*poly_points;
+                    ++i;
+                    ++j;
+                }
+
+                std::size_t column_rotation_offset = PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns;
+                result << "\t\t\t/* 3 - constant columns */" << std::endl;
+                j = 0;
+                while (j < PlaceholderParams::arithmetization_params::constant_columns) {
+                    poly_points = _common_data.columns_rotations[column_rotation_offset + j].size()+1;
+                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
+                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    point_offset += 32*poly_points;
+                    ++i;
+                    ++j;
+                }
+
+                result << "\t\t\t/* 4 - selector columns */" << std::endl;
+                column_rotation_offset = PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns;
+                j = 0;
+                while (j < PlaceholderParams::arithmetization_params::selector_columns) {
+                    poly_points = _common_data.columns_rotations[column_rotation_offset + j].size()+1;
+                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
+                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    point_offset += 32*(poly_points);
+                    ++i;
+                    ++j;
+                }
+
+                result << "\t\t}" << std::endl;
+                return result.str();
+            }
+
             void print(){
                 std::filesystem::create_directory(_folder_name);
                 std::cout << "Generating verifier " << _test_name << std::endl;
@@ -811,6 +879,7 @@ namespace nil {
                 reps["$LOOKUP_INCLUDES$"] = _lookup_includes;
                 reps["$LOOKUP_ARGUMENT_COMPUTATION$"] = lookup_argument;
                 reps["$COMMITMENT_CODE$"] = commitment_code;
+                reps["$ETA_VALUES_VERIFICATION$"] = eta_point_verification_code();
 
                 commitment_scheme_replaces<PlaceholderParams>(reps, _common_data, _lpc_scheme, _permutation_size, _use_lookups);
 

@@ -41,7 +41,7 @@ $GATE_ASSEMBLY_CODE$
 pragma solidity >=0.8.4;
 
 import "../../../contracts/basic_marshalling.sol";
-import "./utils.sol";
+$UTILS_LIBRARY_IMPORT$
 
 library gate_$TEST_NAME$_$GATE_LIB_ID${
     uint256 constant modulus = $MODULUS$;
