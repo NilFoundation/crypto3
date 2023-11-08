@@ -249,7 +249,8 @@ namespace nil {
                             continue;
                         }
                         const auto &[table_name, column_count, rows_amount, fold_count] = table_sizes[i];
-                        std::size_t layout_y = 0;
+                        // First row is reserved for zeroes!
+                        std::size_t layout_y = 1;
                         layout.emplace_back(table_name, column_count, rows_amount, fold_count,
                                             std::make_pair(layout_x, layout_y));
                         layout_y += rows_amount;
@@ -279,15 +280,14 @@ namespace nil {
                             lookup_table_ids, lookup_tables, bp, assignment, constant_columns_ids, usable_rows,
                             max_usable_rows * 2);
                     }
-                    std::cout << "Got past the layout stage." << std::endl;
-                    std::cout << "Showing the layout:" << std::endl;
-                    for (const auto &[table_name, column_count, rows_amount, fold_count, layout_coords] : layout) {
-                        const auto &[layout_x, layout_y] = layout_coords;
-                        std::cout << table_name.get()
-                                  << " Columns: " << column_count << " Rows: " << rows_amount << " Fold: " << fold_count
-                                  << " LX: " << layout_x << " LY: " << layout_y << std::endl;
-                    }
-                    std::cout << "usable_rows_after: " << usable_rows_after << std::endl;
+                    // std::cout << "Showing the layout:" << std::endl;
+                    // for (const auto &[table_name, column_count, rows_amount, fold_count, layout_coords] : layout) {
+                    //     const auto &[layout_x, layout_y] = layout_coords;
+                    //     std::cout << table_name.get()
+                    //               << " Columns: " << column_count << " Rows: " << rows_amount << " Fold: " << fold_count
+                    //               << " LX: " << layout_x << " LY: " << layout_y << std::endl;
+                    // }
+                    // std::cout << "usable_rows_after: " << usable_rows_after << std::endl;
                     // Otherwise we can fit the current tables
                     std::sort(layout.begin(), layout.end(),
                                 [](const auto &lhs, const auto &rhs) {
@@ -351,8 +351,8 @@ namespace nil {
 
                                 next_selector = selector_ids[std::make_pair(subtable.begin, subtable.end)];
                             } else {
-                                /*BOOST_ASSERT_MSG(cur_selector_id < bp.selectors_amount(),
-                                                    "Not enough selector columns for packing lookup tables.");*/
+                                BOOST_ASSERT_MSG(cur_selector_id < ArithmetizationParams::selector_columns,
+                                                 "Not enough selector columns for packing lookup tables.");
                                 next_selector = cur_selector_id++;
                                 selector_ids[std::make_pair(subtable.begin, subtable.end)] = next_selector;
                                 selector_columns.emplace_back(
