@@ -518,7 +518,7 @@ namespace nil {
 
                 bool first_constraint = true;
 
-                while ((printed_cost < _gates_contract_size_threshold) && (it != last) ) {
+                while ((printed_cost <= _gates_contract_size_threshold) && (it != last) ) {
 
                     if (first_constraint) {
                         result << "// gate === " << it->gate_index << " ===" << std::endl;
