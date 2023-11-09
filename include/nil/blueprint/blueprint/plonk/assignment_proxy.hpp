@@ -125,6 +125,13 @@ namespace nil {
                 }
             }
 
+            void fill_selector(std::uint32_t index, const column_type& column) override {
+                for (std::uint32_t i = 0; i < column.size(); i++) {
+                    used_rows.insert(i);
+                }
+                assignment_ptr->fill_selector(index, column);
+            }
+
             value_type &shared(std::uint32_t shared_index, std::uint32_t row_index) override {
                 return assignment_ptr->shared(shared_index, row_index);
             }
@@ -196,6 +203,13 @@ namespace nil {
                     BLUEPRINT_ASSERT(false);
                 }
                 return std::const_pointer_cast<const assignment<ArithmetizationType>>(assignment_ptr)->constant(constant_index, row_index);
+            }
+
+            void fill_constant(std::uint32_t index, const column_type& column) override {
+                for (std::uint32_t i = 0; i < column.size(); i++) {
+                    used_rows.insert(i);
+                }
+                assignment_ptr->fill_constant(index, column);
             }
 
             std::uint32_t constants_amount() const override {

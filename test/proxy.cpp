@@ -390,3 +390,84 @@ BOOST_AUTO_TEST_CASE(blueprint_assignment_proxy_save_shared_test) {
 
         BOOST_ASSERT(assignment.shared_column_size(0) == 2);
 }
+
+BOOST_AUTO_TEST_CASE(blueprint_assignment_proxy_fill_constant_test) {
+        using BlueprintFieldType = typename nil::crypto3::algebra::curves::pallas::base_field_type;
+        constexpr std::size_t WitnessColumns = 15;
+        constexpr std::size_t PublicInputColumns = 1;
+        constexpr std::size_t ConstantColumns = 5;
+        constexpr std::size_t SelectorColumns = 35;
+
+        using ArithmetizationParams =
+        nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+        using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+        using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+        using column_type = typename nil::crypto3::zk::snark::plonk_column<BlueprintFieldType>;
+
+        auto assignment_ptr = std::make_shared<assignment<ArithmetizationType>>();
+        assignment_proxy<ArithmetizationType> assignment(assignment_ptr, 0);
+
+        const column_type constant_col = {1, 2, 3, 4, 5};
+        assignment.fill_constant(1, constant_col);
+
+        BOOST_ASSERT(assignment.constant_column_size(1) == 5);
+        std::set<uint32_t> used_rows = {0, 1, 2, 3, 4};
+        BOOST_ASSERT(assignment.get_used_rows() == used_rows);
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_assignment_proxy_fill_selector_test) {
+        using BlueprintFieldType = typename nil::crypto3::algebra::curves::pallas::base_field_type;
+        constexpr std::size_t WitnessColumns = 15;
+        constexpr std::size_t PublicInputColumns = 1;
+        constexpr std::size_t ConstantColumns = 5;
+        constexpr std::size_t SelectorColumns = 35;
+
+        using ArithmetizationParams =
+        nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+        using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+        using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+        using column_type = typename nil::crypto3::zk::snark::plonk_column<BlueprintFieldType>;
+
+        auto assignment_ptr = std::make_shared<assignment<ArithmetizationType>>();
+        assignment_proxy<ArithmetizationType> assignment(assignment_ptr, 0);
+
+        const column_type selector_col = {1, 2, 3, 4, 5};
+        assignment.fill_selector(1, selector_col);
+
+        BOOST_ASSERT(assignment.selector_column_size(1) == 5);
+        std::set<uint32_t> used_rows = {0, 1, 2, 3, 4};
+        BOOST_ASSERT(assignment.get_used_rows() == used_rows);
+}
+
+BOOST_AUTO_TEST_CASE(blueprint_proxy_call_pack_lookup_tables_test) {
+        using BlueprintFieldType = typename nil::crypto3::algebra::curves::pallas::base_field_type;
+        constexpr std::size_t WitnessColumns = 15;
+        constexpr std::size_t PublicInputColumns = 1;
+        constexpr std::size_t ConstantColumns = 5;
+        constexpr std::size_t SelectorColumns = 35;
+
+        using ArithmetizationParams =
+        nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
+        using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+        using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+        using column_type = typename nil::crypto3::zk::snark::plonk_column<BlueprintFieldType>;
+        typedef nil::crypto3::zk::snark::plonk_lookup_table<BlueprintFieldType> lookup_table_type;
+
+        auto bp_ptr = std::make_shared<circuit<ArithmetizationType>>();
+        circuit_proxy<ArithmetizationType> bp(bp_ptr, 0);
+        auto assignment_ptr = std::make_shared<assignment<ArithmetizationType>>();
+        assignment_proxy<ArithmetizationType> assignment(assignment_ptr, 0);
+
+        std::vector<std::size_t> lookup_columns_indices = {0, 1, 2, 3, 4};
+        std::size_t usable_rows_amount = assignment.allocated_rows();
+        bp.reserve_table("binary_xor_table/full");
+
+        nil::crypto3::zk::snark::pack_lookup_tables(
+                bp.get_reserved_indices(),
+                bp.get_reserved_tables(),
+                bp, assignment, lookup_columns_indices,
+                usable_rows_amount);
+
+        std::set<uint32_t> used_rows = {0, 1, 2, 3, 4};
+        BOOST_ASSERT(assignment.get_used_rows() == used_rows);
+}
