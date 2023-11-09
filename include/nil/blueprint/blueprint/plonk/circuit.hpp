@@ -70,7 +70,7 @@ namespace nil {
             using lookup_gate_id_type = lookup_gate_id<BlueprintFieldType, ArithmetizationParams>;
             using lookup_gate_selector_map = std::map<lookup_gate_id_type, std::size_t>;
 
-            using lookup_table_definition = typename nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
+            using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
 
             gate_selector_map selector_map = {};
             lookup_gate_selector_map lookup_selector_map = {};

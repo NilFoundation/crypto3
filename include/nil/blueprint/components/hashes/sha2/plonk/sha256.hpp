@@ -137,7 +137,7 @@ namespace nil {
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
 
                 using lookup_table_definition = typename
-                    nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
+                    nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
 
                 std::vector<std::shared_ptr<lookup_table_definition>> component_custom_lookup_tables(){
                     std::vector<std::shared_ptr<lookup_table_definition>> result = {};

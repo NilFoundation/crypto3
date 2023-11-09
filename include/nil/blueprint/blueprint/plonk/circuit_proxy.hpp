@@ -49,7 +49,7 @@ namespace nil {
         private:
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
-            using lookup_table_definition = typename nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
+            using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
 
             std::uint32_t id;
             std::shared_ptr<circuit<ArithmetizationType>> circuit_ptr;

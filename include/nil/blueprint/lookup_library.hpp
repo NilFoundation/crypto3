@@ -31,7 +31,7 @@
 
 #include <boost/bimap.hpp>
 
-#include <nil/crypto3/zk/snark/arithmetization/plonk/detail/lookup_table_definition.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_table_definition.hpp>
 #include <nil/blueprint/components/hashes/sha2/plonk/detail/split_functions.hpp>
 #include <nil/blueprint/components/hashes/sha2/plonk/detail/sha_table_generators.hpp>
 #include <nil/blueprint/manifest.hpp>
@@ -65,8 +65,8 @@ namespace nil {
 
         template <typename BlueprintFieldType>
         class lookup_library {
-            using lookup_table_definition = typename nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
-            using filled_lookup_table_definition = typename nil::crypto3::zk::snark::detail::filled_lookup_table_definition<BlueprintFieldType>;
+            using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
+            using filled_lookup_table_definition = typename nil::crypto3::zk::snark::filled_lookup_table_definition<BlueprintFieldType>;
 
             class binary_xor_table_type : public lookup_table_definition{
             public:

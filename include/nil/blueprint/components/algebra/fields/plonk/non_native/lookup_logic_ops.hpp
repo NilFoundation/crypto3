@@ -52,7 +52,7 @@ namespace nil {
             class lookup_logic_and<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                 : public boolean_lookup_op_component<crypto3::zk::snark::plonk_constraint_system< BlueprintFieldType, ArithmetizationParams>>
             {
-                using lookup_table_definition = typename nil::crypto3::zk::snark::detail::lookup_table_definition<BlueprintFieldType>;
+                using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
 
                 class binary_and_table_type : public lookup_table_definition{
                 public:

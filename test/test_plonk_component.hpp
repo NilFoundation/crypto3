@@ -284,7 +284,7 @@ namespace nil {
                 // We may start from zero if component doesn't use ordinary constants.
                 std::vector<size_t> lookup_columns_indices;
                 for( std::size_t i = 1; i < ArithmetizationParams::constant_columns; i++ )  lookup_columns_indices.push_back(i);
-                desc.usable_rows_amount = zk::snark::detail::pack_lookup_tables_horizontal(
+                desc.usable_rows_amount = zk::snark::pack_lookup_tables_horizontal(
                     bp.get_reserved_indices(),
                     bp.get_reserved_tables(),
                     bp, assignment, lookup_columns_indices,
