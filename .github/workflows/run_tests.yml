@@ -97,7 +97,7 @@ jobs:
             # crypto3_zk_systems_pcd_r1cs_pcd_r1cs_mp_ppzkpcd_r1cs_mp_ppzkpcd_test
             # crypto3_zk_systems_plonk_pickles_kimchi_test
             # crypto3_zk_systems_plonk_pickles_oracles_test
- 
+
           ]  # Tests to execute
     steps:
       - name: Cleanup # TODO - move to scripts on runner
