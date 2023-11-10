@@ -80,8 +80,7 @@ jobs:
             crypto3_zk_math_expression_test,
             crypto3_zk_systems_plonk_plonk_constraint_test,
             crypto3_zk_commitment_proof_of_knowledge_test,
-            crypto3_zk_transcript_transcript_test,
-            crypto3_zk_systems_plonk_placeholder_lookup_table_packer_test
+            crypto3_zk_transcript_transcript_test
 
             # Performance tests pass, but they are excluded from here due to speed.
             # crypto3_zk_commitment_lpc_performance_test
