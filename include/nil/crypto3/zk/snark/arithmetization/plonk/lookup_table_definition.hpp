@@ -37,12 +37,16 @@ namespace nil {
             namespace snark {
                 namespace detail {
                     std::size_t next_power_of_two_minus_3(std::size_t x) {
-                        BOOST_ASSERT_MSG(x > 2, "x must be greater than 2");
-                        std::size_t result = (1 << __builtin_clz((x | 1) << 1)) - 2;
-                        if (result <= x) {
-                            result =  (1 << __builtin_clz(result << 1)) - 2;
+                        std::size_t bit_count = 0;
+                        const std::size_t original_x = x;
+                        while (x >>= 1) {
+                            bit_count++;
                         }
-                        return result - 2;
+                        std::size_t result = (1 << (bit_count + 1)) - 2;
+                        if (result <= original_x) {
+                            result = (1 << (bit_count + 2)) - 2;
+                        }
+                        return result;
                     }
                 };
 
