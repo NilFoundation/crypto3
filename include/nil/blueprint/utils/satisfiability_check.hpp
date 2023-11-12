@@ -42,7 +42,7 @@ namespace nil {
 
         template<typename BlueprintFieldType,
                  typename ArithmetizationParams>
-        bool is_satisfied(circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+        bool is_satisfied(const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                               ArithmetizationParams>> &bp,
                           const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                         ArithmetizationParams>> &assignments){

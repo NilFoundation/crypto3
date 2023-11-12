@@ -181,7 +181,7 @@ namespace nil {
                 return _lookup_library.get_reserved_indices().right;
             }
 
-            virtual const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables() {
+            virtual const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables() const {
                 return _lookup_library.get_reserved_tables();
             }
 

@@ -177,7 +177,7 @@ namespace nil {
                 return circuit_ptr->get_reserved_indices_right();
             }
 
-            const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables() override {
+            const std::map<std::string, std::shared_ptr<lookup_table_definition>> &get_reserved_tables() const override {
                 return circuit_ptr->get_reserved_tables();
             }
 
