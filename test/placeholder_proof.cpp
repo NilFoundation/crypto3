@@ -477,7 +477,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
     }
 
     std::ofstream pi_stream;
-    pi_stream.open("circuit2/input.json");
+    pi_stream.open("circuit2/public_input.json");
     pi_stream << "[" << std::endl;
     for(std::size_t i = 0; i <= max_non_zero; i++ ){
         if( i != 0 ) pi_stream << "," << std::endl;
