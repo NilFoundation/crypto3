@@ -31,6 +31,7 @@
 #include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <boost/assert.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -60,7 +61,7 @@ namespace nil {
                     }
 
                     void append_option(const std::vector<variable_type> &variables){
-                        BOOST_CHECK(variables.size() == columns_number);
+                        BOOST_ASSERT(variables.size() == columns_number);
                         lookup_options.push_back(variables);
                     }
                 };
