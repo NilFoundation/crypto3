@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <unordered_set>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
@@ -69,6 +70,8 @@ namespace nil {
             std::uint32_t assignment_allocated_rows = 0;
             std::vector<value_type> assignment_private_storage;
             shared_container_type shared_storage; // results of the previously prover
+            std::set<std::uint32_t> lookup_constant_cols;
+            std::set<std::uint32_t> lookup_selector_cols;
         public:
             static constexpr const std::size_t private_storage_index = std::numeric_limits<std::size_t>::max();
 
@@ -131,6 +134,19 @@ namespace nil {
                 }
             }
 
+            void fill_selector(std::uint32_t index, const column_type& column) override {
+                lookup_selector_cols.insert(index);
+                zk_type::fill_selector(index, column);
+            }
+
+            virtual const std::set<std::uint32_t>& get_lookup_selector_cols() const {
+                return lookup_selector_cols;
+            }
+
+            virtual std::uint32_t get_lookup_selector_amount() const {
+                return lookup_selector_cols.size();
+            }
+
             virtual value_type &shared(std::uint32_t shared_index, std::uint32_t row_index) {
                 if (shared_storage[shared_index].size() <= row_index) {
                     shared_storage[shared_index].resize(row_index + 1);
@@ -149,6 +165,10 @@ namespace nil {
 
             virtual std::uint32_t shareds_amount() const {
                 return shared_storage.size();
+            }
+
+            virtual const column_type& shared(std::uint32_t index) const {
+                return shared_storage[index];
             }
 
             virtual value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
@@ -174,6 +194,10 @@ namespace nil {
 
             virtual std::uint32_t witnesses_amount() const {
                 return zk_type::witnesses_amount();
+            }
+
+            virtual const column_type& witness(std::uint32_t index) const {
+                return zk_type::witness(index);
             }
 
             virtual value_type &public_input(
@@ -204,6 +228,10 @@ namespace nil {
                 return zk_type::public_inputs_amount();
             }
 
+            virtual const column_type& public_input(std::uint32_t index) const {
+                return zk_type::public_input(index);
+            }
+
             virtual value_type &constant(
                 std::uint32_t constant_index, std::uint32_t row_index) {
 
@@ -223,6 +251,23 @@ namespace nil {
                 BLUEPRINT_ASSERT(row_index < zk_type::constant_column_size(constant_index));
 
                 return zk_type::constant(constant_index)[row_index];
+            }
+
+            virtual const column_type& constant(std::uint32_t index) const {
+                return zk_type::constant(index);
+            }
+
+            void fill_constant(std::uint32_t index, const column_type& column) override {
+                lookup_constant_cols.insert(index);
+                zk_type::fill_constant(index, column);
+            }
+
+            virtual const std::set<std::uint32_t>& get_lookup_constant_cols() const {
+                return lookup_constant_cols;
+            }
+
+            virtual std::uint32_t get_lookup_constant_amount() const {
+                return lookup_constant_cols.size();
             }
 
             virtual std::uint32_t constant_column_size(std::uint32_t col_idx) const {

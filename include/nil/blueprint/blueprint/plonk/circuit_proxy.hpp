@@ -70,6 +70,10 @@ namespace nil {
                 return *circuit_ptr;
             }
 
+            circuit<ArithmetizationType>& get() {
+                return *circuit_ptr;
+            }
+
             std::uint32_t get_id() const {
                 return id;
             }
@@ -116,37 +120,37 @@ namespace nil {
 
             std::size_t add_gate(const std::vector<constraint_type> &args) override {
                 const auto selector_index = circuit_ptr->add_gate(args);
-                used_gates.insert(selector_index);
+                used_gates.insert(circuit_ptr->num_gates() - 1);
                 return selector_index;
             }
 
             std::size_t add_gate(const constraint_type &args) override {
                 const auto selector_index = circuit_ptr->add_gate(args);
-                used_gates.insert(selector_index);
+                used_gates.insert(circuit_ptr->num_gates() - 1);
                 return selector_index;
             }
 
             std::size_t add_gate(const std::initializer_list<constraint_type> &&args) override {
                 const auto selector_index = circuit_ptr->add_gate(args);
-                used_gates.insert(selector_index);
+                used_gates.insert(circuit_ptr->num_gates() - 1);
                 return selector_index;
             }
 
             std::size_t add_lookup_gate(const std::vector<lookup_constraint_type> &args) override {
                 const auto selector_index = circuit_ptr->add_lookup_gate(args);
-                used_lookup_gates.insert(selector_index);
+                used_lookup_gates.insert(circuit_ptr->num_lookup_gates() - 1);
                 return selector_index;
             }
 
             std::size_t add_lookup_gate(const lookup_constraint_type &args) override {
                 const auto selector_index = circuit_ptr->add_lookup_gate(args);
-                used_lookup_gates.insert(selector_index);
+                used_lookup_gates.insert(circuit_ptr->num_lookup_gates() - 1);
                 return selector_index;
             }
 
             std::size_t add_lookup_gate(const std::initializer_list<lookup_constraint_type> &&args) override {
                 const auto selector_index = circuit_ptr->add_lookup_gate(args);
-                used_lookup_gates.insert(selector_index);
+                used_lookup_gates.insert(circuit_ptr->num_lookup_gates() - 1);
                 return selector_index;
             }
 
@@ -155,7 +159,6 @@ namespace nil {
             }
 
             void add_lookup_table(const typename ArithmetizationType::lookup_table_type &table) override {
-                used_lookup_tables.insert(circuit_ptr->lookup_tables().size());
                 circuit_ptr->add_lookup_table(table);
             }
 
@@ -165,6 +168,8 @@ namespace nil {
 
             void reserve_table(std::string name) override {
                 circuit_ptr->reserve_table(name);
+                const auto idx = circuit_ptr->get_reserved_indices().at(name) - 1;
+                used_lookup_tables.insert(idx);
             }
 
             const typename lookup_library<BlueprintFieldType>::left_reserved_type
@@ -197,6 +202,9 @@ namespace nil {
 
                 const auto gates = circuit_ptr->gates();
                 const auto copy_constraints = circuit_ptr->copy_constraints();
+                const auto lookup_gates = circuit_ptr->lookup_gates();
+                const auto lookup_tables = circuit_ptr->lookup_tables();
+                const auto lookup_table_indexes = circuit_ptr->get_reserved_indices();
 
                 os << "used_gates_size: " << used_gates.size() << " "
                    << "gates_size: " << gates.size() << " "
@@ -216,6 +224,37 @@ namespace nil {
                     os << i << ": " << copy_constraints[i].first << " "
                        << copy_constraints[i].second << "\n";
                 }
+
+                std::cout << "\nlookup gates:\n";
+                for (const auto& i : used_lookup_gates) {
+                    os << i << ": selector: " << lookup_gates[i].tag_index
+                       << " lookup constraints size: " << lookup_gates[i].constraints.size() << "\n";
+                    for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
+                        os << "constraints size: " << lookup_gates[i].constraints[j].lookup_input.size() << "\n";
+                        os << "table index: " << lookup_gates[i].constraints[j].table_id << "\n";
+                        for (std::size_t k = 0; k < lookup_gates[i].constraints[j].lookup_input.size(); k++) {
+                            os << lookup_gates[i].constraints[j].lookup_input[k] << "\n";
+                        }
+                        std::cout << "\n";
+                    }
+                    std::cout << "\n";
+                }
+
+                std::cout << "\nlookup tables:\n";
+                for (const auto& i : used_lookup_tables) {
+                    bool found = false;
+                    for (const auto it : lookup_table_indexes) {
+                        if (it.second == (i + 1)) {
+                            os << i << ": " << it.first << "\n";
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        os << i << ": not found\n";
+                    }
+                }
+
                 os.flush();
                 os.flags(os_flags);
             }

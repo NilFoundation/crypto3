@@ -287,7 +287,7 @@ namespace nil {
                 desc.usable_rows_amount = zk::snark::pack_lookup_tables_horizontal(
                     bp.get_reserved_indices(),
                     bp.get_reserved_tables(),
-                    bp, assignment, lookup_columns_indices,
+                    bp, assignment, lookup_columns_indices, 0,
                     desc.usable_rows_amount,
                     500000
                 );
