@@ -50,30 +50,9 @@ namespace nil {
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
             class lookup_logic_and<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                : public boolean_lookup_op_component<crypto3::zk::snark::plonk_constraint_system< BlueprintFieldType, ArithmetizationParams>>
-            {
-                using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
-
-                class binary_and_table_type : public lookup_table_definition{
-                public:
-                    binary_and_table_type(): lookup_table_definition("binary_and_table"){
-                        this->subtables["full"] = {{0,1,2}, 0, 3};
-                    }
-                    virtual void generate(){
-                        this->_table = {
-                            {0, 0, 1, 1},
-                            {0, 1, 0, 1},
-                            {0, 0, 0, 1}
-                        };
-                    }
-                    virtual std::size_t get_columns_number(){ return 3; }
-                    virtual std::size_t get_rows_number(){ return 4; }
-                };
+                : public boolean_lookup_op_component<crypto3::zk::snark::plonk_constraint_system< BlueprintFieldType, ArithmetizationParams>> {
 
                 using value_type = typename BlueprintFieldType::value_type;
-
-            protected:
-                std::shared_ptr<lookup_table_definition> binary_and_table;
             public:
                 using component_type =
                     boolean_lookup_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
