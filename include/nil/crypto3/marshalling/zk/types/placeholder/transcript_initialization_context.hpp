@@ -44,8 +44,9 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
-                using marshalling_string_type = nil::marshalling::types::string<TTypeBase, nil::marshalling::option::sequence_size_field_prefix<
-                    nil::marshalling::types::int_value<MyFieldBase, std::uint8_t>>>;
+                using marshalling_string_type = nil::marshalling::types::string<
+                    TTypeBase, nil::marshalling::option::sequence_size_field_prefix<
+                        nil::marshalling::types::int_value<MyFieldBase, std::uint8_t>>>;
 
                 // ******************* placeholder transcript initialization context ********************************* //
                 template<typename TTypeBase, typename TranscriptInitializationContextType>

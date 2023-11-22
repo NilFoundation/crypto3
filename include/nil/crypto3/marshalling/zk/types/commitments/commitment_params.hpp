@@ -35,78 +35,142 @@
 
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/kzg.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
+
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
 
+                // Suddenly, we must distinguish between fri and kzg, and we will do it by checking for
+                // existance of the field "precommitment_type", which exists only in fri.
+                // Both singlethreaded and actor versions of fri must match this type-trait.
+                template <typename CommitmentType>
+                struct is_fri_commitment {
+                    template <typename U>
+                    static std::true_type test(decltype(U::precommitment_type)*);
+                
+                    template <typename>
+                    static std::false_type test(...);
+                
+                    // A constexpr boolean indicating if the field exists in T
+                    static constexpr bool value = decltype(test<T>(nullptr))::value;
+                };
+
+                template <typename TTypeBase, typename FieldElementType>
+                using field_element_vector_type = nil::marshalling::types::array_list<
+                    TTypeBase,
+                    field_element<TTypeBase, FieldElementType>,
+                    nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
+                >;
+
+                // TODO(martun): Move this somewhere shared, this code is duplicated a lot.
+                template<typename integral_type>
+                using marshalling_integral_type = nil::marshalling::types::integral<TTypeBase, integral_type>;
+
+                template<typename integral_type>
+                using integral_vector_type = nil::marshalling::types::array_list<
+                        TTypeBase,
+                        marshalling_integral_type,
+                        nil::marshalling::option::sequence_size_field_prefix<marshalling_integral_type>>;
+
+                template<typename InputContainer>
+                integral_vector_type<typename InputContainer::value_type> make_integral_vector(
+                        const InputContainer& input_container) {
+                    integral_vector_type<integral_type> filled_vector;
+
+                    std::vector<integral_type> &filled_vector_val = filled_vector.value();
+                    for (const auto& element: input_container) {
+                        filled_vector_val.push_back(integral_type(element));
+                    }
+                    return filled_vector;
+                }
+
                 // ******************* Marshalling of commitment params for Basic Fri and KZG. ********************************* //
+
+                // Define commitment_params marshalling type for FRI.
                 template<typename TTypeBase, typename CommitmentParamsType,
-                    typename std::enable_if<
-                        std::is_same<CommitmentParamsType, nil::crypto3::zk::commitments::detail::basic_batched_fri::params_type<typename Proof::field_type, typename Proof::params_type>>::value,
-                        bool
-                    >::type = true
-                >
+                    typename std::enable_if<is_fri_commitment<CommitmentParamsType>::value, bool>::type = true>
                 using commitment_params = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-
-
-
-
-
-
-//                      constexpr static const std::size_t witness_columns = PlaceholderParamsType::witness_columns;
+//                      constexpr static std::size_t lambda;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
-//                      constexpr static const std::size_t public_input_columns = PlaceholderParamsType::public_input_columns;
+//                      constexpr static std::size_t m;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
-//                      constexpr static const std::size_t constant_columns = PlaceholderParamsType::constant_columns;
+//                      constexpr static std::uint32_t grinding_type::mask; If use_grinding==false, this will be 0.
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
-//                      constexpr static const std::size_t selector_columns = PlaceholderParamsType::selector_columns;
+//                      const std::size_t max_degree;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
-//                      constexpr static const typename field_type::value_type delta = PlaceholderParamsType::delta;
-                        field_element<TTypeBase, typename Proof::field_type::value_type>,
-//                      std::size_t rows_amount;
+//                      const std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
+//                      For each evaluation_domain we will include the unity root only.
+                        field_element_vector_type<TTypeBase, typename CommitmentParamsType::field_type::value_type>,
+//                      const std::vector<std::size_t> step_list;
+                        nil::marshalling::types::array_list<
+                            TTypeBase,
+                            integral_type,
+                            nil::marshalling::option::sequence_size_field_prefix<integral_type>>>,
+//                      const std::size_t expand_factor;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
-//                      std::size_t usable_rows_amount;
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
-//                      typename commitment_type::params_type commitment_params;
-                        typename commitment_params<TTypeBase, CommitmentParamsType>::type,
-//                      constexpr static const typename field_type::value_type modulus = field_type::modulus;
-                        field_element<TTypeBase, typename Proof::field_type::value_type>,
-//                      std::string application_id;
-                        marshalling_string_type
                     >
                 >;
 
-                template<typename Endianness, typename CommitmentParamsType>
+                // Marshalling function for FRI params.
+                template<typename Endianness, typename CommitmentParamsType,
+                    typename std::enable_if<is_fri_commitment<CommitmentParamsType>::value, bool>::type = true>
                 commitment_params<nil::marshalling::field_type<Endianness>, CommitmentParamsType>
-                fill_commitment_params(const CommitmentParamsType &init_context){
+                fill_commitment_params(const CommitmentParamsType &fri_params) {
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
-                    using result_type = commitment_params<TTypeBase, CommitmentParamsType>;
-                    using field_element_marshalling_type field_element<TTypeBase, typename Proof::field_type::value_type>;
-
-                    result_type result;
                     using FieldType = typename CommitmentParamsType::field_type;
+                    using result_type = commitment_params<TTypeBase, CommitmentParamsType>;
 
-                    auto filled_commitment_params =
-                        fill_commitment_params<Endianness, typename CommitmentParamsType::commitment_type>(
-                            init_context.commitment_params
-                    );
+                    std::vector<typename FieldType::value_type> D_unity_roots;
+                    for (const auto& domain : fri_params.D) {
+                        D_unity_roots.push_back(domain.get_unity_root());
+                    }
 
                     return result_type(std::make_tuple(
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(init_context.witness_columns),
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(init_context.public_input_columns),
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(init_context.constant_columns),
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(init_context.selector_columns),
-                        field_element_marshalling_type(init_context.delta),
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(init_context.rows_amount),
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(init_context.usable_rows_amount),
-                        filled_commitment_params,
-                        field_element_marshalling_type(init_context.modulus),
-                        marshalling_string_type
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(fri_params.lambda),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(fri_params.m),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(fri_params.use_grinding ? grinding_type::mask: 0),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(fri_params.max_degree),
+                        nil::crypto3::marshalling::types::make_field_element_vector<
+                            typename FieldType::value_type, Endianness>(D_unity_roots),
+                        make_integral_vector(fri_params.step_list),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(fri_params.expand_factor),
+                    ));
+                }
+
+
+                // Define commitment_params marshalling type for KZG.
+                template<typename TTypeBase, typename CommitmentParamsType,
+                    typename std::enable_if<!is_fri_commitment<CommitmentParamsType>::value, bool>::type = true>
+                using commitment_params = nil::marshalling::types::bundle<
+                    TTypeBase,
+                    std::tuple<
+//                      std::vector<typename curve_type::template g1_type<>::value_type> commitment_key;
+                        field_element_vector_type<TTypeBase, typename CommitmentParamsType::field_type::value_type>,
+//                      verification_key_type verification_key;                        
+                        field_element<TTypeBase, typename CommitmentParamsType::field_type::value_type>
+                    >
+                >;
+
+                // Marshalling function for KZG params.
+                template<typename Endianness, typename CommitmentParamsType,
+                    typename std::enable_if<!is_fri_commitment<CommitmentParamsType>::value, bool>::type = true>
+                commitment_params<nil::marshalling::field_type<Endianness>, CommitmentParamsType>
+                fill_commitment_params(const CommitmentParamsType &kzg_params) {
+                    using TTypeBase = typename nil::marshalling::field_type<Endianness>;
+                    using FieldType = typename CommitmentParamsType::field_type;
+                    using result_type = commitment_params<TTypeBase, CommitmentParamsType>;
+
+TODO: Here we have 2 different groups, take care of that.
+                    return result_type(std::make_tuple(
+                        nil::crypto3::marshalling::types::make_field_element_vector<
+                            typename FieldType::value_type, Endianness>(kzg_params.commitment_key),
+                        field_element<TTypeBase, typename FieldType::value_type>(verification_key)
                     ));
                 }
 
