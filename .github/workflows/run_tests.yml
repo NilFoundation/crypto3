@@ -32,6 +32,7 @@ jobs:
             blueprint_algebra_fields_plonk_range_check_test,
             blueprint_algebra_fields_plonk_logic_and_flag_test,
             blueprint_algebra_fields_plonk_logic_or_flag_test,
+            blueprint_algebra_fields_plonk_interpolation_test,
             blueprint_algebra_fields_plonk_non_native_addition_test,
             blueprint_algebra_fields_plonk_non_native_subtraction_test,
             blueprint_algebra_fields_plonk_non_native_multiplication_test,

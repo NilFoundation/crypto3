@@ -133,6 +133,7 @@ set(PLONK_TESTS_FILES
     "algebra/fields/plonk/range_check"
     "algebra/fields/plonk/logic_and_flag"
     "algebra/fields/plonk/logic_or_flag"
+    "algebra/fields/plonk/interpolation"
     "verifiers/pickles/verify_heterogenous_scalar"
     "verifiers/pickles/verify_heterogenous_base"
     "verifiers/pickles/scalar_details/evals_of_split_evals"
