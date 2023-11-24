@@ -30,7 +30,6 @@
 #include <type_traits>
 
 #include <nil/marshalling/types/bundle.hpp>
-#include <nil/marshalling/types/array_list.hpp>
 #include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/types/string.hpp>
@@ -44,9 +43,8 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
-                using marshalling_string_type = nil::marshalling::types::string<
-                    TTypeBase, nil::marshalling::option::sequence_size_field_prefix<
-                        nil::marshalling::types::int_value<MyFieldBase, std::uint8_t>>>;
+                template<typename TTypeBase>
+                using marshalling_string_type = nil::marshalling::types::string<TTypeBase>;
 
                 // ******************* placeholder transcript initialization context ********************************* //
                 template<typename TTypeBase, typename TranscriptInitializationContextType>
@@ -62,32 +60,33 @@ namespace nil {
 //                      constexpr static const std::size_t selector_columns = PlaceholderParamsType::selector_columns;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
 //                      constexpr static const typename field_type::value_type delta = PlaceholderParamsType::delta;
-                        field_element<TTypeBase, typename Proof::field_type::value_type>,
+                        field_element<TTypeBase, typename TranscriptInitializationContextType::field_type::value_type>,
 //                      std::size_t rows_amount;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
 //                      std::size_t usable_rows_amount;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
 //                      typename commitment_type::params_type commitment_params;
-                        typename commitment_params<TTypeBase, typename TranscriptInitializationContextType::commitment_type::params_type>::type,
+                        typename commitment_params<nil::marshalling::option::endian<typename TTypeBase::endian_type>, 
+                            typename TranscriptInitializationContextType::commitment_scheme_type::params_type>::type,
 //                      constexpr static const typename field_type::value_type modulus = field_type::modulus;
-                        field_element<TTypeBase, typename Proof::field_type::value_type>,
+                        field_element<TTypeBase, typename TranscriptInitializationContextType::field_type::value_type>,
 //                      std::string application_id;
-                        marshalling_string_type
+                        marshalling_string_type<TTypeBase>
                     >
                 >;
 
                 template<typename Endianness, typename TranscriptInitializationContextType>
                 transcript_initialization_context<nil::marshalling::field_type<Endianness>, TranscriptInitializationContextType>
-                fill_transcript_initialization_context(const TranscriptInitializationContextType &init_context){
+                fill_transcript_initialization_context(const TranscriptInitializationContextType &init_context) {
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using result_type = transcript_initialization_context<TTypeBase, TranscriptInitializationContextType>;
-                    using field_element_marshalling_type field_element<TTypeBase, typename Proof::field_type::value_type>;
+                    using field_element_marshalling_type = field_element<TTypeBase, typename TranscriptInitializationContextType::field_type::value_type>;
 
                     result_type result;
                     using FieldType = typename TranscriptInitializationContextType::field_type;
 
                     auto filled_commitment_params = 
-                        fill_commitment_params<Endianness, typename TranscriptInitializationContextType::commitment_type::params_type>(
+                        fill_commitment_params<Endianness, typename TranscriptInitializationContextType::commitment_scheme_type::params_type>(
                             init_context.commitment_params
                     );
 
@@ -101,15 +100,15 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(init_context.usable_rows_amount),
                         filled_commitment_params,
                         field_element_marshalling_type(init_context.modulus),
-                        marshalling_string_type
+                        marshalling_string_type<TTypeBase>(init_context.application_id)
                     ));
                 }
 
                 // TODO(martun): We don't need the opposite conversion for now, only for testing purposes.
                 // template<typename Endianness, typename TranscriptInitializationContextType>
                 // TranscriptInitializationContextType
-                // make_transcript_initialization_context(const  
-                //     transcript_initialization_context<nil::marshalling::field_type<Endianness>, TranscriptInitializationContextType> &filled_init_context
+                // make_transcript_initialization_context(
+                //     const transcript_initialization_context<nil::marshalling::field_type<Endianness>, TranscriptInitializationContextType> &filled_init_context
                 // ) {
                 // }
 
