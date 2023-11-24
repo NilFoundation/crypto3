@@ -31,8 +31,8 @@
 
 #ifndef __ZKLLVM__
 #include <nil/crypto3/algebra/fields/fp2.hpp>
-#include <nil/crypto3/algebra/fields/fp12_2over3over2.hpp>
 #endif
+#include <nil/crypto3/algebra/fields/fp12_2over3over2.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -66,9 +66,9 @@ namespace nil {
 
                         using g1_field_type = base_field_type;
 
+                        using gt_field_type = typename fields::fp12_2over3over2<base_field_type>;
 #ifndef __ZKLLVM__
                         using g2_field_type = typename fields::fp2<base_field_type>;
-                        using gt_field_type = typename fields::fp12_2over3over2<base_field_type>;
 
                         using integral_type = typename base_field_type::integral_type;
 #endif

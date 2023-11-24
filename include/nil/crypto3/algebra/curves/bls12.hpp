@@ -69,8 +69,8 @@ namespace nil {
                     //                                          pairing::detail::bls12_pairing_functions<Version>>
                     //     pairing;
 
-                    typedef typename policy_type::gt_field_type gt_type;
 #endif
+                    typedef typename policy_type::gt_field_type gt_type;
                 };
 
                 typedef bls12<381> bls12_381;
