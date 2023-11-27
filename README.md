@@ -1,4 +1,4 @@
-# Marshalling utilities for =nil;Crypto3 Multiprecision 
+# Marshalling utilities for =nil;Crypto3 Multiprecision
 
 This module provides extension of [=nil;Marshalling](https://github.com/NilFoundation/marshalling) utilities for [=nil;Crypto3 Multiprecision](https://github.com/NilFoundation/crypto3-multiprecision)
 
@@ -22,4 +22,4 @@ library in a project it is required to:
 
 ### External
 
-* [Boost](https://boost.org) (>= 1.74)
+* [Boost](https://boost.org) (>= 1.81)

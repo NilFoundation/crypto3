@@ -1,0 +1,24 @@
+name: PR Testing
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  handle-syncwith:
+    name: Call Reusable SyncWith Handler
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@ca357baf14aa93d1ca6295b0397b2fc75be55c0d
+    with:
+      ci-cd-ref: 'ca357baf14aa93d1ca6295b0397b2fc75be55c0d'
+    secrets: inherit
+
+  matrix-test:
+    name: Call Reusable Crypto3 Testing
+    needs:
+      - handle-syncwith
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-crypto3-testing.yml@ca357baf14aa93d1ca6295b0397b2fc75be55c0d
+    with:
+      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
+    secrets: inherit
