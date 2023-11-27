@@ -5,7 +5,7 @@ To define representation rules for custom type we use template-defined pseudo-DS
 
 ## Building
 
-This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git). 
+This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git).
 To actually include this library in a project it is required to:
 
 1. Add [CMake Modules](https://github.com/BoostCMake/cmake_modules.git) as submodule to target project repository.
@@ -17,4 +17,4 @@ To actually include this library in a project it is required to:
 ### Internal
 
 ### External
-* [Boost](https://boost.org) (>= 1.58)
+* [Boost](https://boost.org) (>= 1.81)
