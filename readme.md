@@ -63,7 +63,7 @@ root
 
 - [clang](https://clang.llvm.org/) (>= 11.0)/GCC (>= 10.0)/MSVC (>= 14.20)
 - [cmake](https://cmake.org) (>= 3.6)
-- [boost](https://boost.org) (>= 1.76)
+- [boost](https://boost.org) (>= 1.81)
 
 ### Clone & Build
 

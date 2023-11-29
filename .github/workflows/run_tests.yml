@@ -1,190 +1,167 @@
-name: Run tests
+name: Run Multiplatform Tests
 
 on:
-  # Let's run it on any commit
-  [pull_request]
-  # Triggers the workflow on pull request events but only for the master branch
-  #pull_request:
-  #  branches: [ master ]
+  pull_request:
+    types:
+      - opened
+      - synchronize
 
-  # Allows you to run this workflow manually from the Actions tab
-  #workflow_dispatch:
+permissions: {}
 
 env:
-  SUITE_REPO: "NilFoundation/crypto3"
-  CACHE_NAME: "checkout-job-cache"
+  TESTS_ARTIFACT_NAME: 'test-results'
+  BOOST_VERSION: '1.81.0'
 
 jobs:
-  checkout:
-    runs-on: [self-hosted, tests-runner]
+  handle-syncwith:
+    name: Call Reusable SyncWith Handler
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1
+    with:
+      ci-cd-ref: 'v1'
+    secrets: inherit
+
+
+  build-and-test:
+    name: "Build and Test using Matrix"
+    needs:
+      - handle-syncwith
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Set up a matrix to run the following 4 configurations:
+      # 1. <Linux, Release, latest G++ compiler toolchain on the default runner image, default generator>
+      # 2. <Linux, Release, latest Clang++ compiler toolchain on the default runner image, default generator>
+      # 3. <MacOS, Release, latest G++ compiler toolchain on the default runner image, default generator>
+      # 4. <MacOS, Release, latest Clang++ compiler toolchain on the default runner image, default generator>
+      matrix:
+        os: [ubuntu-22.04, macos-12]
+        cpp_compiler: [g++, clang++]
+        build_type: [Release]
     steps:
-      - name: Cleanup # TODO - move to scripts on runner
-        run: |
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-
-      - name: Checkout suite
-        uses: actions/checkout@v3
+      - name: Checkout Crypto3 repository
+        uses: actions/checkout@v4
         with:
-          repository: ${{ env.SUITE_REPO }}
-          
-          submodules: recursive
+          submodules: 'true' # Using true fetches only the top-level submodules
+          fetch-depth: 1 # Fetch only the latest commit on the triggered branch/ref
 
-      - name: Cmake and build
+      - name: Checkout submodules to specified refs
+        if: inputs.submodules-refs != ''
+        uses: NilFoundation/ci-cd/actions/recursive-checkout@v1
+        with:
+          paths: ${{ github.workspace }}/**
+          refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
+
+      - name: Set usefull strings
+        # Turn input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+        id: strings
+        shell: bash
+        run: |
+          # CMake locations
+          echo "umbrella-build-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+          # Dependencies dir location
+          echo "dependencies-dir=${{ github.workspace }}/../dependencies" >> "$GITHUB_OUTPUT"
+
+          # Get platform version
+          os_version=${{ matrix.os }}
+          platform_version=${os_version##*-}
+          echo "platform-version=${platform_version}" >> $GITHUB_OUTPUT
+
+      - name: Set up dependencies directory
+        run: |
+          mkdir -p "${{ steps.strings.outputs.dependencies-dir }}"
+
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.4.4
+        id: install-boost
+        with:
+          boost_version: ${{ env.BOOST_VERSION }}
+          # Extract version number from matrix.os by replacing os_name-
+          # A list of supported versions can be found here:
+          # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+          platform_version: ${{ steps.strings.outputs.platform-version }}
+          boost_install_dir: ${{ steps.strings.outputs.dependencies-dir }}
+
+      - name: Configure CMake
+        run: >
+          cmake -B ${{ steps.strings.outputs.umbrella-build-dir }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DBUILD_TESTS=TRUE
+          -DENABLE_JUNIT_TEST_OUTPUT=TRUE
+          -S ${{ github.workspace }}
+
         env:
-          CMAKE_ARGS: "
-            -DCMAKE_BUILD_TYPE=Debug
-            -DBUILD_SHARED_LIBS=FALSE
-            -DBUILD_TESTS=TRUE
-            -DZK_PLACEHOLDER_PROFILING=TRUE
-            "
-        run: |
-          mkdir build
-          cd build
-          cmake ${{ env.CMAKE_ARGS }} ..
+          BOOST_ROOT: "${{ steps.install-boost.outputs.BOOST_ROOT }}"
 
-      - name: Archive build results
+      - name: Build all
+        id: build
+        working-directory: ${{ steps.strings.outputs.umbrella-build-dir }}
         run: |
-          touch ${{ env.CACHE_NAME }}.tar.gz
-          tar -czf ${{ env.CACHE_NAME }}.tar.gz --exclude=${{ env.CACHE_NAME }}.tar.gz .
+          # Not considering failed targets bad. We will handle them as junit test result
+          build_log_path=${{ steps.strings.outputs.umbrella-build-dir }}/build.log
+          make -k -j $(uname | grep -q Darwin && sysctl -n hw.ncpu || nproc) 2>&1 | tee build.log
+          echo "build-log=$build_log_path" >> "$GITHUB_OUTPUT"
 
-      - name: Cache archived job output
+      - name: Generate JUnit Report from build result
+        id: make-build-report
+        uses: NilFoundation/ci-cd/actions/build-log-to-junit@v1
+        with:
+          build-log: ${{ steps.build.outputs.build-log }}
+
+      - name: Run tests inside test dir
+        working-directory: ${{ steps.strings.outputs.submodule-test-dir }}
+        # Not considering failed tests bad. We will compare diff instead
+        run: ctest -v -j $(uname | grep -q Darwin && sysctl -n hw.ncpu || nproc) || exit 0
+
+      - name: Move test results to dir for uploading
+        id: prepare-for-uploading
+        run: |
+          # upload action takes only absolute path,the following command fits both macOS and Linux
+          artifact_dir=${{ github.workspace }}/../results_for_uploading
+          mkdir $artifact_dir
+          artifact_dir=$(cd ${{ github.workspace }}/../results_for_uploading && pwd)
+
+          custom_tests_dir=$artifact_dir/${{ matrix.os }}/${{ matrix.cpp_compiler }}/${{ matrix.build_type }}
+          mkdir -p $custom_tests_dir
+
+          mv ${{ steps.make-build-report.outputs.build-junit-report }} $custom_tests_dir
+
+          # Find and process each file
+          libs_build_dir="${{ steps.strings.outputs.umbrella-build-dir }}/libs"
+          find "$libs_build_dir" -type f -path "*/junit_results/*.xml" | while read -r file; do
+              relative_path="${file#$libs_build_dir}"
+              final_path="$custom_tests_dir/$relative_path"
+              mkdir -p "$(dirname "$final_path")"
+              mv "$file" "$final_path"
+          done
+
+          echo "artifact-dir=$artifact_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Upload tests JUnit results
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.CACHE_NAME }}
-          path: ${{ env.CACHE_NAME }}.tar.gz
-          retention-days: 1
+          name: ${{ env.TESTS_ARTIFACT_NAME }}
+          path: ${{ steps.prepare-for-uploading.outputs.artifact-dir }}
 
-  run_tests:
-    runs-on: [self-hosted, tests-runner]
-    needs: [checkout]
-    strategy:
-      fail-fast: false
-      matrix:
-        include: 
-          - target: crypto3_zk_commitment_fold_polynomial_test
-            path: libs/zk/test
-          - target: crypto3_zk_commitment_fri_test
-            path: libs/zk/test
-          - target: crypto3_zk_commitment_lpc_test
-            path: libs/zk/test
-          - target: crypto3_zk_systems_plonk_placeholder_placeholder_test
-            path: libs/zk/test
-          - target: crypto3_zk_commitment_powers_of_tau_test
-            path: libs/zk/test
-          - target: crypto3_zk_commitment_proof_of_knowledge_test
-            path: libs/zk/test
-          - target: crypto3_zk_commitment_r1cs_gg_ppzksnark_mpc_test
-            path: libs/zk/test
-          - target:  crypto3_zk_math_expression_test
-            path: libs/zk/test
-          - target:  crypto3_zk_systems_plonk_plonk_constraint_test
-            path: libs/zk/test
 
-          - target: marshalling_fri_commitment_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_lpc_commitment_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_placeholder_common_data_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_placeholder_proof_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_sparse_vector_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_plonk_constraint_system_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_r1cs_gg_ppzksnark_primary_input_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_r1cs_gg_ppzksnark_proof_test
-            path: libs/marshalling/zk/test
-          - target: marshalling_r1cs_gg_ppzksnark_verification_key_test
-            path: libs/marshalling/zk/test
-
-          - target: algebra_curves_test
-            path: libs/algebra/test
-          - target: algebra_fields_test
-            path: libs/algebra/test
-          - target: algebra_hash_to_curve_test
-            path: libs/algebra/test
-          - target: algebra_pairing_test
-            path: libs/algebra/test
-
-          - target: math_expression_test
-            path: libs/math/test
-          - target: math_lagrange_interpolation_test
-            path: libs/math/test
-          - target: math_polynomial_test
-            path: libs/math/test
-          - target: math_polynomial_dfs_test
-            path: libs/math/test
-          - target: math_polynomial_arithmetic_test
-            path: libs/math/test
-          - target: math_polynomial_view_test
-            path: libs/math/test
-
-          - target: hash_blake2b_test
-            path: libs/hash/test
-          - target: hash_crc_test
-            path: libs/hash/test
-          - target: hash_find_group_hash_test
-            path: libs/hash/test
-          - target: hash_h2c_test
-            path: libs/hash/test
-          - target: hash_h2f_test
-            path: libs/hash/test
-          - target: hash_keccak_test
-            path: libs/hash/test
-          - target: hash_md4_test
-            path: libs/hash/test
-          - target: hash_md5_test
-            path: libs/hash/test
-          - target: hash_pack_test
-            path: libs/hash/test
-          - target: hash_pedersen_test
-            path: libs/hash/test
-          - target: hash_ripemd_test
-            path: libs/hash/test
-          - target: hash_sha1_test
-            path: libs/hash/test
-          - target: hash_sha2_test
-            path: libs/hash/test
-          - target: hash_sha3_test
-            path: libs/hash/test
-          - target: hash_sha_test
-            path: libs/hash/test
-          - target: hash_static_digest_test
-            path: libs/hash/test
-          - target: hash_tiger_test
-            path: libs/hash/test
-
-          # https://github.com/NilFoundation/crypto3-hash/issues/100
-          # - target: hash_reinforced_concrete_test
-          #  path: libs/hash/test
-
+  publish-results:
+    name: "Publish Tests Results"
+    needs:
+      - build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write # needed unless run with comment_mode: off
+      actions: read # required by download step to access artifacts API
+      statuses: write # required to set commit status
     steps:
-      - name: Cleanup # TODO - move to scripts on runner
-        run: |
-          rm -rf ./* || true
-          rm -rf ./.??* || true
-
-      - name: Upload checkout job cache
+      - name: Download Test Results Artifact
         uses: actions/download-artifact@v3
         with:
-          name: ${{ env.CACHE_NAME }}
+          name: ${{ env.TESTS_ARTIFACT_NAME }}
 
-      - name: Extract artifacts
-        run: |
-          tar -xf ${{ env.CACHE_NAME }}.tar.gz
-          rm ${{ env.CACHE_NAME }}.tar.gz
-
-      - name: Build
-        working-directory: ./build
-        run: cmake --build . -t ${{ matrix.target }}
-
-      - name: Run test
-        working-directory: ./build
-        run: |
-          cd ${{ matrix.path }}
-          COLOR='\033[0;33m'
-          echo -e "${COLOR}${{ matrix.target }}"
-          ./${{ matrix.target }}
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@ca89ad036b5fcd524c1017287fb01b5139908408
+        with:
+          files: "${{ env.TESTS_ARTIFACT_NAME }}/**/*.xml"
+          report_individual_runs: true
