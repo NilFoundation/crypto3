@@ -195,20 +195,21 @@ namespace nil {
                     plonk_constraint_system<FieldType, ArithmetizationParams> &bp,
                     plonk_assignment_table<FieldType, ArithmetizationParams> &assignment,
                     const std::vector<std::size_t> &constant_columns_ids,
+                    std::size_t cur_selector_id,
                     std::size_t usable_rows,
                     std::size_t max_usable_rows = 524288
                 ){
                     std::size_t usable_rows_after = usable_rows;
 
                     // Compute first selector index.
-                    std::size_t cur_selector_id = 0;
+                    /*std::size_t cur_selector_id = 0;
                     for(const auto &gate: bp.gates()){
                         cur_selector_id = std::max(cur_selector_id, gate.selector_index);
                     }
                     for(const auto &lookup_gate: bp.lookup_gates()){
                         cur_selector_id = std::max(cur_selector_id, lookup_gate.tag_index);
                     }
-                    cur_selector_id++;
+                    cur_selector_id++;*/
 
                     // Allocate constant columns
                     std::vector<plonk_column<FieldType>> constant_columns(
