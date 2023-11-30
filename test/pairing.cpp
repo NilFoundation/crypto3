@@ -406,7 +406,7 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-const char *test_data = "../../../../libs/algebra/test/data/pairing.json";
+std::string test_data = std::string(TEST_DATA_DIR) + R"(pairing.json)";
 
 boost::property_tree::ptree string_data(const std::string &test_name) {
     boost::property_tree::ptree string_data;
@@ -654,7 +654,7 @@ void pairing_test_Fr_init(std::vector<typename fields::detail::element_fp<FieldP
 
 template<typename CurveType, typename TestSet>
 void pairing_test_G1_init(std::vector<typename CurveType::template g1_type<>::value_type> &elements, const TestSet &test_set) {
-    
+
     using value_type = typename CurveType::template g1_type<>::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G1")) {
@@ -664,7 +664,7 @@ void pairing_test_G1_init(std::vector<typename CurveType::template g1_type<>::va
 
 template<typename CurveType, typename TestSet>
 void pairing_test_G2_init(std::vector<typename CurveType::template g2_type<>::value_type> &elements, const TestSet &test_set) {
-    
+
     using value_type = typename CurveType::template g2_type<>::value_type;
 
     for (auto &elem_coords : test_set.second.get_child("G2")) {
@@ -674,7 +674,7 @@ void pairing_test_G2_init(std::vector<typename CurveType::template g2_type<>::va
 
 template<typename CurveType, typename TestSet>
 void pairing_test_GT_init(std::vector<typename CurveType::gt_type::value_type> &elements, const TestSet &test_set) {
-    
+
     using value_type = typename CurveType::gt_type::value_type;
 
     for (auto &elem_GT : test_set.second.get_child("GT")) {
@@ -688,7 +688,7 @@ void pairing_test_g1_precomp_init(std::vector<typename pairing::pairing_policy<c
     using curve_type = curves::bls12<381>;
     using pairing_policy = typename pairing::pairing_policy<curve_type>;
     using value_type = typename pairing_policy::g1_precomputed_type;
-    
+
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
     using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
@@ -743,7 +743,7 @@ void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<c
     using curve_type = curves::bls12<381>;
     using pairing_policy = typename pairing::pairing_policy<curve_type>;
     using value_type = typename pairing_policy::g2_precomputed_type;
-    
+
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
     using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 
@@ -825,7 +825,7 @@ void pairing_test_g2_precomp_init(std::vector<typename pairing::pairing_policy<c
     using curve_type = curves::mnt6<298>;
     using pairing_policy = typename pairing::pairing_policy<curve_type>;
     using value_type = typename pairing_policy::g2_precomputed_type;
-    
+
     using g1_field_value_type = typename curve_type::base_field_type::value_type;
     using g2_field_value_type = typename curve_type::template g2_type<>::field_type::value_type;
 

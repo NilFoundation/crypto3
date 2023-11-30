@@ -62,7 +62,7 @@ void print_curve_point(std::ostream &os,
 
 template<typename CurveParams, typename Form, typename Coordinates>
 typename std::enable_if<std::is_same<Coordinates, curves::coordinates::jacobian_with_a4_minus_3>::value||
-                        std::is_same<Coordinates, curves::coordinates::jacobian>::value||                       
+                        std::is_same<Coordinates, curves::coordinates::jacobian>::value||
                         std::is_same<Coordinates, curves::coordinates::projective_with_a4_minus_3>::value>::type
     print_curve_point(std::ostream &os, const curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
     os << "( X: [";
@@ -101,7 +101,7 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-const char *test_data = "../../../../libs/algebra/test/data/coordinates.json";
+std::string test_data = std::string(TEST_DATA_DIR) + R"(coordinates.json)";
 
 boost::property_tree::ptree string_data(std::string test_name) {
     boost::property_tree::ptree string_data;

@@ -214,7 +214,7 @@ enum field_operation_test_elements : std::size_t {
 };
 
 // if target == check-algebra just data/fields.json
-const char *test_data = "../../../../libs/algebra/test/data/fields.json";
+std::string test_data = std::string(TEST_DATA_DIR) + R"(fields.json)";
 
 boost::property_tree::ptree string_data(std::string test_name) {
     boost::property_tree::ptree string_data;
@@ -490,7 +490,7 @@ BOOST_AUTO_TEST_CASE(field_operation_test_maxprime){
 
 BOOST_DATA_TEST_CASE(field_operation_test_mnt4_fq, string_data("field_operation_test_mnt4_fq"), data_set) {
     using policy_type = fields::mnt4<298>;
-    
+
     field_operation_test<policy_type>(data_set);
 }
 

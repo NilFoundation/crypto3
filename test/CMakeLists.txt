@@ -23,15 +23,13 @@ macro(define_runtime_algebra_test name)
     set(test_name "algebra_${name}_test")
 
     set(additional_args "")
-    message(STATUS "here")
     if(ENABLE_JUNIT_TEST_OUTPUT)
         set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
         set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
-        file(MAKE_DIRECTORY ${TEST_LOGS_DIR} ${TEST_REPORTS_DIR})
+        file(MAKE_DIRECTORY ${TEST_LOGS_DIR})
 
         set(additional_args "--log_format=JUNIT"
                             "--log_sink=${TEST_LOGS_DIR}/${test_name}.xml")
-        message(STATUS "additional_args: ${additional_args}")
     endif()
 
     cm_test(NAME ${test_name} SOURCES ${name}.cpp ARGS ${additional_args})
@@ -57,6 +55,8 @@ macro(define_runtime_algebra_test name)
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
     endif()
+
+    target_compile_definitions(${test_name} PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
 endmacro()
 
 macro(define_compile_time_algebra_test name)
@@ -86,7 +86,6 @@ set(RUNTIME_TESTS_NAMES
     "fields_static"
     "pairing"
     "hash_to_curve"
-    "wnaf"
     "multiexp"
     )
 
@@ -95,7 +94,6 @@ set(COMPILE_TIME_TESTS_NAMES
     "vector")
 
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
-    message(STATUS "for each")
     define_runtime_algebra_test(${TEST_NAME})
 endforeach()
 

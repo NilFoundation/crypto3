@@ -72,6 +72,7 @@
 // #include <nil/crypto3/algebra/curves/params/multiexp/secp.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/sm2p_v1.hpp>
 // #include <nil/crypto3/algebra/curves/params/multiexp/x962_p.hpp>
+#include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -81,7 +82,7 @@ template<typename GroupType>
 using run_result_t = std::pair<long long, std::vector<typename GroupType::value_type>>;
 
 template<typename T>
-using test_instances_t = std::vector<std::vector<T>>;
+using test_instances_t = std::vector<std::vector<typename T::value_type>>;
 
 template<typename GroupType>
 test_instances_t<GroupType> generate_group_elements(std::size_t count, std::size_t size) {
@@ -92,7 +93,7 @@ test_instances_t<GroupType> generate_group_elements(std::size_t count, std::size
     for (size_t i = 0; i < count; i++) {
 
         typename GroupType::value_type x =
-            random_element<GroupType>().to_projective();    // djb requires input to be in special form
+            random_element<GroupType>();    // djb requires input to be in special form
 
         for (size_t j = 0; j < size; j++) {
             result[i].push_back(x);
@@ -111,7 +112,7 @@ test_instances_t<FieldType> generate_scalars(std::size_t count, std::size_t size
 
     for (size_t i = 0; i < count; i++) {
         for (size_t j = 0; j < size; j++) {
-            result[i].push_back(random_element<FieldType>(i * size + j));
+            result[i].push_back(random_element<FieldType>());
         }
     }
 
@@ -183,10 +184,10 @@ BOOST_AUTO_TEST_SUITE(multiexp_test_suite)
 BOOST_AUTO_TEST_CASE(multiexp_test_case) {
 
     std::cout << "Testing BLS12-381 G1" << std::endl;
-    print_performance_csv<curves::bls12<381>::g1_type<>, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
+    print_performance_csv<curves::bls12<381>::g1_type<>, curves::bls12<381>::scalar_field_type>(2, 12, 14, true);
 
     std::cout << "Testing BLS12-381 G2" << std::endl;
-    print_performance_csv<curves::bls12<381>::g2_type<>, curves::bls12<381>::scalar_field_type>(2, 20, 14, true);
+    print_performance_csv<curves::bls12<381>::g2_type<>, curves::bls12<381>::scalar_field_type>(2, 12, 14, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

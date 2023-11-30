@@ -180,7 +180,7 @@ namespace boost {
 }    // namespace boost
 
 // if target == check-algebra just data/curves.json
-const char *test_data = "../../../../libs/algebra/test/data/curves.json";
+std::string test_data = std::string(TEST_DATA_DIR) + R"(curves.json)";
 
 boost::property_tree::ptree string_data(std::string test_name) {
     boost::property_tree::ptree string_data;
@@ -236,11 +236,11 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
 
     result = points[p1];
-    result *= static_cast<cpp_int>(constants[C1]); 
+    result *= static_cast<cpp_int>(constants[C1]);
     BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
 
     result = points[p2];
-    result *= static_cast<cpp_int>(constants[C1]); 
+    result *= static_cast<cpp_int>(constants[C1]);
     result += points[p2] * static_cast<cpp_int>(constants[C2]);
     BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
@@ -278,11 +278,11 @@ void check_curve_operations_twisted_edwards(
     BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
 
     result = points[p1];
-    result *= static_cast<cpp_int>(constants[C1]); 
+    result *= static_cast<cpp_int>(constants[C1]);
     BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
 
     result = points[p2];
-    result *= static_cast<cpp_int>(constants[C1]); 
+    result *= static_cast<cpp_int>(constants[C1]);
     result += points[p2] * static_cast<cpp_int>(constants[C2]);
     BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
