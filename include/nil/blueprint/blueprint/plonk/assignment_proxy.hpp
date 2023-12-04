@@ -501,7 +501,7 @@ namespace nil {
 
                 for (std::size_t selector_row = 0;
                      selector_row < selector.size(); selector_row++) {
-                    if (!selector[selector_row].is_zero()) {
+                    if (!selector[selector_row].is_zero() && private_rows.find(selector_row) != private_rows.end()) {
                         row_index = selector_row;
                         for (const auto &lookup_constraint: lookup_gates[i].constraints) {
                             for (const auto &constraint : lookup_constraint.lookup_input) {
