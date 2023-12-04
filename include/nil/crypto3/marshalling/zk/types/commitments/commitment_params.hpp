@@ -212,8 +212,8 @@ namespace nil {
 
                     return result_type(std::make_tuple(
                         nil::crypto3::marshalling::types::fill_field_element_vector<
-                            typename CommitmentParamsType::single_commitment_type::value_type, Endianness>(kzg_params.commitment_key),
-                        field_element<TTypeBase, typename CommitmentParamsType::verification_key_type>(kzg_params.verification_key)
+                            typename CommitmentParamsType::params_single_commitment_type::value_type, Endianness>(kzg_params.commitment_key),
+                        field_element<TTypeBase, typename CommitmentParamsType::params_verification_key_type>(kzg_params.verification_key)
                     ));
                 }
 
