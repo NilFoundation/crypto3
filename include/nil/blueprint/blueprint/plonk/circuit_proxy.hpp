@@ -58,6 +58,21 @@ namespace nil {
             std::set<std::uint32_t> used_lookup_gates;
             std::set<std::uint32_t> used_lookup_tables;
 
+            std::uint32_t get_gate_index(std::size_t selector_index) const {
+                const auto& gates = circuit_ptr->gates();
+                auto it = std::find_if(gates.begin(), gates.end(), [selector_index](const typename ArithmetizationType::gates_container_type::value_type& gate) -> bool
+                    { return selector_index == gate.selector_index; });
+                return it - gates.begin();
+            }
+
+            std::uint32_t get_lookup_gate_index(std::size_t selector_index) const {
+                const auto& lookup_gates = circuit_ptr->lookup_gates();
+                auto it = std::find_if(lookup_gates.begin(), lookup_gates.end(),
+                                       [selector_index](const typename ArithmetizationType::lookup_gates_container_type::value_type& lookup_gate) -> bool
+                { return selector_index == lookup_gate.tag_index; });
+                return it - lookup_gates.begin();
+            }
+
         public:
 
             circuit_proxy(std::shared_ptr<circuit<ArithmetizationType>> circuit, std::uint32_t _id) :
@@ -120,37 +135,37 @@ namespace nil {
 
             std::size_t add_gate(const std::vector<constraint_type> &args) override {
                 const auto selector_index = circuit_ptr->add_gate(args);
-                used_gates.insert(circuit_ptr->num_gates() - 1);
+                used_gates.insert(get_gate_index(selector_index));
                 return selector_index;
             }
 
             std::size_t add_gate(const constraint_type &args) override {
                 const auto selector_index = circuit_ptr->add_gate(args);
-                used_gates.insert(circuit_ptr->num_gates() - 1);
+                used_gates.insert(get_gate_index(selector_index));
                 return selector_index;
             }
 
             std::size_t add_gate(const std::initializer_list<constraint_type> &&args) override {
                 const auto selector_index = circuit_ptr->add_gate(args);
-                used_gates.insert(circuit_ptr->num_gates() - 1);
+                used_gates.insert(get_gate_index(selector_index));
                 return selector_index;
             }
 
             std::size_t add_lookup_gate(const std::vector<lookup_constraint_type> &args) override {
                 const auto selector_index = circuit_ptr->add_lookup_gate(args);
-                used_lookup_gates.insert(circuit_ptr->num_lookup_gates() - 1);
+                used_lookup_gates.insert(get_lookup_gate_index(selector_index));
                 return selector_index;
             }
 
             std::size_t add_lookup_gate(const lookup_constraint_type &args) override {
                 const auto selector_index = circuit_ptr->add_lookup_gate(args);
-                used_lookup_gates.insert(circuit_ptr->num_lookup_gates() - 1);
+                used_lookup_gates.insert(get_lookup_gate_index(selector_index));
                 return selector_index;
             }
 
             std::size_t add_lookup_gate(const std::initializer_list<lookup_constraint_type> &&args) override {
                 const auto selector_index = circuit_ptr->add_lookup_gate(args);
-                used_lookup_gates.insert(circuit_ptr->num_lookup_gates() - 1);
+                used_lookup_gates.insert(get_lookup_gate_index(selector_index));
                 return selector_index;
             }
 
