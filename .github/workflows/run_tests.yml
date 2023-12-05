@@ -16,7 +16,16 @@ env:
   CACHE_NAME: "blueprint-job-cache"
 
 jobs:
+  handle-syncwith:
+    if: github.event_name == 'pull_request'
+    name: Call Reusable SyncWith Handler
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1
+    with:
+      ci-cd-ref: 'v1'
+    secrets: inherit
+
   run_tests:
+    needs: [ handle-syncwith ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -82,6 +91,15 @@ jobs:
           repository: ${{ env.SUITE_REPO }}
           submodules: recursive
           fetch-depth: 0
+
+      - name: Checkout submodules to specified refs
+        if: needs.handle-syncwith.outputs.prs-refs != ''
+        uses: NilFoundation/ci-cd/actions/recursive-checkout@v1
+        with:
+          paths: |
+            ${{ github.workspace }}/**
+            !${{ github.workspace }}/**/.git/**
+          refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
 
       - name: Checkout source code
         uses: actions/checkout@v3
