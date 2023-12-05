@@ -503,7 +503,7 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
         math::calculate_domain_set<field_type>(extended_log, r);
 
     // Setup params
-    typename fri_type::params_type params(
+    typename fri_type::params_type fri_params(
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 1, test_global_rnd_engine),
