@@ -37,8 +37,9 @@
 #include <nil/marshalling/endianness.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
-#include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/montgomery/element_g1_affine.hpp>
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
@@ -197,8 +198,8 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
     BOOST_CHECK(cv_bits.size() == field_type::value_bits);
 }
 
-BOOST_AUTO_TEST_CASE(curve_element_curve25519_g1) {
-    using curve_type = nil::crypto3::algebra::curves::curve25519;
+BOOST_AUTO_TEST_CASE(curve_element_ed25519_g1) {
+    using curve_type = nil::crypto3::algebra::curves::ed25519;
     using group_type = typename curve_type::g1_type<>;
     using group_affine_type = typename curve_type::g1_type<nil::crypto3::algebra::curves::coordinates::affine>;
     using group_value_type = typename group_type::value_type;
