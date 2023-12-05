@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MARSHALLING_FRI_COMMITMENT_HPP
-#define CRYPTO3_MARSHALLING_FRI_COMMITMENT_HPP
+#ifndef CRYPTO3_MARSHALLING_FRI_COMMITMENT_PARAMS_HPP
+#define CRYPTO3_MARSHALLING_FRI_COMMITMENT_PARAMS_HPP
 
 #include <boost/assert.hpp>
 
@@ -235,4 +235,4 @@ namespace nil {
         }        // namespace marshalling
     }            // namespace crypto3
 }    // namespace nil
-#endif    // CRYPTO3_MARSHALLING_FRI_COMMITMENT_HPP
+#endif    // CRYPTO3_MARSHALLING_FRI_COMMITMENT_PARAMS_HPP
