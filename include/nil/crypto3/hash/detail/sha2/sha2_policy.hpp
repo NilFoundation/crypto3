@@ -26,11 +26,13 @@
 #ifndef CRYPTO3_HASH_DETAIL_SHA2_POLICY_HPP
 #define CRYPTO3_HASH_DETAIL_SHA2_POLICY_HPP
 
+#include <array>
+#include <cstdint>
+
 #include <nil/crypto3/block/shacal2.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 
-#include <array>
 
 namespace nil {
     namespace crypto3 {

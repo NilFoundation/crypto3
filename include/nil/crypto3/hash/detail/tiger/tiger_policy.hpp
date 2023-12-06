@@ -25,7 +25,11 @@
 #ifndef CRYPTO3_TIGER_POLICY_HPP
 #define CRYPTO3_TIGER_POLICY_HPP
 
+#include <array>
+#include <cstdint>
+
 #include <nil/crypto3/hash/detail/tiger/tiger_functions.hpp>
+
 
 namespace nil {
     namespace crypto3 {

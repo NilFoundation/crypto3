@@ -25,8 +25,8 @@
 
 #define BOOST_TEST_MODULE hash_pack_test
 
-#include <boost/array.hpp>
-#include <boost/cstdint.hpp>
+#include <array>
+#include <cstdint>
 
 #include <nil/crypto3/detail/pack.hpp>
 
@@ -34,7 +34,6 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <cstdio>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::detail;
