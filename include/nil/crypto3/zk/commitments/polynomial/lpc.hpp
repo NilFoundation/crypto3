@@ -111,8 +111,8 @@ namespace nil {
                     }
 
                     proof_type proof_eval(transcript_type &transcript) {
-                        for(auto const& it: _batch_fixed) {
-                            if(it.second){
+                        for (auto const& it: _batch_fixed) {
+                            if (it.second) {
                                 this->append_eval_point(it.first, _etha);
                             }
                         }
@@ -134,12 +134,12 @@ namespace nil {
                         ) {
                             bool first = true;
                             // prepare U and V
-                            for(auto const &it: this->_polys){
+                            for (auto const &it: this->_polys) {
                                 auto b_ind = it.first;
                                 BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
                                 BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
 
-                                for( std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++) {
+                                for (std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++) {
                                     // All evaluation points are filled successfully.
                                     auto& points = this->_points[b_ind][poly_ind];
                                     BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
@@ -289,7 +289,9 @@ namespace nil {
                         return true;
                     }
 
-                    const typename fri_type::params_type &get_fri_params() const {
+                    // Params for LPC are actually FRI params. We can return some LPC params from here in the future if needed.
+                    // This params are used for initializing transcript in the prover.
+                    const params_type& get_commitment_params() const {
                         return _fri_params;
                     }
 
@@ -402,8 +404,6 @@ namespace nil {
                         bool operator!=(const proof_type &rhs) const {
                             return !(rhs == *this);
                         }
-
-                        typedef std::vector<std::vector<typename FieldType::value_type>> z_type;
 
                         eval_storage_type z;
                         typename basic_fri::proof_type fri_proof;

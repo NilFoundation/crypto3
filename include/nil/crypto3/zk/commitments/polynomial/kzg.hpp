@@ -85,9 +85,12 @@ namespace nil {
                     struct params_type {
                         using commitment_type = typename curve_type::template g1_type<>::value_type;
                         using field_type = typename curve_type::scalar_field_type;
+                        using params_single_commitment_type = single_commitment_type;
+                        using params_verification_key_type = verification_key_type;
 
                         single_commitment_type commitment_key;
                         verification_key_type verification_key;
+
                         params_type() {}
                         params_type(std::size_t d) {
                             auto alpha = algebra::random_element<field_type>();
@@ -111,6 +114,7 @@ namespace nil {
                         params_type(single_commitment_type ck, verification_key_type vk) :
                             commitment_key(ck), verification_key(vk) {}
                     };
+
                     struct public_key_type {
                         commitment_type commit;
                         scalar_value_type z;
@@ -307,24 +311,6 @@ namespace nil {
             } // namespace commitments
 
             namespace algorithms {
-                template<typename KZG,
-                    typename std::enable_if<
-                        std::is_base_of<
-                            commitments::batched_kzg<typename KZG::curve_type, typename KZG::transcript_hash_type, typename KZG::poly_type>,
-                            KZG>::value,
-                        bool>::type = true>
-                static void setup_transcript(
-                    const typename KZG::params_type &params,
-                    typename KZG::transcript_type &transcript
-                ) {
-                    for (const auto &g1_elem : params.commitment_key) {
-                        transcript(KZG::serializer::point_to_octets(g1_elem));
-                    }
-                    for (const auto &g2_elem : params.verification_key) {
-                        transcript(KZG::serializer::point_to_octets(g2_elem));
-                    }
-                }
-
                 template<typename KZG,
                     typename std::enable_if<
                         std::is_base_of<
@@ -609,7 +595,7 @@ namespace nil {
             namespace commitments{
                                 // Placeholder-friendly class
                 template<typename KZGScheme, typename PolynomialType = typename math::polynomial_dfs<typename KZGScheme::field_type::value_type>>
-                class kzg_commitment_scheme:public polys_evaluator<typename KZGScheme::params_type, typename KZGScheme::commitment_type, PolynomialType>{
+                class kzg_commitment_scheme : public polys_evaluator<typename KZGScheme::params_type, typename KZGScheme::commitment_type, PolynomialType>{
                 public:
                     using curve_type = typename KZGScheme::curve_type;
                     using field_type = typename KZGScheme::field_type;
@@ -688,7 +674,7 @@ namespace nil {
                     }
                 public:
                     // Interface function. Isn't useful here.
-                    void mark_batch_as_fixed(std::size_t index){
+                    void mark_batch_as_fixed(std::size_t index) {
                     }
 
                     kzg_commitment_scheme(params_type kzg_params) : _params(kzg_params) {}
@@ -718,8 +704,8 @@ namespace nil {
                         return true;
                     }
 
-                    void setup(transcript_type& transcript, preprocessed_data_type b = true){
-                        nil::crypto3::zk::algorithms::setup_transcript<KZGScheme>(_params, transcript);
+                    void setup(transcript_type& transcript, preprocessed_data_type b = true) {
+                        // Nothing to be done here.
                     }
 
                     proof_type proof_eval(transcript_type &transcript){
@@ -766,12 +752,12 @@ namespace nil {
                         const proof_type &proof,
                         const std::map<std::size_t, commitment_type> &commitments,
                         transcript_type &transcript
-                    ){
+                    ) {
                         this->merge_eval_points();
                         this->_commitments = commitments;
                         this->_z = proof.z;
 
-                        for( auto const it: this->_commitments ){
+                        for (auto const it: this->_commitments) {
                             auto k = it.first;
                             update_transcript(k, transcript);
                         }
@@ -780,12 +766,12 @@ namespace nil {
                         auto factor = KZGScheme::scalar_value_type::one();
                         auto left_side_accum = KZGScheme::gt_value_type::one();
 
-                        for( const auto &it: this->_commitments){
+                        for (const auto &it: this->_commitments) {
                             auto k = it.first;
                             for (std::size_t i = 0; i < this->_points.at(k).size(); ++i) {
                                 std::vector<std::uint8_t> byteblob(KZGScheme::g1_blob_size);
 
-                                for( std::size_t j = 0; j < KZGScheme::g1_blob_size; j++){
+                                for (std::size_t j = 0; j < KZGScheme::g1_blob_size; j++) {
                                     byteblob[j] = this->_commitments.at(k)[i * KZGScheme::g1_blob_size + j];
                                 }
                                 auto i_th_commitment = KZGScheme::serializer::octets_to_g1_point(byteblob);
@@ -798,8 +784,8 @@ namespace nil {
                                     commit_g2(set_difference_polynom(_merged_points, this->_points.at(k)[i]))
                                 );
 
-                                left_side_accum = left_side_accum * left_side_pairing;
-                                factor = factor * gamma;
+                                left_side_accum *= left_side_pairing;
+                                factor *= gamma;
                             }
                         }
 
@@ -810,6 +796,11 @@ namespace nil {
 
                         return left_side_accum == right_side_pairing;
                     }
+                    
+                    const params_type& get_commitment_params() const {
+                        return _params;
+                    }
+
                 };
             }
         }         // namespace zk

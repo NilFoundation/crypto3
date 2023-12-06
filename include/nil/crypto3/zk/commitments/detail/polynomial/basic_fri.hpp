@@ -103,12 +103,35 @@ namespace nil {
                         using polynomial_type = math::polynomial<typename FieldType::value_type>;
 
                         struct params_type {
+                            
                             using field_type = FieldType;
                             using merkle_tree_type = containers::merkle_tree<MerkleTreeHashType, 2>;
                             using merkle_proof_type =  typename containers::merkle_proof<MerkleTreeHashType, 2>;
                             using precommitment_type = merkle_tree_type;
                             using commitment_type = typename precommitment_type::value_type;
                             using transcript_type = transcript::fiat_shamir_heuristic_sequential<TranscriptHashType>;
+
+                            // We need these constants duplicated here, so we can access them from marshalling easier. Everything that
+                            // needs to be marshalled is a part of params_type.
+                            using grinding_type = GrindingType;
+
+                            constexpr static std::size_t lambda = Lambda;
+                            constexpr static std::size_t m = M;
+                            constexpr static bool use_grinding = UseGrinding;
+
+                            params_type(const params_type &other) = default;
+                            params_type() = default;
+                            params_type(
+                                std::size_t max_degree,
+                                std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D,
+                                std::vector<std::size_t> step_list_in,
+                                std::size_t expand_factor
+                            ) : max_degree(max_degree)
+                              , D(D)
+                              , r(std::accumulate(step_list_in.begin(), step_list_in.end(), 0))
+                              , step_list(step_list_in)
+                              , expand_factor(expand_factor)
+                            {}
 
                             bool operator==(const params_type &rhs) const {
                                 return r == rhs.r && max_degree == rhs.max_degree && D == rhs.D && step_list == rhs.step_list;
@@ -118,22 +141,16 @@ namespace nil {
                                 return !(rhs == *this);
                             }
 
-                            // TODO: Better if we can construct params_type from any batch size to another
-                            params_type(
-                                const typename basic_batched_fri<FieldType, MerkleTreeHashType, TranscriptHashType, Lambda, M, UseGrinding, GrindingType>::params_type &obj
-                            ) {
-                                r = obj.r;
-                                max_degree = obj.max_degree;
-                                D = obj.D;
-                                step_list = obj.step_list;
-                            }
+                            const std::size_t max_degree;
+                            const std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
+ 
+                            // The total number of FRI-rounds, the sum of 'step_list'.
+                            const std::size_t r;
+                            const std::vector<std::size_t> step_list;
 
-                            params_type() {};
-
-                            std::size_t r;
-                            std::size_t max_degree;
-                            std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
-                            std::vector<std::size_t> step_list;
+                            // Degrees of D are degree_log + expand_factor. This is unused in FRI,
+                            // but we still want to keep the parameter with which it was constructed.
+                            const std::size_t expand_factor;
                         };
 
                         struct round_proof_type {
@@ -568,8 +585,6 @@ namespace nil {
                     return correct_order_idx;
                 }
                  
-                //template<typename FRI, typename PolynomialType>
-
                 template<typename FRI, typename PolynomialType,
                     typename std::enable_if<
                             std::is_base_of<

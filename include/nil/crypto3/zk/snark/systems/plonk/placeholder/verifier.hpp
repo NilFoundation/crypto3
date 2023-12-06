@@ -142,7 +142,7 @@ namespace nil {
                         auto omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
                         auto challenge = proof.eval_proof.challenge;
                         auto numerator = challenge.pow(preprocessed_public_data.common_data.rows_amount) - FieldType::value_type::one();
-                        numerator = numerator / (typename FieldType::value_type(preprocessed_public_data.common_data.rows_amount));
+                        numerator /= typename FieldType::value_type(preprocessed_public_data.common_data.rows_amount);
 
                         for( std::size_t i = 0; i < ParamsType::arithmetization_params::public_input_columns; ++i ){
                             typename FieldType::value_type value = FieldType::value_type::zero();
@@ -153,7 +153,9 @@ namespace nil {
                             }
                             value *= numerator;
                             if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, ParamsType::arithmetization_params::witness_columns + i, 0) )
+{
                                 return false;
+}
                         }
                         return process(preprocessed_public_data, proof, constraint_system, commitment_scheme);
                     }
@@ -170,8 +172,17 @@ namespace nil {
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
                         transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
-                        commitment_scheme.setup(transcript, preprocessed_public_data.common_data.commitment_scheme_data);
 
+                        nil::crypto3::zk::snark::detail::init_transcript<ParamsType, transcript_hash_type>(
+                            transcript,
+                            preprocessed_public_data.common_data.rows_amount,
+                            preprocessed_public_data.common_data.usable_rows_amount,
+                            commitment_scheme.get_commitment_params(),
+                            "Default application dependent transcript initialization string"
+                        );
+
+                        // Setup commitment scheme. LPC adds an additional point here.
+                        commitment_scheme.setup(transcript, preprocessed_public_data.common_data.commitment_scheme_data);
 
                         // 3. append witness commitments to transcript
                         transcript(proof.commitments.at(VARIABLE_VALUES_BATCH));
@@ -300,7 +311,7 @@ namespace nil {
                         commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));
                         commitment_scheme.set_batch_size(PERMUTATION_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));
                         commitment_scheme.set_batch_size(QUOTIENT_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));
-                        if(is_lookup_enabled)
+                        if (is_lookup_enabled)
                             commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));
                         generate_evaluation_points(commitment_scheme, preprocessed_public_data, constraint_system, challenge, is_lookup_enabled);
 
@@ -326,13 +337,13 @@ namespace nil {
 
                         typename FieldType::value_type F_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < f_parts; i++) {
-                            F_consolidated = F_consolidated + alphas[i] * F[i];
+                            F_consolidated += alphas[i] * F[i];
                         }
 
                         typename FieldType::value_type T_consolidated = FieldType::value_type::zero();
                         for (std::size_t i = 0; i < proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH); i++) {
-                            T_consolidated = T_consolidated + proof.eval_proof.eval_proof.z.get(QUOTIENT_BATCH, i, 0) *
-                                                                  challenge.pow((preprocessed_public_data.common_data.rows_amount) * i);
+                            T_consolidated += proof.eval_proof.eval_proof.z.get(QUOTIENT_BATCH, i, 0) *
+                                challenge.pow((preprocessed_public_data.common_data.rows_amount) * i);
                         }
 
                         // Z is polynomial -1, 0 ...., 0, 1

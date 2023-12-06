@@ -40,7 +40,7 @@ namespace nil {
                     typename FieldType, 
                     typename ArithmetizationParams
                 >
-                struct placeholder_circuit_params{
+                struct placeholder_circuit_params {
                     constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
                     constexpr static const std::size_t public_input_columns = ArithmetizationParams::public_input_columns;
                     constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
@@ -57,7 +57,7 @@ namespace nil {
                 };
 
                 template<typename CircuitParams, typename CommitmentScheme>
-                struct placeholder_params{
+                struct placeholder_params {
                     constexpr static const std::size_t witness_columns = CircuitParams::witness_columns;
                     constexpr static const std::size_t public_input_columns = CircuitParams::public_input_columns;
                     constexpr static const std::size_t constant_columns = CircuitParams::constant_columns;
@@ -78,6 +78,7 @@ namespace nil {
 
                     using transcript_hash_type = typename CommitmentScheme::transcript_hash_type;
                     using circuit_params_type = CircuitParams;
+
                 };
             }    // namespace snark
         }        // namespace zk

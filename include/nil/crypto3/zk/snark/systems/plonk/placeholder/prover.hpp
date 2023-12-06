@@ -45,6 +45,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/transcript_initialization_context.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -134,15 +135,25 @@ namespace nil {
                     {
                         // 1. Add circuit definition to transcript
                         // transcript(short_description);
+
+                        // Initialize transcript. 
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
                         transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
 
-                        // setup commitment scheme
+                        nil::crypto3::zk::snark::detail::init_transcript<ParamsType, transcript_hash_type>(
+                            transcript,
+                            preprocessed_public_data.common_data.rows_amount,
+                            preprocessed_public_data.common_data.usable_rows_amount,
+                            _commitment_scheme.get_commitment_params(),
+                            "Default application dependent transcript initialization string"
+                        );
+
+                        // Setup commitment scheme. LPC adds an additional point here.
                         _commitment_scheme.setup(transcript, preprocessed_public_data.common_data.commitment_scheme_data);
                     }
 
                     placeholder_proof<FieldType, ParamsType> process() {
-                        PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time:");
+                        PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time");
 
                         // 2. Commit witness columns and public_input columns
                         _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table.witnesses());

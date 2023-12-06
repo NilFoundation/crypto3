@@ -49,8 +49,9 @@ namespace nil {
                 };
 
                 // Placeholder commitment scheme works with polynomial_dfs
-                template<typename ParamsType, typename TranscriptType, typename PolynomialType = typename math::polynomial_dfs<typename ParamsType::field_type::value_type>>
-                class polys_evaluator{
+                template<typename ParamsType, typename TranscriptType,
+                         typename PolynomialType = typename math::polynomial_dfs<typename ParamsType::field_type::value_type>>
+                class polys_evaluator {
                 public:
                     using params_type = ParamsType;
                     using commitment_type = typename ParamsType::commitment_type;
@@ -102,6 +103,7 @@ namespace nil {
 
                         return math::lagrange_interpolation(U_interpolation_points);
                     }
+
                     std::vector<std::vector<typename field_type::value_type>> get_unique_points_list() const{
                         std::vector<std::vector<typename field_type::value_type>> unique_points;
 
@@ -122,15 +124,16 @@ namespace nil {
                         return unique_points;
                     }
 
-                    std::map<std::size_t, std::vector<std::size_t>> get_eval_map( const std::vector<std::vector<typename field_type::value_type>> unique_points ) const{
+                    std::map<std::size_t, std::vector<std::size_t>> get_eval_map(
+                            const std::vector<std::vector<typename field_type::value_type>>& unique_points) const {
                         std::map<std::size_t, std::vector<std::size_t>> eval_map;
 
-                        for(auto const &[k, point]:_points){
+                        for(auto const &[k, point] : _points) {
                             eval_map[k] = {};
-                            for( std::size_t i = 0; i < point.size(); i++ ){
+                            for (std::size_t i = 0; i < point.size(); i++) {
                                 bool found = false;
-                                for( std::size_t j = 0; j < unique_points.size(); j++ ){
-                                    if( unique_points[j] == point[i] ){
+                                for (std::size_t j = 0; j < unique_points.size(); j++) {
+                                    if (unique_points[j] == point[i]) {
                                         eval_map[k].push_back(j);
                                         found = true;
                                         break;
@@ -157,7 +160,6 @@ namespace nil {
 
                             for (std::size_t i = 0; i < poly.size(); i++) {
                                 _z.set_poly_points_number(k, i, point[i].size());
-
                                 for (std::size_t j = 0; j < point[i].size(); j++) {
                                     _z.set(k, i, j, poly[i].evaluate(point[i][j]));
                                 }
