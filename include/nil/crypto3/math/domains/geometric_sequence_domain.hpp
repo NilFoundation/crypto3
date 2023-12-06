@@ -53,8 +53,11 @@ namespace nil {
                 bool precomputation_sentinel;
                 std::vector<field_value_type> geometric_sequence;
                 std::vector<field_value_type> geometric_triangular_sequence;
+                field_value_type geometric_generator;
 
                 void do_precomputation() {
+                    geometric_generator = field_value_type(fields::arithmetic_params<FieldType>::geometric_generator);
+
                     geometric_sequence = std::vector<field_value_type>(this->m, field_value_type::zero());
                     geometric_sequence[0] = field_value_type::one();
 
@@ -62,8 +65,7 @@ namespace nil {
                     geometric_triangular_sequence[0] = field_value_type::one();
 
                     for (std::size_t i = 1; i < this->m; i++) {
-                        geometric_sequence[i] =
-                            geometric_sequence[i - 1] * fields::arithmetic_params<FieldType>::geometric_generator;
+                        geometric_sequence[i] = geometric_sequence[i - 1] * geometric_generator;
                         geometric_triangular_sequence[i] =
                             geometric_triangular_sequence[i - 1] * geometric_sequence[i - 1];
                     }
@@ -86,7 +88,7 @@ namespace nil {
                     precomputation_sentinel = false;
                 }
 
-                void fft(std::vector<value_type> &a) {
+                void fft(std::vector<value_type> &a) override {
                     if (a.size() != this->m) {
                         if (a.size() < this->m) {
                             a.resize(this->m, value_type::zero());
@@ -120,7 +122,8 @@ namespace nil {
                         a[i] = a[i] * T[i].inversed();
                     }
                 }
-                void inverse_fft(std::vector<value_type> &a) {
+
+                void inverse_fft(std::vector<value_type> &a) override {
                     if (a.size() != this->m) {
                         if (a.size() < this->m) {
                             a.resize(this->m, value_type::zero());
@@ -159,7 +162,8 @@ namespace nil {
                     newton_to_monomial_basis_geometric<FieldType>(a, geometric_sequence, geometric_triangular_sequence,
                                                                   this->m);
                 }
-                std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) {
+
+                std::vector<field_value_type> evaluate_all_lagrange_polynomials(const field_value_type &t) override {
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
                     /* Evaluate for x = t */
                     /* Return coeffs for each l_j(x) = (l / l_i[j]) * w[j] */
@@ -220,7 +224,7 @@ namespace nil {
                 }
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
-                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) {                    
+                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) override { 
                     if(std::distance(t_powers_begin, t_powers_end) < this->m) {
                         throw std::invalid_argument("geometric_sequence_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
                     }
@@ -299,13 +303,19 @@ namespace nil {
                     return result;
                 }
 
-                field_value_type get_domain_element(const std::size_t idx) {
+                // This one is not the unity root actually, but it's ok for our purposes. 
+                const field_value_type& get_unity_root() override {
+                    return geometric_generator;
+                }
+
+                field_value_type get_domain_element(const std::size_t idx) override {
                     if (!precomputation_sentinel)
                         do_precomputation();
 
                     return this->geometric_sequence[idx];
                 }
-                field_value_type compute_vanishing_polynomial(const field_value_type &t) {
+
+                field_value_type compute_vanishing_polynomial(const field_value_type &t) override {
                     if (!precomputation_sentinel)
                         do_precomputation();
 
@@ -317,7 +327,8 @@ namespace nil {
                     }
                     return Z;
                 }
-                polynomial<field_value_type> get_vanishing_polynomial() {
+
+                polynomial<field_value_type> get_vanishing_polynomial() override {
                     if (!precomputation_sentinel)
                         do_precomputation();
 
@@ -327,7 +338,8 @@ namespace nil {
                     }
                     return z;
                 }
-                void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) {
+
+                void add_poly_z(const field_value_type &coeff, std::vector<field_value_type> &H) override {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("geometric: expected H.size() == this->m+1");
 
@@ -351,7 +363,8 @@ namespace nil {
                         H[i] += (x[i] * coeff);
                     }
                 }
-                void divide_by_z_on_coset(std::vector<field_value_type> &P) {
+
+                void divide_by_z_on_coset(std::vector<field_value_type> &P) override {
                     const field_value_type coset = field_value_type(
                         fields::arithmetic_params<FieldType>::multiplicative_generator); /* coset in geometric
                                                                                             sequence? */
