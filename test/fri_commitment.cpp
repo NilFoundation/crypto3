@@ -487,17 +487,16 @@ BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test) {
     typedef typename fri_type::proof_type proof_type;
     typedef typename fri_type::params_type params_type;
 
-    params_type params;
-
-    constexpr static const std::size_t d_extended = d;
-    std::size_t extended_log = boost::static_log2<d_extended>::value;
+    std::size_t extended_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<field_type>>> D =
             math::calculate_domain_set<field_type>(extended_log, r);
 
-    params.r = r;
-    params.D = D;
-    params.max_degree = d - 1;
-    params.step_list = generate_random_step_list(r, 3, test_global_rnd_engine);
+    params_type params(
+        d - 1, // max_degree
+        D,
+        generate_random_step_list(r, 3, test_global_rnd_engine),
+        2 //expand_factor
+    );
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());

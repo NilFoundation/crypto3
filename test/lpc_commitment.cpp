@@ -502,13 +502,13 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     std::vector<std::shared_ptr<math::evaluation_domain<field_type>>> D =
         math::calculate_domain_set<field_type>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
-
     // Setup params
-    fri_params.r = r;
-    fri_params.D = D;
-    fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 1, test_global_rnd_engine);
+    typename fri_type::params_type fri_params(
+        d - 1, // max_degree
+        D,
+        generate_random_step_list(r, 1, test_global_rnd_engine),
+        2 //expand_factor
+    );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename field_type::value_type>>;
     lpc_scheme_type lpc_scheme_prover(fri_params);
