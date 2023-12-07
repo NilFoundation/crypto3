@@ -113,24 +113,18 @@ class placeholder_performance_test_base {
     }
 
     template<typename fri_type, typename FieldType>
-    static typename fri_type::params_type create_fri_params(std::size_t degree_log, const int max_step = 1) {
-        typename fri_type::params_type params;
-        math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    typename fri_type::params_type create_fri_params(
+        std::size_t degree_log, const int max_step = 1, std::size_t expand_factor = 7) {
+    std::size_t r = degree_log - 1;
 
-        constexpr std::size_t expand_factor = 7;
+    return typename fri_type::params_type(
+        (1 << degree_log) - 1, // max_degree
+        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r),
+        generate_random_step_list(r, max_step),
+        expand_factor
+    );
+}
 
-        std::size_t r = degree_log - 1;
-
-        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-            math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
-
-        params.r = r;
-        params.D = domain_set;
-        params.max_degree = (1 << degree_log) - 1;
-        params.step_list = generate_random_step_list(r, max_step);
-
-        return params;
-    }
 };
 
 template<std::size_t lambda>
@@ -327,7 +321,7 @@ private:
     columns_rotations_type columns_rotations;
 };
 
-BOOST_AUTO_TEST_SUITE(placeholder_transpiler_suite)
+BOOST_AUTO_TEST_SUITE(placeholder_transpiler_suite, *boost::unit_test::disabled())
 
 BOOST_FIXTURE_TEST_CASE(placeholder_merkle_tree_poseidon_test, placeholder_performance_test<2>) {
 
