@@ -437,7 +437,7 @@ unchecked {
         tr_state.current_challenge = transcript_state;
         commitment_state memory state;
 
-$ETA_VALUES_VERIFICATION$
+        $ETA_VALUES_VERIFICATION$
 
         {
             uint256 offset;
