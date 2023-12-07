@@ -161,7 +161,7 @@ namespace nil {
             transcript(common_data.vk.fixed_values_commitment);
             auto etha = transcript.template challenge<typename PlaceholderParams::field_type>();
             
-            auto fri_params = lpc_scheme.get_fri_params();
+            auto fri_params = lpc_scheme.get_commitment_params();
             replacements["$R$"] = to_string(fri_params.r);
             replacements["$LAMBDA$"] = to_string(PlaceholderParams::commitment_scheme_type::fri_type::lambda);
             replacements["$D0_SIZE$"] = to_string(fri_params.D[0]->m);
@@ -192,7 +192,7 @@ namespace nil {
             const common_data_type<PlaceholderParams> &common_data,
             const typename PlaceholderParams::commitment_scheme_type& lpc_scheme
         ){
-            auto fri_params = lpc_scheme.get_fri_params();
+            auto fri_params = lpc_scheme.get_commitment_params();
             BOOST_ASSERT(fri_params.step_list.size() == fri_params.r);
             for(std::size_t i = 0; i < fri_params.step_list.size(); i++){
                 BOOST_ASSERT(fri_params.step_list[i] == 1);
