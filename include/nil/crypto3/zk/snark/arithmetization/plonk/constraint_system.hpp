@@ -61,6 +61,11 @@ namespace nil {
                     typedef plonk_lookup_table<FieldType> lookup_table_type;
                     typedef std::vector<lookup_table_type> lookup_tables_type;
                     typedef std::vector<plonk_variable<typename FieldType::value_type>> public_input_gate_type;
+                    typedef math::expression_max_degree_visitor<variable_type> degree_visitor_type;
+                    typedef math::expression<variable_type> expression_type;
+                    typedef math::term<variable_type> term_type;
+                    typedef math::binary_arithmetic_operation<variable_type> binary_operation_type;
+                    typedef math::pow_operation<variable_type> pow_operation_type;
 
                 protected:
                     gates_container_type _gates;
@@ -79,7 +84,7 @@ namespace nil {
                                             const lookup_tables_type &lookup_tables = {}
                     ) :
                         _gates(gates),
-                        _copy_constraints(copy_constraints), 
+                        _copy_constraints(copy_constraints),
                         _lookup_gates(lookup_gates),
                         _lookup_tables(lookup_tables)
                     {
@@ -133,7 +138,7 @@ namespace nil {
                     std::size_t sorted_lookup_columns_number() const {
                         if(_lookup_gates.size() == 0){
                             return 0;
-                        }   
+                        }
                         return lookup_options_num() + lookup_constraints_num();
                     }
 
@@ -152,7 +157,75 @@ namespace nil {
                         }
                         return result;
                     }
-                
+
+                    std::size_t lookup_expressions_num() const{
+                        std::size_t result = 0;
+                        for(std::size_t i = 0; i < _lookup_gates.size(); ++i) {
+                            for(std::size_t j = 0; j < _lookup_gates[i].constraints.size(); ++j) {
+                                result += _lookup_gates[i].constraints[j].lookup_input.size();
+                            }
+                        }
+                        return result;
+                    }
+
+                    std::size_t lookup_tables_columns_num() const{
+                        std::size_t result = 0;
+                        for(std::size_t i = 0; i < _lookup_tables.size(); ++i) {
+                            result += _lookup_tables[i].lookup_options[0].size() * _lookup_tables[i].lookup_options.size();
+                        }
+                        return result;
+                    }
+
+                    std::size_t max_gates_degree() const {
+                        std::size_t max_gates_degree = 0;
+                        math::expression_max_degree_visitor<variable_type> gates_visitor;
+                        for (const auto& gate : _gates) {
+                            for (const auto& constr : gate.constraints) {
+                                std::size_t deg = gates_visitor.compute_max_degree(constr);
+                                max_gates_degree = std::max(max_gates_degree, deg);
+                            }
+                        }
+                        return max_gates_degree;
+                    }
+
+                    std::size_t max_lookup_gates_degree() const {
+                        std::size_t max_lookup_gates_degree = 0;
+                        math::expression_max_degree_visitor<variable_type> lookup_visitor;
+                        for (const auto& gate :_lookup_gates) {
+                            for (const auto& constr : gate.constraints) {
+                                for (const auto& li : constr.lookup_input) {
+                                    std::size_t deg = lookup_visitor.compute_max_degree(li);
+                                    max_lookup_gates_degree = std::max(
+                                        max_lookup_gates_degree,
+                                        deg
+                                    );
+                                }
+                            }
+                        }
+                        return max_lookup_gates_degree;
+                    }
+
+                    std::size_t lookup_poly_degree_bound() const{
+                        std::uint32_t lookup_degree = 0;
+                        if(_lookup_gates.size() > 0){
+                            degree_visitor_type degree_visitor;
+                            for(std::size_t i = 0; i < _lookup_gates.size(); i++){
+                                for(std::size_t j = 0; j < _lookup_gates[i].constraints.size(); j++){
+                                    std::size_t degree = 0;
+                                    for(std::size_t k = 0; k < _lookup_gates[i].constraints[j].lookup_input.size(); k++){
+                                        degree = std::max(degree, std::size_t(degree_visitor.compute_max_degree(_lookup_gates[i].constraints[j].lookup_input[k])));
+                                    }
+                                    lookup_degree += (degree + 1);
+                                }
+                            }
+                            for(std::size_t i = 0; i < _lookup_tables.size(); i++){
+                                lookup_degree += 3 * _lookup_tables[i].lookup_options.size();
+                            }
+                        }
+                        return lookup_degree;
+                    }
+
+
                     bool operator==(const plonk_constraint_system<FieldType, ArithmetizationParams> &other) const {
                         return (this->_gates == other._gates) && (this->_copy_constraints == other._copy_constraints) &&
                                (this->_lookup_gates == other._lookup_gates) && (this->_lookup_tables == other._lookup_tables);

@@ -442,22 +442,10 @@ namespace nil {
                         std::size_t N_rows = table_description.rows_amount;
                         std::size_t usable_rows = table_description.usable_rows_amount;
 
-                        std::uint32_t max_gates_degree = 0;
-                        math::expression_max_degree_visitor<variable_type> gates_visitor;
-                        for (const auto& gate : constraint_system.gates()) {
-                            for (const auto& constr : gate.constraints) {
-                                max_gates_degree = std::max(max_gates_degree, gates_visitor.compute_max_degree(constr));
-                            }
-                        }
-                        math::expression_max_degree_visitor<variable_type> lookup_visitor;
-                        for (const auto& gate : constraint_system.lookup_gates()) {
-                            for (const auto& constr : gate.constraints) {
-                                for (const auto& li : constr.lookup_input) {
-                                    max_gates_degree = std::max(max_gates_degree,
-                                        lookup_visitor.compute_max_degree(li));
-                                }
-                            }
-                        }
+                        std::uint32_t max_gates_degree = std::max(
+                            constraint_system.max_gates_degree(),
+                            constraint_system.max_lookup_gates_degree()
+                        );
                         assert(max_gates_degree > 0);
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
