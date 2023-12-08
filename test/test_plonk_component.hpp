@@ -284,10 +284,19 @@ namespace nil {
                 // We may start from zero if component doesn't use ordinary constants.
                 std::vector<size_t> lookup_columns_indices;
                 for( std::size_t i = 1; i < ArithmetizationParams::constant_columns; i++ )  lookup_columns_indices.push_back(i);
+
+                std::size_t cur_selector_id = 0;
+                for(const auto &gate: bp.gates()){
+                    cur_selector_id = std::max(cur_selector_id, gate.selector_index);
+                }
+                for(const auto &lookup_gate: bp.lookup_gates()){
+                    cur_selector_id = std::max(cur_selector_id, lookup_gate.tag_index);
+                }
+                cur_selector_id++;
                 desc.usable_rows_amount = zk::snark::pack_lookup_tables_horizontal(
                     bp.get_reserved_indices(),
                     bp.get_reserved_tables(),
-                    bp, assignment, lookup_columns_indices, 0,
+                    bp, assignment, lookup_columns_indices, cur_selector_id,
                     desc.usable_rows_amount,
                     500000
                 );
