@@ -31,7 +31,7 @@
 #include <sstream>
 #include <filesystem>
 
-#include <boost/algorithm/string.hpp> 
+#include <boost/algorithm/string.hpp>
 #include <nil/blueprint/transpiler/util.hpp>
 #include <nil/blueprint/transpiler/templates/commitment_scheme.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
@@ -40,21 +40,21 @@ namespace nil {
     namespace blueprint {
         template <typename PlaceholderParams>
         using common_data_type = typename nil::crypto3::zk::snark::placeholder_public_preprocessor<
-            typename PlaceholderParams::field_type, 
+            typename PlaceholderParams::field_type,
             PlaceholderParams
         >::preprocessed_data_type::common_data_type;
-        
+
         std::string rot_string (int j){
-            if(j == 0) return "xi"; else 
-            if(j == 1 ) return "mulmod(xi, omega, modulus)"; else 
-            if(j == -1) return "mulmod(xi, inversed_omega, modulus)"; else 
+            if(j == 0) return "xi"; else
+            if(j == 1 ) return "mulmod(xi, omega, modulus)"; else
+            if(j == -1) return "mulmod(xi, inversed_omega, modulus)"; else
             if(j > 0) return "mulmod(xi, field.pow_small(omega, " + to_string(j) + ", modulus), modulus)"; else
             if(j < 0) return "mulmod(xi, field.pow_small(inversed_omega, " + to_string(-j) + ", modulus), modulus)";
             return "";
         }
 
 
-        template<typename PlaceholderParams> 
+        template<typename PlaceholderParams>
         void commitment_scheme_replaces(
             transpiler_replacements& replacements,
             const common_data_type<PlaceholderParams> &common_data,
@@ -160,7 +160,7 @@ namespace nil {
             transcript(common_data.vk.constraint_system_hash);
             transcript(common_data.vk.fixed_values_commitment);
             auto etha = transcript.template challenge<typename PlaceholderParams::field_type>();
-            
+
             auto fri_params = lpc_scheme.get_commitment_params();
             replacements["$R$"] = to_string(fri_params.r);
             replacements["$LAMBDA$"] = to_string(PlaceholderParams::commitment_scheme_type::fri_type::lambda);

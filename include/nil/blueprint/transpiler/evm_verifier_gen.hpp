@@ -32,7 +32,7 @@
 #include <filesystem>
 #include <unordered_set>
 
-#include <boost/algorithm/string.hpp> 
+#include <boost/algorithm/string.hpp>
 #include <nil/blueprint/transpiler/templates/modular_verifier.hpp>
 #include <nil/blueprint/transpiler/templates/gate_argument.hpp>
 #include <nil/blueprint/transpiler/templates/permutation_argument.hpp>
@@ -44,12 +44,16 @@
 #include <nil/blueprint/transpiler/lpc_scheme_gen.hpp>
 #include <nil/blueprint/transpiler/util.hpp>
 
+#include <nil/crypto3/hash/keccak.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/detail/digest.hpp>
+
 namespace nil {
     namespace blueprint {
         template <typename PlaceholderParams>
         class evm_verifier_printer{
             using common_data_type = typename nil::crypto3::zk::snark::placeholder_public_preprocessor<
-                typename PlaceholderParams::field_type, 
+                typename PlaceholderParams::field_type,
                 PlaceholderParams
             >::preprocessed_data_type::common_data_type;
 
@@ -153,7 +157,7 @@ namespace nil {
             std::size_t term_is_power(crypto3::math::term<variable_type> const& term) {
                 const auto &vars = term.get_vars();
                 auto var = std::cbegin(vars);
-                
+
                 if (var == std::cend(vars))
                     return 0;
 
@@ -287,7 +291,7 @@ namespace nil {
                 std::size_t lookups_library_size_threshold = 1000,
                 std::size_t lookups_contract_size_threshold = 1000,
                 bool deduce_horner = true,
-                bool optimize_powers = true 
+                bool optimize_powers = true
             ) :
             _constraint_system(constraint_system),
             _common_data(common_data),
@@ -447,7 +451,7 @@ namespace nil {
             }
 
             /** @brief Split items into buckets, each bucket is limited
-             * to max_bucket_size, minimizes number of buckets. 
+             * to max_bucket_size, minimizes number of buckets.
              * items must be sorted
              * @param[in] items (item_id, item_size)
              * @param[in] max_bucket_size
@@ -561,7 +565,7 @@ namespace nil {
                 std::unordered_map<std::size_t, std::string> gate_codes;
                 std::vector<std::pair<std::size_t, std::size_t>> gate_costs(gates_count);
                 std::vector<std::size_t> gate_ids(gates_count);
-                
+
                 std::vector<constraint_info> constraints;
                 std::size_t total_cost = 0;
 
@@ -584,8 +588,6 @@ namespace nil {
 
 
                 std::size_t gate_modules_count = 0;
-
-
                 std::size_t current_selector = 0;
                 if (total_cost <= _gates_contract_size_threshold) {
                     auto it = constraints.begin();
@@ -615,6 +617,7 @@ namespace nil {
                         ++gate_modules_count;
                     }
                 }
+                std::cout << "Finished" << std::endl;
 
                 if (_term_powers.size() > 0) {
                     std::stringstream power_functions;
@@ -752,23 +755,23 @@ namespace nil {
                     lookup_str << "\t\t\tstate.shifted_selector_value = basic_marshalling.get_uint256_be(blob, " << _var_indices.at(shifted_sel_var) * 0x20 << ");" << std::endl;
 
                     for( const auto &option: table.lookup_options ){
-                        lookup_str << 
+                        lookup_str <<
                             "\t\t\tl = mulmod( " << table_index << ", state.selector_value, modulus);" << std::endl;
-                        lookup_str << 
+                        lookup_str <<
                             "\t\t\tstate.l_shifted = mulmod( " << table_index << ", state.shifted_selector_value, modulus);" << std::endl;
                         lookup_str << "\t\t\tstate.theta_acc=state.theta;" << std::endl;
                         for( const auto &var: option ){
-                            lookup_str << 
+                            lookup_str <<
                                 "\t\t\tl = addmod( l, mulmod(state.selector_value,  mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
                             variable_type shifted_var = var;
                             shifted_var.rotation = 1;
-                            lookup_str << 
+                            lookup_str <<
                                 "\t\t\tstate.l_shifted = addmod( state.l_shifted, mulmod(state.shifted_selector_value, mulmod( state.theta_acc, basic_marshalling.get_uint256_be(blob, " << _var_indices.at(shifted_var) * 0x20 << "), modulus), modulus), modulus);" << std::endl;
                             lookup_str << "\t\t\tstate.theta_acc = mulmod(state.theta_acc, state.theta, modulus);" << std::endl;
                         }
-                        lookup_str << 
+                        lookup_str <<
                             "\t\t\tl = mulmod( l, state.mask, modulus);" << std::endl;
-                        lookup_str << 
+                        lookup_str <<
                             "\t\t\tstate.l_shifted = mulmod( state.l_shifted, state.shifted_mask, modulus);" << std::endl;
                         lookup_str << "\t\t\tstate.g = mulmod(state.g, addmod( state.factor, addmod(l, mulmod(state.beta, state.l_shifted, modulus), modulus), modulus), modulus);" << std::endl;
                         j++;
@@ -783,63 +786,98 @@ namespace nil {
             std::string eta_point_verification_code() {
                 std::stringstream result;
                 auto fixed_poly_values = _common_data.commitment_scheme_data;
-                
-                std::size_t poly_points = 2;
-                
+                using eta_hash = crypto3::hashes::keccak_1600<256>;
+                using field_element_type = nil::crypto3::marshalling::types::field_element<
+                                nil::marshalling::field_type<nil::marshalling::option::big_endian>,
+                                typename PlaceholderParams::field_type::value_type>;
+
                 if (fixed_poly_values.size() == 0)
                     return "";
-                
-                result << "\t\t{" << std::endl;
-                result << "\t\t\tuint256 poly_at_eta;" << std::endl;
 
-                result << "\t\t\t/* 1 - 2*permutation_size */" << std::endl;
+                std::vector<std::uint8_t> eta_buf;
+
+                std::size_t poly_points = 2*_permutation_size;
+                /* special_selectors */
+                poly_points += 2;
+                poly_points += PlaceholderParams::arithmetization_params::constant_columns;
+                poly_points += PlaceholderParams::arithmetization_params::selector_columns;
+                eta_buf.resize( 32*poly_points );
+
+                std::array<std::uint8_t, 0> empty;
+                auto writer = eta_buf.begin();
+
+                result << "\t\t/* eta points check */" << std::endl;
+                result << "\t\t{" << std::endl;
+                result << "\t\t\tuint256[" << poly_points << "] memory points;" << std::endl;
+
                 std::size_t i = 0, j = 0;
                 std::size_t point_offset = 8;
 
+
+                result << std::showbase << std::hex;
+
+                result << "\t\t\t// 1. 2*permutation_size" << std::endl;
+                poly_points = 2;
+
                 while (j < 2*_permutation_size) {
-                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
-                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    result << "\t\t\tpoints[" << i << "] = basic_marshalling.get_uint256_be(blob,";
+                    result << point_offset + (poly_points-1)*32 << ");" << std::endl;
+                    field_element_type value(fixed_poly_values[0][i]);
+                    value.write(writer, 32);
                     point_offset += 32*poly_points;
                     ++i;
                     ++j;
                 }
 
-                result << "\t\t\t/* 2 - special selectors */" << std::endl;
+                result << "\t\t\t// 2. special selectors " << std::endl;
                 poly_points = 3;
+
                 j = 0;
                 while (j < 2) {
-                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
-                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    result << "\t\t\tpoints[" << i << "] = basic_marshalling.get_uint256_be(blob,";
+                    result << point_offset + (poly_points-1)*32 << ");" << std::endl;
+                    field_element_type value(fixed_poly_values[0][i]);
+                    value.write(writer, 32);
                     point_offset += 32*poly_points;
                     ++i;
                     ++j;
                 }
 
+                result << "\t\t\t// 3. constant columns " << std::endl;
                 std::size_t column_rotation_offset = PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns;
-                result << "\t\t\t/* 3 - constant columns */" << std::endl;
                 j = 0;
                 while (j < PlaceholderParams::arithmetization_params::constant_columns) {
                     poly_points = _common_data.columns_rotations[column_rotation_offset + j].size()+1;
-                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
-                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    result << "\t\t\tpoints[" << i << "] = basic_marshalling.get_uint256_be(blob,";
+                    result << point_offset + (poly_points-1)*32 << ");" << std::endl;
+                    field_element_type value(fixed_poly_values[0][i]);
+                    value.write(writer, 32);
                     point_offset += 32*poly_points;
                     ++i;
                     ++j;
                 }
 
-                result << "\t\t\t/* 4 - selector columns */" << std::endl;
-                column_rotation_offset = PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns;
+                result << "\t\t\t// 4. selector columns " << std::endl;
+                column_rotation_offset += PlaceholderParams::constant_columns;
                 j = 0;
                 while (j < PlaceholderParams::arithmetization_params::selector_columns) {
                     poly_points = _common_data.columns_rotations[column_rotation_offset + j].size()+1;
-                    result << "\t\t\tpoly_at_eta = basic_marshalling.get_uint256_be(blob, " << point_offset+(poly_points-1)*32 << ");" << "// " << i << std::endl;
-                    result << "\t\t\tif(poly_at_eta != " << std::showbase<< std::hex << fixed_poly_values[0][i] << ") return false;" << std::endl;
+                    result << "\t\t\tpoints[" << i << "] = basic_marshalling.get_uint256_be(blob,";
+                    result << point_offset + (poly_points-1)*32 << ");" << std::endl;
+                    field_element_type value(fixed_poly_values[0][i]);
+                    value.write(writer, 32);
                     point_offset += 32*(poly_points);
                     ++i;
                     ++j;
                 }
 
+                eta_hash::digest_type hash_result = crypto3::hash<eta_hash>(eta_buf);
+                result << "\t\t\t// Check keccak(points) " << std::endl;
+                result << "\t\t\tif ( bytes32(0x" << std::to_string(hash_result).data() << ") != keccak256(abi.encode(points))) {" << std::endl;
+                result << "\t\t\t\treturn false;" << std::endl;
+                result << "\t\t\t}" << std::endl;
                 result << "\t\t}" << std::endl;
+
                 return result.str();
             }
 
