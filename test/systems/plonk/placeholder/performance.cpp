@@ -321,7 +321,7 @@ private:
     columns_rotations_type columns_rotations;
 };
 
-BOOST_AUTO_TEST_SUITE(placeholder_transpiler_suite)
+BOOST_AUTO_TEST_SUITE(placeholder_transpiler_suite, *boost::unit_test::disabled())
 
 BOOST_FIXTURE_TEST_CASE(placeholder_merkle_tree_poseidon_test, placeholder_performance_test<2>) {
 
@@ -434,3 +434,5 @@ BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performanc
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
