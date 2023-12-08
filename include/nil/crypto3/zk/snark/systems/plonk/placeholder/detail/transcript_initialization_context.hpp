@@ -111,7 +111,8 @@ namespace nil {
                         auto write_iter = cv.begin();
                         nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
 
-                        transcript(cv);
+                        // TODO(martun): uncomment this after fix.
+                        // transcript(cv);
                     }
                 }    // namespace detail
             }        // namespace snark
