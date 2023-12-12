@@ -51,6 +51,7 @@ namespace nil {
             std::uint32_t id;
             bool check;
             std::set<std::uint32_t> used_rows;
+            std::set<std::uint32_t> used_selector_rows;
         public:
             assignment_proxy(std::shared_ptr<assignment<ArithmetizationType>> assignment,
                              std::uint32_t _id) :
@@ -82,6 +83,10 @@ namespace nil {
                 return used_rows;
             }
 
+            const std::set<std::uint32_t>& get_used_selector_rows() const {
+                return used_selector_rows;
+            }
+
             std::uint32_t rows_amount() const override {
                 return assignment_ptr->rows_amount();
             }
@@ -92,6 +97,7 @@ namespace nil {
 
             value_type &selector(std::size_t selector_index, std::uint32_t row_index) override {
                 used_rows.insert(row_index);
+                used_selector_rows.insert(row_index);
                 return assignment_ptr->selector(selector_index, row_index);
             }
 
@@ -99,7 +105,7 @@ namespace nil {
                 if (check) {
                     const auto lookup_selector_cols = assignment_ptr->get_lookup_selector_cols();
                     if (lookup_selector_cols.find(selector_index) == lookup_selector_cols.end() &&
-                        used_rows.find(row_index) == used_rows.end()) {
+                        used_selector_rows.find(row_index) == used_selector_rows.end()) {
                         std::cout << id << ": Not found selector " << selector_index << " on row " << row_index << std::endl;
                         BLUEPRINT_ASSERT(false);
                     }
@@ -121,6 +127,7 @@ namespace nil {
 
             void enable_selector(const std::size_t selector_index, const std::size_t row_index) override {
                 used_rows.insert(row_index);
+                used_selector_rows.insert(row_index);
                 assignment_ptr->enable_selector(selector_index, row_index);
             }
 
@@ -330,6 +337,12 @@ namespace nil {
                 }
                 os << "\n";
 
+                os << "internal used selector rows: ";
+                for (const auto& it : used_selector_rows) {
+                    os << it << " ";
+                }
+                os << "\n";
+
                 os << "lookup constants: ";
                 for (const auto &it : assignment_ptr->get_lookup_constant_cols()) {
                     os << it << " ";
@@ -419,7 +432,7 @@ namespace nil {
                                   ArithmetizationParams>> &assignments){
 
             using variable_type = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-            const auto& private_rows = assignments.get_used_rows();
+            const auto& private_rows = assignments.get_used_selector_rows();
             const auto& lookup_selector_cols = assignments.get_lookup_selector_cols();
 
             const std::vector<crypto3::zk::snark::plonk_gate<BlueprintFieldType,
