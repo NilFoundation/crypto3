@@ -33,7 +33,19 @@ endif()
 macro(define_zk_test test)
     get_filename_component(name ${test} NAME)
     string(REPLACE "/" "_" full_test_name ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}_${test}_test)
-    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
+
+    set(additional_args "")
+
+    if(ENABLE_JUNIT_TEST_OUTPUT)
+        set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
+        set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
+        file(MAKE_DIRECTORY ${TEST_LOGS_DIR})
+
+        set(additional_args "--log_format=JUNIT"
+                            "--log_sink=${TEST_LOGS_DIR}/${full_test_name}.xml")
+    endif()
+
+    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp ARGS ${additional_args})
 
     target_include_directories(${full_test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
