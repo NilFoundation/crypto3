@@ -88,7 +88,7 @@ namespace nil {
                 struct input_type {
                     var s, y0, y1, alpha;
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {s, y0, y1, alpha};
                     }
                 };

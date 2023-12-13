@@ -93,7 +93,7 @@ namespace nil {
                 struct input_type {
                     std::array<var, 8> k;
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {k[0], k[1], k[2], k[3], k[4], k[5], k[6], k[7]};
                     }
                 };

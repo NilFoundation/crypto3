@@ -99,7 +99,7 @@ namespace nil {
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type
                         input;    // 66,66,66,57 bits
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {input[0], input[1], input[2], input[3]};
                     }
                 };

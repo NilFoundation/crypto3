@@ -127,17 +127,16 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
-                                                       std::size_t n) {
-                    gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount,n));
-                    return manifest;
-                }
-
-
                 using var = typename component_type::var;
                 using value_type = typename BlueprintFieldType::value_type;
                 using manifest_type = plonk_component_manifest;
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount,
+                                                       std::size_t n, value_type omega) {
+                    gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount,n));
+                    return manifest;
+                }
 
                 static manifest_type get_manifest() {
                     static manifest_type manifest = manifest_type(
@@ -151,7 +150,7 @@ namespace nil {
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
                                                              std::size_t lookup_column_amount,
-                                                             std::size_t n) {
+                                                             std::size_t n, value_type omega) {
                     return rows_amount_internal(witness_amount,n,BlueprintFieldType::modulus_bits);
                 }
                 // Initialized by constructor
@@ -169,7 +168,7 @@ namespace nil {
                 struct input_type {
                     var x = var(0, 0, false);
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {x};
                     }
                 };

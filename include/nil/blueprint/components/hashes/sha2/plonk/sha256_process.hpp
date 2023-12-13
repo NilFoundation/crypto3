@@ -108,8 +108,8 @@ namespace nil {
                     std::array<var, 8> input_state;
                     std::array<var, 16> input_words;
 
-                    std::vector<var> all_vars() const {
-                        std::vector<var> result;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> result;
                         result.reserve(24);
                         result.insert(result.end(), input_state.begin(), input_state.end());
                         result.insert(result.end(), input_words.begin(), input_words.end());

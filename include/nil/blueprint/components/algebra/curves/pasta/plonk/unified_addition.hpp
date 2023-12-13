@@ -95,7 +95,7 @@ namespace nil {
                     var_ec_point P;
                     var_ec_point Q;
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {P.x, P.y, Q.x, Q.y};
                     }
                 };

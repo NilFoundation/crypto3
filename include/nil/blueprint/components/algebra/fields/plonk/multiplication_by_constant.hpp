@@ -96,7 +96,7 @@ namespace nil {
                 struct input_type {
                     var x = var(0, 0, false);
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {x};
                     }
                 };

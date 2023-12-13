@@ -91,8 +91,8 @@ namespace nil {
                         input_type() = default;
                         input_type(std::initializer_list<var> input) : input(input) {};
 
-                        std::vector<var> all_vars() const {
-                            std::vector<var> result;
+                        std::vector<std::reference_wrapper<var>> all_vars() {
+                            std::vector<std::reference_wrapper<var>> result;
                             result.insert(result.end(), input.begin(), input.end());
                             return result;
                         }

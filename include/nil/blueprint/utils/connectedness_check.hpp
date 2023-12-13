@@ -85,7 +85,7 @@ namespace nil {
                 const nil::blueprint::assignment<
                         nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &assignment,
-                const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                const std::vector<std::reference_wrapper<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                     &input_variables,
                 const std::size_t start_row_index, std::size_t rows_amount,
                 std::ostream &os) {
@@ -193,7 +193,7 @@ namespace nil {
                 const nil::blueprint::circuit<
                     nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                     &bp,
-                const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                const std::vector<std::reference_wrapper<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                     &input_variables,
                 const std::size_t start_row_index, std::size_t rows_amount) {
 
@@ -264,7 +264,7 @@ namespace nil {
             const nil::blueprint::circuit<
                 nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                 &bp,
-            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+            const std::vector<std::reference_wrapper<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
             const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
                 &output_variables,
@@ -304,7 +304,7 @@ namespace nil {
             const nil::blueprint::circuit<
                 nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                 &bp,
-            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+            const std::vector<std::reference_wrapper<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
             const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
                 &output_variables,

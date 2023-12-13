@@ -121,8 +121,8 @@ namespace nil {
                         std::vector<var> constraints;
                         var selector;
 
-                        std::vector<var> all_vars() const {
-                            std::vector<var> vars;
+                        std::vector<std::reference_wrapper<var>> all_vars() {
+                            std::vector<std::reference_wrapper<var>> vars;
                             vars.push_back(theta);
                             vars.insert(vars.begin() + 1, constraints.begin(), constraints.end());
                             vars.push_back(selector);
@@ -138,7 +138,7 @@ namespace nil {
                                          start_row_index + component.rows_amount - 1, false);
                         }
 
-                        std::vector<var> all_vars() const {
+                        std::vector<var> all_vars() {
                             return {output};
                         }
                     };

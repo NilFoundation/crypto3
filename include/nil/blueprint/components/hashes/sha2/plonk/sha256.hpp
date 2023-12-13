@@ -105,7 +105,7 @@ namespace nil {
                 struct input_type {
                     std::array<var, 4> block_data;
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {block_data[0], block_data[1], block_data[2], block_data[3]};
                     }
                 };

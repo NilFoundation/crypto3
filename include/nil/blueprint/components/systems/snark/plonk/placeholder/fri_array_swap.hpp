@@ -110,8 +110,8 @@ namespace nil {
                     var t; // swap control bit
 	                std::vector<var> arr; // the array with elements to swap
 
-                    std::vector<var> all_vars() const {
-                        std::vector<var> result;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> result;
                         result.reserve(1 + arr.size());
                         result.push_back(t);
                         result.insert(result.end(), arr.begin(), arr.end());
@@ -139,7 +139,7 @@ namespace nil {
                         }
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<var> all_vars() {
                         return output;
                     }
                 };

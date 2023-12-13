@@ -118,7 +118,7 @@ namespace nil {
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type A;
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type B;
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {A[0], A[1], A[2], A[3], B[0], B[1], B[2], B[3]};
                     }
                 };

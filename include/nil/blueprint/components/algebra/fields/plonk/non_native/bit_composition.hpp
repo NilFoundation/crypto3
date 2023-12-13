@@ -87,7 +87,7 @@ namespace nil {
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
                                                        std::size_t lookup_column_amount,
                                                        std::size_t bits_amount,
-                                                       bool check_input) {
+                                                       bool check_input, bit_composition_mode mode = bit_composition_mode::MSB) {
                     gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
                         .merge_with(component_type::get_gate_manifest(witness_amount, lookup_column_amount,
@@ -101,7 +101,7 @@ namespace nil {
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
                                                                  std::size_t lookup_column_amount,
-                                                                 std::size_t bits_amount, bool check_input) {
+                                                                 std::size_t bits_amount, bool check_input, bit_composition_mode mode = bit_composition_mode::MSB) {
                     return component_type::get_rows_amount(witness_amount, lookup_column_amount,
                                                            bits_amount, check_input);
                 }
@@ -111,8 +111,12 @@ namespace nil {
                 struct input_type {
                     std::vector<var> bits;
 
-                    std::vector<var> all_vars() const {
-                        return bits;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> res;
+                        for (auto& it : bits) {
+                            res.push_back(it);
+                        }
+                        return res;
                     }
                 };
 

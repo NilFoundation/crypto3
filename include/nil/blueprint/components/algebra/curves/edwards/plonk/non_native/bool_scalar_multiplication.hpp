@@ -98,7 +98,7 @@ namespace nil {
                     var_ec_point T;
                     var k;
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {T.x[0], T.x[1], T.x[2], T.x[3],
                                 T.y[0], T.y[1], T.y[2], T.y[3],
                                 k};

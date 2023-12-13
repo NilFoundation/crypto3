@@ -96,8 +96,8 @@ namespace nil {
                     var q_pad;
                     std::array<var, 2> thetas;
 
-                    std::vector<var> all_vars() const {
-                        std::vector<var> vars;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> vars;
                         vars.insert(vars.end(), f.begin(), f.end());
                         vars.insert(vars.end(), Se.begin(), Se.end());
                         vars.insert(vars.end(), Ssigma.begin(), Ssigma.end());

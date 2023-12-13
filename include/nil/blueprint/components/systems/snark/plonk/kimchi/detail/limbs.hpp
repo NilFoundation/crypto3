@@ -103,7 +103,7 @@ namespace nil {
                     input_type(var first, var second) : first_limb(first), second_limb(second) {
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {first_limb, second_limb};
                     }
                 };
@@ -280,7 +280,7 @@ namespace nil {
                     input_type(var value) : param(value) {
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {param};
                     }
                 };

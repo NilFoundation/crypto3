@@ -174,7 +174,7 @@ namespace nil {
                     input_type(var_ec_point _T, var _b): T(_T), b(_b) {};
                     input_type(var_ec_point _T, var _b, var _b_high): T(_T), b(_b), b_high(_b_high) {};
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         if (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
                             return {T.x, T.y, b, b_high};
                         } else {

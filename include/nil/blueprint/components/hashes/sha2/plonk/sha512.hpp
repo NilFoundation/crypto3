@@ -102,8 +102,8 @@ namespace nil {
                     var_ec_point A;
                     std::array<var, 4> M;
 
-                    std::vector<var> all_vars() const {
-                        std::vector<var> result;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> result;
                         result.reserve(20);
                         result.insert(result.end(), R.x.begin(), R.x.end());
                         result.insert(result.end(), R.y.begin(), R.y.end());

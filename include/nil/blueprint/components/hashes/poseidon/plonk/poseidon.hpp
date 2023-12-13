@@ -106,8 +106,8 @@ namespace nil {
                 struct input_type {
                     std::array<var, state_size> input_state;
 
-                    std::vector<var> all_vars() const {
-                        std::vector<var> result;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> result;
                         result.insert(result.end(), input_state.begin(), input_state.end());
                         return result;
                     }

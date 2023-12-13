@@ -143,7 +143,7 @@ namespace nil {
                         var base;
                         var exponent;
 
-                        std::vector<var> all_vars() const {
+                        std::vector<std::reference_wrapper<var>> all_vars() {
                             return {base, exponent};
                         }
                     };

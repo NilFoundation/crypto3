@@ -114,8 +114,8 @@ namespace nil {
                         std::vector<var> s;
                         std::vector<var> t;
 
-                        std::vector<var> all_vars() const {
-                            std::vector<var> vars;
+                        std::vector<std::reference_wrapper<var>> all_vars() {
+                            std::vector<std::reference_wrapper<var>> vars;
                             vars.insert(vars.end(), alphas.begin(), alphas.end());
                             vars.insert(vars.end(), s.begin(), s.end());
                             vars.insert(vars.end(), t.begin(), t.end());
@@ -135,7 +135,7 @@ namespace nil {
                             output = var(component.W(l - 1), start_row_index + component.rows_amount - 1, false);
                         }
 
-                        std::vector<var> all_vars() const {
+                        std::vector<var> all_vars() {
                             return {output};
                         }
                     };

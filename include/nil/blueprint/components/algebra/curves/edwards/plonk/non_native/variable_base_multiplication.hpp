@@ -88,7 +88,7 @@ namespace nil {
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
                                                        std::size_t lookup_column_amount,
-                                                       std::size_t bits_amount) {
+                                                       std::size_t bits_amount, bit_shift_mode mode) {
                     static gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
                         .merge_with(
@@ -113,7 +113,7 @@ namespace nil {
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
                                                              std::size_t lookup_column_amount,
-                                                             std::size_t bits_amount) {
+                                                             std::size_t bits_amount, bit_shift_mode mode) {
                     return rows_amount_internal(witness_amount, lookup_column_amount, bits_amount);
                 }
 
@@ -136,7 +136,7 @@ namespace nil {
                     var_ec_point T;
                     var k;
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {T.x[0], T.x[1], T.x[2], T.x[3], T.y[0], T.y[1], T.y[2], T.y[3], k};
                     }
                 };
