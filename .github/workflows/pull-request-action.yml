@@ -11,9 +11,9 @@ on:
 jobs:
   handle-syncwith:
     name: Call Reusable SyncWith Handler
-    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1.1.0
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1.2.0
     with:
-      ci-cd-ref: 'v1.1.3'
+      ci-cd-ref: 'v1.2.0'
     secrets: inherit
 
   matrix-test-linux:

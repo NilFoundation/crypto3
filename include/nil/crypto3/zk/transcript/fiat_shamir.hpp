@@ -30,12 +30,23 @@
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
+#include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/hash/poseidon.hpp>
 
+#include <nil/crypto3/hash/detail/poseidon/kimchi_constants.hpp>
+#include <nil/crypto3/hash/detail/poseidon/original_constants.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -116,8 +127,9 @@ namespace nil {
                     }
                 };
 
-                template<typename Hash>
-                struct fiat_shamir_heuristic_sequential {
+                template<typename Hash, typename Enable = void>
+                struct fiat_shamir_heuristic_sequential
+                {
                     typedef Hash hash_type;
 
                     fiat_shamir_heuristic_sequential() : state(hash<hash_type>({0})) {
@@ -184,6 +196,85 @@ namespace nil {
                 private:
                     typename hash_type::digest_type state;
                 };
+
+                // Specialize for posseidon.
+                template<typename Hash>
+                struct fiat_shamir_heuristic_sequential<
+                        Hash,
+                        typename std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value>> {
+
+                    typedef Hash hash_type;
+                    using field_type = nil::crypto3::algebra::curves::pallas::base_field_type;
+                    using poseidon_policy = nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>;
+                    using permutation_type = nil::crypto3::hashes::detail::poseidon_permutation<poseidon_policy>;
+                    using state_type = typename permutation_type::state_type;
+
+                    fiat_shamir_heuristic_sequential() {
+                    }
+
+                    template<typename InputRange>
+                    fiat_shamir_heuristic_sequential(const InputRange &r) {
+                        sponge.absorb(hash<hash_type>(r));
+                    }
+
+                    template<typename InputIterator>
+                    fiat_shamir_heuristic_sequential(InputIterator first, InputIterator last) {
+                        sponge.absorb(hash<hash_type>(first, last));
+                    }
+
+                    void operator()(const typename hash_type::digest_type input) {
+                        sponge.absorb(input);
+                    }
+
+                    template<typename InputRange>
+                    void operator()(const InputRange &r) {
+                        sponge.absorb(hash<hash_type>(r));
+                    }
+
+                    template<typename InputIterator>
+                    void operator()(InputIterator first, InputIterator last) {
+                        sponge.absorb(hash<hash_type>(first, last));
+                    }
+
+                    template<typename Field>
+                    typename Field::value_type challenge() {
+                        return sponge.squeeze();
+                    }
+
+                    template<typename Integral>
+                    Integral int_challenge() {
+                        auto c = challenge<field_type>();
+                        nil::marshalling::status_type status;
+
+                        nil::crypto3::multiprecision::cpp_int intermediate_result = 
+                            c.data.template convert_to<nil::crypto3::multiprecision::cpp_int>();
+                        Integral result = 0;
+                        Integral factor = 1;
+                        size_t bytes_to_fill = sizeof(Integral);
+                        while (intermediate_result > 0 && bytes_to_fill != 0) {
+                            result += factor * (Integral)(intermediate_result % 0x100);
+                            factor *= 0x100;
+                            intermediate_result = intermediate_result / 0x100;
+                            bytes_to_fill -= 2;
+                        }
+                        return result;
+                    }
+
+                    template<typename Field, std::size_t N>
+                    std::array<typename Field::value_type, N> challenges() {
+
+                        std::array<typename Field::value_type, N> result;
+                        for (auto &ch : result) {
+                            ch = challenge<Field>();
+                        }
+
+                        return result;
+                    }
+
+                private:
+                    hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+                };
+
             }    // namespace transcript
         }        // namespace zk
     }            // namespace crypto3

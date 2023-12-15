@@ -36,6 +36,9 @@
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
 
+#include <nil/crypto3/hash/poseidon.hpp>
+#include <nil/crypto3/hash/keccak.hpp>
+
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
 using namespace nil::crypto3;
@@ -51,19 +54,49 @@ BOOST_AUTO_TEST_CASE(zk_transcript_manual_test) {
     auto ch2 = tr.challenge<field_type>();
     auto ch_n = tr.challenges<field_type, 3>();
 
-    std::cout << ch1.data << std::endl;
-    std::cout << ch2.data << std::endl;
-    for (const auto &ch : ch_n) {
-        std::cout << ch.data << std::endl;
-    }
+    BOOST_CHECK_EQUAL(ch1.data, field_type::value_type(0xe858ba005424eabd6d97de7e930779def59a85c1a9ff7e8a5d001cdb07f6e4_cppui256).data);
+    BOOST_CHECK_EQUAL(ch2.data, field_type::value_type(0xf61f38f58a55b3bbee0480fc5ec3cf8df81603579f4f7134f764bfd3ca5938b_cppui256).data);
 
-    std::vector<std::uint8_t> updated_blob {0xa, 0xb, 0xc, 0xd, 0xe, 0xf};
-    tr(updated_blob);
+    BOOST_CHECK_EQUAL(ch_n[0].data, field_type::value_type(0x4f6b97a9bc99d6996fab5e03d1cd0b418a9b3c97ed64cca070e15777e7cc99a_cppui256).data);
+    BOOST_CHECK_EQUAL(ch_n[1].data, field_type::value_type(0x2414ddf7ecff246500beb2c01b0c5912a400bc3cdca6d7f24bd2bd4987b21e04_cppui256).data);
+    BOOST_CHECK_EQUAL(ch_n[2].data, field_type::value_type(0x10bfe2f4a414eec551dda5fd9899e9b46e327648b4fa564ed0517b6a99396aec_cppui256).data);
+}
 
-    ch_n = tr.challenges<field_type, 3>();
-    for (const auto &ch : ch_n) {
-        std::cout << ch.data << std::endl;
-    }
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(zk_poseidon_transcript_test_suite)
+
+// We need this test to make sure that poseidon keeps working exactly the same after any refactoring/code changes.
+BOOST_AUTO_TEST_CASE(zk_poseidon_transcript_init_test) {
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+    using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+
+    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    transcript::fiat_shamir_heuristic_sequential<poseidon_type> tr(init_blob);
+    auto ch1 = tr.challenge<field_type>();
+    auto ch2 = tr.challenge<field_type>();
+    int ch_int = tr.int_challenge<int>();
+
+    BOOST_CHECK_EQUAL(ch1.data, field_type::value_type(0x7f034babb3066560c2597048bdbbd61327f13734ebe59a225e0c162e869e8f4_cppui256).data);
+    BOOST_CHECK_EQUAL(ch2.data, field_type::value_type(0x3a60c875ae6475d5ac1d73178284ee752e8ad78066aa688752b1436960948b93_cppui256).data);
+    BOOST_CHECK_EQUAL(ch_int, 0x7574);
+}
+
+BOOST_AUTO_TEST_CASE(zk_poseidon_transcript_no_init_test) {
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+    using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+
+    transcript::fiat_shamir_heuristic_sequential<poseidon_type> tr;
+    auto ch1 = tr.challenge<field_type>();
+    auto ch2 = tr.challenge<field_type>();
+    int ch_int = tr.int_challenge<int>();
+
+    BOOST_CHECK_EQUAL(ch1.data, field_type::value_type(0x35626947fa1063436f4e5434029ccaec64075c9fc80034c0923054a2b1d30bd2_cppui256).data);
+    BOOST_CHECK_EQUAL(ch2.data, field_type::value_type(0x1b961886411ee8722dd6b576cba5876eb30999b5237fe0e14255e6d006cff63c_cppui256).data);
+    BOOST_CHECK_EQUAL(ch_int, 0xc92);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

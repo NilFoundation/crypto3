@@ -486,7 +486,7 @@ namespace nil {
 
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType,
-                    arithmetization_params_4>, 3, 3> circuit_test_4(
+                    arithmetization_params_4>, 5, 3> circuit_test_4(
                         typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                         boost::random::mt11213b rnd = boost::random::mt11213b()
                     ) {
@@ -504,7 +504,8 @@ namespace nil {
 
                     typedef placeholder_circuit_params<FieldType, arithmetization_params_4> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, rows_log, permutation> test_circuit;
+                    circuit_description<FieldType, circuit_params, 5, permutation> test_circuit;
+                    test_circuit.table_rows = 1 << rows_log;
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
                     for (std::size_t j = 0; j < table_columns; j++) {
@@ -534,18 +535,9 @@ namespace nil {
                     std::array<plonk_column<FieldType>, public_columns> public_input_assignment = {};
                     std::array<plonk_column<FieldType>, constant_columns> constant_assignment;
 
-                    std::vector<typename FieldType::value_type> sel_lookup(test_circuit.table_rows);
-                    sel_lookup ={1, 1, 0, 1, 1, 0, 0, 0};
-                    selectors_assignment[0] = sel_lookup;
-
-                    std::vector<typename FieldType::value_type> sel_gate0(test_circuit.table_rows);
-                    sel_gate0 = {1, 1, 1, 1, 1, 0, 0, 0};
-                    selectors_assignment[1] = sel_gate0;
-
-
-                    std::vector<typename FieldType::value_type> sel_lookup_table(test_circuit.table_rows);
-                    sel_lookup_table = {0, 1, 1, 1, 1, 0, 0, 0};
-                    selectors_assignment[2] = sel_lookup_table;
+                    selectors_assignment[0] = {1, 1, 0, 1, 1, 0, 0, 0};
+                    selectors_assignment[1] = {1, 1, 1, 1, 1, 0, 0, 0};
+                    selectors_assignment[2] = {0, 1, 1, 1, 1, 0, 0, 0};
 
                     for (std::size_t i = 0; i < constant_columns; i++) {
                         constant_assignment[i] = table[witness_columns + i];
@@ -554,6 +546,7 @@ namespace nil {
                         plonk_private_assignment_table<FieldType, arithmetization_params_4>(private_assignment),
                         plonk_public_assignment_table<FieldType, arithmetization_params_4>(
                             public_input_assignment, constant_assignment, selectors_assignment));
+
 
                     plonk_variable<assignment_type> w0(0, 0, true, plonk_variable<assignment_type>::column_type::witness);
                     plonk_variable<assignment_type> w1(1, 0, true, plonk_variable<assignment_type>::column_type::witness);
