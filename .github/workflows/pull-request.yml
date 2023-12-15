@@ -1,0 +1,70 @@
+name: PR Testing
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  run-pull-request-actions:
+    name: Crypto3 Testing
+    uses: ./.github/workflows/pull-request-action.yml
+
+    secrets: inherit
+    with:
+      targets: |
+        crypto3_zk_commitment_fold_polynomial_test
+        crypto3_zk_commitment_fri_test
+        crypto3_zk_commitment_lpc_test
+        crypto3_zk_systems_plonk_placeholder_placeholder_test
+        crypto3_zk_commitment_powers_of_tau_test
+        crypto3_zk_commitment_proof_of_knowledge_test
+        crypto3_zk_commitment_r1cs_gg_ppzksnark_mpc_test
+        crypto3_zk_math_expression_test
+        crypto3_zk_systems_plonk_plonk_constraint_test
+        marshalling_fri_commitment_test
+        marshalling_lpc_commitment_test
+        marshalling_placeholder_common_data_test
+        marshalling_placeholder_proof_test
+        marshalling_sparse_vector_test
+        marshalling_plonk_constraint_system_test
+        marshalling_r1cs_gg_ppzksnark_primary_input_test
+        marshalling_r1cs_gg_ppzksnark_proof_test
+        marshalling_r1cs_gg_ppzksnark_verification_key_test
+        algebra_curves_test
+        algebra_fields_test
+        algebra_hash_to_curve_test
+        algebra_pairing_test
+        math_expression_test
+        math_lagrange_interpolation_test
+        math_polynomial_test
+        math_polynomial_dfs_test
+        math_polynomial_arithmetic_test
+        math_polynomial_view_test
+        hash_blake2b_test
+        hash_crc_test
+        hash_find_group_hash_test
+        hash_h2c_test
+        hash_h2f_test
+        hash_keccak_test
+        hash_md4_test
+        hash_md5_test
+        hash_pack_test
+        hash_pedersen_test
+        hash_ripemd_test
+        hash_sha1_test
+        hash_sha2_test
+        hash_sha3_test
+        hash_sha_test
+        hash_static_digest_test
+        hash_tiger_test
+        hash_poseidon_test
+
+      test-paths: |
+        libs/zk/test
+        libs/algebra/test
+        libs/hash/test
+        libs/math/test
+        libs/marshalling/zk/test
+       

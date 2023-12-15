@@ -1,0 +1,13 @@
+# Needed to publish test results in fork
+name: Testing Callback
+
+on:
+  workflow_run:
+    workflows: ["PR Testing"]
+    types:
+      - completed
+
+jobs:
+  call-reusable-workflow:
+    name: Call Reusable Testing Callback Workflow
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-crypto3-publish-result.yml@v1.2.0

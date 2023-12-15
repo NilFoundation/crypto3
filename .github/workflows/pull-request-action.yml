@@ -1,0 +1,33 @@
+name: Testing for mac and linux
+
+on:
+  workflow_call:
+    inputs:
+      targets:
+        type: string
+        description: "Make and CTest targets. If not specified, everything is tested"
+        required: false
+      test-paths:
+        type: string
+        description: "Folders from which the test must be ran"
+        required: true
+jobs:
+  matrix-test-linux:
+    name: Linux Crypto3 Testing
+    uses: ./.github/workflows/crypto3-testing-linux.yml
+
+    secrets: inherit
+    with:
+      targets: ${{ inputs.targets }} 
+      test-paths: ${{ inputs.test-paths }} 
+
+  matrix-test-mac:
+    name: Mac Crypto3 Testing
+    uses: ./.github/workflows/crypto3-testing-mac.yml
+
+    secrets: inherit
+    with:
+      # TODO(martun): fix this sometime soon. All the targets must work on mac.
+      targets: crypto3_zk_math_expression_test # ${{ inputs.targets }} 
+      test-paths: libs/zk/test # ${{ inputs.test-paths }} 
+

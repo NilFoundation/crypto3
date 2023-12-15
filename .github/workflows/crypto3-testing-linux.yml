@@ -1,0 +1,210 @@
+name: Crypto3 Build and Test on Linux Platforms
+
+on:
+  workflow_call:
+    inputs:
+      concurrency:
+        type: number
+        description: "Concurrency level (0 to use number of virtual cores)"
+        required: false
+        default: 0
+      targets:
+        type: string
+        description: "Make and CTest targets. If not specified, everything is tested"
+        required: false
+      test-paths:
+        type: string
+        description: "Folders from which the test must be run"
+        required: true
+      boost-version:
+        type: string
+        description: "Version of Boost to install"
+        required: false
+        default: "1.81.0"
+env:
+  TESTS_ARTIFACT_NAME: "test-results"
+  EVENT_FILE_ARTIFACT_NAME: "event-file"
+
+jobs:
+  upload-event-file:
+    # Needed to link test results with PR workflow run
+    name: "Upload Event File"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.EVENT_FILE_ARTIFACT_NAME }}
+          path: ${{ github.event_path }}
+
+  build-and-test:
+    name: "Build and Test using Matrix"
+    runs-on: [self-hosted, Linux, X64, aws_autoscaling]
+
+    env:
+      CONTAINER_TMP: /opt/
+      HOST_TMP: /home/runner/work/_temp/
+      DEBIAN_FRONTEND: noninteractive
+
+    container:
+      image: ubuntu:22.04
+      volumes:
+        - /home/runner/work/_temp/:/opt/
+
+    strategy:
+      # Set up a matrix to run the following 2 configurations:
+      # 1. <Linux, Release, latest G++ compiler toolchain on the default runner image, default generator>
+      # 2. <Linux, Release, latest Clang++ compiler toolchain on the default runner image, default generator>
+      matrix:
+        cpp_compiler: [g++, clang++-12]
+        build_type: [Release]
+
+    steps:
+      - name: Install dependencies
+        run: |
+          env && \
+          apt update && \
+          apt install -y \
+            build-essential \
+            libssl-dev \
+            cmake \
+            clang-12 \
+            git \
+            libicu-dev \
+            curl \
+            pkg-config \
+            libc-ares-dev \
+            liblz4-dev \
+            libgnutls28-dev \
+            libprotobuf-dev \
+            libyaml-cpp-dev \
+            lksctp-tools \
+            libsctp-dev \
+            ragel \
+            spd \
+            lsb-release
+
+      - name: Print toolchain information
+        run: |
+          git --version
+          cc --version
+          cmake --version
+
+      - name: Get OS version
+        # Turn input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+        id: os_version
+        shell: bash
+        run: |
+          # Get platform version
+          platform_version=$(lsb_release -rs)
+          echo "platform-version=${platform_version}" >> $GITHUB_OUTPUT
+
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.4.1
+        id: install-boost
+        with:
+          # A list of supported versions can be found here:
+          # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+          boost_version: ${{ inputs.boost-version }}
+          platform_version: ${{ steps.os_version.outputs.platform-version }}
+          boost_install_dir: ${{ env.CONTAINER_TMP }}
+          toolset: gcc
+          arch: x86
+
+      - name: Checkout Crypto3 repository
+        # We need full history, because during CMake config stage we are finding the nearest tag
+        uses: actions/checkout@v4
+        with:
+          repository: NilFoundation/crypto3
+          fetch-depth: 1 # Fetch only the latest commit on the triggered branch/ref
+          submodules: false
+
+      # Workaround: https://github.com/actions/checkout/issues/1169
+      - name: Mark directory as safe
+        run: |
+          git config --system --add safe.directory $PWD
+
+      - name: Checkout submodules
+        run: |
+          git submodule update --init --recursive --depth=1
+
+      - name: Set usefull strings
+        # Turn input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+        id: strings
+        shell: bash
+        run: |
+          docker_workspace_path="$PWD"
+          echo "docker-workspace-path=$docker_workspace_path" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ inputs.concurrency }}" = "0" ]; then
+            echo "Setting concurrency to number of logical cores"
+            proc_number=$(nproc)
+          else
+            echo "Setting concurrency to user-defined value"
+            proc_number=${{ inputs.concurrency }}
+          fi
+
+          echo "proc-number=${proc_number}" >> $GITHUB_OUTPUT
+
+      - name: Clean index.lock files if checkout step was cancelled or failed
+        if: cancelled() || failure()
+        run: |
+          find .git -name 'index.lock' -exec rm -v {} \;
+
+      - name: Configure CMake
+        run: >
+          cmake -B build
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DBUILD_TESTS=TRUE
+          -DENABLE_JUNIT_TEST_OUTPUT=TRUE -S ${{ steps.strings.outputs.docker-workspace-path }}
+
+        env:
+          BOOST_ROOT: "${{ steps.install-boost.outputs.BOOST_ROOT }}"
+
+      - name: Build tests
+        id: build
+        working-directory: ${{ steps.strings.outputs.docker-workspace-path }}/build
+        run: |
+          # Not considering failed targets bad. We will handle them as junit test result
+          build_log_path=${{ steps.strings.outputs.docker-workspace-path }}/build/build.log
+          targets_str=$(echo "${{ inputs.targets }}" | awk '{$1=$1};1' | sed '/^$/d' | tr '\n' ' ' | sed 's/ $//')
+          make -k -j ${{ steps.strings.outputs.proc-number }} ${targets_str} 2>&1 | tee ${build_log_path}
+          echo "build-log=$build_log_path" >> "$GITHUB_OUTPUT"
+
+      - name: Generate JUnit Report from build result
+        id: make-build-report
+        uses: NilFoundation/ci-cd/actions/build-log-to-junit@v1
+        with:
+          build-log: ${{ steps.build.outputs.build-log }}
+
+      - name: Run tests
+        id: run_tests
+        working-directory: ${{ steps.strings.outputs.docker-workspace-path }}/build
+        # Not considering failed tests bad. We will compare diff instead
+        run: |
+          artifact_dir=${{ steps.strings.outputs.docker-workspace-path }}/../results_for_uploading_${{github.sha}}
+          mkdir -p $artifact_dir
+          artifact_dir=$(cd ${{ steps.strings.outputs.docker-workspace-path }}/../results_for_uploading_${{github.sha}} && pwd)
+          echo "artifact-dir=$artifact_dir" >> "$GITHUB_OUTPUT"
+
+          custom_tests_dir=$artifact_dir/ubuntu-22.04/${{ matrix.cpp_compiler }}/${{ matrix.build_type }}
+          mkdir -p $custom_tests_dir
+
+          targets_str=$(echo "${{ inputs.targets }}" | awk '{$1=$1};1' | sed '/^$/d' | tr '\n' '|' | sed 's/|$//')
+          ctest -v -j ${{ steps.strings.outputs.proc-number }} -R "(${targets_str})" || true
+
+          test_paths="${{ inputs.test-paths }}"
+          for dir in $(echo "${test_paths}" | awk 'NF {$1=$1; print}')
+          do
+            mkdir -p $custom_tests_dir/$dir
+            mv ${{ steps.strings.outputs.docker-workspace-path }}/build/$dir/junit_results/* $custom_tests_dir/$dir
+          done
+
+          mv ${{ steps.make-build-report.outputs.build-junit-report }} $custom_tests_dir
+          
+      - name: Upload tests JUnit results
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.TESTS_ARTIFACT_NAME }}
+          path: ${{ steps.run_tests.outputs.artifact-dir }}
